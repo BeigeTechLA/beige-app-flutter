@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
 
       // ✅ Correct navigation logic
       home: isLoggedIn
-          ? const Mainscreen()
-          : const SplashScreen(),
+          ?  Mainscreen()
+          :  Mainscreen(),
     );
   }
 }

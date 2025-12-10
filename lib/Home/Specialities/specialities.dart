@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'BookShoot.dart';
+
 class Specialities extends StatefulWidget {
   const Specialities({super.key});
 
@@ -68,45 +70,55 @@ class _SpecialitiesState extends State<Specialities> {
                     childAspectRatio: 0.9,
                   ),
                   itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 6,
-                            spreadRadius: 2,
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>  BookShootScreen(),
                           ),
-                        ],
-                      ),
-
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: Stack(
-                          children: [
-
-                            // 🔥 BACKGROUND IMAGE
-                            Positioned.fill(
-                              child: Image.asset(
-                                items[index]["icon"]!,
-                                fit: BoxFit.cover,
-                              ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              spreadRadius: 2,
                             ),
+                          ],
+                        ),
 
-                            // 🔥 TOP-LEFT TEXT
-                /*            Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Text(
-                                items[index]["title"]!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Stack(
+                            children: [
+
+                              // 🔥 BACKGROUND IMAGE
+                              Positioned.fill(
+                                child: Image.asset(
+                                  items[index]["icon"]!,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            ),*/
-                          ],
+
+                              // 🔥 TOP-LEFT TEXT
+                                      /*            Positioned(
+                                top: 12,
+                                left: 12,
+                                child: Text(
+                                  items[index]["title"]!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),*/
+                            ],
+                          ),
                         ),
                       ),
                     );
