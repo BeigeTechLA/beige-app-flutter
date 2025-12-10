@@ -1,0 +1,220 @@
+import 'package:flutter/material.dart';
+
+import '../ChooseYourRole/choose_your_role_screen.dart';
+import '../auth/sign_up_screen.dart';
+import '../utility/ColorCode.dart';
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  _OnboardingScreenState createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _controller = PageController();
+  int _currentPage = 0;
+
+  final List<Map<String, String>> pages = [
+    {
+      "image": "assets/Onboding/onboding1.png",
+      "title": "Find the Perfect Creator\nfor any event",
+      "description": "Browse trusted photographers and  videographers\nfor any event. 🎥✨",
+    },
+    {
+      "image": "assets/Onboding/onboding2.png",
+      "title": "Smart Location-Based\nBooking",
+      "description": "Easily explore creators around you and book\nthem instantly.📍⚡",
+    },
+    {
+      "image": "assets/Onboding/onboding3.png",
+      "title": "Secure & Seamless\nExperience",
+      "description": "Fast payments, chat support, and reliable service\nat every step. 🔒💬💳",
+    },
+  ];
+
+  void _goToNextPage() {
+    if (_currentPage < pages.length - 1) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // Navigate to login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) =>  ChooseYourRoleScreen()),
+      );
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // ---------------- PAGEVIEW ----------------
+          Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: pages.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Image.asset(
+                            pages[index]['image']!,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+                        Text(
+                          pages[index]['title']!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Text(
+                            pages[index]['description']!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: ColorCode.kSubtextOpacity,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // ---------------- DOTS ----------------
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  pages.length,
+                      (dotIndex) {
+                    bool isActive = _currentPage == dotIndex;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: isActive ? 40 : 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isActive ? Colors.black : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ---------------- LOGIN BUTTON ----------------
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: _goToNextPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorCode.kButtonColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: ColorCode.kHeadingColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => SignUpScreen()));
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Don't have an account? ",
+                      style: TextStyle(
+                          color: ColorCode.kSubtextOpacity, fontSize: 14),
+                      children: [
+                        TextSpan(
+                          text: "Sign Up",
+                          style: TextStyle(
+                            color: ColorCode.kHeadingColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ---------------- SKIP BUTTON ----------------
+          if (_currentPage != 2) // 👈 Skip only page 0 & 1 par show hoga
+            Positioned(
+              top: 95,
+              right: 20,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
+                  );
+                },
+                child: const Text(
+                  "Skip",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+}
