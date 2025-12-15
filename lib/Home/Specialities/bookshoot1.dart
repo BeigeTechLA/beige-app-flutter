@@ -15,30 +15,34 @@ class _Bookshoot1State extends State<Bookshoot1> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: ColorCode.bcakgroundcolor,
       body: Stack(
         children: [
 
           /// ✅ Background Image
-          // Container(
-          //   decoration: const BoxDecoration(
-          //     image: DecorationImage(
-          //       image: AssetImage("assets/bg.jpg"), // add image
-          //       fit: BoxFit.cover,
-          //     ),
-          //   ),
-          // ),
+          Container(
+            height: height,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/Rectangle 34660882.png",),
+                  fit: BoxFit.fill
+              ),
+            ),
+          ),
 
           /// ✅ Bottom Sheet Container
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding:  EdgeInsets.all(30),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              padding: EdgeInsets.only(right: 20,left: 20,top: 10,bottom: 20),
+              decoration:BoxDecoration(
+                color: ColorCode.k282828,
                 borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(30),
+                  top: Radius.circular(32),
                 ),
               ),
               child: Column(
@@ -46,13 +50,12 @@ class _Bookshoot1State extends State<Bookshoot1> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// Drag Indicator
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 3,
+                      width: 35,
+                      height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color:ColorCode.kWhiteOpacity70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -67,18 +70,20 @@ class _Bookshoot1State extends State<Bookshoot1> {
                       const Text(
                         "Book Your Shoot Now",
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
+                          color: ColorCode.white,
+                          fontSize: 16,
+                          fontFamily: "Unbounded", //
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close,color: ColorCode.kHeadingColor,),
+                        icon: const Icon(Icons.close,color: ColorCode.white,),
                         onPressed: () {},
                       )
                     ],
                   ),
-                  Divider(color:ColorCode.grey_white,),
-                  SizedBox(height: 16),
+                  Divider(color: ColorCode.kWhiteOpacity60),
+                  SizedBox(height: 10),
 
                   /// ✅ Options
                   buildRadio("Photography", 0),
@@ -92,30 +97,34 @@ class _Bookshoot1State extends State<Bookshoot1> {
                     children: [
                       // ✅ Back Button
                       Expanded(
-                        child: SizedBox(
-                          height: 55,
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: ColorCode.kHeadingColor,
-                              side:  BorderSide(color: ColorCode.kSubtextOpacity),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          child: SizedBox(
+                            height: 55,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: ColorCode.kHeadingColor,
+                                side: const BorderSide(
+                                  color: ColorCode.kWhiteOpacity70,
+                                  width: 0.5,        // ⭐ BORDER WIDTH 0.5
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                "Back",
+                                style: TextStyle(
+                                  color: ColorCode.white,
+                                  fontFamily: 'Unbounded',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.pop(context); // ✅ Back action
-                            },
-                            child: const Text(
-                              "Back",
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                          )
 
-                          ),
-                        ),
                       ),
 
                       const SizedBox(width: 12),
@@ -142,8 +151,10 @@ class _Bookshoot1State extends State<Bookshoot1> {
                               "Next",
                               style: TextStyle(
                                 color: ColorCode.kHeadingColor,
-                                fontSize: 15,
+                                fontFamily: 'Unbounded',   // ← Add this
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
+                                // Looks cleaner in Unbounded
                               ),
                             ),
 
@@ -162,16 +173,16 @@ class _Bookshoot1State extends State<Bookshoot1> {
     );
   }
 
-  /// ✅ Radio Tile Widget
-  Widget buildRadio(String title, int value) {
+  /// ✅ Premium Gradient Radio Tile
+  Widget buildRadio(String title, int item) {
     return InkWell(
       onTap: () {
         setState(() {
-          selectedIndex = value;
+          selectedIndex = item;
         });
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding:  EdgeInsets.all( 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -180,38 +191,58 @@ class _Bookshoot1State extends State<Bookshoot1> {
             Text(
               title,
               style: TextStyle(
-                fontSize: 15,
-                color: ColorCode.kHeadingColor,
-              ),
-            ),
+                color: ColorCode.kWhiteOpacity70,
+                fontFamily: 'Outfit  ',
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                // Looks cleaner in Unbounded
+              ),),
 
-            /// ✅ Custom Circle
+            /// 🔵 Custom Gradient Radio Circle
             Container(
-              width: 26,
-              height: 26,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selectedIndex == value
-                    ? Colors.black
-                    : Colors.transparent,
+
+                /// Gradient when selected
+                gradient: selectedIndex == item
+                    ? const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    ColorCode.kButtonColor,
+                    ColorCode.kCreamSoft
+                  ],
+                )
+                    : null,
+
+                /// When NOT selected → white background
+                color: selectedIndex == item ? null : Colors.transparent,
+
+                /// Border
                 border: Border.all(
-                  color: Colors.black,
-                  width: 2,
+                  color: selectedIndex == item
+                      ? ColorCode.kWhiteOpacity70
+                      : ColorCode.kWhiteOpacity70,
+                  width: 1,
                 ),
               ),
-              child: selectedIndex == value
+
+              /// Inner Dot (Visible only when selected)
+              child: selectedIndex == item
                   ? Center(
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  width: 10,
+                  height: 12,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               )
                   : null,
-            ),
+            )
           ],
         ),
       ),

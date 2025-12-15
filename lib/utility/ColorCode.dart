@@ -6,10 +6,34 @@ class ColorCode {
   static const Color kHeadingColor = Color(0xFF1D1D1B); // (dark)
   static  const Color kSubtextColor = Color(0xFF474746);
   static const Color kSubtextOpacity = Color(0x991D1D1B); // 60% opacity
-  static  const Color kBackgroundColor = Color(0xFFFAF9F6);
+  // static  const Color kBackgroundColor = Color(0xFFFAF9F6);
+  static const Color kCircleBorder = Color(0xFFDDDDDD);
+  static const Color k262624 = Color(0xFF262624);
+  static const Color kGold40 = Color(0x66E9BE78);  // E9BE78 with 40% opacity
+  static const Color k777571 = Color(0xFF777571);
+  static const Color k282828 = Color(0xFF282828);
+  static const Color kWhiteOpacity60 = Color(0x99FFFFFF); // #FFFFFF99 → 60% opacity
+  static const Color k2A2A2A = Color(0xFF2A2A2A);
+  static const Color bcakgroundcolor = Color(0xFF1D1D1B);
+
+
 
   static const Color kCreamSoft = Color(0xFFECE1CE);
+  static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
+  static const Color kBlackOpacity12 = Color(0x1F000000);
 
+  /// ⭐ NEW COLOR ADDED (#FFFFFFB2 → 70% white)
+  static const Color kWhiteOpacity70 = Color(0xB2FFFFFF);
+  /// ⭐ Gold Gradient Colors (From Design)
+  static const Color kGoldGradientLight = Color(0xFFE8D1AB); // #E8D1AB
+  static const Color kGoldGradientDark  = Color(0xFFD4A14D); // #D4A14D
+
+
+  static const Color kCircleGradientTop = Color(0xFF1D1D1B);
+  static const Color kCircleGradientBottom = Color(0xFF434341);
+  static const Color kCircleBorderDark = Color(0xFF1D1D1B);
+
+  static const Color kBlackOpacity10 = Color(0x1A000000); // #0000001A
 
   static const Color wine = Color(0xFF5A0760);
   static const Color white = Color(0xFFFFFFFF);

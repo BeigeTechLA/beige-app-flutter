@@ -1,4 +1,6 @@
-  import 'package:flutter/material.dart';
+  import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 import '../utility/ColorCode.dart';
 import 'Specialities/specialities.dart';
@@ -20,318 +22,891 @@ class _HomeScreenState extends State<HomeScreen> {
   {"title": "Sports &\nAction", "icon": "assets/images/home3.png"},
   {"title": "Personal\nShoots", "icon": "assets/images/home3.png"},
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorCode.kBackgroundColor,
+       backgroundColor: ColorCode.bcakgroundcolor,
 
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+
+            Container(
+            width: double.infinity,
+
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
               children: [
 
-                // ⭐ HEADER SECTION
-                Container(
-                  height: 350,
+                // ⭐ BACKGROUND IMAGE
+                Image.asset(
+                  "assets/images/home7.png",
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/Home1.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: SafeArea(
-                    child: Stack(
+                  fit: BoxFit.cover,
+                ),
+
+                // ⭐ OVERLAY CONTENT
+                SafeArea(
+                  child: Padding(
+                    padding:  EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        // 🔹 TOP BAR
-                        Positioned(
-                          top: 10,
-                          left: 0,
-                          right: 0,
-                          child: Padding(
-                            padding:  EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        const SizedBox(height: 5),
+
+                        // ⭐ TOP ROW — Menu | Location | Bell | Profile
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                        Image(image: AssetImage("assets/Icons/menu-02.png"),color: ColorCode.white,),
+                            // Menu Icon
+                            // Icon(Icons.menu, color: Colors.white, size: 32),
+
+                            // LOCATION SECTION
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-
-                                // 👉 LEFT SIDE: Menu Icon + Address Text
                                 Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Image(
-                                      image: AssetImage("assets/Icons/menu-02.png"),
-                                      color: Colors.white,
-                                      height: 28,
+                                    Text(
+                                      "Westheimer Rd",
+                                      style: TextStyle(
+                                        fontFamily: "HelveticaNeue",   // Add font if included in assets
+                                        color: ColorCode.white,
+                                        fontSize: 16,                 // As per your request
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.34,                 // Line height = 21.51px
+                                        letterSpacing: 0,
+                                      ),
                                     ),
-                                    SizedBox(width: 10),
-
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Westheimer Rd",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          "Santa Ana, Illinois 85486",
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
+                                    SizedBox(width: 4),
+                                    Icon(
+                                      Icons.keyboard_arrow_down,
+                                      color: Colors.white,
+                                      size: 24,
                                     ),
                                   ],
                                 ),
 
-                                // 👉 RIGHT SIDE: Notification Icon
-                                Icon(
-                                  Icons.notifications_none,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                                SizedBox(height: 2),
 
-                        // 🔹 SEARCH BAR
-                        Positioned(
-                          top: 80,
-                          left: 20,
-                          right: 20,
-                          child: Container(
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.search),
-                                hintText: "Search Photographer, Videographer....",
-                                hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                      ],
-                    ),
-                  ),
-                ),
-
-                // ⭐ WHITE CONTAINER — OVERLAPPING
-                Transform.translate(
-                  offset: Offset(0, -25), // ⭐ Overlap adjusts here
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(35),
-                        topRight: Radius.circular(35),
-                      ),
-                    ),
-
-                    child: Column(
-                      children: [
-
-                        // ⭐ TITLE ROW
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children:  [
-                            Text(
-                              "Specialities",
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontFamily: 'Unbounded',   // ← Add this
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,        // Looks cleaner in Unbounded
-                              ),
-                            ),
-
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Specialities(),
+                                Text(
+                                  "Santa Ana, Illinois 85486",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: "HelveticaNeue",
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                );
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ],
+                            ),
+                     SizedBox(width: 5,),
+
+                            // Bell + Profile
+                            Row(
+
+                              children: [
+                              Image(image: AssetImage("assets/Icons/notifactioin.png"),
+                                width: 24,height: 24,
                               ),
-                              child: Text(
-                                "View All",
-                                style: TextStyle(
-                                  fontFamily: 'Outfit',
-                                  color: ColorCode.kSubtextOpacity,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                  decorationThickness: 1.5,
+                                SizedBox(width: 10,),
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage:
+                                  AssetImage("assets/Icons/profile.png"),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // ⭐ SEARCH BAR
+                        Container(
+                          decoration: BoxDecoration(
+                            color: ColorCode.kHeadingColor,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          padding:  EdgeInsets.symmetric(horizontal: 11, vertical: 4),
+                          child: Row(
+                            children: [
+                              // 🔍 Custom Search Image
+                              Image.asset(
+                                "assets/Icons/serch.png",
+                             /*   width: 18,
+                                height: 18,*/
+                                color: ColorCode.white,
+                                fit: BoxFit.fill,
+                              ),
+
+                              const SizedBox(width: 10),
+
+                              // 🔤 Search TextField
+                              Expanded(
+                                child: TextField(
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                  ),
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Search Photographer, Videographer....",
+                                    hintStyle: TextStyle(
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            )
 
-
-
-                          ],
-                        ),
-
-                        SizedBox(height: 15),
-
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(child: specialityCard()),
-                                SizedBox(width: 12),
-                                Expanded(child: specialityCard()),
-                                SizedBox(width: 12),
-                                Expanded(child: specialityCard()),
-                              ],
-                            ),
-
-                            SizedBox(height: 10),
-
-                            Row(
-                              children: [
-                                Expanded(child: specialityCard()),
-                                SizedBox(width: 12),
-                                Expanded(child: specialityCard()),
-                                SizedBox(width: 12),
-                                Expanded(child: specialityCard()),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        )
 
                       ],
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
 
-                // ⭐ ORANGE CAPTURE CARD
-                Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                    height: 160,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/Group 2085664125.png"),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
 
-                          Text(
-                            "Capture Your\nPerfect Moments",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+
+                    // ⭐ TITLE ROW
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        Text(
+                          "Book a Shoot",
+                          style: TextStyle(
+                            color: ColorCode.white,
+                            fontFamily: 'Unbounded',   // ← Add this
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                         // Looks cleaner in Unbounded
                           ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Specialities(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            "assets/Icons/rightside.png",
+                            height: 40,   // bigger height
+                            width: 40,
+                            color: ColorCode.white,
+                          ),
+                        )
 
-                          SizedBox(height: 12),
+                      ],
+                    ),
 
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              "Quick Book",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
+                SizedBox(height: 15,),
+
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 99,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+
+                                  /// 🔹 BACKGROUND IMAGE
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      "assets/images/Frame 2087328875@3x.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                  /// 🔹 TOP LEFT TEXT
+                                  Positioned(
+                                    top: 10,
+                                    left: 5,
+                                    child: Text(
+                                      "Events &\n Parties ",
+                                      style: TextStyle(
+                                        color: ColorCode.white,
+                                        fontFamily: 'Outfit',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        // Looks cleaner in Unbounded
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 🔹 BOTTOM RIGHT IMAGE
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Image.asset(
+                                      "assets/images/party.png", // small image
+                                      height: 70.95,
+                                      width: 70.95,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 20,),
+                            Container(
+                              height: 99,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+
+                                  /// 🔹 BACKGROUND IMAGE
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      "assets/images/Frame 2087328875@3x.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                  /// 🔹 TOP LEFT TEXT
+                                  Positioned(
+                                    top: 10,
+                                    left: 5,
+                                    child: Text(
+                                      "Creative &\n Media ",
+                                      style: TextStyle(
+                                        color: ColorCode.white,
+                                        fontFamily: 'Outfit',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        // Looks cleaner in Unbounded
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 🔹 BOTTOM RIGHT IMAGE
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Image.asset(
+                                      "assets/images/party.png", // small image
+                                      height: 70.95,
+                                      width: 70.95,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 20,),
+                            Container(
+                              height: 99,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+
+                                  /// 🔹 BACKGROUND IMAGE
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      "assets/images/Frame 2087328875@3x.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                  /// 🔹 TOP LEFT TEXT
+                                  Positioned(
+                                    top: 10,
+                                    left: 5,
+                                    child: Text(
+                                      "Events &\n Parties ",
+                                      style: TextStyle(
+                                        color: ColorCode.white,
+                                        fontFamily: 'Outfit',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        // Looks cleaner in Unbounded
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 🔹 BOTTOM RIGHT IMAGE
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Image.asset(
+                                      "assets/images/party.png", // small image
+                                      height: 70.95,
+                                      width: 70.95,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 20,),
+                            Container(
+                              height: 99,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+
+                                  /// 🔹 BACKGROUND IMAGE
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      "assets/images/Frame 2087328875@3x.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                  /// 🔹 TOP LEFT TEXT
+                                  Positioned(
+                                    top: 10,
+                                    left: 5,
+                                    child: Text(
+                                      "Events &\n Parties ",
+                                      style: TextStyle(
+                                        color: ColorCode.white,
+                                        fontFamily: 'Outfit',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        // Looks cleaner in Unbounded
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 🔹 BOTTOM RIGHT IMAGE
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Image.asset(
+                                      "assets/images/party.png", // small image
+                                      height: 70.95,
+                                      width: 70.95,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 20,),
+                          ],
+                        ),
                       ),
                     ),
+
+                  ],
+                ),
+              ),
+             /*  Center(
+              child: Container(
+                height: 240.56,
+                width: 270,
+
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(34),
+                  border: Border.all(
+                    color: Colors.black.withOpacity(0.4),
+                    width: 0.4,
+                  ),
+                  image: DecorationImage(
+                    image: AssetImage("assets/images/home1.png"), // BACKGROUND
+                    fit: BoxFit.cover,
                   ),
                 ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // ⭐ Layer 1 (Middle Image)
+                    Positioned(
+                      top: 15,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28),
+                        child: Image.asset(
+                          "assets/images/home2.png",
+                          height: 326,
+                          width: 290.45,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
 
-                SizedBox(height: 25),
-
-
+                    // ⭐ Layer 2 (Top Image)
+                    Positioned(
+                      top: 25,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          "assets/images/home3.png",
+                          height: 405,
+                          width: 335,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),*/
+              
+              Center(
+                child: 
                 Container(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: Row(
+                  child: Image.asset("assets/images/Group 1597883815 (1).png"),
+                ),
+              ),
+
+
+              SizedBox(height: 25),
+
+
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children:  [
                         Text(
                           "Featured Creatives",
                           style: TextStyle(
-                            color: ColorCode.kHeadingColor,
+                            color: ColorCode.white,
                             fontFamily: 'Unbounded',   // ← Add this
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,        // Looks cleaner in Unbounded
-                          ),
-                        ),
-
-                        Text(
-                          "View All",
-                          style: TextStyle(
-                            fontFamily: 'Outfit',
-                            color: ColorCode.kSubtextOpacity,
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,      // ← Underline added
-                            decorationThickness: 1.5,                  // (Optional) line thickness
+                            fontWeight: FontWeight.bold,
+                            // Looks cleaner in Unbounded
                           ),
                         ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Specialities(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            "assets/Icons/rightside.png",
+                            height: 40,   // bigger height
+                            width: 40,
+                            color: ColorCode.white,
+                          ),
+                        )
+
                       ],
                     ),
-                  ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        teamCard(image: "assets/images/man2.png", name: "George Harris"),
+                        teamCard(image: "assets/images/man2.png", name: "Emily Johnson"),
+                        teamCard(image: "assets/images/man2.png", name: "Charles Smith"),
+                      ],
+                    )
+
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children:  [
+                        Text(
+                          "We Think You’ll Love These ",
+                          style: TextStyle(
+                            color: ColorCode.white,
+                            fontFamily: 'Unbounded',   // ← Add this
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            // Looks cleaner in Unbounded
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Specialities(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            "assets/Icons/rightside.png",
+                            height: 40,   // bigger height
+                            width: 40,
+                            color: ColorCode.white,
+                          ),
+                        ),
+
+
+
+                      ],
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,   // 👉 horizontal scroll enable
+                      child: Row(
+                        children: [
+                          SizedBox(width: 12), // optional spacing
+
+                          // 🔹 Your First Card
+                          Container(
+                            width: 200,
+                            height: 280,
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.asset(
+                                    "assets/images/home2.png",
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(18),
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/Rectangle 19.png",
+                                      fit: BoxFit.fill,
+                                      width: double.infinity,
+                                      height: 120,
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: Container(
+                                    height: 14,
+                                    width: 14,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.favorite_outline_outlined, color: Colors.white, size: 20),
+                                      SizedBox(width: 4),
+                                    ],
+                                  ),
+                                ),
+
+                                // BOTTOM CONTENT
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+
+                                      Row(
+                                        children: [
+                                          Icon(Icons.star, color: Colors.yellow, size: 18),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            "4.5 (120)",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+
+
+
+                                      Text(
+                                        "Angela Kia",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 2),
+
+                                      Text(
+                                        "Videography Specialist",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 10),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: ColorCode.kButtonColor,
+                                              borderRadius: BorderRadius.circular(22),
+                                            ),
+                                            child: Text(
+                                              "From \$450/Hr",
+                                              style: TextStyle(
+                                                fontFamily: "Outfit",
+                                                color: ColorCode.kCircleGradientTop,
+                                                fontWeight: FontWeight.w700,
+
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+
+                                          Container(
+                                            height: 36,
+                                            width: 36,
+                                            child: Image.asset('assets/images/Group 2087328980.png'),
+                                            /*  decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white24,
+                                            ),
+                                            child: Icon(
+                                              Icons.arrow_forward,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),*/
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(width: 16),
+
+                          // 🔹 Second Card (Your full card with button)
+                          Container(
+                            width: 200,
+                            height: 280,
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.asset(
+                                    "assets/images/home2.png",
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(18),
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/Rectangle 19.png",
+                                      fit: BoxFit.fill,
+                                      width: double.infinity,
+                                      height: 100,
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: Container(
+                                    height: 14,
+                                    width: 14,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.favorite_outline_outlined, color: Colors.white, size: 20),
+                                      SizedBox(width: 4),
+                                    ],
+                                  ),
+                                ),
+
+                                // BOTTOM CONTENT
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+
+                                      Row(
+                                        children: [
+                                          Icon(Icons.star, color: Colors.yellow, size: 18),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            "4.5 (120)",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+
+
+
+                                      Text(
+                                        "Angela Kia",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 2),
+
+                                      Text(
+                                        "Videography Specialist",
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 10),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: ColorCode.kButtonColor,
+                                              borderRadius: BorderRadius.circular(22),
+                                            ),
+                                            child: Text(
+                                              "From \$450/Hr",
+                                              style: TextStyle(
+                                                fontFamily: "Outfit",
+                                                color: ColorCode.kCircleGradientTop,
+                                                fontWeight: FontWeight.w700,
+
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+
+                                          Container(
+                                            height: 36,
+                                            width: 36,
+                                            child: Image.asset('assets/images/Group 2087328980.png'),
+                                            /*  decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white24,
+                                            ),
+                                            child: Icon(
+                                              Icons.arrow_forward,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),*/
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(width: 12),
+                        ],
+                      ),
+                    )
+
+
+
+
+
+                  ],
                 ),
 
-                creatorTile(
-                  name: "Ethan Cole",
-                  rating: "4.5",
-                  price: "\$450",
-                  status: "Available",
-                  isAvailable: true,
-                ),
-
-                creatorTile(
-                  name: "Maya Ramirez",
-                  rating: "4.2",
-                  price: "\$200",
-                  status: "Busy",
-                  isAvailable: false,
-                ),
-
-
-                SizedBox(height: 40),
-              ],
-            ),
+              ),
+            ],
           ),
         )
 
@@ -341,25 +916,21 @@ class _HomeScreenState extends State<HomeScreen> {
   // ⭐ SPECIALITY CARD WIDGET
   Widget specialityCard() {
     return Container(
-      height: 120,
+      width: 92,
+      height: 92,
       decoration: BoxDecoration(
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black12,
-        //     blurRadius: 6,
-        //     spreadRadius: 2,
-        //   ),
-        // ],
+        borderRadius: BorderRadius.circular(14),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(
-          "assets/images/home3.png",
-          fit: BoxFit.cover,
-        ),
+      clipBehavior: Clip.antiAlias, // image rounded aayegi
+      child: Image.asset(
+        "assets/images/Group 2087328775 (1).png",
+        fit: BoxFit.cover, // pura container fill karegi
       ),
     );
   }
+
+
+
 
 
   // ⭐ CREATOR TILE
@@ -512,6 +1083,59 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+
+  Widget teamCard({
+    required String image,
+    required String name,
+  }) {
+    return Column(
+      // mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            // Background Circle
+            Container(
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                color: ColorCode.k777571,
+                shape: BoxShape.circle,
+              ),
+            ),
+
+            // Image on top of circle
+            Positioned(
+              top: -20,
+              child: ClipOval(
+                child: Image.asset(
+                  image,
+                  height: 110,
+                  width: 95,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 8),
+
+        // Name
+        Text(
+          name,
+          style: TextStyle(
+            fontFamily: "Outfit",
+            color: ColorCode.white,
+            fontSize: 13,
+            fontWeight: FontWeight.w500
+          ),
+        ),
+      ],
     );
   }
 

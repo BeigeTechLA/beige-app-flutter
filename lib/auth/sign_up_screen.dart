@@ -1,3 +1,5 @@
+import 'package:beige/ChooseYourRole/choose_your_role_screen.dart';
+import 'package:beige/OnbodingScreen/onboding_screen.dart';
 import 'package:beige/auth/login_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
@@ -113,98 +115,145 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: ColorCode.bcakgroundcolor,
+        body: SingleChildScrollView(
+          padding:  EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// Back
+      
               InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
+                  );
+                },
                 child: Image.asset("assets/Icons/Reply.png", height: 24),
               ),
-
-              const SizedBox(height: 30),
-
+      
+      
+              SizedBox(height: 30),
+      
               const Text(
                 "Sign Up Now",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontFamily: "Unbounded",
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: ColorCode.kHeadingColor,
+                  color: ColorCode.white,
                 ),
               ),
-
-              const SizedBox(height: 6),
-
-              const Text(
-                "Join Beige to book talented photographers and videographers.",
+      
+              SizedBox(height: 10),
+      
+               Text(
+                "Join Beige to book talented photographers\n  and videographers.",
                 style: TextStyle(
+                  fontFamily: "Outfit",
                   fontSize: 14,
-                  color: ColorCode.kSubtextOpacity,
+                  fontWeight: FontWeight.w400,
+                  color: ColorCode.kWhiteOpacity70,
                 ),
               ),
-
-              const SizedBox(height: 28),
-
+      
+               SizedBox(height: 20),
+      
               _buildField("Name", nameController),
-              const SizedBox(height: 17),
+              SizedBox(height: 20),
               _buildField("Email ID", emailController),
-              const SizedBox(height: 17),
+              SizedBox(height: 20),
               _buildField("Location", locationController),
-              const SizedBox(height: 17),
-
+              SizedBox(height: 20),
+      
               _buildPasswordField(
                 "Create Password",
                 showPassword,
                     () => setState(() => showPassword = !showPassword),
                 passwordController,
               ),
-
-              const SizedBox(height: 17),
-
+      
+              SizedBox(height: 20),
+      
               _buildPasswordField(
                 "Confirm Password",
                 showConfirmPassword,
                     () => setState(() => showConfirmPassword = !showConfirmPassword),
                 confirmPasswordController,
               ),
-
-              const SizedBox(height: 17),
-
+      
+              SizedBox(height: 20),
+      
               /// Terms checkbox
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   GestureDetector(
                     onTap: () => setState(() => savePassword = !savePassword),
                     child: Container(
-                      height: 20,
-                      width: 20,
+                      height: 18,
+                      width: 18,
                       decoration: BoxDecoration(
-                        color: savePassword ? Colors.black : Colors.transparent,
+                        color: savePassword ? ColorCode.kButtonColor : Colors.black,
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: ColorCode.kSubtextOpacity),
+                        border: Border.all(color: ColorCode.kWhiteOpacity70),
                       ),
                       child: savePassword
-                          ? const Icon(Icons.check, size: 14, color: Colors.white)
+                          ? const Icon(Icons.check, size: 14, color: ColorCode.black)
                           : null,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      "I agree to the Terms & Conditions and Privacy Policy",
-                      style: TextStyle(fontSize: 14),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.black,
+                          height: 1.4, // line spacing perfect
+                        ),
+                        children: const [
+                          TextSpan(text: "I agree to the ",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: ColorCode.kWhiteOpacity70,
+                              fontSize: 13,
+                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                            ),
+                          ),
+      
+                          TextSpan(
+                            text: "Terms & Condition & Privacy Policy",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: ColorCode.white,
+                              fontSize: 13,
+                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                            ),
+                          ),
+      
+      
+                          TextSpan(text: "\nset out of this site",
+                            style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: ColorCode.kWhiteOpacity70,
+                            fontSize: 13,
+                            fontFamily: "Outfit", // ⭐ Added Outfit font
+                          ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+      
+      
                 ],
               ),
-
-              const SizedBox(height: 25),
-
+      
+              const SizedBox(height: 40),
+      
               /// Button
               SizedBox(
                 width: double.infinity,
@@ -214,31 +263,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: isFormValid
                           ? ColorCode.kButtonColor   // ✅ Active color
-                          : ColorCode.kCreamSoft,
+                          : ColorCode.kGold40,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: isLoggingIn
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
+                      :  Text(
                     "Create Account",
                     style: TextStyle(
-                      color: ColorCode.kHeadingColor,
-                      fontSize: 16,
+                      fontSize: 13,
+                      fontFamily: "Unbounded",
+                      color: isFormValid
+                          ? ColorCode.kHeadingColor   // ✅ Active color
+                          : ColorCode.kSubtextOpacity,
+      
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
-
+      
               const SizedBox(height: 20),
-
+      
               /// Login link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account? "),
+                  const Text("Already have an account? ",
+                    style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: ColorCode.kWhiteOpacity70,
+                    fontSize: 14,
+                    fontFamily: "Outfit", // ⭐ Added Outfit font
+                  ),),
                   InkWell(
                     onTap: () {
                       Navigator.push(
@@ -266,37 +325,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
-        labelText: "$title*",
-        floatingLabelBehavior: FloatingLabelBehavior.always, // ⭐ Always on top
-        labelStyle: const TextStyle(
-          color: ColorCode.kSubtextOpacity, // 🔥 Label = #1D1D1B99 (60% opacity)
+        cursorColor: ColorCode.white,
+
+        style: const TextStyle(
+          color: ColorCode.white, // typed text color
         ),
 
+        decoration: InputDecoration(
+          labelText: "$title*",
+          floatingLabelBehavior: FloatingLabelBehavior.always,
 
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:  BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Border = #1D1D1B
+          labelStyle: const TextStyle(
+            color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
           ),
-        ),
 
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Same color on focus
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 18,
           ),
-        ),
 
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kHeadingColor, // 🔥 Floating label = #1D1D1B
-        ),
-      ));
+          /// ⭐ 0.5px BORDER + OPACITY COLOR
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+              width: 0.5,                       // 🔥 exact 0.5px
+            ),
+          ),
+
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+              width: 0.5,                          // focus border thicker
+            ),
+          ),
+
+          floatingLabelStyle: const TextStyle(
+            color: ColorCode.kWhiteOpacity70,
+          ),)
+        ,);
   }
 
   Widget _buildPasswordField(
@@ -308,39 +376,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return TextField(
       controller: controller,
       obscureText: !isVisible,
+      cursorColor: ColorCode.kWhiteOpacity70,
+      style: const TextStyle(
+        color: ColorCode.kWhiteOpacity70,
+      ),
       decoration: InputDecoration(
         labelText: "$title*",
-        floatingLabelBehavior: FloatingLabelBehavior.always, // ⭐ Always on top
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+
         labelStyle: const TextStyle(
-          color: ColorCode.kSubtextOpacity, // 🔥 Label = #1D1D1B99 (60% opacity)
+          color: ColorCode.kWhiteOpacity70,
         ),
-        suffixIcon: IconButton(
-          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
-          onPressed: onToggle,
-        ),
+
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
+        /// 👁️ EYE ICON
+        suffixIcon: IconButton(
+          onPressed: onToggle,
+          icon: Icon(
+            isVisible ? Icons.visibility : Icons.visibility_off,
+            color: ColorCode.kWhiteOpacity70,
+            size: 20,
+          ),
+        ),
+
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide:  BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Border = #1D1D1B
+          borderSide: const BorderSide(
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Same color on focus
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kHeadingColor, // 🔥 Floating label = #1D1D1B
+          color: ColorCode.kWhiteOpacity70,
         ),
       ),
     );
   }
+
 }

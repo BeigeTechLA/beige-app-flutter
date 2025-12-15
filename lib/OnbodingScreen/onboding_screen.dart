@@ -17,17 +17,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> pages = [
     {
-      "image": "assets/Onboding/onboding1.png",
+      "image": "assets/Onboding/Frame 2085664300.png",
       "title": "Find the Perfect Creator\nfor any event",
       "description": "Browse trusted photographers and  videographers\nfor any event. 🎥✨",
     },
     {
-      "image": "assets/Onboding/onboding2.png",
+      "image": "assets/Onboding/Frame 2085664301 (1).png",
       "title": "Smart Location-Based\nBooking",
       "description": "Easily explore creators around you and book\nthem instantly.📍⚡",
     },
     {
-      "image": "assets/Onboding/onboding3.png",
+      "image": "assets/Onboding/Frame 2085664302 (1).png",
       "title": "Secure & Seamless\nExperience",
       "description": "Fast payments, chat support, and reliable service\nat every step. 🔒💬💳",
     },
@@ -72,18 +72,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Image.asset(
                             pages[index]['image']!,
                             width: double.infinity,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fill,
                           ),
                         ),
 
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         Text(
                           pages[index]['title']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 25,
+                          style: TextStyle(
+                            fontFamily: "Unbounded",
+                            color: ColorCode.white,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            fontSize: 18,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -93,21 +94,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Text(
                             pages[index]['description']!,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
+                              fontFamily: "Outfit  ",
+                              color: ColorCode.kWhiteOpacity60,
+                              fontWeight: FontWeight.w400,
                               fontSize: 12,
-                              color: ColorCode.kSubtextOpacity,
                             ),
                           ),
                         ),
 
-                        const SizedBox(height: 40),
                       ],
                     );
                   },
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
 
               // ---------------- DOTS ----------------
               Row(
@@ -122,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: isActive ? 40 : 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: isActive ? Colors.black : Colors.grey.shade300,
+                        color: isActive ? Colors.white : ColorCode.kWhiteOpacity60,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     );
@@ -130,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
               // ---------------- LOGIN BUTTON ----------------
               Padding(
@@ -150,8 +152,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: const Text(
                       "Login",
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
                         color: ColorCode.kHeadingColor,
                       ),
                     ),
@@ -170,17 +173,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding: EdgeInsets.only(bottom: 20),
                   child: Text.rich(
                     TextSpan(
-                      text: "Don't have an account? ",
+                      text: "Don’t have an account? ",
                       style: TextStyle(
-                          color: ColorCode.kSubtextOpacity, fontSize: 14),
+                        fontFamily: "Outfit ",
+                        color: ColorCode.kWhiteOpacity60,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
                       children: [
                         TextSpan(
                           text: "Sign Up",
                           style: TextStyle(
-                            color: ColorCode.kHeadingColor,
-                            fontWeight: FontWeight.bold,
+                            fontFamily: "Outfit",
+                            color: ColorCode.white,
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
                           ),
                         ),
+
                       ],
                     ),
                     textAlign: TextAlign.center,
@@ -192,26 +203,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // ---------------- SKIP BUTTON ----------------
           if (_currentPage != 2) // 👈 Skip only page 0 & 1 par show hoga
-            Positioned(
-              top: 95,
-              right: 20,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
-                  );
-                },
-                child: const Text(
-                  "Skip",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
+          // Put this at the top of Stack children
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50, right: 20),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Skip",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            )
+
         ],
       ),
     );

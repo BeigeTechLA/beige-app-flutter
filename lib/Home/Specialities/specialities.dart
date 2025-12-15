@@ -1,6 +1,6 @@
+import 'package:beige/Home/Specialities/BookShoot.dart';
 import 'package:flutter/material.dart';
-
-import 'BookShoot.dart';
+import '../../utility/ColorCode.dart';
 
 class Specialities extends StatefulWidget {
   const Specialities({super.key});
@@ -10,56 +10,55 @@ class Specialities extends StatefulWidget {
 }
 
 class _SpecialitiesState extends State<Specialities> {
-  // ---- DATA LIST ----
-  final List<Map<String, String>> items = [
-    {"title": "Events &\nParties", "icon": "assets/images/home3.png"},
-    {"title": "Creative &\nMedia", "icon": "assets/images/home3.png"},
-    {"title": "Travel &\nOutdoors", "icon": "assets/images/home3.png"},
-    {"title": "Drone &\nAerial", "icon": "assets/images/home3.png"},
-    {"title": "Sports &\nAction", "icon": "assets/images/home3.png"},
-    {"title": "Personal\nShoots", "icon": "assets/images/home3.png"},
-    {"title": "Hospitality &\nInteriors", "icon": "assets/images/home3.png"},
-    {"title": "Education &\nInstitutions", "icon": "assets/images/home3.png"},
-    {"title": "Business &\nProfessional", "icon": "assets/images/home3.png"},
-    {"title": "Commercial\nShoots", "icon": "assets/images/home3.png"},
-  ];
+
+  // 🔹 Dummy list (10 items)
+  final List<Map<String, String>> items = List.generate(
+    10,
+        (index) => {
+      "title": "Events &\nParties",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/party.png",
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+      backgroundColor: ColorCode.bcakgroundcolor,
+      body: SafeArea(   // ✅ TOP SE AUTO GAP
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-
+          padding: const EdgeInsets.all(20), // ✅ PROPER SIDE + TOP SPACE
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-
+              /// 🔙 BACK BUTTON
               InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
+                onTap: () => Navigator.pop(context),
                 child: Image.asset(
                   "assets/Icons/Reply.png",
                   height: 24,
                   width: 24,
+                  color: ColorCode.white,
                 ),
               ),
-              SizedBox(height: 15),
 
-              Text(
-                "Specialties",
+              const SizedBox(height: 20), // ⬅️ thoda niche
+
+              /// 🔹 TITLE
+              const Text(
+                "Book A shoot",
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  color: ColorCode.white,
+                  fontFamily: 'Unbounded',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
 
-               SizedBox(height: 15),
+              const SizedBox(height: 24), // ⬅️ title ke niche space
 
-              // GRID VIEW (NO BLUE BORDER)
+              /// 🔥 GRID VIEW
               Expanded(
                 child: GridView.builder(
                   itemCount: items.length,
@@ -67,67 +66,75 @@ class _SpecialitiesState extends State<Specialities> {
                     crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 0.9,
+                    childAspectRatio: 1,
                   ),
                   itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>  BookShootScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: Stack(
-                            children: [
-
-                              // 🔥 BACKGROUND IMAGE
-                              Positioned.fill(
-                                child: Image.asset(
-                                  items[index]["icon"]!,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-
-                              // 🔥 TOP-LEFT TEXT
-                                      /*            Positioned(
-                                top: 12,
-                                left: 12,
-                                child: Text(
-                                  items[index]["title"]!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),*/
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-
+                    return _buildGridItem(items[index]);
                   },
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+
+  /// 🔹 SINGLE GRID ITEM
+  Widget _buildGridItem(Map<String, String> item) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>  BookShootScreen(), // next screen
+          ),
+        );
+      },
+
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+
+            /// BACKGROUND IMAGE
+            Positioned.fill(
+              child: Image.asset(
+                item["bg"]!,
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            /// TOP LEFT TEXT
+            Positioned(
+              top: 10,
+              left: 8,
+              child: Text(
+                item["title"]!,
+                style: const TextStyle(
+                  color: ColorCode.white,
+                  fontFamily: 'Outfit',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+
+            /// BOTTOM RIGHT ICON
+            Positioned(
+              bottom: 0,
+              right: 2,
+              child: Image.asset(
+                item["icon"]!,
+                height: 70,
+                width: 60,
+              ),
+            ),
+          ],
         ),
       ),
     );

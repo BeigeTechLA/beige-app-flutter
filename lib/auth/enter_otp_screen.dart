@@ -132,7 +132,7 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      InkWell(
+                    /*  InkWell(
                         onTap: () {
                           Navigator.pop(context);
                         },
@@ -141,8 +141,15 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                           height: 24,
                           width: 24,
                         ),
-                      ),
+                      ),*/
 
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Image.asset(
+                          "assets/Icons/Reply.png",
+                          height: 24,
+                        ),
+                      ),
                       SizedBox(height: 10),
 
                       Text(
@@ -150,14 +157,14 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: ColorCode.kHeadingColor),
+                            color: ColorCode.white),
                       ),
 
                       const SizedBox(height: 6),
 
                       const Text(
                         "Enter 6 digit OTP sent to your registered email ID\nreset your password.",
-                        style: TextStyle(fontSize: 12, color: ColorCode.kHeadingColor),
+                        style: TextStyle(fontSize: 12, color: ColorCode.kWhiteOpacity60),
                       ),
 
                       const SizedBox(height: 20),
@@ -179,7 +186,7 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                                     color: (focusNodes[index].hasFocus ||
                                         controllers[index].text.isNotEmpty)
                                         ? ColorCode.kButtonColor
-                                        : ColorCode.kSubtextOpacity,
+                                        : ColorCode.kWhiteOpacity60,
                                     width: 1.5,
                                   ),
                                 ),
@@ -227,7 +234,7 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: ColorCode.kHeadingColor,
+                              color: ColorCode.kWhiteOpacity60,
                             ),
                           ),
                         ],
@@ -250,7 +257,7 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                     child: Text(
                       "Resend OTP",
                       style: TextStyle(
-                        color: ColorCode.kHeadingColor,
+                        color: ColorCode.kWhiteOpacity60,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -272,7 +279,7 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOtpFilled
                         ? ColorCode.kButtonColor
-                        : ColorCode.kCreamSoft,
+                        : ColorCode.kGold40,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

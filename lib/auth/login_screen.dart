@@ -56,13 +56,13 @@ class _LoginScreenState extends State<LoginScreen> {
         await SharedService.setLoginDetails(response);
 
         // ✅ SUCCESS MESSAGE
-        ScaffoldMessenger.of(context).showSnackBar(
+       /* ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Login successful"),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
-        );
+        );*/
 
         // ✅ Navigate after short delay
         Future.delayed(const Duration(milliseconds: 800), () {
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: EdgeInsetsGeometry.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -116,19 +116,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       const Text(
                         "Welcome Back",
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: ColorCode.kHeadingColor),
-                      ),
-                      const SizedBox(height: 6),
+                       style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: ColorCode.white,
+                    ),),
+                       SizedBox(height: 6),
 
                       const Text(
-                        "Enter your details to access your account. Continue managing your bookings and profile.",
-                        style:
-                        TextStyle(fontSize: 14, color: ColorCode.kSubtextOpacity),
+                        "Enter your details to access your account.Continue \nmanaging your bookings and profile.",
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
                       ),
-                      const SizedBox(height: 25),
+                       SizedBox(height: 25),
 
                       _buildField("Email ID"),
                       const SizedBox(height: 15),
@@ -150,11 +155,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: 20,
                               decoration: BoxDecoration(
                                 color: savePassword
-                                    ? Colors.black
+                                    ? ColorCode.black
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(5),
                                 border: Border.all(
-                                  color: ColorCode.kSubtextOpacity,
+                                  color: ColorCode.kWhiteOpacity70,
                                 ),
                               ),
                               child: savePassword
@@ -166,7 +171,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(width: 8),
                           const Text(
                             "Saved Password",
-                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: ColorCode.kWhiteOpacity60,
+                            ),
                           ),
                           const Spacer(),
                           TextButton(
@@ -177,11 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: const Text(
                               "Forgot Password?",
                               style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontWeight: FontWeight.w700,
+                                fontFamily: "Outfit",
+                                color: ColorCode.kButtonColor,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 14,
                                 decoration: TextDecoration.underline,
                                 decorationThickness: 1.8,
+                                  decorationColor: ColorCode.kButtonColor
                               ),
                             ),
                           ),
@@ -228,8 +240,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       : Text(
                     "Login",
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontFamily: "Unbounded",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: savePassword
                           ? ColorCode.kHeadingColor
                           : Colors.black54, // ✅ text disabled color
@@ -251,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text(
                       "Don’t have an account? ",
                       style: TextStyle(
-                        color: ColorCode.kSubtextOpacity,
+                        color: ColorCode.kWhiteOpacity60,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -270,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         "Sign Up",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
@@ -294,43 +307,46 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildField(String label) {
     return TextField(
       controller: emailController,
-      cursorColor: ColorCode.kHeadingColor,
+      cursorColor: ColorCode.white,
 
       style: const TextStyle(
-        color: ColorCode.kHeadingColor, // 🔥 Typed text = #1D1D1B
+        color: ColorCode.white, // typed text color
       ),
 
       decoration: InputDecoration(
         labelText: "$label*",
-        floatingLabelBehavior: FloatingLabelBehavior.always, // ⭐ Always on top
-        labelStyle: const TextStyle(
-          color: ColorCode.kSubtextOpacity, // 🔥 Label = #1D1D1B99 (60% opacity)
-        ),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
 
+        labelStyle: const TextStyle(
+          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+        ),
 
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
+        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-           borderSide:  BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Border = #1D1D1B
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            width: 0.5,                       // 🔥 exact 0.5px
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor, // 🔥 Same color on focus
+            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            width: 0.5,                          // focus border thicker
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kHeadingColor, // 🔥 Floating label = #1D1D1B
-        ),
-      ),
+          color: ColorCode.kWhiteOpacity70,
+        ),)
+
     );
   }
 
@@ -341,24 +357,24 @@ class _LoginScreenState extends State<LoginScreen> {
     return TextField(
       controller: passwordController,
       obscureText: !showPassword,
-      cursorColor: ColorCode.kHeadingColor,
+      cursorColor: ColorCode.white,
 
       style: const TextStyle(
-        color: ColorCode.kHeadingColor, // 🔥 Typed text = #1D1D1B
+        color: ColorCode.white, // 🔥 Typed text = #1D1D1B
       ),
 
       decoration: InputDecoration(
         labelText: "Password*",
         floatingLabelBehavior: FloatingLabelBehavior.always, //
         labelStyle: const TextStyle(
-          color: ColorCode.kSubtextOpacity, // 🔥 Label = #1D1D1B99
+          color: ColorCode.kWhiteOpacity70, // 🔥 Label = #1D1D1B99
         ),
 
 
         suffixIcon: IconButton(
           icon: Icon(
             showPassword ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kSubtextOpacity, // 🔥 Icon = 60% opacity
+            color: ColorCode.kWhiteOpacity60, // 🔥 Icon = 60% opacity
           ),
           onPressed: () {
             setState(() {
@@ -367,30 +383,34 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         ),
 
+
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
+        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor, // #1D1D1B
+            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            width: 0.5,                       // 🔥 exact 0.5px
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor, // same color on focus
+            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            width: 0.5,                          // focus border thicker
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kHeadingColor,
-        ),
-      ),
-    );
+          color: ColorCode.kWhiteOpacity70,
+        ),)
+
+      );
   }
 
 

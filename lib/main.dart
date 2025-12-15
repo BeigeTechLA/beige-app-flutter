@@ -31,10 +31,23 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'BEIGE',
       theme: ThemeData(
-        scaffoldBackgroundColor: ColorCode.kBackgroundColor,
+        scaffoldBackgroundColor: ColorCode.bcakgroundcolor, // 🌑 All screens background black
+        appBarTheme:  AppBarTheme(
+          backgroundColor: ColorCode.bcakgroundcolor,       // AppBar bhi black
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        colorScheme: ColorScheme.dark(
+          background: ColorCode.bcakgroundcolor,
+          primary: Colors.white,
+        ),
       ),
 
+
       // ✅ Correct navigation logic
+   /*   home: isLoggedIn
+          ?  Mainscreen()
+          :  SplashScreen(),*/
+
       home: isLoggedIn
           ?  Mainscreen()
           :  Mainscreen(),

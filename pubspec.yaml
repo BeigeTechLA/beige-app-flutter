@@ -34,6 +34,8 @@ dependencies:
   shared_preferences: ^2.5.3
   dio: ^5.9.0
   http: ^1.4.0
+  video_player: ^2.8.2
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -63,14 +65,34 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
+
   assets:
     - assets/images/
     - assets/Splash/
     - assets/Onboding/
     - assets/Icons/
 
+  fonts:
+    - family: Unbounded
+      fonts:
+        - asset: assets/fonts/Unbounded-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Unbounded-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Unbounded-SemiBold.ttf
+          weight: 600
 
-  #   - images/a_dot_ham.jpeg
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Outfit-Bold.ttf
+          weight: 700
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

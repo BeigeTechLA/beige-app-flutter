@@ -32,8 +32,8 @@ class _MainscreenState extends State<Mainscreen> {
         currentIndex: _selectedIndex,
         elevation: 0,
 
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: ColorCode.white,
+        unselectedItemColor:ColorCode.kWhiteOpacity70,
 
         selectedLabelStyle:
         TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
@@ -53,44 +53,52 @@ class _MainscreenState extends State<Mainscreen> {
             icon: Image.asset(
               "assets/Icons/Home.png",
               height: 28,
-              color: _selectedIndex == 0 ? ColorCode.kHeadingColor : Colors.grey,
+              color: _selectedIndex == 0 ? ColorCode.white : ColorCode.kWhiteOpacity60,
               colorBlendMode: BlendMode.srcIn,
             ),
             label: "Home",
           ),
-          BottomNavigationBarItem(
+         /* BottomNavigationBarItem(
             icon: Image.asset(
               "assets/Icons/booking.png",
               height: 28,
               color: _selectedIndex == 1 ? ColorCode.kHeadingColor : Colors.grey,
             ),
             label: "Bookings",
-          ),
+          ),*/
           BottomNavigationBarItem(
             icon: Image.asset(
               "assets/Icons/Capture.png",
               height: 28,
-              color: _selectedIndex == 2 ? ColorCode.kHeadingColor : Colors.grey,
+              color: _selectedIndex == 1? ColorCode.kHeadingColor : Colors.grey,
             ),
-            label: "Capture",
+            label: "Book Shoot",
           ),
+          BottomNavigationBarItem(
+            icon: Image.asset(
+              "assets/Icons/booking.png",
+              height: 28,
+              color: _selectedIndex == 2? ColorCode.kHeadingColor : Colors.grey,
+            ),
+            label: "Booking",
+          ),
+
           BottomNavigationBarItem(
             icon: Image.asset(
               "assets/Icons/messge.png",
               height: 28,
-              color: _selectedIndex == 3 ? ColorCode.kHeadingColor : Colors.grey,
+              color: _selectedIndex == 3? ColorCode.kHeadingColor : Colors.grey,
             ),
-            label: "Message",
+            label: "Chat",
           ),
-
 // ⭐ Circle Profile icon
-          BottomNavigationBarItem(
+     /*     BottomNavigationBarItem(
             icon: CircleAvatar(
               radius: 15,
               backgroundImage: AssetImage("assets/Icons/profile.png"),
             ),
             label: "Profile",
-          ),
+          ),*/
 
         ],
       ),

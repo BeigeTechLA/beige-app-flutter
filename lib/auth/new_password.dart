@@ -97,7 +97,7 @@ class _NewPasswordState extends State<NewPassword> {
       body: SafeArea(
 
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: EdgeInsetsGeometry.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,24 +118,27 @@ class _NewPasswordState extends State<NewPassword> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      const Text(
+                       Text(
                         "Secure your Account",
                         style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: ColorCode.kHeadingColor),
-                      ),
+                          fontFamily: "Unbounded",
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ColorCode.white,
+                        ),),
 
                       SizedBox(height: 6),
 
                       const Text(
                         "You're almost done! Set a new password to secure\nyour account. Make sure it's strong and unique.",
                         style: TextStyle(
-                            fontSize: 12,
-                            color: ColorCode.kSubtextOpacity),
-                      ),
+                          fontFamily: "Outfit",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: ColorCode.kWhiteOpacity60,
+                        ),),
 
-                      const SizedBox(height: 25),
+                       SizedBox(height: 25),
 
                       // ⭐ NEW PASSWORD
                       _buildPasswordField(
@@ -226,10 +229,10 @@ class _NewPasswordState extends State<NewPassword> {
     return TextField(
       controller: controller,
       obscureText: !isVisible,
-      cursorColor: ColorCode.kHeadingColor,
+      cursorColor: ColorCode.white,
 
       style: const TextStyle(
-        color: ColorCode.kHeadingColor,
+        color: ColorCode.white,
       ),
 
       onChanged: (value) {
@@ -245,35 +248,40 @@ class _NewPasswordState extends State<NewPassword> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(
-          color: ColorCode.kSubtextOpacity,
+          color: ColorCode.kWhiteOpacity60,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: IconButton(
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kSubtextOpacity,
+            color: ColorCode.kWhiteOpacity60,
           ),
           onPressed: onToggle,
         ),
-
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
+        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor,
+            color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+            width: 0.5,                       // 🔥 exact 0.5px
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kHeadingColor,
-            width: 1.5,
+            color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+            width: 0.5,                          // focus border thicker
           ),
+        ),
+
+        floatingLabelStyle: const TextStyle(
+          color: ColorCode.kWhiteOpacity60,
         ),
       ),
     );
@@ -289,10 +297,10 @@ class _NewPasswordState extends State<NewPassword> {
 
       pageBuilder: (_, __, ___) {
         Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pushReplacement(
+        /*  Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => LoginScreen()),
-          );
+          );*/
         });
 
         return Stack(
@@ -315,10 +323,10 @@ class _NewPasswordState extends State<NewPassword> {
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(20),
-                    image: const DecorationImage(
+                   /* image: const DecorationImage(
                       image: AssetImage("assets/images/Mask group (4).png"),
                       fit: BoxFit.cover,
-                    ),
+                    ),*/
                   ),
 
                   child: Column(

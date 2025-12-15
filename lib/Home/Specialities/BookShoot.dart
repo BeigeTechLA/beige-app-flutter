@@ -15,104 +15,114 @@ class _BookShootScreenState extends State<BookShootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: ColorCode.black,
       body: Stack(
         children: [
-
-          /// ✅ Background Image
+          /// ✅ BACKGROUND IMAGE FIXED — FULL SCREEN
           Container(
+            height: height,
+            width: double.infinity,
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/bg.jpg"), // add image
-                fit: BoxFit.cover,
+                image: AssetImage("assets/images/Rectangle 34660882.png",),
+                  fit: BoxFit.fill
               ),
             ),
           ),
 
-          /// ✅ Bottom Sheet Container
+          /// ✅ BOTTOM SHEET FLOATING ABOVE IMAGE
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding:  EdgeInsets.all(30),
+              padding: EdgeInsets.only(right: 20,left: 20,top: 10,bottom: 20),
+               // padding:  EdgeInsets.all(20),
+              width: double.infinity,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: ColorCode.k282828,
                 borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(30),
+                  top: Radius.circular(32),
                 ),
               ),
+
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// Drag Indicator
+                  /// Drag line
                   Center(
                     child: Container(
-                      width: 40,
-                      height: 6,
+                      width: 35,
+                      height: 5,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color:ColorCode.kWhiteOpacity70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
-                  /// Title + Close
+                  /// Title
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                       Text(
                         "Book Your Shoot Now",
                         style: TextStyle(
-                          fontSize: 18,
+                          color: ColorCode.white,
+                          fontFamily: 'Unbounded',   // ← Add this
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          // Looks cleaner in Unbounded
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {},
+                        icon:  Icon(Icons.close,color: ColorCode.white,),
+                        onPressed: () => Navigator.pop(context),
                       )
                     ],
                   ),
-                 Divider(color:ColorCode.grey_white,),
+
+                  Divider(color: ColorCode.kWhiteOpacity60),
                    SizedBox(height: 16),
 
-                  /// ✅ Options
                   buildRadio("Shoots & Edits", 0),
                   buildRadio("Shoots & Raw Files", 1),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
 
-                  /// ✅ Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 55,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFE7C89E),
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) =>  Bookshoot1()),
-                              );
-                            },
-                            child: const Text("Next"),
-                          ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE7C89E),
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ],
-                  )
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const Bookshoot1()),
+                        );
+                      },
+                      child: const Text("Next",
+                        style: TextStyle(
+                          color: ColorCode.kHeadingColor,
+                          fontFamily: 'Unbounded',   // ← Add this
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          // Looks cleaner in Unbounded
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -122,56 +132,57 @@ class _BookShootScreenState extends State<BookShootScreen> {
     );
   }
 
-  /// ✅ Radio Tile Widget
-  Widget buildRadio(String title, int value) {
+  Widget buildRadio(String title, int item) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          selectedIndex = value;
-        });
-      },
+      onTap: () => setState(() => selectedIndex = item),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding:  EdgeInsets.all( 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(title,
+          style: TextStyle(
+            color: ColorCode.kWhiteOpacity70,
+            fontFamily: 'Outfit  ',
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            // Looks cleaner in Unbounded
+          ),),
 
-            /// Title
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 15,
-                color: ColorCode.kHeadingColor,
-              ),
-            ),
-
-            /// ✅ Custom Circle
+            // Custom Radio Circle
             Container(
-              width: 26,
-              height: 26,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selectedIndex == value
-                    ? Colors.black
-                    : Colors.transparent,
+                gradient: selectedIndex == item
+                    ? const LinearGradient(
+                  colors: [
+                    ColorCode.kButtonColor,
+                    ColorCode.kCreamSoft
+                  ],
+                )
+                    : null,
+                color: selectedIndex == item ? null : Colors.transparent,
                 border: Border.all(
-                  color: Colors.black,
-                  width: 2,
+                  color: selectedIndex == item
+                      ? ColorCode.kWhiteOpacity70
+                      : ColorCode.kWhiteOpacity70,
                 ),
               ),
-              child: selectedIndex == value
+              child: selectedIndex == item
                   ? Center(
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  width: 10,
+                  height: 10,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
+                    color: ColorCode.black,
                   ),
                 ),
               )
                   : null,
-            ),
+            )
           ],
         ),
       ),

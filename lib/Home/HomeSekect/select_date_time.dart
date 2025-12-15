@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utility/ColorCode.dart';
+import 'select_shoot_type_edits.dart';
 
 class SelectDateTime extends StatefulWidget {
   const SelectDateTime({super.key});
@@ -9,350 +10,363 @@ class SelectDateTime extends StatefulWidget {
 }
 
 class _SelectDateTimeState extends State<SelectDateTime> {
+  DateTime baseDate = DateTime.now();
+  Set<DateTime> selectedDates = {};
 
-  int selectedIndex = 0;
+  int selectedTimeIndex = -1;
+  bool isCustomSelected = false;
+  double selectedHour = 16;
 
-  DateTime baseDate = DateTime.now();   // starting point
-  DateTime selectedDate = DateTime.now();
+  final List<String> timeSlots = [
+    "10:00 AM - 12:00 PM",
+    "12:00 PM - 02:00 PM",
+    "02:00 PM - 04:00 PM",
+    "04:00 PM - 06:00 PM",
+    "06:00 PM - 08:00 PM",
+    "08:00 PM - 10:00 PM",
+  ];
 
-  double selectedHour = 16; // default
-
-
-  String getMonthYear(DateTime date) {
+  String getMonthYear() {
     const months = [
       "January","February","March","April","May","June",
       "July","August","September","October","November","December"
     ];
+    DateTime date =
+    selectedDates.isNotEmpty ? selectedDates.first : DateTime.now();
     return "${months[date.month - 1]} ${date.year}";
   }
-  List<String> timeSlots = [
-    "12:45 PM",
-    "01:30 PM",
-    "04:30 PM",
-    "05:30 PM",
-    "06:30 PM",
-    "07:30 PM",
-  ];
 
+  bool isSameDate(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: ColorCode.kBackgroundColor,
+      backgroundColor: ColorCode.black,
       appBar: AppBar(
-        backgroundColor: ColorCode.kBackgroundColor,
+        backgroundColor: ColorCode.black,
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: Image.asset("assets/Icons/Reply.png", height: 24),
+          child: Image.asset(
+            "assets/Icons/Reply.png",
+            height: 22,
+            color: Colors.white,
+          ),
         ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16),
             child: Center(
-              child: Text("2/5", style: TextStyle(color: Colors.black)),
+              child: Text("2/5", style: TextStyle(color: Colors.white)),
             ),
           )
         ],
       ),
-
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-              /// ✅ STEP INDICATOR
-              Row(
-                children: List.generate(
-                  5,
-                      (index) => Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 5),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: index < 2 ? Colors.black : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+            /// STEP INDICATOR
+            Row(
+              children: List.generate(
+                5,
+                    (index) => Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 6),
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: index < 2
+                          ? ColorCode.kButtonColor
+                          : ColorCode.kSubtextColor,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-              /// ✅ TITLE
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Select Date & Time Slots",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+            /// TITLE
+            const Text(
+              "Select Date & Time Slots",
+              style: TextStyle(
+                fontFamily: "Unbounded",
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
+            ),
 
-              const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-              /// ✅ DATE CONTAINER
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    /// ✅ MONTH ROW (DYNAMIC)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          getMonthYear(selectedDate),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-
-                        InkWell(
-                          onTap: () async {
-                            DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate,
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2035),
-                            );
-
-                            if (picked != null) {
-                              setState(() {
-                                selectedDate = picked;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.calendar_month_outlined, size: 20),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    /// ✅ DATE ROW (DYNAMIC)
-                    SizedBox(
-                      height: 75,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 10000, // 👈 practically endless
-                        itemBuilder: (context, index) {
-
-                          final DateTime date =
-                          baseDate.add(Duration(days: index));
-
-                          final bool isSelected =
-                              date.year == selectedDate.year &&
-                                  date.month == selectedDate.month &&
-                                  date.day == selectedDate.day;
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedDate = date;
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: 55,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isSelected
-                                      ? const Color(0xffEAD1A6)
-                                      : Colors.grey.shade100,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      date.day.toString(),
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: isSelected ? Colors.black : Colors.grey,
-                                      ),
-                                    ),
-                                    Text(
-                                      ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
-                                      [date.weekday % 7],
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isSelected ? Colors.black : Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-                  ],
-                ),
+            /// DATE CARD
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorCode.k282828,
+                borderRadius: BorderRadius.circular(14),
               ),
-
-              Container(
-                height: 350, // 👈 image jaise fixed height
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListView.builder(
-                  itemCount: timeSlots.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color:  ColorCode.white, // light beige
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          timeSlots[index],
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Add Custom Time Duration",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-
-                      ],
-                    ),
-
-
-                    const SizedBox(height: 16),
-
-                    /// ✅ SLIDER
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        trackHeight: 4,
-                        activeTrackColor: const Color(0xffEAD1A6),
-                        inactiveTrackColor: Colors.black,
-                        thumbColor: ColorCode.kButtonColor,
-                        overlayColor: const Color(0xffEAD1A6).withOpacity(0.2),
-                        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-                      ),
-                      child: Slider(
-                        min: 5,
-                        max: 50,
-                        divisions: 11, // 02h to 24h
-                        value: selectedHour,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedHour = value;
-                          });
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    /// ✅ HOURS LABELS
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text("02h"),
-                        Text("04h"),
-                        Text("08h"),
-                        Text("12h"),
-                        Text("16h"),
-                        Text("20h"),
-                        Text("24h"),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-
-              Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  // ✅ Next Button
-                  Expanded(
-                    child: SizedBox(
-                      height: 55,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE7C89E),
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                  /// MONTH + CALENDAR ICON
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        getMonthYear(),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
-                        onPressed: () {
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(builder: (_) =>  SelectLocation()),
-                          // );
-                        },
-                        child: const Text(
-                          "Next",
-                          style: TextStyle(
-                            color: ColorCode.kHeadingColor,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
                       ),
+                      InkWell(
+                        onTap: () async {
+                          DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2023),
+                            lastDate: DateTime(2035),
+                          );
+
+                          if (picked != null) {
+                            setState(() {
+                              if (selectedDates.any((d) => isSameDate(d, picked))) {
+                                selectedDates.removeWhere(
+                                        (d) => isSameDate(d, picked));
+                              } else {
+                                if (selectedDates.length < 5) {
+                                  selectedDates.add(picked);
+                                }
+                              }
+                            });
+                          }
+                        },
+                        child: ColorFiltered(
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                          child: Image.asset(
+                            "assets/Icons/Calendar_Mark.png",
+                            width: 22,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /// DATE LIST
+                  SizedBox(
+                    height: 72,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 30,
+                      itemBuilder: (context, index) {
+                        final date = baseDate.add(Duration(days: index));
+                        final bool isSelected =
+                        selectedDates.any((d) => isSameDate(d, date));
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedDates.removeWhere(
+                                        (d) => isSameDate(d, date));
+                              } else if (selectedDates.length < 5) {
+                                selectedDates.add(date);
+                              }
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            width: 55,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected
+                                  ? ColorCode.kButtonColor
+                                  : ColorCode.black,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "${date.day}",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+                                  [date.weekday % 7],
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: isSelected
+                                        ? Colors.black
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
-              )
+              ),
+            ),
 
+            const SizedBox(height: 20),
 
-            ],
-          ),
+            /// TIME SLOTS
+            ...List.generate(timeSlots.length, (index) {
+              final bool isSelected =
+                  selectedTimeIndex == index && !isCustomSelected;
+
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedTimeIndex = index;
+                    isCustomSelected = false;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? ColorCode.kButtonColor
+                        : ColorCode.k282828,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        timeSlots[index],
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color:
+                          isSelected ? Colors.black : Colors.white,
+                        ),
+                      ),
+                      if (isSelected)
+                        const Icon(Icons.check,
+                            color: Colors.black, size: 22),
+                    ],
+                  ),
+                ),
+              );
+            }),
+
+            /// CUSTOM TIME
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorCode.k282828,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        isCustomSelected = true;
+                        selectedTimeIndex = -1;
+                      });
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Add Custom Time Duration",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_ios,
+                            size: 14, color: Colors.white70),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: ColorCode.kButtonColor,
+                      inactiveTrackColor: Colors.black,
+                      thumbColor: ColorCode.kButtonColor,
+                    ),
+                    child: Slider(
+                      min: 2,
+                      max: 24,
+                      divisions: 11,
+                      value: selectedHour,
+                      onChanged: (v) =>
+                          setState(() => selectedHour = v),
+                    ),
+                  ),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("02h"), Text("04h"), Text("08h"),
+                      Text("12h"), Text("16h"), Text("20h"), Text("24h"),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            /// NEXT BUTTON
+            SizedBox(
+              height: 55,
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorCode.kButtonColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SelectShootTypeEdits(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Next",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

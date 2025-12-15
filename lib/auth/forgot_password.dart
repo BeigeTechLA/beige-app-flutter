@@ -95,14 +95,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
 
-                      const Text(
+                       Text(
                         "Forgot Password",
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: ColorCode.kHeadingColor,
+                          fontSize: 16,
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w500,
+                          color: ColorCode.white,
                         ),
                       ),
 
@@ -111,8 +112,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       const Text(
                         "Enter your registered email to receive a reset link.\nWe’ll help you get back into your account quickly.",
                         style: TextStyle(
-                          fontSize: 12,
-                          color: ColorCode.kSubtextOpacity,
+                          fontSize: 14,
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w400,
+
+                          color: ColorCode.kWhiteOpacity60,
                         ),
                       ),
 
@@ -147,11 +151,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       : Text(
                     "Send OTP",
                     style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Unbounded",
                       color: isEmailFilled
                           ? ColorCode.kHeadingColor
                           : Colors.black38,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -174,15 +180,40 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           isEmailFilled = value.trim().isNotEmpty;
         });
       },
-      decoration: InputDecoration(
-        labelText: "Email ID*",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+        decoration: InputDecoration(
+          labelText: "Email ID*",
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+
+          labelStyle: const TextStyle(
+            color: ColorCode.white, // #1D1D1B 60% opacity
+          ),
+
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 18,
+          ),
+
+          /// ⭐ 0.5px BORDER + OPACITY COLOR
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+              width: 0.5,                       // 🔥 exact 0.5px
+            ),
+          ),
+
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+              width: 0.5,                          // focus border thicker
+            ),
+          ),
+
+          floatingLabelStyle: const TextStyle(
+            color: ColorCode.kWhiteOpacity60,
+          ),)
+
     );
   }
 }

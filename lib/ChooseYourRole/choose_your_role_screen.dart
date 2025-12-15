@@ -2,6 +2,7 @@ import 'package:beige/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../auth/sign_up_screen.dart';
+import '../utility/ColorCode.dart';
 
 class ChooseYourRoleScreen extends StatefulWidget {
   const ChooseYourRoleScreen({super.key});
@@ -16,10 +17,10 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+         backgroundColor: ColorCode.bcakgroundcolor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsetsGeometry.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -29,8 +30,10 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
               const Text(
                 "Choose Your Role",
                 style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontFamily: "Unbounded",
+                  color: ColorCode.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(height: 6),
@@ -39,8 +42,10 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
               const Text(
                 "Tell us how you want to use the app and continue your journey.",
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black54,
+                  fontFamily: "Outfit",
+                  color: ColorCode.kWhiteOpacity70,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 15,
                 ),
               ),
               const SizedBox(height: 25),
@@ -48,10 +53,10 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
               /// Option 1 - Client
               _buildRoleCard(
                 index: 0,
-                icon: "assets/Icons/choose_your_paln1.png", // replace with your image
+                icon: "assets/images/Group (8).png", // replace with your image
                 title: "Get Started as Client",
                 subtitle:
-                "Find and hire top photographers and videographers for any project.",
+                "Find and hire top photographers \n&videographers for\n any project.",
               ),
 
               const SizedBox(height: 15),
@@ -59,7 +64,7 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
               /// Option 2 - Creative
               _buildRoleCard(
                 index: 1,
-                icon: "assets/Icons/choose_your_plan2.png", // replace with your image
+                icon: "assets/images/OBJECTS.png", // replace with your image
                 title: "Join as Creative",
                 subtitle:
                 "Share your talent and showcase your portfolio to connect with clients.",
@@ -80,7 +85,7 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LoginScreen(role: role),
+                        builder: (_) => SignUpScreen(role: role),
                       ),
                     );
                   },
@@ -126,58 +131,89 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
           selectedIndex = index;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
         width: double.infinity,
-        padding:  EdgeInsets.all(18),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 9),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
-          border: Border.all(
-            color: isSelected ?  Color(0xFFCCC1C1) : Colors.grey.shade300,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset:  Offset(0, 3),
-            )
-          ],
+          borderRadius: BorderRadius.circular(20),
+
+          /// ⭐ Selected / Unselected background
+          gradient: isSelected
+              ? const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF0D6A8),
+              Color(0xFFE6BF7A),
+            ],
+          )
+              : null,
+
+          color: isSelected ? null : ColorCode.k2A2A2A,
+
+          /// ⭐ Border when selected
+         /* border: Border.all(
+            color: isSelected
+                ? const Color(0xFFE8D1AB)
+                : Colors.transparent,
+            width: 1.2,
+          ), */
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              icon,
-              height: 66,
-              width: 60,
-            ),
-             SizedBox(width: 15),
+            /// LEFT CONTENT
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style:  TextStyle(
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      color: isSelected ? Colors.black : ColorCode.white,
+                      fontWeight: FontWeight.w500,
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black54,
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      color: isSelected
+                          ? Colors.black.withOpacity(0.7)
+                          : ColorCode.kWhiteOpacity70,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
                     ),
+                  ),
+                  const SizedBox(height: 16),
+
+              Image.asset(
+                "assets/images/arrow.png",
+                color: isSelected ? Colors.black : ColorCode.white,
+
                   ),
                 ],
               ),
             ),
+
+            /// RIGHT IMAGE
+            /// RIGHT IMAGE
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Image.asset(
+                icon,
+
+              ),
+            ),
+
           ],
         ),
       ),
     );
   }
+
 }
