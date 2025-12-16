@@ -37,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
             width: double.infinity,
 
-            decoration: const BoxDecoration(
+            decoration:  BoxDecoration(
+              color: ColorCode.k282828,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(40),
                 bottomRight: Radius.circular(40),
@@ -46,13 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
             clipBehavior: Clip.antiAlias,
             child: Stack(
               children: [
-
-                // ⭐ BACKGROUND IMAGE
-                Image.asset(
-                  "assets/images/home7.png",
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
 
                 // ⭐ OVERLAY CONTENT
                 SafeArea(
@@ -114,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                     SizedBox(width: 5,),
+                        SizedBox(width: 5,),
 
                             // Bell + Profile
                             Row(
@@ -439,49 +433,134 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-             /*  Center(
+/*
+            Center(
               child: Container(
-                height: 240.56,
-                width: 270,
-
+                height: 260,
+                width: 280,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(34),
-                  border: Border.all(
-                    color: Colors.black.withOpacity(0.4),
-                    width: 0.4,
-                  ),
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/home1.png"), // BACKGROUND
+                  borderRadius: BorderRadius.circular(32),
+                  image: const DecorationImage(
+                    image: AssetImage("assets/images/home3.png"), // MAIN IMAGE
                     fit: BoxFit.cover,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: Stack(
-                  alignment: Alignment.center,
                   children: [
-                    // ⭐ Layer 1 (Middle Image)
-                    Positioned(
-                      top: 15,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
-                        child: Image.asset(
-                          "assets/images/home2.png",
-                          height: 326,
-                          width: 290.45,
-                          fit: BoxFit.fill,
+
+                    /// 🔥 DARK GRADIENT OVERLAY
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.15),
+                              Colors.black.withOpacity(0.75),
+                            ],
+                          ),
                         ),
                       ),
                     ),
 
-                    // ⭐ Layer 2 (Top Image)
+                    /// 🟢 ACTIVE + RATING
                     Positioned(
-                      top: 25,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          "assets/images/home3.png",
-                          height: 405,
-                          width: 335,
-                          fit: BoxFit.fill,
+                      top: 16,
+                      left: 16,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.star, color: Colors.amber, size: 14),
+                                SizedBox(width: 4),
+                                Text(
+                                  "4.5 (120)",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    /// 🧑‍🎨 TEXT CONTENT
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      bottom: 20,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "Ethan Cole",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: "Outfit",
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Photographer Specialist",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+
+                    /// 💰 PRICE BUTTON
+                    Positioned(
+                      bottom: 18,
+                      right: 16,
+                      child: Container(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAD7B0),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Text(
+                          "From \$450/Hr",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -489,9 +568,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),*/
-              
-              Center(
-                child: 
+
+
+            Center(
+                child:
                 Container(
                   child: Image.asset("assets/images/Group 1597883815 (1).png"),
                 ),
