@@ -64,14 +64,34 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
                         child: Image.asset("assets/Icons/Reply.png", height: 24),
                       ),
-                      CircleAvatar(
-                        backgroundColor: Colors.black45,
-                        child: IconButton(
-                          icon: const Icon(Icons.favorite_border,
-                              color: Colors.white),
-                          onPressed: () {},
-                        ),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // on press action
+                            },
+                            child: Image.asset(
+                              "assets/Icons/Share 2.png", // 👈 apni image path
+                              height: 24,
+                              width: 24,
+                              color: Colors.white, // agar white chahiye
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          GestureDetector(
+                            onTap: () {
+                              // on press action
+                            },
+                            child: Image.asset(
+                              "assets/images/Heart Angle.png", // 👈 apni image path
+                              height: 24,
+                              width: 24,
+                              color: Colors.white, // agar white chahiye
+                            ),
+                          ),
+                        ],
                       ),
+
                     ],
                   ),
                 ),

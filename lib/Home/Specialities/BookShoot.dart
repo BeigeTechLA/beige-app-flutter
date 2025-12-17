@@ -87,7 +87,7 @@ class _BookShootScreenState extends State<BookShootScreen> {
                     ],
                   ),
 
-                  Divider(color: ColorCode.kWhiteOpacity60),
+                  Divider(color: ColorCode.kWhiteOpacity70),
                    SizedBox(height: 16),
 
                   buildRadio("Shoots & Edits", 0),
@@ -155,21 +155,28 @@ class _BookShootScreenState extends State<BookShootScreen> {
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+
+                /// 🔥 GRADIENT WHEN SELECTED
                 gradient: selectedIndex == item
                     ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
-                    ColorCode.kButtonColor,
-                    ColorCode.kCreamSoft
+                    Color(0xFFE8D1AB), // light shade
+                    Color(0xFFD4A14D), // dark shade
                   ],
                 )
                     : null,
+
                 color: selectedIndex == item ? null : Colors.transparent,
+
+                /// 🔸 BORDER
                 border: Border.all(
-                  color: selectedIndex == item
-                      ? ColorCode.kWhiteOpacity70
-                      : ColorCode.kWhiteOpacity70,
+                  color: ColorCode.kWhiteOpacity70,
+                  width: 1,
                 ),
               ),
+
               child: selectedIndex == item
                   ? Center(
                 child: Container(

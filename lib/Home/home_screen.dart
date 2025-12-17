@@ -27,165 +27,149 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
        backgroundColor: ColorCode.bcakgroundcolor,
-
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
 
-            Container(
-            width: double.infinity,
+              Container(
+                width: double.infinity,
 
-            decoration:  BoxDecoration(
-              color: ColorCode.k282828,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
+                padding: const EdgeInsets.fromLTRB(
+                  20, // left
+                  28, // top (status bar ke niche look ke liye)
+                  20, // right
+                  20, // bottom
+                ),
+                decoration: const BoxDecoration(
+                  color: ColorCode.k282828,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
 
-                // ⭐ OVERLAY CONTENT
-                SafeArea(
-                  child: Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    /// 🔹 TOP ROW
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
 
-                        const SizedBox(height: 5),
+                        /// MENU
+                        Image.asset(
+                          "assets/Icons/menu-02.png",
+                          width: 26,
+                          color: Colors.white,
+                        ),
 
-                        // ⭐ TOP ROW — Menu | Location | Bell | Profile
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        /// LOCATION
+                        Column(
                           children: [
-                        Image(image: AssetImage("assets/Icons/menu-02.png"),color: ColorCode.white,),
-                            // Menu Icon
-                            // Icon(Icons.menu, color: Colors.white, size: 32),
-
-                            // LOCATION SECTION
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Westheimer Rd",
-                                      style: TextStyle(
-                                        fontFamily: "HelveticaNeue",   // Add font if included in assets
-                                        color: ColorCode.white,
-                                        fontSize: 16,                 // As per your request
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.34,                 // Line height = 21.51px
-                                        letterSpacing: 0,
-                                      ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(
-                                      Icons.keyboard_arrow_down,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: 2),
-
+                            Row(
+                              children: const [
                                 Text(
-                                  "Santa Ana, Illinois 85486",
-                                  textAlign: TextAlign.center,
+                                  "Westheimer Rd",
                                   style: TextStyle(
                                     fontFamily: "HelveticaNeue",
-                                    color: ColorCode.kWhiteOpacity70,
-                                    fontSize: 12,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w400,
+                                    color: Colors.white,
                                   ),
+                                ),
+                                SizedBox(width: 4),
+                                Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.white,
+                                  size: 22,
                                 ),
                               ],
                             ),
-                        SizedBox(width: 5,),
-
-                            // Bell + Profile
-                            Row(
-
-                              children: [
-                              Image(image: AssetImage("assets/Icons/notifactioin.png"),
-                                width: 24,height: 24,
+                            const SizedBox(height: 2),
+                            Text(
+                              "Santa Ana, Illinois 85486",
+                              style: TextStyle(
+                                fontFamily: "HelveticaNeue",
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: ColorCode.kWhiteOpacity70,
                               ),
-                                SizedBox(width: 10,),
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage:
-                                  AssetImage("assets/Icons/profile.png"),
-                                ),
-                              ],
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 20),
-
-                        // ⭐ SEARCH BAR
-                        Container(
-                          decoration: BoxDecoration(
-                            color: ColorCode.kHeadingColor,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          padding:  EdgeInsets.symmetric(horizontal: 11, vertical: 4),
-                          child: Row(
-                            children: [
-                              // 🔍 Custom Search Image
-                              Image.asset(
-                                "assets/Icons/serch.png",
-                             /*   width: 18,
-                                height: 18,*/
-                                color: ColorCode.white,
-                                fit: BoxFit.fill,
-                              ),
-
-                              const SizedBox(width: 10),
-
-                              // 🔤 Search TextField
-                              Expanded(
-                                child: TextField(
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                  ),
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Search Photographer, Videographer....",
-                                    hintStyle: TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                        )
-
+                        /// BELL + PROFILE
+                        Row(
+                          children: [
+                            Image.asset(
+                              "assets/Icons/notifactioin.png",
+                              width: 22,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 12),
+                            const CircleAvatar(
+                              radius: 18,
+                              backgroundImage:
+                              AssetImage("assets/Icons/profile.png"),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ),
+
+                    const SizedBox(height: 22),
+
+                    /// 🔹 SEARCH BAR (IMAGE JAISE LOOK)
+                    Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: ColorCode.kHeadingColor,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            "assets/Icons/serch.png",
+                            width: 18,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                          const SizedBox(width: 10),
+
+                          Expanded(
+                            child: TextField(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontFamily: "Outfit",
+                              ),
+                              cursorColor: Colors.white,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                border: InputBorder.none,
+                                hintText:
+                                "Search Photographer, Videographer...",
+                                hintStyle: TextStyle(
+                                  color: ColorCode.kWhiteOpacity70,
+                                  fontSize: 14,
+                                  fontFamily: "Outfit",
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
 
-              Padding(
+
+            Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
@@ -195,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children:  [
                         Text(
-                          "Book a Shoot",
+                          "Services we Provide",
                           style: TextStyle(
                             color: ColorCode.white,
                             fontFamily: 'Unbounded',   // ← Add this
@@ -204,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                          // Looks cleaner in Unbounded
                           ),
                         ),
-                        GestureDetector(
+                  /*      GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
@@ -219,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 40,
                             color: ColorCode.white,
                           ),
-                        )
+                        )*/
 
                       ],
                     ),
@@ -256,6 +240,170 @@ class _HomeScreenState extends State<HomeScreen> {
                                     top: 10,
                                     left: 5,
                                     child: Text(
+                                      "Beige \n Fleets ",
+                                      style: TextStyle(
+                                        color: ColorCode.white,
+                                        fontFamily: 'Outfit',
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        // Looks cleaner in Unbounded
+                                      ),
+                                    ),
+                                  ),
+
+                                  /// 🔹 BOTTOM RIGHT IMAGE
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Image.asset(
+                                      "assets/images/home_car_.png", // small image
+                                      height: 70.95,
+                                      width: 70.95,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 15,),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Specialities(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 99,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  children: [
+
+                                    /// 🔹 BACKGROUND IMAGE
+                                    Positioned.fill(
+                                      child: Image.asset(
+                                        "assets/images/Frame 2087328875@3x.png",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    /// 🔹 TOP LEFT TEXT
+                                    Positioned(
+                                      top: 10,
+                                      left: 5,
+                                      child: Text(
+                                        "Beige\nStudios ",
+                                        style: TextStyle(
+                                          color: ColorCode.white,
+                                          fontFamily: 'Outfit',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                          // Looks cleaner in Unbounded
+                                        ),
+                                      ),
+                                    ),
+
+                                    /// 🔹 BOTTOM RIGHT IMAGE
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Image.asset(
+                                        "assets/images/home_studio.png", // small image
+                                        height: 70.95,
+                                        width: 70.95,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 15,),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Specialities(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 99,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  children: [
+
+                                    /// 🔹 BACKGROUND IMAGE
+                                    Positioned.fill(
+                                      child: Image.asset(
+                                        "assets/images/Frame 2087328875@3x.png",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    /// 🔹 TOP LEFT TEXT
+                                    Positioned(
+                                      top: 10,
+                                      left: 5,
+                                      child: Text(
+                                        "Events &\n Parties ",
+                                        style: TextStyle(
+                                          color: ColorCode.white,
+                                          fontFamily: 'Outfit',
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                          // Looks cleaner in Unbounded
+                                        ),
+                                      ),
+                                    ),
+
+                                    /// 🔹 BOTTOM RIGHT IMAGE
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Image.asset(
+                                        "assets/images/party.png", // small image
+                                        height: 70.95,
+                                        width: 70.95,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 15,),
+                            Container(
+                              height: 99,
+                              width: 100,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Stack(
+                                children: [
+
+                                  /// 🔹 BACKGROUND IMAGE
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      "assets/images/Frame 2087328875@3x.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+
+                                  /// 🔹 TOP LEFT TEXT
+                                  Positioned(
+                                    top: 10,
+                                    left: 5,
+                                    child: Text(
                                       "Events &\n Parties ",
                                       style: TextStyle(
                                         color: ColorCode.white,
@@ -280,151 +428,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 20,),
-                            Container(
-                              height: 99,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-
-                                  /// 🔹 BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      "assets/images/Frame 2087328875@3x.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-
-                                  /// 🔹 TOP LEFT TEXT
-                                  Positioned(
-                                    top: 10,
-                                    left: 5,
-                                    child: Text(
-                                      "Creative &\n Media ",
-                                      style: TextStyle(
-                                        color: ColorCode.white,
-                                        fontFamily: 'Outfit',
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        // Looks cleaner in Unbounded
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔹 BOTTOM RIGHT IMAGE
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Image.asset(
-                                      "assets/images/party.png", // small image
-                                      height: 70.95,
-                                      width: 70.95,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 20,),
-                            Container(
-                              height: 99,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-
-                                  /// 🔹 BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      "assets/images/Frame 2087328875@3x.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-
-                                  /// 🔹 TOP LEFT TEXT
-                                  Positioned(
-                                    top: 10,
-                                    left: 5,
-                                    child: Text(
-                                      "Events &\n Parties ",
-                                      style: TextStyle(
-                                        color: ColorCode.white,
-                                        fontFamily: 'Outfit',
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        // Looks cleaner in Unbounded
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔹 BOTTOM RIGHT IMAGE
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Image.asset(
-                                      "assets/images/party.png", // small image
-                                      height: 70.95,
-                                      width: 70.95,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 20,),
-                            Container(
-                              height: 99,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-
-                                  /// 🔹 BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      "assets/images/Frame 2087328875@3x.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-
-                                  /// 🔹 TOP LEFT TEXT
-                                  Positioned(
-                                    top: 10,
-                                    left: 5,
-                                    child: Text(
-                                      "Events &\n Parties ",
-                                      style: TextStyle(
-                                        color: ColorCode.white,
-                                        fontFamily: 'Outfit',
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        // Looks cleaner in Unbounded
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔹 BOTTOM RIGHT IMAGE
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Image.asset(
-                                      "assets/images/party.png", // small image
-                                      height: 70.95,
-                                      width: 70.95,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 20,),
+                            SizedBox(width: 15,),
                           ],
                         ),
                       ),
@@ -677,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           // 🔹 Your First Card
                           Container(
-                            width: 200,
+                            width: 210,
                             height: 280,
                             child: Stack(
                               children: [
@@ -724,7 +728,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   right: 10,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.favorite_outline_outlined, color: Colors.white, size: 20),
+                                      GestureDetector(
+                                        onTap: () {
+                                          // on press action
+                                        },
+                                        child: Image.asset(
+                                          "assets/images/Heart Angle.png", // 👈 apni image path
+                                          height: 24,
+                                          width: 24,
+                                          color: Colors.white, // agar white chahiye
+                                        ),
+                                      ),
+
                                       SizedBox(width: 4),
                                     ],
                                   ),
@@ -827,7 +842,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           // 🔹 Second Card (Your full card with button)
                           Container(
-                            width: 200,
+                            width: 210,
                             height: 280,
                             child: Stack(
                               children: [
@@ -851,7 +866,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       "assets/images/Rectangle 19.png",
                                       fit: BoxFit.fill,
                                       width: double.infinity,
-                                      height: 100,
+                                      height: 120,
                                     ),
                                   ),
                                 ),
@@ -874,7 +889,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                   right: 10,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.favorite_outline_outlined, color: Colors.white, size: 20),
+                                      GestureDetector(
+                                        onTap: () {
+                                          // on press action
+                                        },
+                                        child: Image.asset(
+                                          "assets/images/Heart Angle.png", // 👈 apni image path
+                                          height: 24,
+                                          width: 24,
+                                          color: Colors.white, // agar white chahiye
+                                        ),
+                                      ),
+
                                       SizedBox(width: 4),
                                     ],
                                   ),
@@ -972,7 +998,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ),
-
                           SizedBox(width: 12),
                         ],
                       ),
