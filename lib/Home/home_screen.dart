@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../MyProfile/my_profile.dart';
 import '../utility/ColorCode.dart';
 import 'Specialities/specialities.dart';
 
@@ -12,7 +13,45 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+
+
+  int currentIndex = 0;
+  late AnimationController _controller;
+  late Animation<double> _fade;
+  late Animation<Offset> _slideDown;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _fade = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _scale = Tween<double>(begin: 1, end: 0.94).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _slideDown = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 0.45),
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, String>> items = [
   {"title": "Events &\nParties", "icon": "assets/images/home3.png"},
@@ -22,6 +61,33 @@ class _HomeScreenState extends State<HomeScreen> {
   {"title": "Sports &\nAction", "icon": "assets/images/home3.png"},
   {"title": "Personal\nShoots", "icon": "assets/images/home3.png"},
   ];
+
+  final List<Map<String, String>> cards = [
+    {
+      "name": "Ethan Cole",
+      "role": "Photographer Specialist",
+      "image": "assets/images/home3.png",
+      "price": "From \$450/Hr",
+      "rating": "4.5 (120)"
+    },
+    {
+      "name": "Alex Morgan",
+      "role": "Videographer",
+      "image": "assets/images/home2.png",
+      "price": "From \$380/Hr",
+      "rating": "4.7 (98)"
+    },
+    {
+      "name": "Liam Walker",
+      "role": "Cinematic Director",
+      "image": "assets/images/home1.png", // ✅ NEW IMAGE
+      "price": "From \$520/Hr",
+      "rating": "4.8 (140)"
+    },
+  ];
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,10 +176,18 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.white,
                             ),
                             const SizedBox(width: 12),
-                            const CircleAvatar(
-                              radius: 18,
-                              backgroundImage:
-                              AssetImage("assets/Icons/profile.png"),
+                            InkWell(
+                              onTap: () {
+                               /* Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MyProfile()),
+                                );*/
+                              },
+                              child: const CircleAvatar(
+                                radius: 18,
+                                backgroundImage:
+                                AssetImage("assets/Icons/profile.png"),
+                              ),
                             ),
                           ],
                         ),
@@ -179,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children:  [
                         Text(
-                          "Services we Provide",
+                          "Book a Shoot",
                           style: TextStyle(
                             color: ColorCode.white,
                             fontFamily: 'Unbounded',   // ← Add this
@@ -188,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                          // Looks cleaner in Unbounded
                           ),
                         ),
-                  /*      GestureDetector(
+                        GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
@@ -203,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 40,
                             color: ColorCode.white,
                           ),
-                        )*/
+                        )
 
                       ],
                     ),
@@ -437,149 +511,80 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-/*
-            Center(
-              child: Container(
-                height: 260,
-                width: 280,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(32),
-                  image: const DecorationImage(
-                    image: AssetImage("assets/images/home3.png"), // MAIN IMAGE
-                    fit: BoxFit.cover,
+
+              Center(
+                child: GestureDetector(
+                  onTap: () async {
+                    await _controller.forward();
+
+                    setState(() {
+                      currentIndex = (currentIndex + 1) % cards.length;
+                    });
+
+                    _controller.reset();
+                  },
+                  child: SizedBox(
+                    height: 440,
+                    width: 335,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+
+                        /// 🔹 THIRD CARD (BACK)
+                        Transform.translate(
+                          offset: const Offset(0, -32),
+                          child: Opacity(
+                            opacity: 0.5,
+                            child: _buildCard(
+                              key: const ValueKey("third"),
+                              data: cards[(currentIndex + 2) % cards.length],
+                            ),
+                          ),
+                        ),
+
+                        /// 🔹 SECOND CARD (MIDDLE)
+                        Transform.translate(
+                          offset: const Offset(0, -16),
+                          child: Opacity(
+                            opacity: 0.75,
+                            child: _buildCard(
+                              key: const ValueKey("second"),
+                              data: cards[(currentIndex + 1) % cards.length],
+                            ),
+                          ),
+                        ),
+
+                        /// 🔹 CURRENT CARD (SMOOTH EXIT)
+                        SlideTransition(
+                          position: _slideDown,
+                          child: ScaleTransition(
+                            scale: _scale,
+                            child: FadeTransition(
+                              opacity: _fade,
+                              child: _buildCard(
+                                key: ValueKey(currentIndex),
+                                data: cards[currentIndex],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-
-                    /// 🔥 DARK GRADIENT OVERLAY
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.15),
-                              Colors.black.withOpacity(0.75),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    /// 🟢 ACTIVE + RATING
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.star, color: Colors.amber, size: 14),
-                                SizedBox(width: 4),
-                                Text(
-                                  "4.5 (120)",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /// 🧑‍🎨 TEXT CONTENT
-                    Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 20,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "Ethan Cole",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                              fontFamily: "Outfit",
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "Photographer Specialist",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                        ],
-                      ),
-                    ),
-
-                    /// 💰 PRICE BUTTON
-                    Positioned(
-                      bottom: 18,
-                      right: 16,
-                      child: Container(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEAD7B0),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Text(
-                          "From \$450/Hr",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),*/
 
 
-            Center(
-                child:
-                Container(
-                  child: Image.asset("assets/images/Group 1597883815 (1).png"),
-                ),
-              ),
+
+
+
+              // Center(
+            //     child:
+            //     Container(
+            //       child: Image.asset("assets/images/Group 1597883815 (1).png"),
+            //     ),
+            //   ),
 
 
               SizedBox(height: 25),
@@ -1241,6 +1246,146 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCard({
+    required Map<String, String> data,
+    required Key key,
+    int index = 0,
+  }) {
+    return Transform.translate(
+      offset: Offset(0, -index * 28), // 🔥 YAHI SE TOP SE DIKHEGA
+      child: Container(
+        key: key,
+        height: 376,
+        width: 335,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(35),
+          image: DecorationImage(
+            image: AssetImage(data["image"]!),
+            fit: BoxFit.cover,
+          ),
+       /*   boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],*/
+        ),
+        child: Stack(
+          children: [
+            /// DARK GRADIENT
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(32),
+                /*  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.1),
+                      Colors.black.withOpacity(0.75),
+                    ],
+                  )*/
+                ),
+              ),
+            ),
+
+            /// STATUS + RATING
+            Positioned(
+              top: 16,
+              left: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Transform.translate(
+                        offset: const Offset(0, -2),
+                        child: Image.asset(
+                          "assets/Icons/home_green.png",
+                          height: 22,
+                          width: 22,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: ColorCode.kWhiteOpacity60,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star,
+                                color: Colors.amber, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              data["rating"]!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Text(
+                    data["name"]!,
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      color: ColorCode.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(
+                    data["role"]!,
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      color: ColorCode.kWhiteOpacity70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAD7B0),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      data["price"]!,
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        color: ColorCode.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utility/ColorCode.dart';
+import 'booking_select_date_time_slots.dart';
+import 'upcoming_booking_event_summary.dart';
 
 class BookingAllScreen extends StatefulWidget {
   const BookingAllScreen({super.key});
@@ -137,13 +139,24 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   // ================= UPCOMING CARD =================
 
   Widget upcomingBookingCard() {
-    return bookingCard(
-      imagePath: "assets/images/home2.png",
-      buttonText: "Manage Booking",
-      filledButton: true,
-      showActiveDot: true,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>  BookingSelectDateTimeSlots(),
+          ),
+        );
+      },
+      child: bookingCard(
+        imagePath: "assets/images/home2.png",
+        buttonText: "Manage Booking",
+        filledButton: true,
+        showActiveDot: true,
+      ),
     );
   }
+
 
   // ================= COMPLETED CARD =================
 

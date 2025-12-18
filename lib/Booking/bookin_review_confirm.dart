@@ -1,54 +1,85 @@
-import 'package:beige/utility/ColorCode.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-class BookingSummaryDetils extends StatefulWidget {
-  const BookingSummaryDetils({super.key});
+import '../utility/ColorCode.dart';
+
+class BookinReviewConfirm extends StatefulWidget {
+  const BookinReviewConfirm({super.key});
 
   @override
-  State<BookingSummaryDetils> createState() => _BookingSummaryDetilsState();
+  State<BookinReviewConfirm> createState() => _BookinReviewConfirmState();
 }
 
-class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
+class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   bool payFullAdvance = true;
   int selectedPayment = 0;
   int selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1D1D1B),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding:  EdgeInsets.all(20),
+      backgroundColor: ColorCode.bcakgroundcolor,
+      appBar: AppBar(
+        backgroundColor: ColorCode.bcakgroundcolor,
+        elevation: 0,
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Image.asset(
+            "assets/Icons/Reply.png",
+            height: 22,
+            color: Colors.white,
+          ),
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16),
+            child: Center(
+              child: Text("2/2", style: TextStyle(color: Colors.white)),
+            ),
+          )
+        ],
+      ),
+
+      body: SingleChildScrollView(
+        child: Padding(
+          padding:  EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              /// 🔙 BACK + TITLE
+              /// STEP INDICATOR
+              Row(
+                children: List.generate(
+                  2,
+                      (index) => Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 6),
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: index < 2
+                            ? ColorCode.kButtonColor
+                            : ColorCode.kSubtextColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 24),
               Row(
                 children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      "assets/Icons/Vector.png",
-                      height: 22,
+                  Text(
+                    "Booking Summary",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),
                   ),
                 ],
               ),
-               SizedBox(height: 12),
-               Text(
-                "Booking Summary",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Unbounded",
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-               SizedBox(height: 24),
+              SizedBox(height: 24),
 
               /// 📸 CREATOR CARD
               Container(
@@ -86,7 +117,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                                   Text(
                                     "4.5 (120)",
                                     style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
-                                    fontFamily: "Outfit",
+                                      fontFamily: "Outfit",
                                     ),
                                   ),
                                 ],
@@ -106,7 +137,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                                 "Videography Specialist",
                                 style: TextStyle(
                                   fontSize: 12, color: ColorCode.kWhiteOpacity70,
-                                fontFamily: "Outfit",
+                                  fontFamily: "Outfit",
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -183,7 +214,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                 ),
               ),
               Divider(color: Colors.white24,),
-               SizedBox(height: 28),
+              SizedBox(height: 28),
 
 
               Column(
@@ -219,7 +250,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                       )
                     ],
                   ),
-                   SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   /// 🔹 PAY AT VENUE
                   paymentRadioTile(
@@ -232,44 +263,44 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                     value: 1,
                   ),
                   Container(
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-    color: const Color(0xFF282828),
-    borderRadius: BorderRadius.circular(14),
-    ),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    const Text(
-    "Pay Full Payment in Advance",
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 14,
-    fontFamily: "Outfit",
-    fontWeight: FontWeight.w400,
-    ),
-    ),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF282828),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Pay Full Payment in Advance",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
 
-    /// 🔥 IMAGE-LIKE SWITCH
-    gradientSwitch(
-    value: payFullAdvance,
-    onChanged: (val) {
-    setState(() {
-    payFullAdvance = val;
-    });
-    },
-    ),
-    ],
-    ),
-    ),
+                        /// 🔥 IMAGE-LIKE SWITCH
+                        gradientSwitch(
+                          value: payFullAdvance,
+                          onChanged: (val) {
+                            setState(() {
+                              payFullAdvance = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
 
 
-    ],
+                ],
               ),
 
               Divider(color: Colors.white30),
-               SizedBox(height: 28),
+              SizedBox(height: 28),
 
 
               Row(
@@ -435,8 +466,8 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                   ],
                 ),
               ),
-               SizedBox(height: 28),
-       Divider(color: Colors.white30,),
+              SizedBox(height: 28),
+              Divider(color: Colors.white30,),
               /// 📝 NOTES
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -489,52 +520,90 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
 
               const SizedBox(height: 32),
 
-              /// 🔘 BUTTON
-
             ],
           ),
-
         ),
-
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        child:    SizedBox(
-          width: double.infinity,
-          height: 55,
-          child: ElevatedButton(
-            onPressed: () {
-             /* Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddOnServices(),
-                ),
-              );*/
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor:  ColorCode.kButtonColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child:
-            Text(
-              "Add Payment Method",
-              style: TextStyle(
-                fontFamily: "Unbounded",
-                fontWeight: FontWeight.w500,
-                color: ColorCode.kHeadingColor,
-                fontSize: 14,
-              ),
-            ),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 10,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+
+            /// 🔹 PRICE + DETAILS
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  "\$405.00/-",
+                  style: TextStyle(
+                    fontFamily: "Unbounded",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "01 Services | 11 Hours",
+                  style: TextStyle(
+                    fontFamily: "Outfit",
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white60,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(width: 16),
+
+            /// 🔹 CONTINUE BUTTON
+            Expanded(
+              child: SizedBox(
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () {
+                    showScheduleUpdatedDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorCode.kButtonColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: ColorCode.kHeadingColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+
     );
-
   }
-
-  /// 🔹 WIDGETS
   Widget sectionTitle(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -563,10 +632,10 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 12,
-              color: ColorCode.black,
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w400
+                fontSize: 12,
+                color: ColorCode.black,
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w400
 
             ),
           ),
@@ -634,10 +703,10 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
               child: Text(
                 title,
                 style:  TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w400
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w400
                 ),
               ),
             ),
@@ -733,5 +802,84 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
       ),
     );
   }
+  void showScheduleUpdatedDialog(BuildContext context) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Schedule Updated",
+      barrierColor: Colors.black.withOpacity(0.35), // dark overlay
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (_, __, ___) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // 🔥 BLUR STRENGTH
+          child: Center(
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
+                    /// 🔹 ICON STACK
+
+                    Image.asset(
+                      "assets/images/Group 1171276698 (1).png",
+                      height: 64,
+                      width: 64,
+                      fit: BoxFit.contain,
+                    ),
+
+
+                    const SizedBox(height: 16),
+
+                    /// 🔹 TITLE
+                    const Text(
+                      "Schedule Updated",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.kButtonColor,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    /// 🔹 SUBTITLE
+                    const Text(
+                      "Your booking has been rescheduled with updated date and time.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: ColorCode.kWhiteOpacity70,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    /*  transitionBuilder: (_, anim, __, child) {
+        return FadeTransition(
+          opacity: anim,
+          child: ScaleTransition(
+            scale: Tween(begin: 0.95, end: 1.0).animate(anim),
+            child: child,
+          ),
+        );
+      },*/
+    );
+  }
 }
