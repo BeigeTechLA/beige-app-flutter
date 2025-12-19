@@ -29,24 +29,35 @@ class _HomeScreenState extends State<HomeScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 900), // ⬅ thoda slow & smooth
     );
 
     _fade = Tween<double>(begin: 1, end: 0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
     );
 
-    _scale = Tween<double>(begin: 1, end: 0.94).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    _scale = Tween<double>(begin: 1, end: 0.92).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutBack, // 🔥 premium bounce
+      ),
     );
 
     _slideDown = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, 0.45),
+      end: const Offset(0, 0.55),
     ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutQuart,
+      ),
     );
+
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -54,12 +65,13 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   final List<Map<String, String>> items = [
-  {"title": "Events &\nParties", "icon": "assets/images/home3.png"},
-  {"title": "Creative &\nMedia", "icon": "assets/images/home3.png"},
-  {"title": "Travel &\nOutdoors", "icon": "assets/images/home3.png"},
-  {"title": "Drone &\nAerial", "icon": "assets/images/home3.png"},
-  {"title": "Sports &\nAction", "icon": "assets/images/home3.png"},
-  {"title": "Personal\nShoots", "icon": "assets/images/home3.png"},
+
+  {"title": "Events &\nParties", "icon": "assets/images/party.png"},
+  {"title": "Creative &\nMedia", "icon": "assets/images/Creative.png"},
+  {"title": "Travel &\nOutdoors", "icon": "assets/images/Travel.png"},
+  {"title": "Drone &\nAerial", "icon": "assets/images/drone.png"},
+  {"title": "Sports &\nAction", "icon": "assets/images/Creative.png"},
+  {"title": "Personal\nShoots", "icon": "assets/images/personal_shoot.png"},
   ];
 
   final List<Map<String, String>> cards = [
@@ -178,10 +190,10 @@ class _HomeScreenState extends State<HomeScreen>
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                               /* Navigator.push(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => MyProfile()),
-                                );*/
+                                );
                               },
                               child: const CircleAvatar(
                                 radius: 18,
@@ -289,224 +301,74 @@ class _HomeScreenState extends State<HomeScreen>
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 99,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
+                          children: List.generate(items.length, (index) {
+                            final item = items[index];
 
-                                  /// 🔹 BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      "assets/images/Frame 2087328875@3x.png",
-                                      fit: BoxFit.cover,
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Specialities(),
                                     ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 99,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Stack(
+                                    children: [
 
-                                  /// 🔹 TOP LEFT TEXT
-                                  Positioned(
-                                    top: 10,
-                                    left: 5,
-                                    child: Text(
-                                      "Beige \n Fleets ",
-                                      style: TextStyle(
-                                        color: ColorCode.white,
-                                        fontFamily: 'Outfit',
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        // Looks cleaner in Unbounded
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔹 BOTTOM RIGHT IMAGE
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Image.asset(
-                                      "assets/images/home_car_.png", // small image
-                                      height: 70.95,
-                                      width: 70.95,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Specialities(),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 99,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  children: [
-
-                                    /// 🔹 BACKGROUND IMAGE
-                                    Positioned.fill(
-                                      child: Image.asset(
-                                        "assets/images/Frame 2087328875@3x.png",
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-
-                                    /// 🔹 TOP LEFT TEXT
-                                    Positioned(
-                                      top: 10,
-                                      left: 5,
-                                      child: Text(
-                                        "Beige\nStudios ",
-                                        style: TextStyle(
-                                          color: ColorCode.white,
-                                          fontFamily: 'Outfit',
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                          // Looks cleaner in Unbounded
+                                      /// 🔹 BACKGROUND IMAGE
+                                      Positioned.fill(
+                                        child: Image.asset(
+                                          "assets/images/Frame 2087328875@3x.png",
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                    ),
 
-                                    /// 🔹 BOTTOM RIGHT IMAGE
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Image.asset(
-                                        "assets/images/home_studio.png", // small image
-                                        height: 70.95,
-                                        width: 70.95,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Specialities(),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 99,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  children: [
-
-                                    /// 🔹 BACKGROUND IMAGE
-                                    Positioned.fill(
-                                      child: Image.asset(
-                                        "assets/images/Frame 2087328875@3x.png",
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-
-                                    /// 🔹 TOP LEFT TEXT
-                                    Positioned(
-                                      top: 10,
-                                      left: 5,
-                                      child: Text(
-                                        "Events &\n Parties ",
-                                        style: TextStyle(
-                                          color: ColorCode.white,
-                                          fontFamily: 'Outfit',
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                          // Looks cleaner in Unbounded
+                                      /// 🔹 TOP LEFT TEXT
+                                      Positioned(
+                                        top: 10,
+                                        left: 6,
+                                        child: Text(
+                                          item["title"]!,
+                                          style: const TextStyle(
+                                            color: ColorCode.white,
+                                            fontFamily: 'Outfit',
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ),
 
-                                    /// 🔹 BOTTOM RIGHT IMAGE
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Image.asset(
-                                        "assets/images/party.png", // small image
-                                        height: 70.95,
-                                        width: 70.95,
+                                      /// 🔹 BOTTOM RIGHT IMAGE
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Image.asset(
+                                          item["icon"]!,
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.contain,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 15,),
-                            Container(
-                              height: 99,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-
-                                  /// 🔹 BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      "assets/images/Frame 2087328875@3x.png",
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-
-                                  /// 🔹 TOP LEFT TEXT
-                                  Positioned(
-                                    top: 10,
-                                    left: 5,
-                                    child: Text(
-                                      "Events &\n Parties ",
-                                      style: TextStyle(
-                                        color: ColorCode.white,
-                                        fontFamily: 'Outfit',
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        // Looks cleaner in Unbounded
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔹 BOTTOM RIGHT IMAGE
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Image.asset(
-                                      "assets/images/party.png", // small image
-                                      height: 70.95,
-                                      width: 70.95,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 15,),
-                          ],
+                            );
+                          }),
                         ),
                       ),
                     ),
+
 
                   ],
                 ),
@@ -524,38 +386,44 @@ class _HomeScreenState extends State<HomeScreen>
                     _controller.reset();
                   },
                   child: SizedBox(
-                    height: 440,
-                    width: 335,
+                    height: 420,
+                    width: 320,
                     child: Stack(
-                      clipBehavior: Clip.none,
                       alignment: Alignment.center,
+                      clipBehavior: Clip.none,
                       children: [
 
-                        /// 🔹 THIRD CARD (BACK)
+                        /// 🔹 THIRD CARD (BACK – SMALLEST)
                         Transform.translate(
-                          offset: const Offset(0, -32),
-                          child: Opacity(
-                            opacity: 0.5,
-                            child: _buildCard(
-                              key: const ValueKey("third"),
-                              data: cards[(currentIndex + 2) % cards.length],
+                          offset: const Offset(0, -48),
+                          child: Transform.scale(
+                            scale: 0.88,
+                            child: Opacity(
+                              opacity: 0.35,
+                              child: _buildCard(
+                                key: const ValueKey("third"),
+                                data: cards[(currentIndex + 2) % cards.length],
+                              ),
                             ),
                           ),
                         ),
 
                         /// 🔹 SECOND CARD (MIDDLE)
                         Transform.translate(
-                          offset: const Offset(0, -16),
-                          child: Opacity(
-                            opacity: 0.75,
-                            child: _buildCard(
-                              key: const ValueKey("second"),
-                              data: cards[(currentIndex + 1) % cards.length],
+                          offset: const Offset(0, -24),
+                          child: Transform.scale(
+                            scale: 0.94,
+                            child: Opacity(
+                              opacity: 0.65,
+                              child: _buildCard(
+                                key: const ValueKey("second"),
+                                data: cards[(currentIndex + 1) % cards.length],
+                              ),
                             ),
                           ),
                         ),
 
-                        /// 🔹 CURRENT CARD (SMOOTH EXIT)
+                        /// 🔹 CURRENT CARD (TOP)
                         SlideTransition(
                           position: _slideDown,
                           child: ScaleTransition(
@@ -572,22 +440,19 @@ class _HomeScreenState extends State<HomeScreen>
                       ],
                     ),
                   ),
-                ),
-              ),
-
-
-
-
-
-              // Center(
-            //     child:
-            //     Container(
-            //       child: Image.asset("assets/images/Group 1597883815 (1).png"),
-            //     ),
-            //   ),
-
+                )),
 
               SizedBox(height: 25),
+
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: Divider(
+                    color: ColorCode.kDividerWhite12,
+                    thickness: 1,
+                  ),
+                ),
+              ),
 
 
               Padding(
@@ -631,14 +496,27 @@ class _HomeScreenState extends State<HomeScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         teamCard(image: "assets/images/man2.png", name: "George Harris"),
-                        teamCard(image: "assets/images/man2.png", name: "Emily Johnson"),
-                        teamCard(image: "assets/images/man2.png", name: "Charles Smith"),
+                        teamCard(image: "assets/images/Group 2087329236.png", name: "Emily Johnson"),
+                        teamCard(image: "assets/images/Group 45.png", name: "Charles Smith"),
+
                       ],
                     )
 
                   ],
                 ),
               ),
+
+
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: Divider(
+                    color: ColorCode.kDividerWhite12,
+                    thickness: 1,
+                  ),
+                ),
+              ),
+
 
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -673,9 +551,6 @@ class _HomeScreenState extends State<HomeScreen>
                             color: ColorCode.white,
                           ),
                         ),
-
-
-
                       ],
                     ),
                     SingleChildScrollView(
@@ -694,8 +569,8 @@ class _HomeScreenState extends State<HomeScreen>
                                   borderRadius: BorderRadius.circular(18),
                                   child: Image.asset(
                                     "assets/images/home2.png",
-                                    width: double.infinity,
-                                    height: double.infinity,
+                                 /*   width: double.infinity,
+                                    height: double.infinity,*/
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -707,13 +582,14 @@ class _HomeScreenState extends State<HomeScreen>
                                       bottom: Radius.circular(18),
                                     ),
                                     child: Image.asset(
-                                      "assets/images/Rectangle 19.png",
-                                      fit: BoxFit.fill,
+                                      "assets/images/them_black_back.png",
+                                      fit: BoxFit.cover,
                                       width: double.infinity,
-                                      height: 120,
+                                      // height: 120,
                                     ),
                                   ),
                                 ),
+
 
                                 Positioned(
                                   top: 10,
@@ -767,23 +643,23 @@ class _HomeScreenState extends State<HomeScreen>
                                           Text(
                                             "4.5 (120)",
                                             style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              fontFamily: "Outfit",
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ],
                                       ),
 
 
-
-
                                       Text(
                                         "Angela Kia",
                                         style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
 
@@ -792,8 +668,10 @@ class _HomeScreenState extends State<HomeScreen>
                                       Text(
                                         "Videography Specialist",
                                         style: TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 12,
+                                          fontSize: 10,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
 
@@ -803,7 +681,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
                                             decoration: BoxDecoration(
                                               color: ColorCode.kButtonColor,
                                               borderRadius: BorderRadius.circular(22),
@@ -813,27 +691,18 @@ class _HomeScreenState extends State<HomeScreen>
                                               style: TextStyle(
                                                 fontFamily: "Outfit",
                                                 color: ColorCode.kCircleGradientTop,
-                                                fontWeight: FontWeight.w700,
-
-                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ),
-
-                                          Container(
-                                            height: 36,
-                                            width: 36,
-                                            child: Image.asset('assets/images/Group 2087328980.png'),
-                                            /*  decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white24,
-                                            ),
-                                            child: Icon(
-                                              Icons.arrow_forward,
-                                              color: Colors.white,
-                                              size: 18,
-                                            ),*/
+                                          Image.asset(
+                                            "assets/images/Group 2087328980.png",
+                                            width: 35,   // optional
+                                            height: 35,  // optional
+                                            fit: BoxFit.contain,
                                           ),
+
                                         ],
                                       )
                                     ],
@@ -854,9 +723,9 @@ class _HomeScreenState extends State<HomeScreen>
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(18),
                                   child: Image.asset(
-                                    "assets/images/home2.png",
-                                    width: double.infinity,
-                                    height: double.infinity,
+                                    "assets/images/home1.png",
+                                    /*   width: double.infinity,
+                                    height: double.infinity,*/
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -868,13 +737,14 @@ class _HomeScreenState extends State<HomeScreen>
                                       bottom: Radius.circular(18),
                                     ),
                                     child: Image.asset(
-                                      "assets/images/Rectangle 19.png",
-                                      fit: BoxFit.fill,
+                                      "assets/images/them_black_back.png",
+                                      fit: BoxFit.cover,
                                       width: double.infinity,
-                                      height: 120,
+                                      // height: 120,
                                     ),
                                   ),
                                 ),
+
 
                                 Positioned(
                                   top: 10,
@@ -926,35 +796,37 @@ class _HomeScreenState extends State<HomeScreen>
                                           Icon(Icons.star, color: Colors.yellow, size: 18),
                                           SizedBox(width: 4),
                                           Text(
-                                            "4.5 (120)",
+                                            "4.2 (400)",
                                             style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              fontFamily: "Outfit",
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ],
                                       ),
 
 
-
-
                                       Text(
-                                        "Angela Kia",
+                                        "Lucas Bennett",
                                         style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
 
                                       SizedBox(height: 2),
 
                                       Text(
-                                        "Videography Specialist",
+                                        "Photographer Specialist",
                                         style: TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 12,
+                                          fontSize: 10,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
 
@@ -964,7 +836,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
                                             decoration: BoxDecoration(
                                               color: ColorCode.kButtonColor,
                                               borderRadius: BorderRadius.circular(22),
@@ -974,27 +846,18 @@ class _HomeScreenState extends State<HomeScreen>
                                               style: TextStyle(
                                                 fontFamily: "Outfit",
                                                 color: ColorCode.kCircleGradientTop,
-                                                fontWeight: FontWeight.w700,
-
-                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ),
-
-                                          Container(
-                                            height: 36,
-                                            width: 36,
-                                            child: Image.asset('assets/images/Group 2087328980.png'),
-                                            /*  decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white24,
-                                            ),
-                                            child: Icon(
-                                              Icons.arrow_forward,
-                                              color: Colors.white,
-                                              size: 18,
-                                            ),*/
+                                          Image.asset(
+                                            "assets/images/Group 2087328980.png",
+                                            width: 35,   // optional
+                                            height: 35,  // optional
+                                            fit: BoxFit.contain,
                                           ),
+
                                         ],
                                       )
                                     ],
@@ -1003,14 +866,165 @@ class _HomeScreenState extends State<HomeScreen>
                               ],
                             ),
                           ),
-                          SizedBox(width: 12),
+
+                          SizedBox(width: 16),
+
+                          Container(
+                            width: 210,
+                            height: 280,
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: Image.asset(
+                                    "assets/images/home3.png",
+                                    /*   width: double.infinity,
+                                    height: double.infinity,*/
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.vertical(
+                                      bottom: Radius.circular(18),
+                                    ),
+                                    child: Image.asset(
+                                      "assets/images/them_black_back.png",
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      // height: 120,
+                                    ),
+                                  ),
+                                ),
+
+
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: Container(
+                                    height: 14,
+                                    width: 14,
+                                    decoration: BoxDecoration(
+                                      color: Colors.green,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          // on press action
+                                        },
+                                        child: Image.asset(
+                                          "assets/images/Heart Angle.png", // 👈 apni image path
+                                          height: 24,
+                                          width: 24,
+                                          color: Colors.white, // agar white chahiye
+                                        ),
+                                      ),
+
+                                      SizedBox(width: 4),
+                                    ],
+                                  ),
+                                ),
+
+                                // BOTTOM CONTENT
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+
+                                      Row(
+                                        children: [
+                                          Icon(Icons.star, color: Colors.yellow, size: 18),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            "4.2 (400)",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontFamily: "Outfit",
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+
+                                      Text(
+                                        "Lucas Bennett",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 2),
+
+                                      Text(
+                                        "Photographer Specialist",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontFamily: "Outfit",
+                                          color: ColorCode.white,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 10),
+
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+                                            decoration: BoxDecoration(
+                                              color: ColorCode.kButtonColor,
+                                              borderRadius: BorderRadius.circular(22),
+                                            ),
+                                            child: Text(
+                                              "From \$450/Hr",
+                                              style: TextStyle(
+                                                fontFamily: "Outfit",
+                                                color: ColorCode.kCircleGradientTop,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                          Image.asset(
+                                            "assets/images/Group 2087328980.png",
+                                            width: 35,   // optional
+                                            height: 35,  // optional
+                                            fit: BoxFit.contain,
+                                          ),
+
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+
                         ],
                       ),
                     )
-
-
-
-
 
                   ],
                 ),
@@ -1022,180 +1036,6 @@ class _HomeScreenState extends State<HomeScreen>
 
     );
   }
-
-  // ⭐ SPECIALITY CARD WIDGET
-  Widget specialityCard() {
-    return Container(
-      width: 92,
-      height: 92,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-      ),
-      clipBehavior: Clip.antiAlias, // image rounded aayegi
-      child: Image.asset(
-        "assets/images/Group 2087328775 (1).png",
-        fit: BoxFit.cover, // pura container fill karegi
-      ),
-    );
-  }
-
-
-
-
-
-  // ⭐ CREATOR TILE
-  Widget creatorTile({
-    required String name,
-    required String rating,
-    required String price,
-    required String status,       // Available / Busy
-    required bool isAvailable,    // true → green, false → red
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // LEFT IMAGE CONTAINER (exact screenshot style)
-          Container(
-            height: 95,
-            width: 95,
-            decoration: BoxDecoration(
-              color: ColorCode.kCreamSoft,
-              borderRadius: BorderRadius.circular(22),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Image.asset(
-                  "assets/images/Home4.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 18),
-
-          // MIDDLE CONTENT
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // NAME + STATUS BADGE
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                          fontFamily: 'Unbounded',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-
-                    // STATUS BADGE
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isAvailable ? Colors.green : Colors.red,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Text(
-                        status,
-                        style: TextStyle(
-                          fontFamily: 'Outfit',
-                          fontSize: 13,
-                          color: isAvailable ? Colors.green : Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 4),
-
-                // SPECIALIST TEXT
-                Text(
-                  "Photographer Specialist",
-                  style: TextStyle(
-                    fontFamily: 'Outfit',
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // RATING + PRICE ROW
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Rating
-                    Row(
-                      children: [
-                        const Icon(Icons.star,
-                            size: 20, color: Colors.amber),
-                        const SizedBox(width: 6),
-                        Text(
-                          rating,
-                          style: const TextStyle(
-                            fontFamily: 'Outfit',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "(120)",
-                          style: TextStyle(
-                            fontFamily: 'Outfit',
-                            fontSize: 12,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Price
-                    Text(
-                      "From $price/Hr",
-                      style: const TextStyle(
-                        fontFamily: 'Unbounded',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 
   Widget teamCard({
     required String image,
@@ -1266,13 +1106,14 @@ class _HomeScreenState extends State<HomeScreen>
             image: AssetImage(data["image"]!),
             fit: BoxFit.cover,
           ),
-       /*   boxShadow: [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: Colors.black.withOpacity(0.25),
+              blurRadius: 30,
+              offset: const Offset(0, 20),
             ),
-          ],*/
+          ],
+
         ),
         child: Stack(
           children: [

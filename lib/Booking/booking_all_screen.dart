@@ -1,3 +1,4 @@
+import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:flutter/material.dart';
 import '../utility/ColorCode.dart';
 import 'booking_select_date_time_slots.dart';
@@ -141,10 +142,11 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget upcomingBookingCard() {
     return GestureDetector(
       onTap: () {
+        // 👉 CARD CLICK → DETAILS SCREEN
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>  BookingSelectDateTimeSlots(),
+            builder: (context) =>  UpcomingBookingEventSummary(),
           ),
         );
       },
@@ -153,6 +155,14 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         buttonText: "Manage Booking",
         filledButton: true,
         showActiveDot: true,
+        onButtonTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UpcomingEventSummaryManagebooking(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -176,6 +186,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     required String buttonText,
     required bool filledButton,
     required bool showActiveDot,
+    VoidCallback? onButtonTap, // 👈 ADD THIS
+
   }) {
     return Container(
       width: double.infinity,
@@ -244,6 +256,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           bookingBottomContent(
             buttonText: buttonText,
             filledButton: filledButton,
+            onButtonTap: onButtonTap,
+
           ),
         ],
       ),
@@ -255,6 +269,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget bookingBottomContent({
     required String buttonText,
     required bool filledButton,
+    VoidCallback? onButtonTap,
+
   }) {
     return Positioned(
       bottom: 12,
@@ -297,23 +313,27 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: filledButton ? ColorCode.kButtonColor : null,
-                    borderRadius: BorderRadius.circular(28),
-                    border: filledButton
-                        ? null
-                        : Border.all(color: ColorCode.kWhiteOpacity70),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    buttonText,
-                    style: TextStyle(
-                      fontFamily: "Outfit",
-                      color: filledButton ? Colors.black : Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(28),
+                  onTap: onButtonTap, // 👈 BUTTON CLICK
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: filledButton ? ColorCode.kButtonColor : null,
+                      borderRadius: BorderRadius.circular(28),
+                      border: filledButton
+                          ? null
+                          : Border.all(color: ColorCode.kWhiteOpacity70),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      buttonText,
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        color: filledButton ? Colors.black : Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -325,6 +345,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               ),
             ],
           ),
+
         ],
       ),
     );

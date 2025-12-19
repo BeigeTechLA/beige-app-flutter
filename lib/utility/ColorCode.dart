@@ -15,6 +15,8 @@ class ColorCode {
   static const Color kWhiteOpacity60 = Color(0x99FFFFFF); // #FFFFFF99 → 60% opacity
   static const Color k2A2A2A = Color(0xFF2A2A2A);
   static const Color bcakgroundcolor = Color(0xFF1D1D1B);
+  /// ⭐ Divider / Border Color (White 12% opacity)
+  static const Color kDividerWhite12 = Color(0x1FFFFFFF);
 
 
 

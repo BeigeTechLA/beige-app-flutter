@@ -11,6 +11,7 @@ class Specialities extends StatefulWidget {
 
 class _SpecialitiesState extends State<Specialities> {
 
+/*
   // 🔹 Dummy list (10 items)
   final List<Map<String, String>> items = List.generate(
     10,
@@ -20,6 +21,42 @@ class _SpecialitiesState extends State<Specialities> {
       "icon": "assets/images/party.png",
     },
   );
+*/
+
+  final List<Map<String, String>> items = [
+    {
+      "title": "Events &\nParties",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/party.png",
+    },
+    {
+      "title": "Creative &\nMedia",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/Creative.png",
+    },
+    {
+      "title": "Travel &\nOutdoors",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/Travel.png",
+    },
+    {
+      "title": "Drone &\nAerial",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/drone.png",
+    },
+    {
+      "title": "Sports &\nAction",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/Creative.png",
+    },
+    {
+      "title": "Personal\nShoots",
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/personal_photo.png",
+    },
+  ];
+
+
 
   @override
   Widget build(BuildContext context) {

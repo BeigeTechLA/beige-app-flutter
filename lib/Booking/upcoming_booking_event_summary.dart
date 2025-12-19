@@ -1,3 +1,4 @@
+import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:flutter/material.dart';
 
 import '../utility/ColorCode.dart';
@@ -201,7 +202,7 @@ class _UpcomingBookingEventSummaryState
                         const SizedBox(height: 14),
 
                         /// 🔹 DESCRIPTION
-                        const Text(
+                         Text(
                           "Description",
                           style: TextStyle(
                             fontFamily: "Outfit",
@@ -309,15 +310,9 @@ class _UpcomingBookingEventSummaryState
                         ],
                       ),
                     ),
+
                   ],
                 ),
-
-
-
-
-
-
-                const SizedBox(height: 12),
 
                 ],
               ),
@@ -327,7 +322,39 @@ class _UpcomingBookingEventSummaryState
         ),
       ),
 
-
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20),
+        child:    SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpcomingEventSummaryManagebooking(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:  ColorCode.kButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child:
+            Text(
+              "Manage Booking",
+              style: TextStyle(
+                fontFamily: "Unbounded",
+                fontWeight: FontWeight.w500,
+                color: ColorCode.kHeadingColor,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -425,98 +452,115 @@ class _UpcomingBookingEventSummaryState
   }
 
 
-  void showProjectTimelineDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            children: [
+    void showProjectTimelineDialog(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) {
+          return Align(
+            alignment: Alignment.bottomCenter,
 
-              /// HEADER
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Project Timeline",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Outfit",
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+            child: Container(
+               height: MediaQuery.of(context).size.height * 0.95,
+              padding: EdgeInsets.all(10),
+              // padding: EdgeInsets.only(right: 20,left: 20,top: 10,),
+              decoration: const BoxDecoration(
+                color: ColorCode.k282828,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(32),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 35,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color:ColorCode.kWhiteOpacity70,
+                        borderRadius: BorderRadius.circular(18),
                       ),
                     ),
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.close, color: Colors.white),
+                  ),
+                  /// HEADER
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Project Timeline",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Unbounded",
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: const Icon(Icons.close, color: Colors.white),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              const Divider(color: Colors.white12),
+                  const Divider(color: Colors.white12),
 
-              /// LIST
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(20),
-                  children: [
-                    timelineItem(
-                      title: "Booking Accepted",
-                      subtitle:
-                      "Your booking has been confirmed by the creator.",
-                      time: "Today, 10:34 AM",
-                      isActive: true,
+                  /// LIST
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.all(30),
+                      children: [
+                        timelineItem(
+                          title: "Booking Accepted",
+                          subtitle:
+                          "Your booking has been confirmed\n by the creator.",
+                          time: "Today, 10:34 AM",
+                          isActive: true,
+                        ),
+                        timelineItem(
+                          title: "Shoot Preparation",
+                          subtitle:
+                          "The creator is preparing equipment\nand shoot details.",
+                          time: "Today, 10:34 AM",
+                        ),
+                        timelineItem(
+                          title: "Shoot Day",
+                          subtitle:
+                          "The shoot is currently in progress or\nscheduled for today.",
+                          time: "Today, 10:34 AM",
+                        ),
+                        timelineItem(
+                          title: "Shoot Completed",
+                          subtitle:
+                          "The shoot has been successfully\n completed.",
+                          time: "Today, 10:34 AM",
+                        ),
+                        timelineItem(
+                          title: "Editing in Progress",
+                          subtitle:
+                          "Your footage is being edited \nand finalized.",
+                          time: "Today, 10:34 AM",
+                        ),
+                        timelineItem(
+                          title: "Files Ready for Delivery",
+                          subtitle:
+                          "Your final files are ready to view \nor download.",
+                          time: "Today, 10:34 AM",
+                          showLine: false,
+                        ),
+                      ],
                     ),
-                    timelineItem(
-                      title: "Shoot Preparation",
-                      subtitle:
-                      "The creator is preparing equipment and shoot details.",
-                      time: "Today, 10:34 AM",
-                    ),
-                    timelineItem(
-                      title: "Shoot Day",
-                      subtitle:
-                      "The shoot is currently in progress or scheduled.",
-                      time: "Today, 10:34 AM",
-                    ),
-                    timelineItem(
-                      title: "Shoot Completed",
-                      subtitle:
-                      "The shoot has been successfully completed.",
-                      time: "Today, 10:34 AM",
-                    ),
-                    timelineItem(
-                      title: "Editing in Progress",
-                      subtitle:
-                      "Your footage is being edited and finalized.",
-                      time: "Today, 10:34 AM",
-                    ),
-                    timelineItem(
-                      title: "Files Ready for Delivery",
-                      subtitle:
-                      "Your final files are ready to view or download.",
-                      time: "Today, 10:34 AM",
-                      showLine: false,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
+    }
   Widget timelineItem({
     required String title,
     required String subtitle,
@@ -528,85 +572,133 @@ class _UpcomingBookingEventSummaryState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        /// LEFT DOT + LINE
+        /// LEFT IMAGE CIRCLE + LINE
         Column(
           children: [
             Container(
-              height: 34,
-              width: 34,
+              height: 50,
+              width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isActive
-                    ? const Color(0xFFEAD7B0)
-                    : const Color(0xFF2A2A2A),
+                    ? const Color(0xFFEAD7B0) // ACTIVE BG
+                    : const Color(0xFF1F1F1F), // INACTIVE BG
+               /* border: Border.all(
+                  color: isActive
+                      ? const Color(0xFFEAD7B0)
+                      : Colors.white24,
+                ),*/
               ),
-              child: Icon(
-                Icons.check,
-                size: 18,
-                color: isActive ? Colors.black : Colors.white24,
+              child: Center(
+                child: Image.asset(
+                  "assets/Icons/user_chec_time_linek.png", // 👈 SAME IMAGE FOR ALL
+                 /* height: 16,
+                  width: 16,
+                  color: isActive ? Colors.black : Colors.white38,*/
+                ),
               ),
             ),
-
+SizedBox(height: 5,),
             if (showLine)
-              Container(
-                height: 40,
-                width: 1,
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                color: Colors.white24,
+              Column(
+                children: [
+                  // dashed line
+                  Column(
+                    children: List.generate(
+                      4, // 👈 number of dashes
+                          (index) => Container(
+                        height: 5,
+                        width:1,
+                        margin: const EdgeInsets.symmetric(vertical: 1),
+                        color: isActive
+                            ? ColorCode.white // ACTIVE
+                            : ColorCode.white,         // INACTIVE
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5,),
+                  const SizedBox(height: 4),
+
+                  // arrow down
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: isActive
+                        ? ColorCode.white // ACTIVE
+                        : ColorCode.white,
+                  ),
+                ],
               ),
+
           ],
         ),
 
         const SizedBox(width: 14),
 
-        /// TEXT
+        /// TEXT CONTENT
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                /// TITLE + TIME
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: 12,
                           fontFamily: "Outfit",
-                          color: Colors.white,
                           fontWeight: FontWeight.w500,
+                          color: isActive
+                              ? ColorCode.kButtonColor       // ACTIVE TEXT
+                              : ColorCode.kWhiteOpacity70,     // INACTIVE TEXT
                         ),
                       ),
                     ),
                     Text(
                       time,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.white38,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w400,
+                        color: isActive
+                            ? ColorCode.white       // ACTIVE TEXT
+                            : ColorCode.white,     // INACTIVE TEXT
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+
+                const SizedBox(height: 6),
+
+                /// SUBTITLE
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white54,
+
+           // "..."
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w400,
+                    color: isActive
+                        ? ColorCode.kWhiteOpacity70 // ACTIVE
+                        : ColorCode.kWhiteOpacity70,  // INACTIVE
                   ),
                 ),
+
+
                 const SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ],
-    );
-  }
-
-
+    );}
 
 
 }

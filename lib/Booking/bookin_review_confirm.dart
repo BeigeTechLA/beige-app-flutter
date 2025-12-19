@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../utility/ColorCode.dart';
+import 'booking_summary_view_summary.dart';
 
 class BookinReviewConfirm extends StatefulWidget {
   const BookinReviewConfirm({super.key});
@@ -802,6 +803,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
       ),
     );
   }
+
   void showScheduleUpdatedDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
@@ -863,6 +865,43 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                       ),
                     ),
 
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+
+                        // ✅ Next Button
+                        Expanded(
+                          child: SizedBox(
+                            height: 55,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFE7C89E),
+                                foregroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (_) =>BookingSummaryDetails()),
+                                );
+                              },
+                              child: const Text(
+                                "View Summary",
+                                style: TextStyle(
+                                  color: ColorCode.kHeadingColor,
+                                  fontFamily: 'Unbounded',   // ← Add this
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 20),
                   ],
                 ),
