@@ -144,8 +144,8 @@ class _MainscreenState extends State<Mainscreen> {
               BottomNavigationBarItem(
                 icon: Image.asset(
                   _selectedIndex == 0
-                      ? "assets/Icons/home_white.png"
-                      : "assets/Icons/Home.png",
+                      ? "assets/Icons/home_10.png"
+                      : "assets/Icons/inactive_home.png",
                   height: 28,
                 ),
                 label: "Home",
@@ -153,8 +153,8 @@ class _MainscreenState extends State<Mainscreen> {
               BottomNavigationBarItem(
                 icon: Image.asset(
                   _selectedIndex == 1
-                      ? "assets/Icons/booking_white.png"
-                      : "assets/Icons/Capture.png",
+                      ? "assets/Icons/Group 2087328965.png"
+                      : "assets/Icons/inactive_book_shoot.png",
                   height: 28,
                 ),
                 label: "Book Shoot",
@@ -162,8 +162,8 @@ class _MainscreenState extends State<Mainscreen> {
               BottomNavigationBarItem(
                 icon: Image.asset(
                   _selectedIndex == 2
-                      ? "assets/Icons/capture_white.png"
-                      : "assets/Icons/booking.png",
+                      ? "assets/Icons/Calendar4.png"
+                      : "assets/Icons/inactive_booking.png",
                   height: 28,
                 ),
                 label: "Booking",
@@ -171,8 +171,8 @@ class _MainscreenState extends State<Mainscreen> {
               BottomNavigationBarItem(
                 icon: Image.asset(
                   _selectedIndex == 3
-                      ? "assets/Icons/chat.png"
-                      : "assets/Icons/messge.png",
+                      ? "assets/Icons/chat-1-line 1.png"
+                      : "assets/Icons/inactive_chat.png",
                   height: 28,
                 ),
                 label: "Chat",

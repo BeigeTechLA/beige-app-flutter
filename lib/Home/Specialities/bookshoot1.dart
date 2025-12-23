@@ -82,7 +82,7 @@ class _Bookshoot1State extends State<Bookshoot1> {
                       )
                     ],
                   ),
-                  Divider(color: ColorCode.kWhiteOpacity60),
+                  Divider(color: ColorCode.kDividerWhite12),
                   SizedBox(height: 10),
 
                   /// ✅ Options
@@ -208,11 +208,11 @@ class _Bookshoot1State extends State<Bookshoot1> {
                 /// Gradient when selected
                 gradient: selectedIndex == item
                     ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
-                    ColorCode.kButtonColor,
-                    ColorCode.kCreamSoft
+                    Color(0xFFE8D1AB), // light shade
+                    Color(0xFFD4A14D), // dark shade
                   ],
                 )
                     : null,
@@ -222,9 +222,7 @@ class _Bookshoot1State extends State<Bookshoot1> {
 
                 /// Border
                 border: Border.all(
-                  color: selectedIndex == item
-                      ? ColorCode.kWhiteOpacity70
-                      : ColorCode.kWhiteOpacity70,
+                  color: ColorCode.kWhiteOpacity70,
                   width: 1,
                 ),
               ),
@@ -234,7 +232,7 @@ class _Bookshoot1State extends State<Bookshoot1> {
                   ? Center(
                 child: Container(
                   width: 10,
-                  height: 12,
+                  height: 9,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.black,

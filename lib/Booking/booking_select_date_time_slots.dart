@@ -335,7 +335,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: ColorCode.kButtonColor,
-              inactiveTrackColor: Colors.black,
+              inactiveTrackColor: ColorCode.kCreamSoft,
               thumbColor: ColorCode.kButtonColor,
             ),
             child: Slider(

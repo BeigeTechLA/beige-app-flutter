@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 
 import '../MyProfile/my_profile.dart';
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'Specialities/specialities.dart';
 
@@ -16,6 +18,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
 
+  String location = "";
+  List specialties = [];
+  bool isLoading = true;
+
+
+
+  List<dynamic> incomeList = [];
 
   int currentIndex = 0;
   late AnimationController _controller;
@@ -23,46 +32,56 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<Offset> _slideDown;
   late Animation<double> _scale;
 
+
   @override
   void initState() {
     super.initState();
 
+    /// 🎯 Animation Controller
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900), // ⬅ thoda slow & smooth
+      duration: const Duration(milliseconds: 900),
     );
 
-    _fade = Tween<double>(begin: 1, end: 0).animate(
+    _fade = Tween<double>(begin: 2, end: 0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOutCubic,
+        curve: Curves.easeOut,
       ),
     );
 
-    _scale = Tween<double>(begin: 1, end: 0.92).animate(
+    _scale = Tween<double>(begin: 1, end: 0.95).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOutBack, // 🔥 premium bounce
+        curve: Curves.easeOutBack,
       ),
     );
 
     _slideDown = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, 0.55),
+      end: const Offset(0, 0.6),
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeInOutQuart,
+        curve: Curves.easeOutCubic,
       ),
     );
 
+    /// ▶️ Start animation
+    _controller.forward();
+
+    /// 🌐 API call (IMPORTANT)
+    _fetchhome_data();
   }
+
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
+
+
 
   final List<Map<String, String>> items = [
 
@@ -71,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen>
   {"title": "Travel &\nOutdoors", "icon": "assets/images/Travel.png"},
   {"title": "Drone &\nAerial", "icon": "assets/images/drone.png"},
   {"title": "Sports &\nAction", "icon": "assets/images/Creative.png"},
-  {"title": "Personal\nShoots", "icon": "assets/images/personal_shoot.png"},
+  {"title": "Personal\nShoots", "icon": "assets/images/personal_photo.png"},
   ];
 
   final List<Map<String, String>> cards = [
@@ -98,6 +117,23 @@ class _HomeScreenState extends State<HomeScreen>
     },
   ];
 
+
+
+
+  Future<void> _fetchhome_data() async {
+    try {
+      final response =
+      await ApiService().fetchData(ApiEndpoints.home_data);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          incomeList = response["data"] ?? [];
+        });
+      }
+    } catch (e) {
+      print("Fetch Error: $e");
+    }
+  }
 
 
 
@@ -190,10 +226,10 @@ class _HomeScreenState extends State<HomeScreen>
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                                Navigator.push(
+                              /*  Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => MyProfile()),
-                                );
+                                );*/
                               },
                               child: const CircleAvatar(
                                 radius: 18,
@@ -377,14 +413,17 @@ class _HomeScreenState extends State<HomeScreen>
               Center(
                 child: GestureDetector(
                   onTap: () async {
-                    await _controller.forward();
+                    if (_controller.isAnimating) return;
+
+                    await _controller.forward(); // ⬅ pehle pura animation
 
                     setState(() {
                       currentIndex = (currentIndex + 1) % cards.length;
                     });
 
-                    _controller.reset();
+                    _controller.reset(); // ⬅ phir new card clean state me
                   },
+
                   child: SizedBox(
                     height: 420,
                     width: 320,
@@ -395,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                         /// 🔹 THIRD CARD (BACK – SMALLEST)
                         Transform.translate(
-                          offset: const Offset(0, -48),
+                           offset: const Offset(0, -48),
                           child: Transform.scale(
                             scale: 0.88,
                             child: Opacity(
@@ -1095,7 +1134,7 @@ class _HomeScreenState extends State<HomeScreen>
     int index = 0,
   }) {
     return Transform.translate(
-      offset: Offset(0, -index * 28), // 🔥 YAHI SE TOP SE DIKHEGA
+      offset: Offset(0, -index * 30), // 🔥 YAHI SE TOP SE DIKHEGA
       child: Container(
         key: key,
         height: 376,
@@ -1106,13 +1145,13 @@ class _HomeScreenState extends State<HomeScreen>
             image: AssetImage(data["image"]!),
             fit: BoxFit.cover,
           ),
-          boxShadow: [
+         /* boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.25),
               blurRadius: 30,
               offset: const Offset(0, 20),
             ),
-          ],
+          ],*/
 
         ),
         child: Stack(

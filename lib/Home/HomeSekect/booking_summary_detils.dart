@@ -182,7 +182,10 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                   ],
                 ),
               ),
-              Divider(color: Colors.white24,),
+
+              SizedBox(height: 10),
+
+              Divider(color: ColorCode.kDividerWhite12,),
                SizedBox(height: 28),
 
 

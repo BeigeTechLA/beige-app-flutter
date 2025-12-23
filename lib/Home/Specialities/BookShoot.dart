@@ -87,7 +87,7 @@ class _BookShootScreenState extends State<BookShootScreen> {
                     ],
                   ),
 
-                  Divider(color: ColorCode.kWhiteOpacity70),
+                  Divider(color: ColorCode.kDividerWhite12),
                    SizedBox(height: 16),
 
                   buildRadio("Shoots & Edits", 0),

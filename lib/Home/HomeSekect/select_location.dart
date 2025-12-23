@@ -12,6 +12,7 @@ class SelectLocation extends StatefulWidget {
 class _SelectLocationState extends State<SelectLocation> {
   bool savePassword = false;
   String? selectedStudio;
+  bool showMap = false;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +79,7 @@ class _SelectLocationState extends State<SelectLocation> {
             const SizedBox(height: 12),
 
             /// ✅ Search Field
-            TextField(
+          /*  TextField(
               decoration: InputDecoration(
                 hintText: "Search for area, street name...",
                 hintStyle: TextStyle(
@@ -113,8 +114,32 @@ class _SelectLocationState extends State<SelectLocation> {
                 ),
 
               ),
-            ),
+            ),*/
 
+            TextField(
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  setState(() {
+                    showMap = true;
+                  });
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Search for area, street name...",
+                hintStyle: TextStyle(
+                  color: ColorCode.k777571,
+                  fontFamily: 'Outfit',
+                  fontSize: 12,
+                ),
+                prefixIcon: const Icon(Icons.search, color: ColorCode.white),
+                filled: true,
+                fillColor: ColorCode.k262624,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
 
             const SizedBox(height: 16),
 

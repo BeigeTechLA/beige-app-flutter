@@ -379,8 +379,8 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                               colors: [
-                                                ColorCode.kButtonColor,
-                                                ColorCode.kCreamSoft,
+                                                Color(0xFFE8D1AB), // light shade
+                                                Color(0xFFD4A14D), // dark shade
                                               ],
                                             )
                                                 : null,

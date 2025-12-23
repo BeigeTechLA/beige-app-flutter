@@ -75,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           "name": nameController.text.trim(),
           "email": emailController.text.trim(),
           "password": passwordController.text.trim(),
-          "role": widget.role ?? 1, // ✅ 1 = Client, 2 = Creative
+          "user_type": widget.role ?? 1, // ✅ 1 = Client, 2 = Creative
           "location": locationController.text.trim(),
         },
       );

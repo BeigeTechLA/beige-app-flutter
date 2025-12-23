@@ -236,15 +236,15 @@ class _SelectShootTypeEditsState extends State<SelectShootTypeEdits> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          ColorCode.kButtonColor,
-                          ColorCode.kCreamSoft,
+                          Color(0xFFE8D1AB), // light shade
+                          Color(0xFFD4A14D), // dark shade
                         ],
                       )
                           : null,
                       color: selectedValue == item ? null : Colors.transparent,
                       border: Border.all(
                         color: selectedValue == item
-                            ? ColorCode.kWhiteOpacity60
+                            ? Colors.transparent
                             : ColorCode.kWhiteOpacity60,
                         width: 1,
                       ),

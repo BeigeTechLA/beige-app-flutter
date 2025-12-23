@@ -311,9 +311,9 @@ class _SelectDateTimeState extends State<SelectDateTime> {
                   const SizedBox(height: 18),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: ColorCode.kButtonColor,
-                      inactiveTrackColor: Colors.black,
-                      thumbColor: ColorCode.kButtonColor,
+                      activeTrackColor: ColorCode.kCreamSoft,
+                      inactiveTrackColor: ColorCode.white,
+                      thumbColor: ColorCode.kCreamSoft,
                     ),
                     child: Slider(
                       min: 2,

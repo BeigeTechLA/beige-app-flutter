@@ -44,13 +44,13 @@ class MyApp extends StatelessWidget {
 
 
       // ✅ Correct navigation logic
-     /* home: isLoggedIn
-          ?  Mainscreen()
-          :  SplashScreen(),*/
-
       home: isLoggedIn
           ?  Mainscreen()
-          :  Mainscreen(),
+          :  SplashScreen(),
+
+  /*    home: isLoggedIn
+          ?  Mainscreen()
+          :  Mainscreen(),*/
     );
   }
 }

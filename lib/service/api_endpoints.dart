@@ -6,5 +6,8 @@ class ApiEndpoints {
   static const String forgotpassword_verify_otp = "auth/forgot-password-verify-otp";
   static const String reset_password = "auth/reset-password";
 
+// home screen
+  static const String home_data = "home/home-data";
+
 
 }

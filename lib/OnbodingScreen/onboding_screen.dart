@@ -17,23 +17,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> pages = [
     {
-      "image": "assets/Onboding/Frame 2085664300.png",
+      "image": "assets/Onboding/Frame 2087328917.png",
       "title": "Find the Perfect Creator\nfor any event",
       "description": "Browse trusted photographers and  videographers\nfor any event. 🎥✨",
     },
     {
-      "image": "assets/Onboding/Frame 2085664301 (1).png",
-      "title": "Smart Location-Based\nBooking",
+      "image": "assets/Onboding/Group 2087329238.png",
+      "title": "Discover & Book \nAround You",
       "description": "Easily explore creators around you and book\nthem instantly.📍⚡",
     },
-    {
+   /* {
       "image": "assets/Onboding/Frame 2085664302 (1).png",
       "title": "Secure & Seamless\nExperience",
       "description": "Fast payments, chat support, and reliable service\nat every step. 🔒💬💳",
-    },
+    },*/
   ];
 
-  void _goToNextPage() {
+/*  void _goToNextPage() {
     if (_currentPage < pages.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 400),
@@ -46,7 +46,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         MaterialPageRoute(builder: (_) =>  ChooseYourRoleScreen()),
       );
     }
+  }*/
+
+
+  void _goToNextPage() {
+    if (_currentPage < pages.length - 1) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChooseYourRoleScreen(),
+        ),
+      );
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Image.asset(
                             pages[index]['image']!,
                             width: double.infinity,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.none,
                           ),
                         ),
 
