@@ -9,15 +9,16 @@ class AppConfig {
   static void setEnvironment(String env) {
     switch (env) {
       case 'dev':
-            apiUrl = 'http://localhost:3004/api/';
-           imageUrl = 'https://development-shambhavi.s3.ap-south-1.amazonaws.com/ayumanagerpro/'; // Dev URL
+             apiUrl = 'http://localhost:3004/api/';
+            //  apiUrl = 'http://10.0.2.2:3004/api/';
+           imageUrl = 'https://beigexmemehouse.s3.eu-north-1.amazonaws.com/beige/'; // Dev URL
 
 
         break;
-      case 'prod':
+       case 'prod':
         // apiUrl = 'https://api-apm.nextgengurukul.com/api/';
         apiUrl = 'https://api.naturecuretech.com/api/';
-        imageUrl = 'https://ayumanagerpro.s3.ap-south-1.amazonaws.com/'; // Dev URL
+        imageUrl = 'https://beigexmemehouse.s3.amazonaws.com/beige/'; // Dev URL
 
         break;
       default:

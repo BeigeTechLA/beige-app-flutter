@@ -29,9 +29,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _fetchLogin() async {
     final apiService = ApiService();
 
-    // ✅ Validation
-    if (emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
+    debugPrint("👉 LOGIN CLICKED");
+
+    debugPrint("📧 Email: ${emailController.text}");
+    debugPrint("🔑 Password length: ${passwordController.text.length}");
+
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      debugPrint("❌ Validation failed: empty fields");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill all fields"),
@@ -42,8 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     setState(() => isLoggingIn = true);
+    debugPrint("⏳ Loader started");
 
     try {
+      debugPrint("🌐 Calling API: ${ApiEndpoints.login}");
+
       final response = await apiService.postData(
         ApiEndpoints.login,
         {
@@ -52,45 +59,67 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
-      if (response['error'] == false && response['data'] != null) {
+      debugPrint("✅ RAW LOGIN RESPONSE => $response");
+      debugPrint("🔍 Response type => ${response.runtimeType}");
+
+      if (response == null) {
+        debugPrint("❌ Response is NULL");
+      } else {
+        debugPrint("🔹 error => ${response['error']}");
+        debugPrint("🔹 message => ${response['message']}");
+        debugPrint("🔹 data => ${response['data']}");
+      }
+
+      if (response != null &&
+          response['error'] == false &&
+          response['data'] != null) {
+
+        debugPrint("🎉 LOGIN SUCCESS");
+
         await SharedService.setLoginDetails(response);
+        debugPrint("💾 Login data saved in SharedPreferences");
 
-        // ✅ SUCCESS MESSAGE
-       /* ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Login successful"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );*/
+        if (!mounted) {
+          debugPrint("⚠ Widget not mounted");
+          return;
+        }
 
-        // ✅ Navigate after short delay
-        Future.delayed(const Duration(milliseconds: 800), () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) =>  Mainscreen()),
-          );
-        });
+        debugPrint("➡ Navigating to MainScreen");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Mainscreen()),
+        );
 
       } else {
+        debugPrint("❌ LOGIN FAILED CONDITION");
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? "Invalid email or password"),
+            content: Text(response?['message'] ?? "Login failed"),
             backgroundColor: Colors.red,
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint("🔥 LOGIN EXCEPTION => $e");
+      debugPrint("📌 STACKTRACE => $stack");
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Invalid email or password"),
+          content: Text("Something went wrong"),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      setState(() => isLoggingIn = false);
+      debugPrint("⏹ Loader stopped");
+      if (mounted) {
+        setState(() => isLoggingIn = false);
+      }
     }
   }
+
+
 
 
 
@@ -212,7 +241,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: savePassword && !isLoggingIn ? _fetchLogin : null,
+                  onPressed: savePassword && !isLoggingIn
+                      ? () {
+                    debugPrint("🖱 LOGIN BUTTON PRESSED");
+                    _fetchLogin();
+                  }
+                      : null,
+
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
                           (states) {

@@ -1,10 +1,13 @@
 import 'package:beige/Home/HomeSekect/review_confirm.dart';
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 
 class AddInformationBudget extends StatefulWidget {
-  const AddInformationBudget({super.key});
+  final int bookingId;
+  const AddInformationBudget({super.key, required this.bookingId});
 
   @override
   State<AddInformationBudget> createState() => _AddInformationBudgetState();
@@ -12,6 +15,61 @@ class AddInformationBudget extends StatefulWidget {
 
 class _AddInformationBudgetState extends State<AddInformationBudget> {
   RangeValues budgetRange = const RangeValues(100, 15000);
+bool isLoading =false;
+
+
+  final TextEditingController shootNamecontroller = TextEditingController();
+  final TextEditingController crewSizecontroller = TextEditingController();
+  final TextEditingController referenceLinkcontroller  = TextEditingController();
+  final TextEditingController notescontroller  = TextEditingController();
+
+
+  Future<void> select_location() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/details",
+        {
+          "project_name": shootNamecontroller.text.trim(),
+          "crew_size_needed": int.tryParse(crewSizecontroller.text) ?? 0,
+          "reference_link": referenceLinkcontroller.text.trim(),
+          "notes": notescontroller.text.trim(),
+          "budget_min": budgetRange.start.toInt(),
+          "budget_max": budgetRange.end.toInt(),
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+        /// ✅ API success → next screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReviewConfirm(
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Details save failed"),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Details API Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -82,23 +140,24 @@ class _AddInformationBudgetState extends State<AddInformationBudget> {
               const SizedBox(height: 20),
 
               /// ---- SHOOT NAME ----
-              _buildInputField("Shoot Name",),
+              _buildInputField("Shoot Name",controller:shootNamecontroller ),
 
               const SizedBox(height: 16),
 
 
-              _buildInputField( "Add Crew Size",),
+              _buildInputField( "Add Crew Size",controller: crewSizecontroller),
 
               const SizedBox(height: 16),
 
               /// ---- REFERENCE LINK ----
-              _buildInputField( "Reference Link",),
+              _buildInputField( "Reference Link",controller: referenceLinkcontroller),
 
               const SizedBox(height: 16),
 
               /// ---- SPECIAL NOTE ----
               _buildInputField(
                "Special Note",
+                controller: notescontroller,
                 maxLines: 4,
               ),
 
@@ -106,7 +165,7 @@ class _AddInformationBudgetState extends State<AddInformationBudget> {
 
               /// ---- BUDGET RANGE ----
               Container(
-                padding: const EdgeInsets.all(16),
+                padding:  EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: ColorCode.k282828, // dark card background
                   borderRadius: BorderRadius.circular(16),
@@ -216,15 +275,11 @@ class _AddInformationBudgetState extends State<AddInformationBudget> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReviewConfirm(),
-                      ),
-                    );
-                  },
-                  child: const Text(
+                  onPressed: isLoading ? null : select_location,
+
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: ColorCode.kDividerWhite12)
+                      : const Text(
                     "Next",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),

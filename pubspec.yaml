@@ -35,6 +35,10 @@ dependencies:
   dio: ^5.9.0
   http: ^1.4.0
   video_player: ^2.8.2
+  google_maps_flutter: ^2.6.0
+  geolocator: ^11.0.0
+
+
 
 
 

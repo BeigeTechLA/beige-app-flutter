@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import 'add_information_budget.dart';
 
 class SelectShootTypeEdits extends StatefulWidget {
-  const SelectShootTypeEdits({super.key});
+  final int bookingId;
+
+  const SelectShootTypeEdits({super.key, required this.bookingId});
 
   @override
   State<SelectShootTypeEdits> createState() => _SelectShootTypeEditsState();
@@ -13,10 +17,112 @@ class _SelectShootTypeEditsState extends State<SelectShootTypeEdits> {
   // Selected values
   String selectedShoot = "Wedding";
   String selectedEdit = "";
+  int? selectedSpecialtyId;
+  List<String> selectedEdits = [];
 
   // Expand/Collapse states
   bool shootOpen = true;
   bool editOpen = true;
+bool isLoading =false;
+
+
+  List specialties = [];
+
+  final Map<String, int> shootTypeMap = {
+    "Wedding": 1,
+    "Engagement / Pre-wedding": 2,
+    "Birthday Parties": 3,
+    "Baby Shower": 4,
+    "Cultural Events": 5,
+    "Others": 6,
+  };
+
+  static const List<String> list = [
+    "None/Raw Files",
+    "Basic Color Correction",
+    "Advanced Color Grading",
+    "Motion Graphics",
+    "Visual Effects",
+    "Standard Edit",
+  ];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchbooking_data();
+  }
+  Future<void> _fetchbooking_data() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response =
+      await ApiService().fetchData(ApiEndpoints.booking_specialties);
+
+      if (response != null && response['error'] == false) {
+        final List data = response['data']['deliverables'] ?? [];
+
+        if (data.isNotEmpty) {
+          setState(() {
+            specialties = data;
+            selectedSpecialtyId = data[0]['specialty_id']; // ✅ NOT NULL
+          });
+
+          debugPrint("Selected Specialty ID → $selectedSpecialtyId");
+        }
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  Future<void> select_shoottype() async {
+
+
+    setState(() => isLoading = true);
+
+    try {
+      final payload = {
+        "specialty_id": selectedSpecialtyId,
+        "shoot_type_id": shootTypeMap[selectedShoot], // ✅ dynamic
+        "edit_types": selectedEdits, // ✅ list
+      };
+
+      debugPrint("API Payload → $payload");
+
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/options",
+        payload,
+      );
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AddInformationBudget(
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'] ?? "Something went wrong")),
+        );
+      }
+    } catch (e) {
+      debugPrint("Shoot API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -128,39 +234,40 @@ class _SelectShootTypeEditsState extends State<SelectShootTypeEdits> {
 
               const SizedBox(height: 40),
 
-              /// -------------- NEXT BUTTON ----------------
-              /// ✅ Next Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE7C89E),
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddInformationBudget(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Next",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 20),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SizedBox(
+          height: 55,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE7C89E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: isLoading ? null : select_shoottype,
+            child: isLoading
+                ? const CircularProgressIndicator(
+              color: Colors.black,
+              strokeWidth: 2,
+            )
+                : const Text(
+              "Next",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ),
+
     );
   }
 

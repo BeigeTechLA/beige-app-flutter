@@ -1,16 +1,83 @@
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import 'booking_summary_detils.dart';
 
 class AddOnServices extends StatefulWidget {
-  const AddOnServices({super.key});
+  final int bookingId;
+  const AddOnServices({super.key, required this.bookingId});
 
   @override
   State<AddOnServices> createState() => _AddOnServicesState();
 }
 
 class _AddOnServicesState extends State<AddOnServices> {
+
+  bool isLoading = false;
+  List<Map<String, dynamic>> addOns = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAddOns();
+  }
+
+  Future<void> _fetchAddOns() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_select}/${widget.bookingId}/add-ons",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          addOns = response['data'] ?? [];
+        });
+      } else {
+        debugPrint("Add-ons API failed");
+      }
+    } catch (e) {
+      debugPrint("Add-ons API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> addons() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking_select}/${widget.bookingId}/add-ons",
+          {
+            "items": [
+              { "addon_id": 1, "qty": 1 },
+              { "addon_id": 3, "qty": 2 }
+            ]
+          }
+
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+        });
+      } else {
+        debugPrint("Add-ons API failed");
+      }
+    } catch (e) {
+      debugPrint("Add-ons API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +89,7 @@ class _AddOnServicesState extends State<AddOnServices> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-          
+
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   child: Image.asset(
@@ -32,10 +99,10 @@ class _AddOnServicesState extends State<AddOnServices> {
                     colorBlendMode: BlendMode.srcIn,
                   ),
                 ),
-          
-          
+
+
                 const SizedBox(height: 20),
-          
+
                 /// 🟡 TITLE
                 const Text(
                   "Add - Ons",
@@ -46,9 +113,9 @@ class _AddOnServicesState extends State<AddOnServices> {
                     color: ColorCode.white,
                   ),
                 ),
-          
+
                 const SizedBox(height: 6),
-          
+
                 /// 🔹 SUB TITLE
                 Text(
                   "Would you like to add anything to your shoot?",
@@ -59,10 +126,10 @@ class _AddOnServicesState extends State<AddOnServices> {
                     color: ColorCode.kWhiteOpacity70,
                   ),
                 ),
-          
+
                 const SizedBox(height: 20),
-          
-          
+
+
            Container(
           margin: const EdgeInsets.only(bottom: 14),
           padding: const EdgeInsets.all(14),
@@ -82,11 +149,11 @@ class _AddOnServicesState extends State<AddOnServices> {
                      Text("Drone Footage"),
                         Text("1 hr - 30 min"),
                         Text("\$ 500.00/-"),
-          
+
                       ],
                     ),
                   ),
-          
+
                   /// ➕ BUTTON
                   Container(
                     width: 32,
@@ -126,7 +193,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                            fontSize: 14
                        ),
                        ),
-          
+
                        Text("1 hr - 30 min",
                          style: TextStyle(
                          color: ColorCode.kWhiteOpacity60,
@@ -144,7 +211,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                          ),
                        ),
                        SizedBox(height: 30,),
-          
+
                        TextField(
                          style: const TextStyle(
                            color: Colors.white,
@@ -179,8 +246,8 @@ class _AddOnServicesState extends State<AddOnServices> {
                            ),
                          ),
                        ),
-          
-          
+
+
                      ],
                    ),
                  ),
@@ -223,7 +290,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                               fontSize: 14
                           ),
                         ),
-          
+
                         Text("1 hr - 30 min",
                           style: TextStyle(
                               color: ColorCode.kWhiteOpacity60,
@@ -241,7 +308,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                           ),
                         ),
                         SizedBox(height: 30,),
-          
+
                         TextField(
                           style: const TextStyle(
                             color: Colors.white,
@@ -276,12 +343,12 @@ class _AddOnServicesState extends State<AddOnServices> {
                             ),
                           ),
                         ),
-          
-          
+
+
                       ],
                     ),
                   ),
-          
+
                   /// ➕ BUTTON
                   Container(
                     width: 32,
@@ -306,7 +373,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                 ],
               ),
               Divider(color: Colors.white30,thickness: 1,),
-          
+
               Row(
                 children: [
                   /// TEXT
@@ -332,7 +399,7 @@ class _AddOnServicesState extends State<AddOnServices> {
                           ),
                         ),
 
-          
+
                       ],
                     ),
                   ),
@@ -419,14 +486,14 @@ class _AddOnServicesState extends State<AddOnServices> {
 
                 ],
               ),
-          
-          
+
+
             ],
           ),
                 ),
-          
-          
-          
+
+
+
                 /// 🟡 BOTTOM BUTTON
                 SizedBox(
                   width: double.infinity,

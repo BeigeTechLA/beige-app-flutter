@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:beige/utility/ColorCode.dart';
 
 class FindingThePerfectScreen extends StatefulWidget {
-  const FindingThePerfectScreen({super.key});
+  final int bookingId;
+  const FindingThePerfectScreen({super.key, required this.bookingId});
 
   @override
   State<FindingThePerfectScreen> createState() =>
@@ -29,7 +30,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (_) =>  RecommendedForYou(), // 👈 next screen
+            builder: (_) =>  RecommendedForYou(bookingId: widget.bookingId,), // 👈 next screen
         ),
       );
     });

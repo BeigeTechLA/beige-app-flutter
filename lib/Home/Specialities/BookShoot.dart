@@ -1,10 +1,16 @@
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import 'bookshoot1.dart';
 
 class BookShootScreen extends StatefulWidget {
-  const BookShootScreen({super.key});
+  final int specialtyId;
+
+  const BookShootScreen({super.key,
+    required this.specialtyId,
+  });
 
   @override
   State<BookShootScreen> createState() => _BookShootScreenState();
@@ -12,6 +18,39 @@ class BookShootScreen extends StatefulWidget {
 
 class _BookShootScreenState extends State<BookShootScreen> {
   int selectedIndex = 0;
+  String? selectedDeliverableName;
+  int? selectedDeliverableId;
+
+
+  bool isLoadingSpecialties = true;
+
+  List deliverables = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchbooking_data();
+  }
+
+  Future<void> _fetchbooking_data() async {
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.booking_data);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          deliverables = response['data']['deliverables'] ?? [];
+          isLoadingSpecialties = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoadingSpecialties = false);
+    }
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +129,22 @@ class _BookShootScreenState extends State<BookShootScreen> {
                   Divider(color: ColorCode.kDividerWhite12),
                    SizedBox(height: 16),
 
-                  buildRadio("Shoots & Edits", 0),
-                  buildRadio("Shoots & Raw Files", 1),
+                  isLoadingSpecialties
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: deliverables.length,
+                    itemBuilder: (context, index) {
+                      final item = deliverables[index];
+                      return buildRadio(
+                        item["label"],
+                        index,
+                        item["id"],
+                      );
+
+                    },
+                  ),
 
                   const SizedBox(height: 25),
 
@@ -107,9 +160,22 @@ class _BookShootScreenState extends State<BookShootScreen> {
                         ),
                       ),
                       onPressed: () {
+                        if (selectedDeliverableId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select an option")),
+                          );
+                          return;
+                        }
+
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const Bookshoot1()),
+                          MaterialPageRoute(
+                            builder: (_) => Bookshoot1(
+                              specialtyId: widget.specialtyId,          // already have
+                              deliverableId: selectedDeliverableId!,    // ✅ ID
+                              deliverableName: selectedDeliverableName!,// ✅ NAME
+                            ),
+                          ),
                         );
                       },
                       child: const Text("Next",
@@ -132,52 +198,50 @@ class _BookShootScreenState extends State<BookShootScreen> {
     );
   }
 
-  Widget buildRadio(String title, int item) {
+  Widget buildRadio(String title, int index, int id) {
     return InkWell(
-      onTap: () => setState(() => selectedIndex = item),
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+          selectedDeliverableId = id;          // ✅ ID
+          selectedDeliverableName = title;     // ✅ NAME
+        });
+      },
       child: Padding(
-        padding:  EdgeInsets.all( 10),
+        padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title,
-          style: TextStyle(
-            color: ColorCode.kWhiteOpacity70,
-            fontFamily: 'Outfit  ',
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            // Looks cleaner in Unbounded
-          ),),
-
-            // Custom Radio Circle
+            Text(
+              title,
+              style: const TextStyle(
+                color: ColorCode.kWhiteOpacity70,
+                fontFamily: 'Outfit',
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
             Container(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-
-                /// 🔥 GRADIENT WHEN SELECTED
-                gradient: selectedIndex == item
+                gradient: selectedIndex == index
                     ? const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFE8D1AB), // light shade
-                    Color(0xFFD4A14D), // dark shade
+                    Color(0xFFE8D1AB),
+                    Color(0xFFD4A14D),
                   ],
                 )
                     : null,
-
-                color: selectedIndex == item ? null : Colors.transparent,
-
-                /// 🔸 BORDER
                 border: Border.all(
                   color: ColorCode.kWhiteOpacity70,
                   width: 1,
                 ),
               ),
-
-              child: selectedIndex == item
+              child: selectedIndex == index
                   ? Center(
                 child: Container(
                   width: 10,
@@ -195,4 +259,6 @@ class _BookShootScreenState extends State<BookShootScreen> {
       ),
     );
   }
+
+
 }

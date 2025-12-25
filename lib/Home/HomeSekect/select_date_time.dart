@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import 'select_shoot_type_edits.dart';
 
 class SelectDateTime extends StatefulWidget {
-  const SelectDateTime({super.key});
+  final int bookingId;
+
+  const SelectDateTime({super.key, required this.bookingId});
 
   @override
   State<SelectDateTime> createState() => _SelectDateTimeState();
@@ -16,6 +20,10 @@ class _SelectDateTimeState extends State<SelectDateTime> {
   int selectedTimeIndex = -1;
   bool isCustomSelected = false;
   double selectedHour = 16;
+bool isLoading =false;
+
+  DateTime? selectedDate;
+
 
   final List<String> timeSlots = [
     "10:00 AM - 12:00 PM",
@@ -39,6 +47,102 @@ class _SelectDateTimeState extends State<SelectDateTime> {
   bool isSameDate(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
+
+
+  String formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  String formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final period = time.period == DayPeriod.am ? "AM" : "PM";
+    return "${hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} $period";
+  }
+
+  Map<String, String> parseTimeSlot(String slot) {
+    final parts = slot.split(" - ");
+    return {
+      "start": parts[0],
+      "end": parts[1],
+    };
+  }
+
+
+  String formatTime24(TimeOfDay time) {
+    return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> selectTimeApi() async {
+    if (selectedDates.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select date")),
+      );
+      return;
+    }
+
+    if (selectedTimeIndex == -1 && !isCustomSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select time")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      String startTime = "";
+      String endTime = "";
+      int durationHours = 0;
+
+      if (!isCustomSelected) {
+        final slot = parseTimeSlot(timeSlots[selectedTimeIndex]);
+        startTime = slot['start']!.split(" ")[0]; // 10:00
+        endTime = slot['end']!.split(" ")[0];     // 12:00
+        durationHours = 2;
+      } else {
+        startTime = "10:00";
+        endTime = "${10 + selectedHour.toInt()}:00";
+        durationHours = selectedHour.toInt();
+      }
+
+      final DateTime apiDate = selectedDates.first;
+
+      final body = {
+        "event_date": formatDate(apiDate), // ✅ REQUIRED FIELD
+        "start_time": startTime,
+        "end_time": endTime,
+        "duration_hours": durationHours,
+      };
+
+      debugPrint("TIME API BODY => $body");
+
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/time",
+        body,
+      );
+
+      debugPrint("TIME API RESPONSE => $response");
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => SelectShootTypeEdits(bookingId: widget.bookingId,)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response?['message'] ?? "Failed")),
+        );
+      }
+    } catch (e) {
+      debugPrint("TIME API ERROR => $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -348,14 +452,8 @@ class _SelectDateTimeState extends State<SelectDateTime> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SelectShootTypeEdits(),
-                    ),
-                  );
-                },
+                onPressed: isLoading ? null : selectTimeApi,
+
                 child: const Text(
                   "Next",
                   style: TextStyle(

@@ -1,9 +1,16 @@
 import 'package:beige/Home/HomeSekect/select_date_time.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 
 class SelectLocation extends StatefulWidget {
-  const SelectLocation({super.key});
+  final int bookingId;
+
+  const SelectLocation({super.key, required this.bookingId});
 
   @override
   State<SelectLocation> createState() => _SelectLocationState();
@@ -13,6 +20,76 @@ class _SelectLocationState extends State<SelectLocation> {
   bool savePassword = false;
   String? selectedStudio;
   bool showMap = false;
+bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  GoogleMapController? mapController;
+  LatLng? currentLatLng;
+
+  Future<void> select_location() async {
+    if (currentLatLng == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select location from map")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/location",
+        {
+          "event_location": "Selected from map",
+          "event_latitude": currentLatLng!.latitude,
+          "event_longitude": currentLatLng!.longitude,
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SelectDateTime(
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      currentLatLng = LatLng(position.latitude, position.longitude);
+    });
+
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(currentLatLng!, 15),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +115,7 @@ class _SelectLocationState extends State<SelectLocation> {
           )
         ],
       ),
+
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -145,49 +223,35 @@ class _SelectLocationState extends State<SelectLocation> {
 
             /// ✅ Map Placeholder
             Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      image: DecorationImage(
-                        image: AssetImage("assets/Icons/map.png"),
-                        // <-- YOUR IMAGE
-                        fit: BoxFit.cover,
-
-                      ),
-                    ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: currentLatLng == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: currentLatLng!,
+                    zoom: 14,
                   ),
-
-                  /// Gradient overlay (optional)
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: Colors.black.withOpacity(0.15), // light overlay
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  onMapCreated: (controller) {
+                    mapController = controller;
+                  },
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("current"),
+                      position: currentLatLng!,
                     ),
-                  ),
-
-                  /// Use Current Location Button
-                  /*     Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: () {},
-                      icon: const Icon(Icons.my_location, size: 18),
-                      label: const Text("Use current location"),
-                    ),
-                  ),*/
-                ],
+                  },
+                  onTap: (latLng) {
+                    setState(() {
+                      currentLatLng = latLng;
+                    });
+                  },
+                ),
               ),
             ),
+
 
             SizedBox(height: 16),
 
@@ -236,7 +300,7 @@ class _SelectLocationState extends State<SelectLocation> {
 
             /// ✅ Next Button
             ///
-            Column(
+     /*       Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
@@ -302,7 +366,7 @@ class _SelectLocationState extends State<SelectLocation> {
                 SizedBox(height: 15),
 
               ],
-            ),
+            ),*/
 
             SizedBox(
               width: double.infinity,
@@ -315,14 +379,8 @@ class _SelectLocationState extends State<SelectLocation> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SelectDateTime(),
-                    ),
-                  );
-                },
+                onPressed: isLoading ? null : select_location,
+
                 child: const Text(
                   "Next",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -335,50 +393,6 @@ class _SelectLocationState extends State<SelectLocation> {
     );
   }
 
-  Widget _buildField(String label) {
-    return TextField(
-        cursorColor: ColorCode.kButtonColor,
-
-        style: const TextStyle(
-          color: ColorCode.kButtonColor, // typed text color
-        ),
-
-        decoration: InputDecoration(
-          labelText: "$label*",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-
-          labelStyle: const TextStyle(
-            color: ColorCode.kButtonColor, // #1D1D1B 60% opacity
-          ),
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
-          ),
-
-          /// ⭐ 0.5px BORDER + OPACITY COLOR
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: ColorCode.kButtonColor, // #1D1D1B99 (60% opacity)
-              width: 0.5, // 🔥 exact 0.5px
-            ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: ColorCode.kButtonColor, // #1D1D1B99 (60% opacity)
-              width: 0.5, // focus border thicker
-            ),
-          ),
-
-          floatingLabelStyle: TextStyle(
-            color: ColorCode.kButtonColor,
-          ),)
-
-    );
-  }
 
   Widget buildSelectStudioField() {
     String? selectedStudio;

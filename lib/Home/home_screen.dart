@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen>
   String location = "";
   List specialties = [];
   bool isLoading = true;
+  List featuredCreatives = [];
+
 
 
 
@@ -93,6 +95,27 @@ class _HomeScreenState extends State<HomeScreen>
   {"title": "Personal\nShoots", "icon": "assets/images/personal_photo.png"},
   ];
 
+  final List<String> specialtyIcons = [
+    "assets/images/party.png",
+    "assets/images/creative.png",
+    "assets/images/travel.png",
+    "assets/images/drone.png",
+    "assets/images/sports.png",
+    "assets/images/personal.png",
+    "assets/images/Creative.png",
+    "assets/images/personal_photo.png",
+  ];
+
+
+
+  final List<String> featuredImages = [
+    "assets/images/man2.png",
+    "assets/images/Group 2087329236.png",
+    "assets/images/Group 45.png",
+    "assets/images/man2.png",
+    "assets/images/Group 2087329236.png",
+  ];
+
   final List<Map<String, String>> cards = [
     {
       "name": "Ethan Cole",
@@ -119,7 +142,6 @@ class _HomeScreenState extends State<HomeScreen>
 
 
 
-
   Future<void> _fetchhome_data() async {
     try {
       final response =
@@ -127,11 +149,15 @@ class _HomeScreenState extends State<HomeScreen>
 
       if (response != null && response['error'] == false) {
         setState(() {
-          incomeList = response["data"] ?? [];
+          location = response['data']['location'] ?? "";
+          specialties = response['data']['specialties'] ?? [];
+          featuredCreatives = response['data']['featuredCreatives'] ?? [];
+          isLoading = false;
         });
       }
     } catch (e) {
-      print("Fetch Error: $e");
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
     }
   }
 
@@ -184,36 +210,35 @@ class _HomeScreenState extends State<HomeScreen>
                         Column(
                           children: [
                             Row(
-                              children: const [
+                              children: [
                                 Text(
-                                  "Westheimer Rd",
-                                  style: TextStyle(
+                                  location.isNotEmpty ? location.split(',').first : "",
+                                  style: const TextStyle(
                                     fontFamily: "HelveticaNeue",
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white,
                                   ),
                                 ),
-                                SizedBox(width: 4),
-                                Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: Colors.white,
-                                  size: 22,
-                                ),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.keyboard_arrow_down,
+                                    color: Colors.white, size: 22),
                               ],
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              "Santa Ana, Illinois 85486",
+                              location.contains(',')
+                                  ? location.split(',').sublist(1).join(',')
+                                  : "",
                               style: TextStyle(
                                 fontFamily: "HelveticaNeue",
                                 fontSize: 12,
-                                fontWeight: FontWeight.w400,
                                 color: ColorCode.kWhiteOpacity70,
                               ),
                             ),
                           ],
                         ),
+
 
                         /// BELL + PROFILE
                         Row(
@@ -337,8 +362,8 @@ class _HomeScreenState extends State<HomeScreen>
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: List.generate(items.length, (index) {
-                            final item = items[index];
+                          children: List.generate(specialties.length, (index) {
+                            final item = specialties[index];
 
                             return Padding(
                               padding: const EdgeInsets.only(right: 15),
@@ -347,7 +372,9 @@ class _HomeScreenState extends State<HomeScreen>
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Specialities(),
+                                      builder: (context) => Specialities(
+                                        // specialtyId: item["specialty_id"], // optional
+                                      ),
                                     ),
                                   );
                                 },
@@ -369,27 +396,32 @@ class _HomeScreenState extends State<HomeScreen>
                                         ),
                                       ),
 
-                                      /// 🔹 TOP LEFT TEXT
+                                      /// 🔹 NAME → BACKEND
                                       Positioned(
                                         top: 10,
                                         left: 6,
-                                        child: Text(
-                                          item["title"]!,
+                                        right: 6,
+                                        child:Text(
+                                          (item["name"] ?? "").toString().replaceAll(" & ", " &\n"),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: ColorCode.white,
                                             fontFamily: 'Outfit',
                                             fontSize: 10,
                                             fontWeight: FontWeight.w500,
+                                            height: 1.2, // optional: line spacing clean
                                           ),
                                         ),
+
                                       ),
 
-                                      /// 🔹 BOTTOM RIGHT IMAGE
+                                      /// 🔹 IMAGE → FRONTEND (ASSET)
                                       Positioned(
                                         bottom: 0,
                                         right: 0,
                                         child: Image.asset(
-                                          item["icon"]!,
+                                          specialtyIcons[index],
                                           height: 70,
                                           width: 70,
                                           fit: BoxFit.contain,
@@ -406,9 +438,13 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
 
 
+
                   ],
                 ),
               ),
+
+
+
 
               Center(
                 child: GestureDetector(
@@ -512,14 +548,14 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
+            /*              onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Specialities(),
                               ),
                             );
-                          },
+                          },*/
                           child: Image.asset(
                             "assets/Icons/rightside.png",
                             height: 40,   // bigger height

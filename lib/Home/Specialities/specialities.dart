@@ -1,5 +1,7 @@
 import 'package:beige/Home/Specialities/BookShoot.dart';
 import 'package:flutter/material.dart';
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 
 class Specialities extends StatefulWidget {
@@ -10,66 +12,70 @@ class Specialities extends StatefulWidget {
 }
 
 class _SpecialitiesState extends State<Specialities> {
+  bool isLoadingSpecialties = true;
 
-/*
-  // 🔹 Dummy list (10 items)
-  final List<Map<String, String>> items = List.generate(
-    10,
-        (index) => {
-      "title": "Events &\nParties",
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/party.png",
-    },
-  );
-*/
+  List specialties = [];
 
-  final List<Map<String, String>> items = [
+  final List<Map<String, String>> staticAssets = [
     {
-      "title": "Events &\nParties",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/party.png",
     },
     {
-      "title": "Creative &\nMedia",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/Creative.png",
     },
     {
-      "title": "Travel &\nOutdoors",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/Travel.png",
     },
     {
-      "title": "Drone &\nAerial",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/drone.png",
     },
     {
-      "title": "Sports &\nAction",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/Creative.png",
     },
     {
-      "title": "Personal\nShoots",
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/personal_photo.png",
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchhome_data();
+  }
 
+  Future<void> _fetchhome_data() async {
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.home_data);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          specialties = response['data']['specialties'] ?? [];
+          isLoadingSpecialties = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoadingSpecialties = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
-      body: SafeArea(   // ✅ TOP SE AUTO GAP
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20), // ✅ PROPER SIDE + TOP SPACE
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// 🔙 BACK BUTTON
+              /// 🔙 BACK
               InkWell(
                 onTap: () => Navigator.pop(context),
                 child: Image.asset(
@@ -80,11 +86,11 @@ class _SpecialitiesState extends State<Specialities> {
                 ),
               ),
 
-              const SizedBox(height: 20), // ⬅️ thoda niche
+              const SizedBox(height: 20),
 
               /// 🔹 TITLE
               const Text(
-                "Book A shoot",
+                "Book A Shoot",
                 style: TextStyle(
                   color: ColorCode.white,
                   fontFamily: 'Unbounded',
@@ -93,20 +99,26 @@ class _SpecialitiesState extends State<Specialities> {
                 ),
               ),
 
-              const SizedBox(height: 24), // ⬅️ title ke niche space
+              const SizedBox(height: 24),
 
-              /// 🔥 GRID VIEW
+              /// 🔥 GRID
               Expanded(
-                child: GridView.builder(
-                  itemCount: items.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                child: isLoadingSpecialties
+                    ? const Center(child: CircularProgressIndicator())
+                    : GridView.builder(
+                  itemCount: specialties.length,
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 1,
                   ),
                   itemBuilder: (context, index) {
-                    return _buildGridItem(items[index]);
+                    return _buildGridItem(
+                      specialties[index],
+                      index,
+                    );
                   },
                 ),
               ),
@@ -116,20 +128,20 @@ class _SpecialitiesState extends State<Specialities> {
       ),
     );
   }
+  Widget _buildGridItem(Map item, int index) {
+    final assetIndex = index % staticAssets.length;
 
-
-  /// 🔹 SINGLE GRID ITEM
-  Widget _buildGridItem(Map<String, String> item) {
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>  BookShootScreen(), // next screen
+            builder: (context) => BookShootScreen(
+              specialtyId: item["specialty_id"],
+            ),
           ),
         );
       },
-
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -137,36 +149,38 @@ class _SpecialitiesState extends State<Specialities> {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-
-            /// BACKGROUND IMAGE
+            /// 🔹 STATIC BACKGROUND
             Positioned.fill(
               child: Image.asset(
-                item["bg"]!,
+                staticAssets[assetIndex]["bg"]!,
                 fit: BoxFit.cover,
               ),
             ),
 
-            /// TOP LEFT TEXT
+            /// 🔹 DYNAMIC NAME
             Positioned(
               top: 10,
               left: 8,
               child: Text(
-                item["title"]!,
-                style: const TextStyle(
+                (item["name"] ?? "").toString().replaceAll(" & ", " &\n"),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style:  TextStyle(
                   color: ColorCode.white,
                   fontFamily: 'Outfit',
                   fontSize: 10,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2, // optional: line spacing clean
                 ),
               ),
             ),
 
-            /// BOTTOM RIGHT ICON
+            /// 🔹 STATIC ICON
             Positioned(
               bottom: 0,
               right: 2,
               child: Image.asset(
-                item["icon"]!,
+                staticAssets[assetIndex]["icon"]!,
                 height: 70,
                 width: 60,
               ),

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import 'add_on_services.dart';
 
 class RecommendedDetilsScreen extends StatefulWidget {
-  const RecommendedDetilsScreen({super.key});
+
+  final int id;
+  final int bookingId;
+  const RecommendedDetilsScreen({super.key, required this.id, required this.bookingId});
 
   @override
   State<RecommendedDetilsScreen> createState() =>
@@ -12,6 +17,121 @@ class RecommendedDetilsScreen extends StatefulWidget {
 }
 
 class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
+  bool isLoading = true;
+
+  Map<String, dynamic>? creative;
+  Map<String, dynamic>? stats;
+  Map<String, dynamic>? about;
+
+  List portfolio = [];
+  List team = [];
+  Map<String, dynamic>? weeklyAvailability;
+
+  List reviews = [];
+  Map<String, dynamic>? reviewSummary;
+
+  double getAverageRating() {
+    if (reviews.isEmpty) return 0.0;
+    double total = 0;
+    for (var r in reviews) {
+      total += double.tryParse(r['rating'].toString()) ?? 0;
+    }
+    return total / reviews.length;
+  }
+
+  int getTotalReviews() {
+    int total = 0;
+    for (var b in reviewSummary?['breakdown'] ?? []) {
+      total += b['count'] as int;
+    }
+    return total;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// 🔥 Screen load hote hi API call
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchHomeReview();
+    });
+  }
+
+  Future<void> _fetchHomeReview() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_creatives}/${widget.id}/profile?latitude=34.05&longitude=-118.24",
+      );
+
+      if (response != null && response['error'] == false) {
+        final data = response['data'];
+
+        setState(() {
+          creative = data['creative'];
+          stats = data['stats'];
+          about = data['about'];
+
+          portfolio = data['portfolio_preview'] ?? [];
+          team = data['team_preview'] ?? [];
+
+          weeklyAvailability = data['weekly_availability'];
+
+          reviews = data['reviews']['preview'] ?? [];
+          reviewSummary = data['reviews'];
+        });
+      }
+    } catch (e) {
+      debugPrint("Profile API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _Booking() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.booking_select}/${widget.bookingId}/hold",
+        {
+          "creative_user_id": widget.id,
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+        /// ✅ API SUCCESS → NEXT SCREEN
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddOnServices(
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
+      } else {
+        /// ❌ API FAILED
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response?['message'] ?? "Booking failed"),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Booking API Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,12 +146,20 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             /// 🔹 TOP IMAGE + ACTIONS
             Stack(
               children: [
-                Image.asset(
-                  "assets/images/Rectangle 34661070.png",
+                /// 🔹 BACKGROUND IMAGE (Profile Image)
+                Image.network(
+                  creative!['profile_image_url'] != null
+                      ? ApiService().getImageURL(creative!['profile_image_url'])
+                      : "",
                   height: 360,
                   width: double.infinity,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    "assets/images/Rectangle 34661070.png",
+                    fit: BoxFit.cover,
+                  ),
                 ),
+
 
                 Container(
                   height: 360,
@@ -48,7 +176,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   ),
                 ),
 
-                /// BACK + FAVORITE
+                /// 🔹 BACK + SHARE + FAVORITE
                 Positioned(
                   top: 40,
                   left: 16,
@@ -57,46 +185,23 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: () {
-                          Navigator.pop(context); // 🔙 back
-
-                        },
-
+                        onTap: () => Navigator.pop(context),
                         child: Image.asset("assets/Icons/Reply.png", height: 24),
                       ),
                       Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              // on press action
-                            },
-                            child: Image.asset(
-                              "assets/Icons/Share 2.png", // 👈 apni image path
-                              height: 24,
-                              width: 24,
-                              color: Colors.white, // agar white chahiye
-                            ),
-                          ),
-                          SizedBox(width: 10,),
-                          GestureDetector(
-                            onTap: () {
-                              // on press action
-                            },
-                            child: Image.asset(
-                              "assets/images/Heart Angle.png", // 👈 apni image path
-                              height: 24,
-                              width: 24,
-                              color: Colors.white, // agar white chahiye
-                            ),
-                          ),
+                          Image.asset("assets/Icons/Share 2.png",
+                              height: 24, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/Heart Angle.png",
+                              height: 24, color: Colors.white),
                         ],
                       ),
-
                     ],
                   ),
                 ),
 
-                /// NAME + ROLE
+                /// 🔹 NAME + ROLE + PRICE
                 Positioned(
                   left: 16,
                   bottom: 24,
@@ -106,31 +211,30 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            "Angela Kia",
-                            style: TextStyle(
-                              fontFamily: "outfit",
+                            creative?['name'] ?? "",
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: ColorCode.white,
+                              color: Colors.white,
                             ),
                           ),
-                          SizedBox(height: 6),
+                          const SizedBox(height: 6),
                           Text(
-                            "Videography Specialist",
-                            style: TextStyle(
-                              fontFamily: "outfit",
+                            creative?['primary_title'] ?? "",
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
                               fontSize: 14,
-                              fontWeight: FontWeight.w400,
                               color: ColorCode.kWhiteOpacity70,
                             ),
                           ),
                         ],
                       ),
                       Text(
-                        "From \$450/Hr",
-                        style: TextStyle(
+                        "From \$${creative?['hourly_rate']}/Hr",
+                        style: const TextStyle(
                           fontFamily: "Outfit",
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -141,7 +245,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   ),
                 ),
               ],
-            ),
+            )
+            ,
 
             // const SizedBox(height: 20),
 
@@ -153,17 +258,17 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                 children: [
                   infoCard(
                     icon: Icons.group_outlined,
-                    value: "1000+",
+                    value: "${stats?['clients_count'] ?? 0}",
                     title: "Clients",
                   ),
                   infoCard(
                     icon: Icons.verified_outlined,
-                    value: "05 yrs",
+                    value: "${stats?['years_experience'] ?? 0} yrs",
                     title: "Experience",
                   ),
                   infoCard(
                     icon: Icons.star_border,
-                    value: "4.5",
+                    value: creative?['bookings_count'] ?? "0.0",
                     title: "Ratings",
                   ),
                 ],
@@ -180,34 +285,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             /// 🔹 ABOUT
             sectionTitle("About Creator"),
             sectionText(
-              "Angela Kia is a skilled videographer known for delivering cinematic visuals and compelling storytelling for brands and creators.",
+              about?['bio'] ?? "",
             ),
-
-            /// 🔹 PORTFOLIO
-           /* sectionTitle("Portfolio"),
-            SizedBox(
-              height: 110,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                padding: const EdgeInsets.only(left: 16),
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 12),
-                    width: 140,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      image: const DecorationImage(
-                        image:
-                        AssetImage("assets/images/profile_detils.png"),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-*/
 
         Column(
           children: [
@@ -349,25 +428,15 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
         SizedBox(height: 10,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                teamCard(
-                  image: "assets/images/man2.png",
-                  name: "Emma Hale",
-                  role: "Assistant",
-                  // showRating: true,
-                ),
-                teamCard(
-                  image: "assets/images/man2.png",
-                  name: "Adam Brooks",
-                  role: "Lighting Expert",
-                ),
-                teamCard(
-                  image: "assets/images/man2.png",
-                  name: "Nora Blake",
-                  role: "Photo Editor",
-                ),
-              ],
+              children: team.take(3).map((member) {
+                return teamCard(
+                  image: member['avatar_url'],
+                  name: member['name'],
+                  role: member['role'],
+                );
+              }).toList(),
             ),
+
           ],
         ),
       ),
@@ -400,16 +469,20 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
-                  children: [
-                    availabilityRow("Monday", false),
-                    availabilityRow("Tuesday", false),
-                    availabilityRow("Wednesday", true),
-                    availabilityRow("Thursday", false),
-                    availabilityRow("Friday", false),
-                    availabilityRow("Saturday", false),
-                    availabilityRow("Sunday", false),
-                  ],
+                  children: weeklyAvailability!.entries.map((entry) {
+                    final day = entry.key;
+                    final slots = entry.value as List;
+
+                    return availabilityRow(
+                      day,
+                      slots.isNotEmpty,
+                      slots.isNotEmpty
+                          ? "${slots.first['start_time']} - ${slots.first['end_time']}"
+                          : "Not Available",
+                    );
+                  }).toList(),
                 ),
+
               ),
             ],
           ),
@@ -514,41 +587,19 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             /// 🔹 HORIZONTAL SCROLL REVIEWS
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  reviewCard(),
-                  reviewCard(),
-                  reviewCard(),
-                  reviewCard(),
-                ],
+              child:Row(
+                children: reviews.map((r) {
+                  return reviewCard(
+                    name: r['client_name'],
+                    rating: r['rating'],
+                    text: r['review_text'],
+                    image: r['client_profile_image_url'],
+                  );
+                }).toList(),
               ),
-            ),
-      SizedBox(height: 40,),
-            /*SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: () {
 
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:  ColorCode.kButtonColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child:
-                      Text(
-                  "Book Now & Continue",
-                        style: TextStyle(
-                          fontFamily: "Unbounded",
-                          fontWeight: FontWeight.w500,
-                          color: ColorCode.kHeadingColor,
-                          fontSize: 14,
-                        ),
-                ),
-              ),
-            ),*/
+            ),
+           SizedBox(height: 40,),
           ],
 
         ),
@@ -566,30 +617,31 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddOnServices(),
-                ),
-              );
-            },
+            onPressed: isLoading ? null : _Booking,
             style: ElevatedButton.styleFrom(
               backgroundColor:  ColorCode.kButtonColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child:
-            Text(
+            child: isLoading
+                ? const SizedBox(
+              height: 22,
+              width: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.black,
+              ),
+            )
+                : const Text(
               "Book Now & Continue",
               style: TextStyle(
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kHeadingColor,
                 fontSize: 14,
               ),
             ),
+
           ),
         ),
       ),
@@ -772,32 +824,6 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
               ),
             ),
 
-            /// ⭐ OPTIONAL RATING BADGE
-           /* if (showRating)
-              Positioned(
-                bottom: -6,
-                child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Row(
-                    children: [
-                      Text(
-                        "4.1",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Icon(Icons.star, size: 14),
-                    ],
-                  ),
-                ),
-              ),*/
           ],
         ),
 
@@ -833,7 +859,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
   }
 
 
-  Widget availabilityRow(String day, bool isActive) {
+  Widget availabilityRow(String day, bool isActive, String time)
+  {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -882,106 +909,55 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
       ),
     );
   }
-  Widget reviewCard() {
+  Widget reviewCard({
+    required String name,
+    required String rating,
+    required String text,
+    String? image,
+  }) {
     return Card(
-      elevation: 6,
-      // shadowColor: Colors.black.withOpacity(0.4),
+      margin: const EdgeInsets.only(right: 12),
+      color: ColorCode.k282828,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
-      color: ColorCode.k282828,
-      margin: const EdgeInsets.only(right: 12),
       child: Container(
         width: 280,
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            /// 🔹 USER ROW
             Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 22,
-                  backgroundImage: AssetImage("assets/images/man2.png"),
+                  backgroundImage: image != null
+                      ? NetworkImage(ApiService().getImageURL(image))
+                      : const AssetImage("assets/images/man2.png")
+                  as ImageProvider,
                 ),
                 const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      "Jake Turner",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      "Mon, 14 Apr 2025 | 9:05 pm",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontWeight: FontWeight.w400,
-                        color: ColorCode.kWhiteOpacity70,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
-
-            /// 🔹 RATING BADGE
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "4.1",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: ColorCode.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Icon(
-                    Icons.star,
-                    size: 14,
-                    color: ColorCode.black,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            /// 🔹 REVIEW TEXT
-            const Text(
-              "Amazing experience! The creator and their team worked seamlessly throughout the event. Everyone was professional, punctual, and extremely easy to coordinate with. The final results exceeded our expectations.",
-              style: TextStyle(
-                fontFamily: "Outfit",
-                color: Colors.white,
-                fontSize: 12,
-                height: 1.4,
-                fontWeight: FontWeight.w400,
-              ),
-
+            Text("⭐ $rating"),
+            const SizedBox(height: 8),
+            Text(
+              text,
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),
       ),
     );
-
   }
+
 
 }

@@ -117,13 +117,21 @@ class ApiService {
     return imageURL + folder + image; // Combine URL with folder and image
   }
 */
-  static Future<String> getImageURL(String image) async {
+
+ /* static Future<String> getImageURL(String image) async {
     String folder = await getFolder() ?? '';
     return imageURL + folder + image;
   }
 
   static String getImageURLSync(String folder, String image) {
     return imageURL + folder + image;
+  }*/
+
+
+
+  /// ✅ Image URL Builder
+  String getImageURL(String imagePath) {
+    return imageURL + imagePath;
   }
 
 

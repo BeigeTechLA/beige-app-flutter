@@ -1,15 +1,92 @@
 import 'package:flutter/material.dart';
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import 'recommended_detils_screen.dart';
 
 class RecommendedForYou extends StatefulWidget {
-  const RecommendedForYou({super.key});
+  final int bookingId;
+  const RecommendedForYou({super.key, required this.bookingId});
 
   @override
   State<RecommendedForYou> createState() => _RecommendedForYouState();
 }
 
 class _RecommendedForYouState extends State<RecommendedForYou> {
+  bool isLoading = false;
+  List matches = [];
+
+
+
+  double? minRate;
+  double? maxRate;
+
+  List recommendedList = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHomeReview();
+    _fetch_RecommendedForYou();
+  }
+
+  Future<void> _fetchHomeReview() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          matches = response['data']['items'] ?? [];
+        });
+      }
+    } catch (e) {
+      debugPrint("Review API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  Future<void> _fetch_RecommendedForYou() async {
+    if (minRate == null || maxRate == null) return;
+
+    setState(() => isLoading = true);
+
+    try {
+      final uri = Uri.parse(
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches",
+      ).replace(
+        queryParameters: {
+          "sort": "nearest",
+          "min_rate": minRate!.toInt().toString(),
+          "max_rate": maxRate!.toInt().toString(),
+          "starts_with": "H",
+          "page": "1",
+          "limit": "10",
+        },
+      );
+
+      final response = await ApiService().fetchData(uri.toString());
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          recommendedList = response['data'] ?? [];
+        });
+      }
+    } catch (e) {
+      debugPrint("Recommended API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,10 +132,14 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
 
               /// 🔹 LIST VIEW
               Expanded(
-                child: ListView.builder(
-                  itemCount: 10,
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                  itemCount: matches.length,
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
+                    final item = matches[index];
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Container(
@@ -70,15 +151,27 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
                           children: [
-                            /// 🔹 BACKGROUND IMAGE
+
                             Positioned.fill(
-                              child: Image.asset(
+                              child: item['profile_image_url'] != null &&
+                                  item['profile_image_url'].toString().isNotEmpty
+                                  ? Image.network(
+                                ApiService().getImageURL(item['profile_image_url']),
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                              )
+
+                                  : Image.asset(
                                 "assets/images/Rectangle 34661070.png",
                                 fit: BoxFit.cover,
                               ),
                             ),
 
-                            /// 🔹 GRADIENT OVERLAY
+
+                            /// 🔹 GRADIENT
                             Positioned.fill(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -100,44 +193,19 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                               left: 12,
                               right: 12,
                               child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
-                                    children: [
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      const Text(
+                                    children: const [
+                                      CircleAvatar(radius: 4, backgroundColor: Colors.green),
+                                      SizedBox(width: 6),
+                                      Text(
                                         "Active",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
                                       ),
                                     ],
                                   ),
-
-                                  Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black.withOpacity(0.4),
-                                    ),
-                                    child: const Icon(
-                                      Icons.favorite_border,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                  ),
+                                  const Icon(Icons.favorite_border, color: Colors.white),
                                 ],
                               ),
                             ),
@@ -148,42 +216,37 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                               right: 14,
                               bottom: 14,
                               child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
+
+                                  /// LEFT INFO
                                   Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: const [
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.star,
-                                              color: Colors.amber, size: 14),
-                                          SizedBox(width: 4),
+                                          const Icon(Icons.star, color: Colors.amber, size: 14),
+                                          const SizedBox(width: 4),
                                           Text(
-                                            "4.5 (120)",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
+                                            "${item['average_rating']} (${item['total_reviews']})",
+                                            style: const TextStyle(color: Colors.white, fontSize: 12),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 6),
+                                      const SizedBox(height: 6),
                                       Text(
-                                        "Angela Kia",
-                                        style: TextStyle(
+                                        item['name'] ?? "",
+                                        style: const TextStyle(
                                           fontSize: 14,
-                                          fontFamily: "Helvetica Neue",
                                           fontWeight: FontWeight.w500,
                                           color: Colors.white,
                                         ),
                                       ),
-                                      SizedBox(height: 2),
+                                      const SizedBox(height: 2),
                                       Text(
-                                        "Videography Specialist",
-                                        style: TextStyle(
+                                        item['primary_title'] ?? "",
+                                        style: const TextStyle(
                                           fontSize: 11,
                                           color: Colors.white70,
                                         ),
@@ -191,6 +254,7 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                     ],
                                   ),
 
+                                  /// RIGHT BUTTON
                                   Row(
                                     children: [
                                       InkWell(
@@ -199,23 +263,23 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>  RecommendedDetilsScreen(),
+                                              builder: (_) => RecommendedDetilsScreen(
+                                                id: matches[index]['id'],
+                                                bookingId: widget.bookingId,
+                                              ),
                                             ),
                                           );
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
-                                            horizontal: 14,
-                                            vertical: 8,
-                                          ),
+                                              horizontal: 14, vertical: 8),
                                           decoration: BoxDecoration(
                                             color: ColorCode.kButtonColor,
                                             borderRadius: BorderRadius.circular(30),
                                           ),
-                                          child: const Text(
-                                            "From \$450/Hr",
-                                            style: TextStyle(
-                                              fontFamily: "Outfit",
+                                          child: Text(
+                                            "From \$${item['hourly_rate']}/Hr",
+                                            style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.black,
@@ -223,7 +287,6 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                           ),
                                         ),
                                       ),
-
                                       const SizedBox(width: 8),
                                       Image.asset(
                                         "assets/images/Group 2087328980.png",
@@ -241,6 +304,7 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                   },
                 ),
               ),
+
             ],
           ),
         ),

@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import '../HomeSekect/select_location.dart';
 
 class Bookshoot1 extends StatefulWidget {
-  const Bookshoot1({super.key});
+  final int specialtyId;
+  final int deliverableId;
+  final String deliverableName;
+
+  const Bookshoot1({super.key, required this.specialtyId, required this.deliverableId, required this.deliverableName});
 
   @override
   State<Bookshoot1> createState() => _Bookshoot1State();
@@ -12,6 +18,81 @@ class Bookshoot1 extends StatefulWidget {
 
 class _Bookshoot1State extends State<Bookshoot1> {
   int selectedIndex = 0;
+
+  int? selectedServiceTypeId;
+  List serviceTypes = [];
+  bool isLoading = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchbooking_data();
+  }
+
+
+  Future<void> _fetchbooking_data() async {
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.booking_data);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          serviceTypes = response['data']['service_types'] ?? [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> booking() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().postData(
+        ApiEndpoints.booking,
+        {
+          "specialty_id": widget.specialtyId,
+          "deliverable_option": widget.deliverableId,
+          "service_type": selectedServiceTypeId,
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+
+        /// 🔹 booking_id extract
+        final int bookingId = response['data']['booking_id'];
+
+        /// 🔹 Navigate with booking_id
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SelectLocation(
+              bookingId: bookingId,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'] ?? "Booking failed")),
+        );
+      }
+    } catch (e) {
+      debugPrint("Booking Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +167,21 @@ class _Bookshoot1State extends State<Bookshoot1> {
                   SizedBox(height: 10),
 
                   /// ✅ Options
-                  buildRadio("Photography", 0),
+              /*    buildRadio("Photography", 0),
                   buildRadio("Videography", 1),
-                  buildRadio("Both", 2),
+                  buildRadio("Both", 2),*/
+
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                    children: serviceTypes.map((item) {
+                      return buildRadio(
+                        title: item['label'],
+                        id: item['id'],
+                      );
+                    }).toList(),
+                  ),
+
 
                   const SizedBox(height: 20),
 
@@ -141,26 +234,43 @@ class _Bookshoot1State extends State<Bookshoot1> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) =>  SelectLocation()),
-                              );
+
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                              if (selectedServiceTypeId == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Please select service type"),
+                                  ),
+                                );
+                                return;
+                              }
+                              booking(); // ✅ API CALL HERE
                             },
-                            child: const Text(
+
+                            child: isLoading
+                                ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              ),
+                            )
+                                : const Text(
                               "Next",
                               style: TextStyle(
                                 color: ColorCode.kHeadingColor,
-                                fontFamily: 'Unbounded',   // ← Add this
+                                fontFamily: 'Unbounded',
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                // Looks cleaner in Unbounded
                               ),
                             ),
-
                           ),
                         ),
                       ),
+
                     ],
                   )
 
@@ -173,66 +283,56 @@ class _Bookshoot1State extends State<Bookshoot1> {
     );
   }
 
-  /// ✅ Premium Gradient Radio Tile
-  Widget buildRadio(String title, int item) {
+  Widget buildRadio({required String title, required int id}) {
+    final isSelected = selectedServiceTypeId == id;
+
     return InkWell(
       onTap: () {
         setState(() {
-          selectedIndex = item;
+          selectedServiceTypeId = id;
         });
       },
       child: Padding(
-        padding:  EdgeInsets.all( 10),
+        padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-
-            /// Title
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 color: ColorCode.kWhiteOpacity70,
-                fontFamily: 'Outfit  ',
+                fontFamily: 'Outfit',
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                // Looks cleaner in Unbounded
-              ),),
+              ),
+            ),
 
-            /// 🔵 Custom Gradient Radio Circle
+            /// 🔵 Custom Radio
             Container(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-
-                /// Gradient when selected
-                gradient: selectedIndex == item
+                gradient: isSelected
                     ? const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFFE8D1AB), // light shade
-                    Color(0xFFD4A14D), // dark shade
+                    Color(0xFFE8D1AB),
+                    Color(0xFFD4A14D),
                   ],
                 )
                     : null,
-
-                /// When NOT selected → white background
-                color: selectedIndex == item ? null : Colors.transparent,
-
-                /// Border
                 border: Border.all(
                   color: ColorCode.kWhiteOpacity70,
                   width: 1,
                 ),
               ),
-
-              /// Inner Dot (Visible only when selected)
-              child: selectedIndex == item
+              child: isSelected
                   ? Center(
                 child: Container(
                   width: 10,
-                  height: 9,
+                  height: 10,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.black,
@@ -240,10 +340,11 @@ class _Bookshoot1State extends State<Bookshoot1> {
                 ),
               )
                   : null,
-            )
+            ),
           ],
         ),
       ),
     );
   }
+
 }

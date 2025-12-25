@@ -1,15 +1,104 @@
 import 'package:flutter/material.dart';
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import 'finding_the_perfect_screen.dart';
 
 class ReviewConfirm extends StatefulWidget {
-  const ReviewConfirm({super.key});
+  final int bookingId;
+
+  const ReviewConfirm({super.key, required this.bookingId});
 
   @override
   State<ReviewConfirm> createState() => _ReviewConfirmState();
 }
 
 class _ReviewConfirmState extends State<ReviewConfirm> {
+
+  bool isLoading = false;
+  Map<String, dynamic>? reviewData;
+
+  Map<String, dynamic>? booking;
+  Map<String, dynamic>? timeSlot;
+  Map<String, dynamic>? Rev;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHomeReview();
+    _fetchHome();
+  }
+
+  Future<void> _fetchHomeReview() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/review",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          booking = response['data']['booking'];
+          timeSlot = response['data']['time_slot'];
+        });
+      }
+    } catch (e) {
+      debugPrint("Review API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _fetchHome() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        ApiEndpoints.booking_select,
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          booking = response['data']['booking'];
+          timeSlot = response['data']['time_slot'];
+        });
+      }
+    } catch (e) {
+      debugPrint("Review API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  String formatTime(String time) {
+    final parts = time.split(":");
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+
+    final suffix = hour >= 12 ? "PM" : "AM";
+    hour = hour > 12 ? hour - 12 : hour;
+    hour = hour == 0 ? 12 : hour;
+
+    return "${hour.toString().padLeft(2, '0')}:"
+        "${minute.toString().padLeft(2, '0')} $suffix";
+  }
+
+  String formatDate(String date) {
+    final d = DateTime.parse(date);
+    return "${_monthName(d.month)} ${d.day}, ${d.year}";
+  }
+
+  String _monthName(int month) {
+    const months = [
+      "January","February","March","April","May","June",
+      "July","August","September","October","November","December"
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,112 +163,117 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
               const SizedBox(height: 20),
 
               /// ------------------ WHITE CARD ------------------
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: ColorCode.k282828,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ColorCode.k282828,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                /// --- Title ---
+                Row(
                   children: [
-
-
-                    Row(
-                      children: [
-                        Image.asset("assets/images/Group 2087328887.png", height: 24),
-                        const SizedBox(width: 10),
-                         Text(
-                          "Wedding Event (Photography)",
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: ColorCode.white,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: "Outfit",
-                          ),
-                        ),
-                      ],
+                    Image.asset(
+                      "assets/images/Group 2087328887.png",
+                      height: 24,
                     ),
-
-                    const SizedBox(height: 20),
-
-                    /// --- Time Row ---
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 20),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: RichText(
-                            text: const TextSpan(
-                              text: "01:30 AM to 03:30 AM ",
-                              style: TextStyle(
-                                color: ColorCode.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Outfit",
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: "(Estimated 11h duration)",
-                                  style: TextStyle(
-                                    color: ColorCode.kButtonColor,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 11,
-                                    fontFamily: "Outfit",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        booking?['project_name'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: ColorCode.white,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Outfit",
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    /// --- Date Row ---
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_month, size: 20),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "March 22, 2025",
-                          style:TextStyle(
-                            color: ColorCode.kWhiteOpacity70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Outfit",
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    /// --- Location Row ---
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.location_on_outlined, size: 22),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: Text(
-                            "2458 Sunset Boulevard Los Angeles, CA 90026",
-                            style:TextStyle(
-                              color: ColorCode.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Outfit",
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
+
+                /// --- Time ---
+                Row(
+                  children: [
+                    const Icon(Icons.access_time, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          text:
+                          "${formatTime(timeSlot!['start_time'])} to "
+                              "${formatTime(timeSlot!['end_time'])} ",
+                          style: const TextStyle(
+                            color: ColorCode.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Outfit",
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                              "(Estimated ${booking!['duration_hours']}h duration)",
+                              style: const TextStyle(
+                                color: ColorCode.kButtonColor,
+                                fontSize: 11,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// --- Date ---
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_month, size: 20),
+                    const SizedBox(width: 10),
+                    Text(
+                      formatDate(timeSlot!['event_date']),
+                      style: const TextStyle(
+                        color: ColorCode.kWhiteOpacity70,
+                        fontSize: 12,
+                        fontFamily: "Outfit",
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// --- Location ---
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 22),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        Rev?['event_location'] ?? '',
+                        style: const TextStyle(
+                          color: ColorCode.white,
+                          fontSize: 11,
+                          fontFamily: "Outfit",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
 
               /// ------------------ MAP SECTION ------------------
               ClipRRect(
@@ -247,7 +341,7 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => FindingThePerfectScreen(),
+                        builder: (context) => FindingThePerfectScreen(bookingId: widget.bookingId,),
                       ),
                     );
                   },
