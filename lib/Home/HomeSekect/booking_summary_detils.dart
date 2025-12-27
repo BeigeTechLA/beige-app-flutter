@@ -1,6 +1,7 @@
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
@@ -22,7 +23,7 @@ bool isLoading =true;
 
   Map<String, dynamic>? summaryData;
 
-
+int totals =200;
 
 
 
@@ -52,6 +53,56 @@ bool isLoading =true;
       setState(() => isLoading = false);
     }
   }
+
+
+  Future<void> _payWithStripe() async {
+    try {
+      if (totals == null) return;
+
+      setState(() => isLoading = true);
+
+
+
+      final response = await ApiService().postData(
+        ApiEndpoints.payment,
+        {
+          "booking_id": widget.bookingId,
+          "amount": totals * 100,
+          "currency": "usd",
+        },
+      );
+
+      final String clientSecret = response['client_secret'];
+
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: "Beige",
+          style: ThemeMode.dark,
+        ),
+      );
+
+      await Stripe.instance.presentPaymentSheet();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment Successful 🎉")),
+      );
+
+    } on StripeException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.error.localizedMessage ?? "Stripe Error")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment Failed ❌")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
 
 
 
@@ -591,8 +642,17 @@ bool isLoading =true;
           height: 55,
           child: ElevatedButton(
             onPressed: () {
-
+              if (selectedIndex == 0) {
+                // Pay at Venue
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Pay at Venue Selected")),
+                );
+              } else {
+                // Stripe Card Payment
+                _payWithStripe();
+              }
             },
+
             style: ElevatedButton.styleFrom(
               backgroundColor:  ColorCode.kButtonColor,
               shape: RoundedRectangleBorder(

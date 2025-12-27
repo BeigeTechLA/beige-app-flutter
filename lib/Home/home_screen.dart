@@ -86,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen>
 
 
   final List<Map<String, String>> items = [
-
   {"title": "Events &\nParties", "icon": "assets/images/party.png"},
   {"title": "Creative &\nMedia", "icon": "assets/images/Creative.png"},
   {"title": "Travel &\nOutdoors", "icon": "assets/images/Travel.png"},

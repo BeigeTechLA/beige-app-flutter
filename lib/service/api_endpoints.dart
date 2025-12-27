@@ -21,4 +21,8 @@ class ApiEndpoints {
   //
   static const String booking_creatives = "creatives";
 
+
+  //pyment?
+  static const String payment = "payment";
+
 }

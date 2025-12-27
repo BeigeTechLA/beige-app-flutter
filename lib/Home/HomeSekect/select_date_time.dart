@@ -67,10 +67,19 @@ bool isLoading =false;
     };
   }
 
+  TimeOfDay roundToNextHour(TimeOfDay time) {
+    return TimeOfDay(hour: (time.hour + 1) % 24, minute: 0);
+  }
+
+  TimeOfDay addHours(TimeOfDay time, int hours) {
+    final totalHours = time.hour + hours;
+    return TimeOfDay(hour: totalHours % 24, minute: 0);
+  }
 
   String formatTime24(TimeOfDay time) {
     return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
   }
+
 
   Future<void> selectTimeApi() async {
     if (selectedDates.isEmpty) {
@@ -96,14 +105,19 @@ bool isLoading =false;
 
       if (!isCustomSelected) {
         final slot = parseTimeSlot(timeSlots[selectedTimeIndex]);
-        startTime = slot['start']!.split(" ")[0]; // 10:00
-        endTime = slot['end']!.split(" ")[0];     // 12:00
+        startTime = slot['start']!.split(" ")[0];
+        endTime = slot['end']!.split(" ")[0];
         durationHours = 2;
       } else {
-        startTime = "10:00";
-        endTime = "${10 + selectedHour.toInt()}:00";
+        final now = TimeOfDay.now();
+        final start = roundToNextHour(now);
+        final end = addHours(start, selectedHour.toInt());
+
+        startTime = formatTime24(start);
+        endTime = formatTime24(end);
         durationHours = selectedHour.toInt();
       }
+
 
       final DateTime apiDate = selectedDates.first;
 
@@ -424,8 +438,14 @@ bool isLoading =false;
                       max: 24,
                       divisions: 11,
                       value: selectedHour,
-                      onChanged: (v) =>
-                          setState(() => selectedHour = v),
+                      onChanged: (v) {
+                        setState(() {
+                          selectedHour = v;
+                          isCustomSelected = true;   // 🔥 VERY IMPORTANT
+                          selectedTimeIndex = -1;   // slot deselect
+                        });
+                      },
+
                     ),
                   ),
                   const Row(

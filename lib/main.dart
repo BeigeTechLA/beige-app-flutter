@@ -13,11 +13,9 @@ void main() async {
   // ✅ Set environment
   const environment = String.fromEnvironment('ENV', defaultValue: 'dev');
   AppConfig.setEnvironment(environment);
-/*
 
   Stripe.publishableKey =
   "pk_live_51S5czd54hnPNgHXUeZUKeHnojWxW9CoV1cicTHDbn1upsPakN8GtwNgBNORQt3ghPlmJgtbcycT8tw8ctfxRz4a800NeVNgc5u";
-*/
 
   // ✅ Read login state
   final prefs = await SharedPreferences.getInstance();
