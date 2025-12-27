@@ -58,34 +58,31 @@ class _AddOnServicesState extends State<AddOnServices> {
           if (priceType == 2) {
             items.add({
               "addon_id": addon['addon_id'],
-              "hours": addon['hours'] ?? 1, // ✅ default
+              "hours": addon['hours'] ?? 1,
             });
           } else {
             items.add({
               "addon_id": addon['addon_id'],
-              "qty": addon['quantity'] ?? 1, // ✅ default
+              "qty": addon['quantity'] ?? 1,
             });
           }
         }
       }
 
-      if (items.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select at least one add-on")),
-        );
-        return;
-      }
-
+      /// ✅ EVEN IF items IS EMPTY → API WILL BE CALLED
       final response = await ApiService().putData(
         "${ApiEndpoints.booking_select}/${widget.bookingId}/add-ons",
-        { "items": items },
+        {
+          "items": items, // empty list allowed
+        },
       );
 
       if (response != null && response['error'] == false) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BookingSummaryDetils(bookingId: widget.bookingId,),
+            builder: (_) =>
+                BookingSummaryDetils(bookingId: widget.bookingId),
           ),
         );
       }
@@ -95,6 +92,7 @@ class _AddOnServicesState extends State<AddOnServices> {
       setState(() => isLoading = false);
     }
   }
+
 
 
   @override

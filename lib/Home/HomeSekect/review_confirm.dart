@@ -158,116 +158,116 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
               const SizedBox(height: 20),
 
               /// ------------------ WHITE CARD ------------------
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: ColorCode.k282828,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                /// --- Title ---
-                Row(
-                  children: [
-                    Image.asset(
-                      "assets/images/Group 2087328887.png",
-                      height: 24,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        booking?['project_name'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: ColorCode.white,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "Outfit",
-                        ),
-                      ),
-                    ),
-                  ],
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: ColorCode.k282828,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-
-                const SizedBox(height: 20),
-
-                /// --- Time ---
-                Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.access_time, size: 20),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          text:
-                          "${formatTime(timeSlot!['start_time'])} to ${formatTime(timeSlot!['end_time'])} ",
-                          style: const TextStyle(
-                            color: ColorCode.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Outfit",
+
+                    /// --- Title ---
+                    Row(
+                      children: [
+                        Image.asset(
+                          "assets/images/Group 2087328887.png",
+                          height: 24,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            booking?['project_name'] ?? "-",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: ColorCode.white,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: "Outfit",
+                            ),
                           ),
-                          children: [
-                            TextSpan(
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// --- Time ---
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
                               text:
-                              "(Estimated ${booking!['duration_hours']}h duration)",
+                              "${formatTime(timeSlot?['start_time'])} to ${formatTime(timeSlot?['end_time'])} ",
                               style: const TextStyle(
-                                color: ColorCode.kButtonColor,
+                                color: ColorCode.white,
                                 fontSize: 11,
                                 fontFamily: "Outfit",
                               ),
+                              children: [
+                                TextSpan(
+                                  text:
+                                  "(Estimated ${booking?['duration_hours'] ?? 0}h duration)",
+                                  style: const TextStyle(
+                                    color: ColorCode.kButtonColor,
+                                    fontSize: 11,
+                                    fontFamily: "Outfit",
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
 
-                const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                /// --- Date ---
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_month, size: 20),
-                    const SizedBox(width: 10),
-                    Text(
-                      formatDate(timeSlot!['event_date']),
-                      style: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                        fontSize: 12,
-                        fontFamily: "Outfit",
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                /// --- Location ---
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.location_on_outlined, size: 22),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        booking!['event_location'] ?? '',
-                        style: const TextStyle(
-                          color: ColorCode.white,
-                          fontSize: 11,
-                          fontFamily: "Outfit",
+                    /// --- Date ---
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_month, size: 20),
+                        const SizedBox(width: 10),
+                        Text(
+                          formatDate(timeSlot?['event_date']),
+                          style: const TextStyle(
+                            color: ColorCode.kWhiteOpacity70,
+                            fontSize: 12,
+                            fontFamily: "Outfit",
+                          ),
                         ),
-                      ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// --- Location ---
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 22),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            booking?['event_location'] ?? "-",
+                            style: const TextStyle(
+                              color: ColorCode.white,
+                              fontSize: 11,
+                              fontFamily: "Outfit",
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          const SizedBox(height: 20),
+
+              const SizedBox(height: 20),
 
               /// ------------------ MAP SECTION ------------------
               ClipRRect(

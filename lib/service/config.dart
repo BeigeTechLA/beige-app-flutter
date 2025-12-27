@@ -10,7 +10,8 @@ class AppConfig {
     switch (env) {
       case 'dev':
          // apiUrl = 'http://localhost:3004/api/';
-         apiUrl = 'http://44.195.83.241/api/';
+         //   apiUrl = 'http://10.0.2.2:3004/api/';
+          apiUrl = 'http://44.195.83.241/api/';
            imageUrl = 'https://beigexmemehouse.s3.eu-north-1.amazonaws.com/beige/'; // Dev URL
 
 

@@ -47,6 +47,29 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
     return total;
   }
 
+
+  String formatTime(String time) {
+    final parts = time.split(":");
+    int hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final suffix = hour >= 12 ? "PM" : "AM";
+    hour = hour > 12 ? hour - 12 : hour;
+    hour = hour == 0 ? 12 : hour;
+    return "$hour:$minute $suffix";
+  }
+
+  final List<String> weekDaysOrder = const [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+
+
   @override
   void initState() {
     super.initState();
@@ -142,116 +165,116 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           children: [
 
             /// 🔹 TOP IMAGE + ACTIONS
-            Stack(
+        Stack(
+        children: [
+        Image.network(
+            creative?['profile_image_url'] != null
+            ? ApiService().getImageURL(creative?['profile_image_url'])
+            : "",
+        height: 360,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Image.asset(
+          "assets/images/Rectangle 34661070.png",
+          height: 360,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      ),
+
+      Container(
+        height: 360,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.5),
+              Colors.transparent,
+              Colors.black.withOpacity(0.85),
+            ],
+          ),
+        ),
+      ),
+
+      Positioned(
+        top: 40,
+        left: 16,
+        right: 16,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              onTap: () => Navigator.pop(context),
+              child: Image.asset("assets/Icons/Reply.png", height: 24),
+            ),
+            Row(
               children: [
-                /// 🔹 BACKGROUND IMAGE (Profile Image)
-                Image.network(
-                  creative!['profile_image_url'] != null
-                      ? ApiService().getImageURL(creative!['profile_image_url'])
-                      : "",
-                  height: 360,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    "assets/images/Rectangle 34661070.png",
-                    fit: BoxFit.cover,
+                Image.asset("assets/Icons/Share 2.png",
+                    height: 24, color: Colors.white),
+                const SizedBox(width: 10),
+                Image.asset("assets/images/Heart Angle.png",
+                    height: 24, color: Colors.white),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      Positioned(
+        left: 16,
+        bottom: 24,
+        right: 16,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  creative?['name'] ?? "-",
+                  style: const TextStyle(
+                    fontFamily: "Outfit",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-
-
-                Container(
-                  height: 360,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.5),
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.85),
-                      ],
-                    ),
-                  ),
-                ),
-
-                /// 🔹 BACK + SHARE + FAVORITE
-                Positioned(
-                  top: 40,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Image.asset("assets/Icons/Reply.png", height: 24),
-                      ),
-                      Row(
-                        children: [
-                          Image.asset("assets/Icons/Share 2.png",
-                              height: 24, color: Colors.white),
-                          const SizedBox(width: 10),
-                          Image.asset("assets/images/Heart Angle.png",
-                              height: 24, color: Colors.white),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                /// 🔹 NAME + ROLE + PRICE
-                Positioned(
-                  left: 16,
-                  bottom: 24,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            creative?['name'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            creative?['primary_title'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        "From \$${creative?['hourly_rate']}/Hr",
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: ColorCode.kButtonColor,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 6),
+                Text(
+                  creative?['primary_title'] ?? "",
+                  style: const TextStyle(
+                    fontFamily: "Outfit",
+                    fontSize: 14,
+                    color: ColorCode.kWhiteOpacity70,
                   ),
                 ),
               ],
-            )
-            ,
+            ),
+            Text(
+              creative?['hourly_rate'] != null
+                  ? "From \$${creative?['hourly_rate']}/Hr"
+                  : "",
+              style: const TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: ColorCode.kButtonColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+      ],
+    ),
+
 
             // const SizedBox(height: 20),
 
             /// 🔹 INFO STATS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+              child:  Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   infoCard(
@@ -266,7 +289,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   ),
                   infoCard(
                     icon: Icons.star_border,
-                    value: creative?['bookings_count'] ?? "0.0",
+                    value: "${creative?['bookings_count'] ?? 0}",
                     title: "Ratings",
                   ),
                 ],
@@ -282,9 +305,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
             /// 🔹 ABOUT
             sectionTitle("About Creator"),
-            sectionText(
-              about?['bio'] ?? "",
-            ),
+            sectionText(about?['bio'] ?? "No information available"),
 
         Column(
           children: [
@@ -391,222 +412,217 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             ),
           ],
         ),
-      Padding(
-        padding:  EdgeInsets.fromLTRB(16, 24, 16, 8),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// 🔹 TITLE
-                Text(
-                   "Team",
-                  style: const TextStyle(
-                    fontFamily: "Outfit",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-
-                /// 🔹 RIGHT ARROW
-                InkWell(
-                  onTap: () {
-                    // Navigate to Team list screen
-                  },
-                  borderRadius: BorderRadius.circular(20),
-                  child: const Icon(
-                    Icons.chevron_right,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-        SizedBox(height: 10,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: team.take(3).map((member) {
-                return teamCard(
-                  image: member['avatar_url'],
-                  name: member['name'],
-                  role: member['role'],
-                );
-              }).toList(),
-            ),
-
-          ],
-        ),
-      ),
-
-
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// 🔹 SECTION TITLE
-              const Text(
-                "Weekly Availability",
-                style: TextStyle(
-                  fontFamily: "Outfit",
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              /// 🔹 MAIN CONTAINER
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: weeklyAvailability!.entries.map((entry) {
-                    final day = entry.key;
-                    final slots = entry.value as List;
-
-                    return availabilityRow(
-                      day,
-                      slots.isNotEmpty,
-                      slots.isNotEmpty
-                          ? "${slots.first['start_time']} - ${slots.first['end_time']}"
-                          : "Not Available",
-                    );
-                  }).toList(),
-                ),
-
-              ),
-            ],
-          ),
-        ),
-
-
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            /// 🔹 TITLE ROW
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Reviews",
-                  style: TextStyle(
-                    fontFamily: "Outfit",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    // Navigate to all reviews screen
-                  },
-                  child: const Icon(
-                    Icons.chevron_right,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 14),
-
-            /// 🔹 TOP RATING CARD
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                gradient: const LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color(0xFFE8D1AB),
-                    Color(0xFFFDEFD9),
-                  ],
-                ),
-              ),
-              child: Row(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
                       Text(
-                        "5 Star",
-                        style: TextStyle(
-                          fontFamily: "Unbounded",
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "(567 Reviews)",
+                        "Team",
                         style: TextStyle(
                           fontFamily: "Outfit",
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black38,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
+                      Icon(Icons.chevron_right, color: Colors.white),
                     ],
                   ),
-                  const Spacer(),
-                  Row(
-                    children: List.generate(
-                      5,
-                          (index) => const Padding(
-                        padding: EdgeInsets.only(left: 6),
-                        child: Icon(
-                          Icons.star,
-                          color: Color(0xFFE6B800),
-                          size: 30,
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 10),
+                  team.isEmpty
+                      ? const Text("No team members",
+                      style: TextStyle(color: Colors.white54))
+                      : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: team.take(3).map((m) {
+                      return teamCard(
+                        image: m['avatar_url'] ?? "",
+                        name: m['name'] ?? "",
+                        role: m['role'] ?? "",
+                      );
+                    }).toList(),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Weekly Availability",
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
 
-            /// 🔹 HORIZONTAL SCROLL REVIEWS
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child:Row(
-                children: reviews.map((r) {
-                  return reviewCard(
-                    name: r['client_name'],
-                    rating: r['rating'],
-                    text: r['review_text'],
-                    image: r['client_profile_image_url'],
-                  );
-                }).toList(),
+                  const SizedBox(height: 14),
+
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A2A2A),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+
+                    child: weeklyAvailability == null
+                        ? const Text(
+                      "Not available",
+                      style: TextStyle(color: Colors.white54),
+                    )
+                        : Column(
+                      children: weekDaysOrder.map((day) {
+                        final List slots =
+                            weeklyAvailability![day] as List? ?? [];
+
+                        final bool isActive = slots.isNotEmpty;
+
+                        String timeText = "Not Available";
+                        if (isActive) {
+                          final slot = slots.first;
+                          timeText =
+                          "${formatTime(slot['start_time'])} - ${formatTime(slot['end_time'])}";
+                        }
+
+                        return availabilityRow(
+                          day,
+                          isActive,
+                          timeText,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Divider(color: Colors.white10,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Reviews",
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      Icon(Icons.chevron_right, color: Colors.white),
+                    ],
+                  ),
+
+                  SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding:  EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFFE8D1AB), // light gold
+                          Color(0xFFF7E7C6), // lighter gold
+                        ],
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+
+                        /// LEFT TEXT
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "5 Star",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "(${getTotalReviews()} Reviews)",
+                              style: const TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const Spacer(),
+
+                        /// RIGHT STARS
+                        Row(
+                          children: List.generate(
+                            5,
+                                (index) => const Padding(
+                              padding: EdgeInsets.only(left: 6),
+                              child: Icon(
+                                Icons.star,
+                                size: 26,
+                                color: Color(0xFFE6B800), // golden star
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      const SizedBox(height: 14),
+                      reviews.isEmpty
+                          ? const Text("No reviews yet",
+                          style: TextStyle(color: Colors.white54))
+                          : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: reviews.map((r) {
+                            return reviewCard(
+                              name: r['client_name'] ?? "",
+                              rating: r['rating']?.toString() ?? "0",
+                              text: r['review_text'] ?? "",
+                              image: r['client_profile_image_url'],
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
               ),
 
             ),
-           SizedBox(height: 40,),
+
+             SizedBox(height: 40),
           ],
+        ),
 
         ),
-      ),
 
-
-      ],
-        ),
-      ),
 
       /// 🔹 BOTTOM BUTTON
       bottomNavigationBar: Padding(
@@ -643,7 +659,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
           ),
         ),
-      ),
+      )
     );
   }
 
@@ -857,57 +873,57 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
     );
   }
 
+  /*
+    Widget availabilityRow(String day, bool isActive, String time)
+    {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
 
-  Widget availabilityRow(String day, bool isActive, String time)
-  {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-
-          /// 🔹 GREEN DOT
-          Container(
-            height: 8,
-            width: 8,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2ED47A),
-              shape: BoxShape.circle,
+            /// 🔹 GREEN DOT
+            Container(
+              height: 8,
+              width: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2ED47A),
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          /// 🔹 DAY NAME
-          Expanded(
-            child: Text(
-              day,
+            /// 🔹 DAY NAME
+            Expanded(
+              child: Text(
+                day,
+                style: TextStyle(
+                  fontFamily: "Outfit",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isActive
+                      ? const Color(0xFF2ED47A)
+                      : Colors.white,
+                ),
+              ),
+            ),
+
+            /// 🔹 TIME
+            Text(
+              "10:00 am - 10:00 pm",
               style: TextStyle(
                 fontFamily: "Outfit",
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: isActive
                     ? const Color(0xFF2ED47A)
-                    : Colors.white,
+                    : Colors.white.withOpacity(0.6),
               ),
             ),
-          ),
-
-          /// 🔹 TIME
-          Text(
-            "10:00 am - 10:00 pm",
-            style: TextStyle(
-              fontFamily: "Outfit",
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isActive
-                  ? const Color(0xFF2ED47A)
-                  : Colors.white.withOpacity(0.6),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
+    }*/
   Widget reviewCard({
     required String name,
     required String rating,
@@ -958,5 +974,51 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
     );
   }
 
+
+
+  Widget availabilityRow(String day, bool isActive, String time) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            height: 8,
+            width: 8,
+            decoration: BoxDecoration(
+              color: isActive ? const Color(0xFF2ED47A) : Colors.grey,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Text(
+              day,
+              style: TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isActive
+                    ? const Color(0xFF2ED47A)
+                    : Colors.white,
+              ),
+            ),
+          ),
+
+          Text(
+            time,
+            style: TextStyle(
+              fontFamily: "Outfit",
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isActive
+                  ? const Color(0xFF2ED47A)
+                  : Colors.white.withOpacity(0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 }

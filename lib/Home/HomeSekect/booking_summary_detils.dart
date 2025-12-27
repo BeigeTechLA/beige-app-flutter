@@ -1,6 +1,7 @@
+import 'package:beige/Home/HomeSekect/payment_method.dart';
 import 'package:beige/utility/ColorCode.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
@@ -15,16 +16,24 @@ class BookingSummaryDetils extends StatefulWidget {
 
 class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
   bool payFullAdvance = true;
-  int selectedPayment = 0;
   int selectedIndex = 0;
 
-bool isLoading =true;
+  bool isLoading = true;
+
+
+  bool pageLoading = true;      // summary load
+  bool paymentLoading = false; // payment button
+
+
+
+  final TextEditingController NotesController = TextEditingController();
+
 
   Map<String, dynamic>? summaryData;
-
-
-
-
+  Map<String, dynamic>? creative;
+  Map<String, dynamic>? booking;
+  Map<String, dynamic>? totals;
+  List<dynamic> addons = [];
 
 
   @override
@@ -34,61 +43,136 @@ bool isLoading =true;
   }
 
   Future<void> _fetch_book_summary() async {
-    setState(() => isLoading = true);
+    setState(() => pageLoading = true);
 
     try {
       final response = await ApiService().fetchData(
         "${ApiEndpoints.booking_select}/${widget.bookingId}/summary",
-      );
+      );  debugPrint("📥 API RESPONSE => $response");
 
       if (response != null && response['error'] == false) {
-        setState(() {
-          summaryData = response['data'];
-        });
+        final data = response['data'] ?? {};
+
+        creative = data['creative'];
+        booking = data['booking'];
+        totals = data['totals'];
+        addons = data['addons'] ?? [];
       }
-    } catch (e) {
-      debugPrint("Summary API Error: $e");
     } finally {
-      setState(() => isLoading = false);
+      setState(() => pageLoading = false);
+    }
+  }
+
+  Future<void> _payWithStripe() async {
+    try {
+      setState(() => paymentLoading = true);
+
+      final String paymentMethod =
+      selectedIndex == 0 ? "venue" : "card";
+
+      final Map<String, dynamic> payload =
+      {
+        "payment_method": "card",
+        "pay_full_in_advance": payFullAdvance,
+        "client_notes": NotesController.text.trim(),
+      };
+
+      debugPrint("➡️ PUT PAYMENT API");
+      debugPrint("➡️ Payload: $payload");
+
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking_select}/${widget.bookingId}/payment",
+        payload,
+      );
+
+      debugPrint("✅ Response: $response");
+
+      if (response != null && response['error'] == false) {
+
+        /// ✅ SUCCESS → NEXT SCREEN
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentMethodScreen(
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
+
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response?['message'] ?? "Payment failed"),
+          ),
+        );
+      }
+    } catch (e, s) {
+      debugPrint("❌ Payment Error: $e");
+      debugPrint("❌ StackTrace: $s");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
+    } finally {
+      setState(() => paymentLoading = false);
     }
   }
 
 
 
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
-    final creative = summaryData?['creative'];
-    final booking  = summaryData?['booking'];
-    final payment  = summaryData?['payment'];
-    final addons   = summaryData?['addons'] as List<dynamic>? ?? [];
-    final totals   = summaryData?['totals'];
 
+    /// 🔐 LOADING GUARD
+    if (pageLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1D1D1B),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    /// 🔐 NULL DATA GUARD
+    if (creative == null || booking == null || totals == null) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1D1D1B),
+        body: Center(
+          child: Text(
+            "No booking data found",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF1D1D1B),
       body: SafeArea(
         child: SingleChildScrollView(
-
-          padding:  EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              /// 🔙 BACK + TITLE
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      "assets/Icons/Vector.png",
-                      height: 22,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+              /// BACK
+              InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Image.asset(
+                  "assets/Icons/Vector.png",
+                  height: 22,
+                  color: Colors.white,
+                ),
               ),
-               SizedBox(height: 12),
-               Text(
+
+              const SizedBox(height: 12),
+
+              const Text(
                 "Booking Summary",
                 style: TextStyle(
                   fontSize: 16,
@@ -97,9 +181,10 @@ bool isLoading =true;
                   color: Colors.white,
                 ),
               ),
-               SizedBox(height: 24),
 
-              /// 📸 CREATOR CARD
+              const SizedBox(height: 24),
+
+              /// CREATOR CARD
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -110,10 +195,8 @@ bool isLoading =true;
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// 🔹 TOP PROFILE ROW
                     Row(
                       children: [
-
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Image.asset(
@@ -126,58 +209,56 @@ bool isLoading =true;
 
                         const SizedBox(width: 14),
 
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /// ⭐ RATING
-                    Row(
-                      children: [
-                        const Icon(Icons.star,
-                            size: 14, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          "${creative['average_rating']} "
-                              "(${creative['total_reviews']})",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: ColorCode.kWhiteOpacity70,
-                            fontFamily: "Outfit",
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.star,
+                                      size: 14, color: Colors.amber),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "${creative?['average_rating'] ?? 0} "
+                                        "(${creative?['total_reviews'] ?? 0})",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+
+                              Text(
+                                creative?['name'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  fontFamily: "Outfit",
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              Text(
+                                "From \$${creative?['hourly_rate'] ?? 0}/Hr",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: ColorCode.kButtonColor,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-
-                    /// 👤 NAME
-                    Text(
-                      creative['name'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        fontFamily: "Outfit",
-                      ),
-                    ),
-                    const SizedBox(height:10),
-
-                    /// 💰 RATE
-                    Text(
-                      "From \$${creative['hourly_rate']}/Hr",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: ColorCode.kButtonColor,
-                        fontFamily: "Outfit",
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              )
+                        )
                       ],
                     ),
 
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
 
                     SizedBox(
                       height: 1,
@@ -197,37 +278,30 @@ bool isLoading =true;
                         },
                       ),
                     ),
-
-
                     const SizedBox(height: 12),
 
-                    /// ⬜ WHITE INFO BOX
                     Container(
-                      padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
                       ),
                       child: Column(
                         children: [
                           infoRowBlack(
                             Icons.access_time,
-                        "${booking['start_time']} - ${booking['end_time']} "
-                            "(${booking['duration_hours']}h)",
-
+                            "${booking?['start_time']} - ${booking?['end_time']} "
+                                "(${booking?['duration_hours']}h)",
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.calendar_month,
-                            booking['event_date'],
+                            booking?['event_date'] ?? '--',
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.location_on,
-                            booking['event_location'],
+                            booking?['event_location'] ?? '--',
                           ),
                         ],
                       ),
@@ -236,13 +310,122 @@ bool isLoading =true;
                 ),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 28),
+
 
               Divider(color: ColorCode.kDividerWhite12,),
-               SizedBox(height: 28),
+              SizedBox(height: 28),
 
 
-              Column(
+              if (addons.isNotEmpty) ...[
+                const Text(
+                  "Add-ons",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorCode.white,
+                    fontFamily: "Unbounded",
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: ColorCode.k282828,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    children: List.generate(addons.length, (index) {
+                      final addon = addons[index];
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            /// ICON
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: ColorCode.kButtonColor.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: ColorCode.kButtonColor,
+                                size: 18,
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            /// DETAILS
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    addon['title'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 4),
+
+                                  Text(
+                                    addon['description'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 6),
+
+                                  Text(
+                                    addon['price_type'] == 2
+                                        ? "Hours: ${addon['hours'] ?? 0}"
+                                        : "Qty: ${addon['quantity'] ?? 1}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            /// PRICE
+                            Text(
+                              "\$${addon['line_total'] ?? 0}",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: ColorCode.white,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+
+                ],
+                 SizedBox(height: 28),
+
+                Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
@@ -275,7 +458,7 @@ bool isLoading =true;
                       )
                     ],
                   ),
-                   SizedBox(height: 14),
+                  SizedBox(height: 14),
 
                   /// 🔹 PAY AT VENUE
                   paymentRadioTile(
@@ -288,61 +471,46 @@ bool isLoading =true;
                     value: 1,
                   ),
                   Container(
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    decoration: BoxDecoration(
-    color: const Color(0xFF282828),
-    borderRadius: BorderRadius.circular(14),
-    ),
-    child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    const Text(
-    "Pay Full Payment in Advance",
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 14,
-    fontFamily: "Outfit",
-    fontWeight: FontWeight.w400,
-    ),
-    ),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF282828),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Pay Full Payment in Advance",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
 
-    /// 🔥 IMAGE-LIKE SWITCH
-    gradientSwitch(
-    value: payFullAdvance,
-    onChanged: (val) {
-    setState(() {
-    payFullAdvance = val;
-    });
-    },
-    ),
-    ],
-    ),
-    ),
+                        /// 🔥 IMAGE-LIKE SWITCH
+                        gradientSwitch(
+                          value: payFullAdvance,
+                          onChanged: (val) {
+                            setState(() {
+                              payFullAdvance = val;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
 
-
-    ],
-              ),
-
-              Divider(color: Colors.white30),
-               SizedBox(height: 28),
-
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Payment Details",
-                    style:    TextStyle(
-                        fontSize: 14,
-                        color: ColorCode.white,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w500
-                    ),),
 
                 ],
               ),
-              SizedBox(height: 8),
+
+              Divider(color: Colors.white30),
+              SizedBox(height: 28),
+
+              /// PAYMENT DETAILS
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -350,169 +518,76 @@ bool isLoading =true;
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// 🔹 BASE PACKAGE
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Base Package",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: ColorCode.white,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${totals['base_amount']}.00/-",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: ColorCode.white,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
+                    priceRow(
+                      "Base Package",
+                      "\$ ${totals?['base_amount'] ?? 0}.00/-",
                     ),
 
-                    const SizedBox(height: 6),
-
-                    /// 🔹 ADD-ONS (ONLY IF > 0)
-                    if ((totals['addons_amount'] ?? 0) > 0)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Add-ons",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            "\$ ${totals['addons_amount']}.00/-",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
+                    if ((totals?['addons_amount'] ?? 0) > 0)
+                      priceRow(
+                        "Add-ons",
+                        "\$ ${totals?['addons_amount']}.00/-",
                       ),
 
-                    /// 🔹 DISCOUNT (ONLY IF > 0)
-                    if ((totals['discount_amount'] ?? 0) > 0) ...[
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Discount (${totals['discount_pct']}%)",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.green,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            "- \$ ${totals['discount_amount']}.00/-",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.green,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
+                    if ((totals?['discount_amount'] ?? 0) > 0)
+                      priceRow(
+                        "Discount",
+                        "- \$ ${totals?['discount_amount']}.00/-",
+                        isDiscount: true,
                       ),
-                    ],
 
-                    const SizedBox(height: 12),
+                    const Divider(color: Colors.white30),
 
-                    /// 🔹 DIVIDER
-                    Container(
-                      height: 1,
-                      width: double.infinity,
-                      color: Colors.white.withOpacity(0.15),
+                    priceRow(
+                      "Total",
+                      "\$ ${totals?['total_amount'] ?? 0}.00/-",
+                      isTotal: true,
                     ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
 
-                    const SizedBox(height: 10),
-
-                    /// 🔹 TOTAL
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Total",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: ColorCode.white,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          "\$ ${totals['total_amount']}.00/-",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: ColorCode.white,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD9F8C4),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Icon(
+                      Icons.verified_user,
+                      color: Color(0xFF2E7D32),
+                      size: 20,
                     ),
+                    SizedBox(width: 10),
 
-                    const SizedBox(height: 14),
-
-                    /// 🔹 GREEN PROTECTION BOX (STATIC)
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD9F8C4),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Icon(
-                            Icons.verified_user,
-                            color: Color(0xFF2E7D32),
-                            size: 20,
+                        children: [
+                          Text(
+                            "Beige Project Protection",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: ColorCode.black,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Beige Project Protection",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: ColorCode.black,
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Your payment is protected with Stripe’s secure encryption. "
-                                      "Funds are only released when you’re satisfied.",
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: ColorCode.black,
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
+                          SizedBox(height: 4),
+                          Text(
+                            "Your payment is protected with Stripe’s secure encryption. "
+                                "Funds are only released when you’re satisfied.",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorCode.black,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
@@ -523,8 +598,9 @@ bool isLoading =true;
               ),
 
               SizedBox(height: 28),
-           Divider(color: Colors.white30,),
-              /// 📝 NOTES
+              Divider(color: ColorCode.kDividerWhite12,),
+
+              const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -551,6 +627,7 @@ bool isLoading =true;
                   ),
                 ),
                 child: TextField(
+                  controller: NotesController,
                   minLines: 4, // ✅ 4 lines height
                   maxLines: 6,
                   style: const TextStyle(
@@ -574,33 +651,61 @@ bool isLoading =true;
               ),
 
 
-              const SizedBox(height: 32),
-
-              /// 🔘 BUTTON
-
-            ],
+            ]
+          )
           ),
 
-        ),
-
       ),
-      bottomNavigationBar: Padding(
+
+
+
+    /*  bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
-        child:    SizedBox(
-          width: double.infinity,
+        child: SizedBox(
           height: 55,
           child: ElevatedButton(
-            onPressed: () {
-
-            },
+            onPressed: _payWithStripe,
             style: ElevatedButton.styleFrom(
-              backgroundColor:  ColorCode.kButtonColor,
+              backgroundColor: ColorCode.kButtonColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child:
-            Text(
+            child: const Text(
+              "Add Payment Method",
+              style: TextStyle(
+                fontFamily: "Unbounded",
+                fontWeight: FontWeight.w500,
+                color: ColorCode.kHeadingColor,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+      ),*/
+
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          height: 55,
+          child: ElevatedButton(
+            onPressed: paymentLoading ? null : _payWithStripe,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorCode.kButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: paymentLoading
+                ? const SizedBox(
+              height: 22,
+              width: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+                : const Text(
               "Add Payment Method",
               style: TextStyle(
                 fontFamily: "Unbounded",
@@ -612,44 +717,23 @@ bool isLoading =true;
           ),
         ),
       ),
-    );
 
-  }
 
-  /// 🔹 WIDGETS
-  Widget sectionTitle(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
     );
   }
 
   Widget infoRowBlack(IconData icon, String text) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Colors.black87,
-        ),
+        Icon(icon, size: 16, color: Colors.black),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
               fontSize: 12,
-              color: ColorCode.black,
+              color: Colors.black,
               fontFamily: "Outfit",
-              fontWeight: FontWeight.w400
-
             ),
           ),
         ),
@@ -657,13 +741,10 @@ bool isLoading =true;
     );
   }
 
-
-
-
   Widget priceRow(String title, String price,
       {bool isDiscount = false, bool isTotal = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -680,15 +761,14 @@ bool isLoading =true;
             style: TextStyle(
               fontSize: isTotal ? 16 : 13,
               fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
-              color: isDiscount
-                  ? const Color(0xFF7ED957)
-                  : Colors.white,
+              color: isDiscount ? Colors.green : Colors.white,
             ),
           ),
         ],
       ),
     );
   }
+
   Widget paymentRadioTile({
     required String title,
     required int value,
@@ -716,10 +796,10 @@ bool isLoading =true;
               child: Text(
                 title,
                 style:  TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w400
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w400
                 ),
               ),
             ),
@@ -817,3 +897,5 @@ bool isLoading =true;
   }
 
 }
+
+

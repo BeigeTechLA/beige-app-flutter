@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Creative/creative_sign_up/build_your_creative_profile_sign_up.dart';
 import '../auth/sign_up_screen.dart';
 import '../utility/ColorCode.dart';
 
@@ -86,16 +87,27 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
       onTap: () {
         setState(() => selectedIndex = index);
 
-        /// 🔥 DIRECT NAVIGATION (NO NEXT BUTTON)
         Future.delayed(const Duration(milliseconds: 200), () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SignUpScreen(role: role),
-            ),
-          );
+          if (index == 0) {
+            /// ✅ CLIENT SIGN UP
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const SignUpScreen(role: 1),
+              ),
+            );
+          } else if (index == 1) {
+            /// ✅ CREATIVE SIGN UP (SECOND SCREEN)
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) =>  BuildYourCreativeProfileSignUp(),
+              ),
+            );
+          }
         });
       },
+
       child: Column(
         children: [
           Stack(
