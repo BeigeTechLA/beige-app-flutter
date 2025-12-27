@@ -60,7 +60,8 @@ class _NewPasswordState extends State<NewPassword> {
 
       final response = await apiService.postData(
         ApiEndpoints.reset_password,
-        {
+         {
+          "otp":"111111",
           "email": widget.email,
           "new_password": newPassController.text.trim(),
           "confirm_password": confirmPassController.text.trim(),
@@ -219,7 +220,6 @@ class _NewPasswordState extends State<NewPassword> {
     );
   }
 
-  // ⭐ Reusable Password Field Widget
   Widget _buildPasswordField({
     required String label,
     required TextEditingController controller,
@@ -258,15 +258,14 @@ class _NewPasswordState extends State<NewPassword> {
           ),
           onPressed: onToggle,
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding:  EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
-        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
+          borderSide:  BorderSide(
             color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
             width: 0.5,                       // 🔥 exact 0.5px
           ),
@@ -297,10 +296,10 @@ class _NewPasswordState extends State<NewPassword> {
 
       pageBuilder: (_, __, ___) {
         Future.delayed(const Duration(seconds: 2), () {
-        /*  Navigator.pushReplacement(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => LoginScreen()),
-          );*/
+          );
         });
 
         return Stack(

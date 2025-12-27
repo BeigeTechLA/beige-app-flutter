@@ -26,11 +26,11 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
   @override
   void initState() {
     super.initState();
-    _fetchHomeReview();
-    _fetchHome();
+    _fetchReview();
+
   }
 
-  Future<void> _fetchHomeReview() async {
+  Future<void> _fetchReview() async {
     setState(() => isLoading = true);
 
     try {
@@ -38,42 +38,37 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
         "${ApiEndpoints.booking}/${widget.bookingId}/review",
       );
 
-      if (response != null && response['error'] == false) {
-        setState(() {
-          booking = response['data']['booking'];
-          timeSlot = response['data']['time_slot'];
-        });
-      }
-    } catch (e) {
-      debugPrint("Review API Error: $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  Future<void> _fetchHome() async {
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().fetchData(
-        ApiEndpoints.booking_select,
-      );
+      /// 🔍 Print full API response
+      debugPrint("📥 Review API Full Response:");
+      debugPrint(response.toString());
 
       if (response != null && response['error'] == false) {
         setState(() {
-          booking = response['data']['booking'];
-          timeSlot = response['data']['time_slot'];
+          booking = response['data']?['booking'];
+          timeSlot = response['data']?['time_slot'];
         });
+
+        /// 🔍 Print extracted data
+        debugPrint("📦 Booking Data:");
+        debugPrint(booking.toString());
+
+        debugPrint("⏰ Time Slot Data:");
+        debugPrint(timeSlot.toString());
+      } else {
+        debugPrint("❌ Review API returned error");
       }
     } catch (e) {
-      debugPrint("Review API Error: $e");
+      debugPrint("❌ Review API Exception: $e");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
 
-  String formatTime(String time) {
+
+
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "--:--";
     final parts = time.split(":");
     int hour = int.parse(parts[0]);
     int minute = int.parse(parts[1]);
@@ -82,11 +77,11 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
     hour = hour > 12 ? hour - 12 : hour;
     hour = hour == 0 ? 12 : hour;
 
-    return "${hour.toString().padLeft(2, '0')}:"
-        "${minute.toString().padLeft(2, '0')} $suffix";
+    return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $suffix";
   }
 
-  String formatDate(String date) {
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "";
     final d = DateTime.parse(date);
     return "${_monthName(d.month)} ${d.day}, ${d.year}";
   }
@@ -206,8 +201,7 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
                       child: RichText(
                         text: TextSpan(
                           text:
-                          "${formatTime(timeSlot!['start_time'])} to "
-                              "${formatTime(timeSlot!['end_time'])} ",
+                          "${formatTime(timeSlot!['start_time'])} to ${formatTime(timeSlot!['end_time'])} ",
                           style: const TextStyle(
                             color: ColorCode.white,
                             fontSize: 11,
@@ -259,7 +253,7 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        Rev?['event_location'] ?? '',
+                        booking!['event_location'] ?? '',
                         style: const TextStyle(
                           color: ColorCode.white,
                           fontSize: 11,

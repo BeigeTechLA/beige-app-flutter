@@ -220,8 +220,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
 
           // ---------------- SKIP BUTTON ----------------
-          if (_currentPage != 2) // 👈 Skip only page 0 & 1 par show hoga
-          // Put this at the top of Stack children
+          if (_currentPage != 1) //
             SafeArea(
               child: Align(
                 alignment: Alignment.topRight,

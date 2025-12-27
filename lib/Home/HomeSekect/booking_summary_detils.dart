@@ -2,8 +2,12 @@ import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
+
 class BookingSummaryDetils extends StatefulWidget {
-  const BookingSummaryDetils({super.key});
+  final int bookingId;
+  const BookingSummaryDetils({super.key, required this.bookingId});
 
   @override
   State<BookingSummaryDetils> createState() => _BookingSummaryDetilsState();
@@ -14,12 +18,57 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
   int selectedPayment = 0;
   int selectedIndex = 0;
 
+bool isLoading =true;
+
+  Map<String, dynamic>? summaryData;
+
+
+
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetch_book_summary();
+  }
+
+  Future<void> _fetch_book_summary() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_select}/${widget.bookingId}/summary",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          summaryData = response['data'];
+        });
+      }
+    } catch (e) {
+      debugPrint("Summary API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    final creative = summaryData?['creative'];
+    final booking  = summaryData?['booking'];
+    final payment  = summaryData?['payment'];
+    final addons   = summaryData?['addons'] as List<dynamic>? ?? [];
+    final totals   = summaryData?['totals'];
+
+
     return Scaffold(
       backgroundColor: const Color(0xFF1D1D1B),
       body: SafeArea(
         child: SingleChildScrollView(
+
           padding:  EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,6 +113,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                     /// 🔹 TOP PROFILE ROW
                     Row(
                       children: [
+
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Image.asset(
@@ -73,56 +123,57 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                             fit: BoxFit.cover,
                           ),
                         ),
+
                         const SizedBox(width: 14),
 
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Row(
-                                children: [
-                                  Icon(Icons.star, size: 14, color: Colors.amber),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "4.5 (120)",
-                                    style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
-                                    fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                "Angela Kia",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  fontFamily: "Outfit",
-                                ),
-                              ),
-                              SizedBox(height: 2),
-                              Text(
-                                "Videography Specialist",
-                                style: TextStyle(
-                                  fontSize: 12, color: ColorCode.kWhiteOpacity70,
-                                fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                "From \$450/Hr",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: ColorCode.kButtonColor,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// ⭐ RATING
+                    Row(
+                      children: [
+                        const Icon(Icons.star,
+                            size: 14, color: Colors.amber),
+                        const SizedBox(width: 4),
+                        Text(
+                          "${creative['average_rating']} "
+                              "(${creative['total_reviews']})",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: ColorCode.kWhiteOpacity70,
+                            fontFamily: "Outfit",
                           ),
-                        )
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+
+                    /// 👤 NAME
+                    Text(
+                      creative['name'],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontFamily: "Outfit",
+                      ),
+                    ),
+                    const SizedBox(height:10),
+
+                    /// 💰 RATE
+                    Text(
+                      "From \$${creative['hourly_rate']}/Hr",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: ColorCode.kButtonColor,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              )
                       ],
                     ),
 
@@ -164,17 +215,19 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                         children: [
                           infoRowBlack(
                             Icons.access_time,
-                            "01:30 AM to 03:30 AM (1h duration)",
+                        "${booking['start_time']} - ${booking['end_time']} "
+                            "(${booking['duration_hours']}h)",
+
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.calendar_month,
-                            "Apr 01, 2025 - Apr 04, 2025",
+                            booking['event_date'],
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.location_on,
-                            "2458 Sunset Boulevard, Los Angeles, CA 90026",
+                            booking['event_location'],
                           ),
                         ],
                       ),
@@ -291,9 +344,9 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
               ),
               SizedBox(height: 8),
               Container(
-                padding:  EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color:  ColorCode.k282828,
+                  color: ColorCode.k282828,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
@@ -303,22 +356,23 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                     /// 🔹 BASE PACKAGE
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
+                        const Text(
+                          "Base Package",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: ColorCode.white,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                         Text(
-                          "Base Package (1 Hour)",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
-                          ),),
-                        Text(
-                          "\$ 450.00/-",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
+                          "\$ ${totals['base_amount']}.00/-",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: ColorCode.white,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ],
@@ -326,63 +380,91 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
 
                     const SizedBox(height: 6),
 
-                    /// 🔹 DISCOUNT
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
-                          "Early Bird Discount (10%)",
-                          style:    TextStyle(
+                    /// 🔹 ADD-ONS (ONLY IF > 0)
+                    if ((totals['addons_amount'] ?? 0) > 0)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Add-ons",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: ColorCode.white,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            "\$ ${totals['addons_amount']}.00/-",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: ColorCode.white,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    /// 🔹 DISCOUNT (ONLY IF > 0)
+                    if ((totals['discount_amount'] ?? 0) > 0) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Discount (${totals['discount_pct']}%)",
+                            style: const TextStyle(
                               fontSize: 12,
                               color: ColorCode.green,
                               fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ),
-                        Text(
-                          "- \$45.00/-",
-                          style:    TextStyle(
+                          Text(
+                            "- \$ ${totals['discount_amount']}.00/-",
+                            style: const TextStyle(
                               fontSize: 12,
                               color: ColorCode.green,
                               fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    ],
 
                     const SizedBox(height: 12),
 
-                    SizedBox(
+                    /// 🔹 DIVIDER
+                    Container(
+                      height: 1,
                       width: double.infinity,
-                      child: Container(
-                        height: 1,
-                        color: Colors.white.withOpacity(0.15),
-                      ),
+                      color: Colors.white.withOpacity(0.15),
                     ),
-
 
                     const SizedBox(height: 10),
 
                     /// 🔹 TOTAL
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Total",
-                          style:    TextStyle(
-                              fontSize: 16,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w600
-                          ),),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: ColorCode.white,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         Text(
-                          "\$ 450.00/-",
-                          style:    TextStyle(
-                              fontSize: 16,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w600
+                          "\$ ${totals['total_amount']}.00/-",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: ColorCode.white,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -390,11 +472,11 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
 
                     const SizedBox(height: 14),
 
-                    /// 🔹 GREEN PROTECTION BOX
+                    /// 🔹 GREEN PROTECTION BOX (STATIC)
                     Container(
-                      padding:  EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color:  Color(0xFFD9F8C4),
+                        color: const Color(0xFFD9F8C4),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
@@ -412,21 +494,22 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                               children: [
                                 Text(
                                   "Beige Project Protection",
-                                  style:    TextStyle(
-                                      fontSize: 16,
-                                      color: ColorCode.black,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w700
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: ColorCode.black,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  "Your payment is protected with Stripe’s secure encryption. Funds are only released when you’re satisfied.",
-                                  style:    TextStyle(
-                                      fontSize: 10,
-                                      color: ColorCode.black,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400
+                                  "Your payment is protected with Stripe’s secure encryption. "
+                                      "Funds are only released when you’re satisfied.",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: ColorCode.black,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],
@@ -438,8 +521,9 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
                   ],
                 ),
               ),
-               SizedBox(height: 28),
-       Divider(color: Colors.white30,),
+
+              SizedBox(height: 28),
+           Divider(color: Colors.white30,),
               /// 📝 NOTES
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -507,12 +591,7 @@ class _BookingSummaryDetilsState extends State<BookingSummaryDetils> {
           height: 55,
           child: ElevatedButton(
             onPressed: () {
-             /* Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddOnServices(),
-                ),
-              );*/
+
             },
             style: ElevatedButton.styleFrom(
               backgroundColor:  ColorCode.kButtonColor,

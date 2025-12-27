@@ -1,11 +1,13 @@
 import 'package:beige/Home/HomeSekect/select_date_time.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
+import 'change_location_screen.dart';
 
 class SelectLocation extends StatefulWidget {
   final int bookingId;
@@ -20,7 +22,16 @@ class _SelectLocationState extends State<SelectLocation> {
   bool savePassword = false;
   String? selectedStudio;
   bool showMap = false;
-bool isLoading = false;
+   bool isLoading = false;
+
+  GoogleMapController? mapController;
+  LatLng? currentLatLng;
+
+  String selectedAddress = "Search or select location";
+  TextEditingController searchController = TextEditingController();
+
+
+
 
   @override
   void initState() {
@@ -28,28 +39,80 @@ bool isLoading = false;
     _getCurrentLocation();
   }
 
-  GoogleMapController? mapController;
-  LatLng? currentLatLng;
+  Future<void> searchLocation(String query) async {
+    try {
+      List<Location> locations = await locationFromAddress(query);
+
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+
+        final latLng = LatLng(loc.latitude, loc.longitude);
+
+        setState(() {
+          currentLatLng = latLng;
+        });
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(latLng, 15),
+        );
+
+        await getAddressFromLatLng(latLng);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Location not found")),
+      );
+    }
+  }
+
+  Future<void> getAddressFromLatLng(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks =
+      await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        setState(() {
+          selectedAddress =
+          "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+        });
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
 
   Future<void> select_location() async {
-    if (currentLatLng == null) {
+    if (currentLatLng == null || selectedAddress.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select location from map")),
+        const SnackBar(content: Text("Please select a location")),
       );
       return;
     }
+
+    /// ✅ Prepare payload
+    final Map<String, dynamic> payload = {
+      "event_location": selectedAddress,
+      "event_latitude": currentLatLng!.latitude,
+      "event_longitude": currentLatLng!.longitude,
+    };
+
+    /// 🔍 Print payload (for debugging)
+    debugPrint("📦 Location API Payload:");
+    debugPrint(payload.toString());
 
     setState(() => isLoading = true);
 
     try {
       final response = await ApiService().putData(
         "${ApiEndpoints.booking}/${widget.bookingId}/location",
-        {
-          "event_location": "Selected from map",
-          "event_latitude": currentLatLng!.latitude,
-          "event_longitude": currentLatLng!.longitude,
-        },
+        payload,
       );
+
+      /// 🔍 Print API response
+      debugPrint("✅ Location API Response:");
+      debugPrint(response.toString());
 
       if (response != null && response['error'] == false) {
         Navigator.push(
@@ -60,8 +123,14 @@ bool isLoading = false;
             ),
           ),
         );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response?['message'] ?? "Location update failed")),
+        );
       }
     } catch (e) {
+      debugPrint("❌ Location API Error: $e");
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Something went wrong")),
       );
@@ -73,9 +142,24 @@ bool isLoading = false;
 
 
   Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Enable location services")),
+      );
+      return;
+    }
+
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Location permission permanently denied")),
+      );
+      return;
     }
 
     Position position = await Geolocator.getCurrentPosition(
@@ -85,14 +169,58 @@ bool isLoading = false;
     setState(() {
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
-
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(currentLatLng!, 15),
-    );
   }
+
 
   @override
   Widget build(BuildContext context) {
+
+    const String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{"color": "#383838"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#8a8a8a"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#000000"}]
+  }
+]
+''';
+
     return Scaffold(
       // backgroundColor:  ColorCode.kBackgroundColor,
       appBar: AppBar(
@@ -195,15 +323,14 @@ bool isLoading = false;
             ),*/
 
             TextField(
-              onChanged: (value) {
+              controller: searchController,
+              onSubmitted: (value) {
                 if (value.isNotEmpty) {
-                  setState(() {
-                    showMap = true;
-                  });
+                  searchLocation(value);
                 }
               },
               decoration: InputDecoration(
-                hintText: "Search for area, street name...",
+                hintText: "Search area, street, city...",
                 hintStyle: TextStyle(
                   color: ColorCode.k777571,
                   fontFamily: 'Outfit',
@@ -218,6 +345,7 @@ bool isLoading = false;
                 ),
               ),
             ),
+
 
             const SizedBox(height: 16),
 
@@ -234,21 +362,27 @@ bool isLoading = false;
                   ),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                  zoomControlsEnabled: true,
+                  compassEnabled: true,
                   onMapCreated: (controller) {
                     mapController = controller;
+                    controller.setMapStyle(_darkMapStyle);
                   },
                   markers: {
                     Marker(
-                      markerId: const MarkerId("current"),
+                      markerId: const MarkerId("selected"),
                       position: currentLatLng!,
                     ),
                   },
-                  onTap: (latLng) {
+                  onTap: (latLng) async {
                     setState(() {
                       currentLatLng = latLng;
                     });
+                    await getAddressFromLatLng(latLng);
                   },
                 ),
+
+
               ),
             ),
 
@@ -262,32 +396,46 @@ bool isLoading = false;
                 // SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    "2458 Sunset Boulevard\nLos Angeles, CA 90026",
+                    selectedAddress,
                     style: TextStyle(
                       color: ColorCode.white,
-                      fontFamily: 'Outfit', // ← Add this
+                      fontFamily: 'Outfit',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      // Looks cleaner in Unbounded
                     ),
                   ),
                 ),
+
                 TextButton(
-                  onPressed: () {},
-                  child: const Text(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChangeLocationScreen(
+                          initialLatLng: currentLatLng!,
+                        ),
+                      ),
+                    );
+
+                    if (result != null && result is Map) {
+                      setState(() {
+                        selectedAddress = result['address'] as String;
+                        currentLatLng = result['latLng'] as LatLng;
+                        searchController.text = selectedAddress; // 👈 optional but best
+                      });
+                    }
+
+
+                  },
+                  child:  Text(
                     "Change",
                     style: TextStyle(
                       color: ColorCode.kButtonColor,
-                      fontFamily: 'Outfit',
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
                       decoration: TextDecoration.underline,
-                      decorationColor: ColorCode
-                          .kButtonColor, // ⭐ Underline ka color
-
                     ),
                   ),
                 ),
+
 
               ],
             ),
@@ -300,73 +448,7 @@ bool isLoading = false;
 
             /// ✅ Next Button
             ///
-     /*       Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () => setState(() => savePassword = !savePassword),
-                      child: Container(
-                        height: 18,
-                        width: 18,
-                        decoration: BoxDecoration(
-                          color: savePassword ? Colors.black : Colors.transparent,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: ColorCode.white),
-                        ),
-                        child: savePassword
-                            ? const Icon(Icons.check, size: 14, color: ColorCode.kButtonColor)
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "I need a Beige Studio\n",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontFamily: "Outfit",
-
-                                  ),
-                                ),
-
-                                TextSpan(
-                                  text: "Professional studio with lighting & equipment",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    color: ColorCode.k777571,
-                                    fontSize: 14,
-                                    fontFamily: "Outfit",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-
-
-
-                  ],
-                ),
-                SizedBox(height: 15),
-                buildSelectStudioField(),
-                SizedBox(height: 15),
-
-              ],
-            ),*/
 
             SizedBox(
               width: double.infinity,
@@ -380,13 +462,15 @@ bool isLoading = false;
                   ),
                 ),
                 onPressed: isLoading ? null : select_location,
-
-                child: const Text(
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.black)
+                    : const Text(
                   "Next",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
+
           ],
         ),
       ),

@@ -23,7 +23,8 @@ class _Bookshoot1State extends State<Bookshoot1> {
   List serviceTypes = [];
   bool isLoading = true;
 
-
+  bool isPageLoading = true;
+  bool isBookingLoading = false;
   @override
   void initState() {
     super.initState();
@@ -61,17 +62,12 @@ class _Bookshoot1State extends State<Bookshoot1> {
       );
 
       if (response != null && response['error'] == false) {
-
-        /// 🔹 booking_id extract
         final int bookingId = response['data']['booking_id'];
 
-        /// 🔹 Navigate with booking_id
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => SelectLocation(
-              bookingId: bookingId,
-            ),
+            builder: (_) => SelectLocation(bookingId: bookingId),
           ),
         );
       } else {
@@ -80,7 +76,6 @@ class _Bookshoot1State extends State<Bookshoot1> {
         );
       }
     } catch (e) {
-      debugPrint("Booking Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Something went wrong")),
       );
@@ -88,8 +83,6 @@ class _Bookshoot1State extends State<Bookshoot1> {
       setState(() => isLoading = false);
     }
   }
-
-
 
 
 
@@ -240,25 +233,14 @@ class _Bookshoot1State extends State<Bookshoot1> {
                                 : () {
                               if (selectedServiceTypeId == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Please select service type"),
-                                  ),
+                                  const SnackBar(content: Text("Please select service type")),
                                 );
                                 return;
                               }
-                              booking(); // ✅ API CALL HERE
+                              booking();
                             },
 
-                            child: isLoading
-                                ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.black,
-                              ),
-                            )
-                                : const Text(
+                            child: const Text(
                               "Next",
                               style: TextStyle(
                                 color: ColorCode.kHeadingColor,
@@ -267,6 +249,7 @@ class _Bookshoot1State extends State<Bookshoot1> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+
                           ),
                         ),
                       ),

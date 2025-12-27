@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'MainScreen.dart';
@@ -12,6 +13,11 @@ void main() async {
   // ✅ Set environment
   const environment = String.fromEnvironment('ENV', defaultValue: 'dev');
   AppConfig.setEnvironment(environment);
+/*
+
+  Stripe.publishableKey =
+  "pk_live_51S5czd54hnPNgHXUeZUKeHnojWxW9CoV1cicTHDbn1upsPakN8GtwNgBNORQt3ghPlmJgtbcycT8tw8ctfxRz4a800NeVNgc5u";
+*/
 
   // ✅ Read login state
   final prefs = await SharedPreferences.getInstance();

@@ -17,10 +17,13 @@ class BookShootScreen extends StatefulWidget {
 }
 
 class _BookShootScreenState extends State<BookShootScreen> {
-  int selectedIndex = 0;
+  // int selectedIndex = 0;
   String? selectedDeliverableName;
   int? selectedDeliverableId;
+  bool isNextLoading = false;
 
+
+  int? selectedIndex; // null means nothing selected
 
   bool isLoadingSpecialties = true;
 
@@ -159,7 +162,9 @@ class _BookShootScreenState extends State<BookShootScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
+                      onPressed: isNextLoading
+                          ? null
+                          : () async {
                         if (selectedDeliverableId == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Please select an option")),
@@ -167,17 +172,28 @@ class _BookShootScreenState extends State<BookShootScreen> {
                           return;
                         }
 
+                        setState(() {
+                          isNextLoading = true; // 🔥 loader ON
+                        });
+
+                        await Future.delayed(const Duration(milliseconds: 600)); // smooth feel
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => Bookshoot1(
-                              specialtyId: widget.specialtyId,          // already have
-                              deliverableId: selectedDeliverableId!,    // ✅ ID
-                              deliverableName: selectedDeliverableName!,// ✅ NAME
+                              specialtyId: widget.specialtyId,
+                              deliverableId: selectedDeliverableId!,
+                              deliverableName: selectedDeliverableName!,
                             ),
                           ),
-                        );
+                        ).then((_) {
+                          setState(() {
+                            isNextLoading = false; // 🔥 loader OFF when back
+                          });
+                        });
                       },
+
                       child: const Text("Next",
                         style: TextStyle(
                           color: ColorCode.kHeadingColor,

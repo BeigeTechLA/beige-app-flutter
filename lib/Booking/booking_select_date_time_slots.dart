@@ -331,7 +331,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
               ],
             ),
           ),
-          const SizedBox(height: 18),
+           SizedBox(height: 18),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: ColorCode.kButtonColor,
@@ -347,7 +347,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                   setState(() => selectedHour = v),
             ),
           ),
-          const Row(
+           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("02h"), Text("04h"), Text("08h"),
@@ -359,7 +359,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
     ),
    SizedBox(height: 24),
 
-  /// NEXT BUTTON
+
 
   ],
   ),

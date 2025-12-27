@@ -14,7 +14,6 @@ class AddOnServices extends StatefulWidget {
 }
 
 class _AddOnServicesState extends State<AddOnServices> {
-
   bool isLoading = false;
   List<Map<String, dynamic>> addOns = [];
 
@@ -34,10 +33,10 @@ class _AddOnServicesState extends State<AddOnServices> {
 
       if (response != null && response['error'] == false) {
         setState(() {
-          addOns = response['data'] ?? [];
+          addOns = List<Map<String, dynamic>>.from(
+            response['data']['items'] ?? [],
+          );
         });
-      } else {
-        debugPrint("Add-ons API failed");
       }
     } catch (e) {
       debugPrint("Add-ons API Error: $e");
@@ -46,26 +45,49 @@ class _AddOnServicesState extends State<AddOnServices> {
     }
   }
 
-  Future<void> addons() async {
+  Future<void> _AddOns() async {
     setState(() => isLoading = true);
 
     try {
+      List<Map<String, dynamic>> items = [];
+
+      for (var addon in addOns) {
+        if (addon['selected'] == true) {
+          final int priceType = addon['price_type'];
+
+          if (priceType == 2) {
+            items.add({
+              "addon_id": addon['addon_id'],
+              "hours": addon['hours'] ?? 1, // ✅ default
+            });
+          } else {
+            items.add({
+              "addon_id": addon['addon_id'],
+              "qty": addon['quantity'] ?? 1, // ✅ default
+            });
+          }
+        }
+      }
+
+      if (items.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select at least one add-on")),
+        );
+        return;
+      }
+
       final response = await ApiService().putData(
         "${ApiEndpoints.booking_select}/${widget.bookingId}/add-ons",
-          {
-            "items": [
-              { "addon_id": 1, "qty": 1 },
-              { "addon_id": 3, "qty": 2 }
-            ]
-          }
-
+        { "items": items },
       );
 
       if (response != null && response['error'] == false) {
-        setState(() {
-        });
-      } else {
-        debugPrint("Add-ons API failed");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookingSummaryDetils(bookingId: widget.bookingId,),
+          ),
+        );
       }
     } catch (e) {
       debugPrint("Add-ons API Error: $e");
@@ -73,9 +95,6 @@ class _AddOnServicesState extends State<AddOnServices> {
       setState(() => isLoading = false);
     }
   }
-
-
-
 
 
   @override
@@ -84,448 +103,87 @@ class _AddOnServicesState extends State<AddOnServices> {
       backgroundColor: const Color(0xFF1D1D1B),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    "assets/Icons/Vector.png",
-                    height: 24,
-                    color: Colors.white,
-                    colorBlendMode: BlendMode.srcIn,
-                  ),
-                ),
-
-
-                const SizedBox(height: 20),
-
-                /// 🟡 TITLE
-                const Text(
-                  "Add - Ons",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: ColorCode.white,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                /// 🔹 SUB TITLE
-                Text(
-                  "Would you like to add anything to your shoot?",
-                  style: TextStyle(
-                    fontFamily: "Outfit",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-
-           Container(
-          margin: const EdgeInsets.only(bottom: 14),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
-            borderRadius: BorderRadius.circular(16),
-          ),
+          padding: const EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  /// TEXT
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                     Text("Drone Footage"),
-                        Text("1 hr - 30 min"),
-                        Text("\$ 500.00/-"),
-
-                      ],
-                    ),
-                  ),
-
-                  /// ➕ BUTTON
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFE8D1AB), // light shade
-                          Color(0xFFD4A14D), // dark shade
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-            Divider(color: Colors.white30,thickness: 1,),
-               Row(
-               children: [
-                 /// TEXT
-                 Expanded(
-                   child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                       Text("Additional Hour of Videographer",
-                         style: TextStyle(
-                           color: ColorCode.white,
-                           fontFamily: "Outfit",
-                           fontWeight: FontWeight.w400,
-                           fontSize: 14
-                       ),
-                       ),
-
-                       Text("1 hr - 30 min",
-                         style: TextStyle(
-                         color: ColorCode.kWhiteOpacity60,
-                         fontFamily: "Outfit",
-                         fontWeight: FontWeight.w400,
-                           fontSize: 10
-                       ),),
-                       SizedBox(height: 5,),
-                       Text("\$ 250.00/-",
-                         style: TextStyle(
-                             color: ColorCode.white,
-                             fontFamily: "Outfit",
-                             fontWeight: FontWeight.w400,
-                             fontSize: 14
-                         ),
-                       ),
-                       SizedBox(height: 30,),
-
-                       TextField(
-                         style: const TextStyle(
-                           color: Colors.white,
-                           fontSize: 14,
-                         ),
-                         cursorColor: Colors.white,
-                         decoration: InputDecoration(
-                           hintText: "How many hours",
-                           hintStyle: TextStyle(
-                             fontFamily: "Outfit",
-                             fontSize: 10,
-                             fontWeight: FontWeight.w400,
-                             color: ColorCode.kWhiteOpacity70,
-                           ),
-                           filled: true,
-                           fillColor: ColorCode.kHeadingColor,
-                           contentPadding: const EdgeInsets.symmetric(
-                             horizontal: 5,
-                             vertical: 4, // 🔽 reduced height
-                           ),
-                           border: OutlineInputBorder(
-                             borderRadius: BorderRadius.circular(6),
-                             borderSide: BorderSide.none,
-                           ),
-                           enabledBorder: OutlineInputBorder(
-                             borderRadius: BorderRadius.circular(12),
-                             borderSide: BorderSide.none,
-                           ),
-                           focusedBorder: OutlineInputBorder(
-                             borderRadius: BorderRadius.circular(12),
-                             borderSide: BorderSide.none,
-                           ),
-                         ),
-                       ),
-
-
-                     ],
-                   ),
-                 ),
-
-                 Container(
-                   width: 32,
-                   height: 32,
-                   decoration: BoxDecoration(
-                     borderRadius: BorderRadius.circular(8),
-                     gradient: const LinearGradient(
-                       begin: Alignment.topLeft,
-                       end: Alignment.bottomRight,
-                       colors: [
-                         Color(0xFFE8D1AB), // light shade
-                         Color(0xFFD4A14D), // dark shade
-                       ],
-                     ),
-                   ),
-                   child: const Icon(
-                     Icons.add,
-                     color: Colors.black,
-                     size: 18,
-                   ),
-                 ),
-               ],
-             ),
-              Divider(color: Colors.white30,thickness: 1,),
-              Row(
-                children: [
-                  /// TEXT
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Additional Videographer",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-
-                        Text("1 hr - 30 min",
-                          style: TextStyle(
-                              color: ColorCode.kWhiteOpacity60,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 10
-                          ),),
-                        SizedBox(height: 5,),
-                        Text("\$ 850.00/-",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-                        SizedBox(height: 30,),
-
-                        TextField(
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          cursorColor: Colors.white,
-                          decoration: InputDecoration(
-                            hintText: "How many hours",
-                            hintStyle: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                            filled: true,
-                            fillColor: ColorCode.kHeadingColor,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 4, // 🔽 reduced height
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-
-
-                      ],
-                    ),
-                  ),
-
-                  /// ➕ BUTTON
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFE8D1AB), // light shade
-                          Color(0xFFD4A14D), // dark shade
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(color: Colors.white30,thickness: 1,),
-
-              Row(
-                children: [
-                  /// TEXT
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Same Day Editing",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-
-                        Text("\$ 300.00/-",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-
-
-                      ],
-                    ),
-                  ),
-
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFE8D1AB), // light shade
-                          Color(0xFFD4A14D), // dark shade
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(color: Colors.white30,thickness: 1,),
-
-              Row(
-                children: [
-                  /// TEXT
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Color Graded RAW Footage",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-
-
-                        // SizedBox(height: 5,),
-                        Text("\$ 350/-",
-                          style: TextStyle(
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14
-                          ),
-                        ),
-                        SizedBox(height: 30,),
-
-
-
-                      ],
-                    ),
-                  ),
-
-                  /// ➕ BUTTON
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFFE8D1AB), // light shade
-                          Color(0xFFD4A14D), // dark shade
-                        ],
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                  ),
-
-                ],
+              /// BACK
+              InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Image.asset(
+                  "assets/Icons/Vector.png",
+                  height: 24,
+                  color: Colors.white,
+                ),
               ),
 
+              const SizedBox(height: 20),
 
+              /// TITLE
+              const Text(
+                "Add - Ons",
+                style: TextStyle(
+                  fontFamily: "Unbounded",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: ColorCode.white,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                "Would you like to add anything to your shoot?",
+                style: TextStyle(
+                  fontFamily: "Outfit",
+                  fontSize: 14,
+                  color: ColorCode.kWhiteOpacity70,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// ADDONS LIST
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: addOns.length,
+                itemBuilder: (context, index) {
+                  return _addOnItem(addOns[index]);
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              /// BUTTON
             ],
           ),
-                ),
+        ),
 
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(
+          height: 54,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorCode.kButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            onPressed: isLoading ? null : _AddOns,
 
-
-                /// 🟡 BOTTOM BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorCode.kButtonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BookingSummaryDetils(),
-                        ),
-                      );
-                    },
-
-                    child: const Text(
-                      "Proceed to Payment",
-                      style: TextStyle(
-                          color: ColorCode.kHeadingColor,
-                          fontFamily: "Unbounded",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: const Text(
+              "Proceed to Payment",
+              style: TextStyle(
+                color: ColorCode.kHeadingColor,
+                fontFamily: "Unbounded",
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
             ),
           ),
         ),
@@ -533,12 +191,11 @@ class _AddOnServicesState extends State<AddOnServices> {
     );
   }
 
-  /// 🔹 ADD-ON CARD WIDGET
-  Widget addOnCard({
-    required String title,
-    String? subtitle,
-    required String price,
-  }) {
+  /// ADDON CARD
+  Widget _addOnItem(Map<String, dynamic> addon) {
+    final int priceType = addon['price_type'] ?? 1;
+    final bool showInput = priceType == 2 || priceType == 3;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
@@ -547,59 +204,118 @@ class _AddOnServicesState extends State<AddOnServices> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// TEXT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  addon['title'] ?? '',
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+                    color: ColorCode.white,
+                    fontFamily: "Outfit",
+                    fontSize: 14,
                   ),
                 ),
-                if (subtitle != null) ...[
+
+                if (addon['estimated_duration_text'] != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
+                    addon['estimated_duration_text'],
+                    style: const TextStyle(
+                      color: ColorCode.kWhiteOpacity60,
+                      fontSize: 10,
                     ),
                   ),
                 ],
+
                 const SizedBox(height: 6),
+
                 Text(
-                  price,
+                  "\$ ${addon['unit_price']}.00/-",
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    color: ColorCode.white,
+                    fontSize: 14,
                   ),
                 ),
+
+                if (showInput) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText:
+                      priceType == 2 ? "How many hours" : "Quantity",
+                      hintStyle: const TextStyle(
+                        fontSize: 10,
+                        color: ColorCode.kWhiteOpacity70,
+                      ),
+                      filled: true,
+                      fillColor: ColorCode.kHeadingColor,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (val) {
+                      final value = int.tryParse(val) ?? 1;
+
+                      if (priceType == 2) {
+                        addon['hours'] = value;
+                      } else {
+                        addon['quantity'] = value;
+                      }
+                    },
+                  ),
+                ],
               ],
             ),
           ),
 
-          /// ➕ BUTTON
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAD7B0),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.add,
-              color: Colors.black,
-              size: 18,
+          /// ➕ / ✔ BUTTON
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                addon['selected'] = !(addon['selected'] ?? false);
+
+                /// 🔥 DEFAULT VALUE SET HERE
+                if (addon['selected'] == true) {
+                  if (priceType == 2) {
+                    addon['hours'] ??= 1; // default 1 hour
+                  } else if (priceType == 3) {
+                    addon['quantity'] ??= 1; // default qty 1
+                  }
+                }
+              });
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFE8D1AB),
+                    Color(0xFFD4A14D),
+                  ],
+                ),
+              ),
+              child: Icon(
+                addon['selected'] == true ? Icons.check : Icons.add,
+                color: Colors.black,
+                size: 18,
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
 }

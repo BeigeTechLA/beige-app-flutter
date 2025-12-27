@@ -97,10 +97,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   final List<String> specialtyIcons = [
     "assets/images/party.png",
-    "assets/images/creative.png",
-    "assets/images/travel.png",
+    "assets/images/Creative.png",
+    "assets/images/Travel.png",
     "assets/images/drone.png",
-    "assets/images/sports.png",
+    "assets/images/sports_action.png",
     "assets/images/personal.png",
     "assets/images/Creative.png",
     "assets/images/personal_photo.png",
@@ -421,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen>
                                         bottom: 0,
                                         right: 0,
                                         child: Image.asset(
-                                          specialtyIcons[index],
+                                          specialtyIcons[index % specialtyIcons.length],
                                           height: 70,
                                           width: 70,
                                           fit: BoxFit.contain,

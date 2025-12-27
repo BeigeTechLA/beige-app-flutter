@@ -2,6 +2,7 @@ import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 
 import 'Booking/booking_all_screen.dart';
+import 'Home/Specialities/specialities.dart';
 import 'Home/home_screen.dart';
 
 class Mainscreen extends StatefulWidget {
@@ -16,8 +17,11 @@ class _MainscreenState extends State<Mainscreen> {
 
   final List<Widget> _pages = [
     HomeScreen(),
+    Specialities(),
+
+
     // Center(child: Text("Home", style: TextStyle(fontSize: 22))),
-    Center(child: Text("Bookings", style: TextStyle(fontSize: 22))),
+    // Center(child: Text("Bookings", style: TextStyle(fontSize: 22))),
     BookingAllScreen(),
 
     Center(child: Text("Message", style: TextStyle(fontSize: 22))),

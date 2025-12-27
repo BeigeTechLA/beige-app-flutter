@@ -141,8 +141,6 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-
-
             /// 🔹 TOP IMAGE + ACTIONS
             Stack(
               children: [
@@ -636,6 +634,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                 : const Text(
               "Book Now & Continue",
               style: TextStyle(
+                color: ColorCode.kHeadingColor,
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,
                 fontSize: 14,

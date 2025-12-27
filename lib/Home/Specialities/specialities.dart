@@ -35,11 +35,23 @@ class _SpecialitiesState extends State<Specialities> {
     },
     {
       "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Creative.png",
+      "icon": "assets/images/sports_action.png",
     },
     {
       "bg": "assets/images/Frame 2087328875@3x.png",
       "icon": "assets/images/personal_photo.png",
+    },
+    {
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/hotel.png",
+    },
+    /*{
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/eduction.png",
+    },*/
+    {
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/5522882 1 (2).png",
     },
   ];
 
@@ -87,8 +99,6 @@ class _SpecialitiesState extends State<Specialities> {
               ),
 
               const SizedBox(height: 20),
-
-              /// 🔹 TITLE
               const Text(
                 "Book A Shoot",
                 style: TextStyle(

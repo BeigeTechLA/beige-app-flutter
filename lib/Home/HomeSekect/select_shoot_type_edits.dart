@@ -16,9 +16,9 @@ class SelectShootTypeEdits extends StatefulWidget {
 class _SelectShootTypeEditsState extends State<SelectShootTypeEdits> {
   // Selected values
   String selectedShoot = "Wedding";
-  String selectedEdit = "";
-  int? selectedSpecialtyId;
   List<String> selectedEdits = [];
+
+  int? selectedSpecialtyId;
 
   // Expand/Collapse states
   bool shootOpen = true;
@@ -52,6 +52,9 @@ bool isLoading =false;
     super.initState();
     _fetchbooking_data();
   }
+
+
+
   Future<void> _fetchbooking_data() async {
     setState(() => isLoading = true);
 
@@ -60,15 +63,16 @@ bool isLoading =false;
       await ApiService().fetchData(ApiEndpoints.booking_specialties);
 
       if (response != null && response['error'] == false) {
-        final List data = response['data']['deliverables'] ?? [];
+        final List data = response['data'] ?? [];
 
         if (data.isNotEmpty) {
           setState(() {
             specialties = data;
-            selectedSpecialtyId = data[0]['specialty_id']; // ✅ NOT NULL
+            selectedSpecialtyId = data[0]['specialty_id'];
           });
 
           debugPrint("Selected Specialty ID → $selectedSpecialtyId");
+
         }
       }
     } catch (e) {
@@ -88,7 +92,7 @@ bool isLoading =false;
       final payload = {
         "specialty_id": selectedSpecialtyId,
         "shoot_type_id": shootTypeMap[selectedShoot], // ✅ dynamic
-        "edit_types": selectedEdits, // ✅ list
+        "edit_types": selectedEdits,
       };
 
       debugPrint("API Payload → $payload");
@@ -216,7 +220,7 @@ bool isLoading =false;
               /// -------------------------------------------------------------
               /// EDIT TYPES SECTION
               /// -------------------------------------------------------------
-              buildExpandableSection(
+            /*  buildExpandableSection(
                 title: "Edit Types",
                 isOpen: editOpen,
                 onToggle: () => setState(() => editOpen = !editOpen),
@@ -230,7 +234,15 @@ bool isLoading =false;
                 ],
                 selectedValue: selectedEdit,
                 onSelect: (val) => setState(() => selectedEdit = val),
+              ),*/
+
+              buildMultiSelectSection(
+                title: "Edit Types",
+                isOpen: editOpen,
+                onToggle: () => setState(() => editOpen = !editOpen),
+                items: list,
               ),
+
 
               const SizedBox(height: 40),
 
@@ -257,9 +269,10 @@ bool isLoading =false;
               color: Colors.black,
               strokeWidth: 2,
             )
-                : const Text(
+                :  Text(
               "Next",
               style: TextStyle(
+                color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -381,4 +394,107 @@ bool isLoading =false;
       ),
     );
   }
+
+  Widget buildMultiSelectSection({
+    required String title,
+    required bool isOpen,
+    required VoidCallback onToggle,
+    required List<String> items,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorCode.k282828,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: onToggle,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontFamily: "Outfit",
+                      fontSize: 16,
+                      color: ColorCode.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Icon(
+                    isOpen
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                  )
+                ],
+              ),
+            ),
+          ),
+          const Divider(color: Colors.white10),
+
+          if (isOpen)
+            Column(
+              children: items.map((item) {
+                final isSelected = selectedEdits.contains(item);
+
+                return ListTile(
+                  title: Text(
+                    item,
+                    style: TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+                      fontSize: 16,
+                    ),
+                  ),
+                  trailing: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: isSelected
+                          ? const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFE8D1AB),
+                          Color(0xFFD4A14D),
+                        ],
+                      )
+                          : null,
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.transparent
+                            : ColorCode.kWhiteOpacity60,
+                      ),
+                    ),
+                    child: isSelected
+                        ? const Center(
+                      child: CircleAvatar(
+                        radius: 5,
+                        backgroundColor: Colors.black,
+                      ),
+                    )
+                        : null,
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        selectedEdits.remove(item);
+                      } else {
+                        selectedEdits.add(item);
+                      }
+                    });
+
+                    debugPrint("Selected Edits → $selectedEdits");
+                  },
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
 }
