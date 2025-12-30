@@ -21,10 +21,4 @@ class ApiEndpoints {
   //
   static const String booking_creatives = "creatives";
 
-
-  //pyment?
-  static const String payment = "payment";
-  static const String payment_setup = "payment/setup-intent";
-  static const String payment_attach = "payment/attach";
-
 }
