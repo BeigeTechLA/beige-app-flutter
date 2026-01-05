@@ -21,11 +21,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   void initState() {
     super.initState();
     _fetchBookSummary();
+    _createSetupIntent();
   }
 
 
   bool loading = true;
   Map<String, dynamic>? paymentData;
+  String? setupIntentClientSecret;
 
 
 
@@ -74,88 +76,123 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     }
   }
 
+
   Future<Map<String, dynamic>> _createSetupIntent() async {
-    final response = await ApiService().postData(
-      ApiEndpoints.payment_setup,
-      {},
-    );
+    try {
+      debugPrint("🚀 CREATE SETUP INTENT API START");
 
-    if (response == null || response['error'] == true) {
-      throw response?['message'] ?? "SetupIntent failed";
+      final response = await ApiService().postData(
+        ApiEndpoints.payment_setup,
+        {},
+      );
+
+      debugPrint("📥 RAW SETUP INTENT RESPONSE:");
+      debugPrint(response.toString());
+
+      if (response == null || response['error'] == true) {
+        throw response?['message'] ?? "SetupIntent failed";
+      }
+
+      final data = response['data'];
+
+      /// 🔥 YAHAN CLIENT SECRET SAVE HO RAHA HAI
+      setupIntentClientSecret = data['client_secret'];
+
+      debugPrint("✅ CLIENT SECRET SAVED:");
+      debugPrint(setupIntentClientSecret);
+
+      return data;
+    } catch (e) {
+      debugPrint("❌ CREATE SETUP INTENT ERROR: $e");
+      rethrow;
+    } finally {
+      debugPrint("🛑 CREATE SETUP INTENT API END");
     }
-
-    return response['data'];
   }
+
 
   Future<void> _openStripeSheet() async {
     try {
+      print("=== STRIPE START ===");
       setState(() => loading = true);
 
-      /// 1️⃣ Create SetupIntent
+      // 1. Create SetupIntent
+      print("1️⃣ Calling setup intent API");
       final setupData = await _createSetupIntent();
-      final clientSecret = setupData['client_secret'];
 
-      /// 2️⃣ Init Payment Sheet
+      final String? clientSecret = setupData['client_secret'];
+      print("Client Secret: $clientSecret");
+
+      if (clientSecret == null || clientSecret.isEmpty) {
+        throw "Client secret missing";
+      }
+
+      // 2. Init Payment Sheet
+      print("2️⃣ Initializing payment sheet");
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           setupIntentClientSecret: clientSecret,
           merchantDisplayName: "BEIGE",
-
-          // 🔥 THIS IS THE FIX
-          paymentMethodOrder: ['card'],
-
           allowsDelayedPaymentMethods: false,
         ),
       );
 
-
-      /// 3️⃣ Present Payment Sheet
+      // 3. Present Payment Sheet
+      print("3️⃣ Presenting payment sheet");
       await Stripe.instance.presentPaymentSheet();
+      print("Payment sheet completed");
 
-      /// 4️⃣ 🔥 GET PAYMENT METHOD ID (CORRECT WAY)
+      // 4. Retrieve SetupIntent
+      print("4️⃣ Retrieving setup intent");
       final setupIntent =
       await Stripe.instance.retrieveSetupIntent(clientSecret);
 
-      final paymentMethodId = setupIntent.paymentMethodId;
+      final String? paymentMethodId = setupIntent.paymentMethodId;
+      print("Payment Method ID: $paymentMethodId");
 
       if (paymentMethodId == null || paymentMethodId.isEmpty) {
-        throw "PaymentMethod ID not received from Stripe";
+        throw "Payment method id not found";
       }
 
-      debugPrint("💳 PAYMENT METHOD ID: $paymentMethodId");
-
-
+      // 5. Attach to backend
+      print("5️⃣ Attaching payment method to backend");
       await _attachPaymentMethodToBackend(paymentMethodId);
 
+      // 6. Refresh list
+      print("6️⃣ Refreshing payment list");
       await _fetchBookSummary();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Card saved successfully")),
       );
+
+      print("=== STRIPE SUCCESS ===");
     } catch (e) {
-      debugPrint("❌ STRIPE ERROR: $e");
+      print("❌ STRIPE ERROR: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
     } finally {
       if (mounted) setState(() => loading = false);
+      print("=== STRIPE END ===");
     }
   }
+
+
+
 
   Future<void> _attachPaymentMethodToBackend(String paymentMethodId) async {
     try {
       debugPrint("🔗 ATTACH PAYMENT METHOD API START");
 
       final payload = {
+        // "payment_method_token": paymentMethodId,
         "payment_method_token": paymentMethodId,
       };
 
       debugPrint("📤 REQUEST PAYLOAD:");
       debugPrint(payload.toString());
 
-      debugPrint("📡 API URL: ${ApiEndpoints.payment_attach}");
-
-      /// 🔹 API Call
       final response = await ApiService().postData(
         ApiEndpoints.payment_attach,
         payload,
@@ -164,25 +201,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
       debugPrint("📥 RAW API RESPONSE:");
       debugPrint(response.toString());
 
-
-      if (response == null) {
-        debugPrint("❌ RESPONSE IS NULL");
-        throw "Attach payment API returned null response";
-      }
-
-      debugPrint("ℹ️ error flag: ${response['error']}");
-      debugPrint("ℹ️ message: ${response['message']}");
-
-      if (response['error'] == true) {
-        debugPrint("❌ API ERROR");
-        throw response['message'] ?? "Failed to attach payment method";
+      if (response == null || response['error'] == true) {
+        throw response?['message'] ?? "Failed to attach payment method";
       }
 
       debugPrint("✅ PAYMENT METHOD ATTACHED SUCCESSFULLY");
-
     } catch (e) {
-      debugPrint("🔥 ATTACH PAYMENT METHOD EXCEPTION:");
-      debugPrint(e.toString());
+      debugPrint("🔥 ATTACH PAYMENT METHOD ERROR: $e");
       rethrow;
     }
   }
@@ -193,7 +218,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: ColorCode.bcakgroundcolor,
-     
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -231,7 +256,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   color: ColorCode.kWhiteOpacity70
                 ),
               ),
-        
+
               const SizedBox(height: 24),
 
 
@@ -259,13 +284,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     child: Row(
                       children: [
                         Image.asset(
-                          "assets/Icons/visa.png",
+                          "assets/Icons/stripe.png",
                           height: 28,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            "**** **** **** ${card['last4'] ?? 'XXXX'}",
+                            "Stripe",
                             style: const TextStyle(color: Colors.white),
                           ),
                         ),
@@ -291,7 +316,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-        
+
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
@@ -339,9 +364,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 28),
-        
+
               /// ===== RECOMMENDED =====
               const Text(
                 "Recommended",

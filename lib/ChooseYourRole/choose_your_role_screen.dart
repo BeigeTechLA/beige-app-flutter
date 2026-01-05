@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Creative/creative_sign_up/build_your_creative_profile_sign_up.dart';
+import '../Creative/creative_sign_up/professional_details_sing_up.dart';
+import '../Creative/creative_sign_up/social_engagement_singup.dart';
 import '../auth/sign_up_screen.dart';
 import '../utility/ColorCode.dart';
 
@@ -57,13 +59,13 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
                   _roleCircle(
                     index: 0,
                     image: "assets/images/choose_your_role1.png",
-                    title: "Get Started as Client",
+                    title: "Join to Book a Shoots",
                     role: 1,
                   ),
                   _roleCircle(
                     index: 1,
                     image: "assets/images/chooese_your_role2.png",
-                    title: "Join as Creative",
+                    title: "Join to Find Shoots",
                     role: 2,
                   ),
                 ],
@@ -89,15 +91,13 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
 
         Future.delayed(const Duration(milliseconds: 200), () {
           if (index == 0) {
-            /// ✅ CLIENT SIGN UP
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const SignUpScreen(role: 1),
+                builder: (_) =>  SignUpScreen(role: 1),
               ),
             );
           } else if (index == 1) {
-            /// ✅ CREATIVE SIGN UP (SECOND SCREEN)
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -151,7 +151,7 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
             style: const TextStyle(
               fontFamily: "Outfit",
               color: Colors.white,
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),

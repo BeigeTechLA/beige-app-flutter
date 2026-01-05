@@ -18,6 +18,7 @@ class ColorCode {
   /// ⭐ Divider / Border Color (White 12% opacity)
     static const Color kDividerWhite12 = Color(0x1FFFFFFF);
 
+  static const Color k737373 = Color(0xFF737373); //Medium grey
 
 
   static const Color kCreamSoft = Color(0xFFECE1CE);

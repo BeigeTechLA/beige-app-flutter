@@ -37,9 +37,17 @@ dependencies:
   video_player: ^2.8.2
   google_maps_flutter: ^2.6.0
   geolocator: ^11.0.0
-  flutter_stripe: ^10.1.1
+  flutter_stripe: ^12.1.1
   geocoding: ^2.1.1
   flutter_dotenv: ^5.0.2
+  image_picker: ^1.0.7
+  file_picker: ^8.0.0
+  dotted_border: ^3.1.0
+  image_cropper: ^10.0.0+1
+  path_provider: ^2.1.2
+
+
+
 
 
 
@@ -80,7 +88,7 @@ flutter:
     - assets/Splash/
     - assets/Onboding/
     - assets/Icons/
-    -  assets/.env
+
 
 
   fonts:

@@ -128,6 +128,94 @@ class ApiService {
   }*/
 
 
+  Future<dynamic> postMultipartStep3(
+      String url, {
+        required Map<String, String> fields,
+        File? resume,
+        File? portfolio,
+        List<File>? certificates,
+        List<File>? recentWorks,
+        List<int>? recentWorkIndexes,
+      }) async {
+    final dio = Dio();
+
+    FormData formData = FormData.fromMap(fields);
+
+    /// 📄 Resume
+    if (resume != null) {
+      formData.files.add(
+        MapEntry(
+          "resume",
+          await MultipartFile.fromFile(
+            resume.path,
+            filename: resume.path.split('/').last,
+          ),
+        ),
+      );
+    }
+
+    /// 📁 Portfolio
+    if (portfolio != null) {
+      formData.files.add(
+        MapEntry(
+          "portfolio",
+          await MultipartFile.fromFile(
+            portfolio.path,
+            filename: portfolio.path.split('/').last,
+          ),
+        ),
+      );
+    }
+
+    /// 📜 Certification files (MULTIPLE)
+    if (certificates != null) {
+      for (final file in certificates) {
+        formData.files.add(
+          MapEntry(
+            "certifications",
+            await MultipartFile.fromFile(
+              file.path,
+              filename: file.path.split('/').last,
+            ),
+          ),
+        );
+      }
+    }
+
+    /// 🎬 Recent Work Media + Index
+    if (recentWorks != null && recentWorkIndexes != null) {
+      for (int i = 0; i < recentWorks.length; i++) {
+        formData.files.add(
+          MapEntry(
+            "recent_work_media",
+            await MultipartFile.fromFile(
+              recentWorks[i].path,
+              filename: recentWorks[i].path.split('/').last,
+            ),
+          ),
+        );
+
+        formData.fields.add(
+          MapEntry(
+            "recent_work_media_index",
+            recentWorkIndexes[i].toString(),
+          ),
+        );
+      }
+    }
+
+    final response = await dio.post(
+      url,
+      data: formData,
+      options: Options(
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      ),
+    );
+
+    return response.data;
+  }
 
   /// ✅ Image URL Builder
   String getImageURL(String imagePath) {
@@ -157,7 +245,7 @@ class ApiService {
   /// 📌 WORKING MULTIPART POST
   Future<dynamic> postMultipart(
       String url,
-      Map<String, dynamic> fields,
+      Map<String, String> fields,
       File? imageFile,
       ) async {
     final prefs = await SharedPreferences.getInstance();
@@ -165,24 +253,24 @@ class ApiService {
 
     Dio dio = Dio();
 
-    // Remove JSON header (important for file upload)
     dio.options.headers = {
       "Accept": "application/json",
       "Authorization": "Bearer $token",
     };
 
-    // Create FormData
+    /// ✅ CREATE FORM DATA
     FormData formData = FormData.fromMap({
       ...fields,
+
+      /// ✅ BACKEND EXPECTS: profile_photo
       if (imageFile != null)
-        "photo": await MultipartFile.fromFile(
+        "profile_photo": await MultipartFile.fromFile(
           imageFile.path,
-          filename: imageFile.path.split("/").last,
-        )
+          filename: imageFile.path.split('/').last,
+        ),
     });
 
-    print("📤 FINAL MULTIPART DATA: ${formData.fields}");
-    print("📸 SENDING IMAGE: ${imageFile?.path}");
+
 
     final response = await dio.post(
       _baseUrl + url,
@@ -191,6 +279,7 @@ class ApiService {
 
     return response.data;
   }
+
 
 
 

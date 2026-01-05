@@ -2,6 +2,7 @@ import 'package:beige/auth/sign_up_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 
+import '../Booking/booking_all_screen.dart';
 import '../MainScreen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool savePassword = false;
    bool isLoggingIn =false;
 
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -31,11 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     debugPrint("👉 LOGIN CLICKED");
 
-    debugPrint("📧 Email: ${emailController.text}");
-    debugPrint("🔑 Password length: ${passwordController.text.length}");
-
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      debugPrint("❌ Validation failed: empty fields");
+    /// 🔴 BASIC VALIDATION
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill all fields"),
@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     setState(() => isLoggingIn = true);
-    debugPrint("⏳ Loader started");
 
     try {
       debugPrint("🌐 Calling API: ${ApiEndpoints.login}");
@@ -59,50 +58,58 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
-      debugPrint("✅ RAW LOGIN RESPONSE => $response");
-      debugPrint("🔍 Response type => ${response.runtimeType}");
+      debugPrint("✅ LOGIN RESPONSE => $response");
 
-      if (response == null) {
-        debugPrint("❌ Response is NULL");
-      } else {
-        debugPrint("🔹 error => ${response['error']}");
-        debugPrint("🔹 message => ${response['message']}");
-        debugPrint("🔹 data => ${response['data']}");
-      }
-
-      if (response != null &&
-          response['error'] == false &&
-          response['data'] != null) {
-
-        debugPrint("🎉 LOGIN SUCCESS");
-
-        await SharedService.setLoginDetails(response);
-        debugPrint("💾 Login data saved in SharedPreferences");
-
-        if (!mounted) {
-          debugPrint("⚠ Widget not mounted");
-          return;
-        }
-
-        debugPrint("➡ Navigating to MainScreen");
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => Mainscreen()),
-        );
-
-      } else {
-        debugPrint("❌ LOGIN FAILED CONDITION");
-
+      /// 🔴 RESPONSE CHECK
+      if (response == null ||
+          response['error'] == true ||
+          response['data'] == null ||
+          response['data']['user'] == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(response?['message'] ?? "Login failed"),
             backgroundColor: Colors.red,
           ),
         );
+        return;
       }
+
+      /// ✅ SAVE LOGIN DATA
+      await SharedService.setLoginDetails(response);
+
+      if (!mounted) return;
+
+      /// 🔥 USER TYPE FROM API
+      final int userType = response['data']['user']['user_type'];
+
+      debugPrint("👤 USER TYPE => $userType");
+
+      /// 🔀 ROLE BASED NAVIGATION
+      if (userType == 3) {
+        // ✅ CLIENT / USER
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const Mainscreen()),
+        );
+      }
+      else if (userType == 4) {
+        // ✅ CREATOR
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) =>  BookingAllScreen()),
+        );
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid user type"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
     } catch (e, stack) {
-      debugPrint("🔥 LOGIN EXCEPTION => $e");
+      debugPrint("🔥 LOGIN ERROR => $e");
       debugPrint("📌 STACKTRACE => $stack");
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,12 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } finally {
-      debugPrint("⏹ Loader stopped");
       if (mounted) {
         setState(() => isLoggingIn = false);
       }
     }
   }
+
 
 
 

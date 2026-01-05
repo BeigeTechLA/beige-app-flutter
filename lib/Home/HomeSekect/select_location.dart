@@ -143,22 +143,25 @@ class _SelectLocationState extends State<SelectLocation> {
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Enable location services")),
-      );
+      await Geolocator.openLocationSettings(); // 👈 THIS IS IMPORTANT
       return;
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
 
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location permission permanently denied")),
+        const SnackBar(
+          content: Text("Location permission permanently denied. Enable from settings."),
+        ),
       );
+      await Geolocator.openAppSettings(); // 👈 Open app settings
       return;
     }
 
@@ -170,6 +173,7 @@ class _SelectLocationState extends State<SelectLocation> {
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
   }
+
 
 
   @override

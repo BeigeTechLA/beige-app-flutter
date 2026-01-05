@@ -18,13 +18,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> pages = [
     {
       "image": "assets/Onboding/Frame 2087328917.png",
-      "title": "Find the Perfect Creator\nfor any event",
-      "description": "Browse trusted photographers and  videographers\nfor any event. 🎥✨",
+      "title": "Book Your Dream\n Shoot",
+      "description": "Instantly book creatives for any shoot \nanywhere. 🎥✨",
     },
     {
       "image": "assets/Onboding/Group 2087329238.png",
-      "title": "Discover & Book \nAround You",
-      "description": "Easily explore creators around you and book\nthem instantly.📍⚡",
+      "title": "Find Video & Photo \n Work",
+      "description": "Find local photo, video, and editing work.\nBook. Shoot. Earn.📍⚡",
     },
    /* {
       "image": "assets/Onboding/Frame 2085664302 (1).png",

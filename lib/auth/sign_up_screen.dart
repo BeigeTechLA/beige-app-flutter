@@ -75,12 +75,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           "name": nameController.text.trim(),
           "email": emailController.text.trim(),
           "password": passwordController.text.trim(),
-          "user_type": widget.role ?? 1, // ✅ 1 = Client, 2 = Creative
+          "user_type": 3,
           "location": locationController.text.trim(),
         },
       );
 
-      if (response['error'] == false) {
+      if (response != null && response['error'] == false) {
         await SharedService.setLoginDetails(response);
 
         Navigator.pushReplacement(
@@ -88,14 +88,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
           MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
       } else {
-        _showSnack(response['message'] ?? "Signup failed");
+        _showSnack(response?['message'] ?? "Email already exists. Please use another email");
       }
     } catch (e) {
-      _showSnack("Signup failed: $e");
+      final error = e.toString().toLowerCase();
+
+      if (error.contains("email")) {
+        _showSnack("Email already exists. Please use another email");
+      } else {
+        _showSnack("Email already exists. Please use another email");
+      }
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
+
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
