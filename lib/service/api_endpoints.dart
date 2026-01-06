@@ -29,9 +29,9 @@ class ApiEndpoints {
   // static const String payment_now = "payment";
 
 
+////------------------ My Shoot ----------------------\\\\
 
-
-
+  static const String creatives_myshoots = "creatives/my-shoots";
 
 
 //---------------------------- Creative --------------------------

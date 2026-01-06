@@ -1,5 +1,7 @@
 import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:flutter/material.dart';
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'booking_select_date_time_slots.dart';
 import 'upcoming_booking_event_summary.dart';
@@ -15,6 +17,62 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   bool isUpcomingSelected = true;
   String? selectedPayment;
   int selectedIndex = 0;
+
+  bool isLoading = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchupcoming();
+    _fetchcompleted();
+  }
+
+
+  Future<void> _fetchupcoming() async {
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.creatives_myshoots}?status=upcoming",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          isLoading = false;
+          // TODO: assign upcoming shoots list here
+          // upcomingShoots = response['data'];
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  Future<void> _fetchcompleted() async {
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.creatives_myshoots}?status=completed",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          isLoading = false;
+          // TODO: assign upcoming shoots list here
+          // upcomingShoots = response['data'];
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
