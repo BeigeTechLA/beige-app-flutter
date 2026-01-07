@@ -5,7 +5,24 @@ import 'booking_select_date_time_slots.dart';
 import 'cancel_booking.dart';
 
 class UpcomingEventSummaryManagebooking extends StatefulWidget {
-  const UpcomingEventSummaryManagebooking({super.key});
+  final int bookingId;
+  final String ? projectName;
+  final String ? eventDate;
+  final String ?startTime;
+  final String ?endTime;
+  final int ?durationHours;
+  final String ?location;
+  final String ?imageUrl;
+  const UpcomingEventSummaryManagebooking({super.key,
+    required this.bookingId,
+     this.projectName,
+     this.eventDate,
+     this.startTime,
+     this.endTime,
+     this.durationHours,
+     this.location,
+     this.imageUrl,
+  });
 
   @override
   State<UpcomingEventSummaryManagebooking> createState() => _UpcomingEventSummaryManagebookingState();
@@ -66,7 +83,7 @@ class _UpcomingEventSummaryManagebookingState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Manage Booking",
+                            "Manage Shoots",
                             style:  TextStyle(
                                 color: ColorCode.white,
                                 fontSize: 16,
@@ -119,7 +136,7 @@ class _UpcomingEventSummaryManagebookingState
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children:  [
                                   Row(
                                     children: [
                                       Icon(Icons.star, size: 14, color: Colors.amber),
@@ -134,7 +151,7 @@ class _UpcomingEventSummaryManagebookingState
                                   ),
                                   SizedBox(height: 6),
                                   Text(
-                                    "Angela Kia",
+                                    widget.projectName ?? "N/A",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
@@ -205,18 +222,22 @@ class _UpcomingEventSummaryManagebookingState
                             children: [
                               infoRowBlack(
                                 Icons.access_time,
-                                "01:30 AM to 03:30 AM (1h duration)",
+                                "${widget.startTime ?? '--'} to ${widget.endTime ?? '--'} "
+                                    "(${widget.durationHours ?? 0}h duration)",
                               ),
+
                               const SizedBox(height: 10),
                               infoRowBlack(
                                 Icons.calendar_month,
-                                "Apr 01, 2025 - Apr 04, 2025",
+                                widget.eventDate ?? "Date not available",
                               ),
+
                               const SizedBox(height: 10),
                               infoRowBlack(
                                 Icons.location_on,
-                                "2458 Sunset Boulevard, Los Angeles, CA 90026",
+                                widget.location ?? "Location not available",
                               ),
+
                             ],
                           ),
                         ),
@@ -244,7 +265,9 @@ class _UpcomingEventSummaryManagebookingState
                                     onPressed: () {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (_) =>CancelBooking()),
+                                        MaterialPageRoute(builder: (_) =>CancelBooking(
+                                          bookingId: widget.bookingId,
+                                        )),
                                       );
                                     },
                                     child: const Text(
@@ -278,7 +301,7 @@ class _UpcomingEventSummaryManagebookingState
                                   onPressed: () {
                                      Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) =>BookingSelectDateTimeSlots()),
+                                MaterialPageRoute(builder: (_) =>BookingSelectDateTimeSlots(bookingId: widget.bookingId,)),
                               );
                                   },
                                   child: const Text(

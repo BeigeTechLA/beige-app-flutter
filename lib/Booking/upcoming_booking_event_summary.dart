@@ -1,10 +1,15 @@
 import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 
 class UpcomingBookingEventSummary extends StatefulWidget {
-  const UpcomingBookingEventSummary({super.key});
+  final int bookingId;
+
+  const UpcomingBookingEventSummary({super.key, required this.bookingId});
 
   @override
   State<UpcomingBookingEventSummary> createState() =>
@@ -13,6 +18,61 @@ class UpcomingBookingEventSummary extends StatefulWidget {
 
 class _UpcomingBookingEventSummaryState
     extends State<UpcomingBookingEventSummary> {
+
+  Map<String, dynamic>? bookingData;
+  List<dynamic> timelineData = [];
+  bool loadingTimeline = true;
+  bool loading = true;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUpcomingBookingEventSummary();
+    _fetchTimeline();
+
+  }
+
+
+
+  Future<void> _fetchUpcomingBookingEventSummary() async {
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}",
+      );
+
+      if (response != null && response['error'] == false) {
+        bookingData = response['data'];
+
+      }
+    } catch (e) {
+      debugPrint("Upcoming Error: $e");
+    }
+    setState(() => loading = false);
+  }
+
+  Future<void> _fetchTimeline() async {
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}/timeline",
+      );
+
+      if (response != null && response['error'] == false) {
+        timelineData = response['data'] ?? [];
+      }
+    } catch (e) {
+      debugPrint("Timeline Error: $e");
+    }
+    loadingTimeline = false;
+  }
+
+
+
+  String formatTimelineTime(String isoTime) {
+    final date = DateTime.parse(isoTime).toLocal();
+    return DateFormat('EEE, dd MMM • hh:mm a').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,9 +164,9 @@ class _UpcomingBookingEventSummaryState
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children:  [
                           Text(
-                            "Angela Kia",
+                            bookingData?['creative']?['name'] ?? "",
                             style: TextStyle(
                               fontFamily: "outfit",
                               fontSize: 16,
@@ -116,7 +176,7 @@ class _UpcomingBookingEventSummaryState
                           ),
                           SizedBox(height: 6),
                           Text(
-                            "Videography Specialist",
+                            bookingData?['event']?['type'] ?? "",
                             style: TextStyle(
                               fontFamily: "outfit",
                               fontSize: 14,
@@ -142,23 +202,27 @@ class _UpcomingBookingEventSummaryState
 
                    Divider(color: Colors.white12),
 
-                  /// ⏰ TIME
+
+
                   infoRow(
                     Icons.access_time,
-                    "01:30 AM to 03:30 AM (1h duration)",
+                    "${bookingData?['event']?['start_time']} - "
+                        "${bookingData?['event']?['end_time']} "
+                        "(${bookingData?['event']?['duration_hours']}h)",
                   ),
 
-                  /// 📅 DATE
+
+
                   infoRow(
                     Icons.calendar_month,
-                    "Apr 01, 2025 - Apr 04, 2025",
+                    bookingData?['event']?['event_date'] ?? "",
                   ),
 
-                  /// 📍 LOCATION
                   infoRow(
                     Icons.location_on,
-                    "2458 Sunset Boulevard, Los Angeles, CA 90026",
+                    bookingData?['event']?['location'] ?? "",
                   ),
+
 
                   const SizedBox(height: 12),
 
@@ -179,8 +243,9 @@ class _UpcomingBookingEventSummaryState
                       children: [
 
                         /// 🔹 EVENT NAME & TYPE
-                        const Text(
-                          "Event Name & Type",
+                         Text(
+                           "${bookingData?['event']?['name'] ?? ""} • "
+                               "${bookingData?['event']?['type'] ?? ""}",
                           style: TextStyle(
                             fontFamily: "Outfit",
                             fontSize: 14,
@@ -188,8 +253,8 @@ class _UpcomingBookingEventSummaryState
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
+                         SizedBox(height: 6),
+                       /*  Text(
                           "Wedding / 01",
                           style: TextStyle(
                             fontFamily: "Outfit",
@@ -197,7 +262,7 @@ class _UpcomingBookingEventSummaryState
                             fontWeight: FontWeight.w400,
                             color: Colors.white70,
                           ),
-                        ),
+                        ),*/
 
                         const SizedBox(height: 14),
 
@@ -212,8 +277,9 @@ class _UpcomingBookingEventSummaryState
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          "Wedding photography services for Ethan Cole - Wedding Package",
+                         Text(
+                          bookingData?['event']?['description'] ?? "No description available",
+
                           style: TextStyle(
                             fontFamily: "Outfit",
                             fontSize: 10,
@@ -246,13 +312,14 @@ class _UpcomingBookingEventSummaryState
                               infoItem(
                                 icon: Icons.attach_money,
                                 title: "Event Budget",
-                                value: "\$2,145",
+                                value: "₹${bookingData?['event']?['budget']}",
                               ),
                               const SizedBox(height: 12),
                               infoItem(
                                 icon: Icons.group,
                                 title: "Crew Size Needed",
-                                value: "2 members",
+                                value:
+                                "${bookingData?['event']?['crew_size_needed']} members",
                               ),
                             ],
                           )
@@ -286,6 +353,7 @@ class _UpcomingBookingEventSummaryState
                       borderRadius: BorderRadius.circular(6),
                       onTap: () {
                         showProjectTimelineDialog(context);
+
                       },
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -301,7 +369,7 @@ class _UpcomingBookingEventSummaryState
                               height: 1.2,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                           SizedBox(height: 2),
                           Container(
                             height: 1,
                             width: 110,
@@ -332,7 +400,11 @@ class _UpcomingBookingEventSummaryState
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => UpcomingEventSummaryManagebooking(),
+                  builder: (context) => UpcomingEventSummaryManagebooking(
+
+                    bookingId: widget.bookingId,
+
+                  ),
                 ),
               );
             },
@@ -451,20 +523,21 @@ class _UpcomingBookingEventSummaryState
     );
   }
 
+  void showProjectTimelineDialog(BuildContext context) async {
+    loadingTimeline = true;
+    timelineData.clear();
+    await _fetchTimeline();
 
-    void showProjectTimelineDialog(BuildContext context) {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) {
-          return Align(
-            alignment: Alignment.bottomCenter,
-
-            child: Container(
-               height: MediaQuery.of(context).size.height * 0.95,
-              padding: EdgeInsets.all(10),
-              // padding: EdgeInsets.only(right: 20,left: 20,top: 10,),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.95,
+              padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
                 color: ColorCode.k282828,
                 borderRadius: BorderRadius.vertical(
@@ -473,16 +546,18 @@ class _UpcomingBookingEventSummaryState
               ),
               child: Column(
                 children: [
+                  /// DRAG HANDLE
                   Center(
                     child: Container(
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:ColorCode.kWhiteOpacity70,
+                        color: ColorCode.kWhiteOpacity70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
                   ),
+
                   /// HEADER
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -500,7 +575,8 @@ class _UpcomingBookingEventSummaryState
                         ),
                         InkWell(
                           onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.close, color: Colors.white),
+                          child:
+                          const Icon(Icons.close, color: Colors.white),
                         ),
                       ],
                     ),
@@ -508,59 +584,47 @@ class _UpcomingBookingEventSummaryState
 
                   const Divider(color: Colors.white12),
 
-                  /// LIST
+                  /// BODY
                   Expanded(
-                    child: ListView(
+                    child: loadingTimeline
+                        ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                        : timelineData.isEmpty
+                        ? const Center(
+                      child: Text(
+                        "No timeline available",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    )
+                        : ListView.builder(
                       padding: const EdgeInsets.all(30),
-                      children: [
-                        timelineItem(
-                          title: "Booking Accepted",
-                          subtitle:
-                          "Your booking has been confirmed\n by the creator.",
-                          time: "Today, 10:34 AM",
-                          isActive: true,
-                        ),
-                        timelineItem(
-                          title: "Shoot Preparation",
-                          subtitle:
-                          "The creator is preparing equipment\nand shoot details.",
-                          time: "Today, 10:34 AM",
-                        ),
-                        timelineItem(
-                          title: "Shoot Day",
-                          subtitle:
-                          "The shoot is currently in progress or\nscheduled for today.",
-                          time: "Today, 10:34 AM",
-                        ),
-                        timelineItem(
-                          title: "Shoot Completed",
-                          subtitle:
-                          "The shoot has been successfully\n completed.",
-                          time: "Today, 10:34 AM",
-                        ),
-                        timelineItem(
-                          title: "Editing in Progress",
-                          subtitle:
-                          "Your footage is being edited \nand finalized.",
-                          time: "Today, 10:34 AM",
-                        ),
-                        timelineItem(
-                          title: "Files Ready for Delivery",
-                          subtitle:
-                          "Your final files are ready to view \nor download.",
-                          time: "Today, 10:34 AM",
-                          showLine: false,
-                        ),
-                      ],
+                      itemCount: timelineData.length,
+                      itemBuilder: (context, index) {
+                        final item = timelineData[index];
+
+                        return timelineItem(
+                          title: item['title'] ?? "",
+                          subtitle: item['description'] ?? "",
+                          time: formatTimelineTime(
+                              item['timestamp']),
+                          isActive:
+                          index == timelineData.length - 1,
+                          showLine:
+                          index != timelineData.length - 1,
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      );
-    }
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget timelineItem({
     required String title,
     required String subtitle,
@@ -571,8 +635,7 @@ class _UpcomingBookingEventSummaryState
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-        /// LEFT IMAGE CIRCLE + LINE
+        /// LEFT ICON
         Column(
           children: [
             Container(
@@ -581,71 +644,51 @@ class _UpcomingBookingEventSummaryState
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isActive
-                    ? const Color(0xFFEAD7B0) // ACTIVE BG
-                    : const Color(0xFF1F1F1F), // INACTIVE BG
-               /* border: Border.all(
-                  color: isActive
-                      ? const Color(0xFFEAD7B0)
-                      : Colors.white24,
-                ),*/
+                    ? const Color(0xFFEAD7B0)
+                    : const Color(0xFF1F1F1F),
               ),
               child: Center(
                 child: Image.asset(
-                  "assets/Icons/user_chec_time_linek.png", // 👈 SAME IMAGE FOR ALL
-                 /* height: 16,
-                  width: 16,
-                  color: isActive ? Colors.black : Colors.white38,*/
+                  "assets/Icons/user_chec_time_linek.png",
                 ),
               ),
             ),
-SizedBox(height: 5,),
+            const SizedBox(height: 5),
             if (showLine)
               Column(
                 children: [
-                  // dashed line
                   Column(
                     children: List.generate(
-                      4, // 👈 number of dashes
-                          (index) => Container(
+                      4,
+                          (_) => Container(
                         height: 5,
-                        width:1,
-                        margin: const EdgeInsets.symmetric(vertical: 1),
-                        color: isActive
-                            ? ColorCode.white // ACTIVE
-                            : ColorCode.white,         // INACTIVE
+                        width: 1,
+                        margin:
+                        const EdgeInsets.symmetric(vertical: 1),
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                  SizedBox(height: 5,),
-                  const SizedBox(height: 4),
-
-                  // arrow down
-                  Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 14,
-                    color: isActive
-                        ? ColorCode.white // ACTIVE
-                        : ColorCode.white,
-                  ),
+                  const SizedBox(height: 5),
+                  const Icon(Icons.keyboard_arrow_down,
+                      size: 14, color: Colors.white),
                 ],
               ),
-
           ],
         ),
 
         const SizedBox(width: 14),
 
-        /// TEXT CONTENT
+        /// TEXT
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                /// TITLE + TIME
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
@@ -655,50 +698,37 @@ SizedBox(height: 5,),
                           fontFamily: "Outfit",
                           fontWeight: FontWeight.w500,
                           color: isActive
-                              ? ColorCode.kButtonColor       // ACTIVE TEXT
-                              : ColorCode.kWhiteOpacity70,     // INACTIVE TEXT
+                              ? ColorCode.kButtonColor
+                              : ColorCode.kWhiteOpacity70,
                         ),
                       ),
                     ),
                     Text(
                       time,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         fontFamily: "Outfit",
-                        fontWeight: FontWeight.w400,
-                        color: isActive
-                            ? ColorCode.white       // ACTIVE TEXT
-                            : ColorCode.white,     // INACTIVE TEXT
+                        color: Colors.white,
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 6),
-
-                /// SUBTITLE
                 Text(
                   subtitle,
-
-           // "..."
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 9,
                     fontFamily: "Outfit",
-                    fontWeight: FontWeight.w400,
-                    color: isActive
-                        ? ColorCode.kWhiteOpacity70 // ACTIVE
-                        : ColorCode.kWhiteOpacity70,  // INACTIVE
+                    color: ColorCode.kWhiteOpacity70,
                   ),
                 ),
-
-
                 const SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ],
-    );}
-
+    );
+  }
 
 }

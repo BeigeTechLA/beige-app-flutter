@@ -1,5 +1,6 @@
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -23,6 +24,14 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     super.initState();
     selectedLatLng = widget.initialLatLng;
     _getAddress(widget.initialLatLng);
+
+    /// STATUS BAR – BLACK THEME
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
   }
 
   Future<void> _searchLocation(String query) async {
@@ -42,7 +51,13 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       }
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location not found")),
+        SnackBar(
+          backgroundColor: Colors.black,
+          content: const Text(
+            "Location not found",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       );
     }
   }
@@ -59,28 +74,46 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     }
   }
 
+  /// 🌙 DARK MAP STYLE
+  static const String _darkMapStyle = '''
+[
+  {"elementType":"geometry","stylers":[{"color":"#1d1d1d"}]},
+  {"elementType":"labels.text.fill","stylers":[{"color":"#8a8a8a"}]},
+  {"elementType":"labels.text.stroke","stylers":[{"color":"#1d1d1d"}]},
+  {"featureType":"road","elementType":"geometry","stylers":[{"color":"#2c2c2c"}]},
+  {"featureType":"water","elementType":"geometry","stylers":[{"color":"#000000"}]}
+]
+''';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
 
-      /// 🔝 TOP BAR
       body: Column(
         children: [
+          /// 🔝 TOP BAR
           Container(
             padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
             decoration: const BoxDecoration(
-              color: Color(0xFF1C1C1C),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+              color: Color(0xFF121212),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
             ),
             child: Column(
               children: [
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: InkWell(
+                  child:   InkWell(
+                      onTap: () => Navigator.pop(context),
+                    child: Image.asset("assets/Icons/Reply.png", height: 24),
+                  ),
+
+                  /*nkWell(
                     onTap: () => Navigator.pop(context),
                     child: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),
+                  ),*/
                 ),
                 const SizedBox(height: 16),
 
@@ -90,12 +123,12 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   onSubmitted: _searchLocation,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: "Search area, street, city...",
-                    hintStyle: TextStyle(color: Colors.white54),
+                    hintText: "Search for area, street name...",
+                    hintStyle:  TextStyle(color: ColorCode.kWhiteOpacity70,fontFamily: "Outfit",fontWeight: FontWeight.w400,fontSize: 12),
                     prefixIcon:
-                    const Icon(Icons.search, color: Colors.white),
+                     Icon(Icons.search, color: Colors.white),
                     filled: true,
-                    fillColor: const Color(0xFF2A2A2A),
+                    fillColor: const Color(0xFF1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: BorderSide.none,
@@ -106,14 +139,17 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             ),
           ),
 
-          /// 🗺 MAP
+          /// 🗺 DARK MAP
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: selectedLatLng!,
                 zoom: 15,
               ),
-              onMapCreated: (c) => mapController = c,
+              onMapCreated: (controller) {
+                mapController = controller;
+                controller.setMapStyle(_darkMapStyle);
+              },
               onTap: (latLng) async {
                 setState(() => selectedLatLng = latLng);
                 await _getAddress(latLng);
@@ -133,21 +169,25 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             padding: const EdgeInsets.all(16),
             child: Text(
               selectedAddress,
-              style: const TextStyle(color: Colors.white70),
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
         ],
       ),
 
-      /// 💾 SAVE
+      /// 💾 SAVE BUTTON
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorCode.kButtonColor,
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             minimumSize: const Size(double.infinity, 52),
           ),
           onPressed: () {
@@ -158,7 +198,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
           },
           child: const Text(
             "Save",
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           ),
         ),
       ),

@@ -3,17 +3,56 @@ import 'dart:ui';
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 
 
 class CancelBooking extends StatefulWidget {
-  const CancelBooking({super.key});
+  final int bookingId;
+  const CancelBooking({super.key, required this.bookingId});
 
   @override
   State<CancelBooking> createState() => _CancelBookingState();
 }
 
 class _CancelBookingState extends State<CancelBooking> {
+
+
+  bool isCancelling = false;
+
+  Future<void> _Cancelshoot() async {
+    if (isCancelling) return;
+
+    setState(() => isCancelling = true);
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}/cancel",
+        {},
+      );
+
+      if (response != null && response['error'] == false) {
+        // ✅ SUCCESS
+        AppointmentCancelledDialog(context);
+      } else {
+        _showSnack(response?['message'] ?? "Failed to cancel booking");
+      }
+    } catch (e) {
+      debugPrint("Cancel Booking Error: $e");
+      _showSnack("Something went wrong. Please try again.");
+    } finally {
+      if (mounted) setState(() => isCancelling = false);
+    }
+  }
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,19 +276,23 @@ class _CancelBookingState extends State<CancelBooking> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  onPressed: () {
-                                    AppointmentCancelledDialog(context);
-                                  },
-                                  child: const Text(
+                                  onPressed: isCancelling ? null : _Cancelshoot,
+
+                                  child: isCancelling
+                                      ?  CircularProgressIndicator(
+                                    color: ColorCode.kHeadingColor,
+                                    strokeWidth: 2,
+                                  )
+                                      : const Text(
                                     "Yes, Cancel",
                                     style: TextStyle(
                                       color: ColorCode.kHeadingColor,
-                                      fontFamily: 'Unbounded',   // ← Add this
+                                      fontFamily: 'Unbounded',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      // Looks cleaner in Unbounded
                                     ),
                                   ),
+
 
                                 ),
                               ),

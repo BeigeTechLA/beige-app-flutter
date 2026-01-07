@@ -250,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen>
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                              /*  Navigator.push(
+                           /*     Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => MyProfile()),
                                 );*/
