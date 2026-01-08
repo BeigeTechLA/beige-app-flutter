@@ -250,10 +250,10 @@ class _HomeScreenState extends State<HomeScreen>
                             const SizedBox(width: 12),
                             InkWell(
                               onTap: () {
-                           /*     Navigator.push(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => MyProfile()),
-                                );*/
+                                );
                               },
                               child: const CircleAvatar(
                                 radius: 18,
@@ -997,10 +997,10 @@ class _HomeScreenState extends State<HomeScreen>
                                           // on press action
                                         },
                                         child: Image.asset(
-                                          "assets/images/Heart Angle.png", // 👈 apni image path
+                                          "assets/images/Heart Angle.png",
                                           height: 24,
                                           width: 24,
-                                          color: Colors.white, // agar white chahiye
+                                          color: Colors.white,
                                         ),
                                       ),
 

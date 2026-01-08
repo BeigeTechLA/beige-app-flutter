@@ -79,23 +79,23 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       });
     }
   }
-
-
   Future<void> _pickFeaturedMedia(Function setModalState) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
-      allowMultiple: true,
+      allowMultiple: false, // 🔥 IMPORTANT
     );
 
-    if (result != null) {
+    if (result != null && result.files.single.path != null) {
       setModalState(() {
-        featuredImages = result.files
-            .where((f) => f.path != null)
-            .map((f) => File(f.path!))
-            .toList();
+        featuredImages = [File(result.files.single.path!)];
+        featuredFile = featuredImages.first;
       });
+
+      setState(() {});
     }
   }
+
+
 
 /*
   Future<void> _pickFeaturedMedia(Function setModalState) async {
@@ -154,7 +154,16 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     return ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext);
   }
 
+  String normalizeUrl(String url) {
+    final trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return 'https://$trimmed';
+  }
+
   Future<void> _fetchSingup3() async {
+    /// ✅ BASIC VALIDATION
     if (widget.crewMemberId == null) {
       _showSnack("Crew member id missing");
       return;
@@ -165,61 +174,57 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       return;
     }
 
-   if (featuredImages.isEmpty || featuredFile == null) {
-     _showSnack("Please upload featured work");
-     return;
-   }
+    if (featuredFile == null) {
+      _showSnack("Please upload featured work");
+      return;
+    }
 
     setState(() => isLoggingIn = true);
 
+    /// ✅ SOCIAL LINKS (SAFE FORMAT)
     final socialLinks = savedLinks.map((e) {
       return {
         "platform": e['name'].toString().toLowerCase(),
-        "url": e['url'],
+        "url": normalizeUrl(e['url'].toString()),
       };
     }).toList();
 
+    /// ✅ FEATURED WORK (SINGLE FILE MATCH)
     final featuredWork = [
-    /*  {
-        "work_title": enter_work_titleController.text.trim(),
-        "tags": selectedTags,
-      }*/
       {
-        "work_title": "Wedding Shoot",
-        "tags": ["cinematography", "drone"]
+        "work_title": enter_work_titleController.text.trim().isEmpty
+            ? "Featured Work"
+            : enter_work_titleController.text.trim(),
+        "tags": selectedTags.isEmpty ? ["creative"] : selectedTags,
       }
-
     ];
 
+    /// ✅ CERTIFICATIONS (TEXT ONLY – BACKEND SAFE)
     final certifications = [
-      "Certified Cinematographer – XYZ Institute",
-      "Drone Pilot License – DGCA",
+      "Certified Cinematographer",
+      "Drone Pilot License",
     ];
 
+    /// ✅ FINAL PAYLOAD
     final payload = {
       "crew_member_id": widget.crewMemberId.toString(),
       "certifications": jsonEncode(certifications),
       "social_media_links": jsonEncode(socialLinks),
       "featured_work": jsonEncode(featuredWork),
+      "recent_work_media_index": "0",
     };
 
-    /// 🔥 DEBUG PRINTS (LIKE POSTMAN)
+    /// 🔍 DEBUG
     debugPrint("========== SIGNUP STEP-3 REQUEST ==========");
-    payload.forEach((key, value) {
-      debugPrint("$key : $value");
-    });
-
-    debugPrint("📁 FEATURED FILE:");
-    debugPrint("Path: ${featuredFile!.path}");
-    debugPrint("Name: ${featuredFile!.path.split('/').last}");
-    debugPrint("Size: ${featuredFile!.lengthSync()} bytes");
+    payload.forEach((k, v) => debugPrint("$k : $v"));
+    debugPrint("FILE → ${featuredFile!.path}");
     debugPrint("==========================================");
 
     try {
       final response = await ApiService().postMultipart(
         ApiEndpoints.register_step3,
         payload,
-          featuredFile
+        featuredFile, // MUST MAP TO `recent_work_media`
       );
 
       debugPrint("📥 API RESPONSE: $response");
@@ -231,11 +236,12 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       }
     } catch (e) {
       debugPrint("❌ API ERROR: $e");
-      _showSnack("Something went wrong");
+      _showSnack("Server error. Please try again");
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
+
 
 
 
@@ -914,243 +920,263 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            color: ColorCode.bcakgroundcolor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, // 🔥 keyboard height
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// HEADER
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: ColorCode.bcakgroundcolor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Add Social Links",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+
+
+                  /// 🔘 TOP DRAG INDICATOR
+                  Center(
+                    child: Container(
+                      height: 4,
+                      width: 40,
+                      margin:  EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
-                  )
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              const Text(
-                "Add links that showcase your work, recognition,\npersonality and more!",
-                style: TextStyle(
-                  color: ColorCode.kWhiteOpacity70,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-  Divider(color: ColorCode.kDividerWhite12,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _socialImage(index: 0, imagePath: "assets/Icons/facebook.png"),
-                  _socialImage(index: 1, imagePath: "assets/Icons/ins.png"),
-                  _socialImage(index: 2, imagePath: "assets/Icons/tick_tok.png"),
-                  _socialImage(index: 3, imagePath: "assets/Icons/Vector.png"),
-                  _socialImage(index: 4, imagePath: "assets/Icons/webside.png"),
-                ],
-              ),
-
-
-
-              const SizedBox(height: 20),
-              _buildField("Name of the Link", nameLinkController),
-              const SizedBox(height: 12),
-              _buildField("Link URL", linkController),
-
-              const SizedBox(height: 20),
-              if (savedLinks.isNotEmpty) ...[
-                const SizedBox(height: 12),
-
-                Column(
-                  children: savedLinks.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white24),
-                        color: Colors.black26,
+                  /// HEADER
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Add Social Links",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          /// ICON
-                          Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              color: ColorCode.kButtonColor.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              item['icon'],
-                              color: ColorCode.kButtonColor,
-                            ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close, color: Colors.white),
+                      )
+                    ],
+                  ),
+            
+                  const SizedBox(height: 10),
+            
+                  const Text(
+                    "Add links that showcase your work, recognition,\npersonality and more!",
+                    style: TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+                    ),
+                  ),
+            
+                  const SizedBox(height: 16),
+              Divider(color: ColorCode.kDividerWhite12,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _socialImage(index: 0, imagePath: "assets/Icons/facebook.png"),
+                      _socialImage(index: 1, imagePath: "assets/Icons/ins.png"),
+                      _socialImage(index: 2, imagePath: "assets/Icons/tick_tok.png"),
+                      _socialImage(index: 3, imagePath: "assets/Icons/Vector.png"),
+                      _socialImage(index: 4, imagePath: "assets/Icons/webside.png"),
+                    ],
+                  ),
+            
+            
+            
+                  const SizedBox(height: 20),
+                  _buildField("Name of the Link", nameLinkController),
+                  const SizedBox(height: 12),
+                  _buildField("Link URL", linkController),
+            
+                  const SizedBox(height: 20),
+                  if (savedLinks.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+            
+                    Column(
+                      children: savedLinks.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final item = entry.value;
+            
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white24),
+                            color: Colors.black26,
                           ),
-
-                          const SizedBox(width: 12),
-
-                          /// NAME + URL
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item['name'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          child: Row(
+                            children: [
+                              /// ICON
+                              Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  color: ColorCode.kButtonColor.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  item['url'],
-                                  style: const TextStyle(
-                                    color: ColorCode.kWhiteOpacity70,
-                                    fontSize: 12,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                child: Icon(
+                                  item['icon'],
+                                  color: ColorCode.kButtonColor,
                                 ),
-                              ],
-                            ),
-                          ),
-
-                          /// ✏️ EDIT
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.white70, size: 20),
-                            onPressed: () {
-                              setState(() {
-                                editingIndex = index;
-                                nameLinkController.text = item['name'];
-                                linkController.text = item['url'];
-                                selectedSocialIndex =
-                                    socialIcons.indexOf(item['icon']);
-                              });
-
-                              _openSocialSheet();
-                            },
-                          ),
-
-                          /// 🗑 DELETE
-                          InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              setState(() {
-                                savedLinks.removeAt(index); // ✅ DELETE INSTANT
-                              });
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(6),
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.redAccent,
-                                size: 20,
                               ),
+            
+                              const SizedBox(width: 12),
+            
+                              /// NAME + URL
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['name'],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item['url'],
+                                      style: const TextStyle(
+                                        color: ColorCode.kWhiteOpacity70,
+                                        fontSize: 12,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+            
+                              /// ✏️ EDIT
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.white70, size: 20),
+                                onPressed: () {
+                                  setState(() {
+                                    editingIndex = index;
+                                    nameLinkController.text = item['name'];
+                                    linkController.text = item['url'];
+                                    selectedSocialIndex =
+                                        socialIcons.indexOf(item['icon']);
+                                  });
+            
+                                  _openSocialSheet();
+                                },
+                              ),
+            
+                              /// 🗑 DELETE
+                              InkWell(
+                                borderRadius: BorderRadius.circular(20),
+                                onTap: () {
+                                  setState(() {
+                                    savedLinks.removeAt(index); // ✅ DELETE INSTANT
+                                  });
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(6),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.redAccent,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+            
+            
+                    /// ➕ ADD ANOTHER LINK
+                   /* InkWell(
+                      onTap: _openSocialSheet,
+                      child: Row(
+                        children: const [
+                          Icon(Icons.add, color: ColorCode.kButtonColor),
+                          SizedBox(width: 6),
+                          Text(
+                            "Add another link",
+                            style: TextStyle(
+                              color: ColorCode.kButtonColor,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
-                    );
-                  }).toList(),
-                ),
-
-
-                /// ➕ ADD ANOTHER LINK
-               /* InkWell(
-                  onTap: _openSocialSheet,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.add, color: ColorCode.kButtonColor),
-                      SizedBox(width: 6),
-                      Text(
-                        "Add another link",
+                    ),*/
+                  ],
+            
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorCode.kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (nameLinkController.text.isEmpty ||
+                            linkController.text.isEmpty ||
+                            selectedSocialIndex == -1) return;
+            
+                        setState(() {
+                          if (editingIndex != null) {
+                            /// ✏️ UPDATE EXISTING
+                            savedLinks[editingIndex!] = {
+                              "name": nameLinkController.text,
+                              "url": linkController.text,
+                              "icon": socialIcons[selectedSocialIndex],
+                            };
+                          } else {
+                            /// ➕ ADD NEW
+                            savedLinks.add({
+                              "name": nameLinkController.text,
+                              "url": linkController.text,
+                              "icon": socialIcons[selectedSocialIndex],
+                            });
+                          }
+                        });
+            
+                        /// CLEAR
+                        nameLinkController.clear();
+                        linkController.clear();
+                        selectedSocialIndex = -1;
+                        editingIndex = null;
+            
+                        Navigator.pop(context);
+                      },
+            
+            
+            
+                      child: const Text(
+                        "Save",
                         style: TextStyle(
-                          color: ColorCode.kButtonColor,
+                          color: Colors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
-                  ),
-                ),*/
-              ],
-
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  onPressed: () {
-                    if (nameLinkController.text.isEmpty ||
-                        linkController.text.isEmpty ||
-                        selectedSocialIndex == -1) return;
-
-                    setState(() {
-                      if (editingIndex != null) {
-                        /// ✏️ UPDATE EXISTING
-                        savedLinks[editingIndex!] = {
-                          "name": nameLinkController.text,
-                          "url": linkController.text,
-                          "icon": socialIcons[selectedSocialIndex],
-                        };
-                      } else {
-                        /// ➕ ADD NEW
-                        savedLinks.add({
-                          "name": nameLinkController.text,
-                          "url": linkController.text,
-                          "icon": socialIcons[selectedSocialIndex],
-                        });
-                      }
-                    });
-
-                    /// CLEAR
-                    nameLinkController.clear();
-                    linkController.clear();
-                    selectedSocialIndex = -1;
-                    editingIndex = null;
-
-                    Navigator.pop(context);
-                  },
-
-
-
-                  child: const Text(
-                    "Save",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+            
+            
+                ],
               ),
-
-
-            ],
+            
+            
+            ),
           ),
-
-
         );
 
 

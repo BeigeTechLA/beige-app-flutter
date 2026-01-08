@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:beige/MyProfile/my_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../utility/ColorCode.dart';
 
@@ -10,6 +14,25 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
+
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery, // ✅ open gallery
+      imageQuality: 80,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,10 +64,10 @@ class _EditProfileState extends State<EditProfile> {
                 left: 16,
                 child:  InkWell(
                   onTap: () {
-                    /*  Navigator.pushReplacement(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
-                      );*/
+                        MaterialPageRoute(builder: (_) => MyProfile()),
+                      );
                   },
                   child: Image.asset("assets/Icons/Reply.png", height: 24,color: ColorCode.kHeadingColor,),
                 ),
@@ -76,50 +99,63 @@ class _EditProfileState extends State<EditProfile> {
                 child: Center(
                   child: Stack(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const CircleAvatar(
-                          radius: 48,
-                          backgroundImage:
-                          AssetImage("assets/Icons/profile.png"),
+                      InkWell(
+                        onTap: () {
+                          debugPrint("✏️ Edit icon clicked");
+                          _pickImage();
+                        },
+                        child: Container(
+                          padding:  EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: CircleAvatar(
+                            radius: 48,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: _profileImage != null
+                                ? FileImage(_profileImage!)
+                                :  AssetImage("assets/Icons/profile.png"),
+                          ),
+
+
+
                         ),
                       ),
                       Positioned(
-                        bottom: 2,
+                        bottom: 5,
                         right: 2,
-                        child: GestureDetector(
-                          onTap: () {
-                           /* Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>  EditProfile(),
+                        child: InkWell(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque, // 🔥 extra safety
+                            onTap: () {
+                              debugPrint("✏️ Edit icon clicked");
+                              _pickImage();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 4,
+                                  ),
+                                ],
                               ),
-                            );*/
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: Colors.black,
+                              child: const Icon(
+                                Icons.edit,
+                                size: 22,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
                       ),
+
+
+
 
                     ],
                   ),
@@ -371,7 +407,7 @@ class _EditProfileState extends State<EditProfile> {
             ),
             child:
             Text(
-              "Book Another Session",
+              "Update Profile",
               style: TextStyle(
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,

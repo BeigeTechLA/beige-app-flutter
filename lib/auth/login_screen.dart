@@ -127,6 +127,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
+  bool get isFormValid {
+    return emailController.text.trim().isNotEmpty &&
+        passwordController.text.trim().isNotEmpty &&
+        !isLoggingIn;
+  }
+  @override
+  void initState() {
+    super.initState();
+
+    emailController.addListener(() {
+      setState(() {});
+    });
+
+    passwordController.addListener(() {
+      setState(() {});
+    });
+  }
 
 
 
@@ -248,20 +265,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: savePassword && !isLoggingIn
-                      ? () {
-                    debugPrint("🖱 LOGIN BUTTON PRESSED");
-                    _fetchLogin();
-                  }
-                      : null,
+                  onPressed: isFormValid ? _fetchLogin : null,
 
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
                           (states) {
                         if (states.contains(MaterialState.disabled)) {
-                          return ColorCode.kCreamSoft; // ✅ your disabled color
+                          return ColorCode.kCreamSoft; // disabled color
                         }
-                        return ColorCode.kButtonColor; // ✅ enabled color
+                        return ColorCode.kButtonColor; // enabled color
                       },
                     ),
                     shape: MaterialStateProperty.all(
@@ -270,6 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+
                   child: isLoggingIn
                       ? const SizedBox(
                     height: 22,
@@ -285,13 +298,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontFamily: "Unbounded",
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: savePassword
+                      color: isFormValid
                           ? ColorCode.kHeadingColor
-                          : Colors.black54, // ✅ text disabled color
+                          : Colors.black54,
                     ),
                   ),
                 ),
               ),
+
 
 
 
