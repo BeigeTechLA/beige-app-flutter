@@ -72,6 +72,14 @@ class _UpcomingBookingEventSummaryState
     final date = DateTime.parse(isoTime).toLocal();
     return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
+  String getCreativeImage() {
+    final image = bookingData?['creative']?['profile_image_url'];
+    if (image == null || image.isEmpty) {
+      return "";
+    }
+    return ApiService().getImageURL(image);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +92,34 @@ class _UpcomingBookingEventSummaryState
 
             Stack(
               children: [
-                Image.asset(
-                  "assets/images/Rectangle 34661070.png",
-                  height: 360,
-                  width: double.infinity,
-                  fit: BoxFit.fill,
+                Image(
+                  fit: BoxFit.cover,
+                  image: (getCreativeImage().isNotEmpty)
+                      ? NetworkImage(getCreativeImage())
+                      :  AssetImage(
+                    "assets/images/Rectangle 34661070.png",
+                  ) as ImageProvider,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child; // ✅ image loaded
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white, // loader color
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(
+                      child: Icon(
+                        Icons.broken_image,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    );
+                  },
                 ),
+
 
                 Container(
                   height: 360,

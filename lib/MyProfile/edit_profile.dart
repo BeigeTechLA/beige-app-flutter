@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../utility/ColorCode.dart';
+import 'Change_Password_screen.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -246,48 +247,59 @@ class _EditProfileState extends State<EditProfile> {
             ),
                 SizedBox(height: 20,),
                 TextField(
-                  // controller: emailController,
-                    cursorColor: ColorCode.white,
 
-                    style: const TextStyle(
-                      color: ColorCode.white, // typed text color
+                  cursorColor: ColorCode.white,
+                  style: const TextStyle(
+                    color: ColorCode.white,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: "Email ID*",
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                  /*  suffixIcon: GestureDetector(
+                      onTap: () {
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChangePasswordScreen(),
+                          ),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.edit,
+                        color: ColorCode.kWhiteOpacity70,
+                        size: 20,
+                      ),
+                    ),*/
+
+                    labelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
                     ),
 
-                    decoration: InputDecoration(
-                      labelText: "Email ID*",
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
 
-                      labelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                      ),
-
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
-
-                      /// ⭐ 0.5px BORDER + OPACITY COLOR
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                       // 🔥 exact 0.5px
-                        ),
-                      ),
-
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                          // focus border thicker
-                        ),
-                      ),
-
-                      floatingLabelStyle: const TextStyle(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
                         color: ColorCode.kWhiteOpacity70,
-                      ),)
+                        width: 0.5,
+                      ),
+                    ),
 
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70,
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
                 ),
+
                 SizedBox(height: 20,),
                 TextField(
                   // controller: emailController,
@@ -310,7 +322,6 @@ class _EditProfileState extends State<EditProfile> {
                         vertical: 18,
                       ),
 
-                      /// ⭐ 0.5px BORDER + OPACITY COLOR
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
@@ -348,13 +359,28 @@ class _EditProfileState extends State<EditProfile> {
                       labelStyle: const TextStyle(
                         color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
                       ),
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChangePasswordScreen(),
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                          color: ColorCode.kWhiteOpacity70,
+                          size: 20,
+                        ),
+                      ),
 
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 18,
                       ),
 
-                      /// ⭐ 0.5px BORDER + OPACITY COLOR
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:beige/MainScreen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../service/api_endpoints.dart';
@@ -33,11 +34,10 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
 
   bool isLoggingIn =false;
 
+
   File? documentFile;
-  File? resumeFile;
   File? portfolioFile;
-  File? certificateFile;
-  File? recentWorkFile;
+
 
   IconData? selectedIcon;
   Color? selectedColor;
@@ -46,8 +46,10 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
   List<Map<String, dynamic>> savedLinks = [];
   List<PlatformFile> featuredFiles = [];
   List<bool> featuredIsVideo = [];
-
   List<File> featuredImages = [];
+  bool isSubmitting = false;
+  List<File> tempFeaturedImages = [];
+
   bool isPicking = false;
   List<File> certificateFiles = [];
 
@@ -79,48 +81,22 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       });
     }
   }
-  Future<void> _pickFeaturedMedia(Function setModalState) async {
+  Future<void> pickFeaturedImages(Function setModalState) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
-      allowMultiple: false, // 🔥 IMPORTANT
+      allowMultiple: true,
     );
 
-    if (result != null && result.files.single.path != null) {
+    if (result != null) {
       setModalState(() {
-        featuredImages = [File(result.files.single.path!)];
-        featuredFile = featuredImages.first;
-      });
-
-      setState(() {});
-    }
-  }
-
-
-
-/*
-  Future<void> _pickFeaturedMedia(Function setModalState) async {
-    if (isPicking) return;
-    isPicking = true;
-
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: true, // 🔥 MULTIPLE
-    );
-
-    if (result != null && result.files.isNotEmpty) {
-      setModalState(() {
-        featuredImages = result.files
-            .where((f) => f.path != null)
-            .map((f) => File(f.path!))
+        tempFeaturedImages = result.paths
+            .where((e) => e != null)
+            .map((e) => File(e!))
             .toList();
       });
-
-      setState(() {});
     }
-
-    isPicking = false;
   }
-*/
+
 
   Future<void> _pickDocument() async {
     final result = await FilePicker.platform.pickFiles(
@@ -134,7 +110,6 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       });
     }
   }
-
 
   Future<void> _pickPortfolio() async {
     final result = await FilePicker.platform.pickFiles(
@@ -163,33 +138,25 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
   }
 
   Future<void> _fetchSingup3() async {
-    /// ✅ BASIC VALIDATION
     if (widget.crewMemberId == null) {
       _showSnack("Crew member id missing");
       return;
     }
 
-    if (savedLinks.isEmpty) {
-      _showSnack("Please add at least one social link");
-      return;
-    }
-
-    if (featuredFile == null) {
+    if (featuredImages.isEmpty) {
       _showSnack("Please upload featured work");
       return;
     }
 
     setState(() => isLoggingIn = true);
 
-    /// ✅ SOCIAL LINKS (SAFE FORMAT)
     final socialLinks = savedLinks.map((e) {
       return {
         "platform": e['name'].toString().toLowerCase(),
-        "url": normalizeUrl(e['url'].toString()),
+        "url": normalizeUrl(e['url']),
       };
     }).toList();
 
-    /// ✅ FEATURED WORK (SINGLE FILE MATCH)
     final featuredWork = [
       {
         "work_title": enter_work_titleController.text.trim().isEmpty
@@ -199,51 +166,37 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       }
     ];
 
-    /// ✅ CERTIFICATIONS (TEXT ONLY – BACKEND SAFE)
-    final certifications = [
-      "Certified Cinematographer",
-      "Drone Pilot License",
+    final certificationText = [
+      "Certified Cinematographer – XYZ Institute",
+      "Drone Pilot License – DGCA",
     ];
 
-    /// ✅ FINAL PAYLOAD
     final payload = {
       "crew_member_id": widget.crewMemberId.toString(),
-      "certifications": jsonEncode(certifications),
+      "certifications": jsonEncode(certificationText),
       "social_media_links": jsonEncode(socialLinks),
       "featured_work": jsonEncode(featuredWork),
       "recent_work_media_index": "0",
     };
 
-    /// 🔍 DEBUG
-    debugPrint("========== SIGNUP STEP-3 REQUEST ==========");
-    payload.forEach((k, v) => debugPrint("$k : $v"));
-    debugPrint("FILE → ${featuredFile!.path}");
-    debugPrint("==========================================");
-
     try {
-      final response = await ApiService().postMultipart(
+      final res = await ApiService().postMultipart(
         ApiEndpoints.register_step3,
         payload,
-        featuredFile, // MUST MAP TO `recent_work_media`
+        featuredImages.first, // ⚠️ ONLY ONE FILE
       );
 
-      debugPrint("📥 API RESPONSE: $response");
-
-      if (response != null && response['error'] == false) {
+      if (res != null && res['error'] == false) {
         _showSnack("Signup Step-3 Completed 🎉");
       } else {
-        _showSnack(response?['message'] ?? "Signup failed");
+        _showSnack(res?['message'] ?? "Signup failed");
       }
     } catch (e) {
-      debugPrint("❌ API ERROR: $e");
-      _showSnack("Server error. Please try again");
+      _showSnack("Server error");
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
-
-
-
 
 
   void _showSnack(String message) {
@@ -411,137 +364,99 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                 const SizedBox(height: 20),
 
 
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: ColorCode.bcakgroundcolor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white24),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: ColorCode.bcakgroundcolor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              /// HEADER
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Featured Work",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
 
-                      /// TITLE
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Featured Work",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-
-                          if (featuredImages.isNotEmpty)
-                            InkWell(
-                              onTap: _featuredSheet,
-                              borderRadius: BorderRadius.circular(20),
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "Add another",
-                                    style: TextStyle(
-                                      color: Color(0xFFF4E1C1),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-
-
-                       SizedBox(height: 12),
-
-                      /// ADD / PREVIEW BOX
-                      const SizedBox(height: 12),
-
-                      GestureDetector(
-                        onTap: featuredImages.isEmpty ? _featuredSheet : null,
-                        child: featuredImages.isEmpty
-                            ? Container(
-                          height: 120,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white38),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add, color: Colors.white),
-                              SizedBox(width: 6),
-                              Text(
-                                "Add",
-                                style: TextStyle(color: Colors.white, fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        )
-
-                        /// 🔥 IMAGE PREVIEW MODE (NO BORDER)
-                            : SizedBox(
-                          height: 200,
-                          child: PageView.builder(
-                            controller: PageController(viewportFraction: 0.95),
-                            itemCount: featuredImages.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        child: Image.file(
-                                          featuredImages[index],
-                                          fit: BoxFit.fill,
-                                        ),
-                                      ),
-
-                                      /// OPTIONAL TITLE OVERLAY
-                                      Positioned(
-                                        left: 12,
-                                        bottom: 12,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(0.6),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: const Text(
-                                            "Featured Work",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
+                  InkWell(
+                    onTap: _featuredSheet,
+                    child: Row(
+                      children: const [
+                        Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
+                        SizedBox(width: 4),
+                        Text(
+                          "Add another",
+                          style: TextStyle(
+                            color: Color(0xFFF4E1C1),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
 
-                    ],
+              const SizedBox(height: 12),
+
+              /// EMPTY STATE
+              if (featuredImages.isEmpty)
+                GestureDetector(
+                  onTap: _featuredSheet,
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white38),
+                    ),
+                    child: const Center(
+                      child: Text("Add", style: TextStyle(color: Colors.white)),
+                    ),
                   ),
                 ),
 
+              /// 🔥 ROW IMAGE LIST (AFTER SAVE)
+              if (featuredImages.isNotEmpty)
+                SizedBox(
+                  height: 110,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: featuredImages.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 140,
+                        margin: const EdgeInsets.only(right: 10),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            featuredImages[index],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
 
 
 
-                SizedBox(height: 16),
+
+
+        SizedBox(height: 16),
 
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -734,12 +649,22 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: isLoggingIn
+                    onPressed: () {
+                     /* Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => Mainscreen(), // change screen name
+                        ),
+                      );*/
+                    }
+                    ,
+                  /*  onPressed:
+                    isLoggingIn
                         ? null
                         : () {
                       debugPrint("🟢 NEXT BUTTON CLICKED");
                       _fetchSingup3();
-                    },
+                    },*/
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorCode.kButtonColor,
                       shape: RoundedRectangleBorder(
@@ -1434,68 +1359,91 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                       ),
                     ),*/
 
-                    GestureDetector(
-                      onTap: () => _pickFeaturedMedia(setModalState),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white24),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: featuredImages.isEmpty
-                            ? Column(
-                          children: const [
-                            Icon(Icons.upload, color: Colors.white, size: 28),
-                            SizedBox(height: 10),
-                            Text(
-                              "Upload images",
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              "You can select multiple images\n(Max 10MB each)",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        )
-                            : GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: featuredImages.length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                          ),
-                          itemBuilder: (context, index) {
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                featuredImages[index],
-                                fit: BoxFit.cover, // 🔥 FULL IMAGE
-                              ),
-                            );
-                          },
-                        ),
+                GestureDetector(
+                  onTap: () => pickFeaturedImages(setModalState),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white24,
+                        style: BorderStyle.solid, // agar dashed chahiye to custom painter lagega
                       ),
                     ),
+                    child: tempFeaturedImages.isEmpty
+                        ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.upload,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                        SizedBox(height: 12),
+
+                        /// MAIN TEXT
+                        Text(
+                          "Upload new image, video, or browse",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+
+                        SizedBox(height: 8),
+
+                        /// HELPER TEXT (👇 YE TUM CHAHTE THE)
+                        Text(
+                          "Choose a file in a 4:3, 5:4, 9:16, or 16:9 aspect ratio.\n"
+                              "Max 10MB (images), 500MB (videos).",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            color: Colors.white70,
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    )
+
+                    /// 🔥 PREVIEW MODE (ROW)
+                        : SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: tempFeaturedImages.length,
+                        itemBuilder: (_, index) {
+                          return Container(
+                            width: 130,
+                            margin: const EdgeInsets.only(right: 10),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                tempFeaturedImages[index],
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
 
 
-                    SizedBox(height: 16),
+
+
+
+                SizedBox(height: 16),
 
                     /// 🏷️ ADD TAGS
                     GestureDetector(
-                       // onTap: _openAddTagSheet,
+                        // onTap: _openAddTagSheet,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -1537,6 +1485,11 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                           ),
                         ),
                         onPressed: () {
+                          setState(() {
+                            featuredImages.addAll(tempFeaturedImages);
+                          });
+
+                          tempFeaturedImages.clear();
                           Navigator.pop(context);
                         },
                         child: const Text(

@@ -23,6 +23,9 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   double selectedHour = 16;
   bool isLoading =false;
 
+  Map<String, dynamic>? booking;
+  Map<String, dynamic>? timeSlot;
+
   DateTime? selectedDate;
 
 
@@ -79,6 +82,103 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
 
   String formatTime24(TimeOfDay time) {
     return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+  }
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReview();
+
+  }
+  Future<void> _fetchReview() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/review",
+      );
+
+      if (response != null && response['error'] == false) {
+        booking = response['data']['booking'];
+        timeSlot = response['data']['time_slot'];
+
+        /// 📅 DATE
+        final apiDate = DateTime.parse(timeSlot!['event_date']);
+
+        /// ⏰ TIME (24 hour)
+        final startParts = timeSlot!['start_time'].split(":");
+        final endParts = timeSlot!['end_time'].split(":");
+
+        final startHour = int.parse(startParts[0]);
+        final endHour = int.parse(endParts[0]);
+
+        final duration =
+        endHour >= startHour ? endHour - startHour : (24 - startHour) + endHour;
+
+        setState(() {
+          selectedDates.clear();
+          selectedDates.add(
+            DateTime(apiDate.year, apiDate.month, apiDate.day),
+          );
+
+          selectedHour = duration.toDouble();
+          selectedTimeIndex = -1;
+          isCustomSelected = true;
+        });
+
+        /// 🔥 IMPORTANT LINE (THIS WAS MISSING)
+        matchFixedSlot(startHour, endHour);
+
+        debugPrint("✅ Review Data Applied");
+        debugPrint("Date: $apiDate");
+        debugPrint("Start Hour: $startHour");
+        debugPrint("End Hour: $endHour");
+        debugPrint("Duration: $duration h");
+      }
+    } catch (e) {
+      debugPrint("❌ Review API Exception: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  void matchFixedSlot(int startHour, int endHour) {
+    for (int i = 0; i < timeSlots.length; i++) {
+      final slot = timeSlots[i];
+      final parts = slot.split(" - ");
+
+      final slotStart = to24Hour(parts[0]); // ✅ FIXED
+      final slotEnd   = to24Hour(parts[1]); // ✅ FIXED
+
+      if (slotStart == startHour && slotEnd == endHour) {
+        setState(() {
+          selectedTimeIndex = i;
+          isCustomSelected = false;
+        });
+        return;
+      }
+    }
+
+    /// ❗ no fixed slot matched → custom
+    setState(() {
+      isCustomSelected = true;
+      selectedTimeIndex = -1;
+    });
+  }
+
+  int to24Hour(String time) {
+    final parts = time.split(" ");
+    final hm = parts[0].split(":");
+    int hour = int.parse(hm[0]);
+    final period = parts[1];
+
+    if (period == "PM" && hour != 12) hour += 12;
+    if (period == "AM" && hour == 12) hour = 0;
+
+    return hour;
   }
 
 
@@ -167,7 +267,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => BookinReviewConfirm()),
+        MaterialPageRoute(builder: (_) => BookinReviewConfirm(bookingId: widget.bookingId,)),
       );
     } catch (e) {
       debugPrint("TIME API ERROR => $e");
@@ -175,10 +275,6 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
       setState(() => isLoading = false);
     }
   }
-
-
-
-
 
 
   @override

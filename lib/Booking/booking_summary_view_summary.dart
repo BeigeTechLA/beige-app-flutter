@@ -1,3 +1,4 @@
+import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 import '../utility/ColorCode.dart';
 
@@ -392,12 +393,12 @@ class _BookingSummaryDetailsState extends State<BookingSummaryDetails> {
           height: 55,
           child: ElevatedButton(
             onPressed: () {
-              /* Navigator.push(
+               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddOnServices(),
+                  builder: (context) => Mainscreen(),
                 ),
-              );*/
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorCode.kButtonColor,

@@ -198,17 +198,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   GestureDetector(
-                    onTap: () => setState(() => savePassword = !savePassword),
+                    onTap: () {
+                      setState(() {
+                        savePassword = !savePassword;
+                      });
+                    },
                     child: Container(
-                      height: 18,
-                      width: 18,
+                      height: 20,
+                      width: 20,
                       decoration: BoxDecoration(
-                        color: savePassword ? ColorCode.kButtonColor : Colors.black,
+                        color: savePassword
+                            ? ColorCode.black
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: ColorCode.kWhiteOpacity70),
+                        border: Border.all(
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
                       ),
                       child: savePassword
-                          ? const Icon(Icons.check, size: 14, color: ColorCode.black)
+                          ? const Icon(Icons.check,
+                          size: 14, color: ColorCode.kButtonColor)
                           : null,
                     ),
                   ),
@@ -269,8 +278,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: isLoggingIn ? null : _fetchSingup,
                   style: ElevatedButton.styleFrom(
                       backgroundColor: isFormValid
-                          ? ColorCode.kButtonColor   // ✅ Active color
-                          : ColorCode.kGold40,
+                          ? ColorCode.kCreamSoft   // ✅ Active color
+                          : ColorCode.kButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -309,7 +318,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        MaterialPageRoute(builder: (_) =>  LoginScreen()),
                       );
                     },
                     child: const Text(

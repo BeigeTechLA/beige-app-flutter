@@ -78,7 +78,7 @@ class _UpcomingEventSummaryManagebookingState
                   /// 🔹 HEADER
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children:  [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -103,7 +103,13 @@ class _UpcomingEventSummaryManagebookingState
                           ),
                         ],
                       ),
-                      Icon(Icons.close, color: Colors.white),
+                      IconButton(
+                        icon:  Icon(Icons.close, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      )
+
                     ],
                   ),
 

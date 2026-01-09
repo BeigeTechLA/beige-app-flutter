@@ -2,11 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'booking_summary_view_summary.dart';
 
 class BookinReviewConfirm extends StatefulWidget {
-  const BookinReviewConfirm({super.key});
+  final int bookingId;
+
+  const BookinReviewConfirm({super.key, required this.bookingId});
 
   @override
   State<BookinReviewConfirm> createState() => _BookinReviewConfirmState();
@@ -16,10 +20,151 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   bool payFullAdvance = true;
   int selectedPayment = 0;
   int selectedIndex = 0;
+bool loding =true;
+
+
+
+  List<dynamic> savedCards = [];
+  bool hasSavedCard = false;
+
+
+
+
+
+
+  final TextEditingController NotesController = TextEditingController();
+
+
+  Map<String, dynamic>? summaryData;
+
+  Map<String, dynamic>? creative;
+  Map<String, dynamic>? booking;
+  Map<String, dynamic>? totals;
+  List<dynamic> addons = [];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetch_book_summary();
+  }
+
+  Future<void> _fetch_book_summary() async {
+    setState(() => loding = true);
+    print("🟢 FETCH BOOK SUMMARY START");
+
+    try {
+      final url =
+          "${ApiEndpoints.booking_select}/${widget.bookingId}/summary";
+      print("➡️ API URL: $url");
+
+      final response = await ApiService().fetchData(url);
+
+      print("📥 FULL API RESPONSE:");
+      print(response);
+
+      if (response == null) {
+        print("❌ RESPONSE IS NULL");
+        return;
+      }
+
+      print("ℹ️ ERROR FLAG: ${response['error']}");
+      print("ℹ️ MESSAGE: ${response['message']}");
+
+      if (response['error'] == false) {
+        final data = response['data'] ?? {};
+        print("📦 DATA OBJECT:");
+        print(data);
+
+        creative = data['creative'];
+        booking = data['booking'];
+        totals = data['totals'];
+        addons = data['addons'] ?? [];
+        savedCards = data['saved_cards'] ?? [];
+        hasSavedCard = savedCards.isNotEmpty;
+
+        /// 🔥 FIND DEFAULT CARD
+        if (hasSavedCard) {
+          final defaultCard = savedCards.firstWhere(
+                (card) => card['is_default'] == true,
+            orElse: () => savedCards.first,
+          );
+
+        }
+
+        debugPrint("💳 HAS SAVED CARD: $hasSavedCard");
+        print("✅ CREATIVE:");
+        print(creative);
+
+        print("✅ BOOKING:");
+        print(booking);
+
+        print("✅ TOTALS:");
+        print(totals);
+
+        print("✅ ADDONS:");
+        print(addons);
+      } else {
+        print("❌ API RETURNED ERROR");
+      }
+    } catch (e) {
+      print("🔥 EXCEPTION OCCURRED:");
+      print(e);
+    } finally {
+      setState(() => loding = false);
+      print("🛑 FETCH BOOK SUMMARY END");
+    }
+  }
+
+  Future<void> confirm_reschedule() async {
+    setState(() => loding = true);
+
+    try {
+      print(
+        "➡️ API URL: ${ApiEndpoints.booking}/${widget.bookingId}/confirm-reschedule",
+      );
+
+      final response = await ApiService().postData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/confirm-reschedule",
+        {}, // empty body
+      );
+
+      print("📥 FULL API RESPONSE:");
+      print(response);
+
+      if (response == null) {
+        print("❌ RESPONSE IS NULL");
+        return;
+      }
+
+      if (response['error'] == false) {
+        // ✅ SUCCESS
+        showScheduleUpdatedDialog(context);
+      } else {
+        // ❌ API ERROR
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'] ?? "Something went wrong")),
+        );
+      }
+    } catch (e) {
+      print("🔥 EXCEPTION OCCURRED:");
+      print(e);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Network error")),
+      );
+    } finally {
+      setState(() => loding = false);
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
+
+
       appBar: AppBar(
         backgroundColor: ColorCode.bcakgroundcolor,
         elevation: 0,
@@ -110,13 +255,14 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children:  [
                               Row(
                                 children: [
                                   Icon(Icons.star, size: 14, color: Colors.amber),
                                   SizedBox(width: 4),
                                   Text(
-                                    "4.5 (120)",
+                                    "${creative?['average_rating'] ?? 0} "
+                                        "(${creative?['total_reviews'] ?? 0})",
                                     style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
                                       fontFamily: "Outfit",
                                     ),
@@ -125,7 +271,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                "Angela Kia",
+                                creative?['name'] ?? '',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -196,17 +342,18 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                         children: [
                           infoRowBlack(
                             Icons.access_time,
-                            "01:30 AM to 03:30 AM (1h duration)",
+                            "${booking?['start_time']} - ${booking?['end_time']} "
+                                "(${booking?['duration_hours']}h)",
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.calendar_month,
-                            "Apr 01, 2025 - Apr 04, 2025",
+                            booking?['event_date'] ?? '--',
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
                             Icons.location_on,
-                            "2458 Sunset Boulevard, Los Angeles, CA 90026",
+                            booking?['event_location'] ?? '--',
                           ),
                         ],
                       ),
@@ -320,149 +467,38 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               ),
               SizedBox(height: 8),
               Container(
-                padding:  EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color:  ColorCode.k282828,
+                  color: ColorCode.k282828,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// 🔹 BASE PACKAGE
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
-                          "Base Package (1 Hour)",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
-                          ),),
-                        Text(
-                          "\$ 450.00/-",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
-                          ),
-                        ),
-                      ],
+                    priceRow(
+                      "Base Package",
+                      "\$ ${totals?['base_amount'] ?? 0}.00/-",
                     ),
 
-                    const SizedBox(height: 6),
-
-                    /// 🔹 DISCOUNT
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
-                          "Early Bird Discount (10%)",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.green,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
-                          ),
-                        ),
-                        Text(
-                          "- \$45.00/-",
-                          style:    TextStyle(
-                              fontSize: 12,
-                              color: ColorCode.green,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: Container(
-                        height: 1,
-                        color: Colors.white.withOpacity(0.15),
+                    if ((totals?['addons_amount'] ?? 0) > 0)
+                      priceRow(
+                        "Add-ons",
+                        "\$ ${totals?['addons_amount']}.00/-",
                       ),
-                    ),
 
-
-                    const SizedBox(height: 10),
-
-                    /// 🔹 TOTAL
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Text(
-                          "Total",
-                          style:    TextStyle(
-                              fontSize: 16,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w600
-                          ),),
-                        Text(
-                          "\$ 450.00/-",
-                          style:    TextStyle(
-                              fontSize: 16,
-                              color: ColorCode.white,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w600
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    /// 🔹 GREEN PROTECTION BOX
-                    Container(
-                      padding:  EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color:  Color(0xFFD9F8C4),
-                        borderRadius: BorderRadius.circular(14),
+                    if ((totals?['discount_amount'] ?? 0) > 0)
+                      priceRow(
+                        "Discount",
+                        "- \$ ${totals?['discount_amount']}.00/-",
+                        isDiscount: true,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Icon(
-                            Icons.verified_user,
-                            color: Color(0xFF2E7D32),
-                            size: 20,
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Beige Project Protection",
-                                  style:    TextStyle(
-                                      fontSize: 16,
-                                      color: ColorCode.black,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w700
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "Your payment is protected with Stripe’s secure encryption. Funds are only released when you’re satisfied.",
-                                  style:    TextStyle(
-                                      fontSize: 10,
-                                      color: ColorCode.black,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+
+                    const Divider(color: Colors.white30),
+
+                    priceRow(
+                      "Total",
+                      "\$ ${totals?['total_amount'] ?? 0}.00/-",
+                      isTotal: true,
                     ),
                   ],
                 ),
@@ -547,9 +583,10 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children:  [
                 Text(
-                  "\$405.00/-",
+                  "\$ ${totals?['total_amount'] ?? 0}.00/-",
+                  // "\$ ${totals?['total_amount'] ?? 0}.00/-",
                   style: TextStyle(
                     fontFamily: "Unbounded",
                     fontSize: 16,
@@ -559,7 +596,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  "01 Services | 11 Hours",
+                  "${booking?['service_count'] ?? 0} Services | ${booking?['duration_hours'] ?? 0} Hours",
                   style: TextStyle(
                     fontFamily: "Outfit",
                     fontSize: 12,
@@ -577,9 +614,10 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               child: SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    showScheduleUpdatedDialog(context);
+                  onPressed: () async {
+                    await confirm_reschedule();
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorCode.kButtonColor,
                     elevation: 0,

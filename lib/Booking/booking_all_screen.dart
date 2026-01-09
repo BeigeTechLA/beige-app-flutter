@@ -690,6 +690,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         time: "${shoot['start_time']} - ${shoot['end_time']}",
         hours: shoot['duration_hours'],
         location: shoot['location'],
+        showEditIcon: true, // ✅ UPCOMING ME SHOW
+
         buttonText: "Manage Booking",
         onButtonTap: () {
           Navigator.push(
@@ -725,6 +727,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       date: shoot['event_date'],
       time: "${shoot['start_time']} - ${shoot['end_time']}",
       buttonText: "Book Again",
+
+      showEditIcon: false,
       onButtonTap: () {},
     );
   }
@@ -740,6 +744,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     String? location,
     required String buttonText,
     required VoidCallback onButtonTap,
+    bool showEditIcon = false, // 👈 NEW FLAG
+    VoidCallback? onEditTap,
   }) {
     final isNetwork = imagePath.startsWith("http");
 
@@ -795,28 +801,48 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                      ),
                   ),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: SizedBox(
-                      height: 45,
-                      child: ElevatedButton(
-                        onPressed: onButtonTap,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorCode.kButtonColor,
-                        ),
-                        child: Text(
-                          buttonText,
-                          style:
-                          TextStyle(
-                              color: ColorCode.kHeadingColor,
-                              fontFamily: "Outfit",
-                              fontSize: 16 ,
-                              fontWeight: FontWeight.w600
+                  Row(
+                    children: [
+                      /// 🔹 MAIN BUTTON
+                      Expanded(
+                        child: SizedBox(
+                          height: 45,
+                          child: ElevatedButton(
+                            onPressed: onButtonTap,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorCode.kButtonColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                            ),
+                            child: Text(
+                              buttonText,
+                              style: TextStyle(
+                                color: ColorCode.kHeadingColor,
+                                fontFamily: "Outfit",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+
+                      /// 🔹 EDIT IMAGE (ONLY IF UPCOMING)
+                      if (showEditIcon) ...[
+                        const SizedBox(width: 10),
+                        InkWell(
+                          onTap: onEditTap,
+                          child: Image.asset(
+                            "assets/Icons/Group 2087329022.png",
+                            height: 45,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+
+
                 ],
               ),
             ),
