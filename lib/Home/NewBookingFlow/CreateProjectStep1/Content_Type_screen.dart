@@ -193,7 +193,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("Back"),
+                      child: const Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
                     ),
                   ),
                   const SizedBox(width: 12),

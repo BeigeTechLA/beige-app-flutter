@@ -11,7 +11,7 @@ class VideoShootType extends StatefulWidget {
 
 class _VideoShootTypeState extends State<VideoShootType> {
 
-
+  int selectedIndex = -1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,6 +108,105 @@ class _VideoShootTypeState extends State<VideoShootType> {
                 ],
               ),
 
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 10,
+                  padding: const EdgeInsets.only(top: 12),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                        debugPrint("Selected index: $index");
+                      },
+                      child: Column(
+                        children: [
+
+                          /// 🔹 CARD
+                          Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: SizedBox(
+                              height: 250,
+                              width: double.infinity,
+                              child: Image.asset(
+                                "assets/newbookflow/Frame_2087328912.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// 🔹 TITLE + RADIO
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+
+                                Text(
+                                  "Corporate Event ${index + 1}",
+                                  style: TextStyle(
+                                    fontFamily: 'Outfit',
+                                    color: ColorCode.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+
+                                /// ✅ RADIO BUTTON
+                                Container(
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: selectedIndex == index
+                                        ? const LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Color(0xFFE8D1AB),
+                                        Color(0xFFD4A14D),
+                                      ],
+                                    )
+                                        : null,
+                                    border: Border.all(
+                                      color: ColorCode.kWhiteOpacity70,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: selectedIndex == index
+                                      ? Center(
+                                    child: Container(
+                                      height: 10,
+                                      width: 10,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  )
+                                      : const SizedBox(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    );
+                  },
+
+                ),
+              ),
+
+
 
 
             ],
@@ -121,38 +220,57 @@ class _VideoShootTypeState extends State<VideoShootType> {
         child: Row(
           children: [
             Expanded(
-              child: OutlinedButton(
+              child:  OutlinedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Back"),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.grey),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  debugPrint("Continue clicked");
+                onPressed: selectedIndex == -1
+                    ? null
+                    : () {
+                  debugPrint("Selected index: $selectedIndex");
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ShootDateTimeScreen(
-                        /*  specialtyId: widget.specialtyId,
-                              contentType: selectedContentType!,*/
-                      ),
+                      builder: (context) => ShootDateTimeScreen(),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorCode.kGoldGradientLight,
+                  backgroundColor: selectedIndex == -1
+                      ? ColorCode.kGoldGradientLight // disabled
+                      : ColorCode.kButtonColor, // enabled
+                  foregroundColor: selectedIndex == -1
+                      ? Colors.grey.shade400
+                      : Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: const Text(
                   "Continue",
                   style: TextStyle(
                     fontFamily: "Unbounded",
                     fontWeight: FontWeight.w500,
+                    fontSize: 14,
                   ),
                 ),
               ),
             ),
+
           ],
         ),
       ),
