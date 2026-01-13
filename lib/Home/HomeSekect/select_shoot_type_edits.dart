@@ -370,7 +370,6 @@ bool isLoading =false;
                       ),
                     ),
 
-                    // WHITE INNER DOT (ONLY WHEN SELECTED)
                     child: selectedValue == item
                         ? Center(
                       child: Container(
@@ -417,7 +416,7 @@ bool isLoading =false;
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontFamily: "Outfit",
                       fontSize: 16,
                       color: ColorCode.white,

@@ -218,7 +218,8 @@ class ApiService {
   }
 
   /// ✅ Image URL Builder
-  String getImageURL(String imagePath) {
+  String getImageURL
+      (String imagePath) {
     return imageURL + imagePath;
   }
 

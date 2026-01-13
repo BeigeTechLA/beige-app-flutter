@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 
 class FavouriteScreen extends StatefulWidget {
@@ -12,6 +14,55 @@ class FavouriteScreen extends StatefulWidget {
 class _FavouriteScreenState extends State<FavouriteScreen> {
 
   bool isFavourite = false;
+  bool isLoading = true;
+
+  List<dynamic> favourites = [];
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchfavourites();
+  }
+  Future<void> _fetchfavourites() async {
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.my_favourites);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          favourites = response['data'] ?? [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+  Future<void> _removeFavourite({   required int creatorId, required int index})  async {
+
+    try {
+      final response = await ApiService().deleteData(
+        "${ApiEndpoints.addfavourites}/$creatorId",
+      );
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          favourites.removeAt(index); // 🔥 CARD REMOVE
+        });
+
+        _showFavouriteToast("Removed from Favourite");
+      }
+    } catch (e) {
+      debugPrint("Remove Favourite Error: $e");
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +108,12 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             Expanded(
               child: ListView.builder(
                 padding:  EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 10,
+                itemCount: favourites.length,
                 itemBuilder: (context, index) {
+                  final item = favourites[index];
+                  bool isFav = item['is_favourite'] ?? false;
+                  final int creatorId = item['creator_id'];
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
@@ -66,15 +121,16 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       child: Stack(
                         children: [
                           /// 🔹 BACKGROUND IMAGE
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: Image.asset(
-                              "assets/images/home3.png",
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                          Image.network(
+                            ApiService().getImageURL(item['profile_image_url']),
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(child: CircularProgressIndicator());
+                            },
                           ),
+
 
                           /// 🔹 DARK BOTTOM GRADIENT
                           Positioned(
@@ -122,26 +178,20 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                             top: 12,
                             right: 12,
                             child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isFavourite = !isFavourite;
-                                });
-
-                                _showFavouriteToast(
-                                  isFavourite
-                                      ? "Added to Favourite"
-                                      : "Removed from Favourite",
+                              onTap: () async {
+                                await _removeFavourite(
+                                  creatorId: creatorId,
+                                  index: index,
                                 );
                               },
                               child: Image.asset(
-                                isFavourite
-                                    ? "assets/Icons/Heart_Angl_COLOR.png" // ❤️ selected
-                                    : "assets/images/Heart Angle.png",    // 🤍 unselected
+                                "assets/Icons/Heart_Angl_COLOR.png", // ❤️ always filled in Favourite screen
                                 height: 22,
                                 width: 22,
                               ),
                             ),
                           ),
+
 
 
 
@@ -155,12 +205,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                               children: [
                                 /// ⭐ RATING
                                 Row(
-                                  children: const [
-                                    Icon(Icons.star, color: Colors.yellow, size: 16),
-                                    SizedBox(width: 4),
+                                  children: [
+                                    const Icon(Icons.star, color: Colors.yellow, size: 16),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      "4.5 (120)",
-                                      style: TextStyle(
+                                      item['rating'] != null
+                                          ? "${item['rating']} (${item['total_reviews'] ?? 0})"
+                                          : "No ratings",
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         fontFamily: "Outfit",
                                         color: ColorCode.kWhiteOpacity70,
@@ -169,11 +221,12 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                   ],
                                 ),
 
+
                                 const SizedBox(height: 6),
 
                                 /// 👤 NAME
-                                const Text(
-                                  "Angela Kia",
+                                 Text(
+                                  item['name'] ?? '',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: "Outfit",
@@ -185,8 +238,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 const SizedBox(height: 2),
 
                                 /// 🎥 ROLE
-                                const Text(
-                                  "Videography Specialist",
+                                 Text(
+                                  item['primary_title'] ?? '',
+
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontFamily: "Outfit",
@@ -212,8 +266,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                     color: ColorCode.kButtonColor,
                                     borderRadius: BorderRadius.circular(22),
                                   ),
-                                  child: const Text(
-                                    "From \$450/Hr",
+                                  child:  Text(
+                                    "From \$${item['hourly_rate']}/Hr",
+
                                     style: TextStyle(
                                       fontFamily: "Outfit",
                                       color: ColorCode.kCircleGradientTop,

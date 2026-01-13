@@ -1,9 +1,13 @@
 import 'dart:io';
 
 import 'package:beige/MyProfile/my_profile.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'Change_Password_screen.dart';
 
@@ -16,12 +20,111 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
 
+  bool isLoading =true;
+
   File? _profileImage;
+  List<dynamic> myprofile = [];
+
+
+
   final ImagePicker _picker = ImagePicker();
+
+  String? profileImageUrl;
+
+  Map<String, dynamic>? myProfile;
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMyProfile();
+  }
+
+  Future<void> _fetchMyProfile() async {
+    debugPrint("🟢 MY PROFILE API CALL STARTED");
+
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.my_profile);
+
+      debugPrint("🟡 API RESPONSE: $response");
+
+      if (response != null && response['error'] == false) {
+        final user = response['data']['user'];
+
+        setState(() {
+          myProfile = user;
+
+          nameController.text = user['name'] ?? '';
+          emailController.text = user['email'] ?? '';
+          locationController.text = user['location'] ?? '';
+          profileImageUrl = user['profile_image_url'];
+
+
+          isLoading = false;
+        });
+
+        debugPrint("✅ PROFILE DATA SET IN TEXTFIELDS");
+      } else {
+        isLoading = false;
+      }
+    } catch (e) {
+      debugPrint("🚨 FETCH ERROR: $e");
+      isLoading = false;
+    }
+  }
+
+  Future<void> _edit_profile() async {
+    debugPrint("🟢 EDIT PROFILE API CALL STARTED");
+
+    try {
+      setState(() => isLoading = true);
+
+      final requestBody = {
+        "name": nameController.text.trim(),
+        "location": locationController.text.trim(),
+      };
+
+      debugPrint("📤 REQUEST BODY: $requestBody");
+
+      final response = await ApiService().putData(
+        ApiEndpoints.my_profile,
+        requestBody,
+      );
+
+      debugPrint("📥 API RESPONSE: $response");
+
+      if (response != null && response['error'] == false) {
+        debugPrint("✅ PROFILE UPDATED SUCCESSFULLY");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Profile updated successfully")),
+        );
+
+        // ✅ BACK TO PREVIOUS SCREEN
+        Navigator.pop(context, true);
+      } else {
+        debugPrint("❌ PROFILE UPDATE FAILED");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("❌ Profile update failed")),
+        );
+      }
+    } catch (e) {
+      debugPrint("🚨 API ERROR: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("🚨 Something went wrong")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery, // ✅ open gallery
+      source: ImageSource.gallery,
       imageQuality: 80,
     );
 
@@ -29,9 +132,87 @@ class _EditProfileState extends State<EditProfile> {
       setState(() {
         _profileImage = File(pickedFile.path);
       });
+
+      debugPrint("🟢 IMAGE PICKED: ${pickedFile.path}");
+
+      // ✅ IMAGE SELECT HOTE HI API CALL
+      await _uploadImage();
     }
   }
 
+  Future<void> _uploadImage() async {
+    if (_profileImage == null) {
+      debugPrint("❌ NO IMAGE FOUND");
+      return;
+    }
+
+    try {
+      setState(() => isLoading = true);
+
+      final fileName = _profileImage!.path.split('/').last;
+
+      debugPrint("🟡 START UPLOAD");
+      debugPrint("📁 FILE: $fileName");
+      debugPrint("🌐 API: ${ApiService().baseUrl}auth/profile-photo");
+
+      FormData formData = FormData.fromMap({
+        "profile_photo": await MultipartFile.fromFile(
+          _profileImage!.path,
+          filename: fileName,
+        ),
+      });
+
+      final dio = Dio();
+      final headers = await ApiService().createAuthorizationHeader();
+
+      debugPrint("🧾 HEADERS: $headers");
+
+      final response = await dio.post(
+        "${ApiService().baseUrl}auth/profile-photo",
+        data: formData,
+        options: Options(
+          headers: {
+            ...headers,
+            "Accept": "application/json",
+          },
+        ),
+      );
+
+      debugPrint("✅ API HIT");
+      debugPrint("📊 STATUS: ${response.statusCode}");
+      debugPrint("📦 RESPONSE: ${response.data}");
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Profile image uploaded")),
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ UPLOAD ERROR: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("❌ Upload failed")),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  ImageProvider getProfileImage() {
+    if (_profileImage != null) {
+      // ✅ User selected new image
+      return FileImage(_profileImage!);
+    }
+    else if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
+      // ✅ Image from API
+      return NetworkImage(
+        ApiService().getImageURL(profileImageUrl!),
+      );
+    }
+    else {
+      // ✅ Default image
+      return const AssetImage("assets/Icons/profile.png");
+    }
+  }
 
 
   @override
@@ -101,67 +282,51 @@ class _EditProfileState extends State<EditProfile> {
                   child: Stack(
                     children: [
                       InkWell(
-                        onTap: () {
-                          debugPrint("✏️ Edit icon clicked");
-                          _pickImage();
-                        },
+                        onTap: _pickImage, // ✅ PICK + UPLOAD
                         child: Container(
-                          padding:  EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(4),
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: CircleAvatar(
+                          child:/* CircleAvatar(
                             radius: 48,
                             backgroundColor: Colors.grey.shade200,
                             backgroundImage: _profileImage != null
                                 ? FileImage(_profileImage!)
-                                :  AssetImage("assets/Icons/profile.png"),
-                          ),
-
-
-
+                                : const AssetImage("assets/Icons/profile.png")
+                            as ImageProvider,
+                          ),*/
+                        CircleAvatar(
+                          radius: 48,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: getProfileImage(), // ✅ FIXED
+                        ),
                         ),
                       ),
+
+                      /// ✏️ EDIT ICON
                       Positioned(
                         bottom: 5,
                         right: 2,
-                        child: InkWell(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque, // 🔥 extra safety
-                            onTap: () {
-                              debugPrint("✏️ Edit icon clicked");
-                              _pickImage();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.edit,
-                                size: 22,
-                                color: Colors.black,
-                              ),
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
                             ),
+                            child: const Icon(Icons.edit, size: 22),
                           ),
                         ),
                       ),
-
-
-
-
                     ],
                   ),
                 ),
               ),
+
+
 
             ],
           ),
@@ -171,8 +336,9 @@ class _EditProfileState extends State<EditProfile> {
           const SizedBox(height: 60),
 
           /// 🔹 USER INFO
-          const Text(
-            "John Smith",
+           Text(
+
+             myProfile?['name'] ?? '',
             style: TextStyle(
               fontFamily: "Outfit",
               color: Colors.white,
@@ -181,8 +347,8 @@ class _EditProfileState extends State<EditProfile> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            "johnsmith@gmail.com | +91 98765 43210",
+           Text(
+            "${myProfile?['email'] ?? ''}",
             style: TextStyle(
               color: ColorCode.kWhiteOpacity60,
               fontFamily: "Outfit",
@@ -203,8 +369,8 @@ class _EditProfileState extends State<EditProfile> {
               children: [
 
                 TextField(
-                // controller: emailController,
-                cursorColor: ColorCode.white,
+                    controller: nameController,
+                    cursorColor: ColorCode.white,
 
                 style: const TextStyle(
                   color: ColorCode.white, // typed text color
@@ -247,6 +413,7 @@ class _EditProfileState extends State<EditProfile> {
             ),
                 SizedBox(height: 20,),
                 TextField(
+                  controller: emailController,
 
                   cursorColor: ColorCode.white,
                   style: const TextStyle(
@@ -302,7 +469,8 @@ class _EditProfileState extends State<EditProfile> {
 
                 SizedBox(height: 20,),
                 TextField(
-                  // controller: emailController,
+                    controller: locationController,
+
                     cursorColor: ColorCode.white,
 
                     style: const TextStyle(
@@ -417,14 +585,7 @@ class _EditProfileState extends State<EditProfile> {
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
-            onPressed: () {
-              /* Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddOnServices(),
-                ),
-              );*/
-            },
+            onPressed: isLoading ? null : _edit_profile,
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorCode.kButtonColor,
               shape: RoundedRectangleBorder(

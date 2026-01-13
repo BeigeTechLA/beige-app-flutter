@@ -27,6 +27,18 @@ class ApiEndpoints {
   static const String payment_attach = "payment/attach";
 
   // static const String payment_now = "payment";
+  ///------------------My profile-----------------------\\\
+  static const String my_profile_photo = "auth/profile-photo ";
+  static const String my_profile = "auth/profile";
+
+  ///------------------favourites-----------------------\\\
+  static const String my_favourites = "auth/my-favourites";
+  static const String addfavourites = "creatives/favourites";
+
+  ///------------------Bookings History------------------\\\
+  static const String my_bookings = "auth/bookings/history";
+
+
 
 
 ////------------------ My Shoot ----------------------\\\\

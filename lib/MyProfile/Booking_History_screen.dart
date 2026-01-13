@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
@@ -10,7 +12,35 @@ class BookingHistoryScreen extends StatefulWidget {
 }
 
 class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
-  bool isFavourite = false;
+
+  List<dynamic> bookings = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchmbookings();
+  }
+  Future<void> _fetchmbookings() async {
+    try {
+      final response =
+      await ApiService().fetchData(ApiEndpoints.my_bookings);
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          bookings = response['data'] ?? [];
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("Fetch Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +84,39 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
             const SizedBox(height: 20),
 
             Expanded(
-              child: ListView.builder(
-                padding:  EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 10,
+              child: isLoading
+                  ? const Center(
+                child: CircularProgressIndicator(
+                  color: ColorCode.kButtonColor,
+                ),
+              )
+                  : bookings.isEmpty
+                  ? const Center(
+                child: Text(
+                  "No bookings found",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontFamily: "Outfit",
+                  ),
+                ),
+              )
+                  : ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: bookings.length,
                 itemBuilder: (context, index) {
+                  final booking = bookings[index];
+
+                  final String name =
+                      booking['creator_name'] ?? "N/A";
+                  final String role =
+                      booking['primary_title'] ?? "";
+                  final String image =
+                      booking['cover_image'] ?? "";
+                  final String status =
+                      booking['status'] ?? "Completed";
+                  final String rating =
+                      booking['rating']?.toString() ?? "0";
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
@@ -67,15 +126,20 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                           /// 🔹 BACKGROUND IMAGE
                           ClipRRect(
                             borderRadius: BorderRadius.circular(18),
-                            child: Image.asset(
-                              "assets/images/home2.png",
+                            child: image.isNotEmpty
+                                ? Image.network(
+                              image,
                               width: double.infinity,
                               height: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                                : Image.asset(
+                              "assets/images/home2.png",
                               fit: BoxFit.cover,
                             ),
                           ),
 
-                          /// 🔹 DARK BOTTOM GRADIENT
+                          /// 🔹 GRADIENT
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -98,29 +162,30 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             ),
                           ),
 
-                          ///  ONLINE DOT
-                           Positioned(
+                          /// 🔹 STATUS
+                          Positioned(
                             top: 12,
                             left: 12,
                             child: Row(
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 6,
                                   backgroundColor: Colors.green,
                                 ),
-                                SizedBox(width: 5,),
-                                Text("Completed",style: TextStyle(fontSize: 10,fontWeight: FontWeight.w500,fontFamily: "Outfit"),)
+                                const SizedBox(width: 6),
+                                Text(
+                                  status,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.white,
+                                    fontFamily: "Outfit",
+                                  ),
+                                ),
                               ],
                             ),
-                            
-                            
                           ),
 
-                          /// HEART ICON
-
-
-
-                          /// 🔹 TEXT CONTENT
+                          /// 🔹 DETAILS
                           Positioned(
                             bottom: 20,
                             left: 16,
@@ -128,51 +193,47 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// ⭐ RATING
                                 Row(
-                                  children: const [
-                                    Icon(Icons.star, color: Colors.yellow, size: 16),
-                                    SizedBox(width: 4),
+                                  children: [
+                                    const Icon(Icons.star,
+                                        color: Colors.yellow, size: 16),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      "4.5 (120)",
-                                      style: TextStyle(
+                                      rating,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         fontFamily: "Outfit",
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color:
+                                        ColorCode.kWhiteOpacity70,
                                       ),
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(height: 6),
-
-                                /// 👤 NAME
-                                const Text(
-                                  "Angela Kia",
-                                  style: TextStyle(
+                                Text(
+                                  name,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontFamily: "Outfit",
                                     color: ColorCode.white,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-
                                 const SizedBox(height: 2),
-
-                                /// 🎥 ROLE
-                                const Text(
-                                  "Videography Specialist",
-                                  style: TextStyle(
+                                Text(
+                                  role,
+                                  style: const TextStyle(
                                     fontSize: 11,
                                     fontFamily: "Outfit",
-                                    color: ColorCode.kWhiteOpacity70,
+                                    color:
+                                    ColorCode.kWhiteOpacity70,
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          /// 💰 PRICE + ACTION BUTTON
+                          /// 🔹 ACTION
                           Positioned(
                             bottom: 16,
                             right: 16,
@@ -180,18 +241,18 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 6,
-                                  ),
+                                      horizontal: 14, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: ColorCode.kButtonColor,
-                                    borderRadius: BorderRadius.circular(22),
+                                    borderRadius:
+                                    BorderRadius.circular(22),
                                   ),
-                                  child:  Text(
+                                  child: const Text(
                                     "Add Review",
                                     style: TextStyle(
                                       fontFamily: "Outfit",
-                                      color: ColorCode.kCircleGradientTop,
+                                      color:
+                                      ColorCode.kCircleGradientTop,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
@@ -210,64 +271,16 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                       ),
                     ),
                   );
-
                 },
               ),
             ),
+
           ],
         ),
       ),
     );
   }
-  void _showFavouriteToast(String message) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
 
-    overlayEntry = OverlayEntry(
-      builder: (_) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontFamily: "Outfit",
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => overlayEntry.remove(),
-                  child: const Icon(Icons.close, color: Colors.white, size: 18),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-
-    Future.delayed(const Duration(seconds: 2), () {
-      overlayEntry.remove();
-    });
-  }
 
 
 }

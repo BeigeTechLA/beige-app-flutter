@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 
 class Specialities extends StatefulWidget {
   const Specialities({super.key});
@@ -146,7 +147,7 @@ class _SpecialitiesState extends State<Specialities> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BookShootScreen(
+            builder: (context) => ContentTypeScreen(   //BookShootScreen
               specialtyId: item["specialty_id"],
             ),
           ),

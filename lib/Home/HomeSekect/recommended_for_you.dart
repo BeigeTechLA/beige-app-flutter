@@ -16,6 +16,7 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
   bool isLoading = false;
   List matches = [];
 
+  bool isFavourite = false;
 
 
   double? minRate;
@@ -23,6 +24,7 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
 
   List recommendedList = [];
 
+  Set<int> favouriteUsers = {};
 
   @override
   void initState() {
@@ -48,6 +50,38 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
       debugPrint("Review API Error: $e");
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+
+  Future<void> _addFavourite(int userId) async {
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.addfavourites}/$userId",
+        {},
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite added");
+      }
+    } catch (e) {
+      debugPrint("Add Favourite Error: $e");
+    }
+  }
+
+
+  Future<void> _removeFavourite(int userId) async {
+    try {
+      final response = await ApiService().deleteData(
+        "${ApiEndpoints.addfavourites}/$userId",
+
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite removed");
+      }
+    } catch (e) {
+      debugPrint("Remove Favourite Error: $e");
     }
   }
 
@@ -139,6 +173,9 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
                     final item = matches[index];
+                    final int userId = item['user']['id'];
+                    final bool isFavourite = favouriteUsers.contains(userId);
+
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
@@ -195,6 +232,8 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+
+                                  /// 🟢 ACTIVE STATUS
                                   Row(
                                     children: const [
                                       CircleAvatar(radius: 4, backgroundColor: Colors.green),
@@ -205,10 +244,43 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                       ),
                                     ],
                                   ),
-                                  const Icon(Icons.favorite_border, color: Colors.white),
+
+                                  /// ❤️ HEART ICON
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (isFavourite) {
+                                        // ❌ REMOVE
+                                        setState(() {
+                                          favouriteUsers.remove(userId);
+                                        });
+
+                                        await _removeFavourite(userId);
+
+                                        _showFavouriteToast("Removed from Favourite");
+                                      } else {
+                                        // ✅ ADD
+                                        setState(() {
+                                          favouriteUsers.add(userId);
+                                        });
+
+                                        await _addFavourite(userId);
+
+                                        _showFavouriteToast("Added to Favourite");
+                                      }
+                                    },
+                                    child: Image.asset(
+                                      isFavourite
+                                          ? "assets/Icons/Heart_Angl_COLOR.png"
+                                          : "assets/images/Heart Angle.png",
+                                      height: 22,
+                                      width: 22,
+                                    ),
+                                  ),
+
                                 ],
                               ),
                             ),
+
 
                             /// 🔹 BOTTOM CONTENT
                             Positioned(
@@ -605,6 +677,55 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
         );
       },
     );
+  }
+  void _showFavouriteToast(String message) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (_) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Outfit",
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 
 

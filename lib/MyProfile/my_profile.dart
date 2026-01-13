@@ -1,6 +1,8 @@
 import 'package:beige/Home/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'Booking_History_screen.dart';
 import 'Favourite_screen.dart';
@@ -14,6 +16,52 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> {
+
+
+  bool isLoading =true;
+
+
+  List<dynamic> myprofile = [];
+
+
+  Map<String, dynamic>? myProfile;
+  @override
+  void initState() {
+    super.initState();
+    _fetchMyProfile();
+  }
+
+  Future<void> _fetchMyProfile() async {
+    debugPrint("🟢 MY PROFILE API CALL STARTED");
+
+    try {
+      final response = await ApiService().fetchData(ApiEndpoints.my_profile);
+
+      debugPrint("🟡 API RESPONSE: $response");
+
+      if (response != null && response['error'] == false) {
+        final user = response['data']['user'];
+
+        setState(() {
+          myProfile = user;
+
+
+          isLoading = false;
+        });
+
+        debugPrint("✅ PROFILE DATA SET IN TEXTFIELDS");
+      } else {
+        isLoading = false;
+      }
+    } catch (e) {
+      debugPrint("🚨 FETCH ERROR: $e");
+      isLoading = false;
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,8 +168,8 @@ class _MyProfileState extends State<MyProfile> {
             const SizedBox(height: 60),
 
             /// 🔹 USER INFO
-            const Text(
-              "John Smith",
+             Text(
+              myProfile?['name'] ?? '',
               style: TextStyle(
                 fontFamily: "Outfit",
                 color: Colors.white,
@@ -130,8 +178,8 @@ class _MyProfileState extends State<MyProfile> {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              "johnsmith@gmail.com | +91 98765 43210",
+             Text(
+              "${myProfile?['email'] ?? ''}",
               style: TextStyle(
                 color: ColorCode.kWhiteOpacity60,
                 fontFamily: "Outfit",
@@ -325,6 +373,7 @@ class _MyProfileState extends State<MyProfile> {
 
 
   }
+
   Widget _menuRow(String iconPath, String title, {VoidCallback? onTap}) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -381,7 +430,6 @@ class _MyProfileState extends State<MyProfile> {
       ),
     );
   }
-
 
   void _showLogoutBottomSheet() {
     showModalBottomSheet(
@@ -514,5 +562,4 @@ class _MyProfileState extends State<MyProfile> {
       },
     );
   }
-
 }
