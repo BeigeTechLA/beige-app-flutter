@@ -473,7 +473,11 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
                 SizedBox(height: 20),
 
-                _buildField("Location*", _locationFocus, locationController),
+                _buildField("Location*", _locationFocus, locationController, suffixIcon: Icon(
+                  Icons.location_on_outlined,
+                  color: ColorCode.kWhiteOpacity70,
+                  size: 22,
+                ),),
 
 
                 SizedBox(height: 20),
@@ -589,7 +593,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                     child: isLoggingIn
                         ? const CircularProgressIndicator(color: Colors.white)
                         :  Text(
-                      "Create Account",
+                      "Next",
                       style: TextStyle(
                         fontSize: 13,
                         fontFamily: "Unbounded",
@@ -644,8 +648,9 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
   Widget _buildField(
       String title,
       FocusNode focusNode,
-      TextEditingController controller,
-      ) {
+      TextEditingController controller, {
+        Widget? suffixIcon,
+      }) {
     return TextField(
       controller: controller,
       focusNode: focusNode,
@@ -653,24 +658,24 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
       style: const TextStyle(
         color: ColorCode.white,
       ),
-
       decoration: InputDecoration(
         labelText: title,
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
-        /// 🔥 LABEL COLOR CHANGE
+
         labelStyle: TextStyle(
           color: focusNode.hasFocus
-              ? ColorCode.kButtonColor   // active
-              : ColorCode.kWhiteOpacity70, // inactive
+              ? ColorCode.kButtonColor
+              : ColorCode.kWhiteOpacity70,
         ),
+
+        suffixIcon: suffixIcon,
 
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),
 
-        /// 🔥 BORDER COLOR CHANGE
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -682,19 +687,16 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: ColorCode.kButtonColor, // 🔥 active border
+            color: ColorCode.kButtonColor,
             width: 1,
           ),
         ),
       ),
-      onTap: () {
-        setState(() {}); // 🔁 UI refresh on focus
-      },
-      onChanged: (_) {
-        setState(() {}); // 🔁 UI refresh while typing
-      },
+      onTap: () => setState(() {}),
+      onChanged: (_) => setState(() {}),
     );
   }
+
 
 
   Widget _workingDistanceDropdown() {

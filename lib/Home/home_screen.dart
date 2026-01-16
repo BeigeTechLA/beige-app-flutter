@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen>
     {
       "name": "Liam Walker",
       "role": "Cinematic Director",
-      "image": "assets/images/home1.png", // ✅ NEW IMAGE
+      "image": "assets/images/home1.png",
       "price": "From \$520/Hr",
       "rating": "4.8 (140)"
     },
@@ -175,13 +175,13 @@ class _HomeScreenState extends State<HomeScreen>
               Container(
                 width: double.infinity,
 
-                padding: const EdgeInsets.fromLTRB(
+                padding:  EdgeInsets.fromLTRB(
                   20, // left
-                  28, // top (status bar ke niche look ke liye)
+                  28, // top
                   20, // right
                   20, // bottom
                 ),
-                decoration: const BoxDecoration(
+                decoration:  BoxDecoration(
                   color: ColorCode.k282828,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(40),
@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ],
                     ),
 
-                    const SizedBox(height: 22),
+                     SizedBox(height: 22),
 
                     /// 🔹 SEARCH BAR (IMAGE JAISE LOOK)
                     Container(

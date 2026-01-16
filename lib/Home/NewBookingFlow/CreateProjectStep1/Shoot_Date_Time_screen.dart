@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../utility/ColorCode.dart';
+import '../More_Details/more_details_screen.dart';
 
 class ShootDateTimeScreen extends StatefulWidget {
   const ShootDateTimeScreen({super.key});
@@ -405,7 +406,6 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
 
               TextField(
-
                 cursorColor: ColorCode.white,
                 style:  TextStyle(
                   color: ColorCode.white,
@@ -450,7 +450,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
     ),
       ),
-      bottomNavigationBar: Padding(
+     /* bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
@@ -469,8 +469,8 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ShootDateTimeScreen(
-                        /*  specialtyId: widget.specialtyId,
-                              contentType: selectedContentType!,*/
+                        *//*  specialtyId: widget.specialtyId,
+                              contentType: selectedContentType!,*//*
                       ),
                     ),
                   );
@@ -487,6 +487,64 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),*/
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child:  OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.grey),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  debugPrint("Continue clicked");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MoreDetailsScreen(
+
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                 /* backgroundColor: selectedIndex == -1
+                      ? ColorCode.kGoldGradientLight // disabled
+                      : ColorCode.kButtonColor, // enabled
+                  foregroundColor: selectedIndex == -1
+                      ? Colors.grey.shade400
+                      : Colors.black,*/
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "Continue",
+                  style: TextStyle(
+                    fontFamily: "Unbounded",
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+
           ],
         ),
       ),

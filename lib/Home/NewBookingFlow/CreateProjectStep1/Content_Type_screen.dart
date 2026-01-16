@@ -196,7 +196,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       child: const Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                   SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: isOptionSelected

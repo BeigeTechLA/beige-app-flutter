@@ -28,6 +28,7 @@ class _ProfessionalDetailsSingUpState
   final TextEditingController equipmentController = TextEditingController();
   final TextEditingController HourlyRateController = TextEditingController();
 
+
   List<String> roleList = [];
   List<String> filteredEquipments = [];
   List<String> selectedEquipments = [];
@@ -41,6 +42,7 @@ class _ProfessionalDetailsSingUpState
   Map<String, int> roleMap = {};
   Map<String, int> skillMap = {};
   Map<String, int> equipmentMap = {};
+
 
 
   @override
@@ -364,19 +366,58 @@ class _ProfessionalDetailsSingUpState
               ),
 
                SizedBox(height: 20),
-
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _dropdownField(
-                    "Add Skills",
-                    skills,
-                    allSkills,
-                        (v) {
-                      setState(() => skills = v);
+                  /// 🔽 SKILLS DROPDOWN
+                  DropdownButtonFormField<String>(
+                    value: null,
+                    dropdownColor: const Color(0xFF1C1C1C),
+                    icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
+                    decoration: _inputDecoration("Add Skills"),
+                    items: allSkills.map((skill) {
+                      return DropdownMenuItem(
+                        value: skill,
+                        child: Text(skill),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null && !selectedSkills.contains(value)) {
+                        setState(() {
+                          selectedSkills.add(value);
+                        });
+                      }
                     },
                   ),
+
+                  const SizedBox(height: 12),
+
+                  /// 🧩 SELECTED SKILLS CHIPS
+                  if (selectedSkills.isNotEmpty)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: selectedSkills.map((skill) {
+                        return Chip(
+                          label: Text(
+                            skill,
+                            style:  TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor:
+                          ColorCode.kHeadingColor.withOpacity(0.9),
+                          deleteIconColor: Colors.white,
+                          onDeleted: () {
+                            setState(() {
+                              selectedSkills.remove(skill);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
                 ],
               ),
+
 
 
               const SizedBox(height: 20),
@@ -455,7 +496,7 @@ class _ProfessionalDetailsSingUpState
                               style: const TextStyle(color: Colors.white),
                             ),
                             backgroundColor:
-                            ColorCode.kButtonColor.withOpacity(0.9),
+                            ColorCode.kHeadingColor.withOpacity(0.9),
                             deleteIconColor: Colors.white,
                             onDeleted: () {
                               setState(() {
@@ -490,6 +531,7 @@ class _ProfessionalDetailsSingUpState
                     "Next",
                     style: TextStyle(
                       fontSize: 16,
+                      color: ColorCode.kHeadingColor,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
