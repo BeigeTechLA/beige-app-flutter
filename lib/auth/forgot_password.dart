@@ -16,14 +16,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   final TextEditingController emailController = TextEditingController();
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isLoading = false;
+  }
   bool isEmailFilled = false;
   bool isLoading = false;
 
   Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
+    final email = emailController.text.trim();
 
-    if (emailController.text.trim().isEmpty) {
+    if (email.isEmpty) {
       _showSnack("Please enter email");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      _showSnack("Please enter a valid email address");
       return;
     }
 
@@ -31,30 +42,44 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
     try {
       final response = await apiService.postData(
-        ApiEndpoints.forgotpassword, // ✅ CORRECT API
-        {
-          "email": emailController.text.trim(),
-        },
+        ApiEndpoints.forgotpassword,
+        {"email": email},
       );
 
+      if (response == null) {
+        _showSnack("Server error, please try again");
+        return;
+      }
+
       if (response['error'] == false) {
+        if (!mounted) return;
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => EnterOtpScreen(
-               email: emailController.text.trim(), // ✅ pass email
-            ),
+            builder: (_) => EnterOtpScreen(email: email),
           ),
         );
       } else {
-        _showSnack(response['message'] ?? "Failed to send OTP");
+        /// ✅ BACKEND MESSAGE SHOW KARO
+        _showSnack(response['message'] ?? "Email not registered");
       }
     } catch (e) {
-      _showSnack("Something went wrong");
+      _showSnack("Please enter a valid email address");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:beige/MainScreen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
@@ -61,13 +62,15 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     "Website",
   ];
 
-  final List<IconData> socialIcons = [
-    Icons.facebook,
-    Icons.camera_alt, // Instagram
-    Icons.music_note, // TikTok
-    Icons.brush,      // Behance
-    Icons.language,   // Website
+
+  final List<String> socialIcons = [
+    "assets/Icons/facebook.png",
+    "assets/Icons/ins.png",
+    "assets/Icons/tick_tok.png",
+    "assets/images/social_media_Icon.png",
+    "assets/Icons/webside.png",
   ];
+
 
   Future<void> _pickCertificate() async {
     final result = await FilePicker.platform.pickFiles(
@@ -205,6 +208,30 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     );
   }
 
+  void viewFile(File file) {
+    final ext = file.path.split('.').last.toLowerCase();
+
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)) {
+      // 🔥 IMAGE VIEWER
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(backgroundColor: Colors.black),
+            body: Center(
+              child: InteractiveViewer(
+                child: Image.file(file),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      // 🔥 PDF / DOC / ANY FILE
+      OpenFile.open(file.path);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -311,10 +338,13 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                                 color: ColorCode.kButtonColor.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(
+                              child: Image.asset(
                                 item['icon'],
+                                height: 20,
+                                width: 20,
                                 color: ColorCode.kButtonColor,
                               ),
+
                             ),
 
                             const SizedBox(width: 12),
@@ -560,10 +590,9 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                                   /// VIEW
                                   IconButton(
                                     icon: const Icon(Icons.remove_red_eye, color: Colors.white),
-                                    onPressed: () {
-                                      // TODO: Open PDF / Image viewer
-                                    },
+                                    onPressed: () => viewFile(file),
                                   ),
+
 
                                   /// DELETE
                                   IconButton(
@@ -672,7 +701,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                       ),
                     ),
                     child: const Text(
-                      "Next",
+                      "Create Profile",
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: "Unbounded",
@@ -818,12 +847,10 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
 
           /// VIEW
           IconButton(
-            icon: const Icon(Icons.remove_red_eye,
-                color: Colors.white),
-            onPressed: () {
-              // TODO: open file viewer
-            },
+            icon: const Icon(Icons.remove_red_eye, color: Colors.white),
+            onPressed: () => viewFile(file),
           ),
+
 
           /// DELETE
           IconButton(
@@ -910,7 +937,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                       _socialImage(index: 0, imagePath: "assets/Icons/facebook.png"),
                       _socialImage(index: 1, imagePath: "assets/Icons/ins.png"),
                       _socialImage(index: 2, imagePath: "assets/Icons/tick_tok.png"),
-                      _socialImage(index: 3, imagePath: "assets/Icons/Vector.png"),
+                      _socialImage(index: 3, imagePath: "assets/images/social_media_Icon.png"),
                       _socialImage(index: 4, imagePath: "assets/Icons/webside.png"),
                     ],
                   ),
@@ -949,8 +976,10 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                                   color: ColorCode.kButtonColor.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Icon(
-                                  item['icon'],
+                                child: Image.asset(
+                                  item['icon'], //
+                                  height: 20,
+                                  width: 20,
                                   color: ColorCode.kButtonColor,
                                 ),
                               ),
@@ -991,7 +1020,8 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                                     nameLinkController.text = item['name'];
                                     linkController.text = item['url'];
                                     selectedSocialIndex =
-                                        socialIcons.indexOf(item['icon']);
+                                        socialIcons.indexWhere((e) => e == item['icon']);
+
                                   });
             
                                   _openSocialSheet();
@@ -1069,7 +1099,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                             savedLinks.add({
                               "name": nameLinkController.text,
                               "url": linkController.text,
-                              "icon": socialIcons[selectedSocialIndex],
+                              "icon": socialIcons[selectedSocialIndex], // ✅ image path
                             });
                           }
                         });

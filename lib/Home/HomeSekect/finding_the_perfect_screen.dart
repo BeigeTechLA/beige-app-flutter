@@ -2,6 +2,8 @@ import 'package:beige/Home/HomeSekect/recommended_for_you.dart';
 import 'package:flutter/material.dart';
 import 'package:beige/utility/ColorCode.dart';
 
+import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
+
 class FindingThePerfectScreen extends StatefulWidget {
   final int bookingId;
   const FindingThePerfectScreen({super.key, required this.bookingId});
@@ -30,7 +32,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (_) =>  RecommendedForYou(bookingId: widget.bookingId,), // 👈 next screen
+            builder: (_) =>  SelectYourDreamTeam(), // 👈 next screen
         ),
       );
     });

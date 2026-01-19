@@ -245,7 +245,7 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
                                     ],
                                   ),
 
-                                  /// ❤️ HEART ICON
+                                  /// ❤ HEART ICON
                                   GestureDetector(
                                     onTap: () async {
                                       if (isFavourite) {

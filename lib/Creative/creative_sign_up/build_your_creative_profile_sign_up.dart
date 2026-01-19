@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:beige/Creative/creative_sign_up/professional_details_sing_up.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource, XFile;
 import '../../ChooseYourRole/choose_your_role_screen.dart';
@@ -32,6 +35,13 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
   bool savePassword = false;
   bool isLoggingIn = false;
 
+  GoogleMapController? mapController;
+  LatLng? currentLatLng;
+
+  String selectedAddress = "";
+
+  bool showMap = false;
+  bool isLoading = false;
 
   bool get isFormValid {
     return
@@ -64,6 +74,92 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     "20-50 Miles",
   ];
 
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<void> searchLocation(String query) async {
+    if (query.isEmpty) return;
+
+    try {
+      setState(() => isLoading = true);
+
+      final locations = await locationFromAddress(query);
+
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+        final latLng = LatLng(loc.latitude, loc.longitude);
+
+        setState(() {
+          currentLatLng = latLng;
+          showMap = true;
+        });
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(latLng, 15),
+        );
+
+        await getAddressFromLatLng(latLng);
+      }
+    } catch (e) {
+      _showSnack("Location not found");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+  Future<void> getAddressFromLatLng(LatLng latLng) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+
+        final address =
+            "${p.street ?? ''}, ${p.locality ?? ''}, ${p.administrativeArea ?? ''}";
+
+        setState(() {
+          selectedAddress = address;
+          locationController.text = address;
+        });
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showSnack("Enable location permission from settings");
+      await Geolocator.openAppSettings();
+      return;
+    }
+
+    final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      currentLatLng = LatLng(position.latitude, position.longitude);
+      showMap = true;
+    });
+  }
 
 
 
@@ -380,6 +476,53 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
   @override
   Widget build(BuildContext context) {
+    String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{"color": "#383838"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#8a8a8a"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#000000"}]
+  }
+]
+''';
+
+
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
 
@@ -472,12 +615,48 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                 _buildField("Email Address*", _emailFocus, emailController),
 
                 SizedBox(height: 20),
+                _buildField(
+                  "Location*",
+                  _locationFocus,
+                  locationController,
+                  suffixIcon: Icon(
+                    Icons.location_on_outlined,
+                    color: ColorCode.kWhiteOpacity70,
+                  ),
+                ),
 
-                _buildField("Location*", _locationFocus, locationController, suffixIcon: Icon(
-                  Icons.location_on_outlined,
-                  color: ColorCode.kWhiteOpacity70,
-                  size: 22,
-                ),),
+                if (showMap && currentLatLng != null)
+                  Container(
+                    height: 220,
+                    margin: const EdgeInsets.only(top: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: ColorCode.kGold40),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: currentLatLng!,
+                          zoom: 14,
+                        ),
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          mapController!.setMapStyle(_darkMapStyle);
+                        },
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("current"),
+                            position: currentLatLng!,
+                          ),
+                        },
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                      ),
+                    ),
+                  ),
+
+
 
 
                 SizedBox(height: 20),
@@ -574,7 +753,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                   ],
                 ),
 
-                const SizedBox(height: 40),
+                 SizedBox(height: 40),
 
                 SizedBox(
                   width: double.infinity,
@@ -655,7 +834,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
       controller: controller,
       focusNode: focusNode,
       cursorColor: ColorCode.kButtonColor,
-      style: const TextStyle(
+      style:  TextStyle(
         color: ColorCode.white,
       ),
       decoration: InputDecoration(
@@ -671,7 +850,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
         suffixIcon: suffixIcon,
 
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding:  EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,
         ),

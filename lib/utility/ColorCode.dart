@@ -20,6 +20,8 @@ class ColorCode {
 
   static const Color k737373 = Color(0xFF737373); //Medium grey
 
+  // ⭐ Light Red / Remove Background
+  static const Color kLightRed = Color(0xFFFFC9C9);
 
   static const Color kCreamSoft = Color(0xFFECE1CE);
   static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
