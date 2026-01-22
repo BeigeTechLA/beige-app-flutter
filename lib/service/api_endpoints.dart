@@ -46,6 +46,13 @@ class ApiEndpoints {
   static const String creatives_myshoots = "creatives/my-shoots";
 
 
+
+////------------------ New booking flow  ----------------------\\\\
+
+  static const String booking_shoot_types = "bookings/shoot-types/";
+
+
+
 //---------------------------- Creative --------------------------
   static const String register_step1 = "auth/register-crew-step1";
   static const String register_roles = "auth/crew-roles";

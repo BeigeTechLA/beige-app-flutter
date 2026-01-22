@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart' show ApiService;
 import '../../../utility/ColorCode.dart';
 import 'Video_Shoot_Type.dart';
 
@@ -17,6 +19,114 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   String? selectedContentType;
 
   bool get isOptionSelected => selectedContentType != null;
+
+  String selectedShoot = "";
+  List<String> selectedEdits = [];
+
+  List<int> shootTypeIds = [];
+
+  // Expand/Collapse states
+  bool shootOpen = true;
+  bool isShootTypeLoaded = false; // 👈 NEW
+
+  bool editOpen = true;
+  bool isLoading =false;
+
+
+  List specialties = [];
+
+  int? selectedContentTypeId; // 👈 API VALUE
+  bool get isContinueEnabled {
+    return selectedContentTypeId != null && isShootTypeLoaded && !isLoading;
+  }
+
+
+
+  Future<void> _callBookingApi(int contentTypeId) async {
+    setState(() {
+      isLoading = true;
+      isShootTypeLoaded = false; // reset
+    });
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_shoot_types}$contentTypeId",
+      );
+
+      debugPrint("API Response → $response");
+
+      if (response['error'] == false && response['data'] is List) {
+        shootTypeIds = response['data']
+            .map<int>((e) => e['shoot_type_id'] as int)
+            .toList();
+
+        debugPrint("Shoot Type IDs → $shootTypeIds");
+
+        /// ✅ API SUCCESS → BUTTON ACTIVE
+        setState(() {
+          isShootTypeLoaded = true;
+        });
+      }
+    } catch (e) {
+      debugPrint("API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> select_shoottype() async {
+    if (selectedContentTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select content type")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    final body = {
+      "specialty_id": widget.specialtyId,
+      "content_type": selectedContentTypeId,
+      "shoot_type_id": shootTypeIds.isNotEmpty ? shootTypeIds.first : null,
+    };
+
+    debugPrint("📤 BOOKING PAYLOAD → $body");
+
+    try {
+      final response = await ApiService().postData(
+        ApiEndpoints.booking,
+        body,
+      );
+
+      debugPrint("📥 BOOKING RESPONSE → $response");
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoShootType(
+              contentTypeId: selectedContentTypeId!,
+              specialtyId: widget.specialtyId,
+              // bookingId: response['data']['booking_id'],*/ // ✅ if available
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'] ?? "Something went wrong")),
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ Booking API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+
+
+
 
 
   @override
@@ -121,38 +231,35 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 title: "Select All",
                 activeImage: "assets/newbookflow/selectall_active.png",
                 inactiveImage: "assets/newbookflow/slectall_inactive.png",
-                value: selectedContentType == "all",
+                value: selectedContentTypeId == 3,
                 onTap: () {
-                  setState(() {
-                    selectedContentType = "all";
-                  });
+                  setState(() => selectedContentTypeId = 3);
+                  _callBookingApi(3);
                 },
               ),
-
+              /// 🔹 VIDEOGRAPHY → 1
               _buildOption(
                 title: "Videography",
                 activeImage: "assets/newbookflow/Videocamera_Record_active.png",
                 inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
-                value: selectedContentType == "video",
+                value: selectedContentTypeId == 1,
                 onTap: () {
-                  setState(() {
-                    selectedContentType = "video";
-                  });
+                  setState(() => selectedContentTypeId = 1);
+                  _callBookingApi(1);
                 },
               ),
-
-
+              /// 🔹 PHOTOGRAPHY → 2
               _buildOption(
                 title: "Photography",
                 activeImage: "assets/newbookflow/Camera_active.png",
                 inactiveImage: "assets/newbookflow/Camera_inactive.png",
-                value: selectedContentType == "photo",
+                value: selectedContentTypeId == 2,
                 onTap: () {
-                  setState(() {
-                    selectedContentType = "photo";
-                  });
+                  setState(() => selectedContentTypeId = 2);
+                  _callBookingApi(2);
                 },
               ),
+
 
 
               _buildOption(
@@ -198,27 +305,17 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                   ),
                    SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: isOptionSelected
+                    child:ElevatedButton(
+                      onPressed: isContinueEnabled
                           ? () {
-                        debugPrint("Selected: $selectedContentType");
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoShootType(
-                            /*  specialtyId: widget.specialtyId,
-                              contentType: selectedContentType!,*/
-                            ),
-                          ),
-                        );
+                        select_shoottype();
                       }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isOptionSelected
-                            ? ColorCode.kButtonColor // ✅ active color
-                            : ColorCode.kGoldGradientLight, // ❌ disabled color
-                        foregroundColor: isOptionSelected
+                        backgroundColor: isContinueEnabled
+                            ? ColorCode.kButtonColor      // ✅ ACTIVE
+                            : ColorCode.kGoldGradientLight, // ❌ DISABLED
+                        foregroundColor: isContinueEnabled
                             ? Colors.black
                             : Colors.grey.shade400,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -226,8 +323,25 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child:  Text("Continue",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                      child: isLoading
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.black,
+                        ),
+                      )
+                          : const Text(
+                        "Continue",
+                        style: TextStyle(
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
+
                   ),
 
                 ],

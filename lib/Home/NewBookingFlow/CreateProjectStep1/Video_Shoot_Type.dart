@@ -1,18 +1,69 @@
 import 'package:flutter/material.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
 import 'Shoot_Date_Time_screen.dart';
 class VideoShootType extends StatefulWidget {
-  const VideoShootType({super.key});
+
+  final int contentTypeId;
+  final int specialtyId;
+  const VideoShootType({super.key, required this.contentTypeId, required this.specialtyId});
 
   @override
   State<VideoShootType> createState() => _VideoShootTypeState();
 }
 
 class _VideoShootTypeState extends State<VideoShootType> {
+bool  isLoading =true;
 
   int selectedIndex = -1;
-  @override
+List<Map<String, dynamic>> shootTypes = [];
+
+
+@override
+void initState() {
+  super.initState();
+
+  _callBookingApi(widget.contentTypeId); // 🔥 AUTO API CALL
+}
+
+
+Future<void> _callBookingApi(int contentTypeId) async {
+  setState(() => isLoading = true);
+
+  try {
+    final response = await ApiService().fetchData(
+      "${ApiEndpoints.booking_shoot_types}$contentTypeId",
+    );
+
+    debugPrint("🎯 Shoot Type API → $response");
+
+    if (response['error'] == false && response['data'] is List) {
+      /// 🔥 FILTER BASED ON content_type
+      shootTypes = response['data']
+          .where((e) =>
+      e['content_type'] == widget.contentTypeId ||
+          e['content_type'] == 3) // 👈 3 = BOTH
+          .map<Map<String, dynamic>>((e) => {
+        "id": e['shoot_type_id'],
+        "name": e['name'],
+        "image": e['image_url'],
+        "content_type": e['content_type'],
+      })
+          .toList();
+
+      debugPrint("✅ FILTERED SHOOT TYPES → $shootTypes");
+    }
+  } catch (e) {
+    debugPrint("❌ ShootType API Error → $e");
+  } finally {
+    setState(() => isLoading = false);
+  }
+}
+
+
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       
@@ -110,7 +161,7 @@ class _VideoShootTypeState extends State<VideoShootType> {
 
               Expanded(
                 child: ListView.builder(
-                  itemCount: 10,
+                  itemCount: shootTypes.length,
                   padding: const EdgeInsets.only(top: 12),
                   itemBuilder: (context, index) {
                     return InkWell(

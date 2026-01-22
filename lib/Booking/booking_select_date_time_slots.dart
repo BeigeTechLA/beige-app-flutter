@@ -495,6 +495,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
 
             /// TIME SLOTS
             ...List.generate(timeSlots.length, (index) {
+
               final bool isSelected =
                   selectedTimeIndex == index && !isCustomSelected;
 
