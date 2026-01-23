@@ -21,6 +21,9 @@ bool  isLoading =true;
 List<Map<String, dynamic>> shootTypes = [];
 
 
+int? selectedShootTypeId;
+String? selectedShootTypeName; // ✅ NAME store karne ke liye
+
 @override
 void initState() {
   super.initState();
@@ -37,14 +40,11 @@ Future<void> _callBookingApi(int contentTypeId) async {
       "${ApiEndpoints.booking_shoot_types}$contentTypeId",
     );
 
-    debugPrint("🎯 Shoot Type API → $response");
-
     if (response['error'] == false && response['data'] is List) {
-      /// 🔥 FILTER BASED ON content_type
       shootTypes = response['data']
           .where((e) =>
       e['content_type'] == widget.contentTypeId ||
-          e['content_type'] == 3) // 👈 3 = BOTH
+          e['content_type'] == 3)
           .map<Map<String, dynamic>>((e) => {
         "id": e['shoot_type_id'],
         "name": e['name'],
@@ -52,13 +52,81 @@ Future<void> _callBookingApi(int contentTypeId) async {
         "content_type": e['content_type'],
       })
           .toList();
-
-      debugPrint("✅ FILTERED SHOOT TYPES → $shootTypes");
     }
   } catch (e) {
     debugPrint("❌ ShootType API Error → $e");
   } finally {
     setState(() => isLoading = false);
+  }
+}
+
+
+int? selectedContentTypeId; // 👈 API VALUE
+
+
+Future<void> select_shoottype() async {
+  if (selectedShootTypeId == null || selectedShootTypeName == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please select shoot type")),
+    );
+    return;
+  }
+
+  setState(() => isLoading = true);
+
+  final body = {
+    "project_name": selectedShootTypeName, // ✅ FIRST API NAME
+    "content_type": widget.contentTypeId,  // ✅ dynamic
+    "shoot_type_id": selectedShootTypeId,  // ✅ dynamic
+    "specialty_id": widget.specialtyId,    // ✅ dynamic
+    // "deliverable_option": 1,
+    // "service_type": 2,
+  };
+
+  debugPrint("📤 BOOKING PAYLOAD → $body");
+
+  try {
+    final response = await ApiService().postData(
+      ApiEndpoints.booking,
+      body,
+    );
+
+    debugPrint("📥 BOOKING RESPONSE → $response");
+
+    if (response != null && response['error'] == false) {
+      final bookingId = response['data']?['booking_id'];
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ShootDateTimeScreen(specialtyId: widget.specialtyId, ShootTypeId: selectedShootTypeId!,
+            bookingId: bookingId, contentTypeId: widget.contentTypeId,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'] ?? "Something went wrong")),
+      );
+    }
+  } catch (e) {
+    debugPrint("❌ Booking API Error → $e");
+  } finally {
+    setState(() => isLoading = false);
+  }
+}
+
+
+String getContentTypeTitle(int contentTypeId) {
+  switch (contentTypeId) {
+    case 1:
+      return "Video Shoot Type";
+    case 2:
+      return "Photo Shoot Type";
+    case 3:
+      return "Photo & Video Shoot Type";
+    default:
+      return "Shoot Type";
   }
 }
 
@@ -149,10 +217,11 @@ Future<void> _callBookingApi(int contentTypeId) async {
               Row(
                 children: [
                   Text(
-                    "Video Shoot Type",
-                    style: TextStyle(
+                    getContentTypeTitle(widget.contentTypeId),
+                    style:  TextStyle(
                       fontFamily: "Unbounded",
                       fontSize: 16,
+                      color: ColorCode.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -164,17 +233,32 @@ Future<void> _callBookingApi(int contentTypeId) async {
                   itemCount: shootTypes.length,
                   padding: const EdgeInsets.only(top: 12),
                   itemBuilder: (context, index) {
+                    final item = shootTypes[index];        // ✅ PEHLE
+                    // final imagePath = item['image'];       // ✅ PHIR USE
+                    final imagePath = item['image']?.toString() ?? '';
+                    final fullImageUrl = imagePath.isNotEmpty
+                        ? ApiService().getImageURL(imagePath)
+                        : '';
+
+                    selectedShootTypeId = item['id'];
+                    selectedShootTypeName = item['name'];
+
+                    debugPrint("🧾 RAW IMAGE PATH → $imagePath");
+                    debugPrint("🖼 FULL IMAGE URL → $fullImageUrl");
+
                     return InkWell(
                       onTap: () {
                         setState(() {
                           selectedIndex = index;
+                          selectedShootTypeId = item['id']; // 👈 IMPORTANT
                         });
-                        debugPrint("Selected index: $index");
+
+                        debugPrint("✅ Selected ShootType ID → $selectedShootTypeId");
                       },
                       child: Column(
                         children: [
 
-                          /// 🔹 CARD
+                          /// 🔹 IMAGE CARD (DYNAMIC)
                           Card(
                             elevation: 4,
                             shape: RoundedRectangleBorder(
@@ -184,14 +268,46 @@ Future<void> _callBookingApi(int contentTypeId) async {
                             child: SizedBox(
                               height: 250,
                               width: double.infinity,
-                              child: Image.asset(
+                              child: imagePath.isNotEmpty
+                                  ? Image.network(
+                                fullImageUrl,
+                                fit: BoxFit.cover,
+
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    // ✅ image fully loaded
+                                    return child;
+                                  }
+
+                                  // ✅ image + loader together
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      child, // image render hoti rahe
+                                      const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ],
+                                  );
+                                },
+
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    "assets/newbookflow/Frame_2087328912.png",
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                                  : Image.asset(
                                 "assets/newbookflow/Frame_2087328912.png",
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
 
-                          const SizedBox(height: 10),
+
+
 
                           /// 🔹 TITLE + RADIO
                           Padding(
@@ -200,9 +316,10 @@ Future<void> _callBookingApi(int contentTypeId) async {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
 
+                                /// 🔹 TITLE (DYNAMIC)
                                 Text(
-                                  "Corporate Event ${index + 1}",
-                                  style: TextStyle(
+                                  item['name'] ?? '',
+                                  style: const TextStyle(
                                     fontFamily: 'Outfit',
                                     color: ColorCode.white,
                                     fontSize: 15,
@@ -210,7 +327,7 @@ Future<void> _callBookingApi(int contentTypeId) async {
                                   ),
                                 ),
 
-                                /// ✅ RADIO BUTTON
+                                /// 🔹 RADIO BUTTON
                                 Container(
                                   height: 32,
                                   width: 32,
@@ -232,14 +349,10 @@ Future<void> _callBookingApi(int contentTypeId) async {
                                     ),
                                   ),
                                   child: selectedIndex == index
-                                      ? Center(
-                                    child: Container(
-                                      height: 10,
-                                      width: 10,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.black,
-                                      ),
+                                      ? const Center(
+                                    child: CircleAvatar(
+                                      radius: 5,
+                                      backgroundColor: Colors.black,
                                     ),
                                   )
                                       : const SizedBox(),
@@ -253,10 +366,8 @@ Future<void> _callBookingApi(int contentTypeId) async {
                       ),
                     );
                   },
-
                 ),
               ),
-
 
 
 
@@ -287,17 +398,10 @@ Future<void> _callBookingApi(int contentTypeId) async {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: selectedIndex == -1
+                onPressed: selectedShootTypeId == null
                     ? null
                     : () {
-                  debugPrint("Selected index: $selectedIndex");
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ShootDateTimeScreen(),
-                    ),
-                  );
+                  select_shoottype(); // 🔥 PRE API CALL
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedIndex == -1

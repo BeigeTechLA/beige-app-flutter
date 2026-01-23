@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
 import '../../HomeSekect/finding_the_perfect_screen.dart';
 
 class CrewSizeMatchingScreen extends StatefulWidget {
-  const CrewSizeMatchingScreen({super.key});
+  final int specialtyId;
+  final int ShootTypeId;
+  final int bookingId;
+  final int contentTypeId;
+  const CrewSizeMatchingScreen({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
   State<CrewSizeMatchingScreen> createState() => _CrewSizeMatchingScreenState();
@@ -13,6 +19,37 @@ class CrewSizeMatchingScreen extends StatefulWidget {
 class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
   int currentStep = 1;
+bool isLoading =true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _CrewSizeMatching();
+  }
+
+  Future<void> _CrewSizeMatching() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/crew-recommendation",
+      );
+
+      debugPrint("API Response → $response");
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          // editTypes = response['data'] ?? [];
+        });
+      }
+    } catch (e) {
+      debugPrint("API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -111,7 +111,6 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                 itemCount: favourites.length,
                 itemBuilder: (context, index) {
                   final item = favourites[index];
-                  bool isFav = item['is_favourite'] ?? false;
                   final int creatorId = item['creator_id'];
 
                   return Padding(
@@ -120,19 +119,23 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       height: 220,
                       child: Stack(
                         children: [
-                          /// 🔹 BACKGROUND IMAGE
-                          Image.network(
+
+                          /// ✅ IMAGE (NULL SAFE)
+                          item['profile_image_url'] != null
+                              ? Image.network(
                             ApiService().getImageURL(item['profile_image_url']),
                             width: double.infinity,
+                            height: 220,
                             fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(child: CircularProgressIndicator());
-                            },
+                          )
+                              : Image.asset(
+                            "assets/images/profile_placeholder.png",
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
                           ),
 
-
-                          /// 🔹 DARK BOTTOM GRADIENT
+                          /// DARK GRADIENT
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -140,9 +143,6 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                             child: Container(
                               height: 110,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(18),
-                                ),
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -155,47 +155,43 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                             ),
                           ),
 
-                          ///  ONLINE DOT
+                          /// ACTIVE
                           Positioned(
                             top: 12,
                             left: 12,
                             child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 6,
-                                  backgroundColor: Colors.green,
-                                ),
-                                SizedBox(width: 5,),
-                                Text("Active",style: TextStyle(fontSize: 10,fontWeight: FontWeight.w500,fontFamily: "Outfit"),)
+                              children: const [
+                                CircleAvatar(radius: 6, backgroundColor: Colors.green),
+                                SizedBox(width: 6),
+                                Text(
+                                  "Active",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontFamily: "Outfit",
+                                  ),
+                                )
                               ],
                             ),
-
-
                           ),
 
-                          /// HEART ICON
+                          /// ❤️ REMOVE FAVOURITE
                           Positioned(
                             top: 12,
                             right: 12,
                             child: GestureDetector(
-                              onTap: () async {
-                                await _removeFavourite(
-                                  creatorId: creatorId,
-                                  index: index,
-                                );
-                              },
+                              onTap: () => _removeFavourite(
+                                creatorId: creatorId,
+                                index: index,
+                              ),
                               child: Image.asset(
-                                "assets/Icons/Heart_Angl_COLOR.png", // ❤️ always filled in Favourite screen
+                                "assets/Icons/Heart_Angl_COLOR.png",
                                 height: 22,
-                                width: 22,
                               ),
                             ),
                           ),
 
-
-
-
-                          /// 🔹 TEXT CONTENT
+                          /// TEXT DATA
                           Positioned(
                             bottom: 20,
                             left: 16,
@@ -203,7 +199,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// ⭐ RATING
+
+                                /// ⭐ RATING (NULL SAFE)
                                 Row(
                                   children: [
                                     const Icon(Icons.star, color: Colors.yellow, size: 16),
@@ -214,84 +211,68 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                           : "No ratings",
                                       style: const TextStyle(
                                         fontSize: 12,
-                                        fontFamily: "Outfit",
                                         color: ColorCode.kWhiteOpacity70,
+                                        fontFamily: "Outfit",
                                       ),
                                     ),
                                   ],
                                 ),
 
-
                                 const SizedBox(height: 6),
 
-                                /// 👤 NAME
-                                 Text(
-                                  item['name'] ?? '',
-                                  style: TextStyle(
+                                /// NAME
+                                Text(
+                                  item['name'] ?? "Unknown",
+                                  style: const TextStyle(
                                     fontSize: 14,
+                                    color: Colors.white,
                                     fontFamily: "Outfit",
-                                    color: ColorCode.white,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
 
-                                const SizedBox(height: 2),
-
-                                /// 🎥 ROLE
-                                 Text(
-                                  item['primary_title'] ?? '',
-
-                                  style: TextStyle(
+                                /// ROLE (NULL SAFE)
+                                Text(
+                                  item['primary_title'] ?? "Creative Professional",
+                                  style: const TextStyle(
                                     fontSize: 11,
-                                    fontFamily: "Outfit",
                                     color: ColorCode.kWhiteOpacity70,
+                                    fontFamily: "Outfit",
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          /// 💰 PRICE + ACTION BUTTON
+                          /// PRICE
                           Positioned(
                             bottom: 16,
                             right: 16,
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: ColorCode.kButtonColor,
-                                    borderRadius: BorderRadius.circular(22),
-                                  ),
-                                  child:  Text(
-                                    "From \$${item['hourly_rate']}/Hr",
-
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      color: ColorCode.kCircleGradientTop,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: ColorCode.kButtonColor,
+                                borderRadius: BorderRadius.circular(22),
+                              ),
+                              child: Text(
+                                item['hourly_rate'] != null
+                                    ? "From \$${item['hourly_rate']}/Hr"
+                                    : "Price on request",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorCode.kCircleGradientTop,
                                 ),
-                                const SizedBox(width: 10),
-                                Image.asset(
-                                  "assets/images/Group 2087328980.png",
-                                  height: 34,
-                                  width: 34,
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   );
-
                 },
+
               ),
             ),
           ],

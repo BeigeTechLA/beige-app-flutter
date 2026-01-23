@@ -3,11 +3,17 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
 import 'crew_size_matching_screen.dart';
 
 class MoreDetailsScreen extends StatefulWidget {
-  const MoreDetailsScreen({super.key});
+  final int specialtyId;
+  final int ShootTypeId;
+  final int bookingId;
+  final int contentTypeId;
+  const MoreDetailsScreen({super.key, required this.contentTypeId, required this.specialtyId, required this.ShootTypeId, required this.bookingId});
 
   @override
   State<MoreDetailsScreen> createState() => _MoreDetailsScreenState();
@@ -28,7 +34,116 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   String selectedAddress = "Search or select location";
   TextEditingController searchController = TextEditingController();
+  final TextEditingController additionalDetailsController =
+  TextEditingController();
 
+  final TextEditingController referenceLinksController =
+  TextEditingController();
+
+  bool isSubmitting = false;
+
+  bool get isFormValid {
+    return currentLatLng != null &&
+        searchController.text.isNotEmpty;
+  }
+
+  Future<void> _More_Details() async {
+    if (!isFormValid) return;
+
+    setState(() => isSubmitting = true);
+
+    final payload = {
+      "crew_requirements": _buildCrewRequirements(),
+
+      "event_location": selectedAddress,
+      "event_latitude": currentLatLng!.latitude,
+      "event_longitude": currentLatLng!.longitude,
+
+      "additional_details": additionalDetailsController.text.trim(),
+
+      "reference_links": referenceLinksController.text
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList(),
+    };
+
+    debugPrint("📤 REQUEST BODY → $payload");
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/details",
+        payload,
+      );
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CrewSizeMatchingScreen(
+              bookingId: widget.bookingId,
+              contentTypeId: widget.contentTypeId,
+              specialtyId: widget.specialtyId,
+              ShootTypeId: widget.ShootTypeId,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ API Error → $e");
+    } finally {
+      setState(() => isSubmitting = false);
+    }
+  }
+
+  Map<String, int> _buildCrewRequirements() {
+    final Map<String, int> crew = {};
+
+    if (loding) { // Yes selected
+      switch (widget.contentTypeId) {
+        case 1: // Videography
+          crew["videographer"] = quantity;
+          break;
+        case 2: // Photography
+          crew["photographer"] = quantity;
+          break;
+        case 3: // Both
+          crew["videographer"] = quantity;
+          crew["photographer"] = quantity;
+          break;
+      }
+    }
+
+    return crew;
+  }
+
+
+
+  String getContentTypeTitle(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "Videography";
+      case 2:
+        return "Photography";
+      case 3:
+        return "Photography & Videography";
+      default:
+        return "Shoot Type";
+    }
+  }
+
+  IconData getContentTypeIcon(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return Icons.videocam;
+      case 2:
+        return Icons.camera_alt;
+      case 3:
+        return Icons.video_camera_back; // or Icons.photo_camera
+      default:
+        return Icons.work_outline;
+    }
+  }
 
 
   @override
@@ -284,15 +399,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
         
-              /// 🔹 MORE DETAILS
-              Text(
-                "More Details",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+
         
               const SizedBox(height: 12),
         
@@ -305,6 +412,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 ),
                 child: Row(
                   children: [
+                    /// ICON
                     Container(
                       height: 40,
                       width: 40,
@@ -312,18 +420,29 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.videocam, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Videographer x 1",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      child: Icon(
+                        getContentTypeIcon(widget.contentTypeId),
+                        color: Colors.white,
                       ),
                     ),
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+
+                    const SizedBox(width: 12),
+
+                    /// TITLE
+                    Expanded(
+                      child: Text(
+                        "${getContentTypeTitle(widget.contentTypeId)} x $quantity",
+
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+
+                    /// INCLUDED BADGE
+                   /* Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(20),
@@ -335,18 +454,20 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           fontSize: 12,
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),
-        
+
+
               const SizedBox(height: 24),
         
               /// 🔹 QUESTION
               Text(
-                "Do You Need An Additional\nShooter?",
+                "Would you like to Add Additional\ncreatives?",
                 style: TextStyle(
                   color: Colors.white,
+                  fontFamily: "Unbounded",
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -376,7 +497,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-        
+
                       /// 🔹 TOP ROW (CHECKBOX + TEXT + QTY)
                       Row(
                         children: [
@@ -389,33 +510,27 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-        
+
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children:  [
                                 Text(
-                                  "Videographer",
+                                  "${getContentTypeTitle(widget.contentTypeId)}",
                                   style: TextStyle(color: Colors.white, fontSize: 14),
                                 ),
                                 SizedBox(height: 4),
-                                Text(
-                                  "\$385.00",
-                                  style: TextStyle(
-                                    color: Color(0xFFE7C38A),
-                                    fontSize: 14,
-                                  ),
-                                ),
+
                               ],
                             ),
                           ),
-        
+
                           /// ➕➖ Quantity
                           Container(
                             padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE7C38A),
+                              color:ColorCode.kButtonColor,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Row(
@@ -426,34 +541,34 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                                       setState(() => quantity--);
                                     }
                                   },
-                                  child: const Icon(Icons.remove, size: 18),
+                                  child:  Icon(Icons.remove, size: 18,color: ColorCode.black,),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
                                     quantity.toString().padLeft(2, '0'),
-                                    style: const TextStyle(fontWeight: FontWeight.w600),
+                                    style: const TextStyle(fontWeight: FontWeight.w600,color: ColorCode.black,),
                                   ),
                                 ),
                                 InkWell(
                                   onTap: () {
                                     setState(() => quantity++);
                                   },
-                                  child: const Icon(Icons.add, size: 18),
+                                  child: const Icon(Icons.add, size: 18,color: ColorCode.black,),
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-        
+
                       const SizedBox(height: 16),
-        
-        
+
+
                     ],
                   ),
                 ),
-        
+
                SizedBox(height: 20),
               TextField(
                 controller: searchController,
@@ -545,6 +660,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         
               SizedBox(height: 20),
               TextField(
+                controller: additionalDetailsController,
         maxLines: 5,
         
                 decoration: InputDecoration(
@@ -588,7 +704,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
               TextField(
 
-
+                controller: referenceLinksController,
                 decoration: InputDecoration(
                   labelText:"Supporting Links",
 
@@ -659,17 +775,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  debugPrint("Continue clicked");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CrewSizeMatchingScreen(
+                onPressed: isSubmitting ? null : _More_Details,
 
-                      ),
-                    ),
-                  );
-                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorCode.kButtonColor,
                   /* backgroundColor: selectedIndex == -1
@@ -701,29 +808,53 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     );
   }
   Widget _radioOption(String title, bool value) {
+    final bool isSelected = loding == value;
+
     return InkWell(
       onTap: () {
         setState(() {
           loding = value;
         });
       },
+      borderRadius: BorderRadius.circular(30),
       child: Row(
         children: [
           Container(
-            height: 18,
-            width: 18,
+            height: 28,
+            width: 28,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white54),
-              color: loding == value
-                  ?  Color(0xFFE7C38A)
-                  : Colors.transparent,
+              gradient: isSelected
+                  ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFE8D1AB),
+                  Color(0xFFD4A14D),
+                ],
+              )
+                  : null,
+              border: Border.all(
+                color: ColorCode.kWhiteOpacity70,
+                width: 1,
+              ),
             ),
+            child: isSelected
+                ? const Center(
+              child: CircleAvatar(
+                radius: 5,
+                backgroundColor: Colors.black,
+              ),
+            )
+                : const SizedBox(),
           ),
           const SizedBox(width: 8),
           Text(
             title,
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+            ),
           ),
         ],
       ),

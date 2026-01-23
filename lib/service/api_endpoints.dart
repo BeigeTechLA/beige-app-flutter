@@ -10,7 +10,6 @@ class ApiEndpoints {
   static const String home_data = "home/home-data";
   static const String booking_data = "bookings/start-options";
 
-  static const String booking = "bookings";
 
   //Select Date & Time Slots
 
@@ -51,6 +50,7 @@ class ApiEndpoints {
 
   static const String booking_shoot_types = "bookings/shoot-types/";
 
+  static const String booking = "bookings";
 
 
 //---------------------------- Creative --------------------------

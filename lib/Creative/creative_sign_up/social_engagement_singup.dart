@@ -67,7 +67,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     "assets/Icons/facebook.png",
     "assets/Icons/ins.png",
     "assets/Icons/tick_tok.png",
-    "assets/images/social_media_Icon.png",
+    "assets/images/Social_media.png",
     "assets/Icons/webside.png",
   ];
 
@@ -937,7 +937,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                       _socialImage(index: 0, imagePath: "assets/Icons/facebook.png"),
                       _socialImage(index: 1, imagePath: "assets/Icons/ins.png"),
                       _socialImage(index: 2, imagePath: "assets/Icons/tick_tok.png"),
-                      _socialImage(index: 3, imagePath: "assets/images/social_media_Icon.png"),
+                       _socialImage(index: 3, imagePath: "assets/images/Social_media.png"),
                       _socialImage(index: 4, imagePath: "assets/Icons/webside.png"),
                     ],
                   ),
