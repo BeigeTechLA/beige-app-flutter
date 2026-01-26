@@ -27,7 +27,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
   // Expand/Collapse states
   bool shootOpen = true;
-  bool isShootTypeLoaded = false; // 👈 NEW
+  bool isShootTypeLoaded = false; 
 
   bool editOpen = true;
   bool isLoading =false;

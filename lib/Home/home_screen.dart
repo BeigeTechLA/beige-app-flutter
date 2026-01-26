@@ -23,9 +23,6 @@ class _HomeScreenState extends State<HomeScreen>
   bool isLoading = true;
   List featuredCreatives = [];
 
-
-
-
   List<dynamic> incomeList = [];
 
   int currentIndex = 0;

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
 import '../../HomeSekect/recommended_detils_screen.dart';
 import '../Book_Confirm/review_confirm_screen.dart';
 
 class SelectYourDreamTeam extends StatefulWidget {
-  const SelectYourDreamTeam({super.key});
+  final int specialtyId;
+  final int ShootTypeId;
+  final int bookingId;
+  final int contentTypeId;
+  const SelectYourDreamTeam({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
   State<SelectYourDreamTeam> createState() => _SelectYourDreamTeamState();
@@ -17,6 +23,38 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   bool isAdded = false;
 
   bool isLoading =true;
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    _CrewSizeMatching();
+  }
+  Future<void> _CrewSizeMatching() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.creatives}/${widget.specialtyId}/profile",
+      );
+
+      debugPrint("API Response → $response");
+
+      if (response != null && response['error'] == false) {
+        final data = response['data'];
+
+
+      }
+    } catch (e) {
+      debugPrint("API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

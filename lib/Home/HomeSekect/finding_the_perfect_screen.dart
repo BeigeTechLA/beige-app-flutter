@@ -6,7 +6,11 @@ import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
 
 class FindingThePerfectScreen extends StatefulWidget {
   final int bookingId;
-  const FindingThePerfectScreen({super.key, required this.bookingId});
+  final int specialtyId;
+  final int ShootTypeId;
+
+  final int contentTypeId;
+  const FindingThePerfectScreen({super.key, required this.bookingId, required this.specialtyId, required this.ShootTypeId, required this.contentTypeId});
 
   @override
   State<FindingThePerfectScreen> createState() =>
@@ -32,7 +36,13 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (_) =>  SelectYourDreamTeam(), // 👈 next screen
+            builder: (_) =>  SelectYourDreamTeam(
+              bookingId: widget.bookingId,
+              contentTypeId: widget.contentTypeId,
+              specialtyId: widget.specialtyId,
+              ShootTypeId: widget.ShootTypeId,
+
+            ), // 👈 next screen
         ),
       );
     });

@@ -134,7 +134,7 @@ class _MyProfileState extends State<MyProfile> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const CircleAvatar(
+                          child:  CircleAvatar(
                             radius: 48,
                             backgroundImage:
                             AssetImage("assets/Icons/profile.png"),

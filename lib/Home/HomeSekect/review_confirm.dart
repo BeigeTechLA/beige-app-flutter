@@ -332,12 +332,12 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
+                   /* Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => FindingThePerfectScreen(bookingId: widget.bookingId,),
                       ),
-                    );
+                    );*/
                   },
                   child: const Text(
                     "Find Creative",

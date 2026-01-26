@@ -51,6 +51,7 @@ class ApiEndpoints {
   static const String booking_shoot_types = "bookings/shoot-types/";
 
   static const String booking = "bookings";
+  static const String creatives = "creatives";
 
 
 //---------------------------- Creative --------------------------

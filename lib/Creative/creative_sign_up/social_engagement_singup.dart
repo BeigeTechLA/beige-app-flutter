@@ -140,7 +140,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     return 'https://$trimmed';
   }
 
-  Future<void> _fetchSingup3() async {
+ /* Future<void> _fetchSingup3() async {
     if (widget.crewMemberId == null) {
       _showSnack("Crew member id missing");
       return;
@@ -200,7 +200,70 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       setState(() => isLoggingIn = false);
     }
   }
+*/
+  Future<void> _fetchSingup3() async {
+    if (widget.crewMemberId == null) {
+      _showSnack("Crew member id missing");
+      return;
+    }
 
+    if (featuredImages.isEmpty) {
+      _showSnack("Please upload featured work");
+      return;
+    }
+
+    setState(() => isLoggingIn = true);
+
+    try {
+      /// 🔗 SOCIAL LINKS
+      final socialLinks = savedLinks.map((e) {
+        return {
+          "platform": e['name'].toString().toLowerCase(),
+          "url": normalizeUrl(e['url']),
+        };
+      }).toList();
+
+      /// 🎬 FEATURED WORK
+      final featuredWork = [
+        {
+          "work_title": enter_work_titleController.text.trim().isEmpty
+              ? "Featured Work"
+              : enter_work_titleController.text.trim(),
+          "tags": selectedTags,
+        }
+      ];
+
+      /// 📦 PAYLOAD (TEXT DATA ONLY)
+      final payload = {
+        "crew_member_id": widget.crewMemberId.toString(),
+        "social_media_links": jsonEncode(socialLinks),
+        "featured_work": jsonEncode(featuredWork),
+        "recent_work_media_index": "0",
+      };
+
+      /// ❗ ApiService expects ONE FILE only
+      final res = await ApiService().postMultipart(
+        ApiEndpoints.register_step3,
+        payload,
+        featuredImages.first, // ⚠️ first file only
+      );
+
+      if (res != null && res['error'] == false) {
+        _showSnack("Signup Step-3 Completed 🎉");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Mainscreen()),
+        );
+      } else {
+        _showSnack(res?['message'] ?? "Signup failed");
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      _showSnack("Server error");
+    } finally {
+      setState(() => isLoggingIn = false);
+    }
+  }
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -209,6 +272,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
   }
 
   void viewFile(File file) {
+
     final ext = file.path.split('.').last.toLowerCase();
 
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)) {
@@ -321,8 +385,8 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                       final item = entry.value;
 
                       return Container(
-                         margin: const EdgeInsets.only(bottom: 2),
-                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: Colors.white24),
@@ -340,46 +404,47 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                               ),
                               child: Image.asset(
                                 item['icon'],
-                                height: 20,
-                                width: 20,
                                 color: ColorCode.kButtonColor,
                               ),
-
                             ),
 
                             const SizedBox(width: 12),
 
-                            /// NAME + URL
+                            /// NAME
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['name'],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                item['name'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
 
-                            /// 🗑 DELETE ICON
-                            InkWell(
-                              onTap: () {
+                            /// ✏️ EDIT
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: () {
+                                setState(() {
+                                  editingIndex = index;
+                                  selectedSocialIndex =
+                                      socialNames.indexOf(item['name']);
+                                  nameLinkController.text = item['name'];
+                                  linkController.text = item['url'];
+                                });
+
+                                _openSocialSheet();
+                              },
+                            ),
+
+                            /// 🗑 DELETE
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.redAccent),
+                              onPressed: () {
                                 setState(() {
                                   savedLinks.removeAt(index);
                                 });
                               },
-                              child: const Padding(
-                                padding: EdgeInsets.all(6),
-                                child: Icon(
-                                  Icons.delete,
-                                  color: Colors.redAccent,
-                                  size: 20,
-                                ),
-                              ),
                             ),
                           ],
                         ),
@@ -678,16 +743,25 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {
-                     /* Navigator.pushReplacement(
+              /*      onPressed: () {
+
+
+                     *//* Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (_) => Mainscreen(), // change screen name
                         ),
-                      );*/
+                      );*//*
                     }
-                    ,
-                  /*  onPressed:
+                    ,*/
+                    onPressed: isLoggingIn
+                        ? null
+                        : () {
+                      debugPrint("🟢 CREATE PROFILE CLICKED");
+                      _fetchSingup3();
+                    },
+
+                    /*  onPressed:
                     isLoggingIn
                         ? null
                         : () {
@@ -872,272 +946,163 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom, // 🔥 keyboard height
-          ),
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: ColorCode.bcakgroundcolor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: SingleChildScrollView(
+
+                child:
+                Column(
+                  children: [
 
 
-                  /// 🔘 TOP DRAG INDICATOR
-                  Center(
-                    child: Container(
-                      height: 4,
-                      width: 40,
-                      margin:  EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(4),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
+                        color: ColorCode.bcakgroundcolor,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                       ),
-                    ),
-                  ),
-                  /// HEADER
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Add Social Links",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close, color: Colors.white),
-                      )
-                    ],
-                  ),
-            
-                  const SizedBox(height: 10),
-            
-                  const Text(
-                    "Add links that showcase your work, recognition,\npersonality and more!",
-                    style: TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
-                    ),
-                  ),
-            
-                  const SizedBox(height: 16),
-              Divider(color: ColorCode.kDividerWhite12,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _socialImage(index: 0, imagePath: "assets/Icons/facebook.png"),
-                      _socialImage(index: 1, imagePath: "assets/Icons/ins.png"),
-                      _socialImage(index: 2, imagePath: "assets/Icons/tick_tok.png"),
-                       _socialImage(index: 3, imagePath: "assets/images/Social_media.png"),
-                      _socialImage(index: 4, imagePath: "assets/Icons/webside.png"),
-                    ],
-                  ),
-            
-            
-            
-                  const SizedBox(height: 20),
-                  _buildField("Name of the Link", nameLinkController),
-                  const SizedBox(height: 12),
-                  _buildField("Link URL", linkController),
-            
-                  const SizedBox(height: 20),
-                  if (savedLinks.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-            
-                    Column(
-                      children: savedLinks.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final item = entry.value;
-            
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white24),
-                            color: Colors.black26,
-                          ),
-                          child: Row(
-                            children: [
-                              /// ICON
-                              Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Image.asset(
-                                  item['icon'], //
-                                  height: 20,
-                                  width: 20,
-                                  color: ColorCode.kButtonColor,
-                                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Container(
+                              height: 5,
+                              width: 40,
+                              margin:  EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(4),
                               ),
-            
-                              const SizedBox(width: 12),
-            
-                              /// NAME + URL
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['name'],
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      item['url'],
-                                      style: const TextStyle(
-                                        color: ColorCode.kWhiteOpacity70,
-                                        fontSize: 12,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-            
-                              /// ✏️ EDIT
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.white70, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    editingIndex = index;
-                                    nameLinkController.text = item['name'];
-                                    linkController.text = item['url'];
-                                    selectedSocialIndex =
-                                        socialIcons.indexWhere((e) => e == item['icon']);
-
-                                  });
-            
-                                  _openSocialSheet();
-                                },
-                              ),
-            
-                              /// 🗑 DELETE
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: () {
-                                  setState(() {
-                                    savedLinks.removeAt(index); // ✅ DELETE INSTANT
-                                  });
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.all(6),
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: Colors.redAccent,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ),
-            
-            
-                    /// ➕ ADD ANOTHER LINK
-                   /* InkWell(
-                      onTap: _openSocialSheet,
-                      child: Row(
-                        children: const [
-                          Icon(Icons.add, color: ColorCode.kButtonColor),
-                          SizedBox(width: 6),
-                          Text(
-                            "Add another link",
-                            style: TextStyle(
-                              color: ColorCode.kButtonColor,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
+                          /// HEADER
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                               Text(
+                                "Add Social Links",
+                                style: TextStyle(color: Colors.white, fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,)
+                              ),
+                              IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: const Icon(Icons.close, color: Colors.white),
+                              )
+                            ],
+                          ),
+
+                          Text(
+                              "Add links that showcase your work, recognition,\npersonality and more!",
+                              style: TextStyle(color: ColorCode.kWhiteOpacity70, fontSize: 14,fontFamily: "Outfit",fontWeight: FontWeight.w400,)
+                          ),
+                           SizedBox(height: 20),
+
+                          Divider(color: ColorCode.kDividerWhite12,
+
+                          ),
+                          SizedBox(height: 20),
+                          /// ✅ SOCIAL ICONS
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _socialImage(index: 0, imagePath: socialIcons[0], setModalState: setModalState),
+                              _socialImage(index: 1, imagePath: socialIcons[1], setModalState: setModalState),
+                              _socialImage(index: 2, imagePath: socialIcons[2], setModalState: setModalState),
+                              _socialImage(index: 3, imagePath: socialIcons[3], setModalState: setModalState),
+                              _socialImage(index: 4, imagePath: socialIcons[4], setModalState: setModalState),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          _buildField("Name of the Link", nameLinkController),
+                          SizedBox(height: 20),
+                          _buildField("Link URL", linkController),
+
+                          const SizedBox(height: 24),
+
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorCode.kButtonColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              onPressed: () {
+                                if (selectedSocialIndex == -1 ||
+                                    linkController.text.trim().isEmpty) {
+                                  _showSnack("Please select platform and enter link");
+                                  return;
+                                }
+
+                                final platformName = socialNames[selectedSocialIndex];
+                                final iconPath = socialIcons[selectedSocialIndex];
+                                final url = linkController.text.trim();
+
+                                setState(() {
+                                  if (editingIndex != null) {
+                                    // ✏️ UPDATE
+                                    savedLinks[editingIndex!] = {
+                                      "name": platformName,
+                                      "url": url,
+                                      "icon": iconPath,
+                                    };
+                                  } else {
+                                    // ➕ ADD
+                                    savedLinks.add({
+                                      "name": platformName,
+                                      "url": url,
+                                      "icon": iconPath,
+                                    });
+                                  }
+                                });
+
+                                // RESET
+                                editingIndex = null;
+                                selectedSocialIndex = -1;
+                                nameLinkController.clear();
+                                linkController.clear();
+
+                                Navigator.pop(context);
+                              },
+
+                              child: const Text(
+                                "Save",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+
                         ],
                       ),
-                    ),*/
-                  ],
-            
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorCode.kButtonColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (nameLinkController.text.isEmpty ||
-                            linkController.text.isEmpty ||
-                            selectedSocialIndex == -1) return;
-            
-                        setState(() {
-                          if (editingIndex != null) {
-                            /// ✏️ UPDATE EXISTING
-                            savedLinks[editingIndex!] = {
-                              "name": nameLinkController.text,
-                              "url": linkController.text,
-                              "icon": socialIcons[selectedSocialIndex],
-                            };
-                          } else {
-                            /// ➕ ADD NEW
-                            savedLinks.add({
-                              "name": nameLinkController.text,
-                              "url": linkController.text,
-                              "icon": socialIcons[selectedSocialIndex], // ✅ image path
-                            });
-                          }
-                        });
-            
-                        /// CLEAR
-                        nameLinkController.clear();
-                        linkController.clear();
-                        selectedSocialIndex = -1;
-                        editingIndex = null;
-            
-                        Navigator.pop(context);
-                      },
-            
-            
-            
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ),
-                  ),
-            
-            
-                ],
+                  ],
+                ),
               ),
-            
-            
-            ),
-          ),
+
+            );
+
+
+
+
+          },
         );
-
-
       },
+
     );
+
+
   }
+
 
   Widget _buildField(String title, TextEditingController controller) {
     return TextField(
@@ -1186,16 +1151,15 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
   Widget _socialImage({
     required int index,
     required String imagePath,
+    required void Function(void Function()) setModalState,
   }) {
     final bool isSelected = selectedSocialIndex == index;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        setState(() {
+        setModalState(() {
           selectedSocialIndex = index;
-
-          /// 🔥 AUTO FILL NAME FIELD
           nameLinkController.text = socialNames[index];
         });
       },
@@ -1204,7 +1168,11 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
         height: 52,
         width: 52,
         decoration: BoxDecoration(
-          color: Colors.transparent,
+          /// ✅ BACKGROUND COLOR CHANGE HERE
+          color: isSelected
+              ? ColorCode.kButtonColor.withOpacity(0.2)
+              : Colors.transparent,
+
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
@@ -1212,6 +1180,8 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                 : Colors.white24,
             width: isSelected ? 1.5 : 0.8,
           ),
+
+          /// optional glow
           boxShadow: isSelected
               ? [
             BoxShadow(
@@ -1233,8 +1203,13 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
           ),
         ),
       ),
+
+
     );
+
+
   }
+
 
 
 
@@ -1472,13 +1447,14 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                 SizedBox(height: 16),
 
                     /// 🏷️ ADD TAGS
+                    /// 🏷️ TAG SECTION
                     GestureDetector(
-                        // onTap: _openAddTagSheet,
+                      onTap: _openAddTagSheet, // 👉 edit ke liye bhi same sheet
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 8),
+                        child: selectedTags.isEmpty
+                            ? Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.black26,
                             borderRadius: BorderRadius.circular(20),
@@ -1492,16 +1468,33 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                               SizedBox(width: 6),
                               Text(
                                 "# Add Tags",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                style: TextStyle(color: Colors.white, fontSize: 13),
                               ),
                             ],
                           ),
+                        )
+                            : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: selectedTags.map((tag) {
+                            return Chip(
+                              label: Text(tag),
+                              backgroundColor: Colors.black,
+                              labelStyle: const TextStyle(color: Colors.white),
+                              deleteIconColor: Colors.white,
+                              onDeleted: () {
+                                setState(() {
+                                  selectedTags.remove(tag);
+                                });
+                              },
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
 
-                     SizedBox(height: 24),
+
+                    SizedBox(height: 24),
 
                     /// 💾 SAVE BUTTON
                     SizedBox(
@@ -1654,6 +1647,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                           });
                         }
                       },
+
                     ),
 
                     const SizedBox(height: 12),
@@ -1701,6 +1695,25 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
                         child: const Text("Save"),
                       ),
                     ),
+                    if (selectedTags.isNotEmpty)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: selectedTags.map((tag) {
+                          return Chip(
+                            label: Text(tag),
+                            backgroundColor: Colors.black,
+                            labelStyle: const TextStyle(color: Colors.white),
+                            deleteIconColor: Colors.white,
+                            onDeleted: () {
+                              setState(() {
+                                selectedTags.remove(tag);
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+
                   ],
                 ),
               ),

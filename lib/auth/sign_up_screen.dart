@@ -55,6 +55,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _showSnack("Please fill all fields");
       return;
     }
+    /// 🔴 EMAIL FORMAT VALIDATION
+    if (!isValidEmail(emailController.text.trim())) {
+      _showSnack("Please enter a valid email address");
+      return;
+    }
+
 
     if (passwordController.text != confirmPasswordController.text) {
       _showSnack("Password and Confirm Password do not match");
@@ -88,15 +94,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           MaterialPageRoute(builder: (_) => const LoginScreen()),
         );
       } else {
-        _showSnack(response?['message'] ?? "Email already exists. Please use another email");
+
       }
     } catch (e) {
       final error = e.toString().toLowerCase();
 
       if (error.contains("email")) {
-        _showSnack("Email already exists. Please use another email");
+        _showSnack("Email already exists");
+
       } else {
-        _showSnack("Email already exists. Please use another email");
+        _showSnack("Something went wrong. Please try again");
+
       }
     } finally {
       setState(() => isLoggingIn = false);
@@ -119,6 +127,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     confirmPasswordController.dispose();
     super.dispose();
   }
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
 
   @override
   Widget build(BuildContext context) {

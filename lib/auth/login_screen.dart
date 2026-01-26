@@ -26,31 +26,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-
-
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
   Future<void> _fetchLogin() async {
-    final apiService = ApiService();
-
-    debugPrint("👉 LOGIN CLICKED");
-
-    /// 🔴 BASIC VALIDATION
+    /// 🔴 EMPTY CHECK
     if (emailController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill all fields"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnack("Please fill all fields");
+      return;
+    }
+
+    /// 🔴 EMAIL FORMAT CHECK
+    if (!isValidEmail(emailController.text.trim())) {
+      _showSnack("Please enter a valid email address");
       return;
     }
 
     setState(() => isLoggingIn = true);
 
     try {
-      debugPrint("🌐 Calling API: ${ApiEndpoints.login}");
-
-      final response = await apiService.postData(
+      final response = await ApiService().postData(
         ApiEndpoints.login,
         {
           "email": emailController.text.trim(),
@@ -58,73 +59,60 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
 
-      debugPrint("✅ LOGIN RESPONSE => $response");
+      /// 🔴 LOGIN FAILED (EMAIL / PASSWORD WRONG)
+      if (response == null || response['error'] == true) {
+        final message = response?['message']?.toString().toLowerCase() ?? "";
 
-      /// 🔴 RESPONSE CHECK
-      if (response == null ||
-          response['error'] == true ||
-          response['data'] == null ||
-          response['data']['user'] == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response?['message'] ?? "Login failed"),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (message.contains("password")) {
+          _showSnack("Invalid password");
+        } else if (message.contains("email")) {
+          _showSnack("Email not found");
+        } else {
+          _showSnack("Invalid email or password");
+        }
         return;
       }
 
-      /// ✅ SAVE LOGIN DATA
+      if (response['data'] == null || response['data']['user'] == null) {
+        _showSnack("Invalid email or password");
+        return;
+      }
+
       await SharedService.setLoginDetails(response);
 
       if (!mounted) return;
 
-      /// 🔥 USER TYPE FROM API
       final int userType = response['data']['user']['user_type'];
 
-      debugPrint("👤 USER TYPE => $userType");
-
-      /// 🔀 ROLE BASED NAVIGATION
       if (userType == 3) {
-        // ✅ CLIENT / USER
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const Mainscreen()),
         );
-      }
-      else if (userType == 4) {
-        // ✅ CREATOR
+      } else if (userType == 4) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) =>  BookingAllScreen()),
+          MaterialPageRoute(builder: (_) => BookingAllScreen()),
         );
-      }
-      else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Invalid user type"),
-            backgroundColor: Colors.red,
-          ),
-        );
+      } else {
+        _showSnack("Invalid user type");
       }
 
-    } catch (e, stack) {
-      debugPrint("🔥 LOGIN ERROR => $e");
-      debugPrint("📌 STACKTRACE => $stack");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Something went wrong"),
-          backgroundColor: Colors.red,
-        ),
-      );
+    } catch (e) {
+      /// ❌ ONLY NETWORK / SERVER ISSUE
+      _showSnack(" Please try again later");
     } finally {
-      if (mounted) {
-        setState(() => isLoggingIn = false);
-      }
+      if (mounted) setState(() => isLoggingIn = false);
     }
   }
 
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
 
 
   bool get isFormValid {

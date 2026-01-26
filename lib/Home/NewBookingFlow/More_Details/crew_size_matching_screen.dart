@@ -21,13 +21,23 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
   int currentStep = 1;
 bool isLoading =true;
 
+
+  String shootName = "";
+  String contentType = "";
+  int minCrew = 0;
+  int maxCrew = 0;
+  String defaultOutput = "";
+
+  List<Map<String, dynamic>> roles = [];
+  List<String> reasoning = [];
+
+
   @override
   void initState() {
     super.initState();
 
     _CrewSizeMatching();
   }
-
   Future<void> _CrewSizeMatching() async {
     setState(() => isLoading = true);
 
@@ -39,8 +49,22 @@ bool isLoading =true;
       debugPrint("API Response → $response");
 
       if (response != null && response['error'] == false) {
+        final data = response['data'];
+
         setState(() {
-          // editTypes = response['data'] ?? [];
+          shootName = data['shoot_type']['name'] ?? "";
+          contentType = data['shoot_type']['content_type'] ?? "";
+
+          minCrew = data['recommended_crew']['min'] ?? 0;
+          maxCrew = data['recommended_crew']['max'] ?? 0;
+
+          defaultOutput = data['default_output'] ?? "";
+
+          roles = List<Map<String, dynamic>>.from(
+            data['recommended_crew']['roles'] ?? [],
+          );
+
+          reasoning = List<String>.from(data['reasoning'] ?? []);
         });
       }
     } catch (e) {
@@ -49,7 +73,6 @@ bool isLoading =true;
       setState(() => isLoading = false);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -227,11 +250,27 @@ bool isLoading =true;
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
           
                       children: [
-                        Text("Corporate Event (Video)",style: TextStyle(color: ColorCode.white, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                        Text(
+                          "$shootName (${contentType.toUpperCase()})",
+                          style: TextStyle(
+                            color: ColorCode.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "Outfit",
+                          ),
                         ),
-          
-                        Text("02-04 People",style: TextStyle(color: ColorCode.kButtonColor, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
-                        )
+
+
+                        Text(
+                          "$minCrew - $maxCrew People",
+                          style: TextStyle(
+                            color: ColorCode.kButtonColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "Outfit",
+                          ),
+                        ),
+
                       ],
                     ),
                   ),
@@ -252,7 +291,7 @@ bool isLoading =true;
                             Text("Typical output:",
                               style: TextStyle(color: ColorCode.kWhiteOpacity70, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
                             ),
-          
+
                           ],
                         ),
                         SizedBox(height: 10),
@@ -571,7 +610,13 @@ bool isLoading =true;
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>  FindingThePerfectScreen(bookingId: 2,), // 👈 next screen
+                          builder: (_) =>  FindingThePerfectScreen(
+
+                            bookingId: widget.bookingId,
+                            contentTypeId: widget.contentTypeId,
+                            specialtyId: widget.specialtyId,
+                            ShootTypeId: widget.ShootTypeId,
+                          ), // 👈 next screen
                         ),
                       );
                     },
