@@ -30,6 +30,7 @@ bool isLoading =true;
 
   List<Map<String, dynamic>> roles = [];
   List<String> reasoning = [];
+  String shootImageUrl = "";
 
 
   @override
@@ -222,29 +223,40 @@ bool isLoading =true;
                           ],
                         ),
                       ),
-          
-          
-          
-                  Padding(
-                    padding:  EdgeInsets.all(12.0),
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: SizedBox(
-                        height: 280,
-                        width: double.infinity,
-                        child: Image.asset(
-                          "assets/newbookflow/Frame_2087328912.png",
-                          fit: BoxFit.cover,
+
+
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: SizedBox(
+                            height: 280,
+                            width: double.infinity,
+                            child: shootImageUrl.isNotEmpty
+                                ? Image.network(
+                              ApiService().getImageURL(shootImageUrl),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  "assets/newbookflow/Frame_2087328912.png",
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            )
+                                : Image.asset(
+                              "assets/newbookflow/Frame_2087328912.png",
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-          
-                  Padding(
+
+
+                      Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -297,7 +309,8 @@ bool isLoading =true;
                         SizedBox(height: 10),
                         Row(
                           children: [
-                            Text("1 highlight reel",
+                            Text(
+                              defaultOutput.isNotEmpty ? defaultOutput : "-",
                               style: TextStyle(color: ColorCode.white, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
                             ),
                           ],

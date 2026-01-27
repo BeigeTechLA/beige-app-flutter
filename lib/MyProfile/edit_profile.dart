@@ -61,7 +61,8 @@ class _EditProfileState extends State<EditProfile> {
           nameController.text = user['name'] ?? '';
           emailController.text = user['email'] ?? '';
           locationController.text = user['location'] ?? '';
-          profileImageUrl = user['profile_image_url'];
+
+          profileImageUrl = user['user_profile_image_url'];
 
 
           isLoading = false;
@@ -182,6 +183,8 @@ class _EditProfileState extends State<EditProfile> {
       debugPrint("📊 STATUS: ${response.statusCode}");
       debugPrint("📦 RESPONSE: ${response.data}");
 
+      await _fetchMyProfile(); // 👈 GET again
+
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("✅ Profile image uploaded")),
@@ -199,17 +202,14 @@ class _EditProfileState extends State<EditProfile> {
 
   ImageProvider getProfileImage() {
     if (_profileImage != null) {
-      // ✅ User selected new image
       return FileImage(_profileImage!);
     }
     else if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
-      // ✅ Image from API
       return NetworkImage(
         ApiService().getImageURL(profileImageUrl!),
       );
     }
     else {
-      // ✅ Default image
       return const AssetImage("assets/Icons/profile.png");
     }
   }

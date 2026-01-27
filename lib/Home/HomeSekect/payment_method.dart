@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
+import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   final int bookingId;
@@ -274,31 +275,41 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               ],
               if (savedCards.isNotEmpty)
                 ...savedCards.map((card) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A2A),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          "assets/Icons/stripe.png",
-                          height: 28,
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewConfirmScreen(bookingId: widget.bookingId,),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Stripe",
-                            style: const TextStyle(color: Colors.white),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A2A),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            "assets/Icons/stripe.png",
+                            height: 28,
                           ),
-                        ),
-                        const Icon(
-                          Icons.radio_button_checked,
-                          color: Color(0xFFFFE6A5),
-                        )
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "Stripe",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.radio_button_checked,
+                            color: Color(0xFFFFE6A5),
+                          )
+                        ],
+                      ),
                     ),
                   );
                 }).toList(),

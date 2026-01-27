@@ -21,10 +21,13 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
   int currentStep = 1;
   bool isAdded = false;
+  List<dynamic> crewMatches = [];
+  Set<int> addedCrewIds = {};
 
   bool isLoading =true;
 
-
+  Set<int> favouriteUsers = {};
+  int requiredCount = 1;
 
   @override
   void initState() {
@@ -37,20 +40,55 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
     try {
       final response = await ApiService().fetchData(
-        "${ApiEndpoints.creatives}/${widget.specialtyId}/profile",
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=10",
       );
 
       debugPrint("API Response → $response");
 
       if (response != null && response['error'] == false) {
-        final data = response['data'];
+        setState(() {
+          crewMatches = response['data']['items'];
 
-
+          requiredCount =
+              response['data']['crew_requirements']?[0]?['required_count'] ?? 0;
+        });
       }
+
     } catch (e) {
       debugPrint("API Error → $e");
     } finally {
       setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _addFavourite(int userId) async {
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.addfavourites}/$userId",
+        {},
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite added");
+      }
+    } catch (e) {
+      debugPrint("Add Favourite Error: $e");
+    }
+  }
+
+
+  Future<void> _removeFavourite(int userId) async {
+    try {
+      final response = await ApiService().deleteData(
+        "${ApiEndpoints.addfavourites}/$userId",
+
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite removed");
+      }
+    } catch (e) {
+      debugPrint("Remove Favourite Error: $e");
     }
   }
 
@@ -184,10 +222,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: 10,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
                 physics: const BouncingScrollPhysics(),
+                itemCount: crewMatches.length,
                 itemBuilder: (context, index) {
+                  final item = crewMatches[index];
+                  final bool isAdded = addedCrewIds.contains(item['id']);
+                  final int userId = item['user']['id'];
+                  final bool isFavourite = favouriteUsers.contains(userId);
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Container(
@@ -199,9 +244,16 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       child: Stack(
                         children: [
 
-                          /// 🔹 IMAGE
+                          /// 🔹 IMAGE (API)
                           Positioned.fill(
-                            child: Image.asset(
+                            child: item['profile_image_url'] != null
+                                ? Image.network(
+                              ApiService().getImageURL(
+                                item['profile_image_url'],
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                                : Image.asset(
                               "assets/images/Rectangle 34661070.png",
                               fit: BoxFit.cover,
                             ),
@@ -229,29 +281,49 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                             left: 12,
                             right: 12,
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-
-                                /// ACTIVE
                                 Row(
                                   children: const [
                                     CircleAvatar(
-                                        radius: 4,
-                                        backgroundColor: Colors.green),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      "Active",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
+                                      radius: 4,
+                                      backgroundColor: Colors.green,
                                     ),
+                                    SizedBox(width: 6),
+                                    Text("Active",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 12)),
                                   ],
                                 ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (isFavourite) {
+                                      // ❌ REMOVE
+                                      setState(() {
+                                        favouriteUsers.remove(userId);
+                                      });
 
-                                /// HEART
-                                Image.asset(
-                                  "assets/images/Heart Angle.png",
-                                  height: 22,
+                                      await _removeFavourite(userId);
+
+                                      _showFavouriteToast("Removed from Favourite");
+                                    } else {
+                                      // ✅ ADD
+                                      setState(() {
+                                        favouriteUsers.add(userId);
+                                      });
+
+                                      await _addFavourite(userId);
+
+                                      _showFavouriteToast("Added to Favourite");
+                                    }
+                                  },
+                                  child: Image.asset(
+                                    isFavourite
+                                        ? "assets/Icons/Heart_Angl_COLOR.png"
+                                        : "assets/images/Heart Angle.png",
+                                    height: 22,
+                                    width: 22,
+                                  ),
                                 ),
                               ],
                             ),
@@ -263,41 +335,38 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                             right: 14,
                             bottom: 14,
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
 
                                 /// LEFT INFO
                                 Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: const [
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Row(
                                       children: [
-                                        Icon(Icons.star,
+                                        const Icon(Icons.star,
                                             color: Colors.amber, size: 14),
-                                        SizedBox(width: 4),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          "4.5 (120)",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12),
+                                          "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
+                                          style: const TextStyle(
+                                              color: Colors.white, fontSize: 12),
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: 6),
+                                    const SizedBox(height: 6),
                                     Text(
-                                      "Angela Kia",
-                                      style: TextStyle(
+                                      item['name'] ?? '',
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white,
                                       ),
                                     ),
                                     Text(
-                                      "Videography Specialist",
-                                      style: TextStyle(
+                                      item['role_name'] ?? '',
+                                      style: const TextStyle(
                                         fontSize: 11,
                                         color: Colors.white70,
                                       ),
@@ -305,24 +374,46 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   ],
                                 ),
 
-                                /// RIGHT BUTTON
+                                /// RIGHT BUTTONS
                                 Row(
                                   children: [
+
+                                    /// ADD / REMOVE
                                     InkWell(
                                       onTap: () {
                                         setState(() {
-                                          isAdded = !isAdded; // 🔁 toggle
+                                          if (isAdded) {
+                                            // ✅ Remove allowed anytime
+                                            addedCrewIds.remove(item['id']);
+                                          } else {
+                                            // ❌ Limit reached
+                                            if (addedCrewIds.length >= requiredCount) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "You can add only $requiredCount members",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            // ✅ Add allowed
+                                            addedCrewIds.add(item['id']);
+                                          }
                                         });
                                       },
+
                                       child: Container(
-                                        padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 14, vertical: 8),
                                         decoration: BoxDecoration(
                                           color: isAdded
-                                              ? ColorCode.kLightRed        // ❌ Remove state
-                                              : ColorCode.kButtonColor,   // ✅ Add state
+                                              ? ColorCode.kLightRed
+                                              : ColorCode.kButtonColor,
                                           borderRadius: BorderRadius.circular(30),
                                           border: isAdded
-                                              ? Border.all(color: Colors.red) // 🔴 Remove border
+                                              ? Border.all(color: Colors.red)
                                               : null,
                                         ),
                                         child: Text(
@@ -331,22 +422,27 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             fontSize: 12,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w600,
-                                            color: isAdded ? Colors.red : Colors.black,
+                                            color: isAdded
+                                                ? Colors.red
+                                                : Colors.black,
                                           ),
                                         ),
                                       ),
                                     ),
 
-                                    SizedBox(width: 8),
+                                    const SizedBox(width: 8),
+
+                                    /// DETAILS
                                     InkWell(
                                       onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => RecommendedDetilsScreen(
-                                              id: 1 ,
-                                              bookingId: 2,
-                                            ),
+                                            builder: (_) =>
+                                                RecommendedDetilsScreen(
+                                                  id: item['id'], // ✅ REAL ID
+                                                  bookingId: widget.bookingId,
+                                                ),
                                           ),
                                         );
                                       },
@@ -367,6 +463,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 },
               ),
             ),
+
             SizedBox(height: 20),
           ],
         ),
@@ -387,7 +484,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>  ReviewConfirmScreen(),
+                        builder: (_) =>  ReviewConfirmScreen( bookingId: widget.bookingId,),
                       ),
                     );
                   },
@@ -399,7 +496,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     elevation: 0,
                   ),
                   child:  Text(
-                    "Continue with 00 Member",
+                    "Continue with ${addedCrewIds.length} Member",
+
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: "Unbounded",
@@ -713,4 +811,54 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       },
     );
   }
+  void _showFavouriteToast(String message) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (_) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Outfit",
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
+  }
+
 }

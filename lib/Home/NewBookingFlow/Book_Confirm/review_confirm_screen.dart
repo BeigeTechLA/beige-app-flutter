@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../../../service/api_endpoints.dart';
+import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
+import '../../HomeSekect/payment_method.dart';
+import 'PaymentSuccessScreen.dart';
 
 class ReviewConfirmScreen extends StatefulWidget {
-  const ReviewConfirmScreen({super.key});
+  // final int id;
+  final int bookingId;
+  const ReviewConfirmScreen({super.key,  required this.bookingId});
 
   @override
   State<ReviewConfirmScreen> createState() => _ReviewConfirmScreenState();
@@ -11,9 +18,162 @@ class ReviewConfirmScreen extends StatefulWidget {
 
 class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+
+  Map<String, dynamic>? booking;
+  List<dynamic> heldCreatives = [];
+  Map<String, dynamic>? pricing;
+  Map<String, dynamic>? contact;
+  String creativeName = "";
+  String creativeRole = "";
+  String creativeImage = "";
+  String creativeRate = "";
+  String creativeRatingText = "";
+
+
   int currentStep = 2;
-  bool payFullAdvance = true;
-  int selectedIndex = 0;
+     bool payFullAdvance = true;
+    int selectedIndex = 0;
+     bool isLoading =true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHomeReview();
+  }
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    super.dispose();
+  }
+
+
+  Future<void> _fetchHomeReview() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/summary-details",
+      );
+
+      if (response != null && response['error'] == false) {
+        final data = response['data'];
+        final creatives = data['held_creatives'] as List;
+
+        booking = data['booking'];
+        pricing = data['pricing'];
+
+        if (creatives.isNotEmpty) {
+          final creative = creatives.first['creative'];
+
+          creativeName = creative?['name'] ?? "—";
+          creativeImage = creative?['profile_image_url'] ?? "";
+          creativeRate = creative?['hourly_rate']?.toString() ?? "";
+          creativeRole = getContentTypeTitle(creatives.first['content_type']);
+
+          final rating = creative?['average_rating'];
+          creativeRatingText =
+          (rating != null && rating > 0)
+              ? "$rating (${creative?['total_reviews'] ?? 0})"
+              : "New";
+        } else {
+          /// 🔥 NO CREW ASSIGNED CASE
+          creativeName = "Crew not assigned yet";
+          creativeRole = booking?['shoot_type_name'] ?? "";
+          creativeImage = "";
+          creativeRate = "";
+          creativeRatingText = "—";
+        }
+      }
+    } catch (e) {
+      debugPrint("Review API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _fetchReview() async {
+    if (nameController.text.isEmpty || phoneController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill required fields")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().putData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/payment",
+        {
+          "payment_method": getPaymentMethod(),
+          "full_name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "phone": phoneController.text.trim(),
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("✅ Payment Details Submitted");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentSuccessScreen(
+              bookingId: widget.bookingId,
+              fullName: nameController.text.trim(),
+              phone: phoneController.text.trim(),
+              paymentMethod: getPaymentMethod(),
+            ),
+          ),
+        );
+      }
+      else {
+        debugPrint("❌ Payment API failed: $response");
+      }
+    } catch (e) {
+      debugPrint("Review API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "";
+    final d = DateTime.parse(date);
+    return DateFormat('EEE, dd MMM yyyy').format(d);
+  }
+
+  String getContentTypeTitle(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "Video Shoot Type";
+      case 2:
+        return "Photo Shoot Type";
+      case 3:
+        return "Photo & Video Shoot Type";
+      default:
+        return "Shoot Type";
+    }
+  }
+  String getPaymentMethod() {
+    switch (selectedIndex) {
+      case 0:
+        return "1"; // Card
+      case 1:
+        return "2"; // Stripe
+      default:
+        return "1";
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,16 +221,18 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
         ),
       ),
 
-      body: SingleChildScrollView(
+      body: isLoading
+          ?  Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         child: Padding(
-          padding:  EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-        
+
               Row(
                 children: List.generate(3, (index) {
                   double fillWidth = 0;
-        
+
                   if (index < currentStep) {
                     // ✅ Completed step (FULL)
                     fillWidth = double.infinity;
@@ -78,10 +240,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     // 🟡 Current step (HALF)
                     fillWidth = 140.44;
                   } else {
-        
+
                     fillWidth = 0;
                   }
-        
+
                   return Expanded(
                     child: Container(
                       margin: const EdgeInsets.only(right: 8),
@@ -107,11 +269,11 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   );
                 }),
               ),
-        
+
               SizedBox(
                 height: 20,
               ),
-        
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -124,13 +286,13 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       color: ColorCode.white,
                     ),
                   ),
-        
-        
-        
+
+
+
                 ],
               ),
-        
-        
+
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -140,33 +302,47 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-        
+
                     /// 🔹 TOP PROFILE ROW
                     Row(
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child: Image.asset(
-                            "assets/images/Rectangle 34661070.png",
+                          child: SizedBox(
                             height: 144,
                             width: 126,
-                            fit: BoxFit.cover,
+                            child: creativeImage.isNotEmpty
+                                ? Image.network(
+                              "${ApiService.imageURL}$creativeImage",
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(
+                                "assets/images/Rectangle 34661070.png",
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                                : Image.asset(
+                              "assets/images/Rectangle 34661070.png",
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 14),
-        
+
+
+                        SizedBox(width: 14),
+
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
+                              /// ⭐ Rating
                               Row(
                                 children: [
-                                  Icon(Icons.star, size: 14,
-                                      color: Colors.amber),
-                                  SizedBox(width: 4),
+                                  const Icon(Icons.star, size: 14, color: Colors.amber),
+                                  const SizedBox(width: 4),
                                   Text(
-                                    "4.5 (120)",
-                                    style: TextStyle(fontSize: 14,
+                                    creativeRatingText,
+                                    style: const TextStyle(
+                                      fontSize: 14,
                                       color: ColorCode.kWhiteOpacity70,
                                       fontWeight: FontWeight.w500,
                                       fontFamily: "Outfit",
@@ -174,44 +350,57 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 6),
+
+                              const SizedBox(height: 6),
+
+                              /// 👤 NAME
                               Text(
-                                "Angela Kia",
-                                style: TextStyle(
+                                creativeName,
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
                                   fontFamily: "Outfit",
                                 ),
                               ),
-                              SizedBox(height: 2),
+
+                              const SizedBox(height: 2),
+
+                              /// 🎥 ROLE
                               Text(
-                                "Videography Specialist",
-                                style: TextStyle(
+                                creativeRole,
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: ColorCode.kWhiteOpacity70,
                                   fontFamily: "Outfit",
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                "From \$450/Hr",
-                                style: TextStyle(
+
+                              const SizedBox(height: 10),
+
+                              /// 💰 RATE
+                              creativeRate.isNotEmpty
+                                  ? Text(
+                                "From ₹$creativeRate/Hr",
+                                style: const TextStyle(
                                   fontSize: 14,
                                   color: ColorCode.kButtonColor,
                                   fontFamily: "Outfit",
                                   fontWeight: FontWeight.w700,
                                 ),
-                              ),
+                              )
+                                  : const SizedBox(),
+
                             ],
                           ),
-                        )
+                        ),
+
                       ],
                     ),
-        
-                    const SizedBox(height: 14),
-        
+
+                     SizedBox(height: 14),
+
                     SizedBox(
                       height: 1,
                       child: LayoutBuilder(
@@ -231,10 +420,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         },
                       ),
                     ),
-        
-        
+
+
                     const SizedBox(height: 12),
-        
+
                     /// ⬜ WHITE INFO BOX
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -250,18 +439,21 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         children: [
                           infoRowBlack(
                             Icons.access_time,
-                            "01:30 AM to 03:30 AM (1h duration)",
+                            "${booking?['start_time']} to ${booking?['end_time']} "
+                                "(${pricing?['duration_hours']}h duration)",
                           ),
-                          const SizedBox(height: 10),
+
                           infoRowBlack(
                             Icons.calendar_month,
-                            "Apr 01, 2025 - Apr 04, 2025",
+                            formatDate(booking?['event_date']),
+
                           ),
-                          const SizedBox(height: 10),
+
                           infoRowBlack(
                             Icons.location_on,
-                            "2458 Sunset Boulevard, Los Angeles, CA 90026",
+                            booking?['event_location'] ?? "",
                           ),
+
                         ],
                       ),
                     ),
@@ -270,12 +462,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               ),
               Divider(color: ColorCode.kDividerWhite12,),
               SizedBox(height: 28),
-        
-        
+
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-        
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -290,8 +482,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ],
                   ),
                   SizedBox(height: 14),
-        
-        
+
+
                   Container(
                     margin:  EdgeInsets.only(bottom: 12),
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -309,52 +501,52 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                            ],
                          ),
                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kGoldGradientLight,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text("Highlight Reel",style: TextStyle(color: ColorCode.black,fontFamily: "Outfit",fontSize:12,fontWeight: FontWeight.w400,)
-                                )
-                            ),
-                            Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kGoldGradientLight,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text("Voiceover",style: TextStyle(color: ColorCode.black,fontFamily: "Outfit",fontSize:12,fontWeight: FontWeight.w400,)
-                                )
-                            ),
-                            Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kGoldGradientLight,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text("Featured Video",style: TextStyle(color: ColorCode.black,fontFamily: "Outfit",fontSize:12,fontWeight: FontWeight.w400,)
-                                )
-                            )
-                          ],
-                        )
-        
-                      ],
+                 GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: (booking?['edit_types'] ?? []).length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,        // 🔥 1 row me 2 items
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 3,     // height adjust karne ke liye
+          ),
+          itemBuilder: (context, index) {
+            final edit = booking!['edit_types'][index];
+            return Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: ColorCode.kGoldGradientLight,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                edit,
+                style: const TextStyle(
+                  color: ColorCode.black,
+                  fontFamily: "Outfit",
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            );
+          },
+        ),
+
+
+        ],
                     ),
                   ),
-        
+
                   Padding(
                     padding:  EdgeInsets.all(12.0),
                     child: Divider(color: ColorCode.kDividerWhite12,),
                   ),
-        
+
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-        
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -368,12 +560,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                             ),),
                           GestureDetector(
                             onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => Specialities(),
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentMethodScreen(bookingId: widget.bookingId,),
+                                ),
+                              );
                             },
                             child: Image.asset(
                               "assets/Icons/rightside.png",
@@ -385,20 +577,20 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         ],
                       ),
                       SizedBox(height: 14),
-        
+
                       /// 🔹 PAY AT VENUE
                       paymentRadioTile(
                         title: "Pay By Credit or Debit Card",
                         value: 0,
                       ),
-        
+
                       paymentRadioTile(
                         title: "Pay Via Stripe",
                         value: 1,
                       ),
 
-        
-        
+
+
                     ],
                   ),
 
@@ -423,13 +615,16 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ],
                   ),
                   SizedBox(height: 14),
-                  _buildField("Full Name*"),
+                  _buildField("Full Name*", nameController),
+
                   const SizedBox(height: 15),
 
-                  _buildField("Email ID"),
+                  _buildField("Email ID", emailController),
+
                   const SizedBox(height: 15),
 
-                  _buildField("Phone Number*"),
+                  _buildField("Phone Number*", phoneController),
+
                   const SizedBox(height: 15),
 
                   Padding(
@@ -460,7 +655,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ),
                     child: Column(
                       children: [
-                        
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -557,8 +752,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   fontWeight: FontWeight.w600
                               ),),
                             Text(
-                              "275.00/-",
-                              style: TextStyle(
+                              "₹${pricing?['total_amount'] ?? 0}",                              style: TextStyle(
                                   fontSize: 16,
                                   color: ColorCode.kWhiteOpacity70,
                                   fontFamily: "Outfit",
@@ -591,14 +785,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               child: SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {
-                  /*  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>  FindingThePerfectScreen(bookingId: 2,), // 👈 next screen
-                      ),
-                    );*/
-                  },
+                  onPressed: isLoading ? null : _fetchReview,
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorCode.kButtonColor,
                     shape: RoundedRectangleBorder(
@@ -607,7 +795,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     elevation: 0,
                   ),
                   child:  Text(
-                    "Pay 3,275",
+                    "Pay ₹${pricing?['total_amount'] ?? 0}",
+
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: "Unbounded",
@@ -782,51 +971,34 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
 
   /// Text Field (Email)
-  Widget _buildField(String label) {
+  Widget _buildField(String label, TextEditingController controller) {
     return TextField(
-        // controller: emailController,
-        cursorColor: ColorCode.white,
-
-        style: const TextStyle(
-          color: ColorCode.white, // typed text color
-        ),
-
-        decoration: InputDecoration(
-          labelText: "$label*",
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-
-          labelStyle: const TextStyle(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-          ),
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
-          ),
-
-          /// ⭐ 0.5px BORDER + OPACITY COLOR
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-              width: 0.5,                       // 🔥 exact 0.5px
-            ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-              width: 0.5,                          // focus border thicker
-            ),
-          ),
-
-          floatingLabelStyle: const TextStyle(
+      controller: controller,
+      cursorColor: ColorCode.white,
+      style: const TextStyle(color: ColorCode.white),
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
             color: ColorCode.kWhiteOpacity70,
-          ),)
-
+            width: 0.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
+          ),
+        ),
+      ),
     );
   }
+
 /*
   Widget _buildCheckRow(String text) {
     return Row(

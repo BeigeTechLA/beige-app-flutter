@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 import 'add_on_services.dart';
 
 class RecommendedDetilsScreen extends StatefulWidget {
@@ -85,7 +86,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
     try {
       final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking_creatives}/${widget.id}/profile?latitude=34.05&longitude=-118.24",
+        "${ApiEndpoints.creatives}/${widget.id}/profile",
       );
 
       if (response != null && response['error'] == false) {
@@ -128,7 +129,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AddOnServices(
+            builder: (context) => ReviewConfirmScreen(
               bookingId: widget.bookingId,
             ),
           ),
@@ -648,7 +649,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
               ),
             )
                 : const Text(
-              "Book Now & Continue",
+              "Add to Crew",
               style: TextStyle(
                 color: ColorCode.kHeadingColor,
                 fontFamily: "Unbounded",
