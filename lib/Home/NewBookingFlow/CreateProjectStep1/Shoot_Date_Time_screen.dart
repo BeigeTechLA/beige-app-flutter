@@ -92,7 +92,10 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
 
 
-
+  String getEditTypeDisplayText() {
+    if (selectedEditTypeNames.isEmpty) return "";
+    return selectedEditTypeNames.first; // ✅ NO +1 / +2
+  }
   Future<void> _edittype() async {
     setState(() => isLoading = true);
 
@@ -572,9 +575,16 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                           onTap: _showEditTypeBottomSheet,
                           child: AbsorbPointer(
                             child: TextField(
+                              controller: TextEditingController(
+                                text: getEditTypeDisplayText(),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Outfit",
+                                fontSize: 14,
+                              ),
                               decoration: InputDecoration(
                                 labelText: getContentTypeTitle(widget.contentTypeId),
-
                                 floatingLabelBehavior: FloatingLabelBehavior.always,
                                 suffixIcon: const Icon(
                                   Icons.keyboard_arrow_down,
@@ -596,10 +606,11 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                             ),
                           ),
                         ),
+
                         if (selectedEditTypeNames.isNotEmpty) ...[
                           const SizedBox(height: 14),
 
-                          Wrap(
+                         /* Wrap(
                             spacing: 10,
                             runSpacing: 10,
                             children: List.generate(selectedEditTypeNames.length, (index) {
@@ -644,7 +655,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                 ),
                               );
                             }),
-                          ),
+                          ),*/
                         ]
 
                       ],
@@ -797,90 +808,101 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Select Edit Types",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  ...editTypes.map((item) {
-                    final int id = item['edit_type_id'];
-                    final String name = item['name'];
-
-                    final bool isSelected =
-                    selectedEditTypeIds.contains(id);
-
-                    return CheckboxListTile(
-                      value: isSelected,
-                      activeColor: ColorCode.kButtonColor,
-                      checkColor: Colors.black,
-                      title: Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Outfit",
-                        ),
-                      ),
-                      onChanged: (value) {
-                        setSheetState(() {
-                          if (value == true) {
-                            if (!selectedEditTypeIds.contains(id)) {
-                              selectedEditTypeIds.add(id);
-                              selectedEditTypeNames.add(name);
-                            }
-                          } else {
-                            final index =
-                            selectedEditTypeIds.indexOf(id);
-                            selectedEditTypeIds.remove(id);
-                            selectedEditTypeNames.removeAt(index);
-                          }
-                        });
-
-                        setState(() {}); // 🔥 chips update
-                      },
-                    );
-                  }).toList(),
-
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorCode.kButtonColor,
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        "Done",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: "Unbounded",
-                          fontWeight: FontWeight.w500,
-                        ),
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * 0.65, // 🔥 fixed height
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Select Edit Types",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+
+                    /// ✅ SCROLLABLE LIST (PIXEL ISSUE SOLVED)
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: editTypes.length,
+                        itemBuilder: (context, index) {
+                          final item = editTypes[index];
+                          final int id = item['edit_type_id'];
+                          final String name = item['name'];
+                          final bool isSelected =
+                          selectedEditTypeIds.contains(id);
+
+                          return CheckboxListTile(
+                            value: isSelected,
+                            activeColor: ColorCode.kButtonColor,
+                            checkColor: Colors.black,
+                            title: Text(
+                              name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setSheetState(() {
+                                if (value == true) {
+                                  if (!selectedEditTypeIds.contains(id)) {
+                                    selectedEditTypeIds.add(id);
+                                    selectedEditTypeNames.add(name);
+                                  }
+                                } else {
+                                  final index =
+                                  selectedEditTypeIds.indexOf(id);
+                                  if (index != -1) {
+                                    selectedEditTypeIds.removeAt(index);
+                                    selectedEditTypeNames.removeAt(index);
+                                  }
+                                }
+                              });
+
+                              setState(() {}); // 🔥 update chips
+                            },
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// DONE BUTTON (FIXED AT BOTTOM)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorCode.kButtonColor,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          "Done",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },
         );
+
       },
     );
   }

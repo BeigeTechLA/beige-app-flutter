@@ -67,7 +67,7 @@ class _Bookshoot1State extends State<Bookshoot1> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => SelectLocation(bookingId: bookingId),
+            builder: (_) => SelectLocation(),
           ),
         );
       } else {

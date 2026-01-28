@@ -60,6 +60,15 @@ class _MyProfileState extends State<MyProfile> {
   }
 
 
+  String? getProfileImageUrl() {
+    if (myProfile == null) return null;
+
+    final image = myProfile!['user_profile_image_url'];
+
+    if (image == null || image.toString().isEmpty) return null;
+
+    return ApiService.imageURL + image;
+  }
 
 
   @override
@@ -134,11 +143,53 @@ class _MyProfileState extends State<MyProfile> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child:  CircleAvatar(
+                          child: CircleAvatar(
                             radius: 48,
-                            backgroundImage:
-                            AssetImage("assets/Icons/profile.png"),
+                            backgroundColor: Colors.grey.shade200,
+                            child: ClipOval(
+                              child: getProfileImageUrl() != null
+                                  ? Image.network(
+                                getProfileImageUrl()!,
+                                width: 96,
+                                height: 96,
+                                fit: BoxFit.cover,
+
+                                /// 🔄 LOADER UNTIL IMAGE LOADS
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+
+                                  return Center(
+                                    child: SizedBox(
+                                      height: 22,
+                                      width: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  );
+                                },
+
+                                /// ❌ IF IMAGE FAILS
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    "assets/Icons/profile.png",
+                                    width: 96,
+                                    height: 96,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                                  : Image.asset(
+                                "assets/Icons/profile.png",
+                                width: 96,
+                                height: 96,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
+
+
                         ),
                         /*Positioned(
                           bottom: 2,

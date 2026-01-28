@@ -15,6 +15,9 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
   LatLng? currentLatLng;
   GoogleMapController? mapController;
 
+  List<Location> searchResults = [];
+  bool isSearching = false;
+
   String selectedAddress = "";
   final TextEditingController locationController = TextEditingController();
 
@@ -46,9 +49,14 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    final latLng = LatLng(position.latitude, position.longitude);
+
     setState(() {
-      currentLatLng = LatLng(position.latitude, position.longitude);
+      currentLatLng = latLng;
     });
+
+    /// ✅ IMPORTANT: screen open hote hi address lao
+    await getAddressFromLatLng(latLng);
   }
 
   // ================= REVERSE GEOCODE =================
@@ -70,6 +78,38 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
     } catch (e) {
       debugPrint("Reverse geocode error: $e");
     }
+  }
+
+  Future<void> searchLocation(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        searchResults.clear();
+        isSearching = false;
+      });
+      return;
+    }
+
+    try {
+      final locations = await locationFromAddress(query);
+
+      setState(() {
+        searchResults = locations;
+        isSearching = true;
+      });
+    } catch (e) {
+      debugPrint("Search error: $e");
+    }
+  }
+  Future<String> _getPlaceText(Location loc) async {
+    final placemarks = await placemarkFromCoordinates(
+      loc.latitude,
+      loc.longitude,
+    );
+
+    if (placemarks.isEmpty) return "";
+
+    final p = placemarks.first;
+    return "${p.name}, ${p.locality}, ${p.administrativeArea}";
   }
 
   // ================= UI =================
@@ -132,25 +172,79 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
 
                 // SEARCH DISPLAY
                 Expanded(
-                  child: Container(
-                    height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E1E),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      selectedAddress.isEmpty
-                          ? "Tap on map to select location"
-                          : selectedAddress,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextField(
+                          controller: locationController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            hintText: "Search location",
+                            hintStyle: TextStyle(color: Colors.white54),
+                            border: InputBorder.none,
+                            icon: Icon(Icons.search, color: Colors.white54),
+                          ),
+                          onChanged: searchLocation,
+                        ),
                       ),
-                    ),
+
+                      /// 🔽 SEARCH DROPDOWN
+                      if (isSearching && searchResults.isNotEmpty)
+                        Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: searchResults.length,
+                            itemBuilder: (context, index) {
+                              final loc = searchResults[index];
+
+                              return FutureBuilder<String>(
+                                future: _getPlaceText(loc),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const SizedBox();
+                                  }
+
+                                  return ListTile(
+                                    leading: const Icon(Icons.location_on, color: Colors.white54),
+                                    title: Text(
+                                      snapshot.data!,
+                                      style: const TextStyle(color: Colors.white),
+                                    ),
+                                    onTap: () async {
+                                      final latLng = LatLng(loc.latitude, loc.longitude);
+
+                                      setState(() {
+                                        currentLatLng = latLng;
+                                        locationController.text = snapshot.data!;
+                                        selectedAddress = snapshot.data!;
+                                        isSearching = false;
+                                        searchResults.clear();
+                                      });
+
+                                      mapController?.animateCamera(
+                                        CameraUpdate.newLatLngZoom(latLng, 16),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+
+                        ),
+                    ],
                   ),
                 ),
               ],

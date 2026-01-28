@@ -10,9 +10,9 @@ import '../../service/api_service.dart';
 import 'change_location_screen.dart';
 
 class SelectLocation extends StatefulWidget {
-  final int bookingId;
 
-  const SelectLocation({super.key, required this.bookingId});
+
+  const SelectLocation({super.key, });
 
   @override
   State<SelectLocation> createState() => _SelectLocationState();
@@ -83,61 +83,7 @@ class _SelectLocationState extends State<SelectLocation> {
     }
   }
 
-  Future<void> select_location() async {
-    if (currentLatLng == null || selectedAddress.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a location")),
-      );
-      return;
-    }
 
-    /// ✅ Prepare payload
-    final Map<String, dynamic> payload = {
-      "event_location": selectedAddress,
-      "event_latitude": currentLatLng!.latitude,
-      "event_longitude": currentLatLng!.longitude,
-    };
-
-    /// 🔍 Print payload (for debugging)
-    debugPrint("📦 Location API Payload:");
-    debugPrint(payload.toString());
-
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().putData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/location",
-        payload,
-      );
-
-      /// 🔍 Print API response
-      debugPrint("✅ Location API Response:");
-      debugPrint(response.toString());
-
-      if (response != null && response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => SelectDateTime(
-              bookingId: widget.bookingId,
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response?['message'] ?? "Location update failed")),
-        );
-      }
-    } catch (e) {
-      debugPrint("❌ Location API Error: $e");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong")),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
 
 
 
@@ -416,7 +362,7 @@ class _SelectLocationState extends State<SelectLocation> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => ChangeLocationScreen(
-                          initialLatLng: currentLatLng!,
+                          // initialLatLng: currentLatLng!,
                         ),
                       ),
                     );
@@ -465,7 +411,9 @@ class _SelectLocationState extends State<SelectLocation> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: isLoading ? null : select_location,
+              onPressed: () {
+
+              },
                 child: isLoading
                     ? const CircularProgressIndicator(color: Colors.black)
                     : const Text(

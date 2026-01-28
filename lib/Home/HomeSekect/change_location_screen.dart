@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ChangeLocationScreen extends StatefulWidget {
-  final LatLng initialLatLng;
-
-  const ChangeLocationScreen({super.key, required this.initialLatLng});
+  const ChangeLocationScreen({super.key});
 
   @override
   State<ChangeLocationScreen> createState() => _ChangeLocationScreenState();
@@ -15,17 +14,19 @@ class ChangeLocationScreen extends StatefulWidget {
 
 class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
   LatLng? selectedLatLng;
-  String selectedAddress = "Search or select location";
+  String selectedAddress = "Detecting current location...";
   GoogleMapController? mapController;
   final TextEditingController searchController = TextEditingController();
+  List<Location> searchResults = [];
+  bool isSearching = false;
+
+  List<Map<String, dynamic>> searchResultsData = [];
 
   @override
   void initState() {
     super.initState();
-    selectedLatLng = widget.initialLatLng;
-    _getAddress(widget.initialLatLng);
+    _getCurrentLocation();
 
-    /// STATUS BAR – BLACK THEME
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -34,47 +35,111 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     );
   }
 
-  Future<void> _searchLocation(String query) async {
-    try {
-      final locations = await locationFromAddress(query);
-      if (locations.isNotEmpty) {
-        final latLng =
-        LatLng(locations.first.latitude, locations.first.longitude);
-
-        setState(() => selectedLatLng = latLng);
-
-        mapController?.animateCamera(
-          CameraUpdate.newLatLngZoom(latLng, 15),
-        );
-
-        await _getAddress(latLng);
-      }
-    } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.black,
-          content: const Text(
-            "Location not found",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
+  // ================= CURRENT LOCATION =================
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
     }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return;
+    }
+
+    if (permission == LocationPermission.deniedForever) return;
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    final latLng = LatLng(position.latitude, position.longitude);
+
+    setState(() {
+      selectedLatLng = latLng;
+    });
+
+    await _getAddress(latLng);
+
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(latLng, 16),
+    );
   }
 
-  Future<void> _getAddress(LatLng latLng) async {
-    final placemarks =
-    await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
-    if (placemarks.isNotEmpty) {
-      final p = placemarks.first;
+  // ================= SEARCH LOCATION =================
+  Future<void> searchLocation(String query) async {
+    try {
+      final locations = await locationFromAddress(query);
+
+      if (locations.isEmpty) {
+        setState(() {
+          searchResultsData.clear();
+          isSearching = false;
+        });
+        return;
+      }
+
+      List<Map<String, dynamic>> results = [];
+
+      for (final loc in locations.take(5)) {
+        final placemarks = await placemarkFromCoordinates(
+          loc.latitude,
+          loc.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+
+          final addressParts = [
+            p.name,
+            p.street,
+            p.subLocality,
+            p.locality,
+            p.administrativeArea,
+          ]..removeWhere((e) => e == null || e!.isEmpty);
+
+          results.add({
+            "latLng": LatLng(loc.latitude, loc.longitude),
+            "address": addressParts.join(", "),
+          });
+        }
+      }
+
       setState(() {
-        selectedAddress =
-        "${p.street}, ${p.locality}, ${p.administrativeArea}";
+        searchResultsData = results;
+        isSearching = results.isNotEmpty;
+      });
+    } catch (e) {
+      debugPrint("Search error: $e");
+      setState(() {
+        searchResultsData.clear();
+        isSearching = false;
       });
     }
   }
 
-  /// 🌙 DARK MAP STYLE
+
+  // ================= GET ADDRESS =================
+  Future<void> _getAddress(LatLng latLng) async {
+    final placemarks =
+    await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+
+    if (placemarks.isNotEmpty) {
+      final p = placemarks.first;
+
+      final address =
+          "${p.street}, ${p.locality}, ${p.administrativeArea}";
+
+      setState(() {
+        selectedAddress = address;
+        searchController.text = address; // ✅ show in search box
+      });
+    }
+  }
+
+  // ================= DARK MAP STYLE =================
   static const String _darkMapStyle = '''
 [
   {"elementType":"geometry","stylers":[{"color":"#1d1d1d"}]},
@@ -92,56 +157,111 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
 
       body: Column(
         children: [
-          /// 🔝 TOP BAR
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF121212),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(22),
-              ),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child:   InkWell(
-                      onTap: () => Navigator.pop(context),
-                    child: Image.asset("assets/Icons/Reply.png", height: 24),
+          // ================= TOP BAR =================
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF121212),
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(22),
                   ),
-
-                  /*nkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),*/
                 ),
-                const SizedBox(height: 16),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Image.asset("assets/Icons/Reply.png", height: 24),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
-                /// 🔍 SEARCH FIELD
-                TextField(
-                  controller: searchController,
-                  onSubmitted: _searchLocation,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "Search for area, street name...",
-                    hintStyle:  TextStyle(color: ColorCode.kWhiteOpacity70,fontFamily: "Outfit",fontWeight: FontWeight.w400,fontSize: 12),
-                    prefixIcon:
-                     Icon(Icons.search, color: Colors.white),
-                    filled: true,
-                    fillColor: const Color(0xFF1E1E1E),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
+                    // SEARCH FIELD
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        if (value.trim().length >= 3) {
+                          searchLocation(value.trim());
+                        } else {
+                          setState(() {
+                            searchResultsData.clear();
+                            isSearching = false;
+                          });
+                        }
+                      },
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: "Search for area, street name...",
+                        prefixIcon: const Icon(Icons.search, color: Colors.white),
+                        filled: true,
+                        fillColor: const Color(0xFF1E1E1E),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 🔥 DROPDOWN OVERLAY
+              if (isSearching && searchResultsData.isNotEmpty)
+                Positioned(
+                  top: 140, // search field ke niche
+                  left: 16,
+                  right: 16,
+                  child: Material(
+                    color: const Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(14),
+                    elevation: 8,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: searchResultsData.length,
+                      itemBuilder: (context, index) {
+                        final item = searchResultsData[index];
+                        return ListTile(
+                          leading: const Icon(Icons.location_on,
+                              color: Colors.white70),
+                          title: Text(
+                            item["address"],
+                            style: const TextStyle(color: Colors.white),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          onTap: () {
+                            setState(() {
+                              selectedLatLng = item["latLng"];
+                              selectedAddress = item["address"];
+                              searchController.text = item["address"];
+                              isSearching = false;
+                              searchResultsData.clear();
+                            });
+
+                            mapController?.animateCamera(
+                              CameraUpdate.newLatLngZoom(item["latLng"], 16),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
 
-          /// 🗺 DARK MAP
+
+          // ================= MAP =================
           Expanded(
-            child: GoogleMap(
+            child: selectedLatLng == null
+                ? const Center(
+              child:
+              CircularProgressIndicator(color: Colors.white),
+            )
+                : GoogleMap(
               initialCameraPosition: CameraPosition(
                 target: selectedLatLng!,
                 zoom: 15,
@@ -152,8 +272,9 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               },
               onTap: (latLng) async {
                 setState(() => selectedLatLng = latLng);
-                await _getAddress(latLng);
+                await _getAddress(latLng); //
               },
+
               markers: {
                 Marker(
                   markerId: const MarkerId("m1"),
@@ -164,7 +285,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             ),
           ),
 
-          /// 📍 ADDRESS
+          // ================= ADDRESS =================
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -179,7 +300,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
         ],
       ),
 
-      /// 💾 SAVE BUTTON
+      // ================= SAVE BUTTON =================
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
         child: ElevatedButton(
@@ -198,7 +319,8 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
           },
           child: const Text(
             "Save",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w600),
           ),
         ),
       ),

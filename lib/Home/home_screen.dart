@@ -6,6 +6,8 @@ import '../MyProfile/my_profile.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'HomeSekect/change_location_screen.dart';
+import 'HomeSekect/select_location.dart';
 import 'SelectLocationMapScreen.dart';
 import 'Specialities/specialities.dart';
 
@@ -209,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) =>  SelectLocationMapScreen(),
+                                      builder: (_) =>  ChangeLocationScreen(),
                                     ),
                                   );
 

@@ -317,7 +317,7 @@ class _EditProfileState extends State<EditProfile> {
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.edit, size: 22),
+                            child:  Icon(Icons.edit, size: 22,color:Colors.black,),
                           ),
                         ),
                       ),
