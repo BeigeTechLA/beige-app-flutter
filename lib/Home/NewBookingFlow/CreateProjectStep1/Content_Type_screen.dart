@@ -39,13 +39,24 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   bool get isContinueEnabled {
     return selectedContentTypeId != null && isShootTypeLoaded && !isLoading;
   }
+  bool get isSelectAll => selectedContentTypeId == 3;
 
 
 
   Future<void> _callBookingApi(int contentTypeId) async {
+
+    // 🔥 SELECT ALL → NO LOADER, NO API
+    if (contentTypeId == 3) {
+      setState(() {
+        isShootTypeLoaded = true; // allow continue
+        isLoading = false;
+      });
+      return;
+    }
+
     setState(() {
       isLoading = true;
-      isShootTypeLoaded = false; // reset
+      isShootTypeLoaded = false;
     });
 
     try {
@@ -53,16 +64,11 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
         "${ApiEndpoints.booking_shoot_types}$contentTypeId",
       );
 
-      debugPrint("API Response → $response");
-
       if (response['error'] == false && response['data'] is List) {
         shootTypeIds = response['data']
             .map<int>((e) => e['shoot_type_id'] as int)
             .toList();
 
-        debugPrint("Shoot Type IDs → $shootTypeIds");
-
-        /// ✅ API SUCCESS → BUTTON ACTIVE
         setState(() {
           isShootTypeLoaded = true;
         });
@@ -175,180 +181,185 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
         ),
       ),
 
-      body: SafeArea(
-        child: Padding(
-          padding:  EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: List.generate(3, (index) {
-                  bool isActive = index == 0; // current step (1/3)
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding:  EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: List.generate(3, (index) {
+                      bool isActive = index == 0; // current step (1/3)
 
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: ColorCode.kSubtextColor, // grey background
-                        borderRadius: BorderRadius.circular(64),
-                      ),
-                      child: isActive
-                          ? Align(
-                        alignment: Alignment.centerLeft,
+                      return Expanded(
                         child: Container(
+                          margin: const EdgeInsets.only(right: 8),
                           height: 5,
-                          width: 35.44, // 🔥 colored portion only
                           decoration: BoxDecoration(
-                            color: ColorCode.kButtonColor,
+                            color: ColorCode.kSubtextColor, // grey background
                             borderRadius: BorderRadius.circular(64),
                           ),
+                          child: isActive
+                              ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              height: 5,
+                              width: 35.44, // 🔥 colored portion only
+                              decoration: BoxDecoration(
+                                color: ColorCode.kButtonColor,
+                                borderRadius: BorderRadius.circular(64),
+                              ),
+                            ),
+                          )
+                              : const SizedBox(),
                         ),
-                      )
-                          : const SizedBox(),
-                    ),
-                  );
-                }),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Content Type",
-                    style: TextStyle(
-                      fontFamily: "Unbounded",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                      );
+                    }),
                   ),
-                ],
-              ),
-
-               SizedBox(height: 12),
-
-              _buildOption(
-                title: "Select All",
-                activeImage: "assets/newbookflow/selectall_active.png",
-                inactiveImage: "assets/newbookflow/slectall_inactive.png",
-                value: selectedContentTypeId == 3,
-                onTap: () {
-                  setState(() => selectedContentTypeId = 3);
-                  _callBookingApi(3);
-                },
-              ),
-              /// 🔹 VIDEOGRAPHY → 1
-              _buildOption(
-                title: "Videography",
-                activeImage: "assets/newbookflow/Videocamera_Record_active.png",
-                inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
-                value: selectedContentTypeId == 1,
-                onTap: () {
-                  setState(() => selectedContentTypeId = 1);
-                  _callBookingApi(1);
-                },
-              ),
-              /// 🔹 PHOTOGRAPHY → 2
-              _buildOption(
-                title: "Photography",
-                activeImage: "assets/newbookflow/Camera_active.png",
-                inactiveImage: "assets/newbookflow/Camera_inactive.png",
-                value: selectedContentTypeId == 2,
-                onTap: () {
-                  setState(() => selectedContentTypeId = 2);
-                  _callBookingApi(2);
-                },
-              ),
-
-
-
-              _buildOption(
-                title: "Editing Only",
-
-                value: false,
-                isDisabled: true,
-                activeImage: "assets/newbookflow/edit-01.png",
-                inactiveImage: "assets/newbookflow/edit-01.png",
-                subtitle: "Coming Soon",
-                onTap: null,
-              ),
-
-              _buildOption(
-                title: "Livestreaming",
-
-                value: false,
-                isDisabled: true,
-                activeImage: "assets/newbookflow/Play_Stream.png",
-                inactiveImage: "assets/newbookflow/Play_Stream.png",
-                subtitle: "Coming Soon",
-                onTap: null,
-              ),
-
-              const Spacer(),
-
-              /// 🔹 BOTTOM BUTTONS
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.grey),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
-                    ),
+                  SizedBox(
+                    height: 20,
                   ),
-                   SizedBox(width: 12),
-                  Expanded(
-                    child:ElevatedButton(
-                      onPressed: isContinueEnabled
-                          ? () {
-                        select_shoottype();
-                      }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isContinueEnabled
-                            ? ColorCode.kButtonColor      // ✅ ACTIVE
-                            : ColorCode.kGoldGradientLight, // ❌ DISABLED
-                        foregroundColor: isContinueEnabled
-                            ? Colors.black
-                            : Colors.grey.shade400,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.black,
-                        ),
-                      )
-                          : const Text(
-                        "Continue",
+                  Row(
+                    children: [
+                      Text(
+                        "Content Type",
                         style: TextStyle(
                           fontFamily: "Unbounded",
+                          fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          fontSize: 14,
                         ),
                       ),
-                    ),
-
+                    ],
                   ),
 
+                  SizedBox(height: 12),
+
+                  _buildOption(
+                    title: "Select All",
+                    activeImage: "assets/newbookflow/SelectAll_active.png",
+                    inactiveImage: "assets/newbookflow/slectall_inactive.png",
+                    value: isSelectAll,
+                    onTap: () {
+                      setState(() => selectedContentTypeId = 3);
+                      _callBookingApi(3); // backend ko ALL bhejega
+                    },
+                  ),
+
+                  /// 🔹 VIDEOGRAPHY → 1
+                  _buildOption(
+                    title: "Videography",
+                    activeImage: "assets/newbookflow/Videocamera_Record_active.png",
+                    inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
+                    value: selectedContentTypeId == 1 || isSelectAll, // 🔥 CHANGE
+                    onTap: () {
+                      setState(() => selectedContentTypeId = 1);
+                      _callBookingApi(1);
+                    },
+                  ),
+
+                  /// 🔹 PHOTOGRAPHY → 2
+                  _buildOption(
+                    title: "Photography",
+                    activeImage: "assets/newbookflow/Camera_active.png",
+                    inactiveImage: "assets/newbookflow/Camera_inactive.png",
+                    value: selectedContentTypeId == 2 || isSelectAll, // 🔥 CHANGE
+                    onTap: () {
+                      setState(() => selectedContentTypeId = 2);
+                      _callBookingApi(2);
+                    },
+                  ),
+
+
+
+
+                  _buildOption(
+                    title: "Editing Only(Coming Soon)",
+
+                    value: false,
+                    isDisabled: true,
+                    activeImage: "assets/newbookflow/edit-01.png",
+                    inactiveImage: "assets/newbookflow/edit-01.png",
+                    // subtitle: "Coming Soon",
+                    onTap: null,
+                  ),
+
+                  _buildOption(
+                    title: "Livestreaming (Coming Soon)",
+
+                    value: false,
+                    isDisabled: true,
+                    activeImage: "assets/newbookflow/Play_Stream.png",
+                    inactiveImage: "assets/newbookflow/Play_Stream.png",
+                    // subtitle: "Coming Soon",
+                    onTap: null,
+                  ),
+
+                  const Spacer(),
+
+                  /// 🔹 BOTTOM BUTTONS
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.grey),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child:ElevatedButton(
+                          onPressed: isContinueEnabled
+                              ? () {
+                            select_shoottype();
+                          }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isContinueEnabled
+                                ? ColorCode.kButtonColor      // ✅ ACTIVE
+                                : ColorCode.kGoldGradientLight, // ❌ DISABLED
+                            foregroundColor: isContinueEnabled
+                                ? Colors.black
+                                : Colors.grey.shade400,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child:
+                              /*? CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.black,
+                              )*/
+                              const Text(
+                            "Continue",
+                            style: TextStyle(
+                              fontFamily: "Unbounded",
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+
+                      ),
+
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+
+        ],
+
       ),);
 
 

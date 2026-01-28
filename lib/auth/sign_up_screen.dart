@@ -3,6 +3,9 @@ import 'package:beige/OnbodingScreen/onboding_screen.dart';
 import 'package:beige/auth/login_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -23,6 +26,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool savePassword = false;
   bool isLoggingIn = false;
 
+  GoogleMapController? mapController;
+  LatLng? currentLatLng;
+
+  String selectedAddress = "Search or select location";
+  bool isMapOpen = false;          // 👈 map show / hide
+  List<Location> searchResults = [];
+  FocusNode locationFocus = FocusNode();
+
   bool get isFormValid {
     return nameController.text.isNotEmpty &&
         emailController.text.isNotEmpty &&
@@ -31,11 +42,91 @@ class _SignUpScreenState extends State<SignUpScreen> {
         confirmPasswordController.text.isNotEmpty &&
         savePassword; // ✅ checkbox must be checked
   }
-
   @override
   void initState() {
     super.initState();
     debugPrint("Signup Role: ${widget.role}");
+    _getCurrentLocation();
+
+    locationFocus.addListener(() {
+      if (locationFocus.hasFocus) {
+        setState(() {
+          isMapOpen = true; // 👈 textfield pe click → map open
+        });
+      }
+    });
+  }
+
+
+  Future<void> searchLocation(String query) async {
+    if (query.isEmpty) return;
+
+    try {
+      List<Location> locations = await locationFromAddress(query);
+
+      setState(() {
+        searchResults = locations; // 👈 dropdown data
+      });
+    } catch (e) {
+      debugPrint("Search error: $e");
+    }
+  }
+
+  Future<void> getAddressFromLatLng(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks =
+      await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        final address =
+            "${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+
+        setState(() {
+          selectedAddress = address;
+
+          /// 🔥 IMPORTANT: TextField ko bhi update karo
+          locationController.text = address;
+        });
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
+
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Location permission permanently denied. Enable from settings."),
+        ),
+      );
+      await Geolocator.openAppSettings(); // 👈 Open app settings
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      currentLatLng = LatLng(position.latitude, position.longitude);
+    });
   }
 
   final TextEditingController nameController = TextEditingController();
@@ -137,6 +228,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{"color": "#383838"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#8a8a8a"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#000000"}]
+  }
+]
+''';
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: ColorCode.bcakgroundcolor,
@@ -145,7 +282,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-      
+
               InkWell(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -155,10 +292,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
                 child: Image.asset("assets/Icons/Reply.png", height: 24),
               ),
-      
-      
+
+
               SizedBox(height: 30),
-      
+
               const Text(
                 "Sign Up Now",
                 style: TextStyle(
@@ -168,9 +305,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   color: ColorCode.white,
                 ),
               ),
-      
+
               SizedBox(height: 10),
-      
+
                Text(
                 "Join Beige to book talented photographers\n  and videographers.",
                 style: TextStyle(
@@ -180,34 +317,114 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   color: ColorCode.kWhiteOpacity70,
                 ),
               ),
-      
+
                SizedBox(height: 20),
-      
+
               _buildField("Name", nameController),
               SizedBox(height: 20),
               _buildField("Email ID", emailController),
               SizedBox(height: 20),
-              _buildField("Location", locationController),
+
+
+              TextField(
+                controller: locationController,
+                onSubmitted: (value) {
+                  if (value.isNotEmpty) {
+                    searchLocation(value);
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: "Location*",
+                  suffixIcon: InkWell(
+                    onTap: () {
+                      if (locationController.text.isNotEmpty) {
+                        searchLocation(locationController.text);
+                      }
+                    },
+                    child: const Icon(
+                      Icons.location_on_outlined,
+                      color: ColorCode.white,
+                    ),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ColorCode.kWhiteOpacity70,
+                      width: 0.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ColorCode.kWhiteOpacity70,
+                      width: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+
+
               SizedBox(height: 20),
-      
+
+              /// 🗺️ MAP WITH FIXED HEIGHT
+              SizedBox(
+                height: 280,
+                child:ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: currentLatLng == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                        target: currentLatLng!,
+                      zoom: 14,
+                    ),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    zoomControlsEnabled: true,
+                    compassEnabled: true,
+                    onMapCreated: (controller) {
+                      mapController = controller;
+                      controller.setMapStyle(_darkMapStyle);
+                    },
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId("selected"),
+                        position: currentLatLng!,
+                      ),
+                    },
+                    onTap: (latLng) async {
+                      setState(() {
+                        currentLatLng = latLng;
+                      });
+                      await getAddressFromLatLng(latLng);
+                    },
+                  ),
+
+
+                ),
+              ),
+              SizedBox(height: 20),
               _buildPasswordField(
                 "Create Password",
                 showPassword,
                     () => setState(() => showPassword = !showPassword),
                 passwordController,
               ),
-      
+
               SizedBox(height: 20),
-      
+
               _buildPasswordField(
                 "Confirm Password",
                 showConfirmPassword,
                     () => setState(() => showConfirmPassword = !showConfirmPassword),
                 confirmPasswordController,
               ),
-      
+
               SizedBox(height: 20),
-      
+
               /// Terms checkbox
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -254,7 +471,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontFamily: "Outfit", // ⭐ Added Outfit font
                             ),
                           ),
-      
+
                           TextSpan(
                             text: "Terms & Condition & Privacy Policy",
                             style: TextStyle(
@@ -264,8 +481,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               fontFamily: "Outfit", // ⭐ Added Outfit font
                             ),
                           ),
-      
-      
+
+
                           TextSpan(text: "\nset out of this site",
                             style: TextStyle(
                             fontWeight: FontWeight.w400,
@@ -278,13 +495,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
-      
-      
+
+
                 ],
               ),
-      
+
               const SizedBox(height: 40),
-      
+
               /// Button
               SizedBox(
                 width: double.infinity,
@@ -309,15 +526,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: isFormValid
                           ? ColorCode.kHeadingColor   // ✅ Active color
                           : ColorCode.kSubtextOpacity,
-      
+
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
-      
+
               const SizedBox(height: 20),
-      
+
               /// Login link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

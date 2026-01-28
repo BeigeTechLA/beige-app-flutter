@@ -77,6 +77,20 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
   }
 
 
+  String getContentTypeTitle(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "Video Shoot Type";
+      case 2:
+        return "Photo Shoot Type";
+      case 3:
+        return "Photo & Video Shoot Type";
+      default:
+        return "Shoot Type";
+    }
+  }
+
+
 
 
   Future<void> _edittype() async {
@@ -159,11 +173,20 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
           data: ThemeData.dark().copyWith(
             dialogBackgroundColor: const Color(0xFF121212),
 
-            colorScheme: ColorScheme.dark(
-              primary: ColorCode.kButtonColor, // selected date bg
-              onPrimary: Colors.white,
-              surface: const Color(0xFF1E1E1E),
-              onSurface: Colors.white,
+            colorScheme: const ColorScheme.dark(
+              primary: ColorCode.kButtonColor,      // selected date bg
+              onPrimary: Colors.black,               // selected date text
+              surface: Color(0xFF1E1E1E),             // calendar bg
+              onSurface: Colors.white,                // normal date text
+            ),
+
+            datePickerTheme: const DatePickerThemeData(
+              headerBackgroundColor: ColorCode.kButtonColor,
+              headerForegroundColor: Colors.black,
+              dayForegroundColor: MaterialStatePropertyAll(Colors.white),
+              weekdayStyle: TextStyle(color: Colors.grey),
+              todayForegroundColor: MaterialStatePropertyAll(Colors.white),
+              todayBackgroundColor: MaterialStatePropertyAll(Colors.transparent),
             ),
 
             textButtonTheme: TextButtonThemeData(
@@ -175,6 +198,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
           child: child!,
         );
       },
+
     );
 
     if (picked != null && mounted) {
@@ -202,17 +226,38 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
         return Theme(
           data: ThemeData.dark().copyWith(
             dialogBackgroundColor: const Color(0xFF121212),
-            colorScheme: ColorScheme.dark(
-              primary: ColorCode.kButtonColor, // selected time
-              onPrimary: Colors.white,
-              surface: const Color(0xFF1E1E1E),
+
+            colorScheme: const ColorScheme.dark(
+              primary: ColorCode.kButtonColor, // selected bg
+              onPrimary: Colors.white,         // selected text
+              surface: Color(0xFF1E1E1E),
               onSurface: Colors.white,
             ),
+
             timePickerTheme: const TimePickerThemeData(
-              hourMinuteTextColor: Colors.white,
+              backgroundColor: Color(0xFF121212),
+              dialBackgroundColor: Color(0xFF121212),
               dialHandColor: Colors.white,
-              dialBackgroundColor: Color(0xFF1E1E1E),
+              dialTextColor: Colors.grey, // normal numbers thode soft
+              // 🔥 Hour / Minute box
+              hourMinuteColor: ColorCode.kButtonColor,
+              hourMinuteTextColor: Colors.black, // ✅ BLACK text inside time
+
+              // 🔥 AM / PM
+              dayPeriodColor: ColorCode.kButtonColor,
+              dayPeriodTextColor: Colors.white, // ✅ WHITE text in AM / PM
+
+
+
+              // 🔥 Buttons
+              confirmButtonStyle: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
+              ),
+              cancelButtonStyle: ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
+              ),
             ),
+
           ),
           child: child!,
         );
@@ -231,6 +276,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
       });
     }
   }
+
 
 
 
@@ -527,7 +573,8 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                           child: AbsorbPointer(
                             child: TextField(
                               decoration: InputDecoration(
-                                labelText: "Video Edit Types",
+                                labelText: getContentTypeTitle(widget.contentTypeId),
+
                                 floatingLabelBehavior: FloatingLabelBehavior.always,
                                 suffixIcon: const Icon(
                                   Icons.keyboard_arrow_down,

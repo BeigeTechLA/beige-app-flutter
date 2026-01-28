@@ -21,18 +21,24 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
   int currentStep = 1;
   bool isAdded = false;
-  List<dynamic> crewMatches = [];
-  Set<int> addedCrewIds = {};
 
-  bool isLoading =true;
 
   Set<int> favouriteUsers = {};
+
+
+  Set<int> allowedRoleIds = {};      // ✅ backend allowed roles
+  Set<int> addedCrewIds = {};        // crew_member_ids
+  List<dynamic> crewMatches = [];
+  bool isLoading = true;
   int requiredCount = 1;
+
+  Set<int> addedCrewUserIds = {};   // ✅ store USER IDs
+
 
   @override
   void initState() {
     super.initState();
-
+    _holds();
     _CrewSizeMatching();
   }
   Future<void> _CrewSizeMatching() async {
@@ -43,23 +49,26 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=10",
       );
 
-      debugPrint("API Response → $response");
-
       if (response != null && response['error'] == false) {
         setState(() {
           crewMatches = response['data']['items'];
 
+          allowedRoleIds = (response['data']['crew_requirements'] as List)
+              .map<int>((e) => e['role_id'])
+              .toSet();
+
           requiredCount =
-              response['data']['crew_requirements']?[0]?['required_count'] ?? 0;
+          response['data']['crew_requirements'][0]['required_count'];
         });
       }
-
     } catch (e) {
-      debugPrint("API Error → $e");
+      debugPrint("Crew API Error: $e");
     } finally {
       setState(() => isLoading = false);
     }
   }
+
+
 
   Future<void> _addFavourite(int userId) async {
     try {
@@ -89,6 +98,83 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       }
     } catch (e) {
       debugPrint("Remove Favourite Error: $e");
+    }
+  }
+  Future<bool> _addHolds({
+    required int creativeUserId,
+    required int roleId,
+  }) async {
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/hold",
+        {
+          "creative_user_id": creativeUserId,
+          "role_id": roleId,
+        },
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("✅ Crew added successfully");
+        return true;
+      } else {
+        debugPrint("❌ Add crew failed: $response");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("❌ Add Holds Error: $e");
+      return false;
+    }
+  }
+
+  Future<bool> _removeHolds({
+    required int creativeUserId,
+  }) async {
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove",
+        {
+          "creative_user_id": creativeUserId,
+        }
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("✅ Crew removed successfully");
+        return true;
+      } else {
+        debugPrint("❌ Remove crew failed: $response");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("❌ Remove Holds Error: $e");
+      return false;
+    }
+  }
+
+  Future<void> _holds() async {
+    setState(() => isLoading = true);
+
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/holds",
+      );
+
+      if (response != null && response['error'] == false) {
+        final creatives = response['data']['creatives'] as List;
+
+        setState(() {
+          /// ✅ VERY IMPORTANT FIX
+          addedCrewUserIds =
+              creatives.map<int>((e) => e['creative_user_id'] as int).toSet();
+
+          /// required count from summary
+          requiredCount =
+              response['data']['summary']['required_by_role']['2'] ?? 0;
+        });
+      }
+    } catch (e) {
+      debugPrint("Holds API Error: $e");
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -229,9 +315,16 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 itemCount: crewMatches.length,
                 itemBuilder: (context, index) {
                   final item = crewMatches[index];
-                  final bool isAdded = addedCrewIds.contains(item['id']);
+
                   final int userId = item['user']['id'];
-                  final bool isFavourite = favouriteUsers.contains(userId);
+                  // final bool isFavourite = favouriteUsers.contains(userId);
+
+
+                  final int creativeUserId = item['user']['id'];     // ✅ FIX
+                  final int roleId = int.parse(item['role_id']);
+                  final bool isAdded = addedCrewUserIds.contains(creativeUserId);
+                  final bool isFavourite = favouriteUsers.contains(creativeUserId);
+
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
@@ -375,85 +468,116 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 ),
 
                                 /// RIGHT BUTTONS
-                                Row(
-                                  children: [
+                  Row(
+                  children: [
 
-                                    /// ADD / REMOVE
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          if (isAdded) {
-                                            // ✅ Remove allowed anytime
-                                            addedCrewIds.remove(item['id']);
-                                          } else {
-                                            // ❌ Limit reached
-                                            if (addedCrewIds.length >= requiredCount) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "You can add only $requiredCount members",
-                                                  ),
-                                                ),
-                                              );
-                                              return;
-                                            }
+                  /// ADD / REMOVE CREW
+                  InkWell(
+                  onTap: () async {
+                  // ❌ Role not allowed
+                  if (!allowedRoleIds.contains(roleId)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                  content: Text("This role is not allowed for this booking"),
+                  ),
+                  );
+                  return;
+                  }
 
-                                            // ✅ Add allowed
-                                            addedCrewIds.add(item['id']);
-                                          }
-                                        });
-                                      },
+                  /// REMOVE CREW
+                  if (isAdded) {
+                  final success = await _removeHolds(
+                  creativeUserId: creativeUserId,
+                  );
 
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 14, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: isAdded
-                                              ? ColorCode.kLightRed
-                                              : ColorCode.kButtonColor,
-                                          borderRadius: BorderRadius.circular(30),
-                                          border: isAdded
-                                              ? Border.all(color: Colors.red)
-                                              : null,
-                                        ),
-                                        child: Text(
-                                          isAdded ? "Remove" : "Add to Crew",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: "Outfit",
-                                            fontWeight: FontWeight.w600,
-                                            color: isAdded
-                                                ? Colors.red
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                  if (success) {
+                  setState(() {
+                  addedCrewUserIds.remove(creativeUserId);
+                  });
 
-                                    const SizedBox(width: 8),
+                  // 🔁 sync backend again (IMPORTANT)
+                  await _holds();
+                  }
+                  }
 
-                                    /// DETAILS
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) =>
-                                                RecommendedDetilsScreen(
-                                                  id: item['id'], // ✅ REAL ID
-                                                  bookingId: widget.bookingId,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: Image.asset(
-                                        "assets/images/Group 2087328980.png",
-                                        height: 32,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                  /// ADD CREW
+                  else {
+                  if (addedCrewUserIds.length >= requiredCount) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                  content: Text(
+                  "You can add only $requiredCount members",
+                  ),
+                  ),
+                  );
+                  return;
+                  }
+
+                  final success = await _addHolds(
+                  creativeUserId: creativeUserId,
+                  roleId: roleId,
+                  );
+
+                  if (success) {
+                  setState(() {
+                  addedCrewUserIds.add(creativeUserId);
+                  });
+
+                  // 🔁 sync backend again (IMPORTANT)
+                  await _holds();
+                  }
+                  }
+                  },
+
+                  /// BUTTON UI
+                  child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                  color: isAdded
+                  ? ColorCode.kLightRed
+                      : ColorCode.kButtonColor,
+                  borderRadius: BorderRadius.circular(30),
+                  border: isAdded
+                  ? Border.all(color: Colors.red)
+                      : null,
+                  ),
+                  child: Text(
+                  isAdded ? "Remove" : "Add to Crew",
+                  style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w600,
+                  color: isAdded ? Colors.red : Colors.black,
+                  ),
+                  ),
+                  ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  /// DETAILS BUTTON
+                  InkWell(
+                  onTap: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                  builder: (_) => RecommendedDetilsScreen(
+                  id: item['id'],
+                  bookingId: widget.bookingId,
+                  ),
+                  ),
+                  );
+                  },
+                  child: Image.asset(
+                  "assets/images/Group 2087328980.png",
+                  height: 32,
+                  ),
+                  ),
+                  ],
+                  ),
+
+
+                  ],
                             ),
                           ),
                         ],
@@ -496,7 +620,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     elevation: 0,
                   ),
                   child:  Text(
-                    "Continue with ${addedCrewIds.length} Member",
+                    // "Continue with ${addedCrewIds.length} Member",
+                    "Continue with ${addedCrewUserIds.length} Member",
+
 
                     style: TextStyle(
                       fontSize: 14,

@@ -23,7 +23,26 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   int currentStep = 1;
   bool loding   = true;
-  int quantity = 1;
+  int quantity = 0;
+
+  int includedQuantity = 1;          // 🔒 fixed
+  int additionalQuantity = 0;        // 👈 default 0
+  bool addAdditional = false;        // Yes / No
+  bool isAdditionalSelected = false; // checkbox
+
+
+  // Included (fixed)
+  int includedPhotoQty = 1;
+  int includedVideoQty = 1;
+
+// Additional
+
+  bool addPhoto = false;
+  bool addVideo = false;
+     // 🔒 FIXED (always 1)
+
+  int additionalPhotoQty = 0;
+  int additionalVideoQty = 0;
 
   String? selectedStudio;
   bool showMap = false;
@@ -431,7 +450,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     /// TITLE
                     Expanded(
                       child: Text(
-                        "${getContentTypeTitle(widget.contentTypeId)} x $quantity",
+                        "${getContentTypeTitle(widget.contentTypeId)} x $includedQuantity",
 
                         style: const TextStyle(
                           color: Colors.white,
@@ -461,6 +480,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
 
               const SizedBox(height: 24),
+
+
         
               /// 🔹 QUESTION
               Text(
@@ -475,7 +496,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         
               const SizedBox(height: 12),
         
-              /// 🔹 YES / NO RADIO
+
               Row(
                 children: [
                   _radioOption("Yes", true),
@@ -537,25 +558,31 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
-                                    if (quantity > 1) {
-                                      setState(() => quantity--);
+                                    if (additionalQuantity > 0) {
+                                      setState(() => additionalQuantity--);
                                     }
                                   },
-                                  child:  Icon(Icons.remove, size: 18,color: ColorCode.black,),
+                                  child: const Icon(Icons.remove, size: 18, color: Colors.black),
                                 ),
+
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
-                                    quantity.toString().padLeft(2, '0'),
-                                    style: const TextStyle(fontWeight: FontWeight.w600,color: ColorCode.black,),
+                                    additionalQuantity.toString().padLeft(2, '0'),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
+
                                 InkWell(
                                   onTap: () {
-                                    setState(() => quantity++);
+                                    setState(() => additionalQuantity++);
                                   },
-                                  child: const Icon(Icons.add, size: 18,color: ColorCode.black,),
+                                  child: const Icon(Icons.add, size: 18, color: Colors.black),
                                 ),
+
                               ],
                             ),
                           ),

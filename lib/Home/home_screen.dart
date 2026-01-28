@@ -6,6 +6,7 @@ import '../MyProfile/my_profile.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'SelectLocationMapScreen.dart';
 import 'Specialities/specialities.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -168,147 +169,172 @@ class _HomeScreenState extends State<HomeScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-
               Container(
                 width: double.infinity,
-
-                padding:  EdgeInsets.fromLTRB(
-                  20, // left
-                  28, // top
-                  20, // right
-                  20, // bottom
-                ),
-                decoration:  BoxDecoration(
+                decoration: const BoxDecoration(
                   color: ColorCode.k282828,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(40),
                     bottomRight: Radius.circular(40),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    /// 🔹 TOP ROW
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min, // 🔥 VERY IMPORTANT
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        /// MENU
-                        Image.asset(
-                          "assets/Icons/menu-02.png",
-                          width: 26,
-                          color: Colors.white,
-                        ),
-
-                        /// LOCATION
-                        Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  location.isNotEmpty ? location.split(',').first : "",
-                                  style: const TextStyle(
-                                    fontFamily: "HelveticaNeue",
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(Icons.keyboard_arrow_down,
-                                    color: Colors.white, size: 22),
-                              ],
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              location.contains(',')
-                                  ? location.split(',').sublist(1).join(',')
-                                  : "",
-                              style: TextStyle(
-                                fontFamily: "HelveticaNeue",
-                                fontSize: 12,
-                                color: ColorCode.kWhiteOpacity70,
-                              ),
-                            ),
-                          ],
-                        ),
-
-
-                        /// BELL + PROFILE
+                        /// TOP ROW
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+
+                            /// MENU
                             Image.asset(
-                              "assets/Icons/notifactioin.png",
-                              width: 22,
+                              "assets/Icons/menu-02.png",
+                              width: 26,
                               color: Colors.white,
                             ),
+
                             const SizedBox(width: 12),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => MyProfile()),
-                                );
-                              },
-                              child: const CircleAvatar(
-                                radius: 18,
-                                backgroundImage:
-                                AssetImage("assets/Icons/profile.png"),
+
+                            /// LOCATION (🔥 FIXED)
+                            Expanded(
+                              child: InkWell(
+                                onTap: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>  SelectLocationMapScreen(),
+                                    ),
+                                  );
+
+                                  if (result != null && result is String) {
+                                    setState(() {
+                                      location = result; // 🔥 update header location
+                                    });
+                                  }
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            location.isNotEmpty
+                                                ? location.split(',').first
+                                                : "Select Location",
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontFamily: "Outfit",
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      location.contains(',')
+                                          ? location.split(',').sublist(1).join(', ')
+                                          : "Tap to change location",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFFB5B5B5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+
+
+
+                            const SizedBox(width: 15),
+
+                            /// BELL + PROFILE
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  "assets/Icons/notifactioin.png",
+                                  width: 22,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 15),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MyProfile(),
+                                      ),
+                                    );
+                                  },
+                                  child: const CircleAvatar(
+                                    radius: 18,
+                                    backgroundImage: AssetImage("assets/Icons/profile.png"),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
+                        ),
+
+
+                        const SizedBox(height: 20),
+
+                        /// SEARCH BAR
+                        Container(
+                          height: 48,
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          decoration: BoxDecoration(
+                            color: ColorCode.kHeadingColor,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                "assets/Icons/serch.png",
+                                width: 18,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText:
+                                    "Search Photographer, Videographer...",
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-
-                     SizedBox(height: 22),
-
-                    /// 🔹 SEARCH BAR (IMAGE JAISE LOOK)
-                    Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: ColorCode.kHeadingColor,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            "assets/Icons/serch.png",
-                            width: 18,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                          const SizedBox(width: 10),
-
-                          Expanded(
-                            child: TextField(
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontFamily: "Outfit",
-                              ),
-                              cursorColor: Colors.white,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                border: InputBorder.none,
-                                hintText:
-                                "Search Photographer, Videographer...",
-                                hintStyle: TextStyle(
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontSize: 14,
-                                  fontFamily: "Outfit",
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
+
 
 
 

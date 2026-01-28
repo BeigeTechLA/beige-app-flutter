@@ -259,57 +259,54 @@ String getContentTypeTitle(int contentTypeId) {
                         children: [
 
                           /// 🔹 IMAGE CARD (DYNAMIC)
-                          Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              height: 250,
-                              width: double.infinity,
-                              child: imagePath.isNotEmpty
-                                  ? Image.network(
-                                fullImageUrl,
-                                fit: BoxFit.cover,
+                        Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: SizedBox(
+                          height: 250,
+                          width: double.infinity,
+                          child: imagePath.isNotEmpty
+                              ? Image.network(
+                            fullImageUrl,
+                            fit: BoxFit.cover,
 
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) {
-                                    // ✅ image fully loaded
-                                    return child;
-                                  }
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                // ✅ fully loaded image
+                                return child;
+                              }
 
-                                  // ✅ image + loader together
-                                  return Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      child, // image render hoti rahe
-                                      const CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  );
-                                },
+                              // ✅ proper loader only
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: ColorCode.kButtonColor,
+                                ),
+                              );
+                            },
 
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    "assets/newbookflow/Frame_2087328912.png",
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                                  : Image.asset(
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
                                 "assets/newbookflow/Frame_2087328912.png",
                                 fit: BoxFit.cover,
-                              ),
-                            ),
+                              );
+                            },
+                          )
+                              : Image.asset(
+                            "assets/newbookflow/Frame_2087328912.png",
+                            fit: BoxFit.cover,
                           ),
+                        ),
+                      ),
 
 
 
 
-                          /// 🔹 TITLE + RADIO
+
+                        /// 🔹 TITLE + RADIO
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Row(
