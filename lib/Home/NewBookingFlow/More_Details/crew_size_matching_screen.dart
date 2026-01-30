@@ -56,6 +56,9 @@ bool isLoading =true;
           shootName = data['shoot_type']['name'] ?? "";
           contentType = data['shoot_type']['content_type'] ?? "";
 
+          // ✅ ADD THIS
+          shootImageUrl = data['shoot_type']['image_url'] ?? "";
+
           minCrew = data['recommended_crew']['min'] ?? 0;
           maxCrew = data['recommended_crew']['max'] ?? 0;
 
@@ -67,6 +70,7 @@ bool isLoading =true;
 
           reasoning = List<String>.from(data['reasoning'] ?? []);
         });
+
       }
     } catch (e) {
       debugPrint("API Error → $e");
@@ -75,6 +79,10 @@ bool isLoading =true;
     }
   }
 
+  String getShootImage() {
+    if (shootImageUrl.isEmpty) return "";
+    return ApiService().getImageURL(shootImageUrl);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,11 +244,26 @@ bool isLoading =true;
                           child: SizedBox(
                             height: 280,
                             width: double.infinity,
-                            child: shootImageUrl.isNotEmpty
-                                ? Image.network(
-                              ApiService().getImageURL(shootImageUrl),
+                            child: getShootImage().isNotEmpty
+                                ? Image(
+                              image: ResizeImage(
+                                NetworkImage(getShootImage()),
+                                width: 800, // 👈 performance optimized
+                              ),
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
+
+                              // ✅ smooth fade-in
+                              frameBuilder: (context, child, frame, wasLoaded) {
+                                if (wasLoaded) return child;
+                                return AnimatedOpacity(
+                                  opacity: frame == null ? 0 : 1,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: child,
+                                );
+                              },
+
+                              // ❌ error fallback
+                              errorBuilder: (_, __, ___) {
                                 return Image.asset(
                                   "assets/newbookflow/Frame_2087328912.png",
                                   fit: BoxFit.cover,
@@ -253,6 +276,7 @@ bool isLoading =true;
                             ),
                           ),
                         ),
+
                       ),
 
 

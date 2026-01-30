@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:beige/MyProfile/my_profile.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 
@@ -10,6 +14,8 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'Change_Password_screen.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -25,6 +31,13 @@ class _EditProfileState extends State<EditProfile> {
   File? _profileImage;
   List<dynamic> myprofile = [];
 
+  String? selectedStudio;
+  bool showMap = false;
+
+  GoogleMapController? mapController;
+  LatLng? currentLatLng;
+
+  String selectedAddress = "Search or select location";
 
 
   final ImagePicker _picker = ImagePicker();
@@ -42,7 +55,93 @@ class _EditProfileState extends State<EditProfile> {
   void initState() {
     super.initState();
     _fetchMyProfile();
+    _getCurrentLocation();
   }
+
+
+
+
+  Future<void> searchLocation(String query) async {
+    try {
+      List<Location> locations = await locationFromAddress(query);
+
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+
+        final latLng = LatLng(loc.latitude, loc.longitude);
+
+        setState(() {
+          currentLatLng = latLng;
+        });
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(latLng, 15),
+        );
+
+        await getAddressFromLatLng(latLng);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Location not found")),
+      );
+    }
+  }
+
+  Future<void> getAddressFromLatLng(LatLng latLng) async {
+    try {
+      List<Placemark> placemarks =
+      await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        setState(() {
+          selectedAddress =
+          "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+        });
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
+
+
+
+
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings(); // 👈 THIS IS IMPORTANT
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Location permission permanently denied. Enable from settings."),
+        ),
+      );
+      await Geolocator.openAppSettings(); // 👈 Open app settings
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      currentLatLng = LatLng(position.latitude, position.longitude);
+    });
+  }
+
 
   Future<void> _fetchMyProfile() async {
     debugPrint("🟢 MY PROFILE API CALL STARTED");
@@ -217,319 +316,262 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+
+    const String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#212121"}]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#757575"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [{"color": "#383838"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#8a8a8a"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#000000"}]
+  }
+]
+''';
     return Scaffold(
-      body: Column(
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-
-              /// 🔹 BACKGROUND HEADER
-              SizedBox(
-                width: double.infinity,
-                height: 200,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                  child: Image.asset(
-                    "assets/images/profile.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-              /// 🔹 BACK BUTTON
-              Positioned(
-                top: 90,
-                left: 16,
-                child:  InkWell(
-                  onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => MyProfile()),
-                      );
-                  },
-                  child: Image.asset("assets/Icons/Reply.png", height: 24,color: ColorCode.kHeadingColor,),
-                ),
-              ),
-
-              /// 🔹 TITLE (CENTERED)
-              const Positioned(
-                top:90 ,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Text(
-                    "Edit Profile",
-                    style: TextStyle(
-                      color: ColorCode.kHeadingColor,
-                      fontSize: 16,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w500,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+        
+                /// 🔹 BACKGROUND HEADER
+                SizedBox(
+                  width: double.infinity,
+                  height: 200,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                    child: Image.asset(
+                      "assets/images/profile.png",
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ),
-
-              /// 🔹 PROFILE IMAGE (CUT INTO CURVE)
-              Positioned(
-                bottom: -48,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Stack(
-                    children: [
-                      InkWell(
-                        onTap: _pickImage, // ✅ PICK + UPLOAD
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child:/* CircleAvatar(
-                            radius: 48,
-                            backgroundColor: Colors.grey.shade200,
-                            backgroundImage: _profileImage != null
-                                ? FileImage(_profileImage!)
-                                : const AssetImage("assets/Icons/profile.png")
-                            as ImageProvider,
-                          ),*/
-                        CircleAvatar(
-                          radius: 48,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: getProfileImage(), // ✅ FIXED
-                        ),
-                        ),
+        
+                /// 🔹 BACK BUTTON
+                Positioned(
+                  top: 90,
+                  left: 16,
+                  child:  InkWell(
+                    onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => MyProfile()),
+                        );
+                    },
+                    child: Image.asset("assets/Icons/Reply.png", height: 24,color: ColorCode.kHeadingColor,),
+                  ),
+                ),
+        
+                /// 🔹 TITLE (CENTERED)
+                const Positioned(
+                  top:90 ,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Text(
+                      "Edit Profile",
+                      style: TextStyle(
+                        color: ColorCode.kHeadingColor,
+                        fontSize: 16,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
                       ),
-
-                      /// ✏️ EDIT ICON
-                      Positioned(
-                        bottom: 5,
-                        right: 2,
-                        child: GestureDetector(
-                          onTap: _pickImage,
+                    ),
+                  ),
+                ),
+        
+                /// 🔹 PROFILE IMAGE (CUT INTO CURVE)
+                Positioned(
+                  bottom: -48,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        InkWell(
+                          onTap: _pickImage, // ✅ PICK + UPLOAD
                           child: Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child:  Icon(Icons.edit, size: 22,color:Colors.black,),
+                            child:/* CircleAvatar(
+                              radius: 48,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : const AssetImage("assets/Icons/profile.png")
+                              as ImageProvider,
+                            ),*/
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundColor: Colors.grey.shade200,
+                            backgroundImage: getProfileImage(), // ✅ FIXED
+                          ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-
-
-            ],
-          ),
-
-
-
-          const SizedBox(height: 60),
-
-          /// 🔹 USER INFO
-           Text(
-
-             myProfile?['name'] ?? '',
-            style: TextStyle(
-              fontFamily: "Outfit",
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-           Text(
-            "${myProfile?['email'] ?? ''}",
-            style: TextStyle(
-              color: ColorCode.kWhiteOpacity60,
-              fontFamily: "Outfit",
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-          Padding(
-            padding:  EdgeInsets.all(15),
-            child: Divider(color: ColorCode.kDividerWhite12,),
-          ),
-
-          Padding(
-            padding:  EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-
-                TextField(
-                    controller: nameController,
-                    cursorColor: ColorCode.white,
-
-                style: const TextStyle(
-                  color: ColorCode.white, // typed text color
-                ),
-
-                decoration: InputDecoration(
-                  labelText: "Name*",
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  labelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  /// ⭐ 0.5px BORDER + OPACITY COLOR
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                       // 🔥 exact 0.5px
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                          // focus border thicker
-                    ),
-                  ),
-
-                  floatingLabelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-                  ),)
-
-            ),
-                SizedBox(height: 20,),
-                TextField(
-                  controller: emailController,
-
-                  cursorColor: ColorCode.white,
-                  style: const TextStyle(
-                    color: ColorCode.white,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: "Email ID*",
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  /*  suffixIcon: GestureDetector(
-                      onTap: () {
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ChangePasswordScreen(),
+        
+                        /// ✏️ EDIT ICON
+                        Positioned(
+                          bottom: 5,
+                          right: 2,
+                          child: GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child:  Icon(Icons.edit, size: 22,color:Colors.black,),
+                            ),
                           ),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.edit,
-                        color: ColorCode.kWhiteOpacity70,
-                        size: 20,
-                      ),
-                    ),*/
-
-                    labelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                        ),
+                      ],
                     ),
-
+                  ),
+                ),
+        
+        
+        
+              ],
+            ),
+        
+        
+        
+            const SizedBox(height: 60),
+        
+            /// 🔹 USER INFO
+             Text(
+        
+               myProfile?['name'] ?? '',
+              style: TextStyle(
+                fontFamily: "Outfit",
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+             Text(
+              "${myProfile?['email'] ?? ''}",
+              style: TextStyle(
+                color: ColorCode.kWhiteOpacity60,
+                fontFamily: "Outfit",
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+        
+            const SizedBox(height: 14),
+            Padding(
+              padding:  EdgeInsets.all(15),
+              child: Divider(color: ColorCode.kDividerWhite12,),
+            ),
+        
+            Padding(
+              padding:  EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+        
+                  TextField(
+                      controller: nameController,
+                      cursorColor: ColorCode.white,
+        
+                  style: const TextStyle(
+                    color: ColorCode.white, // typed text color
+                  ),
+        
+                  decoration: InputDecoration(
+                    labelText: "Name*",
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+        
+                    labelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                    ),
+        
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 18,
                     ),
-
+        
+                    /// ⭐ 0.5px BORDER + OPACITY COLOR
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70,
-                        width: 0.5,
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
-
+        
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70,
-                        width: 0.5,
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                          // focus border thicker
                       ),
                     ),
-                  ),
-                ),
-
-                SizedBox(height: 20,),
-                TextField(
-                    controller: locationController,
-
+        
+                    floatingLabelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+                    ),)
+        
+              ),
+                  SizedBox(height: 20,),
+                  TextField(
+                    controller: emailController,
+        
                     cursorColor: ColorCode.white,
-
                     style: const TextStyle(
-                      color: ColorCode.white, // typed text color
+                      color: ColorCode.white,
                     ),
-
                     decoration: InputDecoration(
-                      labelText: "Location*",
+                      labelText: "Email ID*",
                       floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                      labelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                      ),
-
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
-
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                       // 🔥 exact 0.5px
-                        ),
-                      ),
-
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                          // focus border thicker
-                        ),
-                      ),
-
-                      floatingLabelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                      ),)
-
-                ),
-                SizedBox(height: 20,),
-                TextField(
-                  // controller: emailController,
-                    cursorColor: ColorCode.white,
-
-                    style: const TextStyle(
-                      color: ColorCode.white, // typed text color
-                    ),
-
-                    decoration: InputDecoration(
-                      labelText: "Change Password*",
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                      labelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                      ),
-                      suffixIcon: GestureDetector(
+        
+                    /*  suffixIcon: GestureDetector(
                         onTap: () {
-
+        
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -542,42 +584,186 @@ class _EditProfileState extends State<EditProfile> {
                           color: ColorCode.kWhiteOpacity70,
                           size: 20,
                         ),
+                      ),*/
+        
+                      labelStyle: const TextStyle(
+                        color: ColorCode.kWhiteOpacity70,
                       ),
-
+        
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 18,
                       ),
-
+        
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                       // 🔥 exact 0.5px
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
                         ),
                       ),
-
+        
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                          width: 0.5,                          // focus border thicker
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
                         ),
                       ),
+                    ),
+                  ),
+        
+                  SizedBox(height: 20,),
+                  TextField(
+                    controller: locationController,
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        searchLocation(value);
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Location*",
+                      suffixIcon: InkWell(
+                        onTap: () {
+                          if (locationController.text.isNotEmpty) {
+                            searchLocation(locationController.text);
+                          }
+                        },
+                        child: const Icon(
+                          Icons.location_on_outlined,
+                          color: ColorCode.white,
+                        ),
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+        
+        
+                  SizedBox(height: 20,),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: SizedBox(
+                      height: 250,
+                      child: currentLatLng == null
+                          ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                          : GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: currentLatLng!,
+                          zoom: 14,
+                        ),
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        zoomControlsEnabled: true,
+                        compassEnabled: true,
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          controller.setMapStyle(_darkMapStyle);
+                        },
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("selected"),
+                            position: currentLatLng!,
+                          ),
+                        },
+                        onTap: (latLng) async {
+                          setState(() {
+                            currentLatLng = latLng;
+                          });
+                          await getAddressFromLatLng(latLng);
+                          locationController.text = selectedAddress;
+                        },
+                      ),
+                    ),
 
-                      floatingLabelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                      ),)
+                  ),
 
-                ),
-                SizedBox(height: 20,),
-              ],
-            ),
-          )
-
-
-
-        ],
+                  SizedBox(height: 20,),
+        
+                  TextField(
+                    // controller: emailController,
+                      cursorColor: ColorCode.white,
+        
+                      style: const TextStyle(
+                        color: ColorCode.white, // typed text color
+                      ),
+        
+                      decoration: InputDecoration(
+                        labelText: "Change Password*",
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+        
+                        labelStyle: const TextStyle(
+                          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                        ),
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+        
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChangePasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: const Icon(
+                            Icons.edit,
+                            color: ColorCode.kWhiteOpacity70,
+                            size: 20,
+                          ),
+                        ),
+        
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
+        
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                            width: 0.5,                       // 🔥 exact 0.5px
+                          ),
+                        ),
+        
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                            width: 0.5,                          // focus border thicker
+                          ),
+                        ),
+        
+                        floatingLabelStyle: const TextStyle(
+                          color: ColorCode.kWhiteOpacity70,
+                        ),)
+        
+                  ),
+                  SizedBox(height: 20,),
+                ],
+              ),
+            )
+        
+        
+        
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding:  EdgeInsets.all(22),

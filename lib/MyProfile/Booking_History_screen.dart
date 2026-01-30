@@ -12,16 +12,16 @@ class BookingHistoryScreen extends StatefulWidget {
 }
 
 class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
-
   List<dynamic> bookings = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchmbookings();
+    _fetchBookings();
   }
-  Future<void> _fetchmbookings() async {
+
+  Future<void> _fetchBookings() async {
     try {
       final response =
       await ApiService().fetchData(ApiEndpoints.my_bookings);
@@ -32,15 +32,14 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
           isLoading = false;
         });
       } else {
-        setState(() => isLoading = false);
+        isLoading = false;
       }
     } catch (e) {
-      debugPrint("Fetch Error: $e");
-      setState(() => isLoading = false);
+      debugPrint("Booking Fetch Error: $e");
+      isLoading = false;
     }
+    setState(() {});
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -48,37 +47,33 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 🔙 BACK BUTTON
+            /// 🔙 BACK
             Padding(
-              padding:  EdgeInsets.all(16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    "assets/Icons/Reply.png",
-                    height: 24,
-                    color: ColorCode.white,
-                  ),
+              padding: const EdgeInsets.all(16),
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Image.asset(
+                  "assets/Icons/Reply.png",
+                  height: 24,
+                  color: ColorCode.white,
                 ),
               ),
             ),
 
             /// 🏷 TITLE
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  "Booking History",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: ColorCode.white,
-                  ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "Booking History",
+                style: TextStyle(
+                  fontFamily: "Unbounded",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: ColorCode.white,
                 ),
-              ],
+              ),
             ),
 
             const SizedBox(height: 20),
@@ -106,40 +101,49 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                 itemBuilder: (context, index) {
                   final booking = bookings[index];
 
+                  final String image =
+                      booking['profile_image_url'] ?? "";
                   final String name =
-                      booking['creator_name'] ?? "N/A";
+                      booking['creator_name'] ?? "Unknown";
                   final String role =
                       booking['primary_title'] ?? "";
-                  final String image =
-                      booking['cover_image'] ?? "";
                   final String status =
                       booking['status'] ?? "Completed";
                   final String rating =
                       booking['rating']?.toString() ?? "0";
+                  final int reviews =
+                      booking['total_reviews'] ?? 0;
+                  final String price =
+                      booking['hourly_rate']?.toString() ?? "";
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 12),
                     child: SizedBox(
                       height: 220,
                       child: Stack(
                         children: [
-                          /// 🔹 BACKGROUND IMAGE
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: image.isNotEmpty
-                                ? Image.network(
-                              image,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              "assets/images/home2.png",
-                              fit: BoxFit.cover,
-                            ),
+                          /// 🖼 IMAGE
+                          image.isNotEmpty
+                              ? Image.network(
+                            ApiService().getImageURL(image),
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Image.asset(
+                                  "assets/images/profile_placeholder.png",
+                                  fit: BoxFit.cover,
+                                ),
+                          )
+                              : Image.asset(
+                            "assets/images/profile_placeholder.png",
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
                           ),
 
-                          /// 🔹 GRADIENT
+                          /// 🌑 GRADIENT
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -147,9 +151,6 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             child: Container(
                               height: 110,
                               decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.vertical(
-                                  bottom: Radius.circular(18),
-                                ),
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -162,7 +163,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             ),
                           ),
 
-                          /// 🔹 STATUS
+                          /// 🟢 STATUS
                           Positioned(
                             top: 12,
                             left: 12,
@@ -176,95 +177,92 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                 Text(
                                   status,
                                   style: const TextStyle(
-                                    fontSize: 10,
                                     color: Colors.white,
+                                    fontSize: 10,
                                     fontFamily: "Outfit",
                                   ),
-                                ),
+                                )
                               ],
                             ),
                           ),
 
-                          /// 🔹 DETAILS
+                          /// 📄 DETAILS
                           Positioned(
                             bottom: 20,
                             left: 16,
                             right: 16,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
                               children: [
+                                /// ⭐ RATING
                                 Row(
                                   children: [
                                     const Icon(Icons.star,
-                                        color: Colors.yellow, size: 16),
+                                        color: Colors.yellow,
+                                        size: 16),
                                     const SizedBox(width: 4),
                                     Text(
-                                      rating,
+                                      "$rating ($reviews)",
                                       style: const TextStyle(
                                         fontSize: 12,
+                                        color: ColorCode
+                                            .kWhiteOpacity70,
                                         fontFamily: "Outfit",
-                                        color:
-                                        ColorCode.kWhiteOpacity70,
                                       ),
                                     ),
                                   ],
                                 ),
+
                                 const SizedBox(height: 6),
+
+                                /// NAME
                                 Text(
                                   name,
                                   style: const TextStyle(
                                     fontSize: 14,
+                                    color: Colors.white,
                                     fontFamily: "Outfit",
-                                    color: ColorCode.white,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+
+                                /// ROLE
                                 Text(
                                   role,
                                   style: const TextStyle(
                                     fontSize: 11,
+                                    color: ColorCode
+                                        .kWhiteOpacity70,
                                     fontFamily: "Outfit",
-                                    color:
-                                    ColorCode.kWhiteOpacity70,
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          /// 🔹 ACTION
+                          /// 💰 PRICE
                           Positioned(
                             bottom: 16,
                             right: 16,
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: ColorCode.kButtonColor,
-                                    borderRadius:
-                                    BorderRadius.circular(22),
-                                  ),
-                                  child: const Text(
-                                    "Add Review",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      color:
-                                      ColorCode.kCircleGradientTop,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: ColorCode.kButtonColor,
+                                borderRadius:
+                                BorderRadius.circular(22),
+                              ),
+                              child: Text(
+                                "Add Review,",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorCode
+                                      .kCircleGradientTop,
                                 ),
-                                const SizedBox(width: 10),
-                                Image.asset(
-                                  "assets/images/Group 2087328980.png",
-                                  height: 34,
-                                  width: 34,
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ],
@@ -274,13 +272,9 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                 },
               ),
             ),
-
           ],
         ),
       ),
     );
   }
-
-
-
 }

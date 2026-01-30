@@ -32,6 +32,7 @@ void initState() {
 }
 
 
+
 Future<void> _callBookingApi(int contentTypeId) async {
   setState(() => isLoading = true);
 
@@ -273,18 +274,16 @@ String getContentTypeTitle(int contentTypeId) {
                             fullImageUrl,
                             fit: BoxFit.cover,
 
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) {
-                                // ✅ fully loaded image
+                            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                              if (wasSynchronouslyLoaded) {
+                                // ✅ image cache se aayi → loader skip
                                 return child;
                               }
 
-                              // ✅ proper loader only
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: ColorCode.kButtonColor,
-                                ),
+                              return AnimatedOpacity(
+                                opacity: frame == null ? 0 : 1,
+                                duration: const Duration(milliseconds: 300),
+                                child: child,
                               );
                             },
 
@@ -295,6 +294,7 @@ String getContentTypeTitle(int contentTypeId) {
                               );
                             },
                           )
+
                               : Image.asset(
                             "assets/newbookflow/Frame_2087328912.png",
                             fit: BoxFit.cover,

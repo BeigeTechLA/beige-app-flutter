@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../service/api_endpoints.dart';
@@ -73,7 +74,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
           final creative = creatives.first['creative'];
 
           creativeName = creative?['name'] ?? "—";
-          creativeImage = creative?['profile_image_url'] ?? "";
+          creativeImage = creative?['shoot_type_image_url'] ?? "";
           creativeRate = creative?['hourly_rate']?.toString() ?? "";
           creativeRole = getContentTypeTitle(creatives.first['content_type']);
 
@@ -623,7 +624,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                   const SizedBox(height: 15),
 
-                  _buildField("Phone Number*", phoneController),
+                  _buildField("Phone Number*", phoneController, isPhone: true),
 
                   const SizedBox(height: 15),
 
@@ -688,25 +689,25 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               Divider(color: ColorCode.black,),
                               _buildCheckRow(
                                 text: "Unlimited Usage Rights",
-                                iconPath: "assets/newbookflow/security-wifi.png",
+                                iconPath: "assets/newbookflow/security-wifi (1).png",
                               ),
                               const SizedBox(height: 12),
 
                               _buildCheckRow(
                                 text: "All Raw Content",
-                                iconPath: "assets/newbookflow/security-wifi.png",
+                                iconPath: "assets/newbookflow/File Image.png",
                               ),
                               const SizedBox(height: 12),
 
                               _buildCheckRow(
                                 text: "Include Edited Deliverable",
-                                iconPath: "assets/newbookflow/security-wifi.png",
+                                iconPath: "assets/newbookflow/Box.png",
                               ),
                               const SizedBox(height: 12),
 
                               _buildCheckRow(
                                 text: "Up to 2 Sets of Revisions",
-                                iconPath: "assets/newbookflow/security-wifi.png",
+                                iconPath: "assets/newbookflow/Refresh.png",
                               ),
 
                             ],
@@ -971,16 +972,33 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
 
   /// Text Field (Email)
-  Widget _buildField(String label, TextEditingController controller) {
+  Widget _buildField(
+      String label,
+      TextEditingController controller, {
+        bool isPhone = false,
+      }) {
     return TextField(
       controller: controller,
       cursorColor: ColorCode.white,
       style: const TextStyle(color: ColorCode.white),
+
+      /// ✅ PHONE FIELD KE LIYE NUMBER KEYPAD
+      keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
+
+      /// ✅ SIRF DIGITS (PHONE)
+      inputFormatters: isPhone
+          ? [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(10),
+      ]
+          : null,
+
       decoration: InputDecoration(
         labelText: label,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(

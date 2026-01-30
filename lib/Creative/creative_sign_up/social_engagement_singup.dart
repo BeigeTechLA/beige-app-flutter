@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:beige/MainScreen.dart';
+import 'package:beige/auth/login_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:open_file/open_file.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
@@ -114,6 +117,97 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     }
   }
 
+
+  Future<void> _fetchSingup3() async {
+    setState(() => isLoggingIn = true);
+
+    try {
+      final Map<String, dynamic> payload = {
+        "crew_member_id": widget.crewMemberId.toString(),
+
+        /// 🔹 JSON FIELDS (STRINGIFIED)
+        "certifications": jsonEncode(
+          certificateFiles.map((e) => e.path.split('/').last).toList(),
+        ),
+
+        "social_media_links": jsonEncode(
+          savedLinks.map((e) => {
+            "platform": e['name'].toString().toLowerCase(),
+            "url": normalizeUrl(e['url']),
+          }).toList(),
+        ),
+
+        "featured_work": jsonEncode(
+          featuredImages.map((e) => {
+            "work_title": enter_work_titleController.text.trim(),
+            "tags": selectedTags,
+          }).toList(),
+        ),
+      };
+
+      /// 🔹 FILE MAP
+      final Map<String, List<File>> files = {
+        "certifications": certificateFiles,
+        "recent_work_media": featuredImages,
+      };
+
+      /// 🔹 SINGLE FILES
+      if (documentFile != null) {
+        files["resume"] = [documentFile!];
+      }
+
+      if (portfolioFile != null) {
+        files["portfolio"] = [portfolioFile!];
+      }
+
+      debugPrint("📤 STEP-3 PAYLOAD => $payload");
+      debugPrint("📂 FILE COUNT => ${files.length}");
+
+      final response = await ApiService().postMultipartStep3(
+        ApiService().baseUrl + ApiEndpoints.register_step3, // ✅ FULL URL
+        fields: payload.map((k, v) => MapEntry(k, v.toString())),
+
+        resume: documentFile,
+        portfolio: portfolioFile,
+
+        certificates: certificateFiles,
+        recentWorks: featuredImages,
+        recentWorkIndexes: List.generate(
+          featuredImages.length,
+              (i) => i,
+        ),
+      );
+
+
+      debugPrint("📥 STEP-3 RESPONSE => $response");
+
+      if (response != null && response['error'] == false) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) =>  LoginScreen()),
+        );
+      } else {
+        _showSnack(response?['message'] ?? "Submission failed");
+      }
+    } catch (e) {
+      debugPrint("❌ STEP-3 ERROR => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      setState(() => isLoggingIn = false);
+    }
+  }
+  Map<String, List<String>> _buildRecentWorkIndexes() {
+    final Map<String, List<String>> map = {};
+
+    for (int i = 0; i < featuredImages.length; i++) {
+      map.putIfAbsent("recent_work_media_index", () => []);
+      map["recent_work_media_index"]!.add(i.toString());
+    }
+    return map;
+  }
+
+
+
   Future<void> _pickPortfolio() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.any,
@@ -140,130 +234,7 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
     return 'https://$trimmed';
   }
 
- /* Future<void> _fetchSingup3() async {
-    if (widget.crewMemberId == null) {
-      _showSnack("Crew member id missing");
-      return;
-    }
 
-    if (featuredImages.isEmpty) {
-      _showSnack("Please upload featured work");
-      return;
-    }
-
-    setState(() => isLoggingIn = true);
-
-    final socialLinks = savedLinks.map((e) {
-      return {
-        "platform": e['name'].toString().toLowerCase(),
-        "url": normalizeUrl(e['url']),
-      };
-    }).toList();
-
-    final featuredWork = [
-      {
-        "work_title": enter_work_titleController.text.trim().isEmpty
-            ? "Featured Work"
-            : enter_work_titleController.text.trim(),
-        "tags": selectedTags.isEmpty ? ["creative"] : selectedTags,
-      }
-    ];
-
-    final certificationText = [
-      "Certified Cinematographer – XYZ Institute",
-      "Drone Pilot License – DGCA",
-    ];
-
-    final payload = {
-      "crew_member_id": widget.crewMemberId.toString(),
-      "certifications": jsonEncode(certificationText),
-      "social_media_links": jsonEncode(socialLinks),
-      "featured_work": jsonEncode(featuredWork),
-      "recent_work_media_index": "0",
-    };
-
-    try {
-      final res = await ApiService().postMultipart(
-        ApiEndpoints.register_step3,
-        payload,
-        featuredImages.first, // ⚠️ ONLY ONE FILE
-      );
-
-      if (res != null && res['error'] == false) {
-        _showSnack("Signup Step-3 Completed 🎉");
-      } else {
-        _showSnack(res?['message'] ?? "Signup failed");
-      }
-    } catch (e) {
-      _showSnack("Server error");
-    } finally {
-      setState(() => isLoggingIn = false);
-    }
-  }
-*/
-  Future<void> _fetchSingup3() async {
-    if (widget.crewMemberId == null) {
-      _showSnack("Crew member id missing");
-      return;
-    }
-
-    if (featuredImages.isEmpty) {
-      _showSnack("Please upload featured work");
-      return;
-    }
-
-    setState(() => isLoggingIn = true);
-
-    try {
-      /// 🔗 SOCIAL LINKS
-      final socialLinks = savedLinks.map((e) {
-        return {
-          "platform": e['name'].toString().toLowerCase(),
-          "url": normalizeUrl(e['url']),
-        };
-      }).toList();
-
-      /// 🎬 FEATURED WORK
-      final featuredWork = [
-        {
-          "work_title": enter_work_titleController.text.trim().isEmpty
-              ? "Featured Work"
-              : enter_work_titleController.text.trim(),
-          "tags": selectedTags,
-        }
-      ];
-
-      /// 📦 PAYLOAD (TEXT DATA ONLY)
-      final payload = {
-        "crew_member_id": widget.crewMemberId.toString(),
-        "social_media_links": jsonEncode(socialLinks),
-        "featured_work": jsonEncode(featuredWork),
-        "recent_work_media_index": "0",
-      };
-
-      /// ❗ ApiService expects ONE FILE only
-      final res = await ApiService().postMultipart(
-        ApiEndpoints.register_step3,
-        payload,
-        featuredImages.first, // ⚠️ first file only
-      );
-
-      if (res != null && res['error'] == false) {
-        _showSnack("Signup Step-3 Completed 🎉");
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => Mainscreen()),
-        );
-      } else {
-        _showSnack(res?['message'] ?? "Signup failed");
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-      _showSnack("Server error");
-    } finally {
-      setState(() => isLoggingIn = false);
-    }
-  }
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -301,516 +272,552 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding:  EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding:  EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Image.asset(
-                        "assets/Icons/Reply.png",
-                        height: 24,
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () => Navigator.pop(context),
+                          child: Image.asset(
+                            "assets/Icons/Reply.png",
+                            height: 24,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Text(
+                          ""
+                              "3/3",
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// 🔵 PROGRESS BAR
+                    Row(
+                      children: List.generate(
+                        3,
+                            (index) => Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 6),
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: index <= 1
+                                  ? ColorCode.kButtonColor
+                                  : ColorCode.kSubtextColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    /// 📝 TITLE
+                    const Text(
+                      "Social Engagement",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
                         color: Colors.white,
                       ),
                     ),
+
+                    const SizedBox(height: 10),
+
+                    /// SUBTITLE
                     const Text(
-                      ""
-                          "3/3",
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                /// 🔵 PROGRESS BAR
-                Row(
-                  children: List.generate(
-                    3,
-                        (index) => Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 6),
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: index <= 1
-                              ? ColorCode.kButtonColor
-                              : ColorCode.kSubtextColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                      "Complete your profile and connect with top studios\nand filmmakers.",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Outfit",
+                        color: ColorCode.kWhiteOpacity70,
                       ),
                     ),
-                  ),
-                ),
 
-                const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                /// 📝 TITLE
-                const Text(
-                  "Social Engagement",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Unbounded",
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
+                    ///  ADD SOCIAL LINKS
+                    ///
+                    if (savedLinks.isNotEmpty)
+                      Column(
+                        children: savedLinks.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final item = entry.value;
 
-                const SizedBox(height: 10),
-
-                /// SUBTITLE
-                const Text(
-                  "Complete your profile and connect with top studios\nand filmmakers.",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Outfit",
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                ///  ADD SOCIAL LINKS
-                ///
-                if (savedLinks.isNotEmpty)
-                  Column(
-                    children: savedLinks.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final item = entry.value;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white24),
-                          color: Colors.black26,
-                        ),
-                        child: Row(
-                          children: [
-                            /// ICON
-                            Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                color: ColorCode.kButtonColor.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Image.asset(
-                                item['icon'],
-                                color: ColorCode.kButtonColor,
-                              ),
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white24),
+                              color: Colors.black26,
                             ),
+                            child: Row(
+                              children: [
+                                /// ICON
+                                Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    color: ColorCode.kButtonColor.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Image.asset(
+                                    item['icon'],
+                                    color: ColorCode.kButtonColor,
+                                  ),
+                                ),
 
-                            const SizedBox(width: 12),
+                                const SizedBox(width: 12),
 
-                            /// NAME
-                            Expanded(
-                              child: Text(
-                                item['name'],
-                                style: const TextStyle(
+                                /// NAME
+                                Expanded(
+                                  child: Text(
+                                    item['name'],
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+
+                                /// ✏️ EDIT
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.white),
+                                  onPressed: () {
+                                    setState(() {
+                                      editingIndex = index;
+                                      selectedSocialIndex =
+                                          socialNames.indexOf(item['name']);
+                                      nameLinkController.text = item['name'];
+                                      linkController.text = item['url'];
+                                    });
+
+                                    _openSocialSheet();
+                                  },
+                                ),
+
+                                /// 🗑 DELETE
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.redAccent),
+                                  onPressed: () {
+                                    setState(() {
+                                      savedLinks.removeAt(index);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+
+                    _buildAddTile(
+                      title: "Add Social Links",
+                      onTap: _openSocialSheet,
+                    ),
+                    const SizedBox(height: 20),
+
+
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: ColorCode.bcakgroundcolor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          /// HEADER
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Featured Work",
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
+                                ),
+                              ),
+
+                              InkWell(
+                                onTap: _featuredSheet,
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "Add another",
+                                      style: TextStyle(
+                                        color: Color(0xFFF4E1C1),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// EMPTY STATE
+                          if (featuredImages.isEmpty)
+                            GestureDetector(
+                              onTap: _featuredSheet,
+                              child: Container(
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.white38),
+                                ),
+                                child: const Center(
+                                  child: Text("Add", style: TextStyle(color: Colors.white)),
                                 ),
                               ),
                             ),
 
-                            /// ✏️ EDIT
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.white),
-                              onPressed: () {
-                                setState(() {
-                                  editingIndex = index;
-                                  selectedSocialIndex =
-                                      socialNames.indexOf(item['name']);
-                                  nameLinkController.text = item['name'];
-                                  linkController.text = item['url'];
-                                });
-
-                                _openSocialSheet();
-                              },
-                            ),
-
-                            /// 🗑 DELETE
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.redAccent),
-                              onPressed: () {
-                                setState(() {
-                                  savedLinks.removeAt(index);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-
-                _buildAddTile(
-                  title: "Add Social Links",
-                  onTap: _openSocialSheet,
-                ),
-                const SizedBox(height: 20),
-
-
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ColorCode.bcakgroundcolor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white24),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// HEADER
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Featured Work",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  InkWell(
-                    onTap: _featuredSheet,
-                    child: Row(
-                      children: const [
-                        Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
-                        SizedBox(width: 4),
-                        Text(
-                          "Add another",
-                          style: TextStyle(
-                            color: Color(0xFFF4E1C1),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              /// EMPTY STATE
-              if (featuredImages.isEmpty)
-                GestureDetector(
-                  onTap: _featuredSheet,
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white38),
-                    ),
-                    child: const Center(
-                      child: Text("Add", style: TextStyle(color: Colors.white)),
-                    ),
-                  ),
-                ),
-
-              /// 🔥 ROW IMAGE LIST (AFTER SAVE)
-              if (featuredImages.isNotEmpty)
-                SizedBox(
-                  height: 110,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: featuredImages.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 140,
-                        margin: const EdgeInsets.only(right: 10),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            featuredImages[index],
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        ),
-
-
-
-
-
-        SizedBox(height: 16),
-
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: ColorCode.bcakgroundcolor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white24),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      /// 🔹 HEADER
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Upload Certifications",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-
-                          if (certificateFiles.isNotEmpty)
-                            InkWell(
-                              onTap: _pickCertificate,
-                              child: Row(
-                                children: const [
-                                  Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "Add another",
-                                    style: TextStyle(
-                                      color: Color(0xFFF4E1C1),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
+                          /// 🔥 ROW IMAGE LIST (AFTER SAVE)
+                          if (featuredImages.isNotEmpty)
+                            SizedBox(
+                              height: 110,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: featuredImages.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    width: 140,
+                                    margin: const EdgeInsets.only(right: 10),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        featuredImages[index],
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                         ],
                       ),
+                    ),
 
-                      const SizedBox(height: 12),
 
-                      /// 🔹 EMPTY STATE (UPLOAD BOX)
-                      if (certificateFiles.isEmpty)
-                        GestureDetector(
-                          onTap: _pickCertificate,
-                          child: Container(
-                            height: 90,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.white38),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Upload",
-                                style: TextStyle(color: Colors.white),
+
+
+
+                    SizedBox(height: 16),
+
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: ColorCode.bcakgroundcolor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          /// 🔹 HEADER
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Upload Certifications",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+
+                              if (certificateFiles.isNotEmpty)
+                                InkWell(
+                                  onTap: _pickCertificate,
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.add, size: 18, color: Color(0xFFF4E1C1)),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Add another",
+                                        style: TextStyle(
+                                          color: Color(0xFFF4E1C1),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// 🔹 EMPTY STATE (UPLOAD BOX)
+                          if (certificateFiles.isEmpty)
+                            GestureDetector(
+                              onTap: _pickCertificate,
+                              child: Container(
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.white38),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    "Upload",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
                               ),
                             ),
+
+                          /// 🔹 FILE LIST
+                          if (certificateFiles.isNotEmpty)
+                            Column(
+                              children: List.generate(certificateFiles.length, (index) {
+                                final file = certificateFiles[index];
+                                final fileName = file.path.split('/').last;
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black26,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.white24),
+                                  ),
+                                  child: Row(
+                                    children: [
+
+                                      /// FILE ICON
+                                      const Icon(Icons.link, color: Colors.white),
+
+                                      const SizedBox(width: 10),
+
+                                      /// FILE NAME
+                                      Expanded(
+                                        child: Text(
+                                          fileName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+
+                                      /// VIEW
+                                      IconButton(
+                                        icon: const Icon(Icons.remove_red_eye, color: Colors.white),
+                                        onPressed: () => viewFile(file),
+                                      ),
+
+
+                                      /// DELETE
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.white),
+                                        onPressed: () {
+                                          setState(() {
+                                            certificateFiles.removeAt(index);
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ),
+                        ],
+                      ),
+                    ),
+
+
+
+
+                    SizedBox(height: 16),
+
+
+                    Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: ColorCode.bcakgroundcolor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              /// TITLE
+                              const Text(
+                                "Upload Documents",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              /// RESUME
+                              _documentBlock(
+                                label: "Upload Resume/CV",
+                                file: documentFile,
+                                onUpload: _pickDocument,
+                                onDelete: () {
+                                  setState(() => documentFile = null);
+                                },
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              /// PORTFOLIO
+                              _documentBlock(
+                                label: "Upload Portfolio",
+                                file: portfolioFile,
+                                onUpload: _pickPortfolio,
+                                onDelete: () {
+                                  setState(() => portfolioFile = null);
+                                },
+                              ),
+                            ],
                           ),
                         ),
-
-                      /// 🔹 FILE LIST
-                      if (certificateFiles.isNotEmpty)
-                        Column(
-                          children: List.generate(certificateFiles.length, (index) {
-                            final file = certificateFiles[index];
-                            final fileName = file.path.split('/').last;
-
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.black26,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.white24),
-                              ),
-                              child: Row(
-                                children: [
-
-                                  /// FILE ICON
-                                  const Icon(Icons.link, color: Colors.white),
-
-                                  const SizedBox(width: 10),
-
-                                  /// FILE NAME
-                                  Expanded(
-                                    child: Text(
-                                      fileName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-
-                                  /// VIEW
-                                  IconButton(
-                                    icon: const Icon(Icons.remove_red_eye, color: Colors.white),
-                                    onPressed: () => viewFile(file),
-                                  ),
-
-
-                                  /// DELETE
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.white),
-                                    onPressed: () {
-                                      setState(() {
-                                        certificateFiles.removeAt(index);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ),
-                    ],
-                  ),
-                ),
-
-
-
-
-                SizedBox(height: 16),
-
-
-        Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: ColorCode.bcakgroundcolor,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white24),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// TITLE
-                  const Text(
-                    "Upload Documents",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      ],
                     ),
-                  ),
 
-                  const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
-                  /// RESUME
-                  _documentBlock(
-                    label: "Upload Resume/CV",
-                    file: documentFile,
-                    onUpload: _pickDocument,
-                    onDelete: () {
-                      setState(() => documentFile = null);
-                    },
-                  ),
 
-                  const SizedBox(height: 12),
 
-                  /// PORTFOLIO
-                  _documentBlock(
-                    label: "Upload Portfolio",
-                    file: portfolioFile,
-                    onUpload: _pickPortfolio,
-                    onDelete: () {
-                      setState(() => portfolioFile = null);
-                    },
-                  ),
-                ],
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        /*      onPressed: () {
+
+
+                       *//* Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Mainscreen(), // change screen name
+                          ),
+                        );*//*
+                      }
+                      ,*/
+                        onPressed: isLoggingIn
+                            ? null
+                            : () {
+                          debugPrint("🟢 CREATE PROFILE CLICKED");
+                          _fetchSingup3();
+                        },
+
+                        /*  onPressed:
+                      isLoggingIn
+                          ? null
+                          : () {
+                        debugPrint("🟢 NEXT BUTTON CLICKED");
+                        _fetchSingup3();
+                      },*/
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorCode.kButtonColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          "Create Profile",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: "Unbounded",
+                            color: ColorCode.kHeadingColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// LOGIN TEXT
+                    Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Already have an account? ",
+                          style: const TextStyle(
+                            color: ColorCode.kWhiteOpacity70,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Login",
+                              style: TextStyle(
+                                color: ColorCode.kButtonColor,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
-
-        SizedBox(height: 12),
-
-
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-              /*      onPressed: () {
-
-
-                     *//* Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => Mainscreen(), // change screen name
+          ),
+          if (isLoggingIn)
+            Positioned.fill(
+              child: AbsorbPointer(
+                absorbing: true, // 👈 background click disable
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.4),
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: ColorCode.kButtonColor,
                         ),
-                      );*//*
-                    }
-                    ,*/
-                    onPressed: isLoggingIn
-                        ? null
-                        : () {
-                      debugPrint("🟢 CREATE PROFILE CLICKED");
-                      _fetchSingup3();
-                    },
-
-                    /*  onPressed:
-                    isLoggingIn
-                        ? null
-                        : () {
-                      debugPrint("🟢 NEXT BUTTON CLICKED");
-                      _fetchSingup3();
-                    },*/
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorCode.kButtonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text(
-                      "Create Profile",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Unbounded",
-                        color: ColorCode.kHeadingColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                /// LOGIN TEXT
-                Center(
-                  child: Text.rich(
-                    TextSpan(
-                      text: "Already have an account? ",
-                      style: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "Login",
+                        SizedBox(height: 12),
+                        Text(
+                          "Processing payment...",
                           style: TextStyle(
-                            color: ColorCode.kButtonColor,
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontFamily: "Outfit",
                           ),
                         )
                       ],
                     ),
                   ),
-                )
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
+        ],
+
       ),
     );
   }

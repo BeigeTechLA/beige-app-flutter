@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource, XFile;
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +15,9 @@ import '../../ChooseYourRole/choose_your_role_screen.dart';
 import '../../auth/login_screen.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
+import '../../service/google_config.dart';
 import '../../utility/ColorCode.dart';
+import '../../utility/location_helper.dart';
 
 class BuildYourCreativeProfileSignUp extends StatefulWidget {
   const BuildYourCreativeProfileSignUp({super.key});
@@ -31,6 +34,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
   File? profileImage;
   final ImagePicker _picker = ImagePicker();
+  final FocusNode _locationFocus = FocusNode();
 
   bool showPassword = false;
   bool showConfirmPassword = false;
@@ -70,10 +74,8 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
 
-  final FocusNode _firstNameFocus = FocusNode();
-  final FocusNode _lastNameFocus = FocusNode();
-  final FocusNode _emailFocus = FocusNode();
-  final FocusNode _locationFocus = FocusNode();
+
+
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController  = TextEditingController();
@@ -99,6 +101,8 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     super.initState();
     _getCurrentLocation();
   }
+
+
 
   Future<void> searchLocation(String query) async {
     try {
@@ -182,8 +186,6 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
   }
-
-
 
 
   File? _selectedImage;
@@ -772,41 +774,45 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                 ),
                 SizedBox(height: 20),
 
-                _buildField("First Name*", _firstNameFocus, firstNameController),
+                _buildField("First Name*",  firstNameController),
 
                 SizedBox(height: 20),
 
-                _buildField("Last Name*", _lastNameFocus, lastNameController),
+                _buildField("Last Name*", lastNameController),
 
                 SizedBox(height: 20),
 
-                _buildField("Email Address*", _emailFocus, emailController),
+                _buildField("Email Address*", emailController),
+
 
                 SizedBox(height: 20),
 
-                TextField(
-                  controller: searchController,
-                  onSubmitted: (value) {
-                    if (value.isNotEmpty) {
-                      searchLocation(value);
-                    }
-                  },
-                  decoration: InputDecoration(
-                    labelText: "Select Location*",
-                    suffixIcon: InkWell(
-                      onTap: () {
-                        if (searchController.text.isNotEmpty) {
-                          searchLocation(searchController.text);
-                        }
-                      },
-                      child: const Icon(
-                        Icons.location_on_outlined,
-                        color: ColorCode.white,
-                      ),
-                    ),
+
+                GooglePlaceAutoCompleteTextField(
+                  textEditingController: searchController,
+                  googleAPIKey: GoogleConfig.placesApiKey,
+                  debounceTime: 600,
+                  isLatLngRequired: true,
+
+                  textStyle: const TextStyle(
+                    color: ColorCode.white,
+                    fontFamily: "Outfit",
+                  ),
+
+                  inputDecoration: InputDecoration(
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    hintText: "Search or select location",
+                    hintStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+                    ),
+                    suffixIcon: const Icon(
+                      Icons.location_on_outlined,
+                      color: ColorCode.kWhiteOpacity70,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
@@ -817,12 +823,50 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70,
-                        width: 0.5,
+                        color: ColorCode.kButtonColor,
+                        width: 1,
                       ),
                     ),
                   ),
+
+                  /// ✅ PLACE SELECT
+                  getPlaceDetailWithLatLng: (prediction) async {
+                    final latLng = LatLng(
+                      double.parse(prediction.lat!),
+                      double.parse(prediction.lng!),
+                    );
+
+                    setState(() {
+                      currentLatLng = latLng;
+                      selectedAddress = prediction.description ?? "";
+                      searchController.text = selectedAddress;
+                    });
+
+                    // ✅ REAL FIX — EMAIL PE JUMP BAND
+                    // FocusScope.of(context).requestFocus(_dummyFocus);
+
+                    mapController?.animateCamera(
+                      CameraUpdate.newLatLngZoom(latLng, 14),
+                    );
+                  },
+
+
+                  /// ✅ ITEM CLICK
+                  itemClick: (prediction) {
+                    setState(() {
+                      selectedAddress = prediction.description ?? "";
+                      searchController.text = selectedAddress;
+                    });
+
+                    // ✅ SAME FIX
+
+                  },
+
+
+                  isCrossBtnShown: true,
                 ),
+
+
 
 
                 SizedBox(height: 20),
@@ -1032,34 +1076,17 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     );
   }
 
-  Widget _buildField(
-      String title,
-      FocusNode focusNode,
-      TextEditingController controller, {
-        Widget? suffixIcon,
-        Function(String)? onSubmitted, // ✅ ADD THIS
-      }) {
+  Widget _buildField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      focusNode: focusNode,
+      autofocus: false, // 🔥 MOST IMPORTANT LINE
       cursorColor: ColorCode.kButtonColor,
       style: const TextStyle(color: ColorCode.white),
-
-      onSubmitted: onSubmitted, // ✅ HERE
-
       decoration: InputDecoration(
         labelText: title,
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: suffixIcon,
-        labelStyle: TextStyle(
-          color: focusNode.hasFocus
-              ? ColorCode.kButtonColor
-              : ColorCode.kWhiteOpacity70,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
+        labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(

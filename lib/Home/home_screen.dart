@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<double> _fade;
   late Animation<Offset> _slideDown;
   late Animation<double> _scale;
+  Map<String, dynamic>? myProfile;
+
 
 
   @override
@@ -84,6 +86,15 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
 
+  String? getProfileImageUrl() {
+    if (myProfile == null) return null;
+
+    final image = myProfile!['profile_image_url'];
+
+    if (image == null || image.toString().isEmpty) return null;
+
+    return ApiService.imageURL + image;
+  }
 
   final List<Map<String, String>> items = [
   {"title": "Events &\nParties", "icon": "assets/images/party.png"},
@@ -151,6 +162,9 @@ class _HomeScreenState extends State<HomeScreen>
           location = response['data']['location'] ?? "";
           specialties = response['data']['specialties'] ?? [];
           featuredCreatives = response['data']['featuredCreatives'] ?? [];
+
+          myProfile = response['data'];
+
           isLoading = false;
         });
       }
@@ -159,6 +173,8 @@ class _HomeScreenState extends State<HomeScreen>
       setState(() => isLoading = false);
     }
   }
+
+
 
 
 
@@ -211,15 +227,16 @@ class _HomeScreenState extends State<HomeScreen>
                                   final result = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) =>  ChangeLocationScreen(),
+                                      builder: (_) => const ChangeLocationScreen(),
                                     ),
                                   );
-
-                                  if (result != null && result is String) {
+                                  if (result != null && result is Map) {
                                     setState(() {
-                                      location = result; // 🔥 update header location
+                                      location = result["address"]; // 🔥 correct
                                     });
                                   }
+
+
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,8 +247,9 @@ class _HomeScreenState extends State<HomeScreen>
                                         Flexible(
                                           child: Text(
                                             location.isNotEmpty
-                                                ? location.split(',').first
+                                                ? location.split(',').take(2).join(', ')
                                                 : "Select Location",
+
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -269,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen>
 
 
 
-                            const SizedBox(width: 15),
+                             SizedBox(width: 15),
 
                             /// BELL + PROFILE
                             Row(
@@ -290,10 +308,19 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                     );
                                   },
-                                  child: const CircleAvatar(
+                                  child:CircleAvatar(
                                     radius: 18,
-                                    backgroundImage: AssetImage("assets/Icons/profile.png"),
+                                    backgroundColor: Colors.grey.shade800,
+                                    backgroundImage:
+                                    getProfileImageUrl() != null
+                                        ? NetworkImage(getProfileImageUrl()!)
+                                        : const AssetImage("assets/Icons/profile.png") as ImageProvider,
                                   ),
+
+
+
+
+
                                 ),
                               ],
                             ),
@@ -301,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
 
 
-                        const SizedBox(height: 20),
+                         SizedBox(height: 20),
 
                         /// SEARCH BAR
                         Container(

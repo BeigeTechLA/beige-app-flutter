@@ -93,8 +93,16 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
 
   String getEditTypeDisplayText() {
-    if (selectedEditTypeNames.isEmpty) return "";
-    return selectedEditTypeNames.first; // ✅ NO +1 / +2
+
+    if (selectedEditTypeNames.isEmpty) {
+      return "Select skills";
+    }
+
+    if (selectedEditTypeNames.length == 1) {
+      return selectedEditTypeNames.first;
+    }
+
+    return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
   }
   Future<void> _edittype() async {
     setState(() => isLoading = true);

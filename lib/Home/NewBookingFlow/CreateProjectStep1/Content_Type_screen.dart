@@ -27,19 +27,24 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
   // Expand/Collapse states
   bool shootOpen = true;
-  bool isShootTypeLoaded = false; 
+  bool isShootTypeLoaded = false;
 
   bool editOpen = true;
   bool isLoading =false;
 
+  List<int> selectedContentTypeIds = [];
 
   List specialties = [];
 
-  int? selectedContentTypeId; // 👈 API VALUE
+
   bool get isContinueEnabled {
-    return selectedContentTypeId != null && isShootTypeLoaded && !isLoading;
+    return selectedContentTypeIds.isNotEmpty && isShootTypeLoaded && !isLoading;
   }
-  bool get isSelectAll => selectedContentTypeId == 3;
+
+  bool get isSelectAll =>
+      selectedContentTypeIds.contains(1) &&
+          selectedContentTypeIds.contains(2);
+
 
 
 
@@ -48,11 +53,12 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     // 🔥 SELECT ALL → NO LOADER, NO API
     if (contentTypeId == 3) {
       setState(() {
-        isShootTypeLoaded = true; // allow continue
+        isShootTypeLoaded = true;
         isLoading = false;
       });
       return;
     }
+
 
     setState(() {
       isLoading = true;
@@ -81,7 +87,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   }
 
   Future<void> select_shoottype() async {
-    if (selectedContentTypeId == null) {
+    if (selectedContentTypeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select content type")),
       );
@@ -90,30 +96,29 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
     setState(() => isLoading = true);
 
+    int contentTypeToSend =
+    isSelectAll ? 3 : selectedContentTypeIds.first;
+
     final body = {
       "specialty_id": widget.specialtyId,
-      "content_type": selectedContentTypeId,
-      "shoot_type_id": shootTypeIds.isNotEmpty ? shootTypeIds.first : null,
+      "content_type": contentTypeToSend,
+      if (!isSelectAll && shootTypeIds.isNotEmpty)
+        "shoot_type_id": shootTypeIds.first,
     };
 
     debugPrint("📤 BOOKING PAYLOAD → $body");
 
     try {
-      final response = await ApiService().postData(
-        ApiEndpoints.booking,
-        body,
-      );
-
-      debugPrint("📥 BOOKING RESPONSE → $response");
+      final response =
+      await ApiService().postData(ApiEndpoints.booking, body);
 
       if (response != null && response['error'] == false) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => VideoShootType(
-              contentTypeId: selectedContentTypeId!,
+              contentTypeId: contentTypeToSend,
               specialtyId: widget.specialtyId,
-              // bookingId: response['data']['booking_id'],*/ // ✅ if available
             ),
           ),
         );
@@ -128,6 +133,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       setState(() => isLoading = false);
     }
   }
+
 
 
 
@@ -241,34 +247,56 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                     inactiveImage: "assets/newbookflow/slectall_inactive.png",
                     value: isSelectAll,
                     onTap: () {
-                      setState(() => selectedContentTypeId = 3);
-                      _callBookingApi(3); // backend ko ALL bhejega
+                      setState(() {
+                        if (isSelectAll) {
+                          selectedContentTypeIds.clear(); // unselect all
+                          isShootTypeLoaded = false;
+                        } else {
+                          selectedContentTypeIds = [1, 2]; // select all
+                          isShootTypeLoaded = true;
+                        }
+                      });
                     },
+
                   ),
 
-                  /// 🔹 VIDEOGRAPHY → 1
+
                   _buildOption(
                     title: "Videography",
                     activeImage: "assets/newbookflow/Videocamera_Record_active.png",
                     inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
-                    value: selectedContentTypeId == 1 || isSelectAll, // 🔥 CHANGE
+                    value: selectedContentTypeIds.contains(1),
                     onTap: () {
-                      setState(() => selectedContentTypeId = 1);
+                      setState(() {
+                        if (selectedContentTypeIds.contains(1)) {
+                          selectedContentTypeIds.remove(1);
+                        } else {
+                          selectedContentTypeIds.add(1);
+                        }
+                      });
                       _callBookingApi(1);
                     },
                   ),
+
 
                   /// 🔹 PHOTOGRAPHY → 2
                   _buildOption(
                     title: "Photography",
                     activeImage: "assets/newbookflow/Camera_active.png",
                     inactiveImage: "assets/newbookflow/Camera_inactive.png",
-                    value: selectedContentTypeId == 2 || isSelectAll, // 🔥 CHANGE
+                    value: selectedContentTypeIds.contains(2),
                     onTap: () {
-                      setState(() => selectedContentTypeId = 2);
+                      setState(() {
+                        if (selectedContentTypeIds.contains(2)) {
+                          selectedContentTypeIds.remove(2);
+                        } else {
+                          selectedContentTypeIds.add(2);
+                        }
+                      });
                       _callBookingApi(2);
                     },
                   ),
+
 
 
 

@@ -1,3 +1,4 @@
+import 'package:beige/ChooseYourRole/choose_your_role_screen.dart';
 import 'package:beige/auth/sign_up_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
@@ -87,12 +88,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (userType == 3) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const Mainscreen()),
+          MaterialPageRoute(builder: (_) =>  Mainscreen()),
         );
       } else if (userType == 4) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => BookingAllScreen()),
+          MaterialPageRoute(builder: (_) => Mainscreen()),
         );
       } else {
         _showSnack("Invalid user type");
@@ -318,8 +319,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => SignUpScreen(
-                              role: widget.role ?? 1, // ✅ default = 1 (Client)
+                            builder: (_) => ChooseYourRoleScreen(
+                              // role: widget.role ?? 1, // ✅ default = 1 (Client)
                             ),
                           ),
                         );// ✅ safety: default 1)));

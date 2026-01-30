@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
+import '../service/google_config.dart';
 import '../service/shared_service.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -28,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
+  final FocusNode locationFocusNode = FocusNode();
 
   String selectedAddress = "Search or select location";
   bool isMapOpen = false;          // 👈 map show / hide
@@ -56,6 +59,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     });
   }
+
+
 
 
   Future<void> searchLocation(String query) async {
@@ -216,6 +221,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     locationController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    locationFocusNode.dispose();
+
     super.dispose();
   }
   bool isValidEmail(String email) {
@@ -325,30 +332,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
               _buildField("Email ID", emailController),
               SizedBox(height: 20),
 
+              GooglePlaceAutoCompleteTextField(
+                focusNode: locationFocusNode,
+                textEditingController: locationController,
+                googleAPIKey: GoogleConfig.placesApiKey,
+                debounceTime: 600,
+                isLatLngRequired: true,
 
-              TextField(
-                controller: locationController,
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    searchLocation(value);
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: "Location*",
-                  suffixIcon: InkWell(
-                    onTap: () {
-                      if (locationController.text.isNotEmpty) {
-                        searchLocation(locationController.text);
-                      }
-                    },
-                    child: const Icon(
-                      Icons.location_on_outlined,
-                      color: ColorCode.white,
-                    ),
-                  ),
+                textStyle: const TextStyle(
+                  color: ColorCode.white,
+                  fontFamily: "Outfit",
+                ),
+
+                inputDecoration: InputDecoration(
+                  // labelText: "Location*",
                   floatingLabelBehavior: FloatingLabelBehavior.always,
-                  labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+
+                  labelStyle: const TextStyle(
+                    color: ColorCode.kWhiteOpacity70,
+                    fontFamily: "Outfit",
+                  ),
+
+                  hintText: "Search or select location",
+                  hintStyle: const TextStyle(
+                    color: ColorCode.kWhiteOpacity70,
+                  ),
+
+                  suffixIcon: const Icon(
+                    Icons.location_on_outlined,
+                    color: ColorCode.kWhiteOpacity70,
+                  ),
+
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
+                  ),
+
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
@@ -356,16 +375,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       width: 0.5,
                     ),
                   ),
+
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70,
-                      width: 0.5,
+                      color: ColorCode.kButtonColor,
+                      width: 1,
                     ),
                   ),
                 ),
+
+                getPlaceDetailWithLatLng: (prediction) async {
+                  final latLng = LatLng(
+                    double.parse(prediction.lat!),
+                    double.parse(prediction.lng!),
+                  );
+
+                  setState(() {
+                    currentLatLng = latLng;
+                    locationController.text = prediction.description ?? "";
+                  });
+
+                  mapController?.animateCamera(
+                    CameraUpdate.newLatLngZoom(latLng, 14),
+                  );
+                },
+
+                itemClick: (prediction) {
+                  locationController.text = prediction.description ?? "";
+                  locationController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: locationController.text.length),
+                  );
+                },
+
+                isCrossBtnShown: true,
               ),
 
+
+              if (locationFocusNode.hasFocus && currentLatLng != null)
 
               SizedBox(height: 20),
 

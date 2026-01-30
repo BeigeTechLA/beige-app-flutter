@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
+import '../../../service/google_config.dart';
 import '../../../utility/ColorCode.dart';
 import 'crew_size_matching_screen.dart';
 
@@ -24,11 +26,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   int currentStep = 1;
   bool loding   = true;
   int quantity = 0;
+  int get totalQuantity => includedQuantity + additionalQuantity;
 
   int includedQuantity = 1;          // 🔒 fixed
   int additionalQuantity = 0;        // 👈 default 0
   bool addAdditional = false;        // Yes / No
   bool isAdditionalSelected = false; // checkbox
+  // quantity = totalQuantity;
 
 
   // Included (fixed)
@@ -118,24 +122,44 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   Map<String, int> _buildCrewRequirements() {
     final Map<String, int> crew = {};
 
-    if (loding) { // Yes selected
-      switch (widget.contentTypeId) {
-        case 1: // Videography
-          crew["videographer"] = quantity;
-          break;
-        case 2: // Photography
-          crew["photographer"] = quantity;
-          break;
-        case 3: // Both
-          crew["videographer"] = quantity;
-          crew["photographer"] = quantity;
-          break;
-      }
+    // ❌ Agar user ne "No" select kiya
+    if (!loding) return crew;
+
+    // 🎥 Videography
+    if ((widget.contentTypeId == 1 || widget.contentTypeId == 3) &&
+        additionalVideoQty > 0) {
+      crew["videographer"] = additionalVideoQty;
+    }
+
+    // 📸 Photography
+    if ((widget.contentTypeId == 2 || widget.contentTypeId == 3) &&
+        additionalPhotoQty > 0) {
+      crew["photographer"] = additionalPhotoQty;
     }
 
     return crew;
   }
 
+
+  String getTopSummaryText() {
+    List<String> parts = [];
+
+    if (widget.contentTypeId == 1 || widget.contentTypeId == 3) {
+      final videoTotal = includedVideoQty + additionalVideoQty;
+      if (videoTotal > 0) {
+        parts.add("Videography x $videoTotal");
+      }
+    }
+
+    if (widget.contentTypeId == 2 || widget.contentTypeId == 3) {
+      final photoTotal = includedPhotoQty + additionalPhotoQty;
+      if (photoTotal > 0) {
+        parts.add("Photography x $photoTotal");
+      }
+    }
+
+    return parts.join("  |  ");
+  }
 
 
   String getContentTypeTitle(int contentTypeId) {
@@ -450,7 +474,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     /// TITLE
                     Expanded(
                       child: Text(
-                        "${getContentTypeTitle(widget.contentTypeId)} x $includedQuantity",
+                        getTopSummaryText(),
+
 
                         style: const TextStyle(
                           color: Colors.white,
@@ -519,85 +544,39 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      /// 🔹 TOP ROW (CHECKBOX + TEXT + QTY)
-                      Row(
-                        children: [
-                          Container(
-                            height: 20,
-                            width: 20,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.white54),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
+                      /// 📸 Photography (only if allowed)
+                      if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
+                        _buildQtyRow(
+                          title: "Photography",
+                          value: additionalPhotoQty,
+                          onAdd: () => setState(() => additionalPhotoQty++),
+                          onRemove: () {
+                            if (additionalPhotoQty > 0) {
+                              setState(() => additionalPhotoQty--);
+                            }
+                          },
+                        ),
 
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children:  [
-                                Text(
-                                  "${getContentTypeTitle(widget.contentTypeId)}",
-                                  style: TextStyle(color: Colors.white, fontSize: 14),
-                                ),
-                                SizedBox(height: 4),
-
-                              ],
-                            ),
-                          ),
-
-                          /// ➕➖ Quantity
-                          Container(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                              color:ColorCode.kButtonColor,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    if (additionalQuantity > 0) {
-                                      setState(() => additionalQuantity--);
-                                    }
-                                  },
-                                  child: const Icon(Icons.remove, size: 18, color: Colors.black),
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: Text(
-                                    additionalQuantity.toString().padLeft(2, '0'),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-
-                                InkWell(
-                                  onTap: () {
-                                    setState(() => additionalQuantity++);
-                                  },
-                                  child: const Icon(Icons.add, size: 18, color: Colors.black),
-                                ),
-
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-
+                      /// 🎥 Videography (only if allowed)
+                      if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
+                        _buildQtyRow(
+                          title: "Videography",
+                          value: additionalVideoQty,
+                          onAdd: () => setState(() => additionalVideoQty++),
+                          onRemove: () {
+                            if (additionalVideoQty > 0) {
+                              setState(() => additionalVideoQty--);
+                            }
+                          },
+                        ),
                     ],
                   ),
                 ),
 
-               SizedBox(height: 20),
-              TextField(
+
+
+              SizedBox(height: 20),
+             /* TextField(
                 controller: searchController,
                 onSubmitted: (value) {
                   if (value.isNotEmpty) {
@@ -608,19 +587,19 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   labelText:"Select Location*",
                   suffixIcon:
                    Icon(Icons.location_on_outlined, color: ColorCode.white),
-        
-        
+
+
                   floatingLabelBehavior: FloatingLabelBehavior.always,
-        
+
                   labelStyle: const TextStyle(
                     color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
                   ),
-        
+
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 18,
                   ),
-        
+
                   /// ⭐ 0.5px BORDER + OPACITY COLOR
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -629,7 +608,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       width: 0.5,                       // 🔥 exact 0.5px
                     ),
                   ),
-        
+
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
@@ -637,14 +616,92 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       width: 0.5,                          // focus border thicker
                     ),
                   ),
-        
+
                   floatingLabelStyle: const TextStyle(
                     color: ColorCode.kWhiteOpacity70,
-        
+
                   ),
                 ),
+              ),*/
+              GooglePlaceAutoCompleteTextField(
+                textEditingController: searchController,
+                googleAPIKey: GoogleConfig.placesApiKey,
+                debounceTime: 600,
+                isLatLngRequired: true,
+
+                textStyle: const TextStyle(
+                  color: ColorCode.white,
+                  fontFamily: "Outfit",
+                ),
+
+                inputDecoration: InputDecoration(
+                  // labelText: "Select Location*",
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                  labelStyle: const TextStyle(
+                    color: ColorCode.kWhiteOpacity70,
+                    fontFamily: "Outfit",
+                  ),
+
+                  hintText: "Search or select location",
+                  hintStyle: const TextStyle(
+                    color: ColorCode.kWhiteOpacity70,
+                  ),
+
+                  suffixIcon: const Icon(
+                    Icons.location_on_outlined,
+                    color: ColorCode.kWhiteOpacity70,
+                  ),
+
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
+                  ),
+
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ColorCode.kWhiteOpacity70,
+                      width: 0.5,
+                    ),
+                  ),
+
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: ColorCode.kButtonColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+
+                getPlaceDetailWithLatLng: (prediction) async {
+                  final latLng = LatLng(
+                    double.parse(prediction.lat!),
+                    double.parse(prediction.lng!),
+                  );
+
+                  setState(() {
+                    currentLatLng = latLng;
+                    selectedAddress = prediction.description ?? "";
+                    searchController.text = selectedAddress;
+                  });
+
+                  mapController?.animateCamera(
+                    CameraUpdate.newLatLngZoom(latLng, 14),
+                  );
+                },
+
+                itemClick: (prediction) {
+                  searchController.text = prediction.description ?? "";
+                  searchController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: searchController.text.length),
+                  );
+                },
+
+                isCrossBtnShown: true,
               ),
-        
+
               SizedBox(height: 20),
         
               /// 🗺️ MAP WITH FIXED HEIGHT
@@ -881,6 +938,55 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _buildQtyRow({
+    required String title,
+    required int value,
+    required VoidCallback onAdd,
+    required VoidCallback onRemove,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: ColorCode.kButtonColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                InkWell(
+                  onTap: onRemove,
+                  child: const Icon(Icons.remove, size: 18, color: Colors.black),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    value.toString().padLeft(2, '0'),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: onAdd,
+                  child: const Icon(Icons.add, size: 18, color: Colors.black),
+                ),
+              ],
             ),
           ),
         ],

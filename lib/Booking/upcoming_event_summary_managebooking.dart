@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'booking_select_date_time_slots.dart';
 import 'cancel_booking.dart';
@@ -31,6 +32,14 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
 
 class _UpcomingEventSummaryManagebookingState
     extends State<UpcomingEventSummaryManagebooking> {
+
+  String getFullImageUrl() {
+    if (widget.imageUrl == null || widget.imageUrl!.isEmpty) {
+      return "";
+    }
+    return ApiService().getImageURL(widget.imageUrl!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,13 +139,45 @@ class _UpcomingEventSummaryManagebookingState
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
-                              child: Image.asset(
+                              child: getFullImageUrl().isNotEmpty
+                                  ? Image(
+                                image: ResizeImage(
+                                  NetworkImage(getFullImageUrl()),
+                                  width: 400, // 👈 performance optimization
+                                ),
+                                height: 144,
+                                width: 126,
+                                fit: BoxFit.cover,
+
+                                // ✅ smooth fade-in
+                                frameBuilder: (context, child, frame, wasLoaded) {
+                                  if (wasLoaded) return child;
+                                  return AnimatedOpacity(
+                                    opacity: frame == null ? 0 : 1,
+                                    duration: const Duration(milliseconds: 250),
+                                    child: child,
+                                  );
+                                },
+
+                                // ❌ error fallback
+                                errorBuilder: (_, __, ___) {
+                                  return Image.asset(
+                                    "assets/images/Rectangle 34661070.png",
+                                    height: 144,
+                                    width: 126,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                                  : Image.asset(
                                 "assets/images/Rectangle 34661070.png",
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
                               ),
                             ),
+
+
                             const SizedBox(width: 14),
 
                             Expanded(

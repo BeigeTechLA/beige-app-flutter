@@ -1,9 +1,10 @@
-import 'package:beige/utility/ColorCode.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:beige/utility/ColorCode.dart';
 
 class ChangeLocationScreen extends StatefulWidget {
   const ChangeLocationScreen({super.key});
@@ -13,128 +14,60 @@ class ChangeLocationScreen extends StatefulWidget {
 }
 
 class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
-  LatLng? selectedLatLng;
-  String selectedAddress = "Detecting current location...";
+  final Completer<GoogleMapController> _mapController = Completer();
   GoogleMapController? mapController;
-  final TextEditingController searchController = TextEditingController();
-  List<Location> searchResults = [];
-  bool isSearching = false;
 
-  List<Map<String, dynamic>> searchResultsData = [];
+  LatLng? selectedLatLng;
+  String selectedAddress = "Search or select location";
+
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-      ),
-    );
   }
 
   // ================= CURRENT LOCATION =================
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-
-    if (permission == LocationPermission.deniedForever) return;
-
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    final latLng = LatLng(position.latitude, position.longitude);
-
-    setState(() {
-      selectedLatLng = latLng;
-    });
-
-    await _getAddress(latLng);
-
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(latLng, 16),
-    );
-  }
-
-  // ================= SEARCH LOCATION =================
-  Future<void> searchLocation(String query) async {
     try {
-      final locations = await locationFromAddress(query);
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
 
-      if (locations.isEmpty) {
-        setState(() {
-          searchResultsData.clear();
-          isSearching = false;
-        });
-        return;
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
       }
 
-      List<Map<String, dynamic>> results = [];
+      if (permission == LocationPermission.deniedForever) return;
 
-      for (final loc in locations.take(5)) {
-        final placemarks = await placemarkFromCoordinates(
-          loc.latitude,
-          loc.longitude,
-        );
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
 
-        if (placemarks.isNotEmpty) {
-          final p = placemarks.first;
-
-          final addressParts = [
-            p.name,
-            p.street,
-            p.subLocality,
-            p.locality,
-            p.administrativeArea,
-          ]..removeWhere((e) => e == null || e!.isEmpty);
-
-          results.add({
-            "latLng": LatLng(loc.latitude, loc.longitude),
-            "address": addressParts.join(", "),
-          });
-        }
-      }
+      LatLng latLng = LatLng(position.latitude, position.longitude);
 
       setState(() {
-        searchResultsData = results;
-        isSearching = results.isNotEmpty;
+        selectedLatLng = latLng;
       });
+
+      await _getAddressFromLatLng(latLng);
     } catch (e) {
-      debugPrint("Search error: $e");
-      setState(() {
-        searchResultsData.clear();
-        isSearching = false;
-      });
+      debugPrint("Location error: $e");
     }
   }
 
-
-  // ================= GET ADDRESS =================
-  Future<void> _getAddress(LatLng latLng) async {
-    final placemarks =
+  // ================= ADDRESS FROM LAT LNG =================
+  Future<void> _getAddressFromLatLng(LatLng latLng) async {
+    List<Placemark> placemarks =
     await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
 
     if (placemarks.isNotEmpty) {
       final p = placemarks.first;
-
-      final address =
-          "${p.street}, ${p.locality}, ${p.administrativeArea}";
-
       setState(() {
-        selectedAddress = address;
-        searchController.text = address; // ✅ show in search box
+        selectedAddress =
+        "${p.subLocality ?? ""}, ${p.locality ?? ""}, ${p.administrativeArea ?? ""}";
+        searchController.text = selectedAddress;
       });
     }
   }
@@ -157,109 +90,66 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
 
       body: Column(
         children: [
-          // ================= TOP BAR =================
-          Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF121212),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(22),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: InkWell(
-                        onTap: () => Navigator.pop(context),
-                        child: Image.asset("assets/Icons/Reply.png", height: 24),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+          // ================= SEARCH (PLACES AUTOCOMPLETE) =================
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFF121212),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+            ),
+            child: GooglePlaceAutoCompleteTextField(
+              textEditingController: searchController,
+              googleAPIKey: "AIzaSyB55dzOzA9np8T1rn-DpKKqcqGcgbGmgOc",
+              debounceTime: 800,
+              isLatLngRequired: true,
 
-                    // SEARCH FIELD
-                    TextField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        if (value.trim().length >= 3) {
-                          searchLocation(value.trim());
-                        } else {
-                          setState(() {
-                            searchResultsData.clear();
-                            isSearching = false;
-                          });
-                        }
-                      },
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: "Search for area, street name...",
-                        prefixIcon: const Icon(Icons.search, color: Colors.white),
-                        filled: true,
-                        fillColor: const Color(0xFF1E1E1E),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ],
+              inputDecoration: InputDecoration(
+                hintText: "Search location",
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
+                filled: true,
+                fillColor: const Color(0xFF1E1E1E),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
                 ),
               ),
 
-              // 🔥 DROPDOWN OVERLAY
-              if (isSearching && searchResultsData.isNotEmpty)
-                Positioned(
-                  top: 140, // search field ke niche
-                  left: 16,
-                  right: 16,
-                  child: Material(
-                    color: const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(14),
-                    elevation: 8,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: searchResultsData.length,
-                      itemBuilder: (context, index) {
-                        final item = searchResultsData[index];
-                        return ListTile(
-                          leading: const Icon(Icons.location_on,
-                              color: Colors.white70),
-                          title: Text(
-                            item["address"],
-                            style: const TextStyle(color: Colors.white),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          onTap: () {
-                            setState(() {
-                              selectedLatLng = item["latLng"];
-                              selectedAddress = item["address"];
-                              searchController.text = item["address"];
-                              isSearching = false;
-                              searchResultsData.clear();
-                            });
+              getPlaceDetailWithLatLng: (prediction) {
+                if (prediction.lat != null && prediction.lng != null) {
+                  LatLng latLng = LatLng(
+                    double.parse(prediction.lat!),
+                    double.parse(prediction.lng!),
+                  );
 
-                            mapController?.animateCamera(
-                              CameraUpdate.newLatLngZoom(item["latLng"], 16),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ),
-            ],
+                  setState(() {
+                    selectedLatLng = latLng;
+                    selectedAddress = prediction.description!;
+                  });
+
+                  mapController?.animateCamera(
+                    CameraUpdate.newLatLngZoom(latLng, 16),
+                  );
+                }
+              },
+
+              itemClick: (prediction) {
+                searchController.text = prediction.description!;
+                searchController.selection = TextSelection.fromPosition(
+                  TextPosition(offset: prediction.description!.length),
+                );
+              },
+
+              seperatedBuilder: const Divider(color: Colors.white24),
+              isCrossBtnShown: true,
+              textStyle: const TextStyle(color: Colors.white),
+            ),
           ),
-
 
           // ================= MAP =================
           Expanded(
             child: selectedLatLng == null
                 ? const Center(
-              child:
-              CircularProgressIndicator(color: Colors.white),
+              child: CircularProgressIndicator(color: Colors.white),
             )
                 : GoogleMap(
               initialCameraPosition: CameraPosition(
@@ -268,16 +158,16 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               ),
               onMapCreated: (controller) {
                 mapController = controller;
+                _mapController.complete(controller);
                 controller.setMapStyle(_darkMapStyle);
               },
               onTap: (latLng) async {
                 setState(() => selectedLatLng = latLng);
-                await _getAddress(latLng); //
+                await _getAddressFromLatLng(latLng);
               },
-
               markers: {
                 Marker(
-                  markerId: const MarkerId("m1"),
+                  markerId: const MarkerId("selected"),
                   position: selectedLatLng!,
                 ),
               },
@@ -285,31 +175,26 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             ),
           ),
 
-          // ================= ADDRESS =================
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
               selectedAddress,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white70),
               textAlign: TextAlign.center,
             ),
           ),
         ],
       ),
 
-      // ================= SAVE BUTTON =================
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(20),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorCode.kButtonColor,
+            minimumSize: const Size(double.infinity, 52),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
-            minimumSize: const Size(double.infinity, 52),
           ),
           onPressed: () {
             Navigator.pop(context, {
@@ -319,8 +204,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
           },
           child: const Text(
             "Save",
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w600),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           ),
         ),
       ),

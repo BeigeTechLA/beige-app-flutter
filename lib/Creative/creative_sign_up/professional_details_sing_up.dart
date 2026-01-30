@@ -1,5 +1,6 @@
 import 'package:beige/Creative/creative_sign_up/social_engagement_singup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
@@ -38,7 +39,7 @@ class _ProfessionalDetailsSingUpState
   bool equipmentLoading = false;
   bool loading = true;
 
-  String? selectedSkill; // dropdown ke liye
+  String? selectedSkill;
   Map<String, int> roleMap = {};
   Map<String, int> skillMap = {};
   Map<String, int> equipmentMap = {};
@@ -90,6 +91,17 @@ class _ProfessionalDetailsSingUpState
   }
 
 
+  String _skillsDisplayText() {
+    if (selectedSkills.isEmpty) {
+      return "Select skills";
+    }
+
+    if (selectedSkills.length == 1) {
+      return selectedSkills.first;
+    }
+
+    return "${selectedSkills.first} +${selectedSkills.length - 1}";
+  }
 
 
   Future<void> _fetchhome_Skills() async {
@@ -340,15 +352,17 @@ class _ProfessionalDetailsSingUpState
               _textField(
                 title: "Year of Experience*",
                 controller: YearofExperienceController,
+                isNumber: true, // 🔥 numeric keyboard
               ),
-
 
               const SizedBox(height: 20),
 
               _textField(
                 title: "Hourly Rate*",
                 controller: HourlyRateController,
+                isNumber: true, // 🔥 numeric keyboard
               ),
+
               const SizedBox(height: 20),
 
               /// BIO FIELD
@@ -366,12 +380,12 @@ class _ProfessionalDetailsSingUpState
               ),
 
                SizedBox(height: 20),
-              Column(
+         /*     Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// 🔽 SKILLS DROPDOWN
                   DropdownButtonFormField<String>(
-                    value: null,
+                    value: selectedSkill,
                     dropdownColor: const Color(0xFF1C1C1C),
                     icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
                     style: const TextStyle(color: Colors.white),
@@ -385,11 +399,13 @@ class _ProfessionalDetailsSingUpState
                     onChanged: (value) {
                       if (value != null && !selectedSkills.contains(value)) {
                         setState(() {
-                          selectedSkills.add(value);
+                          selectedSkills.add(value); // ✅ ADD
+                          selectedSkill = null;      // 🔥 RESET DROPDOWN
                         });
                       }
                     },
                   ),
+
 
                   const SizedBox(height: 12),
 
@@ -416,6 +432,24 @@ class _ProfessionalDetailsSingUpState
                       }).toList(),
                     ),
                 ],
+              ),*/
+
+
+              GestureDetector(
+                onTap: _openSkillsBottomSheet,
+                child: AbsorbPointer(
+                  child: TextField(
+                    style: const TextStyle(color: Colors.white),
+                    decoration: _inputDecoration("Add Skills").copyWith(
+                      hintText: _skillsDisplayText(),
+                      hintStyle: const TextStyle(color: Colors.white),
+                      suffixIcon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ),
 
 
@@ -591,23 +625,133 @@ class _ProfessionalDetailsSingUpState
     );
   }
 
+  void _openSkillsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1C1C1C),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// 🔼 DRAG HANDLE
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+
+                  /// TITLE
+                   Text(
+                    "Select Skills",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  /// SKILLS LIST
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: allSkills.length,
+                      itemBuilder: (context, index) {
+                        final skill = allSkills[index];
+                        final isSelected =
+                        selectedSkills.contains(skill);
+
+                        return CheckboxListTile(
+                          value: isSelected,
+                          activeColor: ColorCode.kButtonColor,
+                          checkColor: Colors.black,
+                          title: Text(
+                            skill,
+                            style:
+                            const TextStyle(color: Colors.white),
+                          ),
+                          onChanged: (checked) {
+                            setModalState(() {
+                              if (checked == true) {
+                                selectedSkills.add(skill);
+                              } else {
+                                selectedSkills.remove(skill);
+                              }
+                            });
+
+                            // update main UI also
+                            setState(() {});
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// OK BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorCode.kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Done",
+                        style: TextStyle(
+                          color: ColorCode.kHeadingColor,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _textField({
     required String title,
-    // required String hint,
     required TextEditingController controller,
     int maxLines = 1,
+    bool isNumber = false, // 🔥 new flag
   }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
+      keyboardType: isNumber
+          ? const TextInputType.numberWithOptions(decimal: false)
+          : TextInputType.text,
+      inputFormatters: isNumber
+          ? [FilteringTextInputFormatter.digitsOnly] // 🔥 only numbers
+          : [],
       style: const TextStyle(color: Colors.white),
-      decoration: _inputDecoration(title).copyWith(
-        // hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white54),
-      ),
+      decoration: _inputDecoration(title),
     );
   }
+
 
   InputDecoration _inputDecoration(String title) {
     return InputDecoration(

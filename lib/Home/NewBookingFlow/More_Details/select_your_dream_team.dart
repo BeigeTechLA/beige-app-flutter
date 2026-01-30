@@ -162,13 +162,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         final creatives = response['data']['creatives'] as List;
 
         setState(() {
-          /// ✅ VERY IMPORTANT FIX
           addedCrewUserIds =
               creatives.map<int>((e) => e['creative_user_id'] as int).toSet();
-
-          /// required count from summary
-          requiredCount =
-              response['data']['summary']['required_by_role']['2'] ?? 0;
         });
       }
     } catch (e) {
@@ -177,7 +172,6 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       setState(() => isLoading = false);
     }
   }
-
 
 
   @override
@@ -308,9 +302,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
             const SizedBox(height: 16),
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
+              child:ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemCount: crewMatches.length,
                 itemBuilder: (context, index) {
@@ -502,18 +494,19 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                   /// ADD CREW
                   else {
-                  if (addedCrewUserIds.length >= requiredCount) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                  content: Text(
-                  "You can add only $requiredCount members",
-                  ),
-                  ),
-                  );
-                  return;
-                  }
+                    if (addedCrewUserIds.length >= requiredCount) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "You can add only $requiredCount members",
+                          ),
+                        ),
+                      );
+                      return;
+                    }
 
-                  final success = await _addHolds(
+
+                    final success = await _addHolds(
                   creativeUserId: creativeUserId,
                   roleId: roleId,
                   );
