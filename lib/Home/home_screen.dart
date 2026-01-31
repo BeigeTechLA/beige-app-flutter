@@ -230,11 +230,15 @@ class _HomeScreenState extends State<HomeScreen>
                                       builder: (_) => const ChangeLocationScreen(),
                                     ),
                                   );
-                                  if (result != null && result is Map) {
+                                  if (result != null && result is Map<String, dynamic>) {
                                     setState(() {
-                                      location = result["address"]; // 🔥 correct
+                                      location = result["address"] ?? "";
                                     });
+
+
+                                    _fetchhome_data();
                                   }
+
 
 
                                 },

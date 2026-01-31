@@ -55,7 +55,7 @@ bool loding =true;
 
     try {
       final url =
-          "${ApiEndpoints.booking_select}/${widget.bookingId}/summary";
+          "${ApiEndpoints.booking_select}/${widget.bookingId}/summary-details";
       print("➡️ API URL: $url");
 
       final response = await ApiService().fetchData(url);

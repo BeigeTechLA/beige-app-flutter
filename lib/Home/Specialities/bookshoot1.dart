@@ -231,13 +231,13 @@ class _Bookshoot1State extends State<Bookshoot1> {
                             onPressed: isLoading
                                 ? null
                                 : () {
-                              if (selectedServiceTypeId == null) {
+                            /*  if (selectedServiceTypeId == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Please select service type")),
                                 );
                                 return;
                               }
-                              booking();
+                              booking();*/
                             },
 
                             child: const Text(

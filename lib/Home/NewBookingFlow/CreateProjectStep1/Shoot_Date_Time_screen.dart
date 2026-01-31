@@ -678,7 +678,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
             ),
           ),
-          if (isSubmitting)
+        /*  if (isSubmitting)
             Positioned.fill(
               child: Container(
                 color: Colors.black.withOpacity(0.15), // optional dim
@@ -689,7 +689,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                   ),
                 ),
               ),
-            ),
+            ),*/
         ],
 
       ),

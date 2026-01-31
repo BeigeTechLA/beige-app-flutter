@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:beige/Creative/creative_sign_up/social_engagement_singup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
@@ -260,342 +263,370 @@ class _ProfessionalDetailsSingUpState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// 🔙 BACK + STEP
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => BuildYourCreativeProfileSignUp()),
-                      );
-                    },
-                    child: Image.asset(
-                      "assets/Icons/Reply.png",
-                      height: 24,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Text(
-                    "2/3",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              /// 🔵 PROGRESS BAR
-              Row(
-                children: List.generate(
-                  3,
-                      (index) => Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 6),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: index == 0
-                            ? ColorCode.kButtonColor
-                            : ColorCode.kSubtextColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// 📝 TITLE
-              const Text(
-                "Professional Details",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Unbounded",
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              /// SUBTITLE
-              const Text(
-                "Create your profile to get discovered by production teams.",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: "Outfit",
-                  color: ColorCode.kWhiteOpacity70,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              _dropdownField(
-                "Primary Role*",
-                primaryRole,
-                roleList,
-                    (v) {
-                  setState(() => primaryRole = v);
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              _textField(
-                title: "Year of Experience*",
-                controller: YearofExperienceController,
-                isNumber: true, // 🔥 numeric keyboard
-              ),
-
-              const SizedBox(height: 20),
-
-              _textField(
-                title: "Hourly Rate*",
-                controller: HourlyRateController,
-                isNumber: true, // 🔥 numeric keyboard
-              ),
-
-              const SizedBox(height: 20),
-
-              /// BIO FIELD
-              _textField(
-                title: "Bio / About",
-
-                controller: bioController,
-                maxLines: 4,
-              ),
-              SizedBox(height: 5,),
-              Row(
-                children: [
-                  Text("  Highlight your creative focus.",style: TextStyle(color: ColorCode.k737373,fontFamily: "Outfit",fontSize: 12),)
-                ],
-              ),
-
-               SizedBox(height: 20),
-         /*     Column(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// 🔽 SKILLS DROPDOWN
-                  DropdownButtonFormField<String>(
-                    value: selectedSkill,
-                    dropdownColor: const Color(0xFF1C1C1C),
-                    icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: _inputDecoration("Add Skills"),
-                    items: allSkills.map((skill) {
-                      return DropdownMenuItem(
-                        value: skill,
-                        child: Text(skill),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null && !selectedSkills.contains(value)) {
-                        setState(() {
-                          selectedSkills.add(value); // ✅ ADD
-                          selectedSkill = null;      // 🔥 RESET DROPDOWN
-                        });
-                      }
-                    },
+                  /// 🔙 BACK + STEP
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => BuildYourCreativeProfileSignUp()),
+                          );
+                        },
+                        child: Image.asset(
+                          "assets/Icons/Reply.png",
+                          height: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "2/3",
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
                   ),
-
 
                   const SizedBox(height: 12),
 
-                  /// 🧩 SELECTED SKILLS CHIPS
-                  if (selectedSkills.isNotEmpty)
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: selectedSkills.map((skill) {
-                        return Chip(
-                          label: Text(
-                            skill,
-                            style:  TextStyle(color: Colors.white),
+                  /// 🔵 PROGRESS BAR
+                  Row(
+                    children: List.generate(
+                      3,
+                          (index) => Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 6),
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: index == 0
+                                ? ColorCode.kButtonColor
+                                : ColorCode.kSubtextColor,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          backgroundColor:
-                          ColorCode.kHeadingColor.withOpacity(0.9),
-                          deleteIconColor: Colors.white,
-                          onDeleted: () {
-                            setState(() {
-                              selectedSkills.remove(skill);
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                ],
-              ),*/
-
-
-              GestureDetector(
-                onTap: _openSkillsBottomSheet,
-                child: AbsorbPointer(
-                  child: TextField(
-                    style: const TextStyle(color: Colors.white),
-                    decoration: _inputDecoration("Add Skills").copyWith(
-                      hintText: _skillsDisplayText(),
-                      hintStyle: const TextStyle(color: Colors.white),
-                      suffixIcon: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-
-
-              const SizedBox(height: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// 🔍 EQUIPMENT TEXT FIELD (TOP)
-                  TextField(
-                    controller: equipmentController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: _inputDecoration("Add Equipment"),
-                    onChanged: (value) {
-                      _fetchhome_equipment(value);
-                    },
-                  ),
-
-                  /// ⏳ LOADING
-                  if (equipmentLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: ColorCode.kButtonColor,
                         ),
                       ),
                     ),
+                  ),
 
+                  const SizedBox(height: 20),
 
-                  /// 📜 AUTOCOMPLETE LIST
-                  if (filteredEquipments.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.only(top: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1C1C1C),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white24),
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredEquipments.length,
-                        itemBuilder: (context, index) {
-                          final item = filteredEquipments[index];
-                          return ListTile(
-                            title: Text(
-                              item,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            onTap: () {
-                              setState(() {
-                                if (!selectedEquipments.contains(item)) {
-                                  selectedEquipments.add(item);
-                                }
-                                equipmentController.clear();
-                                filteredEquipments.clear();
-                              });
-                            },
-                          );
-                        },
-                      ),
+                  /// 📝 TITLE
+                  const Text(
+                    "Professional Details",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  /// SUBTITLE
+                  const Text(
+                    "Create your profile to get discovered by production teams.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Outfit",
+                      color: ColorCode.kWhiteOpacity70,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  _dropdownField(
+                    "Primary Role*",
+                    primaryRole,
+                    roleList,
+                        (v) {
+                      setState(() => primaryRole = v);
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _textField(
+                    title: "Year of Experience*",
+                    controller: YearofExperienceController,
+                    isNumber: true, // 🔥 numeric keyboard
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _textField(
+                    title: "Hourly Rate*",
+                    controller: HourlyRateController,
+                    isNumber: true, // 🔥 numeric keyboard
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// BIO FIELD
+                  _textField(
+                    title: "Bio / About",
+
+                    controller: bioController,
+                    isMultiline: true, // 👈 NEW
+
+                    maxLines: 4,
+                  ),
+                  SizedBox(height: 5,),
+                  Row(
+                    children: [
+                      Text("  Highlight your creative focus.",style: TextStyle(color: ColorCode.k737373,fontFamily: "Outfit",fontSize: 12),)
+                    ],
+                  ),
+
+                  SizedBox(height: 20),
+                  /*     Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// 🔽 SKILLS DROPDOWN
+                    DropdownButtonFormField<String>(
+                      value: selectedSkill,
+                      dropdownColor: const Color(0xFF1C1C1C),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
+                      decoration: _inputDecoration("Add Skills"),
+                      items: allSkills.map((skill) {
+                        return DropdownMenuItem(
+                          value: skill,
+                          child: Text(skill),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null && !selectedSkills.contains(value)) {
+                          setState(() {
+                            selectedSkills.add(value); // ✅ ADD
+                            selectedSkill = null;      // 🔥 RESET DROPDOWN
+                          });
+                        }
+                      },
                     ),
 
-                  /// 🧩 SELECTED EQUIPMENT CHIPS (NICHE)
-                  if (selectedEquipments.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Wrap(
+
+                    const SizedBox(height: 12),
+
+                    /// 🧩 SELECTED SKILLS CHIPS
+                    if (selectedSkills.isNotEmpty)
+                      Wrap(
                         spacing: 8,
                         runSpacing: 8,
-                        children: selectedEquipments.map((item) {
+                        children: selectedSkills.map((skill) {
                           return Chip(
                             label: Text(
-                              item,
-                              style: const TextStyle(color: Colors.white),
+                              skill,
+                              style:  TextStyle(color: Colors.white),
                             ),
                             backgroundColor:
                             ColorCode.kHeadingColor.withOpacity(0.9),
                             deleteIconColor: Colors.white,
                             onDeleted: () {
                               setState(() {
-                                selectedEquipments.remove(item);
+                                selectedSkills.remove(skill);
                               });
                             },
                           );
                         }).toList(),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                ),*/
 
 
-
-
-              const SizedBox(height: 30),
-
-              /// NEXT BUTTON
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed:_fetch_step2,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "Next",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: ColorCode.kHeadingColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// LOGIN TEXT
-              Center(
-                child: Text.rich(
-                  TextSpan(
-                    text: "Already have an account? ",
-                    style: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: "Login",
-                        style: TextStyle(
-                          color: ColorCode.kButtonColor,
+                  GestureDetector(
+                    onTap: _openSkillsBottomSheet,
+                    child: AbsorbPointer(
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white),
+                        decoration: _inputDecoration("Add Skills").copyWith(
+                          hintText: _skillsDisplayText(),
+                          hintStyle: const TextStyle(color: Colors.white),
+                          suffixIcon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                          ),
                         ),
-                      )
+                      ),
+                    ),
+                  ),
+
+
+
+                  const SizedBox(height: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      /// 🔍 EQUIPMENT TEXT FIELD (TOP)
+                      TextField(
+                        controller: equipmentController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: _inputDecoration("Add Equipment"),
+                        onChanged: (value) {
+                          _fetchhome_equipment(value);
+                        },
+                      ),
+
+                      /// ⏳ LOADING
+                      if (equipmentLoading)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: ColorCode.kButtonColor,
+                            ),
+                          ),
+                        ),
+
+
+                      /// 📜 AUTOCOMPLETE LIST
+                      if (filteredEquipments.isNotEmpty)
+                        Container(
+                          margin: const EdgeInsets.only(top: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1C1C1C),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: filteredEquipments.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredEquipments[index];
+                              return ListTile(
+                                title: Text(
+                                  item,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    if (!selectedEquipments.contains(item)) {
+                                      selectedEquipments.add(item);
+                                    }
+                                    equipmentController.clear();
+                                    filteredEquipments.clear();
+                                  });
+                                },
+                              );
+                            },
+                          ),
+                        ),
+
+                      /// 🧩 SELECTED EQUIPMENT CHIPS (NICHE)
+                      if (selectedEquipments.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: selectedEquipments.map((item) {
+                              return Chip(
+                                label: Text(
+                                  item,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor:
+                                ColorCode.kHeadingColor.withOpacity(0.9),
+                                deleteIconColor: Colors.white,
+                                onDeleted: () {
+                                  setState(() {
+                                    selectedEquipments.remove(item);
+                                  });
+                                },
+                              );
+                            }).toList(),
+                          ),
+                        ),
                     ],
                   ),
-                ),
-              )
-            ],
+
+
+
+
+                  const SizedBox(height: 30),
+
+                  /// NEXT BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed:_fetch_step2,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorCode.kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: ColorCode.kHeadingColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// LOGIN TEXT
+                  Center(
+                    child: Text.rich(
+                      TextSpan(
+                        text: "Already have an account? ",
+                        style: const TextStyle(
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "Login",
+                            style: TextStyle(
+                              color: ColorCode.kButtonColor,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
-        ),
+          if (loading)
+            Positioned.fill(
+              child: AbsorbPointer(
+                absorbing: true,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.4),
+                    alignment: Alignment.center,
+                    child: Lottie.asset(
+                      "assets/lottie/Untitled_file.json",
+                      width: 140,
+                      height: 140,
+                      repeat: true,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+        ],
+
       ),
     );
   }
@@ -736,18 +767,29 @@ class _ProfessionalDetailsSingUpState
     required String title,
     required TextEditingController controller,
     int maxLines = 1,
-    bool isNumber = false, // 🔥 new flag
+    bool isNumber = false,
+    bool isMultiline = false, // 🔥 NEW
   }) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      keyboardType: isNumber
+      minLines: isMultiline ? 4 : 1,
+
+      keyboardType: isMultiline
+          ? TextInputType.multiline
+          : isNumber
           ? const TextInputType.numberWithOptions(decimal: false)
           : TextInputType.text,
+
+      textInputAction:
+      isMultiline ? TextInputAction.newline : TextInputAction.done,
+
       inputFormatters: isNumber
-          ? [FilteringTextInputFormatter.digitsOnly] // 🔥 only numbers
+          ? [FilteringTextInputFormatter.digitsOnly]
           : [],
+
       style: const TextStyle(color: Colors.white),
+
       decoration: _inputDecoration(title),
     );
   }

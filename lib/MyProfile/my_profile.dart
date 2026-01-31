@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
+import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import 'Booking_History_screen.dart';
 import 'Favourite_screen.dart';
@@ -575,16 +576,16 @@ class _MyProfileState extends State<MyProfile> {
                   /// LOGOUT
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await SharedService.logout(); // 🔥 clear all prefs
 
-                        /// TODO: Clear session / SharedPreferences
-                        /// Then navigate to Login screen
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (_) => LoginScreen()),
-                          (route) => false,
+                              (route) => false,
                         );
                       },
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor:  ColorCode.kButtonColor,
                         padding:  EdgeInsets.symmetric(vertical: 14),

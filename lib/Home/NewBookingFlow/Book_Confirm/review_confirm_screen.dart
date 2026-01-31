@@ -54,7 +54,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     super.dispose();
   }
 
-
   Future<void> _fetchHomeReview() async {
     setState(() => isLoading = true);
 
@@ -65,31 +64,28 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
       if (response != null && response['error'] == false) {
         final data = response['data'];
-        final creatives = data['held_creatives'] as List;
 
         booking = data['booking'];
         pricing = data['pricing'];
+        heldCreatives = data['held_creatives'] ?? [];
 
-        if (creatives.isNotEmpty) {
-          final creative = creatives.first['creative'];
+        /// ✅ SHOOT / PROJECT DETAILS (TOP CARD)
+        creativeName = booking?['shoot_type_name'] ?? "—";
+        creativeImage = booking?['shoot_type_image_url'] ?? "";
+        creativeRole = getContentTypeTitle(
+          int.tryParse(booking?['content_type'] ?? "0") ?? 0,
+        );
 
-          creativeName = creative?['name'] ?? "—";
-          creativeImage = creative?['shoot_type_image_url'] ?? "";
-          creativeRate = creative?['hourly_rate']?.toString() ?? "";
-          creativeRole = getContentTypeTitle(creatives.first['content_type']);
+        /// ⭐ Rating text (summary screen pe NEW dikhana safe)
+        creativeRatingText = "New";
 
-          final rating = creative?['average_rating'];
-          creativeRatingText =
-          (rating != null && rating > 0)
-              ? "$rating (${creative?['total_reviews'] ?? 0})"
-              : "New";
+        /// 💰 Rate (first creative ka hourly rate agar ho)
+        if (heldCreatives.isNotEmpty) {
+          creativeRate = heldCreatives.first['creative']?['hourly_rate']
+              ?.toString() ??
+              "";
         } else {
-          /// 🔥 NO CREW ASSIGNED CASE
-          creativeName = "Crew not assigned yet";
-          creativeRole = booking?['shoot_type_name'] ?? "";
-          creativeImage = "";
           creativeRate = "";
-          creativeRatingText = "—";
         }
       }
     } catch (e) {
@@ -98,6 +94,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       setState(() => isLoading = false);
     }
   }
+
 
   Future<void> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
@@ -164,6 +161,23 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
         return "Shoot Type";
     }
   }
+
+  List<String> getContentTypeTitles(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return ["Video Shoot Type"];
+      case 2:
+        return ["Photo Shoot Type"];
+      case 3:
+        return [
+          "Video Shoot Type",
+          "Photo Shoot Type",
+        ];
+      default:
+        return ["Shoot Type"];
+    }
+  }
+
   String getPaymentMethod() {
     switch (selectedIndex) {
       case 0:
@@ -309,24 +323,31 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child: SizedBox(
+                          child: Container(
                             height: 144,
                             width: 126,
+                            color: Colors.black12, // optional bg
                             child: creativeImage.isNotEmpty
                                 ? Image.network(
                               "${ApiService.imageURL}$creativeImage",
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(
-                                "assets/images/Rectangle 34661070.png",
-                                fit: BoxFit.cover,
-                              ),
+                              fit: BoxFit.cover,          // 🔥 proper crop
+                              alignment: Alignment.center, // 🔥 center focus
+                              errorBuilder: (_, __, ___) {
+                                return Image.asset(
+                                  "assets/images/Rectangle 34661070.png",
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.center,
+                                );
+                              },
                             )
                                 : Image.asset(
                               "assets/images/Rectangle 34661070.png",
                               fit: BoxFit.cover,
+                              alignment: Alignment.center,
                             ),
                           ),
                         ),
+
 
 
                         SizedBox(width: 14),
@@ -383,7 +404,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               /// 💰 RATE
                               creativeRate.isNotEmpty
                                   ? Text(
-                                "From ₹$creativeRate/Hr",
+                                "From \$$creativeRate/Hr",
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: ColorCode.kButtonColor,
@@ -498,7 +519,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                          padding: const EdgeInsets.all(8.0),
                          child: Row(
                            children: [
-                             Text("Video Edits:",style: TextStyle(color: ColorCode.white),)
+                             Text(creativeRole,style: TextStyle(color: ColorCode.white),)
                            ],
                          ),
                        ),
@@ -657,17 +678,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     child: Column(
                       children: [
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Video Services",style: TextStyle(fontWeight: FontWeight.w400,fontFamily: "Outfit",color: ColorCode.kWhiteOpacity70,fontSize: 14)
-),
-                            Text("3000.00/- ",style: TextStyle(fontWeight: FontWeight.w400,fontFamily: "Outfit",color: ColorCode.kWhiteOpacity70,fontSize: 14))
-                          ],
-                        ),
-
-                        Divider(color: ColorCode.kDividerWhite12,),
-
                         Container(
                           padding: EdgeInsets.all(15),
                           decoration: BoxDecoration(
@@ -721,7 +731,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                          /*  Text(
                               "Videographer x1",
                               style: TextStyle(
                                   fontSize: 14,
@@ -736,10 +746,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   color: ColorCode.kWhiteOpacity70,
                                   fontFamily: "Outfit",
                                   fontWeight: FontWeight.w400
-                              ),),
+                              ),),*/
                           ],
                         ),
-                        Divider(color: ColorCode.kDividerWhite12,),
+                        // Divider(color: ColorCode.kDividerWhite12,),
                         const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -796,7 +806,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     elevation: 0,
                   ),
                   child:  Text(
-                    "Pay ₹${pricing?['total_amount'] ?? 0}",
+                    "Pay \$${pricing?['total_amount'] ?? 0}",
+
 
                     style: TextStyle(
                       fontSize: 14,

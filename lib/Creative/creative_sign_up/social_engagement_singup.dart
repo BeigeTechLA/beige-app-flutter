@@ -788,29 +788,18 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
           if (isLoggingIn)
             Positioned.fill(
               child: AbsorbPointer(
-                absorbing: true, // 👈 background click disable
+                absorbing: true,
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
                   child: Container(
                     color: Colors.black.withOpacity(0.4),
                     alignment: Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: ColorCode.kButtonColor,
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          "Processing payment...",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontFamily: "Outfit",
-                          ),
-                        )
-                      ],
+                    child: Lottie.asset(
+                      "assets/lottie/Untitled_file.json",
+                      width: 140,
+                      height: 140,
+                      repeat: true,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),

@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
@@ -21,12 +23,13 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
   int currentStep = 1;
 bool isLoading =true;
 
+  List<String> defaultOutput = [];
 
   String shootName = "";
   String contentType = "";
   int minCrew = 0;
   int maxCrew = 0;
-  String defaultOutput = "";
+
 
   List<Map<String, dynamic>> roles = [];
   List<String> reasoning = [];
@@ -62,7 +65,8 @@ bool isLoading =true;
           minCrew = data['recommended_crew']['min'] ?? 0;
           maxCrew = data['recommended_crew']['max'] ?? 0;
 
-          defaultOutput = data['default_output'] ?? "";
+          defaultOutput = List<String>.from(data['default_output'] ?? []);
+
 
           roles = List<Map<String, dynamic>>.from(
             data['recommended_crew']['roles'] ?? [],
@@ -83,6 +87,17 @@ bool isLoading =true;
     if (shootImageUrl.isEmpty) return "";
     return ApiService().getImageURL(shootImageUrl);
   }
+
+  String getDefaultOutputText() {
+    if (defaultOutput.isEmpty) return "-";
+
+    if (defaultOutput.length == 1) {
+      return defaultOutput.first;
+    }
+
+    return "${defaultOutput.first} (+${defaultOutput.length - 1})";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -244,40 +259,47 @@ bool isLoading =true;
                           child: SizedBox(
                             height: 280,
                             width: double.infinity,
-                            child: getShootImage().isNotEmpty
-                                ? Image(
-                              image: ResizeImage(
-                                NetworkImage(getShootImage()),
-                                width: 800, // 👈 performance optimized
-                              ),
+                            child: CachedNetworkImage(
+                              imageUrl: getShootImage(),
                               fit: BoxFit.cover,
 
-                              // ✅ smooth fade-in
-                              frameBuilder: (context, child, frame, wasLoaded) {
-                                if (wasLoaded) return child;
-                                return AnimatedOpacity(
-                                  opacity: frame == null ? 0 : 1,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: child,
+                              // ⏳ loading
+                              placeholder: (context, url) {
+                                debugPrint("⏳ IMAGE LOADING → $url");
+                                return Center(
+                                  child: Lottie.asset(
+                                    "assets/lottie/Untitled_file.json",
+                                    width: 120,
+                                    height: 120,
+                                  ),
                                 );
                               },
 
-                              // ❌ error fallback
-                              errorBuilder: (_, __, ___) {
-                                return Image.asset(
-                                  "assets/newbookflow/Frame_2087328912.png",
+                              // ✅ success
+                              imageBuilder: (context, imageProvider) {
+                                debugPrint("✅ IMAGE LOADED → ${getShootImage()}");
+                                return Image(
+                                  image: imageProvider,
                                   fit: BoxFit.cover,
                                 );
                               },
-                            )
-                                : Image.asset(
-                              "assets/newbookflow/Frame_2087328912.png",
-                              fit: BoxFit.cover,
+
+                              // ❌ error
+                              errorWidget: (context, url, error) {
+                                debugPrint("❌ IMAGE FAILED → $url");
+                                return Center(
+                                  child: Lottie.asset(
+                                    "assets/lottie/Untitled_file.json",
+                                    width: 120,
+                                    height: 120,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
-
                       ),
+
 
 
                       Padding(
@@ -334,7 +356,8 @@ bool isLoading =true;
                         Row(
                           children: [
                             Text(
-                              defaultOutput.isNotEmpty ? defaultOutput : "-",
+                              getDefaultOutputText(),
+
                               style: TextStyle(color: ColorCode.white, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
                             ),
                           ],

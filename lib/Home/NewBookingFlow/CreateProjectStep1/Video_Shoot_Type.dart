@@ -1,14 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
 import 'Shoot_Date_Time_screen.dart';
 class VideoShootType extends StatefulWidget {
-
+  final int bookingId;
   final int contentTypeId;
   final int specialtyId;
-  const VideoShootType({super.key, required this.contentTypeId, required this.specialtyId});
+  const VideoShootType({super.key, required this.contentTypeId, required this.specialtyId, required this.bookingId});
 
   @override
   State<VideoShootType> createState() => _VideoShootTypeState();
@@ -22,7 +24,7 @@ List<Map<String, dynamic>> shootTypes = [];
 
 
 int? selectedShootTypeId;
-String? selectedShootTypeName; // ✅ NAME store karne ke liye
+String? selectedShootTypeName;
 
 @override
 void initState() {
@@ -88,7 +90,8 @@ Future<void> select_shoottype() async {
 
   try {
     final response = await ApiService().postData(
-      ApiEndpoints.booking,
+      // ApiEndpoints.booking,
+       "${ApiEndpoints.booking}/${widget.bookingId}",
       body,
     );
 
@@ -260,53 +263,73 @@ String getContentTypeTitle(int contentTypeId) {
                         children: [
 
                           /// 🔹 IMAGE CARD (DYNAMIC)
-                        Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: SizedBox(
-                          height: 250,
-                          width: double.infinity,
-                          child: imagePath.isNotEmpty
-                              ? Image.network(
-                            fullImageUrl,
-                            fit: BoxFit.cover,
-
-                            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                              if (wasSynchronouslyLoaded) {
-                                // ✅ image cache se aayi → loader skip
-                                return child;
-                              }
-
-                              return AnimatedOpacity(
-                                opacity: frame == null ? 0 : 1,
-                                duration: const Duration(milliseconds: 300),
-                                child: child,
-                              );
-                            },
-
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                "assets/newbookflow/Frame_2087328912.png",
+                          Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: SizedBox(
+                              height: 250,
+                              width: double.infinity,
+                         /*     child: CachedNetworkImage(
+                                imageUrl: fullImageUrl,
                                 fit: BoxFit.cover,
-                              );
-                            },
-                          )
 
-                              : Image.asset(
-                            "assets/newbookflow/Frame_2087328912.png",
-                            fit: BoxFit.cover,
+                                // ⏳ LOAD TIME → LOTTIE
+                                placeholder: (context, url) => Center(
+                                  child: Lottie.asset(
+                                    "assets/lottie/Untitled_file.json",
+                                    width: 140,
+                                    height: 140,
+                                    repeat: true,
+                                  ),
+                                ),
+
+                                // ❌ ERROR → SAME LOTTIE
+                                errorWidget: (context, url, error) => Center(
+                                  child: Lottie.asset(
+                                    "assets/lottie/Untitled_file.json",
+                                    width: 140,
+                                    height: 140,
+                                    repeat: true,
+                                  ),
+                                ),
+                              ),*/
+
+                              child: CachedNetworkImage(
+                                imageUrl: fullImageUrl,
+                                fit: BoxFit.cover,
+                            /*    memCacheHeight: 600,   // 🔥 memory cache
+                                memCacheWidth: 600,*/
+                                fadeInDuration: Duration.zero,
+                                fadeOutDuration: Duration.zero,
+                                placeholderFadeInDuration: Duration.zero,
+
+                                placeholder: (context, url) => Center(
+                                  child: Lottie.asset(
+                                    "assets/lottie/Untitled_file.json",
+                                    width: 100,
+                                    height: 100,
+                                  ),
+                                ),
+
+                                errorWidget: (context, url, error) => Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                ),
+                              ),
+
+                            ),
                           ),
-                        ),
-                      ),
 
 
 
 
 
-                        /// 🔹 TITLE + RADIO
+
+
+                          /// 🔹 TITLE + RADIO
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Row(

@@ -12,7 +12,7 @@ class AppConfig {
          // apiUrl = 'http://localhost:3004/api/';
          //    apiUrl = 'http://10.0.2.2:3004/api/';
            apiUrl = 'http://13.218.189.89/api/';
-           imageUrl = 'https://beigexmemehouse.s3.eu-north-1.amazonaws.com/beige/'; // Dev URL
+           imageUrl = 'https://d2ie1vw0czuje5.cloudfront.net/'; // Dev URL
 
 
         break;

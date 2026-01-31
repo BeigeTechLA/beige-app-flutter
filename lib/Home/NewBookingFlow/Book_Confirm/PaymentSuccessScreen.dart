@@ -1,6 +1,9 @@
+import 'package:beige/MainScreen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import '../../../auth/login_screen.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   final int bookingId;
@@ -77,9 +80,15 @@ class PaymentSuccessScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // 👉 Navigate to Booking Summary / Home
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>  Mainscreen(),
+                      ),
+                          (route) => false,
+                    );
                   },
+
                   child: const Text(
                     "View Summary",
                     style: TextStyle(

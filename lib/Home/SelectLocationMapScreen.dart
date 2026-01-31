@@ -290,8 +290,12 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
                     child: ElevatedButton(
                       onPressed: selectedAddress.isEmpty
                           ? null
-                          : () =>
-                          Navigator.pop(context, selectedAddress),
+                          : () => Navigator.pop(context, {
+                        "address": selectedAddress,
+                        "lat": currentLatLng!.latitude,
+                        "lng": currentLatLng!.longitude,
+                      }),
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(

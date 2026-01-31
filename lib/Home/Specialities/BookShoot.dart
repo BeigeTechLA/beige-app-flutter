@@ -18,6 +18,7 @@ class BookShootScreen extends StatefulWidget {
 
 class _BookShootScreenState extends State<BookShootScreen> {
   // int selectedIndex = 0;
+
   String? selectedDeliverableName;
   int? selectedDeliverableId;
   bool isNextLoading = false;
@@ -36,6 +37,7 @@ class _BookShootScreenState extends State<BookShootScreen> {
     _fetchbooking_data();
   }
 
+
   Future<void> _fetchbooking_data() async {
     try {
       final response = await ApiService().fetchData(ApiEndpoints.booking_data);
@@ -51,7 +53,6 @@ class _BookShootScreenState extends State<BookShootScreen> {
       setState(() => isLoadingSpecialties = false);
     }
   }
-
 
 
 

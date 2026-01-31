@@ -25,12 +25,13 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
   Set<int> favouriteUsers = {};
 
+  int requiredCount = 0;   // ✅ 🔥 YE LINE ADD KARO
 
   Set<int> allowedRoleIds = {};      // ✅ backend allowed roles
   Set<int> addedCrewIds = {};        // crew_member_ids
   List<dynamic> crewMatches = [];
   bool isLoading = true;
-  int requiredCount = 1;
+
 
   Set<int> addedCrewUserIds = {};   // ✅ store USER IDs
 
@@ -38,7 +39,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   @override
   void initState() {
     super.initState();
-    _holds();
+    // _holds();
     _CrewSizeMatching();
   }
   Future<void> _CrewSizeMatching() async {
@@ -46,23 +47,25 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
     try {
       final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=10",
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=30",
       );
 
       if (response != null && response['error'] == false) {
         setState(() {
           crewMatches = response['data']['items'];
 
-          allowedRoleIds = (response['data']['crew_requirements'] as List)
-              .map<int>((e) => e['role_id'])
-              .toSet();
+          final requirements = response['data']['crew_requirements'] as List;
 
-          requiredCount =
-          response['data']['crew_requirements'][0]['required_count'];
+          allowedRoleIds =
+              requirements.map<int>((e) => e['role_id']).toSet();
+
+          requiredCount = requirements[0]['required_count']; // ✅ 4
         });
+
+        debugPrint("✅ REQUIRED COUNT = $requiredCount");
       }
     } catch (e) {
-      debugPrint("Crew API Error: $e");
+      debugPrint("❌ Crew API Error: $e");
     } finally {
       setState(() => isLoading = false);
     }
@@ -100,6 +103,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       debugPrint("Remove Favourite Error: $e");
     }
   }
+
   Future<bool> _addHolds({
     required int creativeUserId,
     required int roleId,
@@ -151,8 +155,6 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   }
 
   Future<void> _holds() async {
-    setState(() => isLoading = true);
-
     try {
       final response = await ApiService().fetchData(
         "${ApiEndpoints.booking}/${widget.bookingId}/holds",
@@ -163,15 +165,16 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
         setState(() {
           addedCrewUserIds =
-              creatives.map<int>((e) => e['creative_user_id'] as int).toSet();
+              creatives.map<int>((e) => e['creative_user_id']).toSet();
         });
+
+        debugPrint("🟢 HOLDS FROM BACKEND: $addedCrewUserIds");
       }
     } catch (e) {
-      debugPrint("Holds API Error: $e");
-    } finally {
-      setState(() => isLoading = false);
+      debugPrint("❌ Holds API Error: $e");
     }
   }
+
 
 
   @override
@@ -460,117 +463,108 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 ),
 
                                 /// RIGHT BUTTONS
-                  Row(
-                  children: [
+                                Row(
+                                  children: [
 
-                  /// ADD / REMOVE CREW
-                  InkWell(
-                  onTap: () async {
-                  // ❌ Role not allowed
-                  if (!allowedRoleIds.contains(roleId)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                  content: Text("This role is not allowed for this booking"),
-                  ),
-                  );
-                  return;
-                  }
+                                    /// ADD / REMOVE CREW
+                                    InkWell(
+                                      onTap: () {
 
-                  /// REMOVE CREW
-                  if (isAdded) {
-                  final success = await _removeHolds(
-                  creativeUserId: creativeUserId,
-                  );
+                                        // ❌ Role not allowed
+                                        if (!allowedRoleIds.contains(roleId)) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text("This role is not allowed for this booking"),
+                                            ),
+                                          );
+                                          return;
+                                        }
 
-                  if (success) {
-                  setState(() {
-                  addedCrewUserIds.remove(creativeUserId);
-                  });
+                                        /// 🔴 REMOVE (LOCAL ONLY)
+                                        if (isAdded) {
+                                          setState(() {
+                                            addedCrewUserIds.remove(creativeUserId);
+                                          });
+                                        }
 
-                  // 🔁 sync backend again (IMPORTANT)
-                  await _holds();
-                  }
-                  }
+                                        /// 🟢 ADD (LOCAL ONLY)
+                                        else {
+                                          // count only local selected
+                                          int selectedForThisRole = 0;
 
-                  /// ADD CREW
-                  else {
-                    if (addedCrewUserIds.length >= requiredCount) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "You can add only $requiredCount members",
-                          ),
-                        ),
-                      );
-                      return;
-                    }
+                                          for (final match in crewMatches) {
+                                            final int uid = match['user']['id'];
+                                            final int rId = int.parse(match['role_id']);
 
+                                            if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                              selectedForThisRole++;
+                                            }
+                                          }
 
-                    final success = await _addHolds(
-                  creativeUserId: creativeUserId,
-                  roleId: roleId,
-                  );
+                                          if (selectedForThisRole >= requiredCount) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "You can add only $requiredCount ${item['role_name']}",
+                                                ),
+                                              ),
+                                            );
+                                            return;
+                                          }
 
-                  if (success) {
-                  setState(() {
-                  addedCrewUserIds.add(creativeUserId);
-                  });
-
-                  // 🔁 sync backend again (IMPORTANT)
-                  await _holds();
-                  }
-                  }
-                  },
-
-                  /// BUTTON UI
-                  child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                  color: isAdded
-                  ? ColorCode.kLightRed
-                      : ColorCode.kButtonColor,
-                  borderRadius: BorderRadius.circular(30),
-                  border: isAdded
-                  ? Border.all(color: Colors.red)
-                      : null,
-                  ),
-                  child: Text(
-                  isAdded ? "Remove" : "Add to Crew",
-                  style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w600,
-                  color: isAdded ? Colors.red : Colors.black,
-                  ),
-                  ),
-                  ),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  /// DETAILS BUTTON
-                  InkWell(
-                  onTap: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                  builder: (_) => RecommendedDetilsScreen(
-                  id: item['id'],
-                  bookingId: widget.bookingId,
-                  ),
-                  ),
-                  );
-                  },
-                  child: Image.asset(
-                  "assets/images/Group 2087328980.png",
-                  height: 32,
-                  ),
-                  ),
-                  ],
-                  ),
+                                          setState(() {
+                                            addedCrewUserIds.add(creativeUserId);
+                                          });
+                                        }
+                                      },
 
 
-                  ],
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: isAdded ? ColorCode.kLightRed : ColorCode.kButtonColor,
+                                          borderRadius: BorderRadius.circular(30),
+                                          border: isAdded ? Border.all(color: Colors.red) : null,
+                                        ),
+                                        child: Text(
+                                          isAdded ? "Remove" : "Add to Crew",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w600,
+                                            color: isAdded ? Colors.red : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+
+                                    const SizedBox(width: 8),
+
+                                    /// DETAILS BUTTON
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => RecommendedDetilsScreen(
+                                              id: item['id'],
+                                              bookingId: widget.bookingId,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Image.asset(
+                                        "assets/images/Group 2087328980.png",
+                                        height: 32,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+
+
+                              ],
                             ),
                           ),
                         ],
@@ -591,37 +585,54 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-
-            // 🔸 Continue Button
             Expanded(
               child: SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {
+                  // ✅ ENABLE / DISABLE LOGIC
+                  onPressed: addedCrewUserIds.length == requiredCount
+                      ? () async {
+                    for (final userId in addedCrewUserIds) {
+                      final match = crewMatches.firstWhere(
+                            (e) => e['user']['id'] == userId,
+                      );
+
+                      await _addHolds(
+                        creativeUserId: userId,
+                        roleId: int.parse(match['role_id']),
+                      );
+                    }
+
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>  ReviewConfirmScreen( bookingId: widget.bookingId,),
+                        builder: (_) => ReviewConfirmScreen(
+                          bookingId: widget.bookingId,
+                        ),
                       ),
                     );
-                  },
+                  }
+                      : null, // ❌ disable when count mismatch
+
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
+                    backgroundColor: addedCrewUserIds.length == requiredCount
+                        ? ColorCode.kButtonColor
+                        : ColorCode.kWhiteOpacity60, // 🔥 disabled look
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
-                  child:  Text(
-                    // "Continue with ${addedCrewIds.length} Member",
+
+                  child: Text(
                     "Continue with ${addedCrewUserIds.length} Member",
-
-
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: "Unbounded",
                       fontWeight: FontWeight.w600,
-                      color: ColorCode.kHeadingColor,
+                      color: addedCrewUserIds.length == requiredCount
+                          ? ColorCode.kHeadingColor
+                          : Colors.black45,
                     ),
                   ),
                 ),
@@ -629,9 +640,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ),
           ],
         ),
-
-
       ),
+
     );
   }
 

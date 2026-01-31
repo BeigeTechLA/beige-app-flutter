@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:beige/Creative/creative_sign_up/professional_details_sing_up.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource, XFile;
+import 'package:lottie/lottie.dart' hide Marker;
 import 'package:path_provider/path_provider.dart';
 import '../../ChooseYourRole/choose_your_role_screen.dart';
 import '../../auth/login_screen.dart';
@@ -696,382 +698,409 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding:  EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-               Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
         children: [
-          InkWell(
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
-              );
-            },
-            child: Image.asset("assets/Icons/Reply.png", height: 24),
-          ),
-          SizedBox(height: 30),
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                "1/3",
-                style: TextStyle(color: ColorCode.white),
-              ),
-            ),
-          )
-        ],
-            ),
-                SizedBox(height: 8),
-
-                /// ✅ Progress Bar
-                Row(
-                  children: List.generate(
-                    3,
-                        (index) =>
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 5),
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: index == -1
-                                  ? ColorCode.kButtonColor
-                                  : ColorCode.kSubtextColor,
-                              borderRadius: BorderRadius.circular(15),
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding:  EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => ChooseYourRoleScreen()),
+                            );
+                          },
+                          child: Image.asset("assets/Icons/Reply.png", height: 24),
+                        ),
+                        SizedBox(height: 30),
+                        Padding(
+                          padding: EdgeInsets.only(right: 16),
+                          child: Center(
+                            child: Text(
+                              "1/3",
+                              style: TextStyle(color: ColorCode.white),
                             ),
                           ),
-                        ),
-                  ),
-                ),
-
-                SizedBox(height: 20),
-                 Text(
-                  "Build your Creative Profile",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Unbounded",
-                    fontWeight: FontWeight.w500,
-                    color: ColorCode.white,
-                  ),
-                ),
-
-                 SizedBox(height: 12),
-
-                /// 📄 SUBTITLE
-                 Text(
-                  "Create your profile to get discovered by production \n teams.",
-                  style: TextStyle(
-                    fontFamily: "Outfit",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                _buildField("First Name*",  firstNameController),
-
-                SizedBox(height: 20),
-
-                _buildField("Last Name*", lastNameController),
-
-                SizedBox(height: 20),
-
-                _buildField("Email Address*", emailController),
-
-
-                SizedBox(height: 20),
-
-
-                GooglePlaceAutoCompleteTextField(
-                  textEditingController: searchController,
-                  googleAPIKey: GoogleConfig.placesApiKey,
-                  debounceTime: 600,
-                  isLatLngRequired: true,
-
-                  textStyle: const TextStyle(
-                    color: ColorCode.white,
-                    fontFamily: "Outfit",
-                  ),
-
-                  inputDecoration: InputDecoration(
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    hintText: "Search or select location",
-                    hintStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                        )
+                      ],
                     ),
-                    suffixIcon: const Icon(
-                      Icons.location_on_outlined,
-                      color: ColorCode.kWhiteOpacity70,
+                    SizedBox(height: 8),
+
+                    /// ✅ Progress Bar
+                    Row(
+                      children: List.generate(
+                        3,
+                            (index) =>
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 5),
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: index == -1
+                                      ? ColorCode.kButtonColor
+                                      : ColorCode.kSubtextColor,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                            ),
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 18,
+
+                    SizedBox(height: 20),
+                    Text(
+                      "Build your Creative Profile",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.white,
+                      ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
+
+                    SizedBox(height: 12),
+
+                    /// 📄 SUBTITLE
+                    Text(
+                      "Create your profile to get discovered by production \n teams.",
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
                         color: ColorCode.kWhiteOpacity70,
-                        width: 0.5,
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: ColorCode.kButtonColor,
-                        width: 1,
+                    SizedBox(height: 20),
+
+                    _buildField("First Name*",  firstNameController),
+
+                    SizedBox(height: 20),
+
+                    _buildField("Last Name*", lastNameController),
+
+                    SizedBox(height: 20),
+
+                    _buildField("Email Address*", emailController),
+
+
+                    SizedBox(height: 20),
+
+
+                    GooglePlaceAutoCompleteTextField(
+                      textEditingController: searchController,
+                      googleAPIKey: GoogleConfig.placesApiKey,
+                      debounceTime: 600,
+                      isLatLngRequired: true,
+                      focusNode: _locationFocus, // ✅ ADD THIS
+
+                      textStyle: const TextStyle(
+                        color: ColorCode.white,
+                        fontFamily: "Outfit",
                       ),
-                    ),
-                  ),
 
-                  /// ✅ PLACE SELECT
-                  getPlaceDetailWithLatLng: (prediction) async {
-                    final latLng = LatLng(
-                      double.parse(prediction.lat!),
-                      double.parse(prediction.lng!),
-                    );
-
-                    setState(() {
-                      currentLatLng = latLng;
-                      selectedAddress = prediction.description ?? "";
-                      searchController.text = selectedAddress;
-                    });
-
-                    // ✅ REAL FIX — EMAIL PE JUMP BAND
-                    // FocusScope.of(context).requestFocus(_dummyFocus);
-
-                    mapController?.animateCamera(
-                      CameraUpdate.newLatLngZoom(latLng, 14),
-                    );
-                  },
-
-
-                  /// ✅ ITEM CLICK
-                  itemClick: (prediction) {
-                    setState(() {
-                      selectedAddress = prediction.description ?? "";
-                      searchController.text = selectedAddress;
-                    });
-
-                    // ✅ SAME FIX
-
-                  },
-
-
-                  isCrossBtnShown: true,
-                ),
-
-
-
-
-                SizedBox(height: 20),
-
-                /// 🗺️ MAP WITH FIXED HEIGHT
-                SizedBox(
-                  height: 280,
-                  child:ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: currentLatLng == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: currentLatLng!,
-                        zoom: 14,
-                      ),
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      zoomControlsEnabled: true,
-                      compassEnabled: true,
-                      onMapCreated: (controller) {
-                        mapController = controller;
-                        controller.setMapStyle(_darkMapStyle);
-                      },
-                      markers: {
-                        Marker(
-                          markerId: const MarkerId("selected"),
-                          position: currentLatLng!,
+                      inputDecoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        hintText: "Search or select location",
+                        hintStyle: const TextStyle(
+                          color: ColorCode.kWhiteOpacity70,
                         ),
-                      },
-                      onTap: (latLng) async {
+                        suffixIcon: const Icon(
+                          Icons.location_on_outlined,
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: ColorCode.kWhiteOpacity70,
+                            width: 0.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: ColorCode.kButtonColor,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+
+                      /// ✅ PLACE SELECT
+                      getPlaceDetailWithLatLng: (prediction) async {
+                        final latLng = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
+
                         setState(() {
                           currentLatLng = latLng;
+                          selectedAddress = prediction.description ?? "";
+                          searchController.text = selectedAddress;
                         });
-                        await getAddressFromLatLng(latLng);
-                      },
-                    ),
 
+                        // ✅ REAL FIX — EMAIL PE JUMP BAND
+                        // FocusScope.of(context).requestFocus(_dummyFocus);
 
-                  ),
-                ),
-
-
-
-                SizedBox(height: 20),
-
-                _workingDistanceDropdown(),
-                SizedBox(height: 20),
-
-                _buildPasswordField(
-                  "Create Password",
-                  showPassword,
-                      () => setState(() => showPassword = !showPassword),
-                  passwordController,
-                  _passwordFocus,
-                ),
-
-                SizedBox(height: 20),
-
-                _buildPasswordField(
-                  "Confirm Password",
-                  showConfirmPassword,
-                      () => setState(() => showConfirmPassword = !showConfirmPassword),
-                  confirmPasswordController,
-                  _confirmPasswordFocus,
-                ),
-
-                SizedBox(height: 20),
-
-                _profilePictureCard(),
-
-                 SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () => setState(() => savePassword = !savePassword),
-                      child: Container(
-                        height: 18,
-                        width: 18,
-                        decoration: BoxDecoration(
-                          color: savePassword ? ColorCode.kButtonColor : Colors.black,
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: ColorCode.kWhiteOpacity70),
-                        ),
-                        child: savePassword
-                            ? const Icon(Icons.check, size: 14, color: ColorCode.black)
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black,
-                            height: 1.4, // line spacing perfect
-                          ),
-                          children: const [
-                            TextSpan(text: "I agree to the ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 13,
-                                fontFamily: "Outfit", // ⭐ Added Outfit font
-                              ),
-                            ),
-
-                            TextSpan(
-                              text: "Terms & Condition & Privacy Policy",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: ColorCode.white,
-                                fontSize: 13,
-                                fontFamily: "Outfit", // ⭐ Added Outfit font
-                              ),
-                            ),
-
-
-                            TextSpan(text: "\nset out of this site",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 13,
-                                fontFamily: "Outfit", // ⭐ Added Outfit font
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-
-                  ],
-                ),
-
-                 SizedBox(height: 40),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: isLoggingIn ? null : _fetchSingup,
-                    // onPressed: isLoggingIn ? null : _fetchSingup,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isFormValid
-                          ? ColorCode.kButtonColor   // ✅ Active color
-                          : ColorCode.kGold40,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: isLoggingIn
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        :  Text(
-                      "Next",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: "Unbounded",
-                        color: isFormValid
-                            ? ColorCode.kHeadingColor   // ✅ Active color
-                            : ColorCode.kSubtextOpacity,
-
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                 SizedBox(height: 20),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                     Text("Already have an account? ",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: ColorCode.kWhiteOpacity70,
-                        fontSize: 14,
-                        fontFamily: "Outfit",
-                      ),),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngZoom(latLng, 14),
                         );
                       },
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
+
+
+                      /// ✅ ITEM CLICK
+                      itemClick: (prediction) {
+                        setState(() {
+                          selectedAddress = prediction.description ?? "";
+                          searchController.text = selectedAddress;
+                        });
+
+                        // ✅ focus remove
+                        _locationFocus.unfocus();
+                      },
+
+
+
+                      isCrossBtnShown: true,
+                    ),
+
+
+
+
+                    SizedBox(height: 20),
+
+                    /// 🗺️ MAP WITH FIXED HEIGHT
+                    SizedBox(
+                      height: 280,
+                      child:ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: currentLatLng == null
+                            ? const Center(child: CircularProgressIndicator())
+                            : GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: currentLatLng!,
+                            zoom: 14,
+                          ),
+                          myLocationEnabled: true,
+                          myLocationButtonEnabled: true,
+                          zoomControlsEnabled: true,
+                          compassEnabled: true,
+                          onMapCreated: (controller) {
+                            mapController = controller;
+                            controller.setMapStyle(_darkMapStyle);
+                          },
+                          markers: {
+                            Marker(
+                              markerId: const MarkerId("selected"),
+                              position: currentLatLng!,
+                            ),
+                          },
+                          onTap: (latLng) async {
+                            setState(() {
+                              currentLatLng = latLng;
+                            });
+                            await getAddressFromLatLng(latLng);
+                          },
+                        ),
+
+
+                      ),
+                    ),
+
+
+
+                    SizedBox(height: 20),
+
+                    _workingDistanceDropdown(),
+                    SizedBox(height: 20),
+
+                    _buildPasswordField(
+                      "Create Password",
+                      showPassword,
+                          () => setState(() => showPassword = !showPassword),
+                      passwordController,
+                      _passwordFocus,
+                    ),
+
+                    SizedBox(height: 20),
+
+                    _buildPasswordField(
+                      "Confirm Password",
+                      showConfirmPassword,
+                          () => setState(() => showConfirmPassword = !showConfirmPassword),
+                      confirmPasswordController,
+                      _confirmPasswordFocus,
+                    ),
+
+                    SizedBox(height: 20),
+
+                    _profilePictureCard(),
+
+                    SizedBox(height: 24),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () => setState(() => savePassword = !savePassword),
+                          child: Container(
+                            height: 18,
+                            width: 18,
+                            decoration: BoxDecoration(
+                              color: savePassword ? ColorCode.kButtonColor : Colors.black,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: ColorCode.kWhiteOpacity70),
+                            ),
+                            child: savePassword
+                                ? const Icon(Icons.check, size: 14, color: ColorCode.black)
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black,
+                                height: 1.4, // line spacing perfect
+                              ),
+                              children: const [
+                                TextSpan(text: "I agree to the ",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontSize: 13,
+                                    fontFamily: "Outfit", // ⭐ Added Outfit font
+                                  ),
+                                ),
+
+                                TextSpan(
+                                  text: "Terms & Condition & Privacy Policy",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorCode.white,
+                                    fontSize: 13,
+                                    fontFamily: "Outfit", // ⭐ Added Outfit font
+                                  ),
+                                ),
+
+
+                                TextSpan(text: "\nset out of this site",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontSize: 13,
+                                    fontFamily: "Outfit", // ⭐ Added Outfit font
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+
+                      ],
+                    ),
+
+                    SizedBox(height: 40),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: isLoggingIn ? null : _fetchSingup,
+                        // onPressed: isLoggingIn ? null : _fetchSingup,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isFormValid
+                              ? ColorCode.kButtonColor   // ✅ Active color
+                              : ColorCode.kGold40,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child:Text(
+                          "Next",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontFamily: "Unbounded",
+                            color: isFormValid
+                                ? ColorCode.kHeadingColor   // ✅ Active color
+                                : ColorCode.kSubtextOpacity,
+
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
+
+                    SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Already have an account? ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: ColorCode.kWhiteOpacity70,
+                            fontSize: 14,
+                            fontFamily: "Outfit",
+                          ),),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                            );
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
                   ],
                 ),
-
-              ],
+              ),
             ),
           ),
-        ),
+
+            if (isLoggingIn)
+              Positioned.fill(
+                child: AbsorbPointer(
+                  absorbing: true,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.4),
+                      alignment: Alignment.center,
+                      child: Lottie.asset(
+                        "assets/lottie/Untitled_file.json",
+                        width: 140,
+                        height: 140,
+                        repeat: true,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+        ],
+
       ),
     );
   }

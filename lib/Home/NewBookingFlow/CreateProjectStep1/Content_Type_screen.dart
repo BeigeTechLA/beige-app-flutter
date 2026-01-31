@@ -111,14 +111,14 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     try {
       final response =
       await ApiService().postData(ApiEndpoints.booking, body);
-
+      final bookingId = response['data']?['booking_id'];
       if (response != null && response['error'] == false) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => VideoShootType(
               contentTypeId: contentTypeToSend,
-              specialtyId: widget.specialtyId,
+              specialtyId: widget.specialtyId, bookingId: bookingId,
             ),
           ),
         );
