@@ -76,7 +76,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
           int.tryParse(booking?['content_type'] ?? "0") ?? 0,
         );
 
-        /// ⭐ Rating text (summary screen pe NEW dikhana safe)
+        ///
         creativeRatingText = "New";
 
         /// 💰 Rate (first creative ka hourly rate agar ho)
@@ -763,7 +763,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   fontWeight: FontWeight.w600
                               ),),
                             Text(
-                              "₹${pricing?['total_amount'] ?? 0}",                              style: TextStyle(
+                              "\$${pricing?['total_amount'] ?? 0}",                              style: TextStyle(
                                   fontSize: 16,
                                   color: ColorCode.kWhiteOpacity70,
                                   fontFamily: "Outfit",

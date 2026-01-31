@@ -25,15 +25,15 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
   Set<int> favouriteUsers = {};
 
-  int requiredCount = 0;   // ✅ 🔥 YE LINE ADD KARO
+  int requiredCount = 0;
 
-  Set<int> allowedRoleIds = {};      // ✅ backend allowed roles
-  Set<int> addedCrewIds = {};        // crew_member_ids
+  Set<int> allowedRoleIds = {};
+  Set<int> addedCrewIds = {};
   List<dynamic> crewMatches = [];
   bool isLoading = true;
 
 
-  Set<int> addedCrewUserIds = {};   // ✅ store USER IDs
+  Set<int> addedCrewUserIds = {};
 
 
   @override
