@@ -6,6 +6,9 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:beige/utility/ColorCode.dart';
 
+import '../../service/api_endpoints.dart';
+import '../../service/api_service.dart';
+
 class ChangeLocationScreen extends StatefulWidget {
   const ChangeLocationScreen({super.key});
 
@@ -19,14 +22,19 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
 
   LatLng? selectedLatLng;
   String selectedAddress = "Search or select location";
+  bool isManualSelection = false;
 
   final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+
+    if (selectedLatLng == null) {
+      _getCurrentLocation();
+    }
   }
+
 
   // ================= CURRENT LOCATION =================
   Future<void> _getCurrentLocation() async {
@@ -69,6 +77,45 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
         "${p.subLocality ?? ""}, ${p.locality ?? ""}, ${p.administrativeArea ?? ""}";
         searchController.text = selectedAddress;
       });
+    }
+  }
+
+
+  Future<void> changeLocationApi() async {
+    if (selectedLatLng == null) return;
+
+    final payload = {
+      "location": selectedAddress,
+      "lat": selectedLatLng!.latitude,
+      "lng": selectedLatLng!.longitude,
+    };
+
+    try {
+      debugPrint("📤 CHANGE LOCATION PAYLOAD = $payload");
+
+      final response = await ApiService().putData(
+        ApiEndpoints.chnage_location,
+        payload,
+      );
+
+      debugPrint("📥 CHANGE LOCATION RESPONSE = $response");
+
+      if (response != null && response['error'] == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Location updated successfully")),
+        );
+
+        Navigator.pop(context, payload); // return updated data
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response?['message'] ?? "Update failed")),
+        );
+      }
+    } catch (e) {
+      debugPrint("❌ CHANGE LOCATION ERROR = $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong")),
+      );
     }
   }
 
@@ -196,12 +243,24 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               borderRadius: BorderRadius.circular(14),
             ),
           ),
-          onPressed: () {
-            Navigator.pop(context, {
-              "address": selectedAddress,
-              "latLng": selectedLatLng,
-            });
+          onPressed: () async {
+            if (selectedLatLng == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Please select a location")),
+              );
+              return;
+            }
+
+            print("SAVE CLICKED");
+            print("SAVE_ADDRESS = $selectedAddress");
+            print("SAVE_LAT = ${selectedLatLng!.latitude}");
+            print("SAVE_LNG = ${selectedLatLng!.longitude}");
+
+            await changeLocationApi(); // 🔥 API HIT HERE
           },
+
+
+
           child: const Text(
             "Save",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),

@@ -86,14 +86,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final int userType = response['data']['user']['user_type'];
 
       if (userType == 3) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) =>  Mainscreen()),
-        );
-      } else if (userType == 4) {
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => Mainscreen()),
+              (route) => false, //
+        );
+      } else if (userType == 4) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => Mainscreen()),
+              (route) => false, //
         );
       } else {
         _showSnack("Invalid user type");
@@ -347,8 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     );
   }
-
-  /// Text Field (Email)
+///////                   \\\\\\
   Widget _buildField(String label) {
     return TextField(
       controller: emailController,

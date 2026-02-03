@@ -75,10 +75,6 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
-
-
-
-
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController  = TextEditingController();
   final TextEditingController emailController     = TextEditingController();
@@ -501,51 +497,55 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
       final frame = await codec.getNextFrame();
       final ui.Image image = frame.image;
 
+      // UI size (crop widget size)
       const double uiSize = 320;
-      const double circleRadius = 130;
+      const double cropUI = 260; // jitna UI me crop box hai
 
-      final double imgW = image.width.toDouble();
-      final double imgH = image.height.toDouble();
+      final imgW = image.width.toDouble();
+      final imgH = image.height.toDouble();
 
-      /// UI → image ratio
-      final double ratio = imgW / uiSize;
+      // Ratio (safe for portrait + landscape)
+      final ratioX = imgW / uiSize;
+      final ratioY = imgH / uiSize;
+      final ratio = ratioX < ratioY ? ratioX : ratioY;
 
-      /// real crop size in pixels
-      final double cropPx = (circleRadius * 2) * ratio / scale;
+      // Real image crop size
+      final cropSize = (cropUI * ratio) / scale;
 
-      /// convert UI offset → image offset
-      final double dx =
-          (imgW / 2) - (circleRadius * ratio) - (offset.dx * ratio);
-      final double dy =
-          (imgH / 2) - (circleRadius * ratio) - (offset.dy * ratio);
+      // Center based crop
+      double dx = (imgW / 2) - (cropSize / 2) - (offset.dx * ratio);
+      double dy = (imgH / 2) - (cropSize / 2) - (offset.dy * ratio);
 
+      // Prevent overflow
+      dx = dx.clamp(0.0, imgW - cropSize);
+      dy = dy.clamp(0.0, imgH - cropSize);
+
+      // Canvas
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
 
-      final paint = Paint()..isAntiAlias = true;
+      final paint = Paint()
+        ..isAntiAlias = true
+        ..filterQuality = FilterQuality.high;
 
-      /// circular crop
-      canvas.clipPath(
-        Path()..addOval(Rect.fromLTWH(0, 0, cropPx, cropPx)),
-      );
-
+      // ✅ NO CLIP — PURE RECTANGLE IMAGE
       canvas.drawImageRect(
         image,
-        Rect.fromLTWH(dx, dy, cropPx, cropPx),
-        Rect.fromLTWH(0, 0, cropPx, cropPx),
+        Rect.fromLTWH(dx, dy, cropSize, cropSize),
+        Rect.fromLTWH(0, 0, cropSize, cropSize),
         paint,
       );
 
       final pic = recorder.endRecording();
       final cropped =
-      await pic.toImage(cropPx.toInt(), cropPx.toInt());
+      await pic.toImage(cropSize.toInt(), cropSize.toInt());
 
       final data =
       await cropped.toByteData(format: ui.ImageByteFormat.png);
 
       final dir = await getTemporaryDirectory();
       final file = File(
-        "${dir.path}/profile_${DateTime.now().millisecondsSinceEpoch}.png",
+        "${dir.path}/crop_${DateTime.now().millisecondsSinceEpoch}.png",
       );
 
       await file.writeAsBytes(data!.buffer.asUint8List());
@@ -585,26 +585,25 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
     setState(() => isLoggingIn = true);
 
-    final payload = {
-      "first_name": firstNameController.text.trim(),
-      "last_name": lastNameController.text.trim(),
-      "email": emailController.text.trim(),
-      "password": passwordController.text.trim(), // "1" bhi jayega
-      "location": searchController.text.trim(),
-      "working_distance": selectedDistance!, // ✅ never empty now
-    };
+
 
     /// 🟢 DEBUG
-    debugPrint("📤 SIGNUP PAYLOAD:");
-    payload.forEach((k, v) => debugPrint("$k : $v"));
     debugPrint("📸 PROFILE IMAGE: ${profileImage!.path}");
 
     try {
       final response = await ApiService().postMultipart(
         ApiEndpoints.register_step1,
-        payload,
+        {
+          "first_name": firstNameController.text.trim(),
+          "last_name": lastNameController.text.trim(),
+          "email": emailController.text.trim(),
+          "password": passwordController.text.trim(), // "1" bhi jayega
+          "location": searchController.text.trim(),
+          "working_distance": selectedDistance!, // ✅ never empty now
+        },
         profileImage!,
       );
+      debugPrint("📤 SIGNUP PAYLOAD:");
 
       debugPrint("📥 API RESPONSE: $response");
 

@@ -15,8 +15,9 @@ class VideoShootType extends StatefulWidget {
   @override
   State<VideoShootType> createState() => _VideoShootTypeState();
 }
+class _VideoShootTypeState extends State<VideoShootType>
+    with AutomaticKeepAliveClientMixin {
 
-class _VideoShootTypeState extends State<VideoShootType> {
 bool  isLoading =true;
 
   int selectedIndex = -1;
@@ -27,10 +28,11 @@ int? selectedShootTypeId;
 String? selectedShootTypeName;
 
 @override
+bool get wantKeepAlive => true; //
+@override
 void initState() {
   super.initState();
-
-  _callBookingApi(widget.contentTypeId); // 🔥 AUTO API CALL
+  _callBookingApi(widget.contentTypeId);
 }
 
 
@@ -64,7 +66,7 @@ Future<void> _callBookingApi(int contentTypeId) async {
 }
 
 
-int? selectedContentTypeId; // 👈 API VALUE
+int? selectedContentTypeId; //
 
 
 Future<void> select_shoottype() async {
@@ -74,6 +76,7 @@ Future<void> select_shoottype() async {
     );
     return;
   }
+
 
   setState(() => isLoading = true);
 
@@ -137,15 +140,16 @@ String getContentTypeTitle(int contentTypeId) {
 
 @override
   Widget build(BuildContext context) {
+     super.build(context);
     return Scaffold(
-      
+
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            
+
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
@@ -179,7 +183,7 @@ String getContentTypeTitle(int contentTypeId) {
           ],
         ),
       ),
-      
+
       body: SafeArea(
         child: Padding(
           padding:  EdgeInsets.all(20.0),
@@ -234,18 +238,18 @@ String getContentTypeTitle(int contentTypeId) {
 
               Expanded(
                 child: ListView.builder(
+                  cacheExtent: 4000,
                   itemCount: shootTypes.length,
-                  padding: const EdgeInsets.only(top: 12),
+                  padding:  EdgeInsets.only(top: 12),
                   itemBuilder: (context, index) {
-                    final item = shootTypes[index];        // ✅ PEHLE
-                    // final imagePath = item['image'];       // ✅ PHIR USE
+
+                    final item = shootTypes[index];
+
                     final imagePath = item['image']?.toString() ?? '';
                     final fullImageUrl = imagePath.isNotEmpty
                         ? ApiService().getImageURL(imagePath)
                         : '';
 
-                    selectedShootTypeId = item['id'];
-                    selectedShootTypeName = item['name'];
 
                     debugPrint("🧾 RAW IMAGE PATH → $imagePath");
                     debugPrint("🖼 FULL IMAGE URL → $fullImageUrl");
@@ -254,10 +258,12 @@ String getContentTypeTitle(int contentTypeId) {
                       onTap: () {
                         setState(() {
                           selectedIndex = index;
-                          selectedShootTypeId = item['id']; // 👈 IMPORTANT
+                          selectedShootTypeId = item['id'];
+                          selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
                         });
 
-                        debugPrint("✅ Selected ShootType ID → $selectedShootTypeId");
+                        debugPrint("✅ Selected ID → $selectedShootTypeId");
+                        debugPrint("✅ Selected Name → $selectedShootTypeName");
                       },
                       child: Column(
                         children: [
@@ -272,40 +278,17 @@ String getContentTypeTitle(int contentTypeId) {
                             child: SizedBox(
                               height: 250,
                               width: double.infinity,
-                         /*     child: CachedNetworkImage(
-                                imageUrl: fullImageUrl,
-                                fit: BoxFit.cover,
 
-                                // ⏳ LOAD TIME → LOTTIE
-                                placeholder: (context, url) => Center(
-                                  child: Lottie.asset(
-                                    "assets/lottie/Untitled_file.json",
-                                    width: 140,
-                                    height: 140,
-                                    repeat: true,
-                                  ),
-                                ),
-
-                                // ❌ ERROR → SAME LOTTIE
-                                errorWidget: (context, url, error) => Center(
-                                  child: Lottie.asset(
-                                    "assets/lottie/Untitled_file.json",
-                                    width: 140,
-                                    height: 140,
-                                    repeat: true,
-                                  ),
-                                ),
-                              ),*/
 
                               child: CachedNetworkImage(
                                 imageUrl: fullImageUrl,
                                 fit: BoxFit.cover,
-                            /*    memCacheHeight: 600,   // 🔥 memory cache
-                                memCacheWidth: 600,*/
+/*
                                 fadeInDuration: Duration.zero,
                                 fadeOutDuration: Duration.zero,
-                                placeholderFadeInDuration: Duration.zero,
-
+                                placeholderFadeInDuration: Duration.zero,*/
+                                fadeInDuration: Duration.zero,
+                                fadeOutDuration: Duration.zero,
                                 placeholder: (context, url) => Center(
                                   child: Lottie.asset(
                                     "assets/lottie/Untitled_file.json",

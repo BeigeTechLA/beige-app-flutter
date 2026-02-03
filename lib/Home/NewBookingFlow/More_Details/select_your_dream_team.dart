@@ -22,6 +22,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   int currentStep = 1;
   bool isAdded = false;
 
+  Map<int, int> requiredCountByRole = {};
 
   Set<int> favouriteUsers = {};
 
@@ -59,7 +60,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           allowedRoleIds =
               requirements.map<int>((e) => e['role_id']).toSet();
 
-          requiredCount = requirements[0]['required_count']; // ✅ 4
+          // requiredCount = requirements[0]['required_count']; // ✅ 4
+          requiredCountByRole = {
+            for (var r in requirements)
+              r['role_id']: r['required_count']
+          };
+
         });
 
         debugPrint("✅ REQUIRED COUNT = $requiredCount");
@@ -135,10 +141,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   }) async {
     try {
       final response = await ApiService().postData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove",
-        {
-          "creative_user_id": creativeUserId,
-        }
+          "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove",
+          {
+            "creative_user_id": creativeUserId,
+          }
       );
 
       if (response != null && response['error'] == false) {
@@ -173,6 +179,32 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     } catch (e) {
       debugPrint("❌ Holds API Error: $e");
     }
+  }
+
+  int get totalRequiredCount {
+    return requiredCountByRole.values.fold(0, (a, b) => a + b);
+  }
+
+  bool get isRoleWiseSelectionComplete {
+    for (final entry in requiredCountByRole.entries) {
+      final roleId = entry.key;
+      final required = entry.value;
+
+      int selected = 0;
+      for (final match in crewMatches) {
+        final int uid = match['user']['id'];
+        final int rId = int.parse(match['role_id']);
+
+        if (rId == roleId && addedCrewUserIds.contains(uid)) {
+          selected++;
+        }
+      }
+
+      if (selected != required) {
+        return false;
+      }
+    }
+    return true;
   }
 
 
@@ -468,7 +500,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                                     /// ADD / REMOVE CREW
                                     InkWell(
-                                      onTap: () {
+                                      /*           onTap: () {
 
                                         // ❌ Role not allowed
                                         if (!allowedRoleIds.contains(roleId)) {
@@ -516,6 +548,57 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             addedCrewUserIds.add(creativeUserId);
                                           });
                                         }
+                                      },*/
+                                      onTap: () {
+
+                                        // ❌ Role not allowed
+                                        if (!allowedRoleIds.contains(roleId)) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text("This role is not allowed for this booking"),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        /// 🔴 REMOVE
+                                        if (isAdded) {
+                                          setState(() {
+                                            addedCrewUserIds.remove(creativeUserId);
+                                          });
+                                          return;
+                                        }
+
+                                        /// 🟢 ADD
+                                        int selectedForThisRole = 0;
+
+                                        for (final match in crewMatches) {
+                                          final int uid = match['user']['id'];
+                                          final int rId = int.parse(match['role_id']);
+
+                                          if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                            selectedForThisRole++;
+                                          }
+                                        }
+
+                                        /// ✅ ROLE-WISE LIMIT
+                                        final int maxAllowed =
+                                            requiredCountByRole[roleId] ?? 0;
+
+                                        if (selectedForThisRole >= maxAllowed) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "You can add only $maxAllowed ${item['role_name']}",
+                                              ),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        setState(() {
+                                          addedCrewUserIds.add(creativeUserId);
+                                        });
                                       },
 
 
@@ -589,8 +672,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
               child: SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  // ✅ ENABLE / DISABLE LOGIC
-                  onPressed: addedCrewUserIds.length == requiredCount
+                  // ✅ FINAL ENABLE / DISABLE LOGIC
+                  onPressed: isRoleWiseSelectionComplete
                       ? () async {
                     for (final userId in addedCrewUserIds) {
                       final match = crewMatches.firstWhere(
@@ -612,12 +695,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       ),
                     );
                   }
-                      : null, // ❌ disable when count mismatch
+                      : null,
 
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: addedCrewUserIds.length == requiredCount
+                    backgroundColor: isRoleWiseSelectionComplete
                         ? ColorCode.kButtonColor
-                        : ColorCode.kWhiteOpacity60, // 🔥 disabled look
+                        : ColorCode.kWhiteOpacity60,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -630,7 +713,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       fontSize: 14,
                       fontFamily: "Unbounded",
                       fontWeight: FontWeight.w600,
-                      color: addedCrewUserIds.length == requiredCount
+                      color: isRoleWiseSelectionComplete
                           ? ColorCode.kHeadingColor
                           : Colors.black45,
                     ),
@@ -641,6 +724,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           ],
         ),
       ),
+
 
     );
   }

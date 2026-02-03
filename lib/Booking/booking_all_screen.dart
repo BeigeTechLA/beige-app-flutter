@@ -439,7 +439,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       final response = await ApiService().fetchData(
         "${ApiEndpoints.creatives_myshoots}?status=upcoming",
       );
-
+print("upcoming DATA =$response");
       if (response != null && response['error'] == false) {
         upcomingShoots = response['data'];
       }

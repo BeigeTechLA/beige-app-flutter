@@ -3,6 +3,9 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
+
 class SelectLocationMapScreen extends StatefulWidget {
   const SelectLocationMapScreen({super.key});
 
@@ -17,6 +20,7 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
 
   List<Location> searchResults = [];
   bool isSearching = false;
+  bool isLoading = false;
 
   String selectedAddress = "";
   final TextEditingController locationController = TextEditingController();
@@ -111,6 +115,8 @@ class _SelectLocationMapScreenState extends State<SelectLocationMapScreen> {
     final p = placemarks.first;
     return "${p.name}, ${p.locality}, ${p.administrativeArea}";
   }
+
+
 
   // ================= UI =================
   @override

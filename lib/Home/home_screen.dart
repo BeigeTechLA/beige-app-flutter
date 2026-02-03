@@ -1,6 +1,7 @@
   import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../MyProfile/my_profile.dart';
 import '../service/api_endpoints.dart';
@@ -35,6 +36,8 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<double> _scale;
   Map<String, dynamic>? myProfile;
 
+  double? selectedLat;
+  double? selectedLng;
 
 
   @override
@@ -154,26 +157,27 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _fetchhome_data() async {
     try {
-      final response =
-      await ApiService().fetchData(ApiEndpoints.home_data);
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.home_data}",
+      );
+
+      print("HOME_API lat=$selectedLat lng=$selectedLng");
+      print("HOME_RESPONSE = $response");
 
       if (response != null && response['error'] == false) {
         setState(() {
           location = response['data']['location'] ?? "";
           specialties = response['data']['specialties'] ?? [];
           featuredCreatives = response['data']['featuredCreatives'] ?? [];
-
           myProfile = response['data'];
-
           isLoading = false;
         });
       }
     } catch (e) {
-      debugPrint("Fetch Error: $e");
+      print("FETCH_ERROR = $e");
       setState(() => isLoading = false);
     }
   }
-
 
 
 
@@ -230,18 +234,15 @@ class _HomeScreenState extends State<HomeScreen>
                                       builder: (_) => const ChangeLocationScreen(),
                                     ),
                                   );
+
                                   if (result != null && result is Map<String, dynamic>) {
                                     setState(() {
-                                      location = result["address"] ?? "";
+                                      isLoading = true;
                                     });
-
-
                                     _fetchhome_data();
                                   }
-
-
-
                                 },
+
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

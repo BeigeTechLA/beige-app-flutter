@@ -768,7 +768,7 @@ class _ProfessionalDetailsSingUpState
     required TextEditingController controller,
     int maxLines = 1,
     bool isNumber = false,
-    bool isMultiline = false, // 🔥 NEW
+    bool isMultiline = false,
   }) {
     return TextField(
       controller: controller,

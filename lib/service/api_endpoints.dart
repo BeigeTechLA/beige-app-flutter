@@ -9,6 +9,7 @@ class ApiEndpoints {
 // home screen
   static const String home_data = "home/home-data";
   static const String booking_data = "bookings/start-options";
+  static const String chnage_location = "auth/profile";
 
 
   //Select Date & Time Slots

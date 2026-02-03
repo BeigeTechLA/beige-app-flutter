@@ -118,159 +118,164 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: SizedBox(
-                        height: 220,
-                        child: Stack(
-                          children: [
-
-                            /// ✅ IMAGE (NULL SAFE)
-                            item['profile_image_url'] != null
-                                ? Image.network(
-                              ApiService().getImageURL(item['profile_image_url']),
-                              width: double.infinity,
-                              height: 220,
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              "assets/images/profile_placeholder.png",
-                              width: double.infinity,
-                              height: 220,
-                              fit: BoxFit.cover,
-                            ),
-
-                            /// DARK GRADIENT
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height: 110,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.85),
-                                    ],
-                                  ),
-                                ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(12))
+                        ),
+                        child: SizedBox(
+                          height: 220,
+                          child: Stack(
+                            children: [
+                        
+                              /// ✅ IMAGE (NULL SAFE)
+                              item['profile_image_url'] != null
+                                  ? Image.network(
+                                ApiService().getImageURL(item['profile_image_url']),
+                                width: double.infinity,
+                                height: 220,
+                                fit: BoxFit.cover,
+                              )
+                                  : Image.asset(
+                                "assets/images/profile_placeholder.png",
+                                width: double.infinity,
+                                height: 220,
+                                fit: BoxFit.cover,
                               ),
-                            ),
-
-                            /// ACTIVE
-                            Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Row(
-                                children: const [
-                                  CircleAvatar(radius: 6, backgroundColor: Colors.green),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    "Active",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontFamily: "Outfit",
+                        
+                              /// DARK GRADIENT
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 110,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.black.withOpacity(0.85),
+                                      ],
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-
-                            /// ❤️ REMOVE FAVOURITE
-                            Positioned(
-                              top: 12,
-                              right: 12,
-                              child: GestureDetector(
-                                onTap: () => _removeFavourite(
-                                  creatorId: creatorId,
-                                  index: index,
-                                ),
-                                child: Image.asset(
-                                  "assets/Icons/Heart_Angl_COLOR.png",
-                                  height: 22,
-                                ),
-                              ),
-                            ),
-
-                            /// TEXT DATA
-                            Positioned(
-                              bottom: 20,
-                              left: 16,
-                              right: 16,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  /// ⭐ RATING (NULL SAFE)
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.yellow, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item['rating'] != null
-                                            ? "${item['rating']} (${item['total_reviews'] ?? 0})"
-                                            : "No ratings",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: ColorCode.kWhiteOpacity70,
-                                          fontFamily: "Outfit",
-                                        ),
-                                      ),
-                                    ],
                                   ),
-
-                                  const SizedBox(height: 6),
-
-                                  /// NAME
-                                  Text(
-                                    item['name'] ?? "Unknown",
+                                ),
+                              ),
+                        
+                              /// ACTIVE
+                              Positioned(
+                                top: 12,
+                                left: 12,
+                                child: Row(
+                                  children: const [
+                                    CircleAvatar(radius: 6, backgroundColor: Colors.green),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      "Active",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontFamily: "Outfit",
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                        
+                              /// ❤️ REMOVE FAVOURITE
+                              Positioned(
+                                top: 12,
+                                right: 12,
+                                child: GestureDetector(
+                                  onTap: () => _removeFavourite(
+                                    creatorId: creatorId,
+                                    index: index,
+                                  ),
+                                  child: Image.asset(
+                                    "assets/Icons/Heart_Angl_COLOR.png",
+                                    height: 22,
+                                  ),
+                                ),
+                              ),
+                        
+                              /// TEXT DATA
+                              Positioned(
+                                bottom: 20,
+                                left: 16,
+                                right: 16,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                        
+                                    /// ⭐ RATING (NULL SAFE)
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.star, color: Colors.yellow, size: 16),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          item['rating'] != null
+                                              ? "${item['rating']} (${item['total_reviews'] ?? 0})"
+                                              : "No ratings",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: ColorCode.kWhiteOpacity70,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                        
+                                    const SizedBox(height: 6),
+                        
+                                    /// NAME
+                                    Text(
+                                      item['name'] ?? "Unknown",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                        
+                                    /// ROLE (NULL SAFE)
+                                    Text(
+                                      item['primary_title'] ?? "Creative Professional",
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: ColorCode.kWhiteOpacity70,
+                                        fontFamily: "Outfit",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                        
+                              /// PRICE
+                              Positioned(
+                                bottom: 16,
+                                right: 16,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: ColorCode.kButtonColor,
+                                    borderRadius: BorderRadius.circular(22),
+                                  ),
+                                  child: Text(
+                                    item['hourly_rate'] != null
+                                        ? "From \$${item['hourly_rate']}/Hr"
+                                        : "Price on request",
                                     style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
+                                      fontSize: 12,
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w600,
+                                      color: ColorCode.kCircleGradientTop,
                                     ),
-                                  ),
-
-                                  /// ROLE (NULL SAFE)
-                                  Text(
-                                    item['primary_title'] ?? "Creative Professional",
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            /// PRICE
-                            Positioned(
-                              bottom: 16,
-                              right: 16,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
-                                  borderRadius: BorderRadius.circular(22),
-                                ),
-                                child: Text(
-                                  item['hourly_rate'] != null
-                                      ? "From \$${item['hourly_rate']}/Hr"
-                                      : "Price on request",
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorCode.kCircleGradientTop,
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
