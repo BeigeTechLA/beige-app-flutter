@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../service/api_service.dart';
@@ -13,6 +15,8 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
   final String ?endTime;
   final int ?durationHours;
   final String ?location;
+  final String? contentType;
+
   final String ?imageUrl;
   const UpcomingEventSummaryManagebooking({super.key,
     required this.bookingId,
@@ -22,7 +26,7 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
      this.endTime,
      this.durationHours,
      this.location,
-     this.imageUrl,
+     this.imageUrl, this.contentType,
   });
 
   @override
@@ -34,11 +38,17 @@ class _UpcomingEventSummaryManagebookingState
     extends State<UpcomingEventSummaryManagebooking> {
 
   String getFullImageUrl() {
-    if (widget.imageUrl == null || widget.imageUrl!.isEmpty) {
-      return "";
+    final url = widget.imageUrl ?? "";
+    if (url.isEmpty) return "";
+
+    if (url.startsWith("http")) {
+      return url;
     }
-    return ApiService().getImageURL(widget.imageUrl!);
+
+
+    return ApiService().getImageURL(url);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +56,40 @@ class _UpcomingEventSummaryManagebookingState
       body: Stack(
         children: [
           /// 🔹 BACKGROUND IMAGE
+          /// 🔹 BACKGROUND IMAGE (DYNAMIC)
+          /// 🔹 BACKGROUND IMAGE (FULL + BLUR)
           Positioned.fill(
-            child: Image.asset(
-              "assets/images/background_booking_event_summey.jpeg", // 👈 background image
-              fit: BoxFit.cover,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                /// 🔹 FULL IMAGE
+                getFullImageUrl().isNotEmpty
+                    ? Image.network(
+                  getFullImageUrl(),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return Image.asset(
+                      "assets/images/background_booking_event_summey.jpeg",
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
+                    : Image.asset(
+                  "assets/images/background_booking_event_summey.jpeg",
+                  fit: BoxFit.cover,
+                ),
+
+                /// 🔹 BLUR EFFECT
+                BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 12, // 👈 horizontal blur
+                    sigmaY: 12, // 👈 vertical blur
+                  ),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.25), // 👈 dark tint
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -143,13 +183,12 @@ class _UpcomingEventSummaryManagebookingState
                                   ? Image(
                                 image: ResizeImage(
                                   NetworkImage(getFullImageUrl()),
-                                  width: 400, // 👈 performance optimization
+                                  width: 400,
                                 ),
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
 
-                                // ✅ smooth fade-in
                                 frameBuilder: (context, child, frame, wasLoaded) {
                                   if (wasLoaded) return child;
                                   return AnimatedOpacity(
@@ -159,7 +198,6 @@ class _UpcomingEventSummaryManagebookingState
                                   );
                                 },
 
-                                // ❌ error fallback
                                 errorBuilder: (_, __, ___) {
                                   return Image.asset(
                                     "assets/images/Rectangle 34661070.png",
@@ -178,13 +216,14 @@ class _UpcomingEventSummaryManagebookingState
                             ),
 
 
-                            const SizedBox(width: 14),
+
+                            SizedBox(width: 14),
 
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children:  [
-                                  Row(
+                           /*       Row(
                                     children: [
                                       Icon(Icons.star, size: 14, color: Colors.amber),
                                       SizedBox(width: 4),
@@ -195,7 +234,7 @@ class _UpcomingEventSummaryManagebookingState
                                         ),
                                       ),
                                     ],
-                                  ),
+                                  ),*/
                                   SizedBox(height: 6),
                                   Text(
                                     widget.projectName ?? "N/A",
@@ -208,7 +247,7 @@ class _UpcomingEventSummaryManagebookingState
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    "Videography Specialist",
+                                    widget.contentType ?? "",
                                     style: TextStyle(
                                       fontSize: 12, color: ColorCode.kWhiteOpacity70,
                                       fontFamily: "Outfit",
@@ -216,15 +255,7 @@ class _UpcomingEventSummaryManagebookingState
                                     ),
                                   ),
                                   SizedBox(height: 10),
-                                  Text(
-                                    "From \$450/Hr",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: ColorCode.kButtonColor,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+
                                 ],
                               ),
                             )
@@ -314,6 +345,14 @@ class _UpcomingEventSummaryManagebookingState
                                         context,
                                         MaterialPageRoute(builder: (_) =>CancelBooking(
                                           bookingId: widget.bookingId,
+                                          projectName: widget.projectName,
+                                          eventDate: widget.eventDate,
+                                          startTime: widget.startTime,
+                                          endTime: widget.endTime,
+                                          durationHours: widget.durationHours,
+                                          location: widget.location,
+                                          contentType: widget.contentType,
+                                          imageUrl: widget.imageUrl,
                                         )),
                                       );
                                     },

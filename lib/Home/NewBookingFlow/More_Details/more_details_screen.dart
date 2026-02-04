@@ -40,6 +40,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   int includedVideoQty = 1;
 
 // Additional
+  final FocusNode locationFocusNode = FocusNode();
 
   bool addPhoto = false;
   bool addVideo = false;
@@ -623,84 +624,164 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   ),
                 ),
               ),*/
-              GooglePlaceAutoCompleteTextField(
-                textEditingController: searchController,
-                googleAPIKey: GoogleConfig.placesApiKey,
-                debounceTime: 600,
-                isLatLngRequired: true,
+              // GooglePlaceAutoCompleteTextField(
+              //   textEditingController: searchController,
+              //   googleAPIKey: GoogleConfig.placesApiKey,
+              //   debounceTime: 600,
+              //   isLatLngRequired: true,
+              //
+              //   textStyle: const TextStyle(
+              //     color: ColorCode.white,
+              //     fontFamily: "Outfit",
+              //   ),
+              //
+              //   inputDecoration: InputDecoration(
+              //     // labelText: "Select Location*",
+              //     floatingLabelBehavior: FloatingLabelBehavior.always,
+              //
+              //     labelStyle: const TextStyle(
+              //       color: ColorCode.kWhiteOpacity70,
+              //       fontFamily: "Outfit",
+              //     ),
+              //
+              //     hintText: "Search or select location",
+              //     hintStyle: const TextStyle(
+              //       color: ColorCode.kWhiteOpacity70,
+              //     ),
+              //
+              //     suffixIcon: const Icon(
+              //       Icons.location_on_outlined,
+              //       color: ColorCode.kWhiteOpacity70,
+              //     ),
+              //
+              //     contentPadding: const EdgeInsets.symmetric(
+              //       horizontal: 20,
+              //       vertical: 18,
+              //     ),
+              //
+              //     enabledBorder: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //       borderSide: const BorderSide(
+              //         color: ColorCode.kWhiteOpacity70,
+              //         width: 0.5,
+              //       ),
+              //     ),
+              //
+              //     focusedBorder: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //       borderSide: const BorderSide(
+              //         color: ColorCode.kButtonColor,
+              //         width: 1,
+              //       ),
+              //     ),
+              //   ),
+              //
+              //   getPlaceDetailWithLatLng: (prediction) async {
+              //     final latLng = LatLng(
+              //       double.parse(prediction.lat!),
+              //       double.parse(prediction.lng!),
+              //     );
+              //
+              //     setState(() {
+              //       currentLatLng = latLng;
+              //       selectedAddress = prediction.description ?? "";
+              //       searchController.text = selectedAddress;
+              //     });
+              //
+              //     mapController?.animateCamera(
+              //       CameraUpdate.newLatLngZoom(latLng, 14),
+              //     );
+              //   },
+              //
+              //   itemClick: (prediction) {
+              //     searchController.text = prediction.description ?? "";
+              //     searchController.selection = TextSelection.fromPosition(
+              //       TextPosition(offset: searchController.text.length),
+              //     );
+              //   },
+              //
+              //   isCrossBtnShown: true,
+              // ),
 
-                textStyle: const TextStyle(
-                  color: ColorCode.white,
-                  fontFamily: "Outfit",
-                ),
 
-                inputDecoration: InputDecoration(
-                  // labelText: "Select Location*",
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  labelStyle: const TextStyle(
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
                     color: ColorCode.kWhiteOpacity70,
+                    width: 0.8,
+                  ),
+                ),
+                child: GooglePlaceAutoCompleteTextField(
+                  textEditingController: searchController,
+                  focusNode: locationFocusNode, // ✅ ADD THIS
+                  googleAPIKey: GoogleConfig.placesApiKey,
+                  debounceTime: 600,
+                  isLatLngRequired: true,
+
+                  textStyle: const TextStyle(
+                    color: ColorCode.white,
                     fontFamily: "Outfit",
+                    fontSize: 14,
                   ),
 
-                  hintText: "Search or select location",
-                  hintStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-
-                  suffixIcon: const Icon(
-                    Icons.location_on_outlined,
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
+                  inputDecoration: const InputDecoration(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    hintText: "Search or select location",
+                    hintStyle: TextStyle(
                       color: ColorCode.kWhiteOpacity70,
-                      width: 0.5,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    suffixIcon: Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Icon(
+                        Icons.location_on_outlined,
+                        color: ColorCode.kWhiteOpacity70,
+                      ),
                     ),
                   ),
 
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kButtonColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
+                  getPlaceDetailWithLatLng: (prediction) async {
+                    final latLng = LatLng(
+                      double.parse(prediction.lat!),
+                      double.parse(prediction.lng!),
+                    );
 
-                getPlaceDetailWithLatLng: (prediction) async {
-                  final latLng = LatLng(
-                    double.parse(prediction.lat!),
-                    double.parse(prediction.lng!),
-                  );
+                    setState(() {
+                      currentLatLng = latLng;
+                      selectedAddress = prediction.description ?? "";
+                    });
 
-                  setState(() {
-                    currentLatLng = latLng;
-                    selectedAddress = prediction.description ?? "";
                     searchController.text = selectedAddress;
-                  });
+                    searchController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: searchController.text.length),
+                    );
 
-                  mapController?.animateCamera(
-                    CameraUpdate.newLatLngZoom(latLng, 14),
-                  );
-                },
+                    locationFocusNode.unfocus(); // ✅ IMPORTANT (cursor fix)
 
-                itemClick: (prediction) {
-                  searchController.text = prediction.description ?? "";
-                  searchController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: searchController.text.length),
-                  );
-                },
+                    mapController?.animateCamera(
+                      CameraUpdate.newLatLngZoom(latLng, 14),
+                    );
+                  },
 
-                isCrossBtnShown: true,
+                  itemClick: (prediction) {
+                    searchController.text = prediction.description ?? "";
+                    searchController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: searchController.text.length),
+                    );
+                  },
+
+                  isCrossBtnShown: true,
+                ),
               ),
+
+
 
               SizedBox(height: 20),
         
@@ -944,6 +1025,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       ),
     );
   }
+
+
   Widget _buildQtyRow({
     required String title,
     required int value,

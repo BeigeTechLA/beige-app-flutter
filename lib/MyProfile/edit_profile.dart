@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
+import '../service/google_config.dart';
 import '../utility/ColorCode.dart';
 import 'Change_Password_screen.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -45,6 +46,7 @@ class _EditProfileState extends State<EditProfile> {
   String? profileImageUrl;
 
   Map<String, dynamic>? myProfile;
+  final FocusNode locationFocusNode = FocusNode();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -614,54 +616,136 @@ class _EditProfileState extends State<EditProfile> {
                   ),
         
                   SizedBox(height: 20,),
-                  TextField(
-                    controller: locationController,
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        searchLocation(value);
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: "Location*",
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          if (locationController.text.isNotEmpty) {
-                            searchLocation(locationController.text);
-                          }
-                        },
-                        child: const Icon(
-                          Icons.location_on_outlined,
-                          color: ColorCode.white,
-                        ),
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
-                          width: 0.5,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
-                          width: 0.5,
-                        ),
+                  // TextField(
+                  //   controller: locationController,
+                  //   onSubmitted: (value) {
+                  //     if (value.isNotEmpty) {
+                  //       searchLocation(value);
+                  //     }
+                  //   },
+                  //   decoration: InputDecoration(
+                  //     labelText: "Location*",
+                  //     suffixIcon: InkWell(
+                  //       onTap: () {
+                  //         if (locationController.text.isNotEmpty) {
+                  //           searchLocation(locationController.text);
+                  //         }
+                  //       },
+                  //       child: const Icon(
+                  //         Icons.location_on_outlined,
+                  //         color: ColorCode.white,
+                  //       ),
+                  //     ),
+                  //     floatingLabelBehavior: FloatingLabelBehavior.always,
+                  //     labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+                  //     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  //     enabledBorder: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       borderSide: const BorderSide(
+                  //         color: ColorCode.kWhiteOpacity70,
+                  //         width: 0.5,
+                  //       ),
+                  //     ),
+                  //     focusedBorder: OutlineInputBorder(
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       borderSide: const BorderSide(
+                  //         color: ColorCode.kWhiteOpacity70,
+                  //         width: 0.5,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: ColorCode.kWhiteOpacity70,
+                        width: 0.8,
                       ),
                     ),
+                    child: GooglePlaceAutoCompleteTextField(
+                      textEditingController: locationController,
+                      focusNode: locationFocusNode, // ✅ IMPORTANT
+                      googleAPIKey: GoogleConfig.placesApiKey,
+                      debounceTime: 600,
+                      isLatLngRequired: true,
+
+                      textStyle: const TextStyle(
+                        color: ColorCode.white,
+                        fontFamily: "Outfit",
+                        fontSize: 14,
+                      ),
+
+                      inputDecoration: const InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+
+                        hintText: "Search or select location",
+                        hintStyle: TextStyle(
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
+
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.location_on_outlined,
+                            color: ColorCode.kWhiteOpacity70,
+                          ),
+                        ),
+                      ),
+
+                      /// ✅ ONLY when place is selected
+                      getPlaceDetailWithLatLng: (prediction) async {
+                        final latLng = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
+
+                        setState(() {
+                          currentLatLng = latLng;
+                          selectedAddress = prediction.description ?? "";
+                        });
+
+                        locationController.text = selectedAddress;
+
+                        locationController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: locationController.text.length),
+                        );
+
+                        locationFocusNode.unfocus(); // ✅ cursor stable
+
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngZoom(latLng, 14),
+                        );
+                      },
+
+                      /// ❌ YAHAN setState MAT LAGANA
+                      itemClick: (prediction) {
+                        locationController.text = prediction.description ?? "";
+                        locationController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: locationController.text.length),
+                        );
+                      },
+
+                      isCrossBtnShown: true,
+                    ),
                   ),
-        
-        
+
+
                   SizedBox(height: 20,),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: SizedBox(
                       height: 250,
                       child: currentLatLng == null
-                          ? const Center(
+                          ?  Center(
                         child: CircularProgressIndicator(),
                       )
                           : GoogleMap(

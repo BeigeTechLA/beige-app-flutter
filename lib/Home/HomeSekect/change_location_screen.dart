@@ -8,6 +8,7 @@ import 'package:beige/utility/ColorCode.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
+import '../../service/google_config.dart';
 
 class ChangeLocationScreen extends StatefulWidget {
   const ChangeLocationScreen({super.key});
@@ -25,6 +26,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
   bool isManualSelection = false;
 
   final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -142,36 +144,63 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
             padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
             decoration: const BoxDecoration(
               color: Color(0xFF121212),
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
             ),
             child: GooglePlaceAutoCompleteTextField(
               textEditingController: searchController,
-              googleAPIKey: "AIzaSyB55dzOzA9np8T1rn-DpKKqcqGcgbGmgOc",
+              focusNode: searchFocusNode, // ✅ IMPORTANT
+              googleAPIKey: GoogleConfig.placesApiKey,
               debounceTime: 800,
               isLatLngRequired: true,
 
+              textStyle: const TextStyle(
+                color: Colors.white,
+                fontFamily: "Outfit",
+                fontSize: 14,
+              ),
+
               inputDecoration: InputDecoration(
                 hintText: "Search location",
-                prefixIcon: const Icon(Icons.search, color: Colors.white),
+                hintStyle: const TextStyle(
+                  color: Colors.white54,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
                 filled: true,
                 fillColor: const Color(0xFF1E1E1E),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
                 ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
               ),
 
+              /// ✅ ONLY when place is selected
               getPlaceDetailWithLatLng: (prediction) {
                 if (prediction.lat != null && prediction.lng != null) {
-                  LatLng latLng = LatLng(
+                  final LatLng latLng = LatLng(
                     double.parse(prediction.lat!),
                     double.parse(prediction.lng!),
                   );
 
                   setState(() {
                     selectedLatLng = latLng;
-                    selectedAddress = prediction.description!;
+                    selectedAddress = prediction.description ?? "";
                   });
+
+                  searchController.text = selectedAddress;
+                  searchController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: searchController.text.length),
+                  );
+
+                  searchFocusNode.unfocus(); // ✅ cursor/focus fix
 
                   mapController?.animateCamera(
                     CameraUpdate.newLatLngZoom(latLng, 16),
@@ -179,18 +208,19 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                 }
               },
 
+              /// ❌ yahan setState MAT lagana
               itemClick: (prediction) {
-                searchController.text = prediction.description!;
+                searchController.text = prediction.description ?? "";
                 searchController.selection = TextSelection.fromPosition(
-                  TextPosition(offset: prediction.description!.length),
+                  TextPosition(offset: searchController.text.length),
                 );
               },
 
               seperatedBuilder: const Divider(color: Colors.white24),
               isCrossBtnShown: true,
-              textStyle: const TextStyle(color: Colors.white),
             ),
           ),
+
 
           // ================= MAP =================
           Expanded(

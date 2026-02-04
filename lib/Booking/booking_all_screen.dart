@@ -439,7 +439,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       final response = await ApiService().fetchData(
         "${ApiEndpoints.creatives_myshoots}?status=upcoming",
       );
-print("upcoming DATA =$response");
+   print("upcoming DATA =$response");
       if (response != null && response['error'] == false) {
         upcomingShoots = response['data'];
       }
@@ -662,36 +662,31 @@ print("upcoming DATA =$response");
       shoot['creative']?['profile_image_url'] ?? '',
     );
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => UpcomingBookingEventSummary(
-              bookingId: shoot['booking_id'],
-             /* projectName: shoot['project_name'] ?? '',
-              eventDate: shoot['event_date'] ?? '',
-              startTime: shoot['start_time'] ?? '',
-              endTime: shoot['end_time'] ?? '',
-              durationHours: shoot['duration_hours'] ?? 0,
-              location: shoot['location'] ?? '',
-              imageUrl: imageUrl.isNotEmpty
-                  ? imageUrl
-                  : "assets/images/home2.png",*/
-            ),
-          ),
-        );
-      },
-      child: bookingCard(
-        imagePath:
-        imageUrl.isNotEmpty ? imageUrl : "assets/images/home2.png",
-        title: shoot['project_name'],
-        date: shoot['event_date'],
-        time: "${shoot['start_time']} - ${shoot['end_time']}",
-        hours: shoot['duration_hours'],
-        location: shoot['location'],
-        showEditIcon: true, // ✅ UPCOMING ME SHOW
+    final String finalImage =
+    imageUrl.isNotEmpty ? imageUrl : "assets/images/home2.png";
 
+    final String contentType =
+        shoot['content_type'] ?? ''; // ✅ IMPORTANT
+
+
+    return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => UpcomingBookingEventSummary(
+            bookingId: shoot['booking_id'],
+          ),
+        ),
+      );
+    },
+      child: bookingCard(
+        imagePath: finalImage,
+        title: shoot['project_name'] ?? '',
+        date: shoot['event_date'] ?? '',
+        time: "${shoot['start_time']} - ${shoot['end_time']}",
+        contentType: contentType, // ✅ PASS HERE
+        showEditIcon: true,
         buttonText: "Manage Booking",
         onButtonTap: () {
           Navigator.push(
@@ -699,15 +694,14 @@ print("upcoming DATA =$response");
             MaterialPageRoute(
               builder: (_) => UpcomingEventSummaryManagebooking(
                 bookingId: shoot['booking_id'],
-                projectName: shoot['project_name'] ?? '',
-                eventDate: shoot['event_date'] ?? '',
-                startTime: shoot['start_time'] ?? '',
-                endTime: shoot['end_time'] ?? '',
-                durationHours: shoot['duration_hours'] ?? 0,
-                location: shoot['location'] ?? '',
-                imageUrl: imageUrl.isNotEmpty
-                    ? imageUrl
-                    : "assets/images/home2.png",
+                projectName: shoot['project_name'],
+                eventDate: shoot['event_date'],
+                startTime: shoot['start_time'],
+                endTime: shoot['end_time'],
+                durationHours: shoot['duration_hours'],
+                location: shoot['location'],
+                imageUrl: finalImage,
+                contentType: contentType, // ✅ PASS TO NEXT SCREEN
               ),
             ),
           );
@@ -715,6 +709,8 @@ print("upcoming DATA =$response");
       ),
     );
   }
+
+
 
 
 
@@ -742,6 +738,7 @@ print("upcoming DATA =$response");
     String? time,
     int? hours,
     String? location,
+    String? contentType, //
     required String buttonText,
     required VoidCallback onButtonTap,
     bool showEditIcon = false, // 👈 NEW FLAG

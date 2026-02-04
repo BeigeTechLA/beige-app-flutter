@@ -304,34 +304,37 @@ bool isLoading =true;
 
                       Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          
+                    child:Row(
                       children: [
-                        Text(
-                          "$shootName (${contentType.toUpperCase()})",
-                          style: TextStyle(
-                            color: ColorCode.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Outfit",
+                        Expanded(
+                          child: Text(
+                            "$shootName (${contentType.toUpperCase()})",
+                            maxLines: 2,                    // ✅ allows wrapping
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: ColorCode.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Outfit",
+                            ),
                           ),
                         ),
 
+                        const SizedBox(width: 8),
 
                         Text(
                           "$minCrew - $maxCrew People",
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: ColorCode.kButtonColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             fontFamily: "Outfit",
                           ),
                         ),
-
                       ],
                     ),
-                  ),
+
+                      ),
                   SizedBox(height: 10),
                   Padding(
                     padding:  EdgeInsets.all(.0),

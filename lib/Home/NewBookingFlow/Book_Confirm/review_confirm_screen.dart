@@ -81,7 +81,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
         /// 💰 Rate (first creative ka hourly rate agar ho)
         if (heldCreatives.isNotEmpty) {
-          creativeRate = heldCreatives.first['creative']?['hourly_rate']
+          creativeRate = heldCreatives.first['creative']?['duration_hours']
               ?.toString() ??
               "";
         } else {
@@ -357,7 +357,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               /// ⭐ Rating
-                              Row(
+                         /*     Row(
                                 children: [
                                   const Icon(Icons.star, size: 14, color: Colors.amber),
                                   const SizedBox(width: 4),
@@ -372,10 +372,19 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   ),
                                 ],
                               ),
-
+*/
                               const SizedBox(height: 6),
-
-                              /// 👤 NAME
+                              Text(
+                                // Content Type:creativeRole,
+                                "Content Type: $creativeRole",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: ColorCode.kButtonColor,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
                               Text(
                                 creativeName,
                                 style: const TextStyle(
@@ -386,22 +395,14 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ),
                               ),
 
-                              const SizedBox(height: 2),
+
 
                               /// 🎥 ROLE
-                              Text(
-                                creativeRole,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
+
 
                               const SizedBox(height: 10),
 
-                              /// 💰 RATE
+                       /*       /// 💰 RATE
                               creativeRate.isNotEmpty
                                   ? Text(
                                 "From \$$creativeRate/Hr",
@@ -413,7 +414,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ),
                               )
                                   : const SizedBox(),
-
+*/
                             ],
                           ),
                         ),
@@ -519,44 +520,55 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                          padding: const EdgeInsets.all(8.0),
                          child: Row(
                            children: [
-                             Text(creativeRole,style: TextStyle(color: ColorCode.white),)
+                             Text(
+
+                               "$creativeRole:",style: TextStyle(color: ColorCode.white,fontSize: 12,fontFamily: "Outfit",fontWeight:FontWeight.w400),
+
+                             )
                            ],
                          ),
                        ),
-                 GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: (booking?['edit_types'] ?? []).length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,        // 🔥 1 row me 2 items
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 3,     // height adjust karne ke liye
-          ),
-          itemBuilder: (context, index) {
-            final edit = booking!['edit_types'][index];
-            return Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: ColorCode.kGoldGradientLight,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                edit,
-                style: const TextStyle(
-                  color: ColorCode.black,
-                  fontFamily: "Outfit",
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            );
-          },
-        ),
+                        SizedBox(height: 10),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: (booking?['edit_types'] ?? []).length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 2.4, // 🔥 wrap ke liye better
+                          ),
+                          itemBuilder: (context, index) {
+                            final edit = booking!['edit_types'][index];
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: ColorCode.kGoldGradientLight,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  edit,
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.visible,
+                                  style: const TextStyle(
+                                    color: ColorCode.black,
+                                    fontFamily: "Outfit",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
 
 
-        ],
+
+                      ],
                     ),
                   ),
 
@@ -627,8 +639,9 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "contact Information",
-                        style: TextStyle(
+                    "Contact Information",
+
+                  style: TextStyle(
                             fontSize: 14,
                             color: ColorCode.white,
                             fontFamily: "Unbounded",

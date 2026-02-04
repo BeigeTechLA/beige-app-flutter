@@ -393,14 +393,14 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 title: "Stripe",
                 icon: "assets/Icons/stripe.png",
               ),
-              _paymentTile(
+             /* _paymentTile(
                 title: "Apple Pay",
                 icon: "assets/Icons/apple.png",
               ),
               _paymentTile(
                 title: "PayPal",
                 icon: "assets/Icons/PayPal.png",
-              ),
+              ),*/
             ],
           ),
         ),

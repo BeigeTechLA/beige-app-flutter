@@ -10,7 +10,17 @@ import '../utility/ColorCode.dart';
 
 class CancelBooking extends StatefulWidget {
   final int bookingId;
-  const CancelBooking({super.key, required this.bookingId});
+
+  final String ? projectName;
+  final String ? eventDate;
+  final String ?startTime;
+  final String ?endTime;
+  final int ?durationHours;
+  final String ?location;
+  final String? contentType;
+  final String? imageUrl; // ✅ ADD THIS
+
+  const CancelBooking({super.key, required this.bookingId, this.projectName, this.eventDate, this.startTime, this.endTime, this.durationHours, this.location, this.contentType, this.imageUrl});
 
   @override
   State<CancelBooking> createState() => _CancelBookingState();
@@ -51,6 +61,14 @@ class _CancelBookingState extends State<CancelBooking> {
     );
   }
 
+  String getFullImageUrl() {
+    final url = widget.imageUrl ?? "";
+    if (url.isEmpty) return "";
+
+    if (url.startsWith("http")) return url;
+
+    return ApiService().getImageURL(url);
+  }
 
 
   @override
@@ -59,12 +77,37 @@ class _CancelBookingState extends State<CancelBooking> {
       body: Stack(
         children: [
           /// 🔹 BACKGROUND IMAGE
+          /// 🔹 BACKGROUND IMAGE (FULL + BLUR)
           Positioned.fill(
-            child: Image.asset(
-              "assets/images/background_booking_event_summey.jpeg", // 👈 background image
-              fit: BoxFit.cover,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                getFullImageUrl().isNotEmpty
+                    ? Image.network(
+                  getFullImageUrl(),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return Image.asset(
+                      "assets/images/background_booking_event_summey.jpeg",
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
+                    : Image.asset(
+                  "assets/images/background_booking_event_summey.jpeg",
+                  fit: BoxFit.cover,
+                ),
+
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.25),
+                  ),
+                ),
+              ],
             ),
           ),
+
 
 
           /// 🔹 BOTTOM MANAGE BOOKING CARD
@@ -100,7 +143,7 @@ class _CancelBookingState extends State<CancelBooking> {
                   /// 🔹 HEADER
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
+                    children:  [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -125,7 +168,13 @@ class _CancelBookingState extends State<CancelBooking> {
                           ),
                         ],
                       ),
-                      Icon(Icons.close, color: Colors.white),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+
                     ],
                   ),
 
@@ -146,34 +195,50 @@ class _CancelBookingState extends State<CancelBooking> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
-                              child: Image.asset(
+                              child: getFullImageUrl().isNotEmpty
+                                  ? Image.network(
+                                getFullImageUrl(),
+                                height: 144,
+                                width: 126,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) {
+                                  return Image.asset(
+                                    "assets/images/Rectangle 34661070.png",
+                                    height: 144,
+                                    width: 126,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                                  : Image.asset(
                                 "assets/images/Rectangle 34661070.png",
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
                               ),
                             ),
+
                             const SizedBox(width: 14),
 
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children:  [
                                   Row(
                                     children: [
-                                      Icon(Icons.star, size: 14, color: Colors.amber),
+                                      // Icon(Icons.star, size: 14, color: Colors.amber),
                                       SizedBox(width: 4),
-                                      Text(
+                                 /*     Text(
                                         "4.5 (120)",
                                         style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
                                           fontFamily: "Outfit",
                                         ),
-                                      ),
+                                      ),*/
                                     ],
                                   ),
                                   SizedBox(height: 6),
                                   Text(
-                                    "Angela Kia",
+                                    widget.projectName ?? "N/A",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
@@ -181,17 +246,18 @@ class _CancelBookingState extends State<CancelBooking> {
                                       fontFamily: "Outfit",
                                     ),
                                   ),
-                                  SizedBox(height: 2),
+
                                   Text(
-                                    "Videography Specialist",
+                                    widget.contentType ?? "",
                                     style: TextStyle(
-                                      fontSize: 12, color: ColorCode.kWhiteOpacity70,
+                                      fontSize: 12,
+                                      color: ColorCode.kWhiteOpacity70,
                                       fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
+
                                   SizedBox(height: 10),
-                                  Text(
+                               /*   Text(
                                     "From \$450/Hr",
                                     style: TextStyle(
                                       fontSize: 14,
@@ -199,7 +265,7 @@ class _CancelBookingState extends State<CancelBooking> {
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w700,
                                     ),
-                                  ),
+                                  ),*/
                                 ],
                               ),
                             )

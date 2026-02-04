@@ -158,6 +158,28 @@ bool loding =true;
     }
   }
 
+  String getContentTypeTitle(String? type) {
+    switch (type) {
+      case "1":
+        return "Video Shoot";
+      case "2":
+        return "Photo Shoot";
+      case "3":
+        return "Photo & Video Shoot";
+      default:
+        return "Shoot Type";
+    }
+  }
+
+  String getShootTypeImage() {
+    final img = booking?['shoot_type_image_url'];
+    if (img == null || img.isEmpty) return "";
+
+    if (img.startsWith("http")) return img;
+
+    return ApiService().getImageURL(img);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -241,37 +263,41 @@ bool loding =true;
                     /// 🔹 TOP PROFILE ROW
                     Row(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: Image.asset(
-                            "assets/images/Rectangle 34661070.png",
-                            height: 144,
-                            width: 126,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
+                 ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: getShootTypeImage().isNotEmpty
+                    ? Image.network(
+                  getShootTypeImage(),
+                  height: 144,
+                  width: 126,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return Image.asset(
+                      "assets/images/Rectangle 34661070.png",
+                      height: 144,
+                      width: 126,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                )
+                    : Image.asset(
+                  "assets/images/Rectangle 34661070.png",
+                  height: 144,
+                  width: 126,
+                  fit: BoxFit.cover,
+                ),
+              ),
+
+        const SizedBox(width: 14),
 
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children:  [
-                              Row(
-                                children: [
-                                  Icon(Icons.star, size: 14, color: Colors.amber),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    "${creative?['average_rating'] ?? 0} "
-                                        "(${creative?['total_reviews'] ?? 0})",
-                                    style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                ],
-                              ),
+
                               SizedBox(height: 6),
                               Text(
-                                creative?['name'] ?? '',
+                                booking?['project_name'] ?? '',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -281,7 +307,7 @@ bool loding =true;
                               ),
                               SizedBox(height: 2),
                               Text(
-                                "Videography Specialist",
+                                booking?['shoot_type_name'] ?? '',
                                 style: TextStyle(
                                   fontSize: 12, color: ColorCode.kWhiteOpacity70,
                                   fontFamily: "Outfit",
@@ -290,7 +316,8 @@ bool loding =true;
                               ),
                               SizedBox(height: 10),
                               Text(
-                                "From \$450/Hr",
+
+                                getContentTypeTitle(booking?['content_type']),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: ColorCode.kButtonColor,
@@ -402,7 +429,7 @@ bool loding =true;
 
                   /// 🔹 PAY AT VENUE
                   paymentRadioTile(
-                    title: "Pay at Venue",
+                    title: "Pay Via Stripe",
                     value: 0,
                   ),
 
@@ -410,7 +437,7 @@ bool loding =true;
                     title: "Pay By Credit or Debit Card",
                     value: 1,
                   ),
-                  Container(
+               /*   Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
@@ -441,7 +468,7 @@ bool loding =true;
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
 
 
                 ],
