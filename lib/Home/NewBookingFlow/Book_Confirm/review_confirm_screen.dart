@@ -34,7 +34,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   String creativeImage = "";
   String creativeRate = "";
   String creativeRatingText = "";
-
+  Map<String, dynamic>? crewSummary;
 
   int currentStep = 2;
      bool payFullAdvance = true;
@@ -68,7 +68,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
         booking = data['booking'];
         pricing = data['pricing'];
         heldCreatives = data['held_creatives'] ?? [];
-
+        crewSummary = data['crew_summary']; // <-- Add this line
         /// ✅ SHOOT / PROJECT DETAILS (TOP CARD)
         creativeName = booking?['shoot_type_name'] ?? "—";
         creativeImage = booking?['shoot_type_image_url'] ?? "";
@@ -667,8 +667,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     child: Divider(color: ColorCode.kDividerWhite12,),
                   ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Pricing Summary",
@@ -676,118 +676,117 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                             fontSize: 14,
                             color: ColorCode.white,
                             fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500
-                        ),),
-                    ],
-                  ),
-
-                  Container(
-                    padding: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: ColorCode.k282828,
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        // border: Border.all(color: ColorCode.kButtonColor)
-                    ),
-                    child: Column(
-                      children: [
-
-                        Container(
-                          padding: EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            color: ColorCode.kGoldGradientLight,
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            // border: Border.all(color: ColorCode.kButtonColor)
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-
-                                children: [
-                                  Text("Package Offer",style: TextStyle(color: ColorCode.kHeadingColor, fontSize: 14,fontWeight: FontWeight.w600,fontFamily: "Outfit"),
-                                  ),
-
-                                ],
-                              ),
-                              Divider(color: ColorCode.black,),
-                              _buildCheckRow(
-                                text: "Unlimited Usage Rights",
-                                iconPath: "assets/newbookflow/security-wifi (1).png",
-                              ),
-                              const SizedBox(height: 12),
-
-                              _buildCheckRow(
-                                text: "All Raw Content",
-                                iconPath: "assets/newbookflow/File Image.png",
-                              ),
-                              const SizedBox(height: 12),
-
-                              _buildCheckRow(
-                                text: "Include Edited Deliverable",
-                                iconPath: "assets/newbookflow/Box.png",
-                              ),
-                              const SizedBox(height: 12),
-
-                              _buildCheckRow(
-                                text: "Up to 2 Sets of Revisions",
-                                iconPath: "assets/newbookflow/Refresh.png",
-                              ),
-
-                            ],
-                          ),
-
-
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: ColorCode.kGoldGradientLight,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        SizedBox(height: 10),
-                        Divider(color: ColorCode.kDividerWhite12,),
-                        const SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                          /*  Text(
-                              "Videographer x1",
+                            const Text(
+                              "Package Offer",
                               style: TextStyle(
-                                  fontSize: 14,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400
-                              ),),
-                            Text(
-                              "275.00/-",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400
-                              ),),*/
+                                color: ColorCode.kHeadingColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                            const Divider(color: ColorCode.black),
+
+                            _buildCheckRow(
+                              text: "Unlimited Usage Rights",
+                              iconPath: "assets/newbookflow/security-wifi (1).png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "All Raw Content",
+                              iconPath: "assets/newbookflow/File Image.png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "Include Edited Deliverable",
+                              iconPath: "assets/newbookflow/Box.png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "Up to 2 Sets of Revisions",
+                              iconPath: "assets/newbookflow/Refresh.png",
+                            ),
                           ],
                         ),
-                        // Divider(color: ColorCode.kDividerWhite12,),
-                        const SizedBox(height: 15),
-                        Row(
+                      ),
+
+                      const SizedBox(height: 14),
+                      Divider(color: ColorCode.kDividerWhite12),
+                      // --- SHOOT COST CARD ---
+                      builderPricingCard(
+                        title: "Shoot Cost",
+                        amount: calculateShootCost()['total'],
+                        subtitles: [
+                          if (calculateShootCost()['hasPreProd']) "",
+                          if (calculateShootCost()['hasRush']) "• Rush Fee",
+
+                        ],
+                      ),
+
+                      // --- EDITING SERVICES CARD ---
+                      builderPricingCard(
+                        title: "Editing Services",
+                        amount: (pricing?['editing_amount'] ?? 0).toDouble(),
+                        subtitles: (pricing?['editing_breakdown'] as List? ?? [])
+                            .map((e) => "• ${e['label']}")
+                            .toList(),
+                      ),
+
+                      // --- ADDITIONAL CREW CARD ---
+                      if (calculateAdditionalCrew()['total'] > 0)
+                        builderPricingCard(
+                          title: "Additional Crew",
+                          amount: calculateAdditionalCrew()['total'],
+                          subtitles: (calculateAdditionalCrew()['counts'] as Map<int, int>)
+                              .entries
+                              .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
+                              .toList(),
+                        ),
+
+                      const SizedBox(height: 10),
+                      const Divider(color: ColorCode.kDividerWhite12),
+
+                      /// 🔹 TOTAL
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            const Text(
                               "Total Amount",
                               style: TextStyle(
-                                  fontSize: 16,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w600
-                              ),),
+                                fontSize: 16,
+                                color: ColorCode.white,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             Text(
-                              "\$${pricing?['total_amount'] ?? 0}",                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w600
-                              ),),
+                              "\$${pricing?['total_amount']?.toStringAsFixed(2) ?? "0.00"}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: ColorCode.kButtonColor, // Making total stand out
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-
+                      ),
+                    ],
+                  )
 
 
                 ],
@@ -840,6 +839,13 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     );
 
   }
+  String formatAmount(num amount) {
+    final isNegative = amount < 0;
+    final value = amount.abs().toStringAsFixed(2);
+    return isNegative ? "-\$$value" : "\$$value";
+  }
+
+
   Widget infoRowBlack(IconData icon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1107,5 +1113,122 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     );
   }
 
+  Widget builderPricingCard({
+    required String title,
+    required double amount,
+    required List<String> subtitles,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A), // Darker background for the cards
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Outfit",
+                ),
+              ),
+              Text(
+                "\$${NumberFormat('#,##0.00').format(amount)}",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Outfit",
+                ),
+              ),
+            ],
+          ),
+      /*    if (subtitles.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              children: subtitles
+                  .map((sub) => Text(
+                sub,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
+                  fontFamily: "Outfit",
+                ),
+              ))
+                  .toList(),
+            ),
+          ]*/
+        ],
+      ),
+    );
+  }
+  /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
+  Map<String, dynamic> calculateShootCost() {
+    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
+    double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
+    double shootCost = preProd + rushFee;
 
+    // Use crewSummary instead of bookingSummaryData
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
+
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      // API keys are strings "1", "2", so we convert to string for lookup
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
+
+      if (current < required) {
+        shootCost += (c['amount'] ?? 0).toDouble();
+        processedCount[roleId] = current + 1;
+      }
+    }
+
+    return {
+      "total": shootCost,
+      "hasPreProd": preProd > 0,
+      "hasRush": rushFee > 0,
+    };
+  }
+
+  Map<String, dynamic> calculateAdditionalCrew() {
+    double additionalTotal = 0;
+    Map<int, int> extraCount = {};
+
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
+
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
+
+      if (current < required) {
+        processedCount[roleId] = current + 1;
+      } else {
+        additionalTotal += (c['amount'] ?? 0).toDouble();
+        extraCount[roleId] = (extraCount[roleId] ?? 0) + 1;
+      }
+    }
+
+    return {
+      "total": additionalTotal,
+      "counts": extraCount,
+    };
+  }
 }

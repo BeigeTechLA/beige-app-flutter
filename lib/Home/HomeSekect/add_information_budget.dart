@@ -23,6 +23,8 @@ bool isLoading =false;
   final TextEditingController referenceLinkcontroller  = TextEditingController();
   final TextEditingController notescontroller  = TextEditingController();
 
+  double? eventLatitude;
+  double? eventLongitude;
 
   Future<void> select_location() async {
     setState(() => isLoading = true);
@@ -36,10 +38,12 @@ bool isLoading =false;
           "reference_link": referenceLinkcontroller.text.trim(),
           "notes": notescontroller.text.trim(),
           "budget_min": budgetRange.start.toInt(),
+          "event_latitude": eventLatitude,
+          "event_longitude": eventLongitude,
           "budget_max": budgetRange.end.toInt(),
         },
       );
-
+      debugPrint("📤 ADD INFORMATION PAYLOAD:");
       if (response != null && response['error'] == false) {
         /// ✅ API success → next screen
         Navigator.push(

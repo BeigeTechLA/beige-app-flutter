@@ -665,27 +665,27 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     final String finalImage =
     imageUrl.isNotEmpty ? imageUrl : "assets/images/home2.png";
 
-    final String contentType =
-        shoot['content_type'] ?? ''; // ✅ IMPORTANT
-
+    final String projectName = shoot['project_name'] ?? '';
+    final String contentType = shoot['content_type'] ?? '';
 
     return GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => UpcomingBookingEventSummary(
-            bookingId: shoot['booking_id'],
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => UpcomingBookingEventSummary(
+              bookingId: shoot['booking_id'],
+              contentType: contentType,
+            ),
           ),
-        ),
-      );
-    },
+        );
+      },
       child: bookingCard(
         imagePath: finalImage,
-        title: shoot['project_name'] ?? '',
-        date: shoot['event_date'] ?? '',
+        title: projectName,
+        date: shoot['event_date'],
         time: "${shoot['start_time']} - ${shoot['end_time']}",
-        contentType: contentType, // ✅ PASS HERE
+        contentType: contentType,
         showEditIcon: true,
         buttonText: "Manage Booking",
         onButtonTap: () {
@@ -694,14 +694,14 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             MaterialPageRoute(
               builder: (_) => UpcomingEventSummaryManagebooking(
                 bookingId: shoot['booking_id'],
-                projectName: shoot['project_name'],
+                projectName: projectName,
+                contentType: contentType,
                 eventDate: shoot['event_date'],
                 startTime: shoot['start_time'],
                 endTime: shoot['end_time'],
                 durationHours: shoot['duration_hours'],
                 location: shoot['location'],
                 imageUrl: finalImage,
-                contentType: contentType, // ✅ PASS TO NEXT SCREEN
               ),
             ),
           );
@@ -709,6 +709,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       ),
     );
   }
+
 
 
 

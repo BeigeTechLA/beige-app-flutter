@@ -32,6 +32,7 @@ class BuildYourCreativeProfileSignUp extends StatefulWidget {
 class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfileSignUp> {
 
 
+
   String? selectedDistance;
 
   File? profileImage;
@@ -45,6 +46,7 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
+
 
   String selectedAddress = "Search or select location";
 
@@ -583,11 +585,16 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
       return;
     }
 
+    if (currentLatLng == null) {
+      _showSnack("Please select location on map");
+      setState(() => isLoggingIn = false);
+      return;
+    }
+
     setState(() => isLoggingIn = true);
 
 
 
-    /// 🟢 DEBUG
     debugPrint("📸 PROFILE IMAGE: ${profileImage!.path}");
 
     try {
@@ -597,9 +604,11 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
           "first_name": firstNameController.text.trim(),
           "last_name": lastNameController.text.trim(),
           "email": emailController.text.trim(),
-          "password": passwordController.text.trim(), // "1" bhi jayega
+          "password": passwordController.text.trim(),
           "location": searchController.text.trim(),
-          "working_distance": selectedDistance!, // ✅ never empty now
+          "working_distance": selectedDistance!,
+          "lat": currentLatLng!.latitude.toString(),
+          "lng": currentLatLng!.longitude.toString(),
         },
         profileImage!,
       );

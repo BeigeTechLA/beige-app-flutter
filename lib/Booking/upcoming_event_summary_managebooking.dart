@@ -26,7 +26,8 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
      this.endTime,
      this.durationHours,
      this.location,
-     this.imageUrl, this.contentType,
+     this.imageUrl,
+    this.contentType,
   });
 
   @override

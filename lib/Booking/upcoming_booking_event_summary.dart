@@ -8,8 +8,9 @@ import '../utility/ColorCode.dart';
 
 class UpcomingBookingEventSummary extends StatefulWidget {
   final int bookingId;
+  final String? contentType;
 
-  const UpcomingBookingEventSummary({super.key, required this.bookingId});
+  const UpcomingBookingEventSummary({super.key, required this.bookingId, this.contentType});
 
   @override
   State<UpcomingBookingEventSummary> createState() =>
@@ -186,6 +187,14 @@ class _UpcomingBookingEventSummaryState
                             color: Colors.white70,
                           ),
                         ),
+                        Text(
+                        widget.contentType!,
+                          style: const TextStyle(
+                            fontFamily: "outfit",
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -243,17 +252,25 @@ class _UpcomingBookingEventSummaryState
                         children: [
       
                           /// 🔹 EVENT NAME & TYPE
-                           Text(
-                             "${bookingData?['event']?['name'] ?? ""} • "
-                                 "${bookingData?['event']?['type'] ?? ""}",
-                            style: TextStyle(
+                          Text(
+                            bookingData?['event']?['name'] ?? "",
+                            style: const TextStyle(
                               fontFamily: "Outfit",
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
                             ),
                           ),
-                           SizedBox(height: 6),
+
+                          SizedBox(height: 6),
+                          Text(
+                            bookingData?['event']?['type'] ?? "",
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
                          /*  Text(
                             "Wedding / 01",
                             style: TextStyle(
