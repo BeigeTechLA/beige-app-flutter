@@ -4,12 +4,14 @@ import 'dart:ui';
 
 import 'package:beige/Creative/creative_sign_up/professional_details_sing_up.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:image_cropper/image_cropper.dart';
+
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource, XFile;
 import 'package:lottie/lottie.dart' hide Marker;
 import 'package:path_provider/path_provider.dart';
@@ -93,15 +95,23 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
   String? selectedStudio;
 
   TextEditingController searchController = TextEditingController();
-
-
-
+  bool _isPlusCode(String value) {
+    return RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$').hasMatch(value);
+  }
   @override
   void initState() {
     super.initState();
+
+    _locationFocus.addListener(() {
+      if (_locationFocus.hasFocus) {
+        setState(() {
+          showMap = true;
+        });
+      }
+    });
+
     _getCurrentLocation();
   }
-
 
 
   Future<void> searchLocation(String query) async {
@@ -185,6 +195,45 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     setState(() {
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
+  }
+
+
+  Future<void> _updateLocationFromLatLng(LatLng latLng) async {
+    setState(() {
+      currentLatLng = latLng;
+    });
+
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(latLng, 14),
+    );
+
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+
+        // 🔥 BUILD CLEAN ADDRESS (NO PLUS CODE)
+        final parts = <String>[
+          if (p.name != null && !_isPlusCode(p.name!)) p.name!,
+          if (p.subLocality != null) p.subLocality!,
+          if (p.locality != null) p.locality!,
+          if (p.administrativeArea != null) p.administrativeArea!,
+        ];
+
+        selectedAddress = parts.join(', ');
+
+        searchController.text = selectedAddress;
+        searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: searchController.text.length),
+        );
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
   }
 
 
@@ -799,85 +848,87 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
                     SizedBox(height: 20),
 
-
-                    GooglePlaceAutoCompleteTextField(
-                      textEditingController: searchController,
-                      googleAPIKey: GoogleConfig.placesApiKey,
-                      debounceTime: 600,
-                      isLatLngRequired: true,
-                      focusNode: _locationFocus, // ✅ ADD THIS
-
-                      textStyle: const TextStyle(
-                        color: ColorCode.white,
-                        fontFamily: "Outfit",
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.8,
+                        ),
                       ),
+                      child: GooglePlaceAutoCompleteTextField(
+                        textEditingController: searchController,
+                        focusNode: _locationFocus, // ✅ ADD THIS
 
-                      inputDecoration: InputDecoration(
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        hintText: "Search or select location",
-                        hintStyle: const TextStyle(
-                          color: ColorCode.kWhiteOpacity70,
+                        googleAPIKey: GoogleConfig.placesApiKey,
+                        debounceTime: 600,
+
+                        isLatLngRequired: true,
+
+
+                        textStyle: const TextStyle(
+                          color: ColorCode.white,
+                          fontFamily: "Outfit",
+                          fontSize: 14,
                         ),
-                        suffixIcon: const Icon(
-                          Icons.location_on_outlined,
-                          color: ColorCode.kWhiteOpacity70,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
+
+                        inputDecoration: const InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          hintText: "Search or select location",
+                          hintStyle: TextStyle(
                             color: ColorCode.kWhiteOpacity70,
-                            width: 0.5,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          suffixIcon: Padding(
+                            padding: EdgeInsets.only(right: 8),
+                            child: Icon(
+                              Icons.location_on_outlined,
+                              color: ColorCode.kWhiteOpacity70,
+                            ),
                           ),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: ColorCode.kButtonColor,
-                            width: 1,
-                          ),
-                        ),
+                        getPlaceDetailWithLatLng: (prediction) async {
+                          final latLng = LatLng(
+                            double.parse(prediction.lat!),
+                            double.parse(prediction.lng!),
+                          );
+
+                          _locationFocus.unfocus();
+
+                          await _updateLocationFromLatLng(latLng);
+
+                          setState(() {
+                            currentLatLng = latLng;
+                            selectedAddress = prediction.description ?? "";
+                            showMap = true;
+                          });
+
+                          searchController.text = selectedAddress;
+                          searchController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: searchController.text.length),
+                          );
+
+                          mapController?.animateCamera(
+                            CameraUpdate.newLatLngZoom(latLng, 14),
+                          );
+                        },
+
+
+                        itemClick: (prediction) {
+                          searchController.text = prediction.description ?? "";
+                          searchController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: searchController.text.length),
+                          );
+                        },
+
+                        isCrossBtnShown: true,
                       ),
-
-                      /// ✅ PLACE SELECT
-                      getPlaceDetailWithLatLng: (prediction) async {
-                        final latLng = LatLng(
-                          double.parse(prediction.lat!),
-                          double.parse(prediction.lng!),
-                        );
-
-                        setState(() {
-                          currentLatLng = latLng;
-                          selectedAddress = prediction.description ?? "";
-                          searchController.text = selectedAddress;
-                        });
-
-                        // ✅ REAL FIX — EMAIL PE JUMP BAND
-                        // FocusScope.of(context).requestFocus(_dummyFocus);
-
-                        mapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(latLng, 14),
-                        );
-                      },
-
-
-                      /// ✅ ITEM CLICK
-                      itemClick: (prediction) {
-                        setState(() {
-                          selectedAddress = prediction.description ?? "";
-                          searchController.text = selectedAddress;
-                        });
-
-                        // ✅ focus remove
-                        _locationFocus.unfocus();
-                      },
-
-
-
-                      isCrossBtnShown: true,
                     ),
 
 
@@ -886,46 +937,57 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
                     SizedBox(height: 20),
 
                     /// 🗺️ MAP WITH FIXED HEIGHT
-                    SizedBox(
-                      height: 280,
-                      child:ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: currentLatLng == null
-                            ? const Center(child: CircularProgressIndicator())
-                            : GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: currentLatLng!,
-                            zoom: 14,
-                          ),
-                          myLocationEnabled: true,
-                          myLocationButtonEnabled: true,
-                          zoomControlsEnabled: true,
-                          compassEnabled: true,
-                          onMapCreated: (controller) {
-                            mapController = controller;
-                            controller.setMapStyle(_darkMapStyle);
-                          },
-                          markers: {
-                            Marker(
-                              markerId: const MarkerId("selected"),
-                              position: currentLatLng!,
+                      if (showMap)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: SizedBox(
+                            height: 280,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: currentLatLng == null
+                                  ? const Center(child: CircularProgressIndicator())
+                                  :GoogleMap(
+                                initialCameraPosition: CameraPosition(
+                                  target: currentLatLng!,
+                                  zoom: 14,
+                                ),
+
+                                myLocationEnabled: true,
+                                myLocationButtonEnabled: true,
+                                zoomControlsEnabled: true,
+                                compassEnabled: false,
+
+                                // 🔥 IMPORTANT FIX (touch enable)
+                                gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                                  Factory<OneSequenceGestureRecognizer>(
+                                        () => EagerGestureRecognizer(),
+                                  ),
+                                },
+
+                                onMapCreated: (controller) {
+                                  mapController = controller;
+                                  controller.setMapStyle(_darkMapStyle);
+                                },
+
+                                markers: {
+                                  Marker(
+                                    markerId: const MarkerId("selected"),
+                                    position: currentLatLng!,
+                                  ),
+                                },
+
+                                onTap: (latLng) async {
+                                  await _updateLocationFromLatLng(latLng);
+                                },
+                              ),
+
                             ),
-                          },
-                          onTap: (latLng) async {
-                            setState(() {
-                              currentLatLng = latLng;
-                            });
-                            await getAddressFromLatLng(latLng);
-                          },
+                          ),
                         ),
 
 
-                      ),
-                    ),
 
-
-
-                    SizedBox(height: 20),
+              SizedBox(height: 20),
 
                     _workingDistanceDropdown(),
                     SizedBox(height: 20),

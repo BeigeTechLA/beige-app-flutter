@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,13 +27,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   int currentStep = 1;
   bool loding   = true;
-  int quantity = 0;
-  int get totalQuantity => includedQuantity + additionalQuantity;
 
-  int includedQuantity = 1;          // 🔒 fixed
-  int additionalQuantity = 0;        // 👈 default 0
-  bool addAdditional = false;        // Yes / No
-  bool isAdditionalSelected = false; // checkbox
+ // checkbox
   // quantity = totalQuantity;
 
 
@@ -51,7 +48,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   String? selectedStudio;
   bool showMap = false;
-  bool isLoading = false;
+
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
@@ -61,8 +58,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   final TextEditingController additionalDetailsController =
   TextEditingController();
 
-  final TextEditingController referenceLinksController =
-  TextEditingController();
+  final TextEditingController referenceLinksController = TextEditingController();
+
 
   bool isSubmitting = false;
 
@@ -141,6 +138,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     return crew;
   }
 
+  bool _isPlusCode(String value) {
+    return RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$').hasMatch(value);
+  }
 
   String getTopSummaryText() {
     List<String> parts = [];
@@ -194,6 +194,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
+    locationFocusNode.addListener(() {
+      if (locationFocusNode.hasFocus) {
+        setState(() {
+          showMap = true; // 🔥 TextField click → map show
+        });
+      }
+    });
   }
 
   Future<void> searchLocation(String query) async {
@@ -239,9 +246,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       debugPrint("Reverse geocode error: $e");
     }
   }
-
-
-
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -276,7 +280,43 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   }
 
 
+  Future<void> _updateLocationFromLatLng(LatLng latLng) async {
+    setState(() {
+      currentLatLng = latLng;
+    });
 
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(latLng, 14),
+    );
+
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+
+        // 🔥 BUILD CLEAN ADDRESS (NO PLUS CODE)
+        final parts = <String>[
+          if (p.name != null && !_isPlusCode(p.name!)) p.name!,
+          if (p.subLocality != null) p.subLocality!,
+          if (p.locality != null) p.locality!,
+          if (p.administrativeArea != null) p.administrativeArea!,
+        ];
+
+        selectedAddress = parts.join(', ');
+
+        searchController.text = selectedAddress;
+        searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: searchController.text.length),
+        );
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
 
 
   @override
@@ -753,6 +793,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       double.parse(prediction.lng!),
                     );
 
+                    locationFocusNode.unfocus(); // 🔥 keyboard close
+
+                    await _updateLocationFromLatLng(latLng);
                     setState(() {
                       currentLatLng = latLng;
                       selectedAddress = prediction.description ?? "";
@@ -783,46 +826,58 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
 
 
-              SizedBox(height: 20),
-        
+              SizedBox(height: 10),
+
               /// 🗺️ MAP WITH FIXED HEIGHT
-              SizedBox(
-                height: 280,
-                child:ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: currentLatLng == null
-                      ? const Center(child: CircularProgressIndicator())
-                      : GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: currentLatLng!,
-                      zoom: 14,
-                    ),
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-                    zoomControlsEnabled: true,
-                    compassEnabled: true,
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                      controller.setMapStyle(_darkMapStyle);
-                    },
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId("selected"),
-                        position: currentLatLng!,
+              if (showMap)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: SizedBox(
+                  height: 280,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: currentLatLng == null
+                        ? const Center(child: CircularProgressIndicator())
+                        :GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: currentLatLng!,
+                        zoom: 14,
                       ),
-                    },
-                    onTap: (latLng) async {
-                      setState(() {
-                        currentLatLng = latLng;
-                      });
-                      await getAddressFromLatLng(latLng);
-                    },
+
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                      zoomControlsEnabled: true,
+                      compassEnabled: false,
+
+                      // 🔥 IMPORTANT FIX (touch enable)
+                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                        Factory<OneSequenceGestureRecognizer>(
+                              () => EagerGestureRecognizer(),
+                        ),
+                      },
+
+                      onMapCreated: (controller) {
+                        mapController = controller;
+                        controller.setMapStyle(_darkMapStyle);
+                      },
+
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId("selected"),
+                          position: currentLatLng!,
+                        ),
+                      },
+
+                      onTap: (latLng) async {
+                        await _updateLocationFromLatLng(latLng);
+                      },
+                    ),
+
                   ),
-        
-        
                 ),
               ),
-        
+
+
               SizedBox(height: 20),
               TextField(
                 controller: additionalDetailsController,

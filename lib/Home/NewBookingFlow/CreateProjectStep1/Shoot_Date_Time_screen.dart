@@ -198,67 +198,10 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
 // ... (Keep your imports and class definition as they are)
 
-  // Helper to format TimeOfDay to String for the Controllers
-  String _formatTimeOfDay(TimeOfDay tod) {
-    final now = DateTime.now();
-    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
-    // Use your preferred format: "09:00 AM"
-    final hour = tod.hourOfPeriod == 0 ? 12 : tod.hourOfPeriod;
-    final minute = tod.minute.toString().padLeft(2, '0');
-    final period = tod.period == DayPeriod.am ? "AM" : "PM";
-    return "${hour.toString().padLeft(2, '0')}:$minute $period";
-  }
 
   // Helper to update both controller text and variables
-  void _updateTimeControllers() {
-    if (startTime != null) {
-      startTimeController.text = _formatTimeOfDay(startTime!);
-    }
-    if (endTime != null) {
-      endTimeController.text = _formatTimeOfDay(endTime!);
-    }
-  }
 
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime.now(),
-  //     lastDate: DateTime(2100),
-  //     builder: (context, child) {
-  //       return Theme(
-  //         data: ThemeData.dark().copyWith(
-  //           colorScheme: const ColorScheme.dark(primary: ColorCode.kButtonColor),
-  //         ),
-  //         child: child!,
-  //       );
-  //     },
-  //   );
-  //
-  //   if (picked != null && mounted) {
-  //     setState(() {
-  //       selectedDate = picked;
-  //       dateController.text = "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
-  //
-  //       // --- NEW AUTO-FILL LOGIC ---
-  //       if (isTodaySelected()) {
-  //         // 1. If Today: Set Start Time to Now + 4 Hours
-  //         DateTime nowPlus4 = DateTime.now().add(const Duration(hours: 4));
-  //         startTime = TimeOfDay.fromDateTime(nowPlus4);
-  //
-  //         // Set End Time to Start Time + 1 Hour (or any default you like)
-  //         DateTime endPlus1 = nowPlus4.add(const Duration(hours: 1));
-  //         endTime = TimeOfDay.fromDateTime(endPlus1);
-  //       } else {
-  //         // 2. If Future Date: Set Default 9 AM to 5 PM
-  //         startTime = const TimeOfDay(hour: 9, minute: 0);
-  //         endTime = const TimeOfDay(hour: 17, minute: 0);
-  //       }
-  //
-  //       _updateTimeControllers();
-  //     });
-  //   }
-  // }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -271,43 +214,47 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
         return Theme(
           data: ThemeData.dark().copyWith(
             useMaterial3: true,
-            colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor, // Your Beige color
-              onPrimary: Colors.black,         // Black text on selection
-              surface: Color(0xFF121212),      // Background
-              onSurface: Colors.white,         // Normal text
-            ),
             dialogBackgroundColor: const Color(0xFF121212),
 
-            // Corrected DatePickerTheme
+            colorScheme: const ColorScheme.dark(
+              primary: ColorCode.kButtonColor,
+              onPrimary: Colors.black,
+              surface: Color(0xFF121212),
+              onSurface: Colors.white,
+            ),
+
             datePickerTheme: DatePickerThemeData(
               backgroundColor: const Color(0xFF121212),
+              dividerColor: Colors.white12,
 
-              // 🔥 This hides the big "Thu, Feb 5" header
-              headerHeadlineStyle: const TextStyle(fontSize: 0, height: 0),
+              // 🔥 HEADER
+              headerHeadlineStyle: const TextStyle(
+                fontFamily: "Unbounded",
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
               headerHelpStyle: const TextStyle(fontSize: 0, height: 0),
-              headerBackgroundColor: const Color(0xFF121212),
+              headerBackgroundColor: Color(0xFF0E0E0E),
 
-              // 🔥 Rounded Square selection (Matches your design)
+              // 🔥 GRID FEEL
               dayShape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
 
-              // Style for the S, M, T, W... labels
               weekdayStyle: const TextStyle(
-                color: Colors.white70,
                 fontFamily: "Outfit",
                 fontSize: 13,
+                color: Colors.white70,
               ),
 
-              // Style for the numbers
               dayStyle: const TextStyle(
                 fontFamily: "Outfit",
                 fontSize: 14,
+                color: Colors.white,
               ),
             ),
 
-            // OK / CANCEL Buttons
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
                 foregroundColor: ColorCode.kButtonColor,
@@ -321,6 +268,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
           child: child!,
         );
       },
+
     );
 
     if (picked != null && mounted) {
