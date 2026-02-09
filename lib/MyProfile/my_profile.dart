@@ -7,6 +7,7 @@ import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import 'Booking_History_screen.dart';
 import 'Favourite_screen.dart';
+import 'app_preferences.dart';
 import 'edit_profile.dart';
 
 class MyProfile extends StatefulWidget {
@@ -406,7 +407,15 @@ class _MyProfileState extends State<MyProfile> {
             ),
             child: Column(
               children: [
-                _menuRow("assets/Icons/mobile-navigator-01.png", "App Preferences"),
+                _menuRow("assets/Icons/mobile-navigator-01.png", "App Preferences",
+                onTap: () {
+          Navigator.push(
+          context,
+          MaterialPageRoute(
+          builder: (_) =>  AppPreferences(),
+          ),
+          );
+          }),
                 _divider(),
                 _menuRow("assets/Icons/Settings Minimalistic.png" ,"Notifications Settings"),
                 _divider(),

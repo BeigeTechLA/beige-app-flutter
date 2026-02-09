@@ -35,7 +35,27 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
 
   Set<int> addedCrewUserIds = {};
+  final List<String> options = [
+    "Top Rated",
+    "Nearest",
+    "Newest Profiles",
+    // "A to Z",
+  ];
 
+  String _getSortKey(int index) {
+    switch (index) {
+      case 0:
+        return "top_rated";
+      case 1:
+        return "nearest";
+      case 2:
+        return "newest";
+      case 3:
+        return "a_z";
+      default:
+        return "nearest";
+    }
+  }
 
   @override
   void initState() {
@@ -207,6 +227,43 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     return true;
   }
 
+  Future<void> _filterCrew({required String sort}) async {
+    setState(() => isLoading = true);
+
+    final String url =
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches"
+        "?sort=$sort&page=1&limit=30";
+
+    // 🔍 PRINT API URL
+    debugPrint("🟡 FILTER API URL => $url");
+
+    try {
+      final response = await ApiService().fetchData(url);
+
+      // 🔍 PRINT FULL RESPONSE
+      debugPrint("🟢 FILTER API RESPONSE => $response");
+
+      if (response != null && response['error'] == false) {
+        final List items = response['data']['items'] ?? [];
+
+        setState(() {
+          crewMatches = items;
+        });
+
+        debugPrint(
+          "✅ FILTER APPLIED: $sort | ITEMS COUNT: ${items.length}",
+        );
+      } else {
+        debugPrint("❌ FILTER API FAILED => $response");
+      }
+    } catch (e, stack) {
+      // 🔥 ERROR + STACK TRACE
+      debugPrint("❌ FILTER API ERROR => $e");
+      debugPrint("📌 STACK TRACE => $stack");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
 
 
   @override
@@ -321,7 +378,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 ),
                 InkWell(
                   onTap: () {
-                    _openFilterDialog(context);
+                    _openFilterDialog(
+                      context,
+                          (sortKey) {
+                        _filterCrew(sort: sortKey);
+                      },
+                    );
                   },
                   child: Image.asset(
                     "assets/Icons/Filter.png",
@@ -330,6 +392,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     color: ColorCode.white,
                   ),
                 ),
+
 
 
               ],
@@ -729,18 +792,13 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     );
   }
 
-  void _openFilterDialog(BuildContext context) {
+  void _openFilterDialog(
+      BuildContext context,
+      Function(String sortKey) onApply,
+      ) {
     int selectedIndex = 1;
     RangeValues priceRange = const RangeValues(100, 15000);
 
-    final List<String> options = [
-      "Top Rated",
-      "Alphabetical A - Z",
-      "Nearest",
-      "Newest Profiles",
-      "Low to High Price",
-      "High to Low Price",
-    ];
 
     showDialog(
       context: context,
@@ -896,7 +954,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                         const SizedBox(height: 14),
 
                         /// PRICE RANGE
-                        Container(
+                    /*    Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             // color: const Color(0xFF1E1E1E),
@@ -951,7 +1009,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               ),
                             ],
                           ),
-                        ),
+                        ),*/
 
                         const SizedBox(height: 16),
 
@@ -997,7 +1055,11 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 ),
                                 child: TextButton(
                                   onPressed: () {
+                                    final sortKey = _getSortKey(selectedIndex);
+
                                     Navigator.pop(context);
+
+                                    onApply(sortKey); // 🔥 YAHI MAIN LINE HAI
                                   },
                                   child: const Text(
                                       "Apply",

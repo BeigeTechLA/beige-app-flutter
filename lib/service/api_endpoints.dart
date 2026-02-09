@@ -39,6 +39,9 @@ class ApiEndpoints {
   static const String my_bookings = "auth/bookings/history";
 
 
+//---------------------------- delete --------------------------
+  static const String user_delete_account = "auth/user/delete-account/request";
+  static const String user_delete = "auth/user/delete-account/confirm";
 
 
 ////------------------ My Shoot ----------------------\\\\

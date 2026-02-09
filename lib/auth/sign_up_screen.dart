@@ -2,6 +2,8 @@ import 'package:beige/ChooseYourRole/choose_your_role_screen.dart';
 import 'package:beige/OnbodingScreen/onboding_screen.dart';
 import 'package:beige/auth/login_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -31,12 +33,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   GoogleMapController? mapController;
   LatLng? currentLatLng;
   final FocusNode locationFocusNode = FocusNode();
-
+  bool showMap = false;
   String selectedAddress = "Search or select location";
   bool isMapOpen = false;          // 👈 map show / hide
   List<Location> searchResults = [];
   FocusNode locationFocus = FocusNode();
-
+  bool _isPlusCode(String value) {
+    return RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$').hasMatch(value);
+  }
   bool get isFormValid {
     return nameController.text.isNotEmpty &&
         emailController.text.isNotEmpty &&
@@ -54,7 +58,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     locationFocus.addListener(() {
       if (locationFocus.hasFocus) {
         setState(() {
-          isMapOpen = true; // 👈 textfield pe click → map open
+          showMap = true; //
         });
       }
     });
@@ -134,6 +138,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
+  Future<void> _updateLocationFromLatLng(LatLng latLng) async {
+    setState(() {
+      currentLatLng = latLng;
+    });
+
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(latLng, 14),
+    );
+
+    try {
+      final placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+
+        // 🔥 BUILD CLEAN ADDRESS (NO PLUS CODE)
+        final parts = <String>[
+          if (p.name != null && !_isPlusCode(p.name!)) p.name!,
+          if (p.subLocality != null) p.subLocality!,
+          if (p.locality != null) p.locality!,
+          if (p.administrativeArea != null) p.administrativeArea!,
+        ];
+
+        selectedAddress = parts.join(', ');
+
+        locationController.text = selectedAddress;
+        locationController.selection = TextSelection.fromPosition(
+          TextPosition(offset: locationController.text.length),
+        );
+      }
+    } catch (e) {
+      debugPrint("Reverse geocode error: $e");
+    }
+  }
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
@@ -152,9 +193,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
     /// 🔴 EMAIL FORMAT VALIDATION
-    if (!isValidEmail(emailController.text.trim())) {
-      _showSnack("Please enter a valid email address");
-      return;
+    bool isValidEmail(String email) {
+      final emailRegex = RegExp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+      );
+      return emailRegex.hasMatch(email);
     }
 
 
@@ -332,127 +375,142 @@ class _SignUpScreenState extends State<SignUpScreen> {
               _buildField("Email ID", emailController),
               SizedBox(height: 20),
 
-              GooglePlaceAutoCompleteTextField(
-                focusNode: locationFocusNode,
-                textEditingController: locationController,
-                googleAPIKey: GoogleConfig.placesApiKey,
-                debounceTime: 600,
-                isLatLngRequired: true,
-
-                textStyle: const TextStyle(
-                  color: ColorCode.white,
-                  fontFamily: "Outfit",
-                ),
-
-                inputDecoration: InputDecoration(
-                  // labelText: "Location*",
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  labelStyle: const TextStyle(
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
                     color: ColorCode.kWhiteOpacity70,
+                    width: 0.8,
+                  ),
+                ),
+                child: GooglePlaceAutoCompleteTextField(
+                  textEditingController: locationController,
+                  focusNode: locationFocus, // ✅ ADD THIS
+
+                  googleAPIKey: GoogleConfig.placesApiKey,
+                  debounceTime: 600,
+
+                  isLatLngRequired: true,
+
+
+                  textStyle: const TextStyle(
+                    color: ColorCode.white,
                     fontFamily: "Outfit",
+                    fontSize: 14,
                   ),
 
-                  hintText: "Search or select location",
-                  hintStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-
-                  suffixIcon: const Icon(
-                    Icons.location_on_outlined,
-                    color: ColorCode.kWhiteOpacity70,
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
+                  inputDecoration: const InputDecoration(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    hintText: "Search or select location",
+                    hintStyle: TextStyle(
                       color: ColorCode.kWhiteOpacity70,
-                      width: 0.5,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    suffixIcon: Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: Icon(
+                        Icons.location_on_outlined,
+                        color: ColorCode.kWhiteOpacity70,
+                      ),
                     ),
                   ),
+                  getPlaceDetailWithLatLng: (prediction) async {
+                    final latLng = LatLng(
+                      double.parse(prediction.lat!),
+                      double.parse(prediction.lng!),
+                    );
 
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kButtonColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
+                    locationFocus.unfocus();
 
-                getPlaceDetailWithLatLng: (prediction) async {
-                  final latLng = LatLng(
-                    double.parse(prediction.lat!),
-                    double.parse(prediction.lng!),
-                  );
+                    await _updateLocationFromLatLng(latLng);
 
-                  setState(() {
-                    currentLatLng = latLng;
+                    setState(() {
+                      currentLatLng = latLng;
+                      selectedAddress = prediction.description ?? "";
+                      showMap = true;
+                    });
+
+                    locationController.text = selectedAddress;
+                    locationController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: locationController.text.length),
+                    );
+
+                    mapController?.animateCamera(
+                      CameraUpdate.newLatLngZoom(latLng, 14),
+                    );
+                  },
+
+
+                  itemClick: (prediction) {
                     locationController.text = prediction.description ?? "";
-                  });
+                    locationController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: locationController.text.length),
+                    );
+                  },
 
-                  mapController?.animateCamera(
-                    CameraUpdate.newLatLngZoom(latLng, 14),
-                  );
-                },
-
-                itemClick: (prediction) {
-                  locationController.text = prediction.description ?? "";
-                  locationController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: locationController.text.length),
-                  );
-                },
-
-                isCrossBtnShown: true,
+                  isCrossBtnShown: true,
+                ),
               ),
 
-
-              if (locationFocusNode.hasFocus && currentLatLng != null)
 
               SizedBox(height: 20),
 
               /// 🗺️ MAP WITH FIXED HEIGHT
-              SizedBox(
-                height: 280,
-                child:ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: currentLatLng == null
-                      ? const Center(child: CircularProgressIndicator())
-                      : GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                        target: currentLatLng!,
-                      zoom: 14,
-                    ),
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-                    zoomControlsEnabled: true,
-                    compassEnabled: true,
-                    onMapCreated: (controller) {
-                      mapController = controller;
-                      controller.setMapStyle(_darkMapStyle);
-                    },
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId("selected"),
-                        position: currentLatLng!,
+              if (showMap)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: SizedBox(
+                    height: 280,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: currentLatLng == null
+                          ? const Center(child: CircularProgressIndicator())
+                          :GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: currentLatLng!,
+                          zoom: 14,
+                        ),
+
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        zoomControlsEnabled: true,
+                        compassEnabled: false,
+
+                        // 🔥 IMPORTANT FIX (touch enable)
+                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                          Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                          ),
+                        },
+
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          controller.setMapStyle(_darkMapStyle);
+                        },
+
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("selected"),
+                            position: currentLatLng!,
+                          ),
+                        },
+
+                        onTap: (latLng) async {
+                          await _updateLocationFromLatLng(latLng);
+                        },
                       ),
-                    },
-                    onTap: (latLng) async {
-                      setState(() {
-                        currentLatLng = latLng;
-                      });
-                      await getAddressFromLatLng(latLng);
-                    },
+
+                    ),
                   ),
-
-
                 ),
-              ),
+
+
               SizedBox(height: 20),
               _buildPasswordField(
                 "Create Password",
