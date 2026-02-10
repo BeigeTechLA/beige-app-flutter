@@ -29,6 +29,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool showConfirmPassword = false;
   bool savePassword = false;
   bool isLoggingIn = false;
+  double? selectedLat;
+  double? selectedLng;
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
@@ -141,6 +143,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<void> _updateLocationFromLatLng(LatLng latLng) async {
     setState(() {
       currentLatLng = latLng;
+      selectedLat = latLng.latitude;   // ✅
+      selectedLng = latLng.longitude;  // ✅
     });
 
     mapController?.animateCamera(
@@ -156,7 +160,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
 
-        // 🔥 BUILD CLEAN ADDRESS (NO PLUS CODE)
         final parts = <String>[
           if (p.name != null && !_isPlusCode(p.name!)) p.name!,
           if (p.subLocality != null) p.subLocality!,
@@ -165,16 +168,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ];
 
         selectedAddress = parts.join(', ');
-
         locationController.text = selectedAddress;
-        locationController.selection = TextSelection.fromPosition(
-          TextPosition(offset: locationController.text.length),
-        );
       }
     } catch (e) {
       debugPrint("Reverse geocode error: $e");
     }
   }
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
@@ -192,14 +192,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _showSnack("Please fill all fields");
       return;
     }
-    /// 🔴 EMAIL FORMAT VALIDATION
-    bool isValidEmail(String email) {
-      final emailRegex = RegExp(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-      );
-      return emailRegex.hasMatch(email);
-    }
 
+    /// ✅ EMAIL VALIDATION
+    if (!isValidEmail(emailController.text.trim())) {
+      _showSnack("Please enter a valid email address");
+      return;
+    }
 
     if (passwordController.text != confirmPasswordController.text) {
       _showSnack("Password and Confirm Password do not match");
@@ -213,42 +211,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => isLoggingIn = true);
 
+    /// 🟡 PAYLOAD
+    final payload = {
+      "name": nameController.text.trim(),
+      "email": emailController.text.trim(),
+      "password": passwordController.text.trim(),
+      "user_type": 3,
+      "location": locationController.text.trim(),
+      "lat": selectedLat,   // ✅
+      "lng": selectedLng,
+
+    };
+
+    /// 🟡 PRINT API & PAYLOAD
+ /*   debugPrint("🟡 SIGNUP API URL => ${ApiEndpoints.singup}");
+    debugPrint("🟡 SIGNUP PAYLOAD => $payload");*/
+
     try {
       final response = await apiService.postData(
         ApiEndpoints.singup,
-        {
-          "name": nameController.text.trim(),
-          "email": emailController.text.trim(),
-          "password": passwordController.text.trim(),
-          "user_type": 3,
-          "location": locationController.text.trim(),
-        },
+        payload,
       );
 
-      if (response != null && response['error'] == false) {
-        await SharedService.setLoginDetails(response);
+      /// 🟢 PRINT FULL RESPONSE
+      debugPrint("🟢 SIGNUP RESPONSE => $response");
 
+      if (response != null) {
+        debugPrint("🟢 ERROR => ${response['error']}");
+        debugPrint("🟢 MESSAGE => ${response['message']}");
+        debugPrint("🟢 DATA => ${response['data']}");
+      }
+
+      if (response != null && response['error'] == false) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => LoginScreen()),
         );
       } else {
-
+        _showSnack(response?['message'] ?? "Signup failed");
       }
     } catch (e) {
-      final error = e.toString().toLowerCase();
-
-      if (error.contains("email")) {
-        _showSnack("Email already exists");
-
-      } else {
-        _showSnack("Something went wrong. Please try again");
-
-      }
+      debugPrint("❌ SIGNUP EXCEPTION => $e");
+      _showSnack(e.toString());
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
+
+
 
 
   void _showSnack(String message) {
@@ -432,18 +442,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                     setState(() {
                       currentLatLng = latLng;
+                      selectedLat = latLng.latitude;   // ✅ SAVE LAT
+                      selectedLng = latLng.longitude;  // ✅ SAVE LNG
                       selectedAddress = prediction.description ?? "";
                       showMap = true;
                     });
 
                     locationController.text = selectedAddress;
-                    locationController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: locationController.text.length),
-                    );
-
-                    mapController?.animateCamera(
-                      CameraUpdate.newLatLngZoom(latLng, 14),
-                    );
                   },
 
 

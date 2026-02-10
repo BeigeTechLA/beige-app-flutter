@@ -296,6 +296,9 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
 
   bool? isEditNeeded;
   bool isSubmitting = false;
+  bool isDateSelected() {
+    return selectedDate != null;
+  }
 
   bool isLoading =true;
   @override
@@ -365,7 +368,127 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   }
 
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+      initialEntryMode: DatePickerEntryMode.calendarOnly, // Hide pencil icon
+      helpText: '', // Remove "Select Date" text
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            useMaterial3: true,
+            dialogBackgroundColor: const Color(0xFF121212),
 
+            colorScheme: const ColorScheme.dark(
+              primary: ColorCode.kButtonColor,
+              onPrimary: Colors.black,
+              surface: Color(0xFF121212),
+              onSurface: Colors.white,
+            ),
+
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: const Color(0xFF121212),
+              dividerColor: Colors.white12,
+
+              // 🔥 HEADER
+              headerHeadlineStyle: const TextStyle(
+                fontFamily: "Unbounded",
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+              headerHelpStyle: const TextStyle(fontSize: 0, height: 0),
+              headerBackgroundColor: Color(0xFF0E0E0E),
+
+              // 🔥 GRID FEEL
+              dayShape: WidgetStateProperty.all(
+                RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              ),
+
+              weekdayStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 13,
+                color: Colors.white70,
+              ),
+
+              dayStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: ColorCode.kButtonColor,
+                textStyle: const TextStyle(
+                  fontFamily: "Unbounded",
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+
+    );
+
+    if (picked != null && mounted) {
+      setState(() {
+        selectedDate = picked;
+        dateController.text = "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
+
+        // --- AUTO-FILL LOGIC ---
+        if (isTodaySelected()) {
+          DateTime nowPlus4 = DateTime.now().add(const Duration(hours: 4));
+          startTime = TimeOfDay.fromDateTime(nowPlus4);
+          DateTime endDefault = nowPlus4.add(const Duration(hours: 2));
+          endTime = TimeOfDay.fromDateTime(endDefault);
+        } else {
+          startTime = const TimeOfDay(hour: 9, minute: 0);
+          endTime = const TimeOfDay(hour: 17, minute: 0);
+        }
+
+        _updateTimeText(startTimeController, startTime!);
+        _updateTimeText(endTimeController, endTime!);
+      });
+    }
+  }
+
+  // Helper method to format time (Make sure this is inside your _ShootDateTimeScreenState class)
+  void _updateTimeText(TextEditingController controller, TimeOfDay picked) {
+    final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod.toString().padLeft(2, '0');
+    final minute = picked.minute.toString().padLeft(2, '0');
+    final period = picked.period == DayPeriod.am ? "AM" : "PM";
+    controller.text = "$hour:$minute $period";
+  }
+  TimeOfDay getMinAllowedTime() {
+    final now = DateTime.now().add(const Duration(hours: 4));
+    return TimeOfDay(hour: now.hour, minute: now.minute);
+  }
+
+  bool isTodaySelected() {
+    if (selectedDate == null) return false;
+    final now = DateTime.now();
+    return selectedDate!.year == now.year &&
+        selectedDate!.month == now.month &&
+        selectedDate!.day == now.day;
+  }
+
+
+  DateTime minDateTimeForToday() {
+    return DateTime.now().add(const Duration(hours: 4));
+  }
+
+  bool isMinTimeNextDay() {
+    final min = minDateTimeForToday();
+    final now = DateTime.now();
+    return min.day != now.day;
+  }
   Future<void> _ShootDate_Time() async {
     if (!isFormValid) return;
 
@@ -407,6 +530,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   }
 
 
+/*
 
 
   Future<void> _selectDate(BuildContext context) async {
@@ -459,45 +583,47 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
       });
     }
   }
+*/
 
   Future<void> _selectTime(
       BuildContext context,
       TextEditingController controller,
-      TimeOfDay? initialTime,
-      Function(TimeOfDay) onTimeSelected,
+      bool isStartTime,
       ) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: initialTime ?? TimeOfDay.now(),
 
+    // Use current values as initial picker time
+    TimeOfDay initial = isStartTime ? (startTime ?? TimeOfDay.now()) : (endTime ?? TimeOfDay.now());
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
             dialogBackgroundColor: const Color(0xFF121212),
 
             colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor, // selected bg
-              onPrimary: Colors.white,         // selected text
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
+              primary: ColorCode.kButtonColor, // Selected circle/hand color
+              onPrimary: Colors.white,         // Text on primary
+              surface: Color(0xFF1E1E1E),      // Picker background
+              onSurface: Colors.white,         // Normal text color
             ),
 
             timePickerTheme: const TimePickerThemeData(
               backgroundColor: Color(0xFF121212),
               dialBackgroundColor: Color(0xFF121212),
               dialHandColor: Colors.white,
-              dialTextColor: Colors.grey, // normal numbers thode soft
-              // 🔥 Hour / Minute box
-              hourMinuteColor: ColorCode.kButtonColor,
-              hourMinuteTextColor: Colors.black, // ✅ BLACK text inside time
+              dialTextColor: Colors.grey,
 
-              // 🔥 AM / PM
+              // 🔥 Hour / Minute box colors
+              hourMinuteColor: ColorCode.kButtonColor,
+              hourMinuteTextColor: Colors.black, // ✅ BLACK text inside selected time box
+
+              // 🔥 AM / PM section
               dayPeriodColor: ColorCode.kButtonColor,
               dayPeriodTextColor: Colors.white, // ✅ WHITE text in AM / PM
 
-
-
-              // 🔥 Buttons
+              // 🔥 Action Buttons (OK / CANCEL)
               confirmButtonStyle: ButtonStyle(
                 foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
               ),
@@ -505,24 +631,52 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                 foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
               ),
             ),
-
           ),
           child: child!,
         );
       },
     );
 
-    if (picked != null && mounted) {
-      setState(() {
-        onTimeSelected(picked);
+    if (picked == null || !mounted) return;
 
-        final hour = picked.hourOfPeriod.toString().padLeft(2, '0');
-        final minute = picked.minute.toString().padLeft(2, '0');
-        final period = picked.period == DayPeriod.am ? "AM" : "PM";
+    // 🔒 HARD BLOCK: 4-HOUR RULE FOR TODAY
+    if (isTodaySelected()) {
+      final now = DateTime.now();
+      final minAllowed = now.add(const Duration(hours: 4));
 
-        controller.text = "$hour:$minute $period";
-      });
+      // Create a DateTime from the picked time to compare easily
+      final pickedDT = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, picked.hour, picked.minute);
+
+      if (pickedDT.isBefore(minAllowed)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("For today, please select a time at least 4 hours from now.")),
+        );
+        return;
+      }
     }
+
+    setState(() {
+      if (isStartTime) {
+        startTime = picked;
+        _updateTimeText(startTimeController, picked);
+
+        // Validation: If Start is now after End, reset End to Start + 1 hour
+        if (endTime != null && !isEndTimeAfterStart(startTime!, endTime!)) {
+          endTime = TimeOfDay(hour: (startTime!.hour + 1) % 24, minute: startTime!.minute);
+          _updateTimeText(endTimeController, endTime!);
+        }
+      } else {
+        // Validation: Check if End is after Start
+        if (startTime != null && !isEndTimeAfterStart(startTime!, picked)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("End time must be after Start time")),
+          );
+          return;
+        }
+        endTime = picked;
+        _updateTimeText(endTimeController, picked);
+      }
+    });
   }
 
 
@@ -991,12 +1145,14 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                       controller: startTimeController,
                       label: "Start Time*",
                       onTap: () {
-                        _selectTime(
-                          context,
-                          startTimeController,
-                          startTime,
-                              (time) => startTime = time,
-                        );
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        // Updated call: 3 arguments (context, controller, isStartTime)
+                        _selectTime(context, startTimeController, true);
                       },
                     ),
 
@@ -1006,12 +1162,14 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                       controller: endTimeController,
                       label: "End Time*",
                       onTap: () {
-                        _selectTime(
-                          context,
-                          endTimeController,
-                          endTime,
-                              (time) => endTime = time,
-                        );
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        // Updated call: 3 arguments (context, controller, isStartTime)
+                        _selectTime(context, endTimeController, false);
                       },
                     ),
 

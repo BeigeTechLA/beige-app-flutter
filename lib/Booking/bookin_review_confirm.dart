@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:beige/Home/HomeSekect/payment_method.dart';
 import 'package:flutter/material.dart';
 
 import '../service/api_endpoints.dart';
@@ -22,6 +23,8 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   int selectedIndex = 0;
 bool loding =true;
 
+  Map<String, dynamic>? pricing;
+  List<dynamic> pricingBreakdown = [];
 
 
   List<dynamic> savedCards = [];
@@ -75,7 +78,8 @@ bool loding =true;
         final data = response['data'] ?? {};
         print("📦 DATA OBJECT:");
         print(data);
-
+        pricing = data['pricing'];
+        pricingBreakdown = pricing?['breakdown'] ?? [];
         creative = data['creative'];
         booking = data['booking'];
         totals = data['totals'];
@@ -355,7 +359,6 @@ bool loding =true;
 
                     const SizedBox(height: 12),
 
-                    /// ⬜ WHITE INFO BOX
                     Container(
                       padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
@@ -370,7 +373,7 @@ bool loding =true;
                           infoRowBlack(
                             Icons.access_time,
                             "${booking?['start_time']} - ${booking?['end_time']} "
-                                "(${booking?['duration_hours']}h)",
+                                "(${pricing?['duration_hours'] ?? 0}h)",
                           ),
                           const SizedBox(height: 10),
                           infoRowBlack(
@@ -409,12 +412,12 @@ bool loding =true;
                         ),),
                       GestureDetector(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => Specialities(),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaymentMethodScreen(bookingId:widget.bookingId),
+                            ),
+                          );
                         },
                         child: Image.asset(
                           "assets/Icons/rightside.png",
@@ -483,16 +486,18 @@ bool loding =true;
                 children: [
                   Text(
                     "Payment Details",
-                    style:    TextStyle(
-                        fontSize: 14,
-                        color: ColorCode.white,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w500
-                    ),),
-
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorCode.white,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ],
               ),
-              SizedBox(height: 8),
+
+              const SizedBox(height: 8),
+
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -502,34 +507,29 @@ bool loding =true;
                 child: Column(
                   children: [
 
-                    priceRow(
-                      "Base Package",
-                      "\$ ${totals?['base_amount'] ?? 0}.00/-",
-                    ),
-
-                    if ((totals?['addons_amount'] ?? 0) > 0)
-                      priceRow(
-                        "Add-ons",
-                        "\$ ${totals?['addons_amount']}.00/-",
-                      ),
-
-                    if ((totals?['discount_amount'] ?? 0) > 0)
-                      priceRow(
-                        "Discount",
-                        "- \$ ${totals?['discount_amount']}.00/-",
-                        isDiscount: true,
-                      ),
+                    /// 🔹 Dynamic pricing rows from API
+                    ...pricingBreakdown.map((item) {
+                      return priceRow(
+                        item['label'] ?? '',
+                        "\$ ${item['amount'] ?? 0}.00/-",
+                      );
+                    }).toList(),
 
                     const Divider(color: Colors.white30),
 
+                    /// 🔹 TOTAL (single source of truth)
                     priceRow(
                       "Total",
-                      "\$ ${totals?['total_amount'] ?? 0}.00/-",
+                      "\$ ${pricing?['total_amount'] ?? 0}.00/-",
                       isTotal: true,
                     ),
                   ],
                 ),
               ),
+
+              const SizedBox(height: 28),
+              Divider(color: Colors.white30),
+
               SizedBox(height: 28),
               Divider(color: Colors.white30,),
               /// 📝 NOTES
@@ -612,8 +612,9 @@ bool loding =true;
               mainAxisSize: MainAxisSize.min,
               children:  [
                 Text(
-                  "\$ ${totals?['total_amount'] ?? 0}.00/-",
-                  // "\$ ${totals?['total_amount'] ?? 0}.00/-",
+            "\$ ${pricing?['total_amount'] ?? 0}.00/-",
+
+        // "\$ ${totals?['total_amount'] ?? 0}.00/-",
                   style: TextStyle(
                     fontFamily: "Unbounded",
                     fontSize: 16,

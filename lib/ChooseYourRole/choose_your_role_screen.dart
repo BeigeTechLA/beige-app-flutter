@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Creative/creative_sign_up/build_your_creative_profile_sign_up.dart';
 import '../Creative/creative_sign_up/professional_details_sing_up.dart';
 import '../Creative/creative_sign_up/social_engagement_singup.dart';
+import '../auth/new_sing_up_screen.dart';
 import '../auth/sign_up_screen.dart';
 import '../utility/ColorCode.dart';
 
@@ -95,6 +96,7 @@ class _ChooseYourRoleScreenState extends State<ChooseYourRoleScreen> {
               context,
               MaterialPageRoute(
                 builder: (_) =>  SignUpScreen(role: 1),
+               // builder: (_) =>  NewSingUpScreen(),
               ),
             );
           } else if (index == 1) {
