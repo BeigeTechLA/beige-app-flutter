@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../utility/ColorCode.dart';
 
@@ -20,9 +21,10 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
           children: [
 
             /// ✅ SUCCESS IMAGE
-            Image.asset(
-              "assets/images/password_suc.png",
-              height: 140,
+            Lottie.asset(
+              "assets/lottie/Untitled file.json",
+              height: 180,
+              repeat: false,
             ),
 
             const SizedBox(height: 24),

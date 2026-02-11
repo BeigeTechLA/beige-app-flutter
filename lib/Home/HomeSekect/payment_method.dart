@@ -90,6 +90,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
       debugPrint("📥 RAW SETUP INTENT RESPONSE:");
       debugPrint(response.toString());
 
+
       if (response == null || response['error'] == true) {
         throw response?['message'] ?? "SetupIntent failed";
       }

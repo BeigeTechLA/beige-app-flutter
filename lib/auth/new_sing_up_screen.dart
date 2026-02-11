@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:beige/OnbodingScreen/onboding_screen.dart';
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -692,20 +693,19 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                     )*/
 
                     /// 🔙 BACK BUTTON
-                    Padding(
-                      padding:  EdgeInsets.all(8.0),
-                      child: Positioned(
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => OnboardingScreen()),
-                            );
-                          },
-                          child: Image.asset(
-                            "assets/Icons/Reply.png",
-                            height: 24,
-                          ),
+
+                    /// 🔙 BACK BUTTON
+                    Positioned(
+                      top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                      left: 16,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context); // 🔥 screen pop karega
+                        },
+                        child: Image.asset(
+                          "assets/Icons/Reply.png",
+                          height: 24,
+                          color: Colors.white, // agar white chahiye ho
                         ),
                       ),
                     ),
@@ -920,6 +920,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                 () => setState(() => showConfirmPassword = !showConfirmPassword),
                             confirmPasswordController,
                           ),
+                          SizedBox(height: 20),
                           _profilePictureCard(),
                           const SizedBox(height: 20),
 
@@ -944,6 +945,80 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                 ),
                               ),
                             ),
+                          ),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    savePassword = !savePassword;
+                                  });
+                                },
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    color: savePassword
+                                        ? ColorCode.black
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: ColorCode.kWhiteOpacity70,
+                                    ),
+                                  ),
+                                  child: savePassword
+                                      ? const Icon(Icons.check,
+                                      size: 14, color: ColorCode.kButtonColor)
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black,
+                                      height: 1.4, // line spacing perfect
+                                    ),
+                                    children: const [
+                                      TextSpan(text: "I agree to the ",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          color: ColorCode.kWhiteOpacity70,
+                                          fontSize: 13,
+                                          fontFamily: "Outfit", // ⭐ Added Outfit font
+                                        ),
+                                      ),
+
+                                      TextSpan(
+                                        text: "Terms & Condition & Privacy Policy",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: ColorCode.white,
+                                          fontSize: 13,
+                                          fontFamily: "Outfit", // ⭐ Added Outfit font
+                                        ),
+                                      ),
+
+
+                                      TextSpan(text: "\nset out of this site",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          color: ColorCode.kWhiteOpacity70,
+                                          fontSize: 13,
+                                          fontFamily: "Outfit", // ⭐ Added Outfit font
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+
+                            ],
                           ),
                         ],
                       ),
@@ -994,7 +1069,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                 "Tell Us About Yourself & Add Details",
                                 style: TextStyle(
                                   fontFamily: "Outfit",
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w500,
                                   color: ColorCode.kWhiteOpacity70,
                                   letterSpacing: 0.2,
@@ -1005,15 +1080,49 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                         ),
                       ),
                     ),
+
                   ],
                 ),
               ),
-
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Already have an account? ",
+                    style: TextStyle(
+                      color: ColorCode.kWhiteOpacity60,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>  NewLoginScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 30),
             ],
           ),
         ),
+
+
       ),
     );
 

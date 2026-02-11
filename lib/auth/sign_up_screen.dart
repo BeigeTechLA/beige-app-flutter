@@ -14,6 +14,7 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
 import '../service/shared_service.dart';
+import 'new_sing_up_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   final int? role;
@@ -342,6 +343,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+/*
 
               InkWell(
                 onTap: () {
@@ -352,6 +354,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
                 child: Image.asset("assets/Icons/Reply.png", height: 24),
               ),
+*/
 
 
               SizedBox(height: 30),
@@ -676,6 +679,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
         ),
+
+
       ),
     );
   }

@@ -321,7 +321,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ChooseYourRoleScreen(
+                            builder: (_) => SignUpScreen(
                               // role: widget.role ?? 1, // ✅ default = 1 (Client)
                             ),
                           ),

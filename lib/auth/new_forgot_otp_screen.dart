@@ -1,25 +1,64 @@
-import 'package:beige/MainScreen.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../utility/ColorCode.dart';
-import 'forgot_password.dart';
-import 'new_forgot_passwrod_screen.dart';
-import 'new_sing_up_screen.dart';
+import 'new_new_passwrod_screen.dart';
 
-class NewLoginScreen extends StatefulWidget {
-  const NewLoginScreen({super.key});
+class NewForgotOtpScreen extends StatefulWidget {
+  const NewForgotOtpScreen({super.key});
 
   @override
-  State<NewLoginScreen> createState() => _NewLoginScreenState();
+  State<NewForgotOtpScreen> createState() => _NewForgotOtpScreenState();
 }
 
-class _NewLoginScreenState extends State<NewLoginScreen> {
+class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
-  bool showConfirmPassword = false;
-  bool savePassword = false;
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  int seconds = 59;
+  Timer? timer;
+  bool isOtpFilled = false;
 
+  List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
+
+  String get enteredOtp {
+    return controllers.map((c) => c.text).join();
+  }
+
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+
+    // ⭐ refresh UI on focus change
+    for (var node in focusNodes) {
+      node.addListener(() {
+        setState(() {});
+      });
+    }
+  }
+  List<TextEditingController> controllers =
+  List.generate(6, (index) => TextEditingController());
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (seconds > 0) {
+        setState(() {
+          seconds--;
+        });
+      } else {
+        timer!.cancel();
+      }
+    });
+  }
+
+  void resetTimer() {
+    setState(() {
+      seconds = 59;      // timer reset
+    });
+    startTimer();        // start again
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,7 +70,10 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
               /// 🔝 TOP IMAGE + TITLE SECTION
               SizedBox(
-                height: MediaQuery.of(context).size.height * 0.29,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.29,
                 child: Stack(
                   children: [
 
@@ -43,8 +85,30 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                       ),
                     ),
 
+                    /// 🌫️ DARK OVERLAY
+                    /*    Positioned.fill(
+                      child: Container(
+                        color: Colors.black.withOpacity(0.55),
+                      ),
+                    )*/
+
+                    /// 🔙 BACK BUTTON
 
 
+                    Positioned(
+                      top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                      left: 16,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context); // 🔥 screen pop karega
+                        },
+                        child: Image.asset(
+                          "assets/Icons/Reply.png",
+                          height: 24,
+                          color: Colors.white, // agar white chahiye ho
+                        ),
+                      ),
+                    ),
 
                     /// 🏷️ TITLE + SUBTITLE (CENTER)
                     Align(
@@ -54,19 +118,21 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                         children: const [
 
                           Text(
-                            "Welcome Back",
+                            "Enter OTP code",
                             style: TextStyle(
                               fontFamily: "Unbounded",
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: ColorCode.white,
+                              color:
+                              ColorCode.white,
                             ),
                           ),
 
                           SizedBox(height: 8),
 
                           Text(
-                            "Enter your details to access your account. Continue\nmanaging your bookings and profile.",
+                            "Enter 6 digit OTP sent to your\nregistered email ID..",
+
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontFamily: "Outfit",
@@ -91,7 +157,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                      // 👈 top extra
                       margin: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: ColorCode.bcakgroundcolor,
@@ -107,78 +174,106 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                           const SizedBox(height: 12),
 
 
-                          _buildField("Email ID", emailController),
-
-
-
-
-                          SizedBox(height: 20),
-
-
-
-                          _buildPasswordField(
-                            "Confirm Password",
-                            showConfirmPassword,
-                                () => setState(() => showConfirmPassword = !showConfirmPassword),
-                            passwordController,
-                          ),
-
-                          const SizedBox(height: 20),
                           Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    savePassword = !savePassword;
-                                  });
-                                },
-                                child: Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: BoxDecoration(
-                                    color: savePassword
-                                        ? ColorCode.black
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: ColorCode.kWhiteOpacity70,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: List.generate(6, (index) {
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: Container(
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+
+                                      // ⭐ Border color logic
+                                      border: Border.all(
+                                        color: (focusNodes[index].hasFocus ||
+                                            controllers[index].text.isNotEmpty)
+                                            ? ColorCode.kButtonColor
+                                            : ColorCode.kWhiteOpacity60,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: TextField(
+                                      controller: controllers[index],          // ⭐ added controller
+                                      focusNode: focusNodes[index],
+                                      textAlign: TextAlign.center,
+                                      keyboardType: TextInputType.number,
+                                      maxLength: 1,
+                                      style: const TextStyle(
+                                        fontSize: 19,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      decoration: const InputDecoration(
+                                        counterText: "",
+                                        border: InputBorder.none,
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isOtpFilled = controllers.every((c) => c.text.trim().isNotEmpty);
+                                        }
+                                        ); // ⭐ refresh for color update
+
+                                        if (value.isNotEmpty && index < 5) {
+                                          FocusScope.of(context).nextFocus();
+                                        }
+                                        if (value.isEmpty && index > 0) {
+                                          FocusScope.of(context).previousFocus();
+                                        }
+                                      },
                                     ),
                                   ),
-                                  child: savePassword
-                                      ? const Icon(Icons.check,
-                                      size: 14, color: ColorCode.kButtonColor)
-                                      : null,
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                "Saved Password",
+                              );
+                            }),
+                          ),
+
+
+               const SizedBox(height: 10),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "00:${seconds.toString().padLeft(2, '0')}",
                                 style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: ColorCode.kWhiteOpacity60,
                                 ),
                               ),
-                              const Spacer(),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+
+                              Text("Didn’t received the code?",style: TextStyle(
+                                color: ColorCode.kWhiteOpacity70,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Outfit",
+                                // decoration: TextDecoration.underline,
+                                decorationThickness: 1.5,
+                              ),),
+                              InkWell(
+                                onTap: () {
+                                  timer?.cancel();  // stop old timer
+                                  resetTimer();     // restart new timer
                                 },
-                                child: const Text(
-                                  "Forgot Password?",
+                                child: Text(
+                                  " Resend OTP",
                                   style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      color: ColorCode.kButtonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 1.8,
-                                      decorationColor: ColorCode.kButtonColor
+                                    color: ColorCode.kButtonColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationThickness: 1.5,
                                   ),
                                 ),
-                              ),
+                              )
+
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -187,7 +282,12 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                             height: 50,
                             child: ElevatedButton(
                               onPressed: () {
-
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const NewNewPasswrodScreen(),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: ColorCode.kGoldGradientLight,
@@ -196,7 +296,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                 ),
                               ),
                               child: const Text(
-                                "Login",
+                                "Submit",
                                 style: TextStyle(
                                   fontFamily: "Unbounded",
                                   fontSize: 13,
@@ -245,7 +345,8 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
-                                    image: AssetImage("assets/images/chooese_your_role2.png"),
+                                    image: AssetImage(
+                                        "assets/images/chooese_your_role2.png"),
                                     fit: BoxFit.fill,
                                   ),
                                 ),
@@ -299,7 +400,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Don’t have an account? ",
+                "I Remember my Password. ",
                 style: TextStyle(
                   color: ColorCode.kWhiteOpacity60,
                   fontSize: 15,
@@ -308,15 +409,15 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
+                  /*  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const NewSingUpScreen(),
                     ),
-                  );
+                  );*/
                 },
                 child: const Text(
-                  "Sign Up",
+                  "Login",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -331,8 +432,6 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
       ),
 
     );
-
-
   }
 
   Widget _buildField(String title, TextEditingController controller) {
@@ -362,7 +461,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
             color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                       // 🔥 exact 0.5px
+            width: 0.5, // 🔥 exact 0.5px
           ),
         ),
 
@@ -370,7 +469,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
             color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                          // focus border thicker
+            width: 0.5, // focus border thicker
           ),
         ),
 
@@ -380,63 +479,4 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
       ,);
   }
 
-  Widget _buildPasswordField(
-      String title,
-      bool isVisible,
-      VoidCallback onToggle,
-      TextEditingController controller,
-      ) {
-    return TextField(
-      controller: controller,
-      obscureText: !isVisible,
-      cursorColor: ColorCode.kWhiteOpacity70,
-      style: const TextStyle(
-        color: ColorCode.kWhiteOpacity70,
-      ),
-      decoration: InputDecoration(
-        labelText: "$title*",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-
-        labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),
-
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-
-        /// 👁️ EYE ICON
-        suffixIcon: IconButton(
-          onPressed: onToggle,
-          icon: Icon(
-            isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kWhiteOpacity70,
-            size: 20,
-          ),
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
-            width: 0.5,
-          ),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
-            width: 0.5,
-          ),
-        ),
-
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),
-      ),
-    );
-  }
-  }
-
+}

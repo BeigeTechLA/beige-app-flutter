@@ -34,7 +34,8 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
   DateTime? selectedDate;
 
-  bool? isEditNeeded;
+  bool isEditNeeded = false;  // ✅ Default = No selected
+
   bool isSubmitting = false;
   bool isDateSelected() {
     return selectedDate != null;
@@ -196,10 +197,6 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     return min.day != now.day;
   }
 
-// ... (Keep your imports and class definition as they are)
-
-
-  // Helper to update both controller text and variables
 
 
   Future<void> _selectDate(BuildContext context) async {
@@ -806,6 +803,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                           ),
                           const SizedBox(width: 24),
                           _buildOption(
+
                             title: "No",
                             isSelected: isEditNeeded == false,
                             onTap: () {
@@ -851,7 +849,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                 ],
                               ),
                               SizedBox(height: 10),
-                              Row(
+                      /*        Row(
                                 children: [
                                   Icon(
                                     Icons.check,
@@ -868,7 +866,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                     ),
                                   ),
                                 ],
-                              ),
+                              ),*/
                             ],
                           ),
                         ),
