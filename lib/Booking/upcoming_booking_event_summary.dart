@@ -309,7 +309,7 @@ class _UpcomingBookingEventSummaryState
                     ),
                     SizedBox(height: 20,),
       
-                  Column(
+           /*       Column(
                     children: [
       
                       /// 🔹 TOP INFO CARD
@@ -366,7 +366,7 @@ class _UpcomingBookingEventSummaryState
                       const SizedBox(height: 14),
       
                       /// 🔹 VIEW PROJECT TIMELINE (PIXEL PERFECT)
-                      InkWell(
+                 *//*     InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: () {
                           showProjectTimelineDialog(context);
@@ -394,10 +394,10 @@ class _UpcomingBookingEventSummaryState
                             ),
                           ],
                         ),
-                      ),
+                      ),*//*
       
                     ],
-                  ),
+                  ),*/
       
                   ],
                 ),

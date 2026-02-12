@@ -15,7 +15,6 @@ void main() async {
   AppConfig.setEnvironment(environment);
   Stripe.publishableKey =
   "pk_test_51S5czd54hnPNgHXUq7sunp8uvTDW4ln6aw8Y3bP249JZmx4xuvoIED4mZTuNIkAFcOoCApICfgv9dM4VbbleJo7L00GqNEkj3I";
-
   // ✅ Read login state
   final prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'new_new_passwrod_screen.dart';
 
 class NewForgotOtpScreen extends StatefulWidget {
-  const NewForgotOtpScreen({super.key});
+  final String email;
+  const NewForgotOtpScreen({super.key, required this.email});
 
   @override
   State<NewForgotOtpScreen> createState() => _NewForgotOtpScreenState();
@@ -59,339 +62,428 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
     });
     startTimer();        // start again
   }
+
+
+  Future<void> _verifyOtp() async {
+    if (!isOtpFilled) {
+      print("❌ OTP Not Filled Completely");
+      _showSnack("Please enter complete OTP");
+      return;
+    }
+
+    print("📢 Verify OTP Clicked");
+    print("📧 Email => ${widget.email}");
+    print("🔢 Entered OTP => $enteredOtp");
+
+    setState(() => isLoading = true);
+
+    try {
+      final apiService = ApiService();
+
+      print("🚀 VERIFY OTP API CALL START");
+      print("📡 Endpoint => ${ApiEndpoints.forgotpassword_verify_otp}");
+
+      final response = await apiService.postData(
+        ApiEndpoints.forgotpassword_verify_otp,
+        {
+          "email": widget.email,
+          "otp": enteredOtp,
+        },
+      );
+
+      print("📩 API RESPONSE => $response");
+
+      if (response == null) {
+        print("❌ Response NULL");
+        _showSnack("Server error");
+        return;
+      }
+
+      if (response['error'] == false) {
+        print("✅ OTP Verified Successfully");
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NewNewPasswrodScreen(
+              otp: enteredOtp ,
+              email: widget.email,
+            ),
+          ),
+        );
+      } else {
+        print("❌ OTP Verification Failed => ${response['message']}");
+        _showSnack(response['message'] ?? "Invalid OTP");
+      }
+    } catch (e) {
+      print("🔥 Exception => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      print("🛑 VERIFY OTP API CALL END");
+    }
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         // backgroundColor: ColorCode.white,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
 
-              /// 🔝 TOP IMAGE + TITLE SECTION
-              SizedBox(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.29,
-                child: Stack(
-                  children: [
+                  /// 🔝 TOP IMAGE + TITLE SECTION
+                  SizedBox(
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.29,
+                    child: Stack(
+                      children: [
 
-                    /// 🖼️ BACKGROUND IMAGE
-                    Positioned.fill(
-                      child: Image.asset(
-                        "assets/images/Rectangle_574057023.png",
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-
-                    /// 🌫️ DARK OVERLAY
-                    /*    Positioned.fill(
-                      child: Container(
-                        color: Colors.black.withOpacity(0.55),
-                      ),
-                    )*/
-
-                    /// 🔙 BACK BUTTON
-
-
-                    Positioned(
-                      top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                      left: 16,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context); // 🔥 screen pop karega
-                        },
-                        child: Image.asset(
-                          "assets/Icons/Reply.png",
-                          height: 24,
-                          color: Colors.white, // agar white chahiye ho
+                        /// 🖼️ BACKGROUND IMAGE
+                        Positioned.fill(
+                          child: Image.asset(
+                            "assets/images/Rectangle_574057023.png",
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                      ),
-                    ),
 
-                    /// 🏷️ TITLE + SUBTITLE (CENTER)
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        /// 🌫️ DARK OVERLAY
+                        /*    Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.55),
+                        ),
+                      )*/
 
-                          Text(
-                            "Enter OTP code",
-                            style: TextStyle(
-                              fontFamily: "Unbounded",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color:
-                              ColorCode.white,
+                        /// 🔙 BACK BUTTON
+
+
+                        Positioned(
+                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                          left: 16,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context); // 🔥 screen pop karega
+                            },
+                            child: Image.asset(
+                              "assets/Icons/Reply.png",
+                              height: 24,
+                              color: Colors.white, // agar white chahiye ho
                             ),
                           ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            "Enter 6 digit OTP sent to your\nregistered email ID..",
-
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// 📦 FORM CONTAINER (NICHE)
-              Transform.translate(
-                offset: const Offset(0, -40),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
-                      // 👈 top extra
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: ColorCode.bcakgroundcolor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
-                          width: 1,
                         ),
-                      ),
-                      child: Column(
-                        children: [
 
-                          const SizedBox(height: 12),
+                        /// 🏷️ TITLE + SUBTITLE (CENTER)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
 
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List.generate(6, (index) {
-                              return Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  child: Container(
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-
-                                      // ⭐ Border color logic
-                                      border: Border.all(
-                                        color: (focusNodes[index].hasFocus ||
-                                            controllers[index].text.isNotEmpty)
-                                            ? ColorCode.kButtonColor
-                                            : ColorCode.kWhiteOpacity60,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: TextField(
-                                      controller: controllers[index],          // ⭐ added controller
-                                      focusNode: focusNodes[index],
-                                      textAlign: TextAlign.center,
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 1,
-                                      style: const TextStyle(
-                                        fontSize: 19,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      decoration: const InputDecoration(
-                                        counterText: "",
-                                        border: InputBorder.none,
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          isOtpFilled = controllers.every((c) => c.text.trim().isNotEmpty);
-                                        }
-                                        ); // ⭐ refresh for color update
-
-                                        if (value.isNotEmpty && index < 5) {
-                                          FocusScope.of(context).nextFocus();
-                                        }
-                                        if (value.isEmpty && index > 0) {
-                                          FocusScope.of(context).previousFocus();
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                          ),
-
-
-               const SizedBox(height: 10),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
                               Text(
-                                "00:${seconds.toString().padLeft(2, '0')}",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorCode.kWhiteOpacity60,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-
-                              Text("Didn’t received the code?",style: TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "Outfit",
-                                // decoration: TextDecoration.underline,
-                                decorationThickness: 1.5,
-                              ),),
-                              InkWell(
-                                onTap: () {
-                                  timer?.cancel();  // stop old timer
-                                  resetTimer();     // restart new timer
-                                },
-                                child: Text(
-                                  " Resend OTP",
-                                  style: TextStyle(
-                                    color: ColorCode.kButtonColor,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationThickness: 1.5,
-                                  ),
-                                ),
-                              )
-
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const NewNewPasswrodScreen(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorCode.kGoldGradientLight,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text(
-                                "Submit",
+                                "Enter OTP code",
                                 style: TextStyle(
                                   fontFamily: "Unbounded",
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorCode.kHeadingColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                  ColorCode.white,
                                 ),
                               ),
-                            ),
-                          ),
 
+                              SizedBox(height: 8),
 
-                        ],
-                      ),
-                    ),
+                              Text(
+                                "Enter 6 digit OTP sent to your\nregistered email ID..",
 
-                    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-                    Positioned(
-                      top: -24,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: ColorCode.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontSize: 14,
+                                  color: ColorCode.kWhiteOpacity70,
+                                ),
                               ),
                             ],
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// 📦 FORM CONTAINER (NICHE)
+                  Transform.translate(
+                    offset: const Offset(0, -40),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+
+
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                          // 👈 top extra
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: ColorCode.bcakgroundcolor,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.06),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
                             children: [
-                              Container(
-                                height: 44,
-                                width: 44,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/images/chooese_your_role2.png"),
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    "Name : John Smith",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+
+                              const SizedBox(height: 12),
+
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: List.generate(6, (index) {
+                                  return Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                                      child: Container(
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+
+                                          // ⭐ Border color logic
+                                          border: Border.all(
+                                            color: (focusNodes[index].hasFocus ||
+                                                controllers[index].text.isNotEmpty)
+                                                ? ColorCode.kButtonColor
+                                                : ColorCode.kWhiteOpacity60,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: TextField(
+                                          controller: controllers[index],          // ⭐ added controller
+                                          focusNode: focusNodes[index],
+                                          textAlign: TextAlign.center,
+                                          keyboardType: TextInputType.number,
+                                          maxLength: 1,
+                                          style: const TextStyle(
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          decoration: const InputDecoration(
+                                            counterText: "",
+                                            border: InputBorder.none,
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isOtpFilled = controllers.every((c) => c.text.trim().isNotEmpty);
+                                            }
+                                            ); // ⭐ refresh for color update
+
+                                            if (value.isNotEmpty && index < 5) {
+                                              FocusScope.of(context).nextFocus();
+                                            }
+                                            if (value.isEmpty && index > 0) {
+                                              FocusScope.of(context).previousFocus();
+                                            }
+                                          },
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 4),
+                                  );
+                                }),
+                              ),
+
+
+                              const SizedBox(height: 10),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
                                   Text(
-                                    "Email ID: johnsmith4545@gmail.com",
+                                    "00:${seconds.toString().padLeft(2, '0')}",
                                     style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black54,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: ColorCode.kWhiteOpacity60,
                                     ),
                                   ),
                                 ],
                               ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+
+                                  Text("Didn’t received the code?",style: TextStyle(
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Outfit",
+                                    // decoration: TextDecoration.underline,
+                                    decorationThickness: 1.5,
+                                  ),),
+                                  InkWell(
+                                    onTap: () {
+                                      timer?.cancel();  // stop old timer
+                                      resetTimer();     // restart new timer
+                                    },
+                                    child: Text(
+                                      " Resend OTP",
+                                      style: TextStyle(
+                                        color: ColorCode.kButtonColor,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        decoration: TextDecoration.underline,
+                                        decorationThickness: 1.5,
+                                      ),
+                                    ),
+                                  )
+
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: isOtpFilled ? _verifyOtp : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorCode.kGoldGradientLight,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Submit",
+                                    style: TextStyle(
+                                      fontFamily: "Unbounded",
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: ColorCode.kHeadingColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+
                             ],
-
-
                           ),
                         ),
-                      ),
+
+                        /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+                        /*           Positioned(
+                        top: -24,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: ColorCode.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.12),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 44,
+                                  width: 44,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/chooese_your_role2.png"),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text(
+                                      "Name : John Smith",
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "Email ID: johnsmith4545@gmail.com",
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+
+
+                            ),
+                          ),
+                        ),
+                      ),*/
+                      ],
                     ),
-                  ],
+                  ),
+
+
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: ColorCode.kButtonColor,
+                    ),
+                  ),
                 ),
               ),
 
+          ],
 
-              const SizedBox(height: 30),
-            ],
-          ),
         ),
 
         bottomNavigationBar: Padding(

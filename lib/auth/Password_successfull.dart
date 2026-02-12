@@ -1,6 +1,8 @@
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../MainScreen.dart';
 import '../utility/ColorCode.dart';
 
 class PasswordSuccessfull extends StatefulWidget {
@@ -11,16 +13,33 @@ class PasswordSuccessfull extends StatefulWidget {
 }
 
 class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// ⏳ 5 second delay then go to MainScreen
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const NewLoginScreen()),
+              (route) => false,
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C), // dark background
+      backgroundColor: const Color(0xFF1C1C1C),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
-            /// ✅ SUCCESS IMAGE
+            /// ✅ SUCCESS LOTTIE
             Lottie.asset(
               "assets/lottie/Untitled file.json",
               height: 180,
@@ -29,7 +48,6 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
 
             const SizedBox(height: 24),
 
-            /// ✅ TITLE TEXT
             const Text(
               "You're All Set",
               style: TextStyle(
@@ -37,14 +55,11 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 fontFamily: "Unbounded",
-
-
               ),
             ),
 
             const SizedBox(height: 8),
 
-            /// ✅ SUBTITLE TEXT
             const Text(
               "Congratulations! Your password has been\nchanged successfully",
               textAlign: TextAlign.center,

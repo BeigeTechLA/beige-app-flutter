@@ -79,7 +79,13 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     super.initState();
 
     _getCurrentLocation();
+    nameController.addListener(() {
+      setState(() {});
+    });
 
+    emailController.addListener(() {
+      setState(() {});
+    });
     locationFocus.addListener(() {
       if (locationFocus.hasFocus) {
         setState(() {
@@ -346,7 +352,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
       final ui.Image image = frame.image;
 
       // UI size (crop widget size)
-      const double uiSize = 320;
+      const double uiSize = 360;
       const double cropUI = 260; // jitna UI me crop box hai
 
       final imgW = image.width.toDouble();
@@ -515,6 +521,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
       debugPrint("Reverse geocode error: $e");
     }
   }
+
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
@@ -522,73 +530,89 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   final TextEditingController confirmPasswordController = TextEditingController();
 
   Future<void> _fetchSingup() async {
-    final apiService = ApiService();
+    print("🚀 SIGNUP BUTTON CLICKED");
 
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        locationController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty) {
-      _showSnack("Please fill all fields");
+    if (!isFormValid) {
+      print("❌ Form not valid");
+      _showSnack("Please fill all fields & accept terms");
       return;
     }
-    /// 🔴 EMAIL FORMAT VALIDATION
-    bool isValidEmail(String email) {
-      final emailRegex = RegExp(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-      );
-      return emailRegex.hasMatch(email);
+
+    if (profileImage == null) {
+      print("❌ Profile image missing");
+      _showSnack("Please upload profile picture");
+      return;
     }
 
+    if (passwordController.text.length < 1) {
+      print("❌ Weak password");
+      _showSnack("Password must be at least 1 characters");
+      return;
+    }
 
     if (passwordController.text != confirmPasswordController.text) {
-      _showSnack("Password and Confirm Password do not match");
+      print("❌ Password mismatch");
+      _showSnack("Password mismatch");
       return;
     }
 
-    if (!savePassword) {
-      _showSnack("Please accept Terms & Conditions");
+    if (selectedLat == null || selectedLng == null) {
+      print("❌ Lat/Lng not selected");
+      _showSnack("Please select location properly");
       return;
     }
+
+
+
+    print("📤 Sending Signup Data...");
+
+    print("🌍 Lat => $selectedLat");
+    print("🌍 Lng => $selectedLng");
+    print("🖼 Image => ${profileImage?.path}");
 
     setState(() => isLoggingIn = true);
 
     try {
-      final response = await apiService.postData(
+      final response = await ApiService().postMultipart(
         ApiEndpoints.singup,
         {
           "name": nameController.text.trim(),
-          "email": emailController.text.trim(),
+          "email":  emailController.text.trim(),
           "password": passwordController.text.trim(),
-          "user_type": 3,
+          "user_type": "3",
           "location": locationController.text.trim(),
+          "lat": selectedLat.toString(),
+          "lng": selectedLng.toString(),
         },
+        profileImage,
       );
 
-      if (response != null && response['error'] == false) {
-        await SharedService.setLoginDetails(response);
+      print("📥 RAW RESPONSE => $response");
+
+      if (response != null &&
+          response['error'] == false &&
+          (response['code'] == 200 || response['code'] == 201)) {
+
+        print("✅ SIGNUP SUCCESS");
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => NewLoginScreen()),
         );
       } else {
-
+        print("❌ SIGNUP FAILED => ${response?['message']}");
+        _showSnack(response?['message'] ?? "Signup failed");
       }
+
     } catch (e) {
-      final error = e.toString().toLowerCase();
-
-      if (error.contains("email")) {
-        _showSnack("Email already exists");
-
-      } else {
-        _showSnack("Something went wrong. Please try again");
-
-      }
+      print("🔥 SIGNUP EXCEPTION => $e");
+      _showSnack("Server error. Try again later.");
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
+
+
 
 
   void _showSnack(String message) {
@@ -618,7 +642,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String _darkMapStyle = '''
+      String _darkMapStyle = '''
 [
   {
     "elementType": "geometry",
@@ -667,459 +691,472 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     return SafeArea(
       child: Scaffold(
         // backgroundColor: ColorCode.white,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
 
-              /// 🔝 TOP IMAGE + TITLE SECTION
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.29,
-                child: Stack(
-                  children: [
+                  /// 🔝 TOP IMAGE + TITLE SECTION
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.25,
+                    child: Stack(
+                      children: [
 
-                    /// 🖼️ BACKGROUND IMAGE
-                    Positioned.fill(
-                      child: Image.asset(
-                        "assets/images/Rectangle_574057023.png",
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-
-                    /// 🌫️ DARK OVERLAY
-                /*    Positioned.fill(
-                      child: Container(
-                        color: Colors.black.withOpacity(0.55),
-                      ),
-                    )*/
-
-                    /// 🔙 BACK BUTTON
-
-                    /// 🔙 BACK BUTTON
-                    Positioned(
-                      top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                      left: 16,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context); // 🔥 screen pop karega
-                        },
-                        child: Image.asset(
-                          "assets/Icons/Reply.png",
-                          height: 24,
-                          color: Colors.white, // agar white chahiye ho
+                        /// 🖼️ BACKGROUND IMAGE
+                        Positioned.fill(
+                          child: Image.asset(
+                            "assets/images/Rectangle_574057023.png",
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                      ),
-                    ),
 
-                    /// 🏷️ TITLE + SUBTITLE (CENTER)
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
 
-                          Text(
-                            "Sign Up Now",
-                            style: TextStyle(
-                              fontFamily: "Unbounded",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorCode.white,
+                        /// 🔙 BACK BUTTON
+                        Positioned(
+                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                          left: 16,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context); // 🔥 screen pop karega
+                            },
+                            child: Image.asset(
+                              "assets/Icons/Reply.png",
+                              height: 24,
+                              color: Colors.white, // agar white chahiye ho
                             ),
                           ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            "Join Beige to book talented photographers\nand videographers for your projects.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// 📦 FORM CONTAINER (NICHE)
-              Transform.translate(
-                offset: const Offset(0, -40),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-
-                    /// 🧱 MAIN FORM CONTAINER
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: ColorCode.bcakgroundcolor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
-                          width: 1,
                         ),
-                      ),
-                      child: Column(
-                        children: [
 
-                          const SizedBox(height: 12),
+                        /// 🏷️ TITLE + SUBTITLE (CENTER)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
 
-                          _buildField("Name", nameController),
-                          const SizedBox(height: 16),
-                          _buildField("Email ID", emailController),
-                          const SizedBox(height: 16),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: ColorCode.kWhiteOpacity70,
-                                width: 0.8,
-                              ),
-                            ),
-                            child: GooglePlaceAutoCompleteTextField(
-                              textEditingController: locationController,
-                              focusNode: locationFocus, // ✅ ADD THIS
-
-                              googleAPIKey: GoogleConfig.placesApiKey,
-                              debounceTime: 600,
-
-                              isLatLngRequired: true,
-
-
-                              textStyle: const TextStyle(
-                                color: ColorCode.white,
-                                fontFamily: "Outfit",
-                                fontSize: 14,
+                              Text(
+                                "Sign Up Now",
+                                style: TextStyle(
+                                  fontFamily: "Unbounded",
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorCode.white,
+                                ),
                               ),
 
-                              inputDecoration: const InputDecoration(
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                hintText: "Search or select location",
-                                hintStyle: TextStyle(
+                              SizedBox(height: 10),
+
+                              Text(
+                                "Join Beige to book talented photographers\nand videographers for your projects.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontSize: 14,
                                   color: ColorCode.kWhiteOpacity70,
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /// 📦 FORM CONTAINER (NICHE)
+                  Transform.translate(
+                    offset: const Offset(0, -40),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+
+                        /// 🧱 MAIN FORM CONTAINER
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: ColorCode.bcakgroundcolor,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.06),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+
+                              const SizedBox(height: 12),
+
+                              _buildField("Name", nameController),
+                              const SizedBox(height: 16),
+                              _buildField("Email ID", emailController),
+                              const SizedBox(height: 16),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: ColorCode.kWhiteOpacity70,
+                                    width: 0.8,
+                                  ),
                                 ),
-                                suffixIcon: Padding(
-                                  padding: EdgeInsets.only(right: 8),
-                                  child: Icon(
-                                    Icons.location_on_outlined,
+                                child: GooglePlaceAutoCompleteTextField(
+                                  textEditingController: locationController,
+                                  focusNode: locationFocus, // ✅ ADD THIS
+
+                                  googleAPIKey: GoogleConfig.placesApiKey,
+                                  debounceTime: 600,
+
+                                  isLatLngRequired: true,
+
+
+                                  textStyle: const TextStyle(
+                                    color: ColorCode.white,
+                                    fontFamily: "Outfit",
+                                    fontSize: 14,
+                                  ),
+
+                                  inputDecoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    hintText: "Search or select location",
+                                    hintStyle: TextStyle(
+                                      color: ColorCode.kWhiteOpacity70,
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                    suffixIcon: Padding(
+                                      padding: EdgeInsets.only(right: 8),
+                                      child: Icon(
+                                        Icons.location_on_outlined,
+                                        color: ColorCode.kWhiteOpacity70,
+                                      ),
+                                    ),
+                                  ),
+                                  getPlaceDetailWithLatLng: (prediction) async {
+                                    final latLng = LatLng(
+                                      double.parse(prediction.lat!),
+                                      double.parse(prediction.lng!),
+                                    );
+
+                                    locationFocus.unfocus();
+
+                                    await _updateLocationFromLatLng(latLng);
+
+                                    setState(() {
+                                      currentLatLng = latLng;
+                                      selectedLat = latLng.latitude;   // ✅ SAVE LAT
+                                      selectedLng = latLng.longitude;  // ✅ SAVE LNG
+                                      selectedAddress = prediction.description ?? "";
+                                      showMap = true;
+                                    });
+
+                                    locationController.text = selectedAddress;
+                                  },
+
+
+                                  itemClick: (prediction) {
+                                    locationController.text = prediction.description ?? "";
+                                    locationController.selection = TextSelection.fromPosition(
+                                      TextPosition(offset: locationController.text.length),
+                                    );
+                                  },
+
+                                  isCrossBtnShown: true,
+                                ),
+                              ),
+
+
+                              SizedBox(height: 20),
+
+                              /// 🗺️ MAP WITH FIXED HEIGHT
+                              if (showMap)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: SizedBox(
+                                    height: 280,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: currentLatLng == null
+                                          ? const Center(child: CircularProgressIndicator())
+                                          :GoogleMap(
+                                        initialCameraPosition: CameraPosition(
+                                          target: currentLatLng!,
+                                          zoom: 14,
+                                        ),
+
+                                        myLocationEnabled: true,
+                                        myLocationButtonEnabled: true,
+                                        zoomControlsEnabled: true,
+                                        compassEnabled: false,
+
+                                        // 🔥 IMPORTANT FIX (touch enable)
+                                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                                          Factory<OneSequenceGestureRecognizer>(
+                                                () => EagerGestureRecognizer(),
+                                          ),
+                                        },
+
+                                        onMapCreated: (controller) {
+                                          mapController = controller;
+                                          controller.setMapStyle(_darkMapStyle);
+                                        },
+
+                                        markers: {
+                                          Marker(
+                                            markerId: const MarkerId("selected"),
+                                            position: currentLatLng!,
+                                          ),
+                                        },
+
+                                        onTap: (latLng) async {
+                                          await _updateLocationFromLatLng(latLng);
+                                        },
+                                      ),
+
+                                    ),
+                                  ),
+                                ),
+
+                              const SizedBox(height: 16),
+
+                              _buildPasswordField(
+                                "Create Password",
+                                showPassword,
+                                    () => setState(() => showPassword = !showPassword),
+                                passwordController,
+                              ),
+                              const SizedBox(height: 16),
+
+                              _buildPasswordField(
+                                "Confirm Password",
+                                showConfirmPassword,
+                                    () => setState(() => showConfirmPassword = !showConfirmPassword),
+                                confirmPasswordController,
+                              ),
+                              SizedBox(height: 20),
+                              _profilePictureCard(),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        savePassword = !savePassword;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        color: savePassword
+                                            ? ColorCode.black
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: ColorCode.kWhiteOpacity70,
+                                        ),
+                                      ),
+                                      child: savePassword
+                                          ? const Icon(Icons.check,
+                                          size: 14, color: ColorCode.kButtonColor)
+                                          : null,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black,
+                                          height: 1.4, // line spacing perfect
+                                        ),
+                                        children: const [
+                                          TextSpan(text: "I agree to the ",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontSize: 13,
+                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                            ),
+                                          ),
+
+                                          TextSpan(
+                                            text: "Terms & Condition & Privacy Policy",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: ColorCode.white,
+                                              fontSize: 13,
+                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                            ),
+                                          ),
+
+
+                                          TextSpan(text: "\nset out of this site",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontSize: 13,
+                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: _fetchSingup,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorCode.kCreamSoft,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Create Account",
+                                    style: TextStyle(
+                                      fontFamily: "Unbounded",
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: ColorCode.kHeadingColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        /*    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+                      Positioned(
+                        top: -24,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: ColorCode.k282828,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.12),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 28,
+                                  width: 28,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.08),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.person_outline,
+                                    size: 16,
                                     color: ColorCode.kWhiteOpacity70,
                                   ),
                                 ),
-                              ),
-                              getPlaceDetailWithLatLng: (prediction) async {
-                                final latLng = LatLng(
-                                  double.parse(prediction.lat!),
-                                  double.parse(prediction.lng!),
-                                );
-
-                                locationFocus.unfocus();
-
-                                await _updateLocationFromLatLng(latLng);
-
-                                setState(() {
-                                  currentLatLng = latLng;
-                                  selectedLat = latLng.latitude;   // ✅ SAVE LAT
-                                  selectedLng = latLng.longitude;  // ✅ SAVE LNG
-                                  selectedAddress = prediction.description ?? "";
-                                  showMap = true;
-                                });
-
-                                locationController.text = selectedAddress;
-                              },
-
-
-                              itemClick: (prediction) {
-                                locationController.text = prediction.description ?? "";
-                                locationController.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: locationController.text.length),
-                                );
-                              },
-
-                              isCrossBtnShown: true,
-                            ),
-                          ),
-
-
-                          SizedBox(height: 20),
-
-                          /// 🗺️ MAP WITH FIXED HEIGHT
-                          if (showMap)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: SizedBox(
-                                height: 280,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: currentLatLng == null
-                                      ? const Center(child: CircularProgressIndicator())
-                                      :GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      target: currentLatLng!,
-                                      zoom: 14,
-                                    ),
-
-                                    myLocationEnabled: true,
-                                    myLocationButtonEnabled: true,
-                                    zoomControlsEnabled: true,
-                                    compassEnabled: false,
-
-                                    // 🔥 IMPORTANT FIX (touch enable)
-                                    gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                                      Factory<OneSequenceGestureRecognizer>(
-                                            () => EagerGestureRecognizer(),
-                                      ),
-                                    },
-
-                                    onMapCreated: (controller) {
-                                      mapController = controller;
-                                      controller.setMapStyle(_darkMapStyle);
-                                    },
-
-                                    markers: {
-                                      Marker(
-                                        markerId: const MarkerId("selected"),
-                                        position: currentLatLng!,
-                                      ),
-                                    },
-
-                                    onTap: (latLng) async {
-                                      await _updateLocationFromLatLng(latLng);
-                                    },
-                                  ),
-
-                                ),
-                              ),
-                            ),
-
-                          const SizedBox(height: 16),
-
-                          _buildPasswordField(
-                            "Create Password",
-                            showPassword,
-                                () => setState(() => showPassword = !showPassword),
-                            passwordController,
-                          ),
-                          const SizedBox(height: 16),
-
-                          _buildPasswordField(
-                            "Confirm Password",
-                            showConfirmPassword,
-                                () => setState(() => showConfirmPassword = !showConfirmPassword),
-                            confirmPasswordController,
-                          ),
-                          SizedBox(height: 20),
-                          _profilePictureCard(),
-                          const SizedBox(height: 20),
-
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _fetchSingup,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorCode.kCreamSoft,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text(
-                                "Create Account",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorCode.kHeadingColor,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    savePassword = !savePassword;
-                                  });
-                                },
-                                child: Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: BoxDecoration(
-                                    color: savePassword
-                                        ? ColorCode.black
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: ColorCode.kWhiteOpacity70,
-                                    ),
-                                  ),
-                                  child: savePassword
-                                      ? const Icon(Icons.check,
-                                      size: 14, color: ColorCode.kButtonColor)
-                                      : null,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: RichText(
-                                  text: TextSpan(
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black,
-                                      height: 1.4, // line spacing perfect
-                                    ),
-                                    children: const [
-                                      TextSpan(text: "I agree to the ",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          color: ColorCode.kWhiteOpacity70,
-                                          fontSize: 13,
-                                          fontFamily: "Outfit", // ⭐ Added Outfit font
-                                        ),
-                                      ),
-
-                                      TextSpan(
-                                        text: "Terms & Condition & Privacy Policy",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: ColorCode.white,
-                                          fontSize: 13,
-                                          fontFamily: "Outfit", // ⭐ Added Outfit font
-                                        ),
-                                      ),
-
-
-                                      TextSpan(text: "\nset out of this site",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          color: ColorCode.kWhiteOpacity70,
-                                          fontSize: 13,
-                                          fontFamily: "Outfit", // ⭐ Added Outfit font
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(width: 10),
+                                const Text(
+                                  "Tell Us About Yourself & Add Details",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: ColorCode.kWhiteOpacity70,
+                                    letterSpacing: 0.2,
                                   ),
                                 ),
-                              ),
-
-
-                            ],
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ),*/
+                        Positioned(
+                          top: -30,
+                          left: 20,
+                          right: 20,
+                          child: ifUserDataCard(),
+                        ),
+
+                      ],
                     ),
-
-                    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-                    Positioned(
-                      top: -24,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: ColorCode.k282828,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
-                              width: 1,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Already have an account? ",
+                        style: TextStyle(
+                          color: ColorCode.kWhiteOpacity60,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>  NewLoginScreen(),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                height: 28,
-                                width: 28,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.08),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.person_outline,
-                                  size: 16,
-                                  color: ColorCode.kWhiteOpacity70,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                "Tell Us About Yourself & Add Details",
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: ColorCode.kWhiteOpacity70,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                            ],
+                          );
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
-                    ),
-
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Already have an account? ",
-                    style: TextStyle(
-                      color: ColorCode.kWhiteOpacity60,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    ],
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>  NewLoginScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
+            ),
+            if (isLoggingIn)
+              Container(
+                color: Colors.black.withOpacity(0.6),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: ColorCode.kButtonColor,
+                  ),
+                ),
+              ),
+          ],
 
-              const SizedBox(height: 30),
-            ],
-          ),
         ),
 
 
@@ -1335,7 +1372,156 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   }
 
 
-}
+  Widget ifUserDataCard() {
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+
+    if (name.isEmpty && email.isEmpty && profileImage == null) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        height: 60,
+        decoration: BoxDecoration(
+          color: ColorCode.k282828,
+          border: Border.all(color: ColorCode.kHeadingColor),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children:  [
+            Container(
+              height: 32,
+              width: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08), // dark bg pe soft circle
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.person_outline,
+                  size: 18,
+                  color: ColorCode.kWhiteOpacity70,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 10),
+
+            Text(
+              "Tell Us About Yourself & Add Details",
+              style: TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 12,
+                color: ColorCode.kWhiteOpacity70,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // 🔥 Dynamic Card (jab data fill ho)
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+
+          /// 🔵 PROFILE IMAGE OR ICON
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.grey.shade200,
+            backgroundImage: profileImage != null
+                ? FileImage(profileImage!)
+                : null,
+            child: profileImage == null
+                ? const Icon(
+              Icons.person,
+              size: 26,
+              color: Colors.grey,
+            )
+                : null,
+          ),
+
+          const SizedBox(width: 14),
+
+          /// 📝 NAME + EMAIL
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+                /// 🔹 NAME
+                Row(
+                  children: [
+                    const Text(
+                      "Name: ",
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      name.isEmpty ? "Your Name" : name,
+                      style: const TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 4),
+
+                /// 🔹 EMAIL WITH LABEL
+                Row(
+                  children: [
+                    const Text(
+                      "Email: ",
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        email.isEmpty ? "Your Email" : email,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontFamily: "Outfit",
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  }
 class CircleHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

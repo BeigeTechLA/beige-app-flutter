@@ -9,6 +9,7 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import 'forgot_password.dart';
+import 'new_sing_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final int?  role;
@@ -321,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => SignUpScreen(
+                            builder: (_) => NewSingUpScreen(
                               // role: widget.role ?? 1, // ✅ default = 1 (Client)
                             ),
                           ),

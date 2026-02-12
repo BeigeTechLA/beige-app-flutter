@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'new_forgot_otp_screen.dart';
 
@@ -16,248 +18,354 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isLoading = false;
+  }
+  bool isEmailFilled = false;
+  bool isLoading = false;
+  Future<void> _fetchForgotPassword() async {
+
+
+
+
+    if (emailController.text.trim().isEmpty) {
+      print("❌ Email Empty");
+      _showSnack("Please enter email");
+      return;
+    }
+
+    if (!isValidEmail(emailController.text.trim())) {
+      print("❌ Invalid Email Format");
+      _showSnack("Please enter a valid email address");
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      print("🚀 API CALL START");
+      print("📡 Endpoint => ${ApiEndpoints.forgotpassword}");
+
+      final response = await ApiService().postData(
+        ApiEndpoints.forgotpassword,
+        {
+          "email": emailController.text.trim(),
+        },
+      );
+
+      print("📩 API RESPONSE => $response");
+
+      if (response == null) {
+        print("❌ Response NULL");
+        _showSnack("Server error, please try again");
+        return;
+      }
+
+      if (response['error'] == false) {
+        print("✅ OTP Sent Successfully");
+
+        if (!mounted) return;
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NewForgotOtpScreen(
+              email: emailController.text.trim(),
+            ),
+          ),
+        );
+      } else {
+        print("❌ Backend Error => ${response['message']}");
+        _showSnack(response['message'] ?? "Email not registered");
+      }
+    } catch (e) {
+      print("🔥 Exception => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      print("🛑 API CALL END");
+    }
+  }
+
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         // backgroundColor: ColorCode.white,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
 
-              /// 🔝 TOP IMAGE + TITLE SECTION
-              SizedBox(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.29,
-                child: Stack(
-                  children: [
+                  /// 🔝 TOP IMAGE + TITLE SECTION
+                  SizedBox(
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.29,
+                    child: Stack(
+                      children: [
 
-                    /// 🖼️ BACKGROUND IMAGE
-                    Positioned.fill(
-                      child: Image.asset(
-                        "assets/images/Rectangle_574057023.png",
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-
-                    /// 🌫️ DARK OVERLAY
-                    /*    Positioned.fill(
-                      child: Container(
-                        color: Colors.black.withOpacity(0.55),
-                      ),
-                    )*/
-
-                    /// 🔙 BACK BUTTON
-
-                    /// 🔙 BACK BUTTON
-                    Positioned(
-                      top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                      left: 16,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context); // 🔥 screen pop karega
-                        },
-                        child: Image.asset(
-                          "assets/Icons/Reply.png",
-                          height: 24,
-                          color: Colors.white, // agar white chahiye ho
+                        /// 🖼️ BACKGROUND IMAGE
+                        Positioned.fill(
+                          child: Image.asset(
+                            "assets/images/Rectangle_574057023.png",
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                      ),
-                    ),
 
-                    /// 🏷️ TITLE + SUBTITLE (CENTER)
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        /// 🌫️ DARK OVERLAY
+                        /*    Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withOpacity(0.55),
+                        ),
+                      )*/
 
-                          Text(
-                            "Forgot Password",
-                            style: TextStyle(
-                              fontFamily: "Unbounded",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorCode.white,
+                        /// 🔙 BACK BUTTON
+
+                        /// 🔙 BACK BUTTON
+                        Positioned(
+                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                          left: 16,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context); // 🔥 screen pop karega
+                            },
+                            child: Image.asset(
+                              "assets/Icons/Reply.png",
+                              height: 24,
+                              color: Colors.white, // agar white chahiye ho
                             ),
                           ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            "Enter your registered email to receive a reset link\n.We’ll help you get back into your accou,nt quickly.",
-
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// 📦 FORM CONTAINER (NICHE)
-              Transform.translate(
-                offset: const Offset(0, -40),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
-                      // 👈 top extra
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: ColorCode.bcakgroundcolor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
-                          width: 1,
                         ),
-                      ),
-                      child: Column(
-                        children: [
 
-                          const SizedBox(height: 12),
+                        /// 🏷️ TITLE + SUBTITLE (CENTER)
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
 
-
-                          _buildField("Email ID", emailController),
-
-
-/*
-                          _buildPasswordField(
-                            "Confirm Password",
-                            showConfirmPassword,
-                                () => setState(() => showConfirmPassword = !showConfirmPassword),
-                            passwordController,
-                          ),*/
-
-
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const NewForgotOtpScreen(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorCode.kGoldGradientLight,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: const Text(
-                                "Send OTP",
+                              Text(
+                                "Forgot Password",
                                 style: TextStyle(
                                   fontFamily: "Unbounded",
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorCode.kHeadingColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorCode.white,
                                 ),
                               ),
-                            ),
-                          ),
 
+                              SizedBox(height: 8),
 
-                        ],
-                      ),
-                    ),
+                              Text(
+                                "Enter your registered email to receive a reset link\n.We’ll help you get back into your accou,nt quickly.",
 
-                    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-                    Positioned(
-                      top: -24,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: ColorCode.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                height: 44,
-                                width: 44,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/images/chooese_your_role2.png"),
-                                    fit: BoxFit.fill,
-                                  ),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontSize: 14,
+                                  color: ColorCode.kWhiteOpacity70,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    "Name : John Smith",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Email ID: johnsmith4545@gmail.com",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ],
-
-
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
+
+                  /// 📦 FORM CONTAINER (NICHE)
+                  Transform.translate(
+                    offset: const Offset(0, -40),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+
+
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                          // 👈 top extra
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: ColorCode.bcakgroundcolor,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.06),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+
+                              const SizedBox(height: 12),
+
+
+                              _buildField("Email ID", emailController),
+
+
+                              /*
+                            _buildPasswordField(
+                              "Confirm Password",
+                              showConfirmPassword,
+                                  () => setState(() => showConfirmPassword = !showConfirmPassword),
+                              passwordController,
+                            ),*/
+
+
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : _fetchForgotPassword,
+
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorCode.kGoldGradientLight,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "Send OTP",
+                                    style: TextStyle(
+                                      fontFamily: "Unbounded",
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: ColorCode.kHeadingColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+
+                            ],
+                          ),
+                        ),
+
+                        /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+                        /*    Positioned(
+                        top: -24,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: ColorCode.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.12),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  height: 44,
+                                  width: 44,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/chooese_your_role2.png"),
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Text(
+                                      "Name : John Smith",
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      "Email ID: johnsmith4545@gmail.com",
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+
+
+                            ),
+                          ),
+                        ),
+                      ),*/
+                      ],
+                    ),
+                  ),
+
+
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+            if (isLoading)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: ColorCode.kGoldGradientLight,
+                  ),
                 ),
               ),
 
+          ],
 
-              const SizedBox(height: 30),
-            ],
-          ),
         ),
 
         bottomNavigationBar: Padding(

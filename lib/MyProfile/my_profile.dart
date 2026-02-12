@@ -1,4 +1,5 @@
 import 'package:beige/Home/home_screen.dart';
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
 import '../service/api_endpoints.dart';
@@ -590,7 +591,7 @@ class _MyProfileState extends State<MyProfile> {
 
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (_) => LoginScreen()),
+                          MaterialPageRoute(builder: (_) => NewLoginScreen()),
                               (route) => false,
                         );
                       },

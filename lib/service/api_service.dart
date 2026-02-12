@@ -127,6 +127,50 @@ class ApiService {
     return imageURL + folder + image;
   }*/
 
+  Future<dynamic> postMultipartData(
+      String url,
+      Map<String, String> fields,
+      File? file,
+      ) async {
+    try {
+      var uri = Uri.parse(baseUrl + url);
+
+      var request = http.MultipartRequest('POST', uri);
+
+      /// Add fields
+      request.fields.addAll(fields);
+
+      print("📦 FIELDS => ${request.fields}");
+
+      /// Add file
+      if (file != null) {
+        print("📦 FILE PATH => ${file.path}");
+        print("📦 FILE SIZE => ${await file.length()} bytes");
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file', // ⚠️ MUST MATCH BACKEND
+            file.path,
+          ),
+        );
+      }
+
+      var response = await request.send();
+
+      print("🟠 STATUS CODE => ${response.statusCode}");
+
+      var responseBody = await response.stream.bytesToString();
+
+      print("🟢 RESPONSE BODY => $responseBody");
+
+      return jsonDecode(responseBody);
+
+    } catch (e) {
+      print("🔥 MULTIPART ERROR => $e");
+      return null;
+    }
+  }
+
 
   Future<dynamic> postMultipartStep3(
       String url, {
@@ -258,19 +302,14 @@ class ApiService {
       "Authorization": "Bearer $token",
     };
 
-    /// ✅ CREATE FORM DATA
     FormData formData = FormData.fromMap({
       ...fields,
-
-      /// ✅ BACKEND EXPECTS: profile_photo
       if (imageFile != null)
-        "profile_photo": await MultipartFile.fromFile(
+        "file": await MultipartFile.fromFile(
           imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
     });
-
-
 
     final response = await dio.post(
       _baseUrl + url,
@@ -279,7 +318,6 @@ class ApiService {
 
     return response.data;
   }
-
 
 
 

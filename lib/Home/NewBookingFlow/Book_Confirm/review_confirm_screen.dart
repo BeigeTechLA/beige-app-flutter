@@ -23,6 +23,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  bool hasSavedCard = false;
 
 
   Map<String, dynamic>? booking;
@@ -68,25 +69,21 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
         booking = data['booking'];
         pricing = data['pricing'];
         heldCreatives = data['held_creatives'] ?? [];
-        crewSummary = data['crew_summary']; // <-- Add this line
-        /// ✅ SHOOT / PROJECT DETAILS (TOP CARD)
+        crewSummary = data['crew_summary'];
+
+        /// ✅ CHECK SAVED CARD
+        List savedCards = data['payment_methods']?['saved_cards'] ?? [];
+        hasSavedCard = savedCards.isNotEmpty;
+
+        if (!hasSavedCard) {
+          selectedIndex = 0; // force default to card
+        }
+
         creativeName = booking?['shoot_type_name'] ?? "—";
         creativeImage = booking?['shoot_type_image_url'] ?? "";
         creativeRole = getContentTypeTitle(
           int.tryParse(booking?['content_type'] ?? "0") ?? 0,
         );
-
-        ///
-        creativeRatingText = "New";
-
-        /// 💰 Rate (first creative ka hourly rate agar ho)
-        if (heldCreatives.isNotEmpty) {
-          creativeRate = heldCreatives.first['creative']?['duration_hours']
-              ?.toString() ??
-              "";
-        } else {
-          creativeRate = "";
-        }
       }
     } catch (e) {
       debugPrint("Review API Error: $e");
@@ -94,6 +91,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       setState(() => isLoading = false);
     }
   }
+
 
 
   Future<void> _fetchReview() async {
@@ -216,6 +214,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
             Text(
               "Book & Confirm",
               style: TextStyle(
+                fontFamily: "Outfit",
                 color: ColorCode.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -613,7 +612,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       SizedBox(height: 14),
 
                       /// 🔹 PAY AT VENUE
-                      paymentRadioTile(
+                    /*  paymentRadioTile(
                         title: "Pay By Credit or Debit Card",
                         value: 0,
                       ),
@@ -621,6 +620,13 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       paymentRadioTile(
                         title: "Pay Via Stripe",
                         value: 1,
+                      ),*/
+                      paymentRadioTile(
+                        title: hasSavedCard
+                            ? "Pay Via Stripe"
+                            : "Pay Via Stripe (Add Card First)",
+                        value: 1,
+                        isDisabled: !hasSavedCard,
                       ),
 
 
@@ -876,66 +882,75 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   Widget paymentRadioTile({
     required String title,
     required int value,
+    bool isDisabled = false,
   }) {
     final bool isSelected = selectedIndex == value;
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),
-      onTap: () {
+      onTap: isDisabled
+          ? () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please add a card first"),
+          ),
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                PaymentMethodScreen(bookingId: widget.bookingId),
+          ),
+        );
+      }
+          : () {
         setState(() {
           selectedIndex = value;
         });
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding:  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color:  Color(0xFF282828),
+          color: isDisabled ? Colors.grey.shade800 : const Color(0xFF282828),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
           children: [
-            /// 🔹 TITLE
             Expanded(
               child: Text(
                 title,
-                style:  TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: "Outfit",
-                    fontWeight: FontWeight.w400
+                style: TextStyle(
+                  color: isDisabled ? Colors.grey : Colors.white,
+                  fontSize: 14,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
 
-            /// 🔹 CUSTOM RADIO (RIGHT SIDE)
             Container(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-
-                /// Gradient when selected
-                gradient: isSelected
+                gradient: isSelected && !isDisabled
                     ? const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFE8D1AB), // light shade
+                    Color(0xFFE8D1AB),
                     Color(0xFFD4A14D),
                   ],
                 )
                     : null,
-
-                /// Border
                 border: Border.all(
                   color: ColorCode.kWhiteOpacity70,
                   width: 1,
                 ),
               ),
-
-              /// 🔹 INNER DOT
-              child: isSelected
+              child: isSelected && !isDisabled
                   ? Center(
                 child: Container(
                   width: 10,
@@ -953,6 +968,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       ),
     );
   }
+
 
   Widget gradientSwitch({
     required bool value,

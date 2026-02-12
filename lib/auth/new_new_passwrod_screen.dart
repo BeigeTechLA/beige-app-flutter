@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'Password_successfull.dart';
 import 'new_forgot_otp_screen.dart';
 
 class NewNewPasswrodScreen extends StatefulWidget {
-  const NewNewPasswrodScreen({super.key});
+  final String email;
+  final String  otp;
+  const NewNewPasswrodScreen({super.key, required this.email, required this.otp});
 
   @override
   State<NewNewPasswrodScreen> createState() => _NewNewPasswrodScreenState();
@@ -14,9 +18,90 @@ class NewNewPasswrodScreen extends StatefulWidget {
 class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
   bool showNewPassword = false;
   bool showConfirmPassword = false;
-
+  bool isLoading = false;
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
+  Future<void> _newpasswrod() async {
+    print("📢 Reset Password Clicked");
+    print("📧 Email => ${widget.email}");
+
+    if (newPasswordController.text.trim().isEmpty ||
+        confirmPasswordController.text.trim().isEmpty) {
+      print("❌ Password fields empty");
+      _showSnack("Please enter password");
+      return;
+    }
+
+    if (newPasswordController.text.trim() !=
+        confirmPasswordController.text.trim()) {
+      print("❌ Passwords do not match");
+      _showSnack("Passwords do not match");
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final apiService = ApiService();
+
+      print("🚀 RESET PASSWORD API CALL START");
+      print("📡 Endpoint => ${ApiEndpoints.reset_password}");
+
+      final response = await apiService.postData(
+        ApiEndpoints.reset_password,
+        {
+          "otp": widget.otp, // 🔥 replace with actual OTP if needed
+          "email": widget.email,
+          "new_password": newPasswordController.text.trim(),
+          "confirm_password": confirmPasswordController.text.trim(),
+        },
+      );
+
+      print("📩 API RESPONSE => $response");
+
+      if (response == null) {
+        _showSnack("Server error");
+        return;
+      }
+
+      if (response['error'] == false) {
+        print("✅ Password Reset Success");
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PasswordSuccessfull(),
+          ),
+        );
+      } else {
+        print("❌ Reset Failed => ${response['message']}");
+        _showSnack(response['message'] ?? "Failed to reset password");
+      }
+    } catch (e) {
+      print("🔥 Exception => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      print("🛑 RESET PASSWORD API CALL END");
+    }
+  }
+
+
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
 
   @override
@@ -163,14 +248,8 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const PasswordSuccessfull(),
-                                  ),
-                                );
-                              },
+                              onPressed: isLoading ? null : _newpasswrod,
+
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: ColorCode.kGoldGradientLight,
                                 shape: RoundedRectangleBorder(
@@ -195,7 +274,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                     ),
 
                     /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-                    Positioned(
+          /*          Positioned(
                       top: -24,
                       left: 0,
                       right: 0,
@@ -265,7 +344,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                           ),
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),

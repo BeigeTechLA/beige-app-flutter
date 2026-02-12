@@ -1,6 +1,9 @@
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../service/api_endpoints.dart';
+import '../service/api_service.dart';
+import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import 'forgot_password.dart';
 import 'new_forgot_passwrod_screen.dart';
@@ -19,6 +22,91 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
   bool savePassword = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+bool isLoggingIn =false;
+  bool get isFormValid {
+    return emailController.text.trim().isNotEmpty &&
+        passwordController.text.trim().isNotEmpty;
+  }
+_showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+  Future<void> _fetchLogin() async {
+    if (emailController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      _showSnack("Please fill all fields");
+      return;
+    }
+
+    if (!isValidEmail(emailController.text.trim())) {
+      _showSnack("Please enter a valid email address");
+      return;
+    }
+
+    setState(() => isLoggingIn = true);
+
+    try {
+      final response = await ApiService().postData(
+        ApiEndpoints.login,
+        {
+          "email": emailController.text.trim(),
+          "password": passwordController.text.trim(),
+        },
+      );
+
+      /// 🔴 If API Failed
+      if (response == null) {
+        _showSnack("Server not responding");
+        return;
+      }
+
+      if (response['error'] == true) {
+        _showSnack(response['message'] ?? "Invalid credentials");
+        return;
+      }
+
+      if (response['data'] == null ||
+          response['data']['user'] == null) {
+        _showSnack("Invalid credentials");
+        return;
+      }
+
+      /// ✅ Save Login Data
+      await SharedService.setLoginDetails(response);
+
+      if (!mounted) return;
+
+      final int userType =
+          response['data']['user']['user_type'] ?? 0;
+
+      if (userType == 3) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => Mainscreen()),
+              (route) => false,
+        );
+      } else {
+        _showSnack("Please enter a valid email address");
+      }
+
+    } catch (e) {
+      _showSnack("Invalid credentials");
+    } finally {
+      if (mounted) setState(() => isLoggingIn = false);
+    }
+  }
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +205,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
 
 
                           _buildPasswordField(
-                            "Confirm Password",
+                            "Password*",
                             showConfirmPassword,
                                 () => setState(() => showConfirmPassword = !showConfirmPassword),
                             passwordController,
@@ -186,16 +274,24 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: isLoggingIn ? null : _fetchLogin,
 
-                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: ColorCode.kGoldGradientLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              child: const Text(
+                              child: isLoggingIn
+                                  ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.black,
+                                ),
+                              )
+                                  : const Text(
                                 "Login",
                                 style: TextStyle(
                                   fontFamily: "Unbounded",
@@ -208,12 +304,13 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                           ),
 
 
+
                         ],
                       ),
                     ),
 
                     /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-                    Positioned(
+           /*         Positioned(
                       top: -24,
                       left: 0,
                       right: 0,
@@ -282,7 +379,7 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
                           ),
                         ),
                       ),
-                    ),
+                    ),*/
                   ],
                 ),
               ),

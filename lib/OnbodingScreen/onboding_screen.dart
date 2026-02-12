@@ -1,4 +1,5 @@
 import 'package:beige/auth/new_login_screen.dart';
+import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../ChooseYourRole/choose_your_role_screen.dart';
@@ -125,7 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
+                          builder: (_) => const NewLoginScreen(),
                         ),
                       );
                     },
@@ -156,7 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>  SignUpScreen(),
+                      builder: (_) =>  NewSingUpScreen(),
                     ),
                   );
                 },
@@ -198,7 +199,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
+                        builder: (_) => const NewLoginScreen(),
                       ),
                     );
                   },
