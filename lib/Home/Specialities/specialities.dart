@@ -16,49 +16,19 @@ class _SpecialitiesState extends State<Specialities> {
   bool isLoadingSpecialties = true;
 
   List specialties = [];
-
-  final List<Map<String, String>> staticAssets = [
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/party.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Creative.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Travel.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/drone.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/sports_action.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/personal_photo.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Hospitality.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Education.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Business.png",
-    },
-    {
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/Commercial.png",
-    },
+  final List<String> bookShootIcons = [
+    "assets/Book_shoot/Events.png",
+    "assets/Book_shoot/Commercial.png",
+    "assets/Book_shoot/music.png",
+    "assets/Book_shoot/Corporate.png",
+    "assets/Book_shoot/Short.png",
+    "assets/Book_shoot/Social_Media.png",
+    "assets/Book_shoot/user 1.png",
+    "assets/Book_shoot/drone 1.png",
+    "assets/Book_shoot/sports 1.png",
+    "assets/Book_shoot/graduation 1.png",
   ];
+
 
 
   @override
@@ -127,11 +97,11 @@ class _SpecialitiesState extends State<Specialities> {
 
                     return GridView.builder(
                       itemCount: specialties.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: width < 360 ? 0.9 : 1,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,   // 🔥 4 in one row
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 0.75,  // important for spacing
                       ),
                       itemBuilder: (context, index) {
                         return _buildGridItem(
@@ -151,76 +121,63 @@ class _SpecialitiesState extends State<Specialities> {
     );
   }
   Widget _buildGridItem(Map item, int index) {
-    final assetIndex = index % staticAssets.length;
+    final iconPath = bookShootIcons[index % bookShootIcons.length];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final boxHeight = constraints.maxHeight;
-        final iconSize = boxHeight * 0.45; // 🔥 responsive icon
-
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ContentTypeScreen(
-                  specialtyId: item["specialty_id"],
-                ),
-              ),
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                /// BACKGROUND
-                Positioned.fill(
-                  child: Image.asset(
-                    staticAssets[assetIndex]["bg"]!,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-
-                /// NAME
-                Positioned(
-                  top: 10,
-                  left: 8,
-                  right: 8,
-                  child: Text(
-                    (item["name"] ?? "")
-                        .toString()
-                        .replaceAll(" & ", " &\n"),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: ColorCode.white,
-                      fontFamily: 'Outfit',
-                  fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-
-                /// ICON
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Image.asset(
-                    staticAssets[assetIndex]["icon"]!,
-                    height: iconSize,
-                    width: iconSize,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ],
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ContentTypeScreen(
+              specialtyId: item["specialty_id"],
             ),
           ),
         );
       },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+
+          /// 🔵 Circle Icon
+          Container(
+            height: 60,
+            width: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF2A2A2A),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Image.asset(
+                iconPath,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          /// 📝 Proper Name Below
+          Text(
+            (item["name"] ?? "")
+                .toString()
+                .replaceAll(" & ", " &\n"),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: ColorCode.white,
+              fontSize: 12,
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
+
+
+
 
 }

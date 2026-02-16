@@ -109,16 +109,16 @@ class _HomeScreenState extends State<HomeScreen>
   ];
 
   final List<String> specialtyIcons = [
-    "assets/images/party.png",
-    "assets/images/Creative.png",
-    "assets/images/Travel.png",
-    "assets/images/drone.png",
-    "assets/images/sports_action.png",
-    "assets/images/personal_photo.png",
-    "assets/images/Hospitality.png",
-    "assets/images/Education.png",
-    "assets/images/Business.png",
-    "assets/images/Commercial.png",
+    "assets/Book_shoot/Events.png",
+    "assets/Book_shoot/Commercial.png",
+    "assets/Book_shoot/music.png",
+    "assets/Book_shoot/Corporate.png",
+    "assets/Book_shoot/Short.png",
+    "assets/Book_shoot/Social_Media.png",
+    "assets/Book_shoot/user 1.png",
+    "assets/Book_shoot/drone 1.png",
+    "assets/Book_shoot/sports 1.png",
+    "assets/Book_shoot/graduation 1.png",
   ];
 
 
@@ -422,71 +422,61 @@ class _HomeScreenState extends State<HomeScreen>
                         child: Row(
                           children: List.generate(specialties.length, (index) {
                             final item = specialties[index];
+                            final iconPath =
+                            specialtyIcons[index % specialtyIcons.length];
 
                             return Padding(
-                              padding: const EdgeInsets.only(right: 15),
+                              padding: const EdgeInsets.only(right: 18),
                               child: InkWell(
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => Specialities(
-                                        // specialtyId: item["specialty_id"], // optional
-                                      ),
+                                      builder: (context) => Specialities(),
                                     ),
                                   );
                                 },
-                                child: Container(
-                                  height: 99,
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Stack(
-                                    children: [
+                                child: Column(
+                                  children: [
 
-                                      /// 🔹 BACKGROUND IMAGE
-                                      Positioned.fill(
-                                        child: Image.asset(
-                                          "assets/images/Frame 2087328875@3x.png",
-                                          fit: BoxFit.cover,
-                                        ),
+                                    /// 🔵 CIRCLE ICON
+                                    Container(
+                                      height: 70,
+                                      width: 70,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: const Color(0xFF2A2A2A),
                                       ),
-
-                                      /// 🔹 NAME → BACKEND
-                                      Positioned(
-                                        top: 10,
-                                        left: 6,
-                                        right: 6,
-                                        child:Text(
-                                          (item["name"] ?? "").toString().replaceAll(" & ", " &\n"),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            color: ColorCode.white,
-                                            fontFamily: 'Outfit',
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.2, // optional: line spacing clean
-                                          ),
-                                        ),
-
-                                      ),
-
-                                      /// 🔹 IMAGE → FRONTEND (ASSET)
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16),
                                         child: Image.asset(
-                                          specialtyIcons[index % specialtyIcons.length],
-                                          height: 70,
-                                          width: 70,
+                                          iconPath,
                                           fit: BoxFit.contain,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    /// 📝 NAME
+                                    SizedBox(
+                                      width: 80,
+                                      child: Text(
+                                        (item["name"] ?? "")
+                                            .toString()
+                                            .replaceAll(" & ", " &\n"),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: ColorCode.white,
+                                          fontFamily: 'Outfit',
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );
@@ -494,6 +484,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
+
 
 
 
