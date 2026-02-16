@@ -299,8 +299,12 @@ class ApiService {
 
     dio.options.headers = {
       "Accept": "application/json",
-      "Authorization": "Bearer $token",
+      if (token.isNotEmpty) "Authorization": "Bearer $token",
     };
+
+    print("🌍 FULL URL => ${_baseUrl + url}");
+    print("📦 FIELDS => $fields");
+    print("🖼 IMAGE PATH => ${imageFile?.path}");
 
     FormData formData = FormData.fromMap({
       ...fields,
@@ -316,8 +320,12 @@ class ApiService {
       data: formData,
     );
 
+    print("📥 STATUS CODE => ${response.statusCode}");
+    print("📥 RESPONSE DATA => ${response.data}");
+
     return response.data;
   }
+
 
 
 

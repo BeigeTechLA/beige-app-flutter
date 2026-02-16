@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'new_login_screen.dart';
 import 'new_new_passwrod_screen.dart';
 
 class NewForgotOtpScreen extends StatefulWidget {
@@ -501,12 +502,12 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
               ),
               InkWell(
                 onTap: () {
-                  /*  Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const NewSingUpScreen(),
+                      builder: (_) => const NewLoginScreen(),
                     ),
-                  );*/
+                  );
                 },
                 child: const Text(
                   "Login",

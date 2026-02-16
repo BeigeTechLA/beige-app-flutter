@@ -1,3 +1,4 @@
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../service/api_endpoints.dart';
@@ -27,9 +28,6 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
   bool isEmailFilled = false;
   bool isLoading = false;
   Future<void> _fetchForgotPassword() async {
-
-
-
 
     if (emailController.text.trim().isEmpty) {
       print("❌ Email Empty");
@@ -383,12 +381,12 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
               ),
               InkWell(
                 onTap: () {
-                  /*  Navigator.push(
+                    Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const NewSingUpScreen(),
+                      builder: (_) => const NewLoginScreen(),
                     ),
-                  );*/
+                  );
                 },
                 child: const Text(
                   "Login",

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:beige/auth/login_screen.dart';
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../service/api_endpoints.dart';
@@ -91,7 +92,7 @@ void resetTimer() {
 
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) =>  LoginScreen()),
+          MaterialPageRoute(builder: (_) =>  NewLoginScreen()),
               (route) => false,
         );
       } else {

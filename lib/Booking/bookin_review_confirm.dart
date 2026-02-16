@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:beige/Home/HomeSekect/payment_method.dart';
+import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../service/api_endpoints.dart';
@@ -950,7 +951,7 @@ bool loding =true;
                               onPressed: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (_) =>BookingSummaryDetails()),
+                                  MaterialPageRoute(builder: (_) =>Mainscreen()),
                                 );
                               },
                               child: const Text(

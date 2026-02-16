@@ -114,9 +114,11 @@ class _HomeScreenState extends State<HomeScreen>
     "assets/images/Travel.png",
     "assets/images/drone.png",
     "assets/images/sports_action.png",
-    "assets/images/personal.png",
-    "assets/images/Creative.png",
     "assets/images/personal_photo.png",
+    "assets/images/Hospitality.png",
+    "assets/images/Education.png",
+    "assets/images/Business.png",
+    "assets/images/Commercial.png",
   ];
 
 

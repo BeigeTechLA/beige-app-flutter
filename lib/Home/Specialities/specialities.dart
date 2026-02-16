@@ -44,17 +44,22 @@ class _SpecialitiesState extends State<Specialities> {
     },
     {
       "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/hotel.png",
+      "icon": "assets/images/Hospitality.png",
     },
-    /*{
-      "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/eduction.png",
-    },*/
     {
       "bg": "assets/images/Frame 2087328875@3x.png",
-      "icon": "assets/images/5522882 1 (2).png",
+      "icon": "assets/images/Education.png",
+    },
+    {
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/Business.png",
+    },
+    {
+      "bg": "assets/images/Frame 2087328875@3x.png",
+      "icon": "assets/images/Commercial.png",
     },
   ];
+
 
   @override
   void initState() {
@@ -116,23 +121,29 @@ class _SpecialitiesState extends State<Specialities> {
               Expanded(
                 child: isLoadingSpecialties
                     ? const Center(child: CircularProgressIndicator())
-                    : GridView.builder(
-                  itemCount: specialties.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1,
-                  ),
-                  itemBuilder: (context, index) {
-                    return _buildGridItem(
-                      specialties[index],
-                      index,
+                    : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+
+                    return GridView.builder(
+                      itemCount: specialties.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: width < 360 ? 0.9 : 1,
+                      ),
+                      itemBuilder: (context, index) {
+                        return _buildGridItem(
+                          specialties[index],
+                          index,
+                        );
+                      },
                     );
                   },
                 ),
               ),
+
             ],
           ),
         ),
@@ -142,63 +153,74 @@ class _SpecialitiesState extends State<Specialities> {
   Widget _buildGridItem(Map item, int index) {
     final assetIndex = index % staticAssets.length;
 
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ContentTypeScreen(   //BookShootScreen
-              specialtyId: item["specialty_id"],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final boxHeight = constraints.maxHeight;
+        final iconSize = boxHeight * 0.45; // 🔥 responsive icon
+
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ContentTypeScreen(
+                  specialtyId: item["specialty_id"],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                /// BACKGROUND
+                Positioned.fill(
+                  child: Image.asset(
+                    staticAssets[assetIndex]["bg"]!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                /// NAME
+                Positioned(
+                  top: 10,
+                  left: 8,
+                  right: 8,
+                  child: Text(
+                    (item["name"] ?? "")
+                        .toString()
+                        .replaceAll(" & ", " &\n"),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: ColorCode.white,
+                      fontFamily: 'Outfit',
+                  fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
+                /// ICON
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Image.asset(
+                    staticAssets[assetIndex]["icon"]!,
+                    height: iconSize,
+                    width: iconSize,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            /// 🔹 STATIC BACKGROUND
-            Positioned.fill(
-              child: Image.asset(
-                staticAssets[assetIndex]["bg"]!,
-                fit: BoxFit.cover,
-              ),
-            ),
-
-            /// 🔹 DYNAMIC NAME
-            Positioned(
-              top: 10,
-              left: 8,
-              child: Text(
-                (item["name"] ?? "").toString().replaceAll(" & ", " &\n"),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style:  TextStyle(
-                  color: ColorCode.white,
-                  fontFamily: 'Outfit',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  height: 1.2, // optional: line spacing clean
-                ),
-              ),
-            ),
-
-            /// 🔹 STATIC ICON
-            Positioned(
-              bottom: 0,
-              right: 2,
-              child: Image.asset(
-                staticAssets[assetIndex]["icon"]!,
-                height: 70,
-                width: 60,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
+
 }
