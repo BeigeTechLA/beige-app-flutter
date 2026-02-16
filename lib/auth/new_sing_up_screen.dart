@@ -528,47 +528,34 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-
-  Future<void> _fetchSingup() async {
+  Future<void> _fetchSignup() async {
     print("🚀 SIGNUP BUTTON CLICKED");
 
     if (!isFormValid) {
-      print("❌ Form not valid");
-      _showSnack("Please fill all fields & accept terms");
+      _showSnack("Please fill all fields");
+      return;
+    }
+
+    /// ✅ EMAIL VALIDATION
+    if (!isValidEmail(emailController.text.trim())) {
+      _showSnack("Please enter a valid email address");
       return;
     }
 
     if (profileImage == null) {
-      print("❌ Profile image missing");
       _showSnack("Please upload profile picture");
       return;
     }
 
-    if (passwordController.text.length < 1) {
-      print("❌ Weak password");
-      _showSnack("Password must be at least 1 characters");
+    if (passwordController.text.length < 6) {
+      _showSnack("Password must be at least 6 characters");
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      print("❌ Password mismatch");
       _showSnack("Password mismatch");
       return;
     }
-
-    if (selectedLat == null || selectedLng == null) {
-      print("❌ Lat/Lng not selected");
-      _showSnack("Please select location properly");
-      return;
-    }
-
-
-
-    print("📤 Sending Signup Data...");
-
-    print("🌍 Lat => $selectedLat");
-    print("🌍 Lng => $selectedLng");
-    print("🖼 Image => ${profileImage?.path}");
 
     setState(() => isLoggingIn = true);
 
@@ -577,7 +564,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         ApiEndpoints.singup,
         {
           "name": nameController.text.trim(),
-          "email":  emailController.text.trim(),
+          "email": emailController.text.trim(),
           "password": passwordController.text.trim(),
           "user_type": "3",
           "location": locationController.text.trim(),
@@ -587,30 +574,26 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         profileImage,
       );
 
-      print("📥 RAW RESPONSE => $response");
-
       if (response != null &&
           response['error'] == false &&
           (response['code'] == 200 || response['code'] == 201)) {
-
-        print("✅ SIGNUP SUCCESS");
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => NewLoginScreen()),
         );
       } else {
-        print("❌ SIGNUP FAILED => ${response?['message']}");
         _showSnack(response?['message'] ?? "Signup failed");
       }
 
     } catch (e) {
-      print("🔥 SIGNUP EXCEPTION => $e");
-      _showSnack("Server error. Try again later.");
+      _showSnack("Server error");
     } finally {
       setState(() => isLoggingIn = false);
     }
   }
+
+
 
 
 
@@ -756,14 +739,14 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                   color: ColorCode.kWhiteOpacity70,
                                 ),
                               ),
-                              SizedBox(height: 10),
+
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-
+                  SizedBox(height: 30),
                   /// 📦 FORM CONTAINER (NICHE)
                   Transform.translate(
                     offset: const Offset(0, -40),
@@ -943,84 +926,89 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                               _profilePictureCard(),
                               const SizedBox(height: 20),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start, // 🔥 important
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        savePassword = !savePassword;
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 20,
-                                      width: 20,
-                                      decoration: BoxDecoration(
-                                        color: savePassword
-                                            ? ColorCode.black
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: ColorCode.kWhiteOpacity70,
+
+                                  /// CHECKBOX
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 3), // align with first text line
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          savePassword = !savePassword;
+                                        });
+                                      },
+                                      child: Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                          color: savePassword
+                                              ? ColorCode.black
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: ColorCode.kWhiteOpacity70,
+                                          ),
                                         ),
+                                        child: savePassword
+                                            ? const Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: ColorCode.kButtonColor,
+                                        )
+                                            : null,
                                       ),
-                                      child: savePassword
-                                          ? const Icon(Icons.check,
-                                          size: 14, color: ColorCode.kButtonColor)
-                                          : null,
                                     ),
                                   ),
+
                                   const SizedBox(width: 10),
+
+                                  /// TEXT
                                   Expanded(
-                                    child: RichText(
-                                      text: TextSpan(
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.black,
-                                          height: 1.4, // line spacing perfect
-                                        ),
-                                        children: const [
-                                          TextSpan(text: "I agree to the ",
+                                    child: Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          const TextSpan(
+                                            text: "I agree to the ",
                                             style: TextStyle(
                                               fontWeight: FontWeight.w400,
                                               color: ColorCode.kWhiteOpacity70,
                                               fontSize: 13,
-                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                              fontFamily: "Outfit",
                                             ),
                                           ),
-
-                                          TextSpan(
+                                          const TextSpan(
                                             text: "Terms & Condition & Privacy Policy",
                                             style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w600,
                                               color: ColorCode.white,
                                               fontSize: 13,
-                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                              fontFamily: "Outfit",
                                             ),
                                           ),
-
-
-                                          TextSpan(text: "\nset out of this site",
+                                          const TextSpan(
+                                            text: " set out of this site",
                                             style: TextStyle(
                                               fontWeight: FontWeight.w400,
                                               color: ColorCode.kWhiteOpacity70,
                                               fontSize: 13,
-                                              fontFamily: "Outfit", // ⭐ Added Outfit font
+                                              fontFamily: "Outfit",
                                             ),
                                           ),
                                         ],
                                       ),
+                                      softWrap: true,
                                     ),
                                   ),
-
-
                                 ],
                               ),
+
                               const SizedBox(height: 20),
                               SizedBox(
                                 width: double.infinity,
                                 height: 50,
                                 child: ElevatedButton(
-                                  onPressed: _fetchSingup,
+                                  onPressed: _fetchSignup,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: ColorCode.kCreamSoft,
                                     shape: RoundedRectangleBorder(
