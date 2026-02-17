@@ -8,6 +8,7 @@ import 'booking_summary_view_summary.dart';
 class BookingSelectDateTimeSlots extends StatefulWidget {
   final int bookingId;
 
+
   const BookingSelectDateTimeSlots({super.key, required this.bookingId});
 
   @override
@@ -304,7 +305,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   @override
   void initState() {
     super.initState();
-
+    _edittype();
   }
   String _apiDateFormat(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -679,7 +680,27 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
     });
   }
 
+  Future<void> _edittype() async {
+    setState(() => isLoading = true);
 
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_shoot_types}${12}/edit-types",
+      );
+
+      debugPrint("API Response → $response");
+
+      if (response != null && response['error'] == false) {
+        setState(() {
+          editTypes = response['data'] ?? [];
+        });
+      }
+    } catch (e) {
+      debugPrint("API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -704,336 +725,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
           )
         ],
       ),
-      // body: SingleChildScrollView(
-      //   padding: const EdgeInsets.all(16),
-      //   child: Column(
-      //     crossAxisAlignment: CrossAxisAlignment.start,
-      //     children: [
-      //
-      //       /// STEP INDICATOR
-      //       Row(
-      //         children: List.generate(
-      //           2,
-      //               (index) => Expanded(
-      //             child: Container(
-      //               margin: const EdgeInsets.only(right: 6),
-      //               height: 5,
-      //               decoration: BoxDecoration(
-      //                 color: index < 1
-      //                     ? ColorCode.kButtonColor
-      //                     : ColorCode.kSubtextColor,
-      //                 borderRadius: BorderRadius.circular(10),
-      //               ),
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //
-      //       const SizedBox(height: 24),
-      //
-      //       /// TITLE
-      //       const Text(
-      //         "Select Date & Time Slots",
-      //         style: TextStyle(
-      //           fontFamily: "Unbounded",
-      //           fontSize: 16,
-      //           fontWeight: FontWeight.w500,
-      //           color: Colors.white,
-      //         ),
-      //       ),
-      //
-      //       const SizedBox(height: 20),
-      //
-      //       /// DATE CARD
-      //   Container(
-      //     padding: const EdgeInsets.all(16),
-      //     decoration: BoxDecoration(
-      //       color: ColorCode.k282828,
-      //       borderRadius: BorderRadius.circular(14),
-      //     ),
-      //     child: Column(
-      //       crossAxisAlignment: CrossAxisAlignment.start,
-      //       children: [
-      //
-      //         /// MONTH + CALENDAR ICON
-      //         Row(
-      //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //           children: [
-      //             Text(
-      //               getMonthYear(),
-      //               style: const TextStyle(
-      //                 fontSize: 18,
-      //                 fontWeight: FontWeight.w600,
-      //                 color: Colors.white,
-      //               ),
-      //             ),
-      //             InkWell(
-      //               onTap: () async {
-      //                 final DateTime now = DateTime.now();
-      //
-      //                 DateTime? picked = await showDatePicker(
-      //                   context: context,
-      //                   initialDate: selectedDates.isNotEmpty
-      //                       ? selectedDates.first
-      //                       : now,
-      //                   firstDate: DateTime(now.year, now.month, now.day),
-      //                   lastDate: DateTime(2035),
-      //                 );
-      //
-      //                 if (picked == null) return;
-      //
-      //                 final normalized =
-      //                 DateTime(picked.year, picked.month, picked.day);
-      //
-      //                 setState(() {
-      //                   if (selectedDates.any((d) => isSameDate(d, normalized))) {
-      //                     selectedDates.removeWhere(
-      //                             (d) => isSameDate(d, normalized));
-      //                   } else {
-      //                     if (selectedDates.length < 5) {
-      //                       selectedDates.add(normalized);
-      //                     } else {
-      //                       ScaffoldMessenger.of(context).showSnackBar(
-      //                         const SnackBar(
-      //                           content: Text("You can select up to 5 dates only"),
-      //                         ),
-      //                       );
-      //                     }
-      //                   }
-      //                 });
-      //               },
-      //               child: ColorFiltered(
-      //                 colorFilter: const ColorFilter.mode(
-      //                   Colors.white,
-      //                   BlendMode.srcIn,
-      //                 ),
-      //                 child: Image.asset(
-      //                   "assets/Icons/Calendar_Mark.png",
-      //                   width: 22,
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //
-      //         const SizedBox(height: 16),
-      //
-      //         /// DATE LIST
-      //         SizedBox(
-      //           height: 72,
-      //           child: ListView.builder(
-      //             scrollDirection: Axis.horizontal,
-      //             itemCount: 30,
-      //             itemBuilder: (context, index) {
-      //               final date = baseDate.add(Duration(days: index));
-      //               final normalized =
-      //               DateTime(date.year, date.month, date.day);
-      //
-      //               final bool isSelected =
-      //               selectedDates.any((d) => isSameDate(d, normalized));
-      //
-      //               return GestureDetector(
-      //                 onTap: () {
-      //                   setState(() {
-      //                     if (isSelected) {
-      //                       selectedDates.removeWhere(
-      //                               (d) => isSameDate(d, normalized));
-      //                     } else {
-      //                       if (selectedDates.length < 5) {
-      //                         selectedDates.add(normalized);
-      //                       } else {
-      //                         ScaffoldMessenger.of(context).showSnackBar(
-      //                           const SnackBar(
-      //                             content:
-      //                             Text("You can select up to 5 dates only"),
-      //                           ),
-      //                         );
-      //                       }
-      //                     }
-      //                   });
-      //                 },
-      //                 child: Container(
-      //                   margin: const EdgeInsets.only(right: 12),
-      //                   width: 55,
-      //                   decoration: BoxDecoration(
-      //                     shape: BoxShape.circle,
-      //                     color: isSelected
-      //                         ? ColorCode.kButtonColor
-      //                         : ColorCode.black,
-      //                   ),
-      //                   child: Column(
-      //                     mainAxisAlignment: MainAxisAlignment.center,
-      //                     children: [
-      //                       Text(
-      //                         "${date.day}",
-      //                         style: TextStyle(
-      //                           fontSize: 18,
-      //                           fontWeight: FontWeight.bold,
-      //                           color:
-      //                           isSelected ? Colors.black : Colors.white,
-      //                         ),
-      //                       ),
-      //                       Text(
-      //                         ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-      //                         [date.weekday % 7],
-      //                         style: TextStyle(
-      //                           fontSize: 11,
-      //                           color:
-      //                           isSelected ? Colors.black : Colors.white,
-      //                         ),
-      //                       ),
-      //                     ],
-      //                   ),
-      //                 ),
-      //               );
-      //             },
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      //
-      //
-      //    SizedBox(height: 20),
-      //
-      //       /// TIME SLOTS
-      //       ...List.generate(timeSlots.length, (index) {
-      //
-      //         final bool isSelected =
-      //             selectedTimeIndex == index && !isCustomSelected;
-      //
-      //         return GestureDetector(
-      //           onTap: () {
-      //             setState(() {
-      //               selectedTimeIndex = index;
-      //               isCustomSelected = false;
-      //             });
-      //           },
-      //           child: Container(
-      //             margin: const EdgeInsets.only(bottom: 12),
-      //             padding:
-      //             const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      //             decoration: BoxDecoration(
-      //               color: isSelected
-      //                   ? ColorCode.kButtonColor
-      //                   : ColorCode.k282828,
-      //               borderRadius: BorderRadius.circular(14),
-      //             ),
-      //             child: Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //               children: [
-      //                 Text(
-      //                   timeSlots[index],
-      //                   style: TextStyle(
-      //                     fontSize: 15,
-      //                     fontWeight: FontWeight.w500,
-      //                     color:
-      //                     isSelected ? Colors.black : Colors.white,
-      //                   ),
-      //                 ),
-      //                 if (isSelected)
-      //                   const Icon(Icons.check,
-      //                       color: Colors.black, size: 22),
-      //               ],
-      //             ),
-      //           ),
-      //         );
-      //       }),
-      //
-      //       /// CUSTOM TIME
-      //       Container(
-      //         padding: const EdgeInsets.all(16),
-      //         decoration: BoxDecoration(
-      //           color: ColorCode.k282828,
-      //           borderRadius: BorderRadius.circular(14),
-      //         ),
-      //         child: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             GestureDetector(
-      //               onTap: () {
-      //                 setState(() {
-      //                   isCustomSelected = true;
-      //                   selectedTimeIndex = -1;
-      //                 });
-      //               },
-      //               child: const Row(
-      //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //                 children: [
-      //                   Text(
-      //                     "Add Custom Time Duration",
-      //                     style: TextStyle(
-      //                       fontSize: 15,
-      //                       fontWeight: FontWeight.w500,
-      //                       color: Colors.white,
-      //                     ),
-      //                   ),
-      //                   Icon(Icons.arrow_forward_ios,
-      //                       size: 14, color: Colors.white70),
-      //                 ],
-      //               ),
-      //             ),
-      //             const SizedBox(height: 18),
-      //             SliderTheme(
-      //               data: SliderTheme.of(context).copyWith(
-      //                 activeTrackColor: ColorCode.kCreamSoft,
-      //                 inactiveTrackColor: ColorCode.white,
-      //                 thumbColor: ColorCode.kCreamSoft,
-      //               ),
-      //               child: Slider(
-      //                 min: 2,
-      //                 max: 24,
-      //                 divisions: 11,
-      //                 value: selectedHour,
-      //                 onChanged: (v) {
-      //                   setState(() {
-      //                     selectedHour = v;
-      //                     isCustomSelected = true;   // 🔥 VERY IMPORTANT
-      //                     selectedTimeIndex = -1;   // slot deselect
-      //                   });
-      //                 },
-      //
-      //               ),
-      //             ),
-      //             const Row(
-      //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //               children: [
-      //                 Text("02h"), Text("04h"), Text("08h"),
-      //                 Text("12h"), Text("16h"), Text("20h"), Text("24h"),
-      //               ],
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //
-      //       const SizedBox(height: 24),
-      //
-      //       /// NEXT BUTTON
-      //       SizedBox(
-      //         height: 55,
-      //         width: double.infinity,
-      //         child: ElevatedButton(
-      //           style: ElevatedButton.styleFrom(
-      //             backgroundColor: ColorCode.kButtonColor,
-      //             shape: RoundedRectangleBorder(
-      //               borderRadius: BorderRadius.circular(12),
-      //             ),
-      //           ),
-      //           onPressed: isLoading ? null : selectTimeApi,
-      //
-      //           child: const Text(
-      //             "Next",
-      //             style: TextStyle(
-      //               fontSize: 15,
-      //               fontWeight: FontWeight.bold,
-      //               color: Colors.black,
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+
 
 
 
@@ -1071,7 +763,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                     Row(
                       children: [
                         Text(
-                          "Select Date & Time Slots",
+                          "Shoot Date & Time",
                           style: TextStyle(
                             fontFamily: "Unbounded",
                             fontSize: 16,
@@ -1173,8 +865,8 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                       },
                     ),
 
-                                 /*     SizedBox(height: 30,),
-                    Column(
+                                      SizedBox(height: 30,),
+      /*              Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
@@ -1274,46 +966,46 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                           SizedBox(height: 30),
 
 
-                          // GestureDetector(
-                          //   onTap: _showEditTypeBottomSheet,
-                          //   child: AbsorbPointer(
-                          //     child: TextField(
-                          //       controller: TextEditingController(
-                          //         text: getEditTypeDisplayText(),
-                          //       ),
-                          //       style: const TextStyle(
-                          //         color: Colors.white,
-                          //         fontFamily: "Outfit",
-                          //         fontSize: 14,
-                          //       ),
-                          //       decoration: InputDecoration(
-                          //         labelText: getContentTypeTitle(widget.contentTypeId),
-                          //         floatingLabelBehavior: FloatingLabelBehavior.always,
-                          //         suffixIcon: const Icon(
-                          //           Icons.keyboard_arrow_down,
-                          //           color: ColorCode.kWhiteOpacity70,
-                          //         ),
-                          //         contentPadding:
-                          //         const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                          //         enabledBorder: OutlineInputBorder(
-                          //           borderRadius: BorderRadius.circular(12),
-                          //           borderSide:
-                          //           const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
-                          //         ),
-                          //         focusedBorder: OutlineInputBorder(
-                          //           borderRadius: BorderRadius.circular(12),
-                          //           borderSide:
-                          //           const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
+                          GestureDetector(
+                            onTap: _showEditTypeBottomSheet,
+                            child: AbsorbPointer(
+                              child: TextField(
+                                controller: TextEditingController(
+                                  text: getEditTypeDisplayText(),
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Outfit",
+                                  fontSize: 14,
+                                ),
+                                decoration: InputDecoration(
+                                  // labelText: getContentTypeTitle(widget.contentTypeId),
+                                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                                  suffixIcon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: ColorCode.kWhiteOpacity70,
+                                  ),
+                                  contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                    const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                    const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
 
                           if (selectedEditTypeNames.isNotEmpty) ...[
                             const SizedBox(height: 14),
 
-                            *//* Wrap(
+                            Wrap(
                             spacing: 10,
                             runSpacing: 10,
                             children: List.generate(selectedEditTypeNames.length, (index) {
@@ -1358,7 +1050,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                                 ),
                               );
                             }),
-                          ),*//*
+                          ),
                           ]
 
                         ],

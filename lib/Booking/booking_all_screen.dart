@@ -676,6 +676,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             builder: (_) => UpcomingBookingEventSummary(
               bookingId: shoot['booking_id'],
               contentType: contentType,
+                shootTypeId: shoot['shoot_type_id']
             ),
           ),
         );
@@ -702,6 +703,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 durationHours: shoot['duration_hours'],
                 location: shoot['location'],
                 imageUrl: finalImage,
+                shootTypeId: shoot['shoot_type_id'],   // ✅ ADD THIS
+
               ),
             ),
           );

@@ -38,11 +38,16 @@ class _HomeScreenState extends State<HomeScreen>
 
   double? selectedLat;
   double? selectedLng;
-
+  late ScrollController _scrollController;
+  late final double _scrollSpeed;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollSpeed = 1.5; // speed control
+
+    startAutoScroll();
 
     /// 🎯 Animation Controller
     _controller = AnimationController(
@@ -88,6 +93,31 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  void startAutoScroll() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!_scrollController.hasClients) return;
+
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 50) {
+          _scrollController.jumpTo(0);
+        }
+      });
+
+      Future.doWhile(() async {
+        await Future.delayed(const Duration(milliseconds: 16));
+
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(
+            _scrollController.position.pixels + _scrollSpeed,
+          );
+        }
+
+        return true;
+      });
+    });
+  }
+
 
   String? getProfileImageUrl() {
     if (myProfile == null) return null;
@@ -124,11 +154,19 @@ class _HomeScreenState extends State<HomeScreen>
 
 
   final List<String> featuredImages = [
-    "assets/images/man2.png",
-    "assets/images/Group 2087329236.png",
-    "assets/images/Group 45.png",
-    "assets/images/man2.png",
-    "assets/images/Group 2087329236.png",
+    "assets/images/Alec+H.png",
+    "assets/images/Benson+F.png",
+    "assets/images/Christopher+R.png",
+    "assets/images/Corey+B.png",
+    "assets/images/Cornelius+M. (1).png"
+  ];
+
+  final List<String> featuredNames = [
+    "Alec H",
+    "Benson F",
+    "Christopher R",
+    "Corey B",
+    "Cornelius M"
   ];
 
   final List<Map<String, String>> cards = [
@@ -415,80 +453,104 @@ class _HomeScreenState extends State<HomeScreen>
 
                 SizedBox(height: 15,),
 
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: List.generate(specialties.length, (index) {
-                            final item = specialties[index];
-                            final iconPath =
-                            specialtyIcons[index % specialtyIcons.length];
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: SizedBox(
+                  height: 115, // 🔥 fixed total height for stability
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: specialties.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 18),
+                    itemBuilder: (context, index) {
+                      final item = specialties[index];
+                      final iconPath =
+                      specialtyIcons[index % specialtyIcons.length];
 
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 18),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Specialities(),
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(50),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Specialities(),
+                            ),
+                          );
+                        },
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+
+                            double circleSize = 65; // 🔥 balanced size
+
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+
+                                /// 🔵 Premium Circle
+                                Container(
+                                  height: circleSize,
+                                  width: circleSize,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF2E2E2E),
+                                        Color(0xFF1F1F1F),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
-                                  );
-                                },
-                                child: Column(
-                                  children: [
-
-                                    /// 🔵 CIRCLE ICON
-                                    Container(
-                                      height: 70,
-                                      width: 70,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: const Color(0xFF2A2A2A),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.4),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Image.asset(
-                                          iconPath,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14),
+                                    child: Image.asset(
+                                      iconPath,
+                                      fit: BoxFit.contain,
                                     ),
-
-                                    const SizedBox(height: 8),
-
-                                    /// 📝 NAME
-                                    SizedBox(
-                                      width: 80,
-                                      child: Text(
-                                        (item["name"] ?? "")
-                                            .toString()
-                                            .replaceAll(" & ", " &\n"),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: ColorCode.white,
-                                          fontFamily: 'Outfit',
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+
+                                const SizedBox(height: 8),
+
+                                /// 📝 Name
+                                SizedBox(
+                                  width: circleSize + 10,
+                                  child: Text(
+                                    (item["name"] ?? "")
+                                        .toString()
+                                        .replaceAll(" & ", " &\n"),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: 'Outfit',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
-                          }),
+                          },
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                  ),
+                ),
+              ),
 
 
 
 
-                  ],
+
+              ],
                 ),
               ),
 
@@ -616,15 +678,22 @@ class _HomeScreenState extends State<HomeScreen>
                       ],
                     ),
                     SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        teamCard(image: "assets/images/man2.png", name: "George Harris"),
-                        teamCard(image: "assets/images/Group 2087329236.png", name: "Emily Johnson"),
-                        teamCard(image: "assets/images/Group 45.png", name: "Charles Smith"),
+                    SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: featuredImages.length,
+                        itemBuilder: (context, index) {
+                          return teamCard(
+                            image: featuredImages[index],
+                            name: featuredNames[index],
+                          );
+                        },
+                      ),
+                    ),
 
-                      ],
-                    )
+
 
                   ],
                 ),
@@ -1160,58 +1229,65 @@ class _HomeScreenState extends State<HomeScreen>
 
     );
   }
-
   Widget teamCard({
     required String image,
     required String name,
   }) {
-    return Column(
-      // mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
+    return TweenAnimationBuilder(
+      duration: const Duration(milliseconds: 600),
+      tween: Tween<double>(begin: 0.9, end: 1),
+      curve: Curves.easeOutBack,
+      builder: (context, double scale, child) {
+        return Transform.scale(
+          scale: scale,
+          child: child,
+        );
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 16),
+        child: Column(
           children: [
-            // Background Circle
             Container(
-              height: 90,
-              width: 90,
+              height: 140,
+              width: 120,
               decoration: BoxDecoration(
-                color: ColorCode.k777571,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  )
+                ],
               ),
-            ),
-
-            // Image on top of circle
-            Positioned(
-              top: -20,
-              child: ClipOval(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
                 child: Image.asset(
                   image,
-                  height: 110,
-                  width: 95,
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                 ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              name,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: ColorCode.white,
+                fontFamily: "Outfit",
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
         ),
-
-        SizedBox(height: 8),
-
-        // Name
-        Text(
-          name,
-          style: TextStyle(
-            fontFamily: "Outfit",
-            color: ColorCode.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w500
-          ),
-        ),
-      ],
+      ),
     );
   }
+
 
   Widget _buildCard({
     required Map<String, String> data,

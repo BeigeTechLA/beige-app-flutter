@@ -101,7 +101,7 @@ class _SpecialitiesState extends State<Specialities> {
                         crossAxisCount: 4,   // 🔥 4 in one row
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 20,
-                        childAspectRatio: 0.75,  // important for spacing
+                        childAspectRatio: 0.65,
                       ),
                       itemBuilder: (context, index) {
                         return _buildGridItem(
@@ -124,6 +124,7 @@ class _SpecialitiesState extends State<Specialities> {
     final iconPath = bookShootIcons[index % bookShootIcons.length];
 
     return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: () {
         Navigator.push(
           context,
@@ -134,48 +135,70 @@ class _SpecialitiesState extends State<Specialities> {
           ),
         );
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double circleSize = constraints.maxWidth * 0.75; // 🔥 bigger circle
 
-          /// 🔵 Circle Icon
-          Container(
-            height: 60,
-            width: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFF2A2A2A),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Image.asset(
-                iconPath,
-                fit: BoxFit.contain,
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+
+              /// 🔵 Bigger Circle
+              Container(
+                height: circleSize,
+                width: circleSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF2E2E2E),
+                      Color(0xFF1F1F1F),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(circleSize * 0.22),
+                  child: Image.asset(
+                    iconPath,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 8),
+              const SizedBox(height: 14),
 
-          /// 📝 Proper Name Below
-          Text(
-            (item["name"] ?? "")
-                .toString()
-                .replaceAll(" & ", " &\n"),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: ColorCode.white,
-              fontSize: 12,
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+              /// 📝 Name
+              Text(
+                (item["name"] ?? "")
+                    .toString()
+                    .replaceAll(" & ", " &\n"),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: ColorCode.kWhiteOpacity60,
+                  fontSize: 11, // 🔥 little bigger text
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
+
+
 
 
 

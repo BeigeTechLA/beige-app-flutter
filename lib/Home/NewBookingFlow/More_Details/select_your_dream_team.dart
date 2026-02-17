@@ -207,26 +207,34 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   }
 
   bool get isRoleWiseSelectionComplete {
+
+    if (requiredCountByRole.isEmpty) {
+      return true;
+    }
+
     for (final entry in requiredCountByRole.entries) {
       final roleId = entry.key;
       final required = entry.value;
 
       int selected = 0;
+
       for (final match in crewMatches) {
         final int uid = match['user']['id'];
-        final int rId = int.parse(match['role_id']);
+        final int rId = int.tryParse(match['role_id'].toString()) ?? 0;
 
         if (rId == roleId && addedCrewUserIds.contains(uid)) {
           selected++;
         }
       }
 
-      if (selected != required) {
+      if (selected < required) {
         return false;
       }
     }
+
     return true;
   }
+
 
   Future<void> _filterCrew({required String sort}) async {
     setState(() => isLoading = true);
@@ -737,19 +745,29 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 height: 55,
                 child: ElevatedButton(
                   // ✅ FINAL ENABLE / DISABLE LOGIC
-                  onPressed: isRoleWiseSelectionComplete
-                      ? () async {
-                    for (final userId in addedCrewUserIds) {
-                      final match = crewMatches.firstWhere(
-                            (e) => e['user']['id'] == userId,
-                      );
+                  onPressed: () async {
 
-                      await _addHolds(
-                        creativeUserId: userId,
-                        roleId: int.parse(match['role_id']),
-                      );
+                    // 🔹 Agar koi crew select kiya hai tab hi hold API call kare
+                    if (addedCrewUserIds.isNotEmpty) {
+                      for (final userId in addedCrewUserIds) {
+
+                        final matches = crewMatches
+                            .where((e) => e['user']['id'] == userId)
+                            .toList();
+
+                        if (matches.isEmpty) continue;
+
+                        final roleId =
+                            int.tryParse(matches.first['role_id'].toString()) ?? 0;
+
+                        await _addHolds(
+                          creativeUserId: userId,
+                          roleId: roleId,
+                        );
+                      }
                     }
 
+                    // 🔥 ALWAYS GO NEXT SCREEN
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -758,13 +776,13 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                         ),
                       ),
                     );
-                  }
-                      : null,
+                  },
+
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isRoleWiseSelectionComplete
                         ? ColorCode.kButtonColor
-                        : ColorCode.kWhiteOpacity60,
+                        : ColorCode.kButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -779,7 +797,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       fontWeight: FontWeight.w600,
                       color: isRoleWiseSelectionComplete
                           ? ColorCode.kHeadingColor
-                          : Colors.black45,
+                          : ColorCode.kHeadingColor,
                     ),
                   ),
                 ),

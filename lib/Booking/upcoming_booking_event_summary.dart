@@ -9,8 +9,8 @@ import '../utility/ColorCode.dart';
 class UpcomingBookingEventSummary extends StatefulWidget {
   final int bookingId;
   final String? contentType;
-
-  const UpcomingBookingEventSummary({super.key, required this.bookingId, this.contentType});
+  final int shootTypeId;
+  const UpcomingBookingEventSummary({super.key, required this.bookingId, this.contentType, required this.shootTypeId});
 
   @override
   State<UpcomingBookingEventSummary> createState() =>
@@ -428,7 +428,7 @@ class _UpcomingBookingEventSummaryState
                       imageUrl: getCreativeImage().isNotEmpty
                           ? getCreativeImage()
                           : "assets/images/home2.png",
-                      bookingId: widget.bookingId,
+                      bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
       
                     ),
                   ),

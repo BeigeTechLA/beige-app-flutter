@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:beige/Home/HomeSekect/payment_method.dart';
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -34,7 +35,12 @@ bool loding =true;
 
 
 
-
+  String creativeName = "";
+  String creativeRole = "";
+  String creativeImage = "";
+  String creativeRate = "";
+  String creativeRatingText = "";
+  Map<String, dynamic>? crewSummary;
 
   final TextEditingController NotesController = TextEditingController();
 
@@ -85,9 +91,24 @@ bool loding =true;
         booking = data['booking'];
         totals = data['totals'];
         addons = data['addons'] ?? [];
-        savedCards = data['saved_cards'] ?? [];
+
+        booking = data['booking'];
+        pricing = data['pricing'];
+
+        crewSummary = data['crew_summary'];
+
+        /// ✅ CHECK SAVED CARD
+        List savedCards = data['payment_methods']?['saved_cards'] ?? [];
         hasSavedCard = savedCards.isNotEmpty;
 
+        if (!hasSavedCard) {
+          selectedIndex = 0; // force default to card
+        }
+        creativeRole = getContentTypeTitle(
+          int.tryParse(booking?['content_type'] ?? "0") ?? 0,
+        );
+        creativeName = booking?['shoot_type_name'] ?? "—";
+        creativeImage = booking?['shoot_type_image_url'] ?? "";
         /// 🔥 FIND DEFAULT CARD
         if (hasSavedCard) {
           final defaultCard = savedCards.firstWhere(
@@ -144,7 +165,7 @@ bool loding =true;
 
       if (response['error'] == false) {
         // ✅ SUCCESS
-        showScheduleUpdatedDialog(context);
+
       } else {
         // ❌ API ERROR
         ScaffoldMessenger.of(context).showSnackBar(
@@ -163,18 +184,49 @@ bool loding =true;
     }
   }
 
-  String getContentTypeTitle(String? type) {
-    switch (type) {
-      case "1":
-        return "Video Shoot";
-      case "2":
-        return "Photo Shoot";
-      case "3":
-        return "Photo & Video Shoot";
+  String getContentTypeTitle(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "Video Shoot Type";
+      case 2:
+        return "Photo Shoot Type";
+      case 3:
+        return "Photo & Video Shoot Type";
       default:
         return "Shoot Type";
     }
   }
+
+  List<String> getContentTypeTitles(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return ["Video Shoot Type"];
+      case 2:
+        return ["Photo Shoot Type"];
+      case 3:
+        return [
+          "Video Shoot Type",
+          "Photo Shoot Type",
+        ];
+      default:
+        return ["Shoot Type"];
+    }
+  }
+
+  int getSafeContentType() {
+    final value = booking?['content_type'];
+
+    if (value == null) return 0;
+
+    if (value is int) return value;
+
+    if (value is String) {
+      return int.tryParse(value) ?? 0;
+    }
+
+    return 0;
+  }
+
 
   String getShootTypeImage() {
     final img = booking?['shoot_type_image_url'];
@@ -322,7 +374,8 @@ bool loding =true;
                               SizedBox(height: 10),
                               Text(
 
-                                getContentTypeTitle(booking?['content_type']),
+                                getContentTypeTitle(getSafeContentType()),
+
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: ColorCode.kButtonColor,
@@ -395,8 +448,230 @@ bool loding =true;
               Divider(color: Colors.white24,),
               SizedBox(height: 28),
 
-
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Editing Services",
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: ColorCode.white,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w500
+                        ),),
+                    ],
+                  ),
+                  SizedBox(height: 14),
+
+
+                  Container(
+                    margin:  EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF282828),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
+
+                                "$creativeRole:",style: TextStyle(color: ColorCode.white,fontSize: 12,fontFamily: "Outfit",fontWeight:FontWeight.w400),
+
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: (booking?['edit_types'] ?? []).length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            childAspectRatio: 2.4, // 🔥 wrap ke liye better
+                          ),
+                          itemBuilder: (context, index) {
+                            final edit = booking!['edit_types'][index];
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: ColorCode.kGoldGradientLight,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  edit,
+                                  textAlign: TextAlign.center,
+                                  softWrap: true,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.visible,
+                                  style: const TextStyle(
+                                    color: ColorCode.black,
+                                    fontFamily: "Outfit",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+
+
+
+                      ],
+                    ),
+                  ),
+
+
+                  SizedBox(height: 14),
+                  // _buildField("Full Name*", nameController),
+                  //
+                  // const SizedBox(height: 15),
+                  //
+                  // _buildField("Email ID", emailController),
+                  //
+                  // const SizedBox(height: 15),
+                  //
+                  // _buildField("Phone Number*", phoneController, isPhone: true),
+
+
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Pricing Summary",
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: ColorCode.white,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          color: ColorCode.kGoldGradientLight,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Package Offer",
+                              style: TextStyle(
+                                color: ColorCode.kHeadingColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                            const Divider(color: ColorCode.black),
+
+                            _buildCheckRow(
+                              text: "Unlimited Usage Rights",
+                              iconPath: "assets/newbookflow/security-wifi (1).png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "All Raw Content",
+                              iconPath: "assets/newbookflow/File Image.png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "Include Edited Deliverable",
+                              iconPath: "assets/newbookflow/Box.png",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildCheckRow(
+                              text: "Up to 2 Sets of Revisions",
+                              iconPath: "assets/newbookflow/Refresh.png",
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+                      Divider(color: ColorCode.kDividerWhite12),
+                      // --- SHOOT COST CARD ---
+                      builderPricingCard(
+                        title: "Shoot Cost",
+                        amount: calculateShootCost()['total'],
+                        subtitles: [
+                          if (calculateShootCost()['hasPreProd']) "",
+                          if (calculateShootCost()['hasRush']) "• Rush Fee",
+
+                        ],
+                      ),
+
+                      // --- EDITING SERVICES CARD ---
+                      builderPricingCard(
+                        title: "Editing Services",
+                        amount: (pricing?['editing_amount'] ?? 0).toDouble(),
+                        subtitles: (pricing?['editing_breakdown'] as List? ?? [])
+                            .map((e) => "• ${e['label']}")
+                            .toList(),
+                      ),
+
+                      // --- ADDITIONAL CREW CARD ---
+                      if (calculateAdditionalCrew()['total'] > 0)
+                        builderPricingCard(
+                          title: "Additional Crew",
+                          amount: calculateAdditionalCrew()['total'],
+                          subtitles: (calculateAdditionalCrew()['counts'] as Map<int, int>)
+                              .entries
+                              .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
+                              .toList(),
+                        ),
+
+                      const SizedBox(height: 10),
+                      const Divider(color: ColorCode.kDividerWhite12),
+
+                      /// 🔹 TOTAL
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Total Amount",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: ColorCode.white,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              "\$${pricing?['total_amount']?.toStringAsFixed(2) ?? "0.00"}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: ColorCode.kButtonColor, // Making total stand out
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+
+
+                ],
+              ),
+             /* Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
@@ -441,7 +716,7 @@ bool loding =true;
                     title: "Pay By Credit or Debit Card",
                     value: 1,
                   ),
-               /*   Container(
+               *//*   Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
@@ -472,115 +747,14 @@ bool loding =true;
                         ),
                       ],
                     ),
-                  ),*/
+                  ),*//*
 
 
                 ],
-              ),
-
-              Divider(color: Colors.white30),
-              SizedBox(height: 28),
+              ),*/
 
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Payment Details",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorCode.white,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 8),
-
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: ColorCode.k282828,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  children: [
-
-                    /// 🔹 Dynamic pricing rows from API
-                    ...pricingBreakdown.map((item) {
-                      return priceRow(
-                        item['label'] ?? '',
-                        "\$ ${item['amount'] ?? 0}.00/-",
-                      );
-                    }).toList(),
-
-                    const Divider(color: Colors.white30),
-
-                    /// 🔹 TOTAL (single source of truth)
-                    priceRow(
-                      "Total",
-                      "\$ ${pricing?['total_amount'] ?? 0}.00/-",
-                      isTotal: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 28),
-              Divider(color: Colors.white30),
-
-              SizedBox(height: 28),
-              Divider(color: Colors.white30,),
-              /// 📝 NOTES
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Notes",
-                    style:    TextStyle(
-                        fontSize: 14,
-                        color: ColorCode.white,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w500
-                    ),),
-
-                ],
-              ),
-              SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  color: ColorCode.k282828,
-                  borderRadius: BorderRadius.circular(12), // ✅ Radius 12px
-                  border: Border.all(
-                    color: const Color(0x80DDDDDD), // ✅ #DDDDDD at 50%
-                    width: 0.5, // ✅ Border 0.5px
-                  ),
-                ),
-                child: TextField(
-                  minLines: 4, // ✅ 4 lines height
-                  maxLines: 6,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: "Outfit",
-                  ),
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    hintText: "Comments or request",
-                    hintStyle: TextStyle(
-                      fontSize: 12,
-                      color: ColorCode.kWhiteOpacity70,
-                      fontFamily: "Outfit",
-                      fontWeight: FontWeight.w400,
-                    ),
-                    border: InputBorder.none,
-                    isCollapsed: true,
-                  ),
-                ),
-              ),
 
 
               const SizedBox(height: 32),
@@ -608,7 +782,7 @@ bool loding =true;
           children: [
 
             /// 🔹 PRICE + DETAILS
-            Column(
+           /* Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children:  [
@@ -634,7 +808,7 @@ bool loding =true;
                   ),
                 ),
               ],
-            ),
+            ),*/
 
             const SizedBox(width: 16),
 
@@ -655,7 +829,7 @@ bool loding =true;
                     ),
                   ),
                   child: const Text(
-                    "Continue",
+                    "Update Schedule",
                     style: TextStyle(
                       fontFamily: "Unbounded",
                       fontSize: 14,
@@ -871,121 +1045,161 @@ bool loding =true;
     );
   }
 
-  void showScheduleUpdatedDialog(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Schedule Updated",
-      barrierColor: Colors.black.withOpacity(0.35), // dark overlay
-      transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // 🔥 BLUR STRENGTH
+  Widget _buildCheckRow({
+    required String text,
+    required String iconPath,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 28,
+          width: 28,
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            shape: BoxShape.circle,
+          ),
           child: Center(
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-
-                    /// 🔹 ICON STACK
-
-                    Image.asset(
-                      "assets/images/Group 1171276698 (1).png",
-                      height: 64,
-                      width: 64,
-                      fit: BoxFit.contain,
-                    ),
-
-
-                    const SizedBox(height: 16),
-
-                    /// 🔹 TITLE
-                    const Text(
-                      "Schedule Updated",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: ColorCode.kButtonColor,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    /// 🔹 SUBTITLE
-                    const Text(
-                      "Your booking has been rescheduled with updated date and time.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: ColorCode.kWhiteOpacity70,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-
-                        // ✅ Next Button
-                        Expanded(
-                          child: SizedBox(
-                            height: 55,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFE7C89E),
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (_) =>Mainscreen()),
-                                );
-                              },
-                              child: const Text(
-                                "View Summary",
-                                style: TextStyle(
-                                  color: ColorCode.kHeadingColor,
-                                  fontFamily: 'Unbounded',   // ← Add this
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+            child: Image.asset(
+              iconPath,
+              height: 14,
+              width: 14,
+              color: Colors.white,
             ),
           ),
-        );
-      },
-    /*  transitionBuilder: (_, anim, __, child) {
-        return FadeTransition(
-          opacity: anim,
-          child: ScaleTransition(
-            scale: Tween(begin: 0.95, end: 1.0).animate(anim),
-            child: child,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: ColorCode.black,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              fontFamily: "Outfit",
+            ),
           ),
-        );
-      },*/
+        ),
+      ],
     );
+  }
+
+  Widget builderPricingCard({
+    required String title,
+    required double amount,
+    required List<String> subtitles,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A), // Darker background for the cards
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Outfit",
+                ),
+              ),
+              Text(
+                "\$${NumberFormat('#,##0.00').format(amount)}",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: "Outfit",
+                ),
+              ),
+            ],
+          ),
+          /*    if (subtitles.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              children: subtitles
+                  .map((sub) => Text(
+                sub,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
+                  fontFamily: "Outfit",
+                ),
+              ))
+                  .toList(),
+            ),
+          ]*/
+        ],
+      ),
+    );
+  }
+  /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
+  Map<String, dynamic> calculateShootCost() {
+    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
+    double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
+    double shootCost = preProd + rushFee;
+
+    // Use crewSummary instead of bookingSummaryData
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
+
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      // API keys are strings "1", "2", so we convert to string for lookup
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
+
+      if (current < required) {
+        shootCost += (c['amount'] ?? 0).toDouble();
+        processedCount[roleId] = current + 1;
+      }
+    }
+
+    return {
+      "total": shootCost,
+      "hasPreProd": preProd > 0,
+      "hasRush": rushFee > 0,
+    };
+  }
+
+  Map<String, dynamic> calculateAdditionalCrew() {
+    double additionalTotal = 0;
+    Map<int, int> extraCount = {};
+
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
+
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
+
+      if (current < required) {
+        processedCount[roleId] = current + 1;
+      } else {
+        additionalTotal += (c['amount'] ?? 0).toDouble();
+        extraCount[roleId] = (extraCount[roleId] ?? 0) + 1;
+      }
+    }
+
+    return {
+      "total": additionalTotal,
+      "counts": extraCount,
+    };
   }
 }

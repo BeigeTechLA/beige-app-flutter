@@ -16,6 +16,8 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
   final int ?durationHours;
   final String ?location;
   final String? contentType;
+  final int shootTypeId;
+
 
   final String ?imageUrl;
   const UpcomingEventSummaryManagebooking({super.key,
@@ -27,7 +29,7 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
      this.durationHours,
      this.location,
      this.imageUrl,
-    this.contentType,
+    this.contentType, required this.shootTypeId,
   });
 
   @override
@@ -248,7 +250,7 @@ class _UpcomingEventSummaryManagebookingState
                                   ),
                                   SizedBox(height: 2),
                                   Text(
-                                    widget.contentType ?? "",
+                                    widget.contentType ?? '',
                                     style: TextStyle(
                                       fontSize: 12, color: ColorCode.kWhiteOpacity70,
                                       fontFamily: "Outfit",
@@ -386,10 +388,16 @@ class _UpcomingEventSummaryManagebookingState
                                     ),
                                   ),
                                   onPressed: () {
-                                     Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (_) =>BookingSelectDateTimeSlots(bookingId: widget.bookingId,)),
-                              );
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BookingSelectDateTimeSlots(
+                                          bookingId: widget.bookingId,
+                                      /*    contentType: widget.contentType ?? '',
+                                          shootTypeId: widget.shootTypeId,*/
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: const Text(
                                     "Reschedule",
