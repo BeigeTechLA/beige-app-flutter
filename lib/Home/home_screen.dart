@@ -8,6 +8,7 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
 import 'HomeSekect/change_location_screen.dart';
+import 'HomeSekect/recommended_detils_screen.dart';
 import 'HomeSekect/select_location.dart';
 import 'SelectLocationMapScreen.dart';
 import 'Specialities/specialities.dart';
@@ -38,40 +39,84 @@ class _HomeScreenState extends State<HomeScreen>
 
   double? selectedLat;
   double? selectedLng;
-  late ScrollController _scrollController;
+
   late final double _scrollSpeed;
+  late PageController _pageController;
+  double _currentPage = 0;
+
+  final int _initialPage = 1000;
+
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollSpeed = 1.5; // speed control
 
-    startAutoScroll();
+    /// 🔥 PageController (Smooth Infinite Carousel)
+    _pageController = PageController(
+      viewportFraction: 0.42, // thoda spacing better
+      initialPage: _initialPage,
+    );
 
-    /// 🎯 Animation Controller
+    _currentPage = _initialPage.toDouble();
+
+    /// ❌ No setState here (smooth scrolling)
+    _pageController.addListener(() {
+      _currentPage =
+          _pageController.page ?? _initialPage.toDouble();
+    });
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _fade = Tween<double>(begin: 2, end: 0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
-
-    _scale = Tween<double>(begin: 1, end: 0.95).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutBack,
-      ),
+      duration: const Duration(milliseconds: 450),
     );
 
     _slideDown = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, 0.6),
+      end: const Offset(0, -0.5),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.9,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+    _fade = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
+
+
+    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _scale = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _slideDown = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -79,10 +124,10 @@ class _HomeScreenState extends State<HomeScreen>
       ),
     );
 
-    /// ▶️ Start animation
+
     _controller.forward();
 
-    /// 🌐 API call (IMPORTANT)
+    /// 🌐 API call
     _fetchhome_data();
   }
 
@@ -93,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  void startAutoScroll() {
+ /* void startAutoScroll() {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!_scrollController.hasClients) return;
 
@@ -117,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen>
       });
     });
   }
-
+*/
 
   String? getProfileImageUrl() {
     if (myProfile == null) return null;
@@ -158,7 +203,13 @@ class _HomeScreenState extends State<HomeScreen>
     "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
-    "assets/images/Cornelius+M. (1).png"
+    "assets/images/Cornelius+M. (1).png",
+    "assets/images/Daniel+A.png",
+    "assets/images/Daniel+C.png",
+    "assets/images/Gary+Ahmed.png",
+    "assets/images/Jesse+S.png",
+    "assets/images/Mikey+D (1).jpg",
+    "assets/images/Nathan+Grant.png"
   ];
 
   final List<String> featuredNames = [
@@ -166,7 +217,13 @@ class _HomeScreenState extends State<HomeScreen>
     "Benson F",
     "Christopher R",
     "Corey B",
-    "Cornelius M"
+    "Cornelius M",
+    "Daniel A",
+    "Daniel C",
+    "Gary Ahmed",
+    "Jesse S.",
+    "Mikey D",
+    "Nathan Grant"
   ];
 
   final List<Map<String, String>> cards = [
@@ -562,13 +619,12 @@ class _HomeScreenState extends State<HomeScreen>
                   onTap: () async {
                     if (_controller.isAnimating) return;
 
-                    await _controller.forward(); // ⬅ pehle pura animation
-
+                    await _controller.reverse();
                     setState(() {
                       currentIndex = (currentIndex + 1) % cards.length;
                     });
-
-                    _controller.reset(); // ⬅ phir new card clean state me
+                    _controller.forward();
+                    // new card smooth enter
                   },
 
                   child: SizedBox(
@@ -612,10 +668,10 @@ class _HomeScreenState extends State<HomeScreen>
                         /// 🔹 CURRENT CARD (TOP)
                         SlideTransition(
                           position: _slideDown,
-                          child: ScaleTransition(
-                            scale: _scale,
-                            child: FadeTransition(
-                              opacity: _fade,
+                          child: FadeTransition(
+                            opacity: _fade,
+                            child: ScaleTransition(
+                              scale: _scale,
                               child: _buildCard(
                                 key: ValueKey(currentIndex),
                                 data: cards[currentIndex],
@@ -623,6 +679,8 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
                         ),
+
+
                       ],
                     ),
                   ),
@@ -679,19 +737,61 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     SizedBox(height: 20),
                     SizedBox(
-                      height: 200,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: featuredImages.length,
-                        itemBuilder: (context, index) {
-                          return teamCard(
-                            image: featuredImages[index],
-                            name: featuredNames[index],
+                      height: 260,
+                      child: AnimatedBuilder(
+                        animation: _pageController,
+                        builder: (context, child) {
+                          return PageView.builder(
+                            controller: _pageController,
+                            physics: const BouncingScrollPhysics(), // 🔥 smooth iOS feel
+                            itemBuilder: (context, index) {
+
+                              final int actualIndex =
+                                  index % featuredImages.length;
+
+                              double page = _pageController.hasClients
+                                  ? _pageController.page ?? _initialPage.toDouble()
+                                  : _initialPage.toDouble();
+
+                              double difference = (page - index);
+
+                              // 🔥 ultra smooth scale
+                              double scale = 1 -
+                                  (difference.abs() * 0.15);
+
+                              scale = scale.clamp(0.85, 1.0);
+
+                              // 🔥 smoother vertical movement
+                              double translateY =
+                              (difference.abs() * 25);
+
+                              translateY = translateY.clamp(0, 30);
+
+                              // 🔥 smoother opacity
+                              double opacity =
+                                  1 - (difference.abs() * 0.25);
+
+                              opacity = opacity.clamp(0.6, 1.0);
+
+                              return Opacity(
+                                opacity: opacity,
+                                child: Transform.translate(
+                                  offset: Offset(0, translateY),
+                                  child: Transform.scale(
+                                    scale: scale,
+                                    child: teamCard(
+                                      image: featuredImages[actualIndex],
+                                      name: featuredNames[actualIndex],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
                     ),
+
 
 
 
@@ -873,19 +973,30 @@ class _HomeScreenState extends State<HomeScreen>
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kButtonColor,
-                                              borderRadius: BorderRadius.circular(22),
-                                            ),
-                                            child: Text(
-                                              "From \$450/Hr",
-                                              style: TextStyle(
-                                                fontFamily: "Outfit",
-                                                color: ColorCode.kCircleGradientTop,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
+                                          GestureDetector(
+                                      /*      onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => RecommendedDetilsScreen(id: 2, bookingId: 2,), // 👈 jis screen pe bhejna hai
+                                                ),
+                                              );
+                                            },*/
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 7),
+                                              decoration: BoxDecoration(
+                                                color: ColorCode.kButtonColor,
+                                                borderRadius: BorderRadius.circular(22),
+                                              ),
+                                              child: Text(
+                                                "View Profile",
+                                            
+                                                style: TextStyle(
+                                                  fontFamily: "Outfit",
+                                                  color: ColorCode.kCircleGradientTop,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1035,7 +1146,7 @@ class _HomeScreenState extends State<HomeScreen>
                                               borderRadius: BorderRadius.circular(22),
                                             ),
                                             child: Text(
-                                              "From \$450/Hr",
+                                              "View Profile",
                                               style: TextStyle(
                                                 fontFamily: "Outfit",
                                                 color: ColorCode.kCircleGradientTop,
@@ -1143,7 +1254,7 @@ class _HomeScreenState extends State<HomeScreen>
                                           Icon(Icons.star, color: Colors.yellow, size: 18),
                                           SizedBox(width: 4),
                                           Text(
-                                            "4.2 (400)",
+                                            "View Profile",
                                             style: TextStyle(
                                               fontSize: 12,
                                               fontFamily: "Outfit",
@@ -1189,7 +1300,7 @@ class _HomeScreenState extends State<HomeScreen>
                                               borderRadius: BorderRadius.circular(22),
                                             ),
                                             child: Text(
-                                              "From \$450/Hr",
+                                              "View Profile",
                                               style: TextStyle(
                                                 fontFamily: "Outfit",
                                                 color: ColorCode.kCircleGradientTop,
@@ -1233,60 +1344,50 @@ class _HomeScreenState extends State<HomeScreen>
     required String image,
     required String name,
   }) {
-    return TweenAnimationBuilder(
-      duration: const Duration(milliseconds: 600),
-      tween: Tween<double>(begin: 0.9, end: 1),
-      curve: Curves.easeOutBack,
-      builder: (context, double scale, child) {
-        return Transform.scale(
-          scale: scale,
-          child: child,
-        );
-      },
-      child: Container(
-        width: 120,
-        margin: const EdgeInsets.only(right: 16),
-        child: Column(
-          children: [
-            Container(
-              height: 140,
-              width: 120,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  )
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Image.asset(
-                  image,
-                  fit: BoxFit.cover,
+    return Container(
+      // margin: const EdgeInsets.symmetric(horizontal: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds:600),
+            curve: Curves.easeOutCubic,
+            height: 190,
+            width: 180,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              boxShadow: [
+                BoxShadow(
+                  // color: Colors.black.withOpacity(0.45),
+                  blurRadius: 12,
+                  // offset: const Offset(0, 10),
                 ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(19),
+              child: Image.asset(
+                image,
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: ColorCode.white,
-                fontFamily: "Outfit",
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: ColorCode.white,
+              fontFamily: "Outfit",
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 
 
   Widget _buildCard({

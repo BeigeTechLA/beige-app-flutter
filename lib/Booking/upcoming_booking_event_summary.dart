@@ -81,6 +81,21 @@ class _UpcomingBookingEventSummaryState
     return ApiService().getImageURL(image);
   }
 
+  String formatBudget() {
+    final budgetString = bookingData?['event']?['budget'];
+
+    if (budgetString == null || budgetString.isEmpty) {
+      return "\$/0";
+    }
+
+    final budget = double.tryParse(budgetString) ?? 0;
+
+    return NumberFormat.currency(
+      locale: 'en_US',
+      symbol: '\$',
+      decimalDigits: 0,
+    ).format(budget);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +324,7 @@ class _UpcomingBookingEventSummaryState
                     ),
                     SizedBox(height: 20,),
       
-           /*       Column(
+                  Column(
                     children: [
       
                       /// 🔹 TOP INFO CARD
@@ -346,9 +361,10 @@ class _UpcomingBookingEventSummaryState
                                   child: infoItem(
                                     icon: Icons.attach_money,
                                     title: "Event Budget",
-                                    value: "\$2,145",
+                                    value: formatBudget(),
                                   ),
                                 ),
+
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: infoItem(
@@ -366,7 +382,7 @@ class _UpcomingBookingEventSummaryState
                       const SizedBox(height: 14),
       
                       /// 🔹 VIEW PROJECT TIMELINE (PIXEL PERFECT)
-                 *//*     InkWell(
+                /*      InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: () {
                           showProjectTimelineDialog(context);
@@ -394,10 +410,10 @@ class _UpcomingBookingEventSummaryState
                             ),
                           ],
                         ),
-                      ),*//*
+                      ),*/
       
                     ],
-                  ),*/
+                  ),
       
                   ],
                 ),
@@ -429,7 +445,7 @@ class _UpcomingBookingEventSummaryState
                           ? getCreativeImage()
                           : "assets/images/home2.png",
                       bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
-      
+                      contentType: widget.contentType,
                     ),
                   ),
                 );
@@ -442,7 +458,7 @@ class _UpcomingBookingEventSummaryState
               ),
               child:
               Text(
-                "Manage Booking",
+                "Manage Boosssssking",
                 style: TextStyle(
                   fontFamily: "Unbounded",
                   fontWeight: FontWeight.w500,

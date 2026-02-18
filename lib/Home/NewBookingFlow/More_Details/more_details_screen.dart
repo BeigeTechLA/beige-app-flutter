@@ -26,7 +26,7 @@ class MoreDetailsScreen extends StatefulWidget {
 class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   int currentStep = 1;
-  bool loding   = true;
+  bool loding   = false;
 
  // checkbox
   // quantity = totalQuantity;
@@ -1034,6 +1034,12 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       onTap: () {
         setState(() {
           loding = value;
+
+          // 🔥 If user selects NO → reset quantities
+          if (!loding) {
+            additionalPhotoQty = 0;
+            additionalVideoQty = 0;
+          }
         });
       },
       borderRadius: BorderRadius.circular(30),
@@ -1046,8 +1052,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               shape: BoxShape.circle,
               gradient: isSelected
                   ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
                 colors: [
                   Color(0xFFE8D1AB),
                   Color(0xFFD4A14D),
@@ -1066,7 +1070,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 backgroundColor: Colors.black,
               ),
             )
-                : const SizedBox(),
+                : null,
           ),
           const SizedBox(width: 8),
           Text(
@@ -1080,6 +1084,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       ),
     );
   }
+
 
 
   Widget _buildQtyRow({

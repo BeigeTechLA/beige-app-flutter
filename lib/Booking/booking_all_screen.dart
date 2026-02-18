@@ -535,33 +535,86 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               const SizedBox(height: 20),
 
               /// TOGGLE
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() => isUpcomingSelected = true);
-                      },
-                      child: toggleButton(
-                        title: "Upcoming",
-                        isSelected: isUpcomingSelected,
+              Container(
+                height: 60,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1F1F1F),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+
+                    /// 🔹 UPCOMING TAB
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isUpcomingSelected = true;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          decoration: BoxDecoration(
+                            color: isUpcomingSelected
+                                ? const Color(0xFFE8D8BD) // selected bg
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Upcoming",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: isUpcomingSelected
+                                  ? Colors.black
+                                  : Colors.white70,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() => isUpcomingSelected = false);
-                      },
-                      child: toggleButton(
-                        title: "Completed",
-                        isSelected: !isUpcomingSelected,
+
+                    /// 🔹 COMPLETED TAB
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isUpcomingSelected = false;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          decoration: BoxDecoration(
+                            color: !isUpcomingSelected
+                                ? const Color(0xFFE8D8BD)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Completed",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: !isUpcomingSelected
+                                  ? Colors.black
+                                  : Colors.white70,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+
+
 
               const SizedBox(height: 20),
 
@@ -658,12 +711,16 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   // ================= UPCOMING CARD =================
 
   Widget upcomingBookingCard(Map shoot) {
-    final imageUrl = ApiService().getImageURL(
+    final String fallbackImage =
+        "assets/images/Rectangle 34661070.png";
+
+    final String imageUrl = ApiService().getImageURL(
       shoot['creative']?['profile_image_url'] ?? '',
     );
 
+    /// 🔥 Final Image Logic
     final String finalImage =
-    imageUrl.isNotEmpty ? imageUrl : "assets/images/home2.png";
+    (imageUrl.isNotEmpty) ? imageUrl : fallbackImage;
 
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
@@ -676,7 +733,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             builder: (_) => UpcomingBookingEventSummary(
               bookingId: shoot['booking_id'],
               contentType: contentType,
-                shootTypeId: shoot['shoot_type_id']
+              shootTypeId: shoot['shoot_type_id'],
             ),
           ),
         );
@@ -703,8 +760,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 durationHours: shoot['duration_hours'],
                 location: shoot['location'],
                 imageUrl: finalImage,
-                shootTypeId: shoot['shoot_type_id'],   // ✅ ADD THIS
-
+                shootTypeId: shoot['shoot_type_id'],
               ),
             ),
           );
@@ -712,7 +768,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       ),
     );
   }
-
 
 
 
@@ -757,13 +812,24 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(22),
-            child: Image(
+            child: isNetwork
+                ? Image.network(
+              imagePath,
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
-              image: isNetwork
-                  ? NetworkImage(imagePath)
-                  : AssetImage(imagePath) as ImageProvider,
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  "assets/images/Rectangle 34661070.png",
+                  fit: BoxFit.cover,
+                );
+              },
+            )
+                : Image.asset(
+              imagePath,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
 

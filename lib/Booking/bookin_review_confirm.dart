@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'Shoot_updated_screen.dart';
 import 'booking_summary_view_summary.dart';
 
 class BookinReviewConfirm extends StatefulWidget {
@@ -23,7 +24,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   bool payFullAdvance = true;
   int selectedPayment = 0;
   int selectedIndex = 0;
-bool loding =true;
+  bool loding =true;
 
   Map<String, dynamic>? pricing;
   List<dynamic> pricingBreakdown = [];
@@ -818,8 +819,16 @@ bool loding =true;
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () async {
-                    await confirm_reschedule();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShootUpdatedScreen(
+
+                        ),
+                      ),
+                    );
                   },
+
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorCode.kButtonColor,

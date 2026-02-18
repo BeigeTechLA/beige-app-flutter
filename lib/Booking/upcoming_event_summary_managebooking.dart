@@ -257,6 +257,7 @@ class _UpcomingEventSummaryManagebookingState
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
+
                                   SizedBox(height: 10),
 
                                 ],

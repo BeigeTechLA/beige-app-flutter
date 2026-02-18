@@ -463,7 +463,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
             /// 🔹 RIGHT CHECK
             Container(
-              height: 22,
+              height: 25,
               width: 22,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),

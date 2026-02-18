@@ -70,7 +70,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
 
             children: [
@@ -95,7 +95,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                  mainAxisAlignment: MainAxisAlignment.start,
                  children: [
                    Text(
-                    "Favourites",
+                    "       Favourites",
                     style: TextStyle(
                       fontFamily: "Unbounded",
                       fontSize: 16,
@@ -106,7 +106,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                  ],
                ),
 
-              const SizedBox(height: 20),
+
 
               Expanded(
                 child: ListView.builder(
@@ -118,15 +118,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(12))
-                        ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+
                         child: SizedBox(
                           height: 220,
                           child: Stack(
                             children: [
-                        
+
                               /// ✅ IMAGE (NULL SAFE)
                               item['profile_image_url'] != null
                                   ? Image.network(
@@ -136,12 +135,12 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 fit: BoxFit.cover,
                               )
                                   : Image.asset(
-                                "assets/images/profile_placeholder.png",
+                                "assets/images/Rectangle 34661070.png",
                                 width: double.infinity,
                                 height: 220,
                                 fit: BoxFit.cover,
                               ),
-                        
+
                               /// DARK GRADIENT
                               Positioned(
                                 bottom: 0,
@@ -161,9 +160,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                   ),
                                 ),
                               ),
-                        
+
                               /// ACTIVE
-                              Positioned(
+                      /*        Positioned(
                                 top: 12,
                                 left: 12,
                                 child: Row(
@@ -180,8 +179,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                     )
                                   ],
                                 ),
-                              ),
-                        
+                              ),*/
+
                               /// ❤️ REMOVE FAVOURITE
                               Positioned(
                                 top: 12,
@@ -197,7 +196,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                   ),
                                 ),
                               ),
-                        
+
                               /// TEXT DATA
                               Positioned(
                                 bottom: 20,
@@ -206,7 +205,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                        
+
                                     /// ⭐ RATING (NULL SAFE)
                                     Row(
                                       children: [
@@ -224,9 +223,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                         ),
                                       ],
                                     ),
-                        
+
                                     const SizedBox(height: 6),
-                        
+
                                     /// NAME
                                     Text(
                                       item['name'] ?? "Unknown",
@@ -237,7 +236,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                        
+
                                     /// ROLE (NULL SAFE)
                                     Text(
                                       item['primary_title'] ?? "Creative Professional",
@@ -250,9 +249,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                   ],
                                 ),
                               ),
-                        
+
                               /// PRICE
-                              Positioned(
+                       /*       Positioned(
                                 bottom: 16,
                                 right: 16,
                                 child: Container(
@@ -273,7 +272,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                     ),
                                   ),
                                 ),
-                              ),
+                              ),*/
                             ],
                           ),
                         ),

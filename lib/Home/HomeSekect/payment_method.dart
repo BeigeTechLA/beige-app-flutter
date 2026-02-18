@@ -329,51 +329,54 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               ),
               const SizedBox(height: 12),
 
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.credit_card,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        "Add Credit or Debit Card",
-                        style: TextStyle(
+              InkWell(
+                onTap: _openStripeSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2A2A),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.credit_card,
                           color: Colors.white,
-                          fontSize: 14,
+                          size: 22,
                         ),
                       ),
-                    ),
-                    Container(
-                      height: 32,
-                      width: 32,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFE6A5),
-                        borderRadius: BorderRadius.circular(8),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          "Add Credit or Debit Card",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.add,
-                        size: 20,
-                        color: Colors.black,
+                      Container(
+                        height: 32,
+                        width: 32,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFE6A5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          size: 20,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
