@@ -31,6 +31,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
  // checkbox
   // quantity = totalQuantity;
 
+  String? locationError;
 
   // Included (fixed)
   int includedPhotoQty = 1;
@@ -69,9 +70,20 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   }
 
   Future<void> _More_Details() async {
-    if (!isFormValid) return;
 
-    setState(() => isSubmitting = true);
+    // 🔴 LOCATION VALIDATION
+    if (currentLatLng == null || searchController.text.trim().isEmpty) {
+      setState(() {
+        locationError = "Please enter location";
+      });
+      return;
+    }
+
+    // ✅ Clear error if valid
+    setState(() {
+      locationError = null;
+      isSubmitting = true;
+    });
 
     final payload = {
       "crew_requirements": _buildCrewRequirements(),
@@ -116,6 +128,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       setState(() => isSubmitting = false);
     }
   }
+
 
   Map<String, int> _buildCrewRequirements() {
     final Map<String, int> crew = {};
@@ -744,85 +757,107 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               // ),
 
 
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: ColorCode.kWhiteOpacity70,
-                    width: 0.8,
-                  ),
-                ),
-                child: GooglePlaceAutoCompleteTextField(
-                  textEditingController: searchController,
-                  focusNode: locationFocusNode, // ✅ ADD THIS
-                  googleAPIKey: GoogleConfig.placesApiKey,
-                  debounceTime: 600,
-                  isLatLngRequired: true,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
-                  textStyle: const TextStyle(
-                    color: ColorCode.white,
-                    fontFamily: "Outfit",
-                    fontSize: 14,
-                  ),
-
-                  inputDecoration: const InputDecoration(
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Search or select location",
-                    hintStyle: TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    suffixIcon: Padding(
-                      padding: EdgeInsets.only(right: 8),
-                      child: Icon(
-                        Icons.location_on_outlined,
+                  /// 🔹 LOCATION FIELD
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
                         color: ColorCode.kWhiteOpacity70,
+                        width: 0.8,
+                      ),
+
+                    ),
+                    child: GooglePlaceAutoCompleteTextField(
+                      textEditingController: searchController,
+                      focusNode: locationFocusNode,
+                      googleAPIKey: GoogleConfig.placesApiKey,
+                      debounceTime: 600,
+                      isLatLngRequired: true,
+
+                      textStyle: const TextStyle(
+                        color: ColorCode.white,
+                        fontFamily: "Outfit",
+                        fontSize: 14,
+                      ),
+
+                      inputDecoration: const InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        hintText: "Search or select location",
+                        hintStyle: TextStyle(
+                          color: ColorCode.kWhiteOpacity70,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        suffixIcon: Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.location_on_outlined,
+                            color: ColorCode.kWhiteOpacity70,
+                          ),
+                        ),
+                      ),
+
+                      getPlaceDetailWithLatLng: (prediction) async {
+                        final latLng = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
+
+                        locationFocusNode.unfocus();
+
+                        await _updateLocationFromLatLng(latLng);
+
+                        setState(() {
+                          currentLatLng = latLng;
+                          selectedAddress = prediction.description ?? "";
+                          locationError = null; // ✅ REMOVE ERROR HERE
+                        });
+
+                        searchController.text = selectedAddress;
+                        searchController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: searchController.text.length),
+                        );
+
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngZoom(latLng, 14),
+                        );
+                      },
+
+                      itemClick: (prediction) {
+                        searchController.text = prediction.description ?? "";
+                        searchController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: searchController.text.length),
+                        );
+                      },
+
+                      isCrossBtnShown: true,
+                    ),
+                  ),
+
+                  /// 🔴 ERROR TEXT
+                  if (locationError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        locationError!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                  ),
-
-                  getPlaceDetailWithLatLng: (prediction) async {
-                    final latLng = LatLng(
-                      double.parse(prediction.lat!),
-                      double.parse(prediction.lng!),
-                    );
-
-                    locationFocusNode.unfocus(); // 🔥 keyboard close
-
-                    await _updateLocationFromLatLng(latLng);
-                    setState(() {
-                      currentLatLng = latLng;
-                      selectedAddress = prediction.description ?? "";
-                    });
-
-                    searchController.text = selectedAddress;
-                    searchController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: searchController.text.length),
-                    );
-
-                    locationFocusNode.unfocus(); // ✅ IMPORTANT (cursor fix)
-
-                    mapController?.animateCamera(
-                      CameraUpdate.newLatLngZoom(latLng, 14),
-                    );
-                  },
-
-                  itemClick: (prediction) {
-                    searchController.text = prediction.description ?? "";
-                    searchController.selection = TextSelection.fromPosition(
-                      TextPosition(offset: searchController.text.length),
-                    );
-                  },
-
-                  isCrossBtnShown: true,
-                ),
+                ],
               ),
+
 
 
 

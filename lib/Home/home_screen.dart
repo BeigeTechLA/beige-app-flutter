@@ -493,7 +493,7 @@ class _HomeScreenState extends State<HomeScreen>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Specialities(),
+                                builder: (context) =>  const  Specialities(showBackButton: true,),
                               ),
                             );
                           },
@@ -523,80 +523,69 @@ class _HomeScreenState extends State<HomeScreen>
                       final iconPath =
                       specialtyIcons[index % specialtyIcons.length];
 
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(50),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Specialities(),
-                            ),
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+
+                          double circleSize = 65; // 🔥 balanced size
+
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+
+                              /// 🔵 Premium Circle
+                              Container(
+                                height: circleSize,
+                                width: circleSize,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF2E2E2E),
+                                      Color(0xFF1F1F1F),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.4),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Image.asset(
+                                    iconPath,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              /// 📝 Name
+                              SizedBox(
+                                width: circleSize + 10,
+                                child: Text(
+                                  (item["name"] ?? "")
+                                      .toString()
+                                      .replaceAll(" & ", " &\n"),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontFamily: 'Outfit',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
                           );
                         },
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-
-                            double circleSize = 65; // 🔥 balanced size
-
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-
-                                /// 🔵 Premium Circle
-                                Container(
-                                  height: circleSize,
-                                  width: circleSize,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF2E2E2E),
-                                        Color(0xFF1F1F1F),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.4),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(14),
-                                    child: Image.asset(
-                                      iconPath,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                /// 📝 Name
-                                SizedBox(
-                                  width: circleSize + 10,
-                                  child: Text(
-                                    (item["name"] ?? "")
-                                        .toString()
-                                        .replaceAll(" & ", " &\n"),
-                                    textAlign: TextAlign.center,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: 'Outfit',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
                       );
                     },
                   ),
@@ -828,21 +817,11 @@ class _HomeScreenState extends State<HomeScreen>
                             // Looks cleaner in Unbounded
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Specialities(),
-                              ),
-                            );
-                          },
-                          child: Image.asset(
-                            "assets/Icons/rightside.png",
-                            height: 40,   // bigger height
-                            width: 40,
-                            color: ColorCode.white,
-                          ),
+                        Image.asset(
+                          "assets/Icons/rightside.png",
+                          height: 40,   // bigger height
+                          width: 40,
+                          color: ColorCode.white,
                         ),
                       ],
                     ),

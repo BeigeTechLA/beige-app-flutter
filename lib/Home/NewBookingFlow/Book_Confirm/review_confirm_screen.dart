@@ -25,6 +25,9 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   final TextEditingController phoneController = TextEditingController();
   bool hasSavedCard = false;
 
+  String? nameError;
+  String? emailError;
+  String? phoneError;
 
   Map<String, dynamic>? booking;
   List<dynamic> heldCreatives = [];
@@ -236,7 +239,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       ),
 
       body: isLoading
-          ?  Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -254,7 +257,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     // 🟡 Current step (HALF)
                     fillWidth = 140.44;
                   } else {
-
                     fillWidth = 0;
                   }
 
@@ -271,7 +273,9 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         alignment: Alignment.centerLeft,
                         child: Container(
                           height: 5,
-                          width: fillWidth == double.infinity ? null : fillWidth,
+                          width: fillWidth == double.infinity
+                              ? null
+                              : fillWidth,
                           decoration: BoxDecoration(
                             color: ColorCode.kButtonColor,
                             borderRadius: BorderRadius.circular(64),
@@ -302,7 +306,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   ),
 
 
-
                 ],
               ),
 
@@ -329,7 +332,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                             child: creativeImage.isNotEmpty
                                 ? Image.network(
                               "${ApiService.imageURL}$creativeImage",
-                              fit: BoxFit.cover,          // 🔥 proper crop
+                              fit: BoxFit.cover, // 🔥 proper crop
                               alignment: Alignment.center, // 🔥 center focus
                               errorBuilder: (_, __, ___) {
                                 return Image.asset(
@@ -348,15 +351,15 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         ),
 
 
-
                         SizedBox(width: 14),
 
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+
                               /// ⭐ Rating
-                         /*     Row(
+                              /*     Row(
                                 children: [
                                   const Icon(Icons.star, size: 14, color: Colors.amber),
                                   const SizedBox(width: 4),
@@ -395,13 +398,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               ),
 
 
-
                               /// 🎥 ROLE
 
 
                               const SizedBox(height: 10),
 
-                       /*       /// 💰 RATE
+                              /*       /// 💰 RATE
                               creativeRate.isNotEmpty
                                   ? Text(
                                 "From \$$creativeRate/Hr",
@@ -421,7 +423,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ],
                     ),
 
-                     SizedBox(height: 14),
+                    SizedBox(height: 14),
 
                     SizedBox(
                       height: 1,
@@ -507,7 +509,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
 
                   Container(
-                    margin:  EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 12),
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: Color(0xFF282828),
@@ -515,18 +517,22 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ),
                     child: Column(
                       children: [
-                       Padding(
-                         padding: const EdgeInsets.all(8.0),
-                         child: Row(
-                           children: [
-                             Text(
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Text(
 
-                               "$creativeRole:",style: TextStyle(color: ColorCode.white,fontSize: 12,fontFamily: "Outfit",fontWeight:FontWeight.w400),
+                                "$creativeRole:", style: TextStyle(
+                                  color: ColorCode.white,
+                                  fontSize: 12,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w400),
 
-                             )
-                           ],
-                         ),
-                       ),
+                              )
+                            ],
+                          ),
+                        ),
                         SizedBox(height: 10),
                         GridView.builder(
                           shrinkWrap: true,
@@ -541,7 +547,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                           itemBuilder: (context, index) {
                             final edit = booking!['edit_types'][index];
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
                               decoration: BoxDecoration(
                                 color: ColorCode.kGoldGradientLight,
                                 borderRadius: BorderRadius.circular(8),
@@ -566,13 +573,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         ),
 
 
-
                       ],
                     ),
                   ),
 
                   Padding(
-                    padding:  EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(12.0),
                     child: Divider(color: ColorCode.kDividerWhite12,),
                   ),
 
@@ -585,7 +591,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         children: [
                           Text(
                             "Payment Method",
-                            style:    TextStyle(
+                            style: TextStyle(
                                 fontSize: 14,
                                 color: ColorCode.white,
                                 fontFamily: "Unbounded",
@@ -596,13 +602,15 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => PaymentMethodScreen(bookingId: widget.bookingId,),
+                                  builder: (context) =>
+                                      PaymentMethodScreen(
+                                        bookingId: widget.bookingId,),
                                 ),
                               );
                             },
                             child: Image.asset(
                               "assets/Icons/rightside.png",
-                              height: 40,   // bigger height
+                              height: 40, // bigger height
                               width: 40,
                               color: ColorCode.white,
                             ),
@@ -612,7 +620,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       SizedBox(height: 14),
 
                       /// 🔹 PAY AT VENUE
-                    /*  paymentRadioTile(
+                      /*  paymentRadioTile(
                         title: "Pay By Credit or Debit Card",
                         value: 0,
                       ),
@@ -630,24 +638,22 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ),
 
 
-
                     ],
                   ),
 
                   Padding(
-                    padding:  EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(12.0),
                     child: Divider(color: ColorCode.kDividerWhite12,),
                   ),
-
 
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                    "Contact Information",
+                        "Contact Information",
 
-                  style: TextStyle(
+                        style: TextStyle(
                             fontSize: 14,
                             color: ColorCode.white,
                             fontFamily: "Unbounded",
@@ -669,7 +675,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   const SizedBox(height: 15),
 
                   Padding(
-                    padding:  EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(12.0),
                     child: Divider(color: ColorCode.kDividerWhite12,),
                   ),
 
@@ -731,34 +737,26 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       const SizedBox(height: 14),
                       Divider(color: ColorCode.kDividerWhite12),
                       // --- SHOOT COST CARD ---
+                      // --- SHOOT COST CARD ---
                       builderPricingCard(
                         title: "Shoot Cost",
-                        amount: calculateShootCost()['total'],
-                        subtitles: [
-                          if (calculateShootCost()['hasPreProd']) "",
-                          if (calculateShootCost()['hasRush']) "• Rush Fee",
-
-                        ],
+                        amount: calculateShootCost(),
+                        subtitles: [],
                       ),
 
-                      // --- EDITING SERVICES CARD ---
+// --- EDITING SERVICES CARD ---
                       builderPricingCard(
                         title: "Editing Services",
-                        amount: (pricing?['editing_amount'] ?? 0).toDouble(),
-                        subtitles: (pricing?['editing_breakdown'] as List? ?? [])
-                            .map((e) => "• ${e['label']}")
-                            .toList(),
+                        amount: calculateEditingCost(),
+                        subtitles: [],
                       ),
 
-                      // --- ADDITIONAL CREW CARD ---
-                      if (calculateAdditionalCrew()['total'] > 0)
+// --- ADDITIONAL CREW CARD ---
+                      if (calculateAdditionalCrew() > 0)
                         builderPricingCard(
                           title: "Additional Crew",
-                          amount: calculateAdditionalCrew()['total'],
-                          subtitles: (calculateAdditionalCrew()['counts'] as Map<int, int>)
-                              .entries
-                              .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
-                              .toList(),
+                          amount: calculateAdditionalCrew(),
+                          subtitles: [],
                         ),
 
                       const SizedBox(height: 10),
@@ -780,10 +778,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               ),
                             ),
                             Text(
-                              "\$${pricing?['total_amount']?.toStringAsFixed(2) ?? "0.00"}",
+                              "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
                               style: const TextStyle(
                                 fontSize: 18,
-                                color: ColorCode.kButtonColor, // Making total stand out
+                                color: ColorCode.kButtonColor,
                                 fontFamily: "Outfit",
                                 fontWeight: FontWeight.w700,
                               ),
@@ -791,6 +789,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                           ],
                         ),
                       ),
+
                     ],
                   )
 
@@ -823,9 +822,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child:  Text(
-                    "Pay \$${pricing?['total_amount'] ?? 0}",
-
+                  child: Text(
+                    "Pay \$${NumberFormat('#,##0.00').format(
+                      (pricing?['total_amount'] ?? 0).toDouble(),
+                    )}",
 
                     style: TextStyle(
                       fontSize: 14,
@@ -843,12 +843,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
       ),
     );
-
-  }
-  String formatAmount(num amount) {
-    final isNegative = amount < 0;
-    final value = amount.abs().toStringAsFixed(2);
-    return isNegative ? "-\$$value" : "\$$value";
   }
 
 
@@ -1063,32 +1057,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     );
   }
 
-/*
-  Widget _buildCheckRow(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Image.asset(
-          "assets/newbookflow/true.png", // ✔️ icon image
-          height: 24,
-          width: 24,
-          color: ColorCode.black,
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: ColorCode.black,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              fontFamily: "Outfit",
-            ),
-          ),
-        ),
-      ],
-    );
-  }*/
+
 
   Widget _buildCheckRow({
     required String text,
@@ -1139,13 +1108,14 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A), // Darker background for the cards
+        color: const Color(0xFF1A1A1A),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1169,28 +1139,53 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               ),
             ],
           ),
-      /*    if (subtitles.isNotEmpty) ...[
+
+          if (subtitles.isNotEmpty) ...[
             const SizedBox(height: 8),
-            Wrap(
-              spacing: 12,
-              children: subtitles
-                  .map((sub) => Text(
-                sub,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 12,
-                  fontFamily: "Outfit",
-                ),
-              ))
-                  .toList(),
-            ),
-          ]*/
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: subtitles.map((sub) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    sub,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 12,
+                      fontFamily: "Outfit",
+                    ),
+                  ),
+                );
+              }).toList(),
+            )
+          ],
         ],
       ),
     );
   }
-  /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
-  Map<String, dynamic> calculateShootCost() {
+
+
+  double calculateShootCost() {
+    double base = pricing?['base_amount']?.toDouble() ?? 0.0;
+    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
+    return base + preProd;
+  }
+
+  double calculateEditingCost() {
+    return pricing?['editing_amount']?.toDouble() ?? 0.0;
+  }
+
+  double calculateAdditionalCrew() {
+    double total = pricing?['total_amount']?.toDouble() ?? 0.0;
+    double shoot = calculateShootCost();
+    double editing = calculateEditingCost();
+
+    double extra = total - (shoot + editing);
+    return extra > 0 ? extra : 0;
+  }
+
+/// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
+  /*Map<String, dynamic> calculateShootCost() {
     double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
     double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
     double shootCost = preProd + rushFee;
@@ -1246,5 +1241,5 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       "total": additionalTotal,
       "counts": extraCount,
     };
-  }
+  }*/
 }

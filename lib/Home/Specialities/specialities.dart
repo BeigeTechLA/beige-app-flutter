@@ -6,7 +6,9 @@ import '../../utility/ColorCode.dart';
 import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 
 class Specialities extends StatefulWidget {
-  const Specialities({super.key});
+  final bool? showBackButton;
+
+  const Specialities({super.key, this.showBackButton  = false});
 
   @override
   State<Specialities> createState() => _SpecialitiesState();
@@ -64,15 +66,18 @@ class _SpecialitiesState extends State<Specialities> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// 🔙 BACK
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
-                  height: 24,
-                  width: 24,
-                  color: ColorCode.white,
+              if (widget.showBackButton == true)
+
+                InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    "assets/Icons/Reply.png",
+                    height: 24,
+                    width: 24,
+                    color: ColorCode.white,
+                  ),
                 ),
-              ),
+
 
               const SizedBox(height: 20),
               const Text(

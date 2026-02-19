@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
@@ -35,21 +36,27 @@ class ApiService {
     }
   }
 
+
   fetchData(String url) async {
     final headers = await createAuthorizationHeader();
 
-    final response =
-    await http.get(Uri.parse(_baseUrl + url), headers: headers);
+    try {
+      final response = await http
+          .get(Uri.parse(_baseUrl + url), headers: headers)
+          .timeout(const Duration(seconds: 20));
 
-    // final response = await http.get(Uri.parse(_baseUrl + url));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Server Error');
+      }
 
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
-      return json.decode(response.body);
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load data');
+    } on SocketException {
+      throw Exception("NO_INTERNET");
+    } on TimeoutException {
+      throw Exception("TIMEOUT");
+    } catch (e) {
+      throw Exception("UNKNOWN_ERROR");
     }
   }
 

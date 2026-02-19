@@ -336,39 +336,50 @@ bool isLoading =true;
 
                       ),
                   SizedBox(height: 10),
-                  Padding(
-                    padding:  EdgeInsets.all(.0),
-                    child: Divider(color: ColorCode.kDividerWhite12,),
-                  ),
-          
-                  Padding(
-          
-          
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text("Typical output:",
-                              style: TextStyle(color: ColorCode.kWhiteOpacity70, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
-                            ),
+                      if (defaultOutput.isNotEmpty) ...[
+                        const SizedBox(height: 10),
 
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              getDefaultOutputText(),
+                        Divider(color: ColorCode.kDividerWhite12),
 
-                              style: TextStyle(color: ColorCode.white, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
-                            ),
-                          ],
+                        const SizedBox(height: 10),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    "Typical output:",
+                                    style: TextStyle(
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Text(
+                                    getDefaultOutputText(),
+                                    style: const TextStyle(
+                                      color: ColorCode.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  )
-          
+
                     ],
                   ),
                 ),
@@ -391,7 +402,7 @@ bool isLoading =true;
                    padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
-                      border: Border.all(color: ColorCode.kButtonColor)
+                  /*    border: Border.all(color: ColorCode.kButtonColor)*/
                   ),
                   child: Column(
                     children: [
@@ -411,11 +422,11 @@ bool isLoading =true;
                         ],
                       ),
 
-                      Divider(color: ColorCode.kDividerWhite12,),
-          
-          
+                      // Divider(color: ColorCode.kDividerWhite12,),
+                      //
 
-          
+
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
 
@@ -425,26 +436,23 @@ bool isLoading =true;
 
                         ],
                       ),
-                      SizedBox(height: 10),
+
 
 
                     Container(
-            decoration: BoxDecoration(
+          /*  decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(13)),
               color: ColorCode.k282828,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCheckRow("Industry best practices"),
-                  const SizedBox(height: 10),
-                  _buildCheckRow("Optimal team composition"),
-                  const SizedBox(height: 10),
-                  _buildCheckRow("Matched based on your budget"),
-                ],
-              ),
+            ),*/
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCheckRow("Optimal team composition"),
+                const SizedBox(height: 10),
+                _buildCheckRow("Matched based on your budget"),
+                const SizedBox(height: 10),
+                _buildCheckRow("Industry best practices"),
+              ],
             ),
           ),
 
@@ -454,6 +462,8 @@ bool isLoading =true;
                 ),
 
                 SizedBox(height: 20),
+                Divider(color: ColorCode.kDividerWhite12,),
+                SizedBox(height:15),
                 Row(
                   children: [
                     Text(
@@ -468,7 +478,7 @@ bool isLoading =true;
                 ),
 
 
-                SizedBox(height:15),
+                SizedBox(height:20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
 
@@ -481,11 +491,11 @@ bool isLoading =true;
                 SizedBox(height:15),
 
           Container(
-            decoration: BoxDecoration(
+         /*   decoration: BoxDecoration(
               color: ColorCode.k282828,
               borderRadius: BorderRadius.circular(14),
-            ),
-            padding: const EdgeInsets.all(20),
+            ),*/
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

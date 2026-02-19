@@ -747,27 +747,31 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                   // ✅ FINAL ENABLE / DISABLE LOGIC
                   onPressed: () async {
 
-                    // 🔹 Agar koi crew select kiya hai tab hi hold API call kare
-                    if (addedCrewUserIds.isNotEmpty) {
-                      for (final userId in addedCrewUserIds) {
-
-                        final matches = crewMatches
-                            .where((e) => e['user']['id'] == userId)
-                            .toList();
-
-                        if (matches.isEmpty) continue;
-
-                        final roleId =
-                            int.tryParse(matches.first['role_id'].toString()) ?? 0;
-
-                        await _addHolds(
-                          creativeUserId: userId,
-                          roleId: roleId,
-                        );
-                      }
+                    // 🔴 IF NO CREW SELECTED → SHOW POPUP
+                    if (addedCrewUserIds.isEmpty) {
+                      _showNoCrewPopup();
+                      return;
                     }
 
-                    // 🔥 ALWAYS GO NEXT SCREEN
+                    // 🟢 IF CREW SELECTED → CALL HOLD API
+                    for (final userId in addedCrewUserIds) {
+
+                      final matches = crewMatches
+                          .where((e) => e['user']['id'] == userId)
+                          .toList();
+
+                      if (matches.isEmpty) continue;
+
+                      final roleId =
+                          int.tryParse(matches.first['role_id'].toString()) ?? 0;
+
+                      await _addHolds(
+                        creativeUserId: userId,
+                        roleId: roleId,
+                      );
+                    }
+
+                    // 🚀 GO NEXT SCREEN
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -779,6 +783,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                   },
 
 
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isRoleWiseSelectionComplete
                         ? ColorCode.kButtonColor
@@ -788,9 +793,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     ),
                     elevation: 0,
                   ),
-
                   child: Text(
-                    "Continue with ${addedCrewUserIds.length} Member",
+                    "Continue with "
+                        "${addedCrewUserIds.length.toString().padLeft(2, '0')} "
+                        "${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: "Unbounded",
@@ -800,6 +806,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           : ColorCode.kHeadingColor,
                     ),
                   ),
+
                 ),
               ),
             ),
@@ -1154,5 +1161,143 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       overlayEntry.remove();
     });
   }
+  void _showNoCrewPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.7),
+      builder: (context) {
+        return Center(
+          child: Container(
+            width: 380,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  /// 🔹 ICON
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF2A2A2A),
+                    ),
+                    child: const Icon(
+                      Icons.error_outline,
+                      color: ColorCode.kButtonColor,
+                      size: 28,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔹 TITLE
+                  const Text(
+                    "No Crew Selected?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Unbounded",
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  /// 🔹 DESCRIPTION
+                  const Text(
+                    "You are choosing to continue without adding any team members.\n\nBeige's team will create the best talent for you based on your needs.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      fontFamily: "Outfit",
+                      height: 1.4,
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  /// 🔹 BUTTONS
+                  Row(
+                    children: [
+
+                      /// Go Back Button
+                      Expanded(
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              "Go Back & Select",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 14),
+
+                      /// Yes Continue Button
+                      Expanded(
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: ColorCode.kButtonColor,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ReviewConfirmScreen(
+                                    bookingId: widget.bookingId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Yes, Continue",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
 }

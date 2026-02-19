@@ -79,6 +79,10 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     dateController.dispose();
     super.dispose();
   }
+  void resetEditTypes() {
+    selectedEditTypeIds.clear();
+    selectedEditTypeNames.clear();
+  }
 
 
   String getContentTypeTitle(int contentTypeId) {
@@ -809,8 +813,12 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                             onTap: () {
                               setState(() {
                                 isEditNeeded = false;
+
+                                // 🔥 CLEAR OLD DATA
+                                resetEditTypes();
                               });
                             },
+
                           ),
                         ],
                       ),
