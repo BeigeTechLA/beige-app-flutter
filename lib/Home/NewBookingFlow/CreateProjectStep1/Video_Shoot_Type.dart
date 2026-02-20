@@ -266,74 +266,76 @@ String getContentTypeTitle(int contentTypeId) {
                         debugPrint("✅ Selected Name → $selectedShootTypeName");
                       },
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
 
-                          /// 🔹 IMAGE CARD (DYNAMIC)
-                          Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              height: 250,
-                              width: double.infinity,
+                          /// 🔹 IMAGE CARD
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
 
-
-                              child: CachedNetworkImage(
-                                imageUrl: fullImageUrl,
-                                fit: BoxFit.cover,
-/*
-                                fadeInDuration: Duration.zero,
-                                fadeOutDuration: Duration.zero,
-                                placeholderFadeInDuration: Duration.zero,*/
-                                fadeInDuration: Duration.zero,
-                                fadeOutDuration: Duration.zero,
-                                placeholder: (context, url) => Center(
-                                  child: Lottie.asset(
-                                    "assets/lottie/Untitled_file.json",
-                                    width: 100,
-                                    height: 100,
-                                  ),
-                                ),
-
-                                errorWidget: (context, url, error) => Icon(
-                                  Icons.broken_image,
-                                  color: Colors.grey,
-                                ),
-                              ),
 
                             ),
-                          ),
-
-
-
-
-
-
-
-                          /// 🔹 TITLE + RADIO
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
 
-                                /// 🔹 TITLE (DYNAMIC)
-                                Text(
-                                  item['name'] ?? '',
-                                  style: const TextStyle(
-                                    fontFamily: 'Outfit',
-                                    color: ColorCode.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
+                                /// 🔹 LEFT IMAGE
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: SizedBox(
+                                    height: 125,
+                                    width: 120,
+                                    child: CachedNetworkImage(
+                                      imageUrl: fullImageUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(
+                                        child: Lottie.asset(
+                                          "assets/lottie/Untitled_file.json",
+                                          width: 60,
+                                          height: 60,
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                      const Icon(Icons.broken_image, color: Colors.grey),
+                                    ),
                                   ),
                                 ),
 
-                                /// 🔹 RADIO BUTTON
+                                const SizedBox(width: 16),
+
+                                /// 🔹 CENTER TEXT SECTION
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+
+                                      /// Title
+                                      Text(
+                                        item['name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontFamily: "Outfit",
+                                        ),
+                                      ),
+
+
+
+
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(width: 12),
+
+                                /// 🔹 RIGHT RADIO BUTTON
                                 Container(
-                                  height: 32,
-                                  width: 32,
+                                  height: 30,
+                                  width: 30,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     gradient: selectedIndex == index
@@ -347,8 +349,7 @@ String getContentTypeTitle(int contentTypeId) {
                                     )
                                         : null,
                                     border: Border.all(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      width: 1,
+                                      color: Colors.white54,
                                     ),
                                   ),
                                   child: selectedIndex == index
@@ -358,13 +359,13 @@ String getContentTypeTitle(int contentTypeId) {
                                       backgroundColor: Colors.black,
                                     ),
                                   )
-                                      : const SizedBox(),
+                                      : null,
                                 ),
                               ],
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+
                         ],
                       ),
                     );

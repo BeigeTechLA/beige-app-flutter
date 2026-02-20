@@ -680,16 +680,15 @@ bool isLoading =true;
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>  FindingThePerfectScreen(
-
+                          builder: (_) => FindingThePerfectScreen(
                             bookingId: widget.bookingId,
                             contentTypeId: widget.contentTypeId,
                             specialtyId: widget.specialtyId,
                             ShootTypeId: widget.ShootTypeId,
-                          ), // 👈 next screen
+                          ),
                         ),
                       );
                     },

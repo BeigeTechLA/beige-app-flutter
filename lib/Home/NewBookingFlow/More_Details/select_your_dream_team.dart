@@ -286,11 +286,13 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
 
-            // 🔹 Back Button (Left)
+
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                },
                 child: Image.asset(
                   "assets/Icons/Reply.png",
                   height: 24,
@@ -1214,7 +1216,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                   /// 🔹 DESCRIPTION
                   const Text(
-                    "You are choosing to continue without adding any team members.\n\nBeige's team will create the best talent for you based on your needs.",
+                    "You are choosing to continue without adding any team members.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white70,
@@ -1223,7 +1225,16 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       height: 1.4,
                     ),
                   ),
-
+                   Text(
+                    "Beige's team will create the best talent for you based on your needs.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: ColorCode.kButtonColor,
+                      fontSize: 14,
+                      fontFamily: "Outfit",
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 28),
 
                   /// 🔹 BUTTONS
@@ -1235,7 +1246,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.white24),
                           ),
                           child: TextButton(
@@ -1262,7 +1273,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           height: 50,
                           decoration: BoxDecoration(
                             color: ColorCode.kButtonColor,
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: TextButton(
                             onPressed: () {

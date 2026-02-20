@@ -1166,22 +1166,19 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
 
   double calculateShootCost() {
-    double base = pricing?['base_amount']?.toDouble() ?? 0.0;
-    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
-    return base + preProd;
+    double base = (pricing?['base_amount'] ?? 0).toDouble();
+    double preProd = (pricing?['pre_production'] ?? 0).toDouble();
+    double rushFee = (pricing?['rush_fee'] ?? 0).toDouble();
+
+    return base + preProd + rushFee;   // ✅ Rush added
   }
 
   double calculateEditingCost() {
-    return pricing?['editing_amount']?.toDouble() ?? 0.0;
+    return (pricing?['editing_amount'] ?? 0).toDouble();
   }
 
   double calculateAdditionalCrew() {
-    double total = pricing?['total_amount']?.toDouble() ?? 0.0;
-    double shoot = calculateShootCost();
-    double editing = calculateEditingCost();
-
-    double extra = total - (shoot + editing);
-    return extra > 0 ? extra : 0;
+    return (pricing?['creative_base_total'] ?? 0).toDouble();
   }
 
 /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush

@@ -71,7 +71,22 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     return true;
   }
 
+  String getEditingDescription() {
 
+    // 🎬 Video Content
+    if (widget.contentTypeId == 1) {
+      return "Professional editing includes color grading,\n sound mixing, and basic revisions.";
+    }
+
+    // 📸 Photo Content (Special Case 16 & 9)
+    if ((widget.ShootTypeId == 16 || widget.ShootTypeId == 9) &&
+        (widget.contentTypeId == 2 || widget.contentTypeId == 3)) {
+      return "50 edited photos per hour for weddings";
+    }
+
+    // 📷 Default Photo
+    return "25 edited photos per hour";
+  }
   @override
   void dispose() {
     startTimeController.dispose();
@@ -836,7 +851,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children:  [
                               Row(
                                 children: [
                                   Icon(
@@ -857,7 +872,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                 ],
                               ),
                               SizedBox(height: 10),
-                      /*        Row(
+                              Row(
                                 children: [
                                   Icon(
                                     Icons.check,
@@ -866,15 +881,15 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    "25 edited photos per hour",
-                                    style: TextStyle(
+                                    getEditingDescription(),
+                                    style:  TextStyle(
                                       color: Color(0xFFBDBDBD),
                                       fontSize: 13,
                                       fontFamily: "Outfit",
                                     ),
                                   ),
                                 ],
-                              ),*/
+                              ),
                             ],
                           ),
                         ),
