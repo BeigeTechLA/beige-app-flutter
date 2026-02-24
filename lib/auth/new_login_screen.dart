@@ -205,7 +205,7 @@ _showSnack(String message) {
 
 
                           _buildPasswordField(
-                            "Password*",
+                            "Password",
                             showConfirmPassword,
                                 () => setState(() => showConfirmPassword = !showConfirmPassword),
                             passwordController,
