@@ -399,7 +399,7 @@ bool isLoading =true;
           
                 SizedBox(height: 10),
                 Container(
-                   padding: EdgeInsets.all(15),
+                   padding: EdgeInsets.all(9),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                   /*    border: Border.all(color: ColorCode.kButtonColor)*/
@@ -425,7 +425,7 @@ bool isLoading =true;
                       // Divider(color: ColorCode.kDividerWhite12,),
                       //
 
-
+                      SizedBox(height: 10),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -437,7 +437,7 @@ bool isLoading =true;
                         ],
                       ),
 
-
+                      SizedBox(height: 10),
 
                     Container(
           /*  decoration: BoxDecoration(

@@ -1279,7 +1279,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                             onPressed: () {
                               Navigator.pop(context);
 
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => ReviewConfirmScreen(
