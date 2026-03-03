@@ -50,6 +50,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   bool _isPlusCode(String value) {
     return RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$').hasMatch(value);
   }
+
   bool get isFormValid {
     return nameController.text.isNotEmpty &&
         emailController.text.isNotEmpty &&
@@ -528,6 +529,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
   Future<void> _fetchSignup() async {
     print("🚀 SIGNUP BUTTON CLICKED");
 
@@ -547,8 +549,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
       return;
     }
 
-    if (passwordController.text.length < 6) {
-      _showSnack("Password must be at least 6 characters");
+    if (passwordController.text.length < 1) {
+      _showSnack("Password must be at least 1 characters");
       return;
     }
 
@@ -574,20 +576,28 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         profileImage,
       );
 
-      if (response != null &&
-          response['error'] == false &&
-          (response['code'] == 200 || response['code'] == 201)) {
+      if (response != null) {
+        if (response['error'] == false &&
+            (response['code'] == 200 || response['code'] == 201)) {
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => NewLoginScreen()),
-        );
+    
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => NewLoginScreen()),
+          );
+
+        } else {
+          // 🔥 Backend ka exact message show karo
+          _showSnack(response['message'] ?? "Signup failed");
+        }
       } else {
-        _showSnack(response?['message'] ?? "Signup failed");
+        _showSnack("No response from server");
       }
 
     } catch (e) {
       _showSnack("Server error");
+
     } finally {
       setState(() => isLoggingIn = false);
     }

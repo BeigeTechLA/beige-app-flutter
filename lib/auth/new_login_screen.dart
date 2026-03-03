@@ -36,13 +36,15 @@ _showSnack(String message) {
     );
   }
   Future<void> _fetchLogin() async {
-    if (emailController.text.trim().isEmpty ||
-        passwordController.text.trim().isEmpty) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
       _showSnack("Please fill all fields");
       return;
     }
 
-    if (!isValidEmail(emailController.text.trim())) {
+    if (!isValidEmail(email)) {
       _showSnack("Please enter a valid email address");
       return;
     }
@@ -53,17 +55,17 @@ _showSnack(String message) {
       final response = await ApiService().postData(
         ApiEndpoints.login,
         {
-          "email": emailController.text.trim(),
-          "password": passwordController.text.trim(),
+          "email": email,
+          "password": password,
         },
       );
 
-      /// 🔴 If API Failed
       if (response == null) {
         _showSnack("Server not responding");
         return;
       }
 
+      /// 🔴 Backend error message handle
       if (response['error'] == true) {
         _showSnack(response['message'] ?? "Invalid credentials");
         return;
@@ -75,7 +77,7 @@ _showSnack(String message) {
         return;
       }
 
-      /// ✅ Save Login Data
+      /// ✅ Save login
       await SharedService.setLoginDetails(response);
 
       if (!mounted) return;
@@ -90,13 +92,15 @@ _showSnack(String message) {
               (route) => false,
         );
       } else {
-        _showSnack("Please enter a valid email address");
+        _showSnack("Access denied for this account");
       }
 
     } catch (e) {
-      _showSnack("Invalid credentials");
+      _showSnack("Something went wrong");
     } finally {
-      if (mounted) setState(() => isLoggingIn = false);
+      if (mounted) {
+        setState(() => isLoggingIn = false);
+      }
     }
   }
 

@@ -62,20 +62,34 @@ class ApiService {
 
 
 
-  postData(String url, Map<String, dynamic> data) async {
-    final headers = await createAuthorizationHeader();
+  Future<dynamic> postData(String url, Map<String, dynamic> data) async {
+    try {
+      final headers = await createAuthorizationHeader();
 
-    final response = await http.post(
-      Uri.parse(_baseUrl + url),
-      headers: headers,
-      body: jsonEncode(data),
-    );
+      final response = await http.post(
+        Uri.parse(_baseUrl + url),
+        headers: headers,
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
       final bodyRes = json.decode(response.body);
+
+      print("STATUS CODE => ${response.statusCode}");
+      print("RESPONSE BODY => $bodyRes");
+
+      // ✅ Success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return bodyRes;
+      }
+
+      // 🔴 API error (400, 401 etc.)
       return bodyRes;
-    } else {
-      throw Exception('Failed to post data');
+
+    } catch (e) {
+      return {
+        "error": true,
+        "message": "Network error"
+      };
     }
   }
 
@@ -309,31 +323,35 @@ class ApiService {
       if (token.isNotEmpty) "Authorization": "Bearer $token",
     };
 
-    print("🌍 FULL URL => ${_baseUrl + url}");
-    print("📦 FIELDS => $fields");
-    print("🖼 IMAGE PATH => ${imageFile?.path}");
+    try {
+      FormData formData = FormData.fromMap({
+        ...fields,
+        if (imageFile != null)
+          "file": await MultipartFile.fromFile(
+            imageFile.path,
+            filename: imageFile.path.split('/').last,
+          ),
+      });
 
-    FormData formData = FormData.fromMap({
-      ...fields,
-      if (imageFile != null)
-        "file": await MultipartFile.fromFile(
-          imageFile.path,
-          filename: imageFile.path.split('/').last,
-        ),
-    });
+      final response = await dio.post(
+        _baseUrl + url,
+        data: formData,
+      );
 
-    final response = await dio.post(
-      _baseUrl + url,
-      data: formData,
-    );
+      return response.data;
 
-    print("📥 STATUS CODE => ${response.statusCode}");
-    print("📥 RESPONSE DATA => ${response.data}");
-
-    return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // 🔥 Backend ka actual error return karo
+        return e.response?.data;
+      } else {
+        return {
+          "error": true,
+          "message": "Something went wrong"
+        };
+      }
+    }
   }
-
-
 
 
 
