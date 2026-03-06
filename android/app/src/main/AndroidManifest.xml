@@ -17,7 +17,7 @@
     <application
         android:label="BEIGE"
         android:name="${applicationName}"
-        android:icon="@mipmap/app_logo">
+        android:icon="@mipmap/new_app_logo">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
