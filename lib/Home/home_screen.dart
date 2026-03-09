@@ -705,11 +705,25 @@ class _HomeScreenState extends State<HomeScreen>
 
 
 
-              mainCreatives.isEmpty
+              isLoading
                   ? const Padding(
                 padding: EdgeInsets.symmetric(vertical: 80),
                 child: Center(
                   child: CircularProgressIndicator(),
+                ),
+              )
+                  : mainCreatives.isEmpty
+                  ? const Padding(
+                padding: EdgeInsets.symmetric(vertical: 80),
+                child: Center(
+                  child: Text(
+                    "No Data Found",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               )
                   : Center(
@@ -726,13 +740,11 @@ class _HomeScreenState extends State<HomeScreen>
                   },
                   child: SizedBox(
                     height: 420,
-
                     child: Stack(
                       alignment: Alignment.center,
                       clipBehavior: Clip.none,
                       children: [
-
-                        /// 🔹 THIRD CARD
+                        /// THIRD CARD
                         Transform.translate(
                           offset: const Offset(0, -48),
                           child: Transform.scale(
@@ -749,7 +761,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
 
-                        /// 🔹 SECOND CARD
+                        /// SECOND CARD
                         Transform.translate(
                           offset: const Offset(0, -24),
                           child: Transform.scale(
@@ -766,7 +778,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
 
-                        /// 🔹 CURRENT CARD
+                        /// CURRENT CARD
                         SlideTransition(
                           position: _slideDown,
                           child: FadeTransition(
@@ -785,7 +797,6 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
 
               Center(
