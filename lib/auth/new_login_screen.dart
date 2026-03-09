@@ -60,19 +60,16 @@ _showSnack(String message) {
         },
       );
 
-      /// ✅ Agar response hi null hai
       if (response == null) {
         _showSnack("Server error, please try again");
         return;
       }
 
-      /// ✅ Backend error handle
       if (response["error"] == true) {
         _showSnack(response["message"] ?? "Login failed");
         return;
       }
 
-      /// ✅ Data validation
       if (response["data"] == null || response["data"]["user"] == null) {
         _showSnack("User data not found");
         return;
@@ -83,20 +80,14 @@ _showSnack(String message) {
 
       if (!mounted) return;
 
-      final int userType = response["data"]["user"]["user_type"] ?? 0;
-
-      if (userType == 3) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => Mainscreen()),
-              (route) => false,
-        );
-      } else {
-        _showSnack("Access denied for this account");
-      }
+      /// ✅ Direct Navigate
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => Mainscreen()),
+            (route) => false,
+      );
 
     } catch (e) {
-      /// ❌ Sirf network ya unexpected error
       _showSnack("Something went wrong");
     } finally {
       if (mounted) {
