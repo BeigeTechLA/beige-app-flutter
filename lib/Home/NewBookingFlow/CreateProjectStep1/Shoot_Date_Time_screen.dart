@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
@@ -6,13 +7,13 @@ import '../../../utility/ColorCode.dart';
 import '../More_Details/more_details_screen.dart';
 
 class ShootDateTimeScreen extends StatefulWidget {
-  final int specialtyId;
+  // final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
   final int contentTypeId;
 
   const ShootDateTimeScreen({super.key,
-    required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
+    required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
   State<ShootDateTimeScreen> createState() => _ShootDateTimeScreenState();
@@ -114,19 +115,35 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
   }
 
 
-
   String getEditTypeDisplayText() {
 
+    /// 🔥 When nothing selected
     if (selectedEditTypeNames.isEmpty) {
-      return "Select skills";
+
+      switch (widget.contentTypeId) {
+        case 1:
+          return "Select Video Edit Type";
+
+        case 2:
+          return "Select Photo Edit Type";
+
+        case 3:
+          return "Select Photo & Video Edit Type";
+
+        default:
+          return "Select Edit Type";
+      }
     }
 
+    /// 🔥 Single selection
     if (selectedEditTypeNames.length == 1) {
       return selectedEditTypeNames.first;
     }
 
+    /// 🔥 Multiple selection
     return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
   }
+
   Future<void> _edittype() async {
     setState(() => isLoading = true);
 
@@ -177,7 +194,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
           MaterialPageRoute(
             builder: (_) => MoreDetailsScreen(
               contentTypeId: widget.contentTypeId,
-              specialtyId: widget.specialtyId,
+              specialtyId: 22,
               ShootTypeId: widget.ShootTypeId,
               bookingId: widget.bookingId,
 
@@ -614,10 +631,9 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
-                  color: ColorCode.white,
                 ),
               ),
             ),
@@ -1267,8 +1283,8 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
             child: isSelected
                 ? Center(
               child: Container(
-                height: 10,
-                width: 10,
+                height: 8,
+                width: 8,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.black,

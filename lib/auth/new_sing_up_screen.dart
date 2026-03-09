@@ -6,6 +6,7 @@ import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -79,14 +80,21 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   void initState() {
     super.initState();
 
+    nameController.addListener(() => setState(() {}));
+    emailController.addListener(() => setState(() {}));
+    // locationController.addListener(() => setState(() {}));
+    passwordController.addListener(() => setState(() {}));
+    confirmPasswordController.addListener(() => setState(() {}));
+
     _getCurrentLocation();
+ /*   _getCurrentLocation();
     nameController.addListener(() {
       setState(() {});
     });
 
     emailController.addListener(() {
       setState(() {});
-    });
+    });*/
     locationFocus.addListener(() {
       if (locationFocus.hasFocus) {
         setState(() {
@@ -681,129 +689,123 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 ]
 ''';
 
-    return SafeArea(
-      child: Scaffold(
-        // backgroundColor: ColorCode.white,
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
+    return Scaffold(
+      // backgroundColor: ColorCode.white,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
 
-                  /// 🔝 TOP IMAGE + TITLE SECTION
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    child: Stack(
-                      children: [
+                /// 🔝 TOP IMAGE + TITLE SECTION
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  child: Stack(
+                    children: [
 
-                        /// 🖼️ BACKGROUND IMAGE
-                        Positioned.fill(
-                          child: Image.asset(
-                            "assets/images/Rectangle_574057023.png",
-                            fit: BoxFit.fill,
-                          ),
+                      /// 🖼️ BACKGROUND IMAGE
+                      Positioned.fill(
+                        child: Image.asset(
+                          "assets/images/Rectangle_574057023.png",
+                          fit: BoxFit.fill,
                         ),
+                      ),
 
 
-                        /// 🔙 BACK BUTTON
-                        Positioned(
-                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                          left: 16,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context); // 🔥 screen pop karega
-                            },
-                            child: Image.asset(
-                              "assets/Icons/Reply.png",
-                              height: 24,
-                              color: Colors.white, // agar white chahiye ho
+                      /// 🔙 BACK BUTTON
+                      Positioned(
+                        top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                        left: 16,
+                        child:InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: SvgPicture.asset(
+                            "assets/svg/back.svg",
+                            height: 24,
+                          ),
+                        )
+                      ),
+
+                      /// 🏷️ TITLE + SUBTITLE (CENTER)
+                      Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+
+                            Text(
+                              "Sign Up Now",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorCode.white,
+                              ),
                             ),
-                          ),
-                        ),
 
-                        /// 🏷️ TITLE + SUBTITLE (CENTER)
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            SizedBox(height: 10),
 
-                              Text(
-                                "Sign Up Now",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorCode.white,
-                                ),
+                            Text(
+                              "Join Beige to book talented photographers\nand videographers for your projects.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 14,
+                                color: ColorCode.kWhiteOpacity70,
                               ),
+                            ),
 
-                              SizedBox(height: 10),
-
-                              Text(
-                                "Join Beige to book talented photographers\nand videographers for your projects.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontSize: 14,
-                                  color: ColorCode.kWhiteOpacity70,
-                                ),
-                              ),
-
-                            ],
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 30),
-                  /// 📦 FORM CONTAINER (NICHE)
-                  Transform.translate(
-                    offset: const Offset(0, -40),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
+                ),
+                SizedBox(height: 30),
+                /// 📦 FORM CONTAINER (NICHE)
+                Transform.translate(
+                  offset: const Offset(0, -40),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
 
-                        /// 🧱 MAIN FORM CONTAINER
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: ColorCode.bcakgroundcolor,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.06),
-                              width: 1,
-                            ),
+                      /// 🧱 MAIN FORM CONTAINER
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: ColorCode.bcakgroundcolor,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.06),
+                            width: 1,
                           ),
-                          child: Column(
-                            children: [
+                        ),
+                        child: Column(
+                          children: [
 
-                              const SizedBox(height: 12),
+                            const SizedBox(height: 12),
 
-                              _buildField("Name", nameController),
-                              const SizedBox(height: 16),
-                              _buildField("Email ID", emailController),
-                              const SizedBox(height: 16),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: ColorCode.kWhiteOpacity70,
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: GooglePlaceAutoCompleteTextField(
+                            _buildField("Name", nameController),
+                            const SizedBox(height: 16),
+                            _buildField("Email ID", emailController),
+                            const SizedBox(height: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                /// LABEL
+
+
+                                /// FIELD
+                                GooglePlaceAutoCompleteTextField(
                                   textEditingController: locationController,
-                                  focusNode: locationFocus, // ✅ ADD THIS
-
+                                  focusNode: locationFocus,
                                   googleAPIKey: GoogleConfig.placesApiKey,
                                   debounceTime: 600,
-
                                   isLatLngRequired: true,
-
 
                                   textStyle: const TextStyle(
                                     color: ColorCode.white,
@@ -811,26 +813,31 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                     fontSize: 14,
                                   ),
 
-                                  inputDecoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    hintText: "Search or select location",
-                                    hintStyle: TextStyle(
+                                  inputDecoration: InputDecoration(
+                                    hintText: "Location",
+                                    hintStyle: const TextStyle(
                                       color: ColorCode.kWhiteOpacity70,
                                     ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 14,
+                                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    border: InputBorder.none,
+
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 18,
                                     ),
+
+                                    /// 📍 LOCATION SVG
                                     suffixIcon: Padding(
-                                      padding: EdgeInsets.only(right: 8),
-                                      child: Icon(
-                                        Icons.location_on_outlined,
+                                      padding: const EdgeInsets.only(right: 14),
+                                      child: SvgPicture.asset(
+                                        "assets/svg/LocationPin.svg",
+                                        width: 12,
+                                        height: 12,
                                         color: ColorCode.kWhiteOpacity70,
                                       ),
                                     ),
                                   ),
+
                                   getPlaceDetailWithLatLng: (prediction) async {
                                     final latLng = LatLng(
                                       double.parse(prediction.lat!),
@@ -843,8 +850,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                                     setState(() {
                                       currentLatLng = latLng;
-                                      selectedLat = latLng.latitude;   // ✅ SAVE LAT
-                                      selectedLng = latLng.longitude;  // ✅ SAVE LNG
+                                      selectedLat = latLng.latitude;
+                                      selectedLng = latLng.longitude;
                                       selectedAddress = prediction.description ?? "";
                                       showMap = true;
                                     });
@@ -852,313 +859,316 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                     locationController.text = selectedAddress;
                                   },
 
-
                                   itemClick: (prediction) {
                                     locationController.text = prediction.description ?? "";
-                                    locationController.selection = TextSelection.fromPosition(
-                                      TextPosition(offset: locationController.text.length),
-                                    );
                                   },
 
                                   isCrossBtnShown: true,
                                 ),
-                              ),
+                              ],
+                            ),
 
 
-                              SizedBox(height: 20),
+                            SizedBox(height: 20),
 
-                              /// 🗺️ MAP WITH FIXED HEIGHT
-                              if (showMap)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: SizedBox(
-                                    height: 280,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: currentLatLng == null
-                                          ? const Center(child: CircularProgressIndicator())
-                                          :GoogleMap(
-                                        initialCameraPosition: CameraPosition(
-                                          target: currentLatLng!,
-                                          zoom: 14,
-                                        ),
-
-                                        myLocationEnabled: true,
-                                        myLocationButtonEnabled: true,
-                                        zoomControlsEnabled: true,
-                                        compassEnabled: false,
-
-                                        // 🔥 IMPORTANT FIX (touch enable)
-                                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                                          Factory<OneSequenceGestureRecognizer>(
-                                                () => EagerGestureRecognizer(),
-                                          ),
-                                        },
-
-                                        onMapCreated: (controller) {
-                                          mapController = controller;
-                                          controller.setMapStyle(_darkMapStyle);
-                                        },
-
-                                        markers: {
-                                          Marker(
-                                            markerId: const MarkerId("selected"),
-                                            position: currentLatLng!,
-                                          ),
-                                        },
-
-                                        onTap: (latLng) async {
-                                          await _updateLocationFromLatLng(latLng);
-                                        },
+                            /// 🗺️ MAP WITH FIXED HEIGHT
+                            if (showMap)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: SizedBox(
+                                  height: 280,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: currentLatLng == null
+                                        ? const Center(child: CircularProgressIndicator())
+                                        :GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                        target: currentLatLng!,
+                                        zoom: 14,
                                       ),
 
-                                    ),
-                                  ),
-                                ),
+                                      myLocationEnabled: true,
+                                      myLocationButtonEnabled: true,
+                                      zoomControlsEnabled: true,
+                                      compassEnabled: false,
 
-                              const SizedBox(height: 16),
-
-                              _buildPasswordField(
-                                "Create Password",
-                                showPassword,
-                                    () => setState(() => showPassword = !showPassword),
-                                passwordController,
-                              ),
-                              const SizedBox(height: 16),
-
-                              _buildPasswordField(
-                                "Confirm Password",
-                                showConfirmPassword,
-                                    () => setState(() => showConfirmPassword = !showConfirmPassword),
-                                confirmPasswordController,
-                              ),
-                              SizedBox(height: 20),
-                              _profilePictureCard(),
-                              const SizedBox(height: 20),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start, // 🔥 important
-                                children: [
-
-                                  /// CHECKBOX
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 3), // align with first text line
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          savePassword = !savePassword;
-                                        });
+                                      // 🔥 IMPORTANT FIX (touch enable)
+                                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                                        Factory<OneSequenceGestureRecognizer>(
+                                              () => EagerGestureRecognizer(),
+                                        ),
                                       },
-                                      child: Container(
-                                        height: 20,
-                                        width: 20,
-                                        decoration: BoxDecoration(
-                                          color: savePassword
-                                              ? ColorCode.black
-                                              : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: Border.all(
-                                            color: ColorCode.kWhiteOpacity70,
-                                          ),
+
+                                      onMapCreated: (controller) {
+                                        mapController = controller;
+                                        controller.setMapStyle(_darkMapStyle);
+                                      },
+
+                                      markers: {
+                                        Marker(
+                                          markerId: const MarkerId("selected"),
+                                          position: currentLatLng!,
                                         ),
-                                        child: savePassword
-                                            ? const Icon(
-                                          Icons.check,
-                                          size: 14,
-                                          color: ColorCode.kButtonColor,
-                                        )
-                                            : null,
-                                      ),
-                                    ),
-                                  ),
+                                      },
 
-                                  const SizedBox(width: 10),
+                                      onTap: (latLng) async {
+                                        await _updateLocationFromLatLng(latLng);
+                                      },
+                                    ),
 
-                                  /// TEXT
-                                  Expanded(
-                                    child: Text.rich(
-                                      TextSpan(
-                                        children: [
-                                          const TextSpan(
-                                            text: "I agree to the ",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: ColorCode.kWhiteOpacity70,
-                                              fontSize: 13,
-                                              fontFamily: "Outfit",
-                                            ),
-                                          ),
-                                          const TextSpan(
-                                            text: "Terms & Condition & Privacy Policy",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: ColorCode.white,
-                                              fontSize: 13,
-                                              fontFamily: "Outfit",
-                                            ),
-                                          ),
-                                          const TextSpan(
-                                            text: " set out of this site",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: ColorCode.kWhiteOpacity70,
-                                              fontSize: 13,
-                                              fontFamily: "Outfit",
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 20),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: _fetchSignup,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ColorCode.kCreamSoft,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    "Create Account",
-                                    style: TextStyle(
-                                      fontFamily: "Unbounded",
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: ColorCode.kHeadingColor,
-                                    ),
                                   ),
                                 ),
                               ),
 
+                            const SizedBox(height: 16),
 
+                            _buildPasswordField(
+                              "Create Password",
+                              showPassword,
+                                  () => setState(() => showPassword = !showPassword),
+                              passwordController,
+                            ),
+                            const SizedBox(height: 16),
+
+                            _buildPasswordField(
+                              "Confirm Password",
+                              showConfirmPassword,
+                                  () => setState(() => showConfirmPassword = !showConfirmPassword),
+                              confirmPasswordController,
+                            ),
+                            SizedBox(height: 20),
+                            _profilePictureCard(),
+                            const SizedBox(height: 20),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start, // 🔥 important
+                              children: [
+
+                                /// CHECKBOX
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 3), // align with first text line
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        savePassword = !savePassword;
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        color: savePassword
+                                            ? ColorCode.black
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: ColorCode.kWhiteOpacity70,
+                                        ),
+                                      ),
+                                      child: savePassword
+                                          ? const Icon(
+                                        Icons.check,
+                                        size: 14,
+                                        color: ColorCode.kButtonColor,
+                                      )
+                                          : null,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                /// TEXT
+                                Expanded(
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        const TextSpan(
+                                          text: "I agree to the ",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: ColorCode.kWhiteOpacity70,
+                                            fontSize: 13,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text: "Terms & Condition & Privacy Policy",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorCode.white,
+                                            fontSize: 13,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                        const TextSpan(
+                                          text: " set out of this site",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: ColorCode.kWhiteOpacity70,
+                                            fontSize: 13,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: isFormValid ? _fetchSignup : null,
+
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: isFormValid
+                                      ? ColorCode.kButtonColor
+                                      : ColorCode.kGoldGradientLight,
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+
+                                child: Text(
+                                  "Create Account",
+                                  style: TextStyle(
+                                    fontFamily: "Unbounded",
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: isFormValid
+                                        ? ColorCode.kHeadingColor
+                                        : ColorCode.k282828,
+                                  ),
+                                ),
+                              ),
+                            )
+
+
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      /*    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+                    Positioned(
+                      top: -24,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: ColorCode.k282828,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.12),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                height: 28,
+                                width: 28,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.08),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.person_outline,
+                                  size: 16,
+                                  color: ColorCode.kWhiteOpacity70,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                "Tell Us About Yourself & Add Details",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: ColorCode.kWhiteOpacity70,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        /*    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+                      ),
+                    ),*/
                       Positioned(
-                        top: -24,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: ColorCode.k282828,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.12),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.35),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  height: 28,
-                                  width: 28,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.08),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.person_outline,
-                                    size: 16,
-                                    color: ColorCode.kWhiteOpacity70,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                const Text(
-                                  "Tell Us About Yourself & Add Details",
-                                  style: TextStyle(
-                                    fontFamily: "Outfit",
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: ColorCode.kWhiteOpacity70,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),*/
-                        Positioned(
-                          top: -30,
-                          left: 20,
-                          right: 20,
-                          child: ifUserDataCard(),
-                        ),
+                        top: -30,
+                        left: 20,
+                        right: 20,
+                        child: ifUserDataCard(),
+                      ),
 
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Already have an account? ",
-                        style: TextStyle(
-                          color: ColorCode.kWhiteOpacity60,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>  NewLoginScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                  const SizedBox(height: 30),
-                ],
-              ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Already have an account? ",
+                      style: TextStyle(
+                        color: ColorCode.kWhiteOpacity60,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>  NewLoginScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+              ],
             ),
-            if (isLoggingIn)
-              Container(
-                color: Colors.black.withOpacity(0.6),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: ColorCode.kButtonColor,
-                  ),
+          ),
+          if (isLoggingIn)
+            Container(
+              color: Colors.black.withOpacity(0.6),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: ColorCode.kButtonColor,
                 ),
               ),
-          ],
-
-        ),
-
+            ),
+        ],
 
       ),
+
+
     );
 
   }
@@ -1167,47 +1177,57 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     return TextField(
       controller: controller,
       cursorColor: ColorCode.white,
-
       style: const TextStyle(
-        color: ColorCode.white, // typed text color
+        color: ColorCode.white,
+        fontFamily: "Outfit",
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
       ),
-
       decoration: InputDecoration(
         labelText: "$title*",
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
+        ),
+
+        floatingLabelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
         ),
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
+          horizontal: 18,
+          vertical: 15,
         ),
 
-        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                       // 🔥 exact 0.5px
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                          // focus border thicker
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
-
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),)
-      ,);
+      ),
+    );
   }
-
   Widget _buildPasswordField(
       String title,
       bool isVisible,
@@ -1218,7 +1238,11 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
       controller: controller,
       obscureText: !isVisible,
       cursorColor: ColorCode.kWhiteOpacity70,
-      style: const TextStyle(
+      style:const TextStyle(
+        fontFamily: "Outfit",
+        fontWeight: FontWeight.w400,
+        fontSize: 12,
+
         color: ColorCode.kWhiteOpacity70,
       ),
       decoration: InputDecoration(
@@ -1226,6 +1250,20 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
+        ),
+
+        floatingLabelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
           color: ColorCode.kWhiteOpacity70,
         ),
 
@@ -1239,7 +1277,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
           onPressed: onToggle,
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kWhiteOpacity70,
+            color: ColorCode.white,
             size: 20,
           ),
         ),
@@ -1260,9 +1298,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
           ),
         ),
 
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),
+
       ),
     );
   }
@@ -1391,7 +1427,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
               width: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08), // dark bg pe soft circle
+                color: ColorCode.k1D1D1B_Opacity70,
               ),
               child: const Center(
                 child: Icon(

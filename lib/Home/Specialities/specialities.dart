@@ -1,5 +1,6 @@
 import 'package:beige/Home/Specialities/BookShoot.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
@@ -18,17 +19,18 @@ class _SpecialitiesState extends State<Specialities> {
   bool isLoadingSpecialties = true;
 
   List specialties = [];
+
   final List<String> bookShootIcons = [
-    "assets/Book_shoot/Events.png",
-    "assets/Book_shoot/Commercial.png",
-    "assets/Book_shoot/music.png",
-    "assets/Book_shoot/Corporate.png",
-    "assets/Book_shoot/Short.png",
-    "assets/Book_shoot/Social_Media.png",
-    "assets/Book_shoot/user 1.png",
-    "assets/Book_shoot/drone 1.png",
-    "assets/Book_shoot/sports 1.png",
-    "assets/Book_shoot/graduation 1.png",
+    "assets/Book_shoot_svg/Events.svg",
+    "assets/Book_shoot_svg/Commercial.svg",
+    "assets/Book_shoot_svg/Music-Video.svg",
+    "assets/Book_shoot_svg/Corporate.svg",
+    "assets/Book_shoot_svg/Short.svg",
+    "assets/Book_shoot_svg/Social Media.svg",
+    "assets/Book_shoot_svg/Personal.svg",
+    "assets/Book_shoot_svg/droneee.svg",
+    "assets/Book_shoot_svg/Sports.svg",
+    "assets/Book_shoot_svg/Education.svg",
   ];
 
 
@@ -140,72 +142,44 @@ class _SpecialitiesState extends State<Specialities> {
           ),
         );
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          double circleSize = constraints.maxWidth * 0.75; // 🔥 bigger circle
+      child: Column(
+        children: [
 
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-
-              /// 🔵 Bigger Circle
-              Container(
-                height: circleSize,
-                width: circleSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF2E2E2E),
-                      Color(0xFF1F1F1F),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(circleSize * 0.22),
-                  child: Image.asset(
-                    iconPath,
-                    fit: BoxFit.contain,
-                  ),
-                ),
+          /// 🔵 Icon area
+          Expanded(
+            flex: 3,
+            child: Center(
+              child: SvgPicture.asset(
+                iconPath,
+                fit: BoxFit.contain,
               ),
+            ),
+          ),
 
-              const SizedBox(height: 14),
+          const SizedBox(height: 6),
 
-              /// 📝 Name
-              Text(
-                (item["name"] ?? "")
-                    .toString()
-                    .replaceAll(" & ", " &\n"),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: ColorCode.kWhiteOpacity60,
-                  fontSize: 11, // 🔥 little bigger text
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
-                ),
+          /// 📝 Text area
+          Flexible(
+            flex: 2,
+            child: Text(
+              (item["name"] ?? "")
+                  .toString()
+                  .replaceAll(" & ", " &\n"),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: ColorCode.kWhiteOpacity60,
+                fontSize: 11,
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
-
-
-
-
 
 
 }

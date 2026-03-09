@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
@@ -293,10 +294,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child:SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
-                  color: ColorCode.white,
                 ),
               ),
             ),

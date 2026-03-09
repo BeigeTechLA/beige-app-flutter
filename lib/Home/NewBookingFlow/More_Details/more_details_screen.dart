@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -396,10 +397,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
-                  color: ColorCode.white,
                 ),
               ),
             ),
@@ -1101,7 +1101,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             child: isSelected
                 ? const Center(
               child: CircleAvatar(
-                radius: 5,
+                radius: 4,
                 backgroundColor: Colors.black,
               ),
             )

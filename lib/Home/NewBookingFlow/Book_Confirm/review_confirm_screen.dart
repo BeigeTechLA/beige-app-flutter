@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 import '../../../service/api_endpoints.dart';
@@ -153,11 +154,11 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
-        return "Video Shoot Type";
+        return "Videography";
       case 2:
-        return "Photo Shoot Type";
+        return "Photography";
       case 3:
-        return "Photo & Video Shoot Type";
+        return "Photography & Videography";
       default:
         return "Shoot Type";
     }
@@ -207,12 +208,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
-                  color: ColorCode.white,
                 ),
-              ),
+                ),
+
             ),
             Text(
               "Book & Confirm",
@@ -509,70 +510,87 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
 
                   Container(
-                    margin: EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Color(0xFF282828),
+                      color: const Color(0xFF282828),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        /// 🔹 Title
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Text(
-
-                                "$creativeRole:", style: TextStyle(
-                                  color: ColorCode.white,
-                                  fontSize: 12,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400),
-
-                              )
-                            ],
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            "$creativeRole:",
+                            style: const TextStyle(
+                              color: ColorCode.white,
+                              fontSize: 12,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 10),
+
+                        /// 🔹 Grid
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: (booking?['edit_types'] ?? []).length,
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                            childAspectRatio: 2.4, // 🔥 wrap ke liye better
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2.3, // thoda slim card
                           ),
                           itemBuilder: (context, index) {
+
                             final edit = booking!['edit_types'][index];
+
+                            final parts = edit.split('(');
+                            final title = parts[0].trim();
+                            final duration = parts.length > 1 ? "(${parts[1]}" : "";
+
                             return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                               decoration: BoxDecoration(
-                                color: ColorCode.kGoldGradientLight,
-                                borderRadius: BorderRadius.circular(8),
+                                color: ColorCode.kGoldLight20,   // ✅ background change
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Center(
-                                child: Text(
-                                  edit,
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.visible,
-                                  style: const TextStyle(
-                                    color: ColorCode.black,
-                                    fontFamily: "Outfit",
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+
+                                  /// 🔹 Title
+                                  Text(
+                                    title,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: ColorCode.kButtonColor, // ✅ text color change
+                                      fontFamily: "Outfit",
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
+
+                                  /// 🔹 Duration
+                                  if (duration.isNotEmpty)
+                                    Text(
+                                      duration,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: ColorCode.kButtonColor, // ✅ text color change
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                ],
                               ),
                             );
                           },
                         ),
-
-
                       ],
                     ),
                   ),
@@ -694,7 +712,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       Container(
                         padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
-                          color: ColorCode.kGoldGradientLight,
+                          color: ColorCode.kCreamSoft,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(

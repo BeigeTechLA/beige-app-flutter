@@ -60,20 +60,21 @@ _showSnack(String message) {
         },
       );
 
+      /// ✅ Agar response hi null hai
       if (response == null) {
-        _showSnack("Server not responding");
+        _showSnack("Server error, please try again");
         return;
       }
 
-      /// 🔴 Backend error message handle
-      if (response['error'] == true) {
-        _showSnack(response['message'] ?? "Invalid credentials");
+      /// ✅ Backend error handle
+      if (response["error"] == true) {
+        _showSnack(response["message"] ?? "Login failed");
         return;
       }
 
-      if (response['data'] == null ||
-          response['data']['user'] == null) {
-        _showSnack("Invalid credentials");
+      /// ✅ Data validation
+      if (response["data"] == null || response["data"]["user"] == null) {
+        _showSnack("User data not found");
         return;
       }
 
@@ -82,8 +83,7 @@ _showSnack(String message) {
 
       if (!mounted) return;
 
-      final int userType =
-          response['data']['user']['user_type'] ?? 0;
+      final int userType = response["data"]["user"]["user_type"] ?? 0;
 
       if (userType == 3) {
         Navigator.pushAndRemoveUntil(
@@ -96,6 +96,7 @@ _showSnack(String message) {
       }
 
     } catch (e) {
+      /// ❌ Sirf network ya unexpected error
       _showSnack("Something went wrong");
     } finally {
       if (mounted) {
@@ -110,375 +111,391 @@ _showSnack(String message) {
     );
     return emailRegex.hasMatch(email);
   }
+  @override
+  void initState() {
+    super.initState();
 
+    emailController.addListener(_updateUI);
+    passwordController.addListener(_updateUI);
+  }
+
+  void _updateUI() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        // backgroundColor: ColorCode.white,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
+    return Scaffold(
+      // backgroundColor: ColorCode.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
 
-              /// 🔝 TOP IMAGE + TITLE SECTION
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.29,
-                child: Stack(
-                  children: [
+            /// 🔝 TOP IMAGE + TITLE SECTION
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.29,
+              child: Stack(
+                children: [
 
-                    /// 🖼️ BACKGROUND IMAGE
-                    Positioned.fill(
-                      child: Image.asset(
-                        "assets/images/Rectangle_574057023.png",
-                        fit: BoxFit.fill,
-                      ),
+                  /// 🖼️ BACKGROUND IMAGE
+                  Positioned.fill(
+                    child: Image.asset(
+                      "assets/images/Rectangle_574057023.png",
+                      fit: BoxFit.fill,
                     ),
-
-
-
-
-                    /// 🏷️ TITLE + SUBTITLE (CENTER)
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-
-                          Text(
-                            "Welcome Back",
-                            style: TextStyle(
-                              fontFamily: "Unbounded",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorCode.white,
-                            ),
-                          ),
-
-                          SizedBox(height: 8),
-
-                          Text(
-                            "Enter your details to access your account. Continue\nmanaging your bookings and profile.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              color: ColorCode.kWhiteOpacity70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// 📦 FORM CONTAINER (NICHE)
-              Transform.translate(
-                offset: const Offset(0, -40),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-
-
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: ColorCode.bcakgroundcolor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-
-                          const SizedBox(height: 12),
-
-
-                          _buildField("Email ID", emailController),
-
-
-
-
-                          SizedBox(height: 20),
-
-
-
-                          _buildPasswordField(
-                            "Password",
-                            showConfirmPassword,
-                                () => setState(() => showConfirmPassword = !showConfirmPassword),
-                            passwordController,
-                          ),
-
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    savePassword = !savePassword;
-                                  });
-                                },
-                                child: Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: BoxDecoration(
-                                    color: savePassword
-                                        ? ColorCode.black
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: ColorCode.kWhiteOpacity70,
-                                    ),
-                                  ),
-                                  child: savePassword
-                                      ? const Icon(Icons.check,
-                                      size: 14, color: ColorCode.kButtonColor)
-                                      : null,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                "Saved Password",
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: ColorCode.kWhiteOpacity60,
-                                ),
-                              ),
-                              const Spacer(),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
-                                },
-                                child: const Text(
-                                  "Forgot Password?",
-                                  style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      color: ColorCode.kButtonColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 1.8,
-                                      decorationColor: ColorCode.kButtonColor
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: isLoggingIn ? null : _fetchLogin,
-
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorCode.kGoldGradientLight,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              child: isLoggingIn
-                                  ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.black,
-                                ),
-                              )
-                                  : const Text(
-                                "Login",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: ColorCode.kHeadingColor,
-                                ),
-                              ),
-                            ),
-                          ),
-
-
-
-                        ],
-                      ),
-                    ),
-
-                    /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-           /*         Positioned(
-                      top: -24,
-                      left: 0,
-                      right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: ColorCode.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                height: 44,
-                                width: 44,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: AssetImage("assets/images/chooese_your_role2.png"),
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    "Name : John Smith",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Email ID: johnsmith4545@gmail.com",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-
-
-                          ),
-                        ),
-                      ),
-                    ),*/
-                  ],
-                ),
-              ),
-
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Don’t have an account? ",
-                style: TextStyle(
-                  color: ColorCode.kWhiteOpacity60,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const NewSingUpScreen(),
-                    ),
-                  );
-                },
-                child: const Text(
-                  "Sign Up",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
                   ),
-                ),
+
+
+
+
+                  /// 🏷️ TITLE + SUBTITLE (CENTER)
+                  Align(
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+
+                        Text(
+                          "Welcome Back",
+                          style: TextStyle(
+                            fontFamily: "Unbounded",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ColorCode.white,
+                          ),
+                        ),
+
+                        SizedBox(height: 8),
+
+                        Text(
+                          "Enter your details to access your account. Continue\nmanaging your bookings and profile.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 14,
+                            color: ColorCode.kWhiteOpacity70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            /// 📦 FORM CONTAINER (NICHE)
+            Transform.translate(
+              offset: const Offset(0, -40),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+
+
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: ColorCode.bcakgroundcolor,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.06),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+
+                        const SizedBox(height: 12),
+
+
+                        _buildField("Email ID", emailController),
+
+
+
+
+                        SizedBox(height: 20),
+
+
+
+                        _buildPasswordField(
+                          "Password",
+                          showConfirmPassword,
+                              () => setState(() => showConfirmPassword = !showConfirmPassword),
+                          passwordController,
+                        ),
+
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  savePassword = !savePassword;
+                                });
+                              },
+                              child: Container(
+                                height: 20,
+                                width: 20,
+                                decoration: BoxDecoration(
+                                  color: savePassword
+                                      ? ColorCode.black
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: ColorCode.kWhiteOpacity70,
+                                  ),
+                                ),
+                                child: savePassword
+                                    ? const Icon(Icons.check,
+                                    size: 14, color: ColorCode.kButtonColor)
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              "Save Password",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: ColorCode.kWhiteOpacity60,
+                              ),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
+                              },
+                              child: const Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    color: ColorCode.kButtonColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    decoration: TextDecoration.underline,
+                                    decorationThickness: 1.8,
+                                    decorationColor: ColorCode.kButtonColor
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: (!isFormValid || isLoggingIn)
+                                ? null
+                                : _fetchLogin,
+
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isFormValid
+                                  ? ColorCode.kButtonColor
+                                  : ColorCode.kGoldGradientLight,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: isFormValid
+                                    ? ColorCode.kHeadingColor
+                                    : ColorCode.k282828,
+                              ),
+                            ),
+                          ),
+                        ),
+
+
+
+                      ],
+                    ),
+                  ),
+
+                  /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
+         /*         Positioned(
+                    top: -24,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: ColorCode.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.12),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.35),
+                              blurRadius: 16,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              height: 44,
+                              width: 44,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage("assets/images/chooese_your_role2.png"),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text(
+                                  "Name : John Smith",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "Email ID: johnsmith4545@gmail.com",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+
+
+                        ),
+                      ),
+                    ),
+                  ),*/
+                ],
+              ),
+            ),
+
+
+            const SizedBox(height: 30),
+          ],
         ),
       ),
 
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Don’t have an account? ",
+              style: TextStyle(
+                color: ColorCode.kWhiteOpacity60,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const NewSingUpScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                "Sign Up",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
 
 
   }
 
   Widget _buildField(String title, TextEditingController controller) {
-    return TextField(
+    return  TextField(
       controller: controller,
       cursorColor: ColorCode.white,
-
       style: const TextStyle(
-        color: ColorCode.white, // typed text color
+        color: ColorCode.white,
+        fontFamily: "Outfit",
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
       ),
-
       decoration: InputDecoration(
         labelText: "$title*",
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
+        ),
+
+        floatingLabelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
         ),
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
+          horizontal: 18,
+          vertical: 15,
         ),
 
-        /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                       // 🔥 exact 0.5px
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-            width: 0.5,                          // focus border thicker
+            color: ColorCode.kWhiteOpacity70,
+            width: 0.5,
           ),
         ),
-
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),)
-      ,);
+      ),
+    );
   }
 
   Widget _buildPasswordField(
@@ -499,8 +516,23 @@ _showSnack(String message) {
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 12,
+          height: 1.0,
+          letterSpacing: 0,
           color: ColorCode.kWhiteOpacity70,
         ),
+
+        floatingLabelStyle: const TextStyle(
+          fontFamily: "Outfit",
+          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          height: 1.0,
+          letterSpacing: 0,
+          color: ColorCode.kWhiteOpacity70,
+        ),
+
 
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
@@ -533,9 +565,7 @@ _showSnack(String message) {
           ),
         ),
 
-        floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
-        ),
+
       ),
     );
   }

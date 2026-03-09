@@ -6,8 +6,8 @@ import '../../../utility/ColorCode.dart';
 import 'Video_Shoot_Type.dart';
 
 class ContentTypeScreen extends StatefulWidget {
-  final int specialtyId;
-  const ContentTypeScreen({super.key, required this.specialtyId});
+  final int ?specialtyId;
+  const ContentTypeScreen({super.key,  this.specialtyId});
 
   @override
   State<ContentTypeScreen> createState() => _ContentTypeScreenState();
@@ -86,7 +86,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     }
   }
 
-  Future<void> select_shoottype() async {
+/*  Future<void> select_shoottype() async {
     if (selectedContentTypeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select content type")),
@@ -118,7 +118,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
           MaterialPageRoute(
             builder: (_) => VideoShootType(
               contentTypeId: contentTypeToSend,
-              specialtyId: widget.specialtyId, bookingId: bookingId,
+              // specialtyId: widget.specialtyId,
+              bookingId: bookingId,
             ),
           ),
         );
@@ -132,11 +133,59 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     } finally {
       setState(() => isLoading = false);
     }
+  }*/
+
+
+
+
+  Future<void> _handleSelection(int contentTypeId) async {
+
+    setState(() {
+      selectedContentTypeIds = contentTypeId == 3 ? [1,2] : [contentTypeId];
+    });
+
+    /// Select All → API nahi
+    if (contentTypeId != 3) {
+      await _callBookingApi(contentTypeId);
+    } else {
+      setState(() {
+        isShootTypeLoaded = true;
+      });
+    }
+
+    if (!isShootTypeLoaded) return;
+
+    int contentTypeToSend = contentTypeId == 3 ? 3 : contentTypeId;
+
+    final body = {
+      "specialty_id": widget.specialtyId,
+      "content_type": contentTypeToSend,
+      if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
+        "shoot_type_id": shootTypeIds.first,
+    };
+
+    try {
+      final response =
+      await ApiService().postData(ApiEndpoints.booking, body);
+
+      final bookingId = response['data']?['booking_id'];
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoShootType(
+              contentTypeId: contentTypeToSend,
+              bookingId: bookingId,
+            ),
+          ),
+        );
+      }
+
+    } catch (e) {
+      debugPrint("❌ Error → $e");
+    }
   }
-
-
-
-
 
 
 
@@ -148,32 +197,24 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        title: Stack(
+          alignment: Alignment.center,
           children: [
 
-            // 🔹 Back Button (Left)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: InkWell(
-                onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
-                  height: 24,
+            /// Center Title
+            Center(
+              child: Text(
+                "Create Project",
+                style: TextStyle(
                   color: ColorCode.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            Text(
-              "Create Project",
-              style: TextStyle(
-                color: ColorCode.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            // 🔹 Step Text (Right)
-             Align(
+
+            /// Right Step Text
+            Align(
               alignment: Alignment.centerRight,
               child: Text(
                 "1/3",
@@ -226,22 +267,28 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        "Content Type",
-                        style: TextStyle(
-                          fontFamily: "Unbounded",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Content Type",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
                       ),
-                    ],
+                    ),
                   ),
-
                   SizedBox(height: 12),
 
                   _buildOption(
+                    title: "Select All",
+                    activeImage: "assets/newbookflow/SelectAll_active.png",
+                    inactiveImage: "assets/newbookflow/slectall_inactive.png",
+                    value: isSelectAll,
+                    onTap: () => _handleSelection(3),
+                  ),
+               /*   _buildOption(
                     title: "Select All",
                     activeImage: "assets/newbookflow/SelectAll_active.png",
                     inactiveImage: "assets/newbookflow/slectall_inactive.png",
@@ -258,10 +305,10 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       });
                     },
 
-                  ),
+                  ),*/
 
 
-                  _buildOption(
+           /*       _buildOption(
                     title: "Videography",
                     activeImage: "assets/newbookflow/Videocamera_Record_active.png",
                     inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
@@ -276,11 +323,19 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       });
                       _callBookingApi(1);
                     },
+                  ),*/
+                  _buildOption(
+                    title: "Videography",
+                    activeImage: "assets/newbookflow/Videocamera_Record_active.png",
+                    inactiveImage: "assets/newbookflow/Videocamera_Record_inactive.png",
+                    value: selectedContentTypeIds.contains(1),
+                    onTap: () => _handleSelection(1),
                   ),
 
 
+
                   /// 🔹 PHOTOGRAPHY → 2
-                  _buildOption(
+               /*   _buildOption(
                     title: "Photography",
                     activeImage: "assets/newbookflow/Camera_active.png",
                     inactiveImage: "assets/newbookflow/Camera_inactive.png",
@@ -295,9 +350,14 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       });
                       _callBookingApi(2);
                     },
+                  ),*/
+                  _buildOption(
+                    title: "Photography",
+                    activeImage: "assets/newbookflow/Camera_active.png",
+                    inactiveImage: "assets/newbookflow/Camera_inactive.png",
+                    value: selectedContentTypeIds.contains(2),
+                    onTap: () => _handleSelection(2),
                   ),
-
-
 
 
 
@@ -326,7 +386,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                   const Spacer(),
 
                   /// 🔹 BOTTOM BUTTONS
-                  Row(
+             /*     Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
@@ -363,10 +423,10 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                             ),
                           ),
                           child:
-                              /*? CircularProgressIndicator(
+                              *//*? CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: Colors.black,
-                              )*/
+                              )*//*
                               const Text(
                             "Continue",
                             style: TextStyle(
@@ -380,7 +440,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       ),
 
                     ],
-                  ),
+                  ),*/
                 ],
               ),
             ),
@@ -404,6 +464,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     return InkWell(
       onTap: isDisabled ? null : onTap, // 🔥 FULL ROW CLICK
       borderRadius: BorderRadius.circular(14),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Row(
@@ -420,8 +483,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               child: Center(
                 child: Image.asset(
                   value ? activeImage : inactiveImage,
-                  height: 18,
-                  width: 18,
+                  height: 24,
+                  width: 24,
                 ),
               ),
             ),
@@ -463,8 +526,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
             /// 🔹 RIGHT CHECK
             Container(
-              height: 25,
-              width: 22,
+              height: 32,
+              width: 32,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(

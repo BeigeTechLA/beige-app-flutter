@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "image": "assets/Onboding/Frame 2087328917.png",
       "title": "Book Your Dream\nShoot",
       "description":
-      "Instantly book creatives for any shoot\nanywhere. 🎥✨",
+      "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
       "image": "assets/Onboding/Group 2087329238.png",

@@ -177,6 +177,22 @@ class _SplashScreenState extends State<SplashScreen> {
               fit: BoxFit.contain, // ✅ no distortion
             ),
           ),
+
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Text(
+              "—  Streamline your crew, equipment, & projects  —",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: ColorCode.white,
+                fontSize: 12,
+
+                fontFamily: "Unbounded",
+              ),
+            ),
+          ),
         ],
       ),
     );

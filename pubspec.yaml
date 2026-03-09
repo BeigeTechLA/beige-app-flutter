@@ -52,6 +52,7 @@ dependencies:
   google_places_flutter: ^2.0.6
   cached_network_image: ^3.3.1
   connectivity_plus: ^7.0.0
+  flutter_svg: ^2.0.10
 
 
 
@@ -104,6 +105,8 @@ flutter:
     - assets/lottie/
     - assets/newbookflow/
     - assets/Book_shoot/
+    - assets/Book_shoot_svg/
+    - assets/svg/
 
 
 

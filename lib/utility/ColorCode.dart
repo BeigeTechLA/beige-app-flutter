@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 class ColorCode {
 
+  // ⭐ New Colors from UI/UX
+
+  static const Color kGoldLight20 = Color(0x33E8D5B5); // #E8D5B5 with 20% opacity
+  static const Color kDarkText = Color(0xFF4E4B44);    // #4E4B44
+
   static const Color kButtonColor = Color(0xFFE8D1AB);
   static const Color kHeadingColor = Color(0xFF1D1D1B); // (dark)
   static  const Color kSubtextColor = Color(0xFF474746);
