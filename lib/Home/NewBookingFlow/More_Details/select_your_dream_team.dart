@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
@@ -34,6 +35,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   List<dynamic> crewMatches = [];
   bool isLoading = true;
 
+  List<dynamic> nearbyCreators = [];
+  List<dynamic> otherCreators = [];
+  bool showLocationCard = false;
 
   Set<int> addedCrewUserIds = {};
   final List<String> options = [
@@ -74,7 +78,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       print("📥 FULL RESPONSE => $response");
       
       if (response != null && response['error'] == false) {
-        setState(() {
+      /*  setState(() {
           crewMatches = response['data']['items'];
 
           final requirements = response['data']['crew_requirements'] as List;
@@ -88,6 +92,34 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
               r['role_id']: r['required_count']
           };
 
+        });*/
+
+        setState(() {
+          crewMatches = response['data']['items'];
+
+          nearbyCreators.clear();
+          otherCreators.clear();
+
+          for (var item in crewMatches) {
+            double distance = (item['distance_km'] ?? 9999).toDouble();
+
+            if (distance <= 50) {
+              nearbyCreators.add(item); // near creators
+            } else {
+              otherCreators.add(item); // other creators
+            }
+          }
+
+          /// agar nearby empty ho to special card dikhao
+          showLocationCard = nearbyCreators.isEmpty;
+
+          final requirements = response['data']['crew_requirements'] as List;
+
+          allowedRoleIds = requirements.map<int>((e) => e['role_id']).toSet();
+
+          requiredCountByRole = {
+            for (var r in requirements) r['role_id']: r['required_count']
+          };
         });
 
         debugPrint("✅ REQUIRED COUNT = $requiredCount");
@@ -221,7 +253,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
       for (final match in crewMatches) {
         final int uid = match['user']['id'];
-        final int rId = int.tryParse(match['role_id'].toString()) ?? 0;
+        final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
 
         if (rId == roleId && addedCrewUserIds.contains(uid)) {
           selected++;
@@ -275,7 +307,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     }
   }
 
-
+  int getRoleId(dynamic roleData) {
+    if (roleData is List && roleData.isNotEmpty) {
+      return int.tryParse(roleData.first.toString()) ?? 0;
+    }
+    return int.tryParse(roleData.toString()) ?? 0;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -323,279 +360,329 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         ),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
 
 
 
-            Row(
-              children: List.generate(3, (index) {
-                double fillWidth = 0;
+                Row(
+                  children: List.generate(3, (index) {
+                    double fillWidth = 0;
 
-                if (index < currentStep) {
-                  // ✅ Completed step (FULL)
-                  fillWidth = double.infinity;
-                } else if (index == currentStep) {
-                  // 🟡 Current step (HALF)
-                  fillWidth = 140.44;
-                } else {
+                    if (index < currentStep) {
+                      // ✅ Completed step (FULL)
+                      fillWidth = double.infinity;
+                    } else if (index == currentStep) {
+                      // 🟡 Current step (HALF)
+                      fillWidth = 140.44;
+                    } else {
 
-                  fillWidth = 0;
-                }
+                      fillWidth = 0;
+                    }
 
-                return Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: ColorCode.kSubtextColor, // grey background
-                      borderRadius: BorderRadius.circular(64),
-                    ),
-                    child: fillWidth > 0
-                        ? Align(
-                      alignment: Alignment.centerLeft,
+                    return Expanded(
                       child: Container(
+                        margin: const EdgeInsets.only(right: 8),
                         height: 5,
-                        width: fillWidth == double.infinity ? null : fillWidth,
                         decoration: BoxDecoration(
-                          color: ColorCode.kButtonColor,
+                          color: ColorCode.kSubtextColor, // grey background
                           borderRadius: BorderRadius.circular(64),
                         ),
+                        child: fillWidth > 0
+                            ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            height: 5,
+                            width: fillWidth == double.infinity ? null : fillWidth,
+                            decoration: BoxDecoration(
+                              color: ColorCode.kButtonColor,
+                              borderRadius: BorderRadius.circular(64),
+                            ),
+                          ),
+                        )
+                            : const SizedBox(),
                       ),
-                    )
-                        : const SizedBox(),
-                  ),
-                );
-              }),
-            ),
-
-            SizedBox(
-              height: 20,
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Select Your Dream Team",
-                  style: TextStyle(
-                    fontFamily: "Unbounded ",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: ColorCode.white,
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    _openFilterDialog(
-                      context,
-                          (sortKey) {
-                        _filterCrew(sort: sortKey);
-                      },
                     );
-                  },
-                  child: Image.asset(
-                    "assets/Icons/Filter.png",
-                    height: 24,
-                    width: 24,
-                    color: ColorCode.white,
-                  ),
+                  }),
                 ),
 
+                SizedBox(
+                  height: 20,
+                ),
 
-
-              ],
-            ),
-
-            const SizedBox(height: 16),
-            Expanded(
-              child:ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: crewMatches.length,
-                itemBuilder: (context, index) {
-                  final item = crewMatches[index];
-
-                  final int userId = item['user']['id'];
-                  // final bool isFavourite = favouriteUsers.contains(userId);
-
-
-                  final int creativeUserId = item['user']['id'];     // ✅ FIX
-                  final int roleId = int.parse(item['role_id']);
-                  final bool isAdded = addedCrewUserIds.contains(creativeUserId);
-                  final bool isFavourite = favouriteUsers.contains(creativeUserId);
-
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Container(
-                      height: 237,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Select Your Dream Team",
+                      style: TextStyle(
+                        fontFamily: "Unbounded ",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.white,
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Stack(
-                        children: [
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _openFilterDialog(
+                          context,
+                              (sortKey) {
+                            _filterCrew(sort: sortKey);
+                          },
+                        );
+                      },
+                      child: Image.asset(
+                        "assets/Icons/Filter.png",
+                        height: 24,
+                        width: 24,
+                        color: ColorCode.white,
+                      ),
+                    ),
 
-                          /// 🔹 IMAGE (API)
-                          Positioned.fill(
-                            child: item['profile_image_url'] != null
-                                ? Image.network(
-                              ApiService().getImageURL(
-                                item['profile_image_url'],
-                              ),
-                              fit: BoxFit.cover,
-                            )
-                                : Image.asset(
-                              "assets/images/Rectangle 34661070.png",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
 
-                          /// 🔹 GRADIENT
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.75),
-                                  ],
+
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+                /*        Expanded(
+                child:ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: crewMatches.length,
+                  itemBuilder: (context, index) {
+                    final item = crewMatches[index];
+
+                    final int userId = item['user']['id'];
+                    // final bool isFavourite = favouriteUsers.contains(userId);
+
+
+                    final int creativeUserId = item['user']['id'];     // ✅ FIX
+                    final int roleId = int.parse(item['role_id']);
+                    final bool isAdded = addedCrewUserIds.contains(creativeUserId);
+                    final bool isFavourite = favouriteUsers.contains(creativeUserId);
+
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Container(
+                        height: 237,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          children: [
+
+                            /// 🔹 IMAGE (API)
+                            Positioned.fill(
+                              child: item['profile_image_url'] != null
+                                  ? Image.network(
+                                ApiService().getImageURL(
+                                  item['profile_image_url'],
                                 ),
+                                fit: BoxFit.cover,
+                              )
+                                  : Image.asset(
+                                "assets/images/Rectangle 34661070.png",
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ),
 
-                          /// 🔹 TOP ROW
-                          Positioned(
-                            top: 12,
-                            left: 12,
-                            right: 12,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: const [
-                                    CircleAvatar(
-                                      radius: 4,
-                                      backgroundColor: Colors.green,
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text("Active",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12)),
-                                  ],
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    if (isFavourite) {
-                                      // ❌ REMOVE
-                                      setState(() {
-                                        favouriteUsers.remove(userId);
-                                      });
-
-                                      await _removeFavourite(userId);
-
-                                      _showFavouriteToast("Removed from Favourite");
-                                    } else {
-                                      // ✅ ADD
-                                      setState(() {
-                                        favouriteUsers.add(userId);
-                                      });
-
-                                      await _addFavourite(userId);
-
-                                      _showFavouriteToast("Added to Favourite");
-                                    }
-                                  },
-                                  child: Image.asset(
-                                    isFavourite
-                                        ? "assets/Icons/Heart_Angl_COLOR.png"
-                                        : "assets/images/Heart Angle.png",
-                                    height: 22,
-                                    width: 22,
+                            /// 🔹 GRADIENT
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.75),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
 
-                          /// 🔹 BOTTOM CONTENT
-                          Positioned(
-                            left: 14,
-                            right: 14,
-                            bottom: 14,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
+                            /// 🔹 TOP ROW
+                            Positioned(
+                              top: 12,
+                              left: 12,
+                              right: 12,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: const [
+                                      CircleAvatar(
+                                        radius: 4,
+                                        backgroundColor: Colors.green,
+                                      ),
+                                      SizedBox(width: 6),
+                                      Text("Active",
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 12)),
+                                    ],
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (isFavourite) {
+                                        // ❌ REMOVE
+                                        setState(() {
+                                          favouriteUsers.remove(userId);
+                                        });
 
-                                /// LEFT INFO
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.star,
-                                            color: Colors.amber, size: 14),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
-                                          style: const TextStyle(
-                                              color: Colors.white, fontSize: 12),
+                                        await _removeFavourite(userId);
+
+                                        _showFavouriteToast("Removed from Favourite");
+                                      } else {
+                                        // ✅ ADD
+                                        setState(() {
+                                          favouriteUsers.add(userId);
+                                        });
+
+                                        await _addFavourite(userId);
+
+                                        _showFavouriteToast("Added to Favourite");
+                                      }
+                                    },
+                                    child: Image.asset(
+                                      isFavourite
+                                          ? "assets/Icons/Heart_Angl_COLOR.png"
+                                          : "assets/images/Heart Angle.png",
+                                      height: 22,
+                                      width: 22,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            /// 🔹 BOTTOM CONTENT
+                            Positioned(
+                              left: 14,
+                              right: 14,
+                              bottom: 14,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+
+                                  /// LEFT INFO
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.star,
+                                              color: Colors.amber, size: 14),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
+                                            style: const TextStyle(
+                                                color: Colors.white, fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        item['name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      item['name'] ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
                                       ),
-                                    ),
-                                    Text(
-                                      item['role_name'] ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.white70,
+                                      Text(
+                                        item['role_name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.white70,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
-                                /// RIGHT BUTTONS
-                                Row(
-                                  children: [
+                                  /// RIGHT BUTTONS
+                                  Row(
+                                    children: [
 
-                                    /// ADD / REMOVE CREW
-                                    InkWell(
-                                      /*           onTap: () {
+                                      /// ADD / REMOVE CREW
+                                      InkWell(
+                                        *//*           onTap: () {
 
-                                        // ❌ Role not allowed
-                                        if (!allowedRoleIds.contains(roleId)) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text("This role is not allowed for this booking"),
-                                            ),
-                                          );
-                                          return;
-                                        }
+                                          // ❌ Role not allowed
+                                          if (!allowedRoleIds.contains(roleId)) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text("This role is not allowed for this booking"),
+                                              ),
+                                            );
+                                            return;
+                                          }
 
-                                        /// 🔴 REMOVE (LOCAL ONLY)
-                                        if (isAdded) {
-                                          setState(() {
-                                            addedCrewUserIds.remove(creativeUserId);
-                                          });
-                                        }
+                                          /// 🔴 REMOVE (LOCAL ONLY)
+                                          if (isAdded) {
+                                            setState(() {
+                                              addedCrewUserIds.remove(creativeUserId);
+                                            });
+                                          }
 
-                                        /// 🟢 ADD (LOCAL ONLY)
-                                        else {
-                                          // count only local selected
+                                          /// 🟢 ADD (LOCAL ONLY)
+                                          else {
+                                            // count only local selected
+                                            int selectedForThisRole = 0;
+
+                                            for (final match in crewMatches) {
+                                              final int uid = match['user']['id'];
+                                              final int rId = int.parse(match['role_id']);
+
+                                              if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                                selectedForThisRole++;
+                                              }
+                                            }
+
+                                            if (selectedForThisRole >= requiredCount) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "You can add only $requiredCount ${item['role_name']}",
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            setState(() {
+                                              addedCrewUserIds.add(creativeUserId);
+                                            });
+                                          }
+                                        },*//*
+                                        onTap: () {
+
+                                          // ❌ Role not allowed
+                                          if (!allowedRoleIds.contains(roleId)) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text("This role is not allowed for this booking"),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          /// 🔴 REMOVE
+                                          if (isAdded) {
+                                            setState(() {
+                                              addedCrewUserIds.remove(creativeUserId);
+                                            });
+                                            return;
+                                          }
+
+                                          /// 🟢 ADD
                                           int selectedForThisRole = 0;
 
                                           for (final match in crewMatches) {
@@ -607,11 +694,15 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             }
                                           }
 
-                                          if (selectedForThisRole >= requiredCount) {
+                                          /// ✅ ROLE-WISE LIMIT
+                                          final int maxAllowed =
+                                              requiredCountByRole[roleId] ?? 0;
+
+                                          if (selectedForThisRole >= maxAllowed) {
                                             ScaffoldMessenger.of(context).showSnackBar(
                                               SnackBar(
                                                 content: Text(
-                                                  "You can add only $requiredCount ${item['role_name']}",
+                                                  "You can add only $maxAllowed ${item['role_name']}",
                                                 ),
                                               ),
                                             );
@@ -621,124 +712,446 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                           setState(() {
                                             addedCrewUserIds.add(creativeUserId);
                                           });
-                                        }
-                                      },*/
-                                      onTap: () {
+                                        },
 
-                                        // ❌ Role not allowed
-                                        if (!allowedRoleIds.contains(roleId)) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text("This role is not allowed for this booking"),
+
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: isAdded ? ColorCode.kLightRed : ColorCode.kButtonColor,
+                                            borderRadius: BorderRadius.circular(30),
+                                            border: isAdded ? Border.all(color: Colors.red) : null,
+                                          ),
+                                          child: Text(
+                                            isAdded ? "Remove" : "Add to Crew",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontFamily: "Outfit",
+                                              fontWeight: FontWeight.w600,
+                                              color: isAdded ? Colors.red : Colors.black,
                                             ),
-                                          );
-                                          return;
-                                        }
+                                          ),
+                                        ),
+                                      ),
 
-                                        /// 🔴 REMOVE
-                                        if (isAdded) {
-                                          setState(() {
-                                            addedCrewUserIds.remove(creativeUserId);
-                                          });
-                                          return;
-                                        }
 
-                                        /// 🟢 ADD
-                                        int selectedForThisRole = 0;
+                                      const SizedBox(width: 8),
 
-                                        for (final match in crewMatches) {
-                                          final int uid = match['user']['id'];
-                                          final int rId = int.parse(match['role_id']);
-
-                                          if (addedCrewUserIds.contains(uid) && rId == roleId) {
-                                            selectedForThisRole++;
-                                          }
-                                        }
-
-                                        /// ✅ ROLE-WISE LIMIT
-                                        final int maxAllowed =
-                                            requiredCountByRole[roleId] ?? 0;
-
-                                        if (selectedForThisRole >= maxAllowed) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                "You can add only $maxAllowed ${item['role_name']}",
+                                      /// DETAILS BUTTON
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => RecommendedDetilsScreen(
+                                                id: item['id'],
+                                                bookingId: widget.bookingId,
                                               ),
                                             ),
                                           );
-                                          return;
-                                        }
-
-                                        setState(() {
-                                          addedCrewUserIds.add(creativeUserId);
-                                        });
-                                      },
-
-
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: isAdded ? ColorCode.kLightRed : ColorCode.kButtonColor,
-                                          borderRadius: BorderRadius.circular(30),
-                                          border: isAdded ? Border.all(color: Colors.red) : null,
+                                        },
+                                        child: Image.asset(
+                                          "assets/images/Group 2087328980.png",
+                                          height: 32,
                                         ),
-                                        child: Text(
-                                          isAdded ? "Remove" : "Add to Crew",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: "Outfit",
-                                            fontWeight: FontWeight.w600,
-                                            color: isAdded ? Colors.red : Colors.black,
+                                      ),
+                                    ],
+                                  ),
+
+
+
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              SizedBox(height: 20),*/
+
+
+                Expanded(
+                  child: Column(
+                    children: [
+
+                      /// 🔥 LOCATION NOT FOUND CARD
+                      if (crewMatches.isNotEmpty &&
+                          (crewMatches.first['distance_km'] ?? 0) > 100)
+
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E1E1E),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            children: [
+
+                              /// ICON
+                              Container(
+                                decoration: const BoxDecoration(
+
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    "assets/Icons/sale.png",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const Text(
+                                "Our creators around\nyour location are booked",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: "Unbounded",
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const Text(
+                                "Looks like no creators are available right now, but our sales \nexpert can help you find a great match.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      /// TITLE
+                      if (crewMatches.isNotEmpty &&
+                          (crewMatches.first['distance_km'] ?? 0) > 100)
+
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Text(
+                              "Browse Other Creative Partners",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 14,
+                                color: ColorCode.white,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      /// LIST
+                      Expanded(
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: crewMatches.length,
+                          itemBuilder: (context, index) {
+
+                            final item = crewMatches[index];
+
+                            final int userId = item['user']['id'];
+                            final int creativeUserId = item['user']['id'];
+                            final int roleId = int.tryParse(item['role_id'][0].toString()) ?? 0;
+                            final bool isAdded = addedCrewUserIds.contains(creativeUserId);
+                            final bool isFavourite = favouriteUsers.contains(creativeUserId);
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Container(
+                                height: 237,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  children: [
+
+                                    /// IMAGE
+                                    Positioned.fill(
+                                      child: item['profile_image_url'] != null
+                                          ? Image.network(
+                                        ApiService().getImageURL(item['profile_image_url']),
+                                        fit: BoxFit.cover,
+                                      )
+                                          : Image.asset(
+                                        "assets/images/Rectangle 34661070.png",
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    /// GRADIENT
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.transparent,
+                                              Colors.black.withOpacity(0.75),
+                                            ],
                                           ),
                                         ),
                                       ),
                                     ),
 
+                                    /// TOP ROW
+                                    Positioned(
+                                      top: 12,
+                                      left: 12,
+                                      right: 12,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
 
-                                    const SizedBox(width: 8),
+                                          /// ACTIVE STATUS
+                                          Row(
+                                            children: const [
+                                              CircleAvatar(
+                                                radius: 4,
+                                                backgroundColor: Colors.green,
+                                              ),
+                                              SizedBox(width: 6),
+                                              Text(
+                                                "Active",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
 
-                                    /// DETAILS BUTTON
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => RecommendedDetilsScreen(
-                                              id: item['id'],
-                                              bookingId: widget.bookingId,
+                                          /// FAVOURITE ICON
+                                          GestureDetector(
+                                            onTap: () async {
+
+                                              if (isFavourite) {
+                                                setState(() {
+                                                  favouriteUsers.remove(userId);
+                                                });
+
+                                                await _removeFavourite(userId);
+                                                _showFavouriteToast("Removed from Favourite");
+
+                                              } else {
+
+                                                setState(() {
+                                                  favouriteUsers.add(userId);
+                                                });
+
+                                                await _addFavourite(userId);
+                                                _showFavouriteToast("Added to Favourite");
+                                              }
+                                            },
+                                            child: Image.asset(
+                                              isFavourite
+                                                  ? "assets/Icons/Heart_Angl_COLOR.png"
+                                                  : "assets/images/Heart Angle.png",
+                                              height: 22,
+                                              width: 22,
                                             ),
                                           ),
-                                        );
-                                      },
-                                      child: Image.asset(
-                                        "assets/images/Group 2087328980.png",
-                                        height: 32,
+                                        ],
+                                      ),
+                                    ),
+
+                                    /// BOTTOM CONTENT
+                                    Positioned(
+                                      left: 14,
+                                      right: 14,
+                                      bottom: 14,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+
+                                          /// LEFT INFO
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+
+                                              Row(
+                                                children: [
+                                                  const Icon(Icons.star,
+                                                      color: Colors.amber, size: 14),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              const SizedBox(height: 6),
+
+                                              Text(
+                                                item['name'] ?? '',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+
+                                              Text(
+                                                item['role_name'] ?? '',
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          /// RIGHT BUTTONS
+                                          Row(
+                                            children: [
+
+                                              /// ADD / REMOVE CREW
+                                              InkWell(
+                                                onTap: () {
+
+                                                  if (!allowedRoleIds.contains(roleId)) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text("This role is not allowed for this booking"),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+
+                                                  if (isAdded) {
+                                                    setState(() {
+                                                      addedCrewUserIds.remove(creativeUserId);
+                                                    });
+                                                    return;
+                                                  }
+
+                                                  int selectedForThisRole = 0;
+
+                                                  for (final match in crewMatches) {
+                                                    final int uid = match['user']['id'];
+                                                    final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
+                                                    if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                                      selectedForThisRole++;
+                                                    }
+                                                  }
+
+                                                  final int maxAllowed =
+                                                      requiredCountByRole[roleId] ?? 0;
+
+                                                  if (selectedForThisRole >= maxAllowed) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "You can add only $maxAllowed ${item['role_name']}",
+                                                        ),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+
+                                                  setState(() {
+                                                    addedCrewUserIds.add(creativeUserId);
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 14, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: isAdded
+                                                        ? ColorCode.kLightRed
+                                                        : ColorCode.kButtonColor,
+                                                    borderRadius: BorderRadius.circular(30),
+                                                    border: isAdded
+                                                        ? Border.all(color: Colors.red)
+                                                        : null,
+                                                  ),
+                                                  child: Text(
+                                                    isAdded ? "Remove" : "Add to Crew",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w600,
+                                                      color: isAdded
+                                                          ? Colors.red
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+
+                                              const SizedBox(width: 8),
+
+                                              /// DETAILS BUTTON
+                                              InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) => RecommendedDetilsScreen(
+                                                        id: item['id'],
+                                                        bookingId: widget.bookingId,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Image.asset(
+                                                  "assets/images/Group 2087328980.png",
+                                                  height: 32,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-
-
-
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
             ),
 
-            SizedBox(height: 20),
-          ],
-        ),
-
+          ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5), // dark overlay
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: ColorCode.kButtonColor, // loader color
+                    strokeWidth: 3,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
 
-      bottomNavigationBar: Padding(
+  /*    bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
@@ -814,8 +1227,111 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ),
           ],
         ),
-      ),
+      ),*/
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
 
+              /// 🔹 TEXT ABOVE BUTTON
+              if (showLocationCard)
+                 Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ReviewConfirmScreen(
+                            bookingId: widget.bookingId,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Complete your Shoot",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ),
+
+              /// 🔹 BUTTON
+              SizedBox(
+                height: 55,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+
+                    /// CONTACT SALES FLOW
+                    if (showLocationCard) {
+                      showSalesDialog(context);   // 🔥 Dialog open hoga
+                      return;
+                    }
+
+                    /// NORMAL FLOW
+              /*      if (addedCrewUserIds.isEmpty) {
+                      _showNoCrewPopup();
+                      return;
+                    }*/
+
+                    for (final userId in addedCrewUserIds) {
+
+                      final matches = crewMatches
+                          .where((e) => e['user']['id'] == userId)
+                          .toList();
+
+                      if (matches.isEmpty) continue;
+
+                      final roleId =
+                          int.tryParse(matches.first['role_id'].toString()) ?? 0;
+
+                      await _addHolds(
+                        creativeUserId: userId,
+                        roleId: roleId,
+                      );
+                    }
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReviewConfirmScreen(
+                          bookingId: widget.bookingId,
+                        ),
+                      ),
+                    );
+                  },
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorCode.kButtonColor,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+
+                  child: Text(
+                    showLocationCard
+                        ? "Contact With Sales"
+                        : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
 
     );
   }
@@ -1309,6 +1825,106 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       },
     );
   }
+  void showSalesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: const Color(0xFF1E1E1E),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
 
+                /// CLOSE BUTTON
+                Align(
+                  alignment: Alignment.topRight,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.close, color: Colors.white54),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// SUCCESS ICON
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Lottie.asset(
+                    "assets/lottie/Untitled file.json",
+                    repeat: true,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// TITLE
+                const Text(
+                  "Request Received",
+                  style: TextStyle(
+                    color: ColorCode.kButtonColor,
+                    fontSize: 20,
+                    fontFamily: "Unbounded",
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// DESCRIPTION
+                const Text(
+                  "Our Sales team will shortly reach out to you to\nfinalize your creative requirements.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorCode.kWhiteOpacity70,
+                    fontSize: 14,
+                    fontFamily: "Outfit",
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                /// BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD6C29C), // beige color
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "Got it",
+                      style: TextStyle(
+                        color: Color(0xFF1D1D1B), // dark text like UI
+                        fontSize: 14,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 }

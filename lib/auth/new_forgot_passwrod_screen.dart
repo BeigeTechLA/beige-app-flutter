@@ -1,5 +1,6 @@
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -156,10 +157,9 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                           onTap: () {
                             Navigator.pop(context); // 🔥 screen pop karega
                           },
-                          child: Image.asset(
-                            "assets/Icons/Reply.png",
+                          child: SvgPicture.asset(
+                            "assets/svg/back.svg",
                             height: 24,
-                            color: Colors.white, // agar white chahiye ho
                           ),
                         ),
                       ),
