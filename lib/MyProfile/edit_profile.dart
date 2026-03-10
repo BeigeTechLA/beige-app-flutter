@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:beige/MyProfile/my_profile.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -392,14 +393,13 @@ class _EditProfileState extends State<EditProfile> {
                 Positioned(
                   top: 90,
                   left: 16,
-                  child:  InkWell(
-                    onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => MyProfile()),
-                        );
-                    },
-                    child: Image.asset("assets/Icons/Reply.png", height: 24,color: ColorCode.kHeadingColor,),
+                  child:      InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: SvgPicture.asset(
+                      "assets/svg/back.svg",
+                      color: ColorCode.black,
+                      height: 24,
+                    ),
                   ),
                 ),
         
@@ -420,7 +420,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                 ),
-        
+
                 /// 🔹 PROFILE IMAGE (CUT INTO CURVE)
                 Positioned(
                   bottom: -48,
@@ -452,7 +452,7 @@ class _EditProfileState extends State<EditProfile> {
                           ),
                           ),
                         ),
-        
+
                         /// ✏️ EDIT ICON
                         Positioned(
                           bottom: 5,

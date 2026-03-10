@@ -17,7 +17,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool isEmailFilled = false;
   bool isLoading = false;
 
-  Future<void> _fetchForgotPassword() async {
+ /* Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
 
     if (emailController.text.trim().isEmpty) {
@@ -52,7 +52,74 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     } finally {
       setState(() => isLoading = false);
     }
+  }*/
+/*
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }*/
+
+
+  Future<void> _fetchForgotPassword() async {
+    final apiService = ApiService();
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showSnack("Please enter email");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      _showSnack("Please enter a valid email address");
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final response = await apiService.postData(
+        ApiEndpoints.forgotpassword,
+        {"email": email},
+      );
+
+      if (response == null) {
+        _showSnack("Server error, please try again");
+        return;
+      }
+
+      if (response['error'] == false) {
+        if (!mounted) return;
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EnterOtpCodeScreen(email: email),
+          ),
+        );
+      } else {
+        /// ✅ BACKEND MESSAGE SHOW KARO
+        _showSnack(response['message'] ?? "Email not registered");
+      }
+    } catch (e) {
+      _showSnack("Please enter a valid email address");
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
+
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
 
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

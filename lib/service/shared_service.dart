@@ -124,6 +124,21 @@
         print("🗑️ User data cleared from SharedPreferences");
       }
 
+      // static Future<void> logout() async {
+      //   final prefs = await SharedPreferences.getInstance();
+      //
+      //   await prefs.remove('token');
+      //   await prefs.remove('environment_id');
+      //   await prefs.remove('folder');
+      //   await prefs.remove('name');
+      //   await prefs.remove('designation');
+      //   await prefs.remove('department');
+      //   await prefs.remove('department_id');
+      //   await prefs.remove('isLoggedIn');
+      //
+      //   print("User session cleared but password kept");
+      // }
+
       /// Get stored token
       static Future<String?> getToken() async {
         final prefs = await SharedPreferences.getInstance();

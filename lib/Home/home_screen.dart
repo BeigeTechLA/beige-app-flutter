@@ -947,490 +947,170 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ],
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,   // 👉 horizontal scroll enable
-                      child: Row(
-                        children: [
-                          SizedBox(width: 12), // optional spacing
+                    SizedBox(
+                      height: 280,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: featuredCreatives.length,
+                        itemBuilder: (context, index) {
 
-                          // 🔹 Your First Card
-                          Container(
-                            width: 210,
-                            height: 280,
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child: Image.asset(
-                                    "assets/images/home2.png",
-                                 /*   width: double.infinity,
-                                    height: double.infinity,*/
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                          final item = featuredCreatives[index];
 
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                      bottom: Radius.circular(18),
-                                    ),
-                                    child: Image.asset(
-                                      "assets/images/them_black_back.png",
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 12, right: 4),
+                            child: Container(
+                              width: 210,
+                              height: 280,
+                              child: Stack(
+                                children: [
+
+                                  /// IMAGE
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(18),
+                                    child: item["profile_image_url"] != null
+                                        ? Image.network(
+                                      ApiService().getImageURL(item["profile_image_url"]),
                                       fit: BoxFit.cover,
                                       width: double.infinity,
-                                      // height: 120,
+                                      height: double.infinity,
+                                    )
+                                        : Image.asset(
+                                      "assets/images/home1.png",
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                ),
 
-
-                                Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: Container(
-                                    height: 14,
-                                    width: 14,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          // on press action
-                                        },
-                                        child: Image.asset(
-                                          "assets/images/Heart Angle.png", // 👈 apni image path
-                                          height: 24,
-                                          width: 24,
-                                          color: Colors.white, // agar white chahiye
+                                  /// BLACK GRADIENT
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Container(
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.vertical(
+                                            bottom: Radius.circular(18)),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black.withOpacity(0.8)
+                                          ],
                                         ),
                                       ),
-
-                                      SizedBox(width: 4),
-                                    ],
+                                    ),
                                   ),
-                                ),
 
-                                // BOTTOM CONTENT
-                                Positioned(
-                                  bottom: 12,
-                                  left: 12,
-                                  right: 12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                                  /// ONLINE DOT
+                                  const Positioned(
+                                    top: 10,
+                                    left: 10,
+                                    child: CircleAvatar(
+                                      radius: 6,
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  ),
 
+                                  /// HEART ICON
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: Image.asset(
+                                      "assets/images/Heart Angle.png",
+                                      height: 22,
+                                      color: Colors.white,
+                                    ),
+                                  ),
 
-                                      Row(
-                                        children: [
-                                          Icon(Icons.star, color: Colors.yellow, size: 18),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            "4.5 (120)",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontFamily: "Outfit",
-                                              color: ColorCode.kWhiteOpacity70,
-                                              fontWeight: FontWeight.w500,
+                                  /// TEXT DATA
+                                  Positioned(
+                                    bottom: 12,
+                                    left: 12,
+                                    right: 12,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.star,
+                                                color: Colors.yellow, size: 16),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              item["average_rating"] != null
+                                                  ? item["average_rating"].toString()
+                                                  : "4.5",
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 12,
+                                              ),
                                             ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 4),
+
+                                        /// NAME
+                                        Text(
+                                          item["name"] ?? "",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                        ],
-                                      ),
-
-
-                                      Text(
-                                        "Angela Kia",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w500,
                                         ),
-                                      ),
 
-                                      SizedBox(height: 2),
+                                        const SizedBox(height: 2),
 
-                                      Text(
-                                        "Videography Specialist",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w400,
+                                        /// TITLE
+                                        Text(
+                                          item["primary_title"] ?? "",
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 11,
+                                          ),
                                         ),
-                                      ),
 
-                                      SizedBox(height: 10),
+                                        const SizedBox(height: 8),
 
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          GestureDetector(
-                                      /*      onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => RecommendedDetilsScreen(id: 2, bookingId: 2,), // 👈 jis screen pe bhejna hai
-                                                ),
-                                              );
-                                            },*/
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 7),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+
+                                            /// VIEW PROFILE BUTTON
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 18, vertical: 6),
                                               decoration: BoxDecoration(
                                                 color: ColorCode.kButtonColor,
-                                                borderRadius: BorderRadius.circular(22),
+                                                borderRadius: BorderRadius.circular(20),
                                               ),
-                                              child: Text(
+                                              child: const Text(
                                                 "View Profile",
-                                            
                                                 style: TextStyle(
-                                                  fontFamily: "Outfit",
-                                                  color: ColorCode.kCircleGradientTop,
+                                                  fontSize: 11,
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Image.asset(
-                                            "assets/images/Group 2087328980.png",
-                                            width: 35,   // optional
-                                            height: 35,  // optional
-                                            fit: BoxFit.contain,
-                                          ),
 
-                                        ],
-                                      )
-                                    ],
+                                            /// ICON
+                                            Image.asset(
+                                              "assets/images/Group 2087328980.png",
+                                              width: 30,
+                                              height: 30,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-
-                          SizedBox(width: 16),
-
-                          // 🔹 Second Card (Your full card with button)
-                          Container(
-                            width: 210,
-                            height: 280,
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child: Image.asset(
-                                    "assets/images/home1.png",
-                                    /*   width: double.infinity,
-                                    height: double.infinity,*/
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                      bottom: Radius.circular(18),
-                                    ),
-                                    child: Image.asset(
-                                      "assets/images/them_black_back.png",
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      // height: 120,
-                                    ),
-                                  ),
-                                ),
-
-
-                                Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: Container(
-                                    height: 14,
-                                    width: 14,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          // on press action
-                                        },
-                                        child: Image.asset(
-                                          "assets/images/Heart Angle.png", // 👈 apni image path
-                                          height: 24,
-                                          width: 24,
-                                          color: Colors.white, // agar white chahiye
-                                        ),
-                                      ),
-
-                                      SizedBox(width: 4),
-                                    ],
-                                  ),
-                                ),
-
-                                // BOTTOM CONTENT
-                                Positioned(
-                                  bottom: 12,
-                                  left: 12,
-                                  right: 12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-
-
-                                      Row(
-                                        children: [
-                                          Icon(Icons.star, color: Colors.yellow, size: 18),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            "4.2 (400)",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontFamily: "Outfit",
-                                              color: ColorCode.kWhiteOpacity70,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-
-                                      Text(
-                                        "Lucas Bennett",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 2),
-
-                                      Text(
-                                        "Photographer Specialist",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 10),
-
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kButtonColor,
-                                              borderRadius: BorderRadius.circular(22),
-                                            ),
-                                            child: Text(
-                                              "View Profile",
-                                              style: TextStyle(
-                                                fontFamily: "Outfit",
-                                                color: ColorCode.kCircleGradientTop,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                          Image.asset(
-                                            "assets/images/Group 2087328980.png",
-                                            width: 35,   // optional
-                                            height: 35,  // optional
-                                            fit: BoxFit.contain,
-                                          ),
-
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(width: 16),
-
-                          Container(
-                            width: 210,
-                            height: 280,
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child: Image.asset(
-                                    "assets/images/home3.png",
-                                    /*   width: double.infinity,
-                                    height: double.infinity,*/
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(
-                                      bottom: Radius.circular(18),
-                                    ),
-                                    child: Image.asset(
-                                      "assets/images/them_black_back.png",
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      // height: 120,
-                                    ),
-                                  ),
-                                ),
-
-
-                                Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: Container(
-                                    height: 14,
-                                    width: 14,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          // on press action
-                                        },
-                                        child: Image.asset(
-                                          "assets/images/Heart Angle.png",
-                                          height: 24,
-                                          width: 24,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-
-                                      SizedBox(width: 4),
-                                    ],
-                                  ),
-                                ),
-
-                                // BOTTOM CONTENT
-                                Positioned(
-                                  bottom: 12,
-                                  left: 12,
-                                  right: 12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-
-
-                                      Row(
-                                        children: [
-                                          Icon(Icons.star, color: Colors.yellow, size: 18),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            "View Profile",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontFamily: "Outfit",
-                                              color: ColorCode.kWhiteOpacity70,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-
-                                      Text(
-                                        "Lucas Bennett",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 2),
-
-                                      Text(
-                                        "Photographer Specialist",
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontFamily: "Outfit",
-                                          color: ColorCode.white,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 10),
-
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kButtonColor,
-                                              borderRadius: BorderRadius.circular(22),
-                                            ),
-                                            child: Text(
-                                              "View Profile",
-                                              style: TextStyle(
-                                                fontFamily: "Outfit",
-                                                color: ColorCode.kCircleGradientTop,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                          Image.asset(
-                                            "assets/images/Group 2087328980.png",
-                                            width: 35,   // optional
-                                            height: 35,  // optional
-                                            fit: BoxFit.contain,
-                                          ),
-
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-
-                        ],
+                          );
+                        },
                       ),
                     )
-
                   ],
                 ),
 

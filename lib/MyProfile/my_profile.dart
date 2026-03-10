@@ -1,6 +1,7 @@
 import 'package:beige/Home/home_screen.dart';
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../auth/login_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -110,7 +111,11 @@ class _MyProfileState extends State<MyProfile> {
                   left: 16,
                   child:  InkWell(
                     onTap: () => Navigator.pop(context),
-                    child: Image.asset("assets/Icons/Reply.png", height: 24,color: ColorCode.kHeadingColor,),
+                    child:SvgPicture.asset(
+                      "assets/svg/back.svg",
+                      color: ColorCode.black,
+                      height: 24,
+                    ),
                   ),
                 ),
 
@@ -247,12 +252,12 @@ class _MyProfileState extends State<MyProfile> {
             /// 🔹 EDIT BUTTON
             InkWell(
               onTap: () {
-                 Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>  EditProfile(),
-                              ),
-                            );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfile(),
+                  ),
+                );
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),

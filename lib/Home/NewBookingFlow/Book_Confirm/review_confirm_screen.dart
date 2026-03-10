@@ -451,8 +451,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                     /// ⬜ WHITE INFO BOX
                     Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
@@ -462,26 +461,26 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ),
                       child: Column(
                         children: [
+
                           infoRowBlack(
-                            Icons.access_time,
+                            "assets/svg/Group 2087328870.svg",
                             "${booking?['start_time']} to ${booking?['end_time']} "
                                 "(${pricing?['duration_hours']}h duration)",
                           ),
-
+                          const SizedBox(height: 8),
                           infoRowBlack(
-                            Icons.calendar_month,
+                            "assets/svg/Frame.svg",
                             formatDate(booking?['event_date']),
-
                           ),
-
+                          const SizedBox(height: 8),
                           infoRowBlack(
-                            Icons.location_on,
+                            "assets/svg/location.svg",
                             booking?['event_location'] ?? "",
                           ),
 
                         ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -864,28 +863,34 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   }
 
 
-  Widget infoRowBlack(IconData icon, String text) {
+  Widget infoRowBlack(String svgIcon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 16,
+
+        /// SVG ICON
+        SvgPicture.asset(
+          svgIcon,
+          height: 16,
+          width: 16,
           color: Colors.black87,
         ),
+
         const SizedBox(width: 8),
+
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
-                fontSize: 12,
-                color: ColorCode.black,
-                fontFamily: "Outfit",
-                fontWeight: FontWeight.w400
-
+              fontSize: 12,
+              color: ColorCode.black,
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w400,
             ),
           ),
+
         ),
+        const SizedBox(height: 8),
       ],
     );
   }

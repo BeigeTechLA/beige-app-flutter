@@ -24,7 +24,8 @@ class ColorCode {
     static const Color kDividerWhite12 = Color(0x1FFFFFFF);
 
   static const Color k737373 = Color(0xFF737373); //Medium grey
-
+  /// ⭐ Figma Border (#DDDDDD 50%)
+  static const Color kBorderLight = Color(0x80DDDDDD);
   // ⭐ Light Red / Remove Background
   static const Color kLightRed = Color(0xFFFFC9C9);
 

@@ -1,5 +1,6 @@
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -74,7 +75,15 @@ _showSnack(String message) {
         _showSnack("User data not found");
         return;
       }
+      await SharedService.setLoginDetails(response);
 
+      /// ✅ Save password if checkbox checked
+      final prefs = await SharedPreferences.getInstance();
+
+      if (savePassword) {
+        await prefs.setString("email", email);
+        await prefs.setString("password", password);
+      }
       /// ✅ Save login
       await SharedService.setLoginDetails(response);
 
