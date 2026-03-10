@@ -828,11 +828,11 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                                     /// 📍 LOCATION SVG
                                     suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 14),
+                                      padding: const EdgeInsets.only(right: 16),
                                       child: SvgPicture.asset(
                                         "assets/svg/LocationPin.svg",
-                                        width: 12,
-                                        height: 12,
+                                        width: 10,
+                                        height: 10,
                                         color: ColorCode.kWhiteOpacity70,
                                       ),
                                     ),

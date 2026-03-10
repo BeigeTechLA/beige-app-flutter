@@ -289,10 +289,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                 }),
               ),
 
-              SizedBox(
-                height: 20,
-              ),
-
+              SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
