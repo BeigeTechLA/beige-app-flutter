@@ -435,11 +435,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           },
                         );
                       },
-                      child: Image.asset(
-                        "assets/Icons/Filter.png",
+                      child: SvgPicture.asset(
+                        "assets/svg/Filter.svg",
                         height: 24,
-                        width: 24,
-                        color: ColorCode.white,
                       ),
                     ),
 
@@ -772,20 +770,18 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
               ),
 
               SizedBox(height: 20),*/
-
-
                 Expanded(
-                  child: Column(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
                     children: [
 
                       /// 🔥 LOCATION NOT FOUND CARD
                       if (crewMatches.isNotEmpty &&
                           (crewMatches.first['distance_km'] ?? 0) > 100)
-
                         Container(
                           width: double.infinity,
                           margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E1E1E),
                             borderRadius: BorderRadius.circular(20),
@@ -793,23 +789,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           child: Column(
                             children: [
 
-                              /// ICON
-                              Container(
-                                decoration: const BoxDecoration(
-
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    "assets/Icons/sale.png",
-                                    fit: BoxFit.cover,
-                                  ),
+                              ClipOval(
+                                child: Image.asset(
+                                  "assets/Icons/sale.png",
+                                  fit: BoxFit.cover,
                                 ),
                               ),
 
                               const SizedBox(height: 10),
 
                               const Text(
-                                "Our creators around\nyour location are booked",
+                                "Our Creators Around Your Location Are Booked",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: "Unbounded",
@@ -822,111 +812,177 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               const SizedBox(height: 10),
 
                               const Text(
-                                "Looks like no creators are available right now, but our sales \nexpert can help you find a great match.",
+                                "Looks like no creators are available right now, but our sales expert can help you find a great match.",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 12,
+                                  fontWeight: FontWeight.w400,
                                   color: Colors.white60,
                                 ),
                               ),
+
+                              SizedBox(height: 10),
+                              Center(
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.85,
+                                  child: Divider(
+                                    color: ColorCode.kDividerWhite12,
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ),
                             ],
+
                           ),
                         ),
 
                       /// TITLE
                       if (crewMatches.isNotEmpty &&
                           (crewMatches.first['distance_km'] ?? 0) > 100)
-
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              "Browse Other Creative Partners",
-                              style: TextStyle(
-                                fontFamily: "Unbounded",
-                                fontSize: 14,
-                                color: ColorCode.white,
-                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "  Browse Other Creative Partners",
+                            style: TextStyle(
+                              fontFamily: "Unbounded",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: ColorCode.white,
                             ),
                           ),
                         ),
 
-                      /// LIST
-                      Expanded(
-                        child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: crewMatches.length,
-                          itemBuilder: (context, index) {
+                      /// CREW LIST
+                      ...crewMatches.map((item) {
 
-                            final item = crewMatches[index];
+                        final int userId = item['user']['id'];
+                        final int creativeUserId = item['user']['id'];
+                        final int roleId =
+                            int.tryParse(item['role_id'][0].toString()) ?? 0;
 
-                            final int userId = item['user']['id'];
-                            final int creativeUserId = item['user']['id'];
-                            final int roleId = int.tryParse(item['role_id'][0].toString()) ?? 0;
-                            final bool isAdded = addedCrewUserIds.contains(creativeUserId);
-                            final bool isFavourite = favouriteUsers.contains(creativeUserId);
+                        final bool isAdded = addedCrewUserIds.contains(creativeUserId);
+                        final bool isFavourite = favouriteUsers.contains(creativeUserId);
 
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: Container(
-                                height: 237,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Container(
+                            height: 237,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Stack(
+                              children: [
+
+                                /// IMAGE
+                                Positioned.fill(
+                                  child: item['profile_image_url'] != null
+                                      ? Image.network(
+                                    ApiService().getImageURL(item['profile_image_url']),
+                                    fit: BoxFit.cover,
+                                  )
+                                      : Image.asset(
+                                    "assets/images/Rectangle 34661070.png",
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  children: [
 
-                                    /// IMAGE
-                                    Positioned.fill(
-                                      child: item['profile_image_url'] != null
-                                          ? Image.network(
-                                        ApiService().getImageURL(item['profile_image_url']),
-                                        fit: BoxFit.cover,
-                                      )
-                                          : Image.asset(
-                                        "assets/images/Rectangle 34661070.png",
-                                        fit: BoxFit.cover,
+                                /// GRADIENT
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.75),
+                                        ],
                                       ),
                                     ),
+                                  ),
+                                ),
 
-                                    /// GRADIENT
-                                    Positioned.fill(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.black.withOpacity(0.75),
-                                            ],
+                                /// ACTIVE + FAV ICON
+                                Positioned(
+                                  top: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+
+                                      Row(
+                                        children: const [
+                                          CircleAvatar(
+                                            radius: 4,
+                                            backgroundColor: Colors.green,
                                           ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            "Active",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      GestureDetector(
+                                        onTap: () async {
+                                          if (isFavourite) {
+                                            setState(() {
+                                              favouriteUsers.remove(userId);
+                                            });
+
+                                            await _removeFavourite(userId);
+                                            _showFavouriteToast("Removed from Favourite");
+
+                                          } else {
+                                            setState(() {
+                                              favouriteUsers.add(userId);
+                                            });
+
+                                            await _addFavourite(userId);
+                                            _showFavouriteToast("Added to Favourite");
+                                          }
+                                        },
+                                        child: Image.asset(
+                                          isFavourite
+                                              ? "assets/Icons/Heart_Angl_COLOR.png"
+                                              : "assets/images/Heart Angle.png",
+                                          height: 22,
+                                          width: 22,
                                         ),
                                       ),
-                                    ),
+                                    ],
+                                  ),
+                                ),
 
-                                    /// TOP ROW
-                                    Positioned(
-                                      top: 12,
-                                      left: 12,
-                                      right: 12,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                /// BOTTOM INFO
+                                Positioned(
+                                  left: 14,
+                                  right: 14,
+                                  bottom: 14,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+
+                                      /// LEFT INFO
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
 
-                                          /// ACTIVE STATUS
                                           Row(
-                                            children: const [
-                                              CircleAvatar(
-                                                radius: 4,
-                                                backgroundColor: Colors.green,
-                                              ),
-                                              SizedBox(width: 6),
+                                            children: [
+                                              const Icon(Icons.star,
+                                                  color: Colors.amber, size: 14),
+                                              const SizedBox(width: 4),
                                               Text(
-                                                "Active",
-                                                style: TextStyle(
+                                                "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,
                                                 ),
@@ -934,204 +990,495 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             ],
                                           ),
 
-                                          /// FAVOURITE ICON
-                                          GestureDetector(
-                                            onTap: () async {
+                                          const SizedBox(height: 6),
 
-                                              if (isFavourite) {
-                                                setState(() {
-                                                  favouriteUsers.remove(userId);
-                                                });
+                                          Text(
+                                            item['name'] ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white,
+                                            ),
+                                          ),
 
-                                                await _removeFavourite(userId);
-                                                _showFavouriteToast("Removed from Favourite");
-
-                                              } else {
-
-                                                setState(() {
-                                                  favouriteUsers.add(userId);
-                                                });
-
-                                                await _addFavourite(userId);
-                                                _showFavouriteToast("Added to Favourite");
-                                              }
-                                            },
-                                            child: Image.asset(
-                                              isFavourite
-                                                  ? "assets/Icons/Heart_Angl_COLOR.png"
-                                                  : "assets/images/Heart Angle.png",
-                                              height: 22,
-                                              width: 22,
+                                          Text(
+                                            item['role_name'] ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white70,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
 
-                                    /// BOTTOM CONTENT
-                                    Positioned(
-                                      left: 14,
-                                      right: 14,
-                                      bottom: 14,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                      /// RIGHT BUTTONS
+                                      Row(
                                         children: [
 
-                                          /// LEFT INFO
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
+                                          /// ADD / REMOVE CREW
+                                          InkWell(
+                                            onTap: () {
 
-                                              Row(
-                                                children: [
-                                                  const Icon(Icons.star,
-                                                      color: Colors.amber, size: 14),
-                                                  const SizedBox(width: 4),
-                                                  Text(
-                                                    "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
+                                              if (!allowedRoleIds.contains(roleId)) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text("This role is not allowed for this booking"),
+                                                  ),
+                                                );
+                                                return;
+                                              }
+
+                                              if (isAdded) {
+                                                setState(() {
+                                                  addedCrewUserIds.remove(creativeUserId);
+                                                });
+                                                return;
+                                              }
+
+                                              int selectedForThisRole = 0;
+
+                                              for (final match in crewMatches) {
+                                                final int uid = match['user']['id'];
+                                                final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
+
+                                                if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                                  selectedForThisRole++;
+                                                }
+                                              }
+
+                                              final int maxAllowed = requiredCountByRole[roleId] ?? 0;
+
+                                              if (selectedForThisRole >= maxAllowed) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "You can add only $maxAllowed ${item['role_name']}",
                                                     ),
                                                   ),
-                                                ],
+                                                );
+                                                return;
+                                              }
+
+                                              setState(() {
+                                                addedCrewUserIds.add(creativeUserId);
+                                              });
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 14, vertical: 8),
+                                              decoration: BoxDecoration(
+                                                color: isAdded
+                                                    ? ColorCode.kLightRed
+                                                    : ColorCode.kButtonColor,
+                                                borderRadius: BorderRadius.circular(30),
+                                                border: isAdded
+                                                    ? Border.all(color: Colors.red)
+                                                    : null,
                                               ),
-
-                                              const SizedBox(height: 6),
-
-                                              Text(
-                                                item['name'] ?? '',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white,
+                                              child: Text(
+                                                isAdded ? "Remove" : "Add to Crew",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontFamily: "Outfit",
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isAdded ? Colors.red : Colors.black,
                                                 ),
                                               ),
-
-                                              Text(
-                                                item['role_name'] ?? '',
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  color: Colors.white70,
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
 
-                                          /// RIGHT BUTTONS
-                                          Row(
-                                            children: [
+                                          const SizedBox(width: 8),
 
-                                              /// ADD / REMOVE CREW
-                                              InkWell(
-                                                onTap: () {
-
-                                                  if (!allowedRoleIds.contains(roleId)) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text("This role is not allowed for this booking"),
-                                                      ),
-                                                    );
-                                                    return;
-                                                  }
-
-                                                  if (isAdded) {
-                                                    setState(() {
-                                                      addedCrewUserIds.remove(creativeUserId);
-                                                    });
-                                                    return;
-                                                  }
-
-                                                  int selectedForThisRole = 0;
-
-                                                  for (final match in crewMatches) {
-                                                    final int uid = match['user']['id'];
-                                                    final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
-                                                    if (addedCrewUserIds.contains(uid) && rId == roleId) {
-                                                      selectedForThisRole++;
-                                                    }
-                                                  }
-
-                                                  final int maxAllowed =
-                                                      requiredCountByRole[roleId] ?? 0;
-
-                                                  if (selectedForThisRole >= maxAllowed) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "You can add only $maxAllowed ${item['role_name']}",
-                                                        ),
-                                                      ),
-                                                    );
-                                                    return;
-                                                  }
-
-                                                  setState(() {
-                                                    addedCrewUserIds.add(creativeUserId);
-                                                  });
-                                                },
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                      horizontal: 14, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: isAdded
-                                                        ? ColorCode.kLightRed
-                                                        : ColorCode.kButtonColor,
-                                                    borderRadius: BorderRadius.circular(30),
-                                                    border: isAdded
-                                                        ? Border.all(color: Colors.red)
-                                                        : null,
-                                                  ),
-                                                  child: Text(
-                                                    isAdded ? "Remove" : "Add to Crew",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w600,
-                                                      color: isAdded
-                                                          ? Colors.red
-                                                          : Colors.black,
-                                                    ),
+                                          /// DETAILS BUTTON
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => RecommendedDetilsScreen(
+                                                    id: item['id'],
+                                                    bookingId: widget.bookingId,
                                                   ),
                                                 ),
-                                              ),
-
-                                              const SizedBox(width: 8),
-
-                                              /// DETAILS BUTTON
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) => RecommendedDetilsScreen(
-                                                        id: item['id'],
-                                                        bookingId: widget.bookingId,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Image.asset(
-                                                  "assets/images/Group 2087328980.png",
-                                                  height: 32,
-                                                ),
-                                              ),
-                                            ],
+                                              );
+                                            },
+                                            child: Image.asset(
+                                              "assets/images/Group 2087328980.png",
+                                              height: 32,
+                                            ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      )
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ],
                   ),
-                ),
+                )
+
+                // Expanded(
+                //   child: Column(
+                //     children: [
+                //
+                //       /// 🔥 LOCATION NOT FOUND CARD
+                //       if (crewMatches.isNotEmpty &&
+                //           (crewMatches.first['distance_km'] ?? 0) > 100)
+                //
+                //         Container(
+                //           width: double.infinity,
+                //           margin: const EdgeInsets.only(bottom: 16),
+                //           padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                //           decoration: BoxDecoration(
+                //             color: const Color(0xFF1E1E1E),
+                //             borderRadius: BorderRadius.circular(20),
+                //           ),
+                //           child: Column(
+                //             children: [
+                //
+                //               /// ICON
+                //               Container(
+                //                 decoration: const BoxDecoration(
+                //
+                //                 ),
+                //                 child: ClipOval(
+                //                   child: Image.asset(
+                //                     "assets/Icons/sale.png",
+                //                     fit: BoxFit.cover,
+                //                   ),
+                //                 ),
+                //               ),
+                //
+                //               const SizedBox(height: 10),
+                //
+                //               const Text(
+                //                 "Our creators Around\nyour location Are Booked",
+                //                 textAlign: TextAlign.center,
+                //                 style: TextStyle(
+                //                   fontFamily: "Unbounded",
+                //                   fontSize: 15,
+                //                   fontWeight: FontWeight.w600,
+                //                   color: Colors.white,
+                //                 ),
+                //               ),
+                //
+                //               const SizedBox(height: 10),
+                //
+                //               const Text(
+                //                 "Looks like no creators are available right now, but our sales \nexpert can help you find a great match.",
+                //                 textAlign: TextAlign.center,
+                //                 style: TextStyle(
+                //                   fontSize: 12,
+                //                   color: Colors.white60,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+                //
+                //       /// TITLE
+                //       if (crewMatches.isNotEmpty &&
+                //           (crewMatches.first['distance_km'] ?? 0) > 100)
+                //
+                //         Align(
+                //           alignment: Alignment.centerLeft,
+                //           child: Padding(
+                //             padding: const EdgeInsets.only(bottom: 10),
+                //             child: Text(
+                //               "Browse Other Creative Partners",
+                //               style: TextStyle(
+                //                 fontFamily: "Unbounded",
+                //                 fontSize: 14,
+                //                 color: ColorCode.white,
+                //               ),
+                //             ),
+                //           ),
+                //         ),
+                //
+                //       /// LIST
+                //       Expanded(
+                //         child: ListView.builder(
+                //           physics: const BouncingScrollPhysics(),
+                //           itemCount: crewMatches.length,
+                //           itemBuilder: (context, index) {
+                //
+                //             final item = crewMatches[index];
+                //
+                //             final int userId = item['user']['id'];
+                //             final int creativeUserId = item['user']['id'];
+                //             final int roleId = int.tryParse(item['role_id'][0].toString()) ?? 0;
+                //             final bool isAdded = addedCrewUserIds.contains(creativeUserId);
+                //             final bool isFavourite = favouriteUsers.contains(creativeUserId);
+                //
+                //             return Padding(
+                //               padding: const EdgeInsets.only(bottom: 16),
+                //               child: Container(
+                //                 height: 237,
+                //                 decoration: BoxDecoration(
+                //                   borderRadius: BorderRadius.circular(20),
+                //                 ),
+                //                 clipBehavior: Clip.antiAlias,
+                //                 child: Stack(
+                //                   children: [
+                //
+                //                     /// IMAGE
+                //                     Positioned.fill(
+                //                       child: item['profile_image_url'] != null
+                //                           ? Image.network(
+                //                         ApiService().getImageURL(item['profile_image_url']),
+                //                         fit: BoxFit.cover,
+                //                       )
+                //                           : Image.asset(
+                //                         "assets/images/Rectangle 34661070.png",
+                //                         fit: BoxFit.cover,
+                //                       ),
+                //                     ),
+                //
+                //                     /// GRADIENT
+                //                     Positioned.fill(
+                //                       child: Container(
+                //                         decoration: BoxDecoration(
+                //                           gradient: LinearGradient(
+                //                             begin: Alignment.topCenter,
+                //                             end: Alignment.bottomCenter,
+                //                             colors: [
+                //                               Colors.transparent,
+                //                               Colors.black.withOpacity(0.75),
+                //                             ],
+                //                           ),
+                //                         ),
+                //                       ),
+                //                     ),
+                //
+                //                     /// TOP ROW
+                //                     Positioned(
+                //                       top: 12,
+                //                       left: 12,
+                //                       right: 12,
+                //                       child: Row(
+                //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //                         children: [
+                //
+                //                           /// ACTIVE STATUS
+                //                           Row(
+                //                             children: const [
+                //                               CircleAvatar(
+                //                                 radius: 4,
+                //                                 backgroundColor: Colors.green,
+                //                               ),
+                //                               SizedBox(width: 6),
+                //                               Text(
+                //                                 "Active",
+                //                                 style: TextStyle(
+                //                                   color: Colors.white,
+                //                                   fontSize: 12,
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //
+                //                           /// FAVOURITE ICON
+                //                           GestureDetector(
+                //                             onTap: () async {
+                //
+                //                               if (isFavourite) {
+                //                                 setState(() {
+                //                                   favouriteUsers.remove(userId);
+                //                                 });
+                //
+                //                                 await _removeFavourite(userId);
+                //                                 _showFavouriteToast("Removed from Favourite");
+                //
+                //                               } else {
+                //
+                //                                 setState(() {
+                //                                   favouriteUsers.add(userId);
+                //                                 });
+                //
+                //                                 await _addFavourite(userId);
+                //                                 _showFavouriteToast("Added to Favourite");
+                //                               }
+                //                             },
+                //                             child: Image.asset(
+                //                               isFavourite
+                //                                   ? "assets/Icons/Heart_Angl_COLOR.png"
+                //                                   : "assets/images/Heart Angle.png",
+                //                               height: 22,
+                //                               width: 22,
+                //                             ),
+                //                           ),
+                //                         ],
+                //                       ),
+                //                     ),
+                //
+                //                     /// BOTTOM CONTENT
+                //                     Positioned(
+                //                       left: 14,
+                //                       right: 14,
+                //                       bottom: 14,
+                //                       child: Row(
+                //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //                         crossAxisAlignment: CrossAxisAlignment.end,
+                //                         children: [
+                //
+                //                           /// LEFT INFO
+                //                           Column(
+                //                             crossAxisAlignment: CrossAxisAlignment.start,
+                //                             children: [
+                //
+                //                               Row(
+                //                                 children: [
+                //                                   const Icon(Icons.star,
+                //                                       color: Colors.amber, size: 14),
+                //                                   const SizedBox(width: 4),
+                //                                   Text(
+                //                                     "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
+                //                                     style: const TextStyle(
+                //                                       color: Colors.white,
+                //                                       fontSize: 12,
+                //                                     ),
+                //                                   ),
+                //                                 ],
+                //                               ),
+                //
+                //                               const SizedBox(height: 6),
+                //
+                //                               Text(
+                //                                 item['name'] ?? '',
+                //                                 style: const TextStyle(
+                //                                   fontSize: 14,
+                //                                   fontWeight: FontWeight.w500,
+                //                                   color: Colors.white,
+                //                                 ),
+                //                               ),
+                //
+                //                               Text(
+                //                                 item['role_name'] ?? '',
+                //                                 style: const TextStyle(
+                //                                   fontSize: 11,
+                //                                   color: Colors.white70,
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //
+                //                           /// RIGHT BUTTONS
+                //                           Row(
+                //                             children: [
+                //
+                //                               /// ADD / REMOVE CREW
+                //                               InkWell(
+                //                                 onTap: () {
+                //
+                //                                   if (!allowedRoleIds.contains(roleId)) {
+                //                                     ScaffoldMessenger.of(context).showSnackBar(
+                //                                       const SnackBar(
+                //                                         content: Text("This role is not allowed for this booking"),
+                //                                       ),
+                //                                     );
+                //                                     return;
+                //                                   }
+                //
+                //                                   if (isAdded) {
+                //                                     setState(() {
+                //                                       addedCrewUserIds.remove(creativeUserId);
+                //                                     });
+                //                                     return;
+                //                                   }
+                //
+                //                                   int selectedForThisRole = 0;
+                //
+                //                                   for (final match in crewMatches) {
+                //                                     final int uid = match['user']['id'];
+                //                                     final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
+                //                                     if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                //                                       selectedForThisRole++;
+                //                                     }
+                //                                   }
+                //
+                //                                   final int maxAllowed =
+                //                                       requiredCountByRole[roleId] ?? 0;
+                //
+                //                                   if (selectedForThisRole >= maxAllowed) {
+                //                                     ScaffoldMessenger.of(context).showSnackBar(
+                //                                       SnackBar(
+                //                                         content: Text(
+                //                                           "You can add only $maxAllowed ${item['role_name']}",
+                //                                         ),
+                //                                       ),
+                //                                     );
+                //                                     return;
+                //                                   }
+                //
+                //                                   setState(() {
+                //                                     addedCrewUserIds.add(creativeUserId);
+                //                                   });
+                //                                 },
+                //                                 child: Container(
+                //                                   padding: const EdgeInsets.symmetric(
+                //                                       horizontal: 14, vertical: 8),
+                //                                   decoration: BoxDecoration(
+                //                                     color: isAdded
+                //                                         ? ColorCode.kLightRed
+                //                                         : ColorCode.kButtonColor,
+                //                                     borderRadius: BorderRadius.circular(30),
+                //                                     border: isAdded
+                //                                         ? Border.all(color: Colors.red)
+                //                                         : null,
+                //                                   ),
+                //                                   child: Text(
+                //                                     isAdded ? "Remove" : "Add to Crew",
+                //                                     style: TextStyle(
+                //                                       fontSize: 12,
+                //                                       fontFamily: "Outfit",
+                //                                       fontWeight: FontWeight.w600,
+                //                                       color: isAdded
+                //                                           ? Colors.red
+                //                                           : Colors.black,
+                //                                     ),
+                //                                   ),
+                //                                 ),
+                //                               ),
+                //
+                //                               const SizedBox(width: 8),
+                //
+                //                               /// DETAILS BUTTON
+                //                               InkWell(
+                //                                 onTap: () {
+                //                                   Navigator.push(
+                //                                     context,
+                //                                     MaterialPageRoute(
+                //                                       builder: (_) => RecommendedDetilsScreen(
+                //                                         id: item['id'],
+                //                                         bookingId: widget.bookingId,
+                //                                       ),
+                //                                     ),
+                //                                   );
+                //                                 },
+                //                                 child: Image.asset(
+                //                                   "assets/images/Group 2087328980.png",
+                //                                   height: 32,
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //                         ],
+                //                       ),
+                //                     ),
+                //                   ],
+                //                 ),
+                //               ),
+                //             );
+                //           },
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                // ),
               ],
             ),
 
@@ -1252,10 +1599,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     child: Text(
                       "Complete your Shoot",
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontFamily: "Outfit",
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white70,
+                        fontWeight: FontWeight.w400,
+                        color: ColorCode.kWhiteOpacity70,
                         decoration: TextDecoration.underline,
                       ),
                     ),
@@ -1831,96 +2178,92 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: ColorCode.k282828,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+          insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Stack(
+            children: [
 
-                /// CLOSE BUTTON
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.close, color: Colors.white54),
-                  ),
-                ),
+              /// MAIN CONTENT
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-                const SizedBox(height: 10),
-
-                /// SUCCESS ICON
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Lottie.asset(
-                    "assets/lottie/Untitled file.json",
-                    repeat: true,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                /// TITLE
-                const Text(
-                  "Request Received",
-                  style: TextStyle(
-                    color: ColorCode.kButtonColor,
-                    fontSize: 20,
-                    fontFamily: "Unbounded",
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                /// DESCRIPTION
-                const Text(
-                  "Our Sales team will shortly reach out to you to\nfinalize your creative requirements.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-                    fontSize: 14,
-                    fontFamily: "Outfit",
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                /// BUTTON
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD6C29C), // beige color
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                    /// SUCCESS ICON
+                    SizedBox(
+                      height: 100,
+                      child: Lottie.asset(
+                        "assets/lottie/Untitled file.json",
+                        repeat: false,
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      "Got it",
+
+                    const SizedBox(height: 18),
+
+                    /// TITLE
+                    const Text(
+                      "Request Received",
                       style: TextStyle(
-                        color: Color(0xFF1D1D1B), // dark text like UI
-                        fontSize: 14,
+                        color: Color(0xFFD6C29C),
+                        fontSize: 18,
                         fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                )
-              ],
-            ),
+
+                    const SizedBox(height: 10),
+
+                    /// DESCRIPTION
+                    const Text(
+                      "Our Sales team will shortly reach out to you to finalize your creative requirements.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontFamily: "Outfit",
+                      ),
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    /// BUTTON
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD6C29C),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Got it",
+                          style: TextStyle(
+                            color: Color(0xFF1D1D1B),
+                            fontSize: 14,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// CLOSE BUTTON
+
+            ],
           ),
         );
       },

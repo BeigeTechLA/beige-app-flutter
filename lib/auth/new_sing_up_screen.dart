@@ -539,30 +539,43 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   final TextEditingController confirmPasswordController = TextEditingController();
 
   Future<void> _fetchSignup() async {
+
     print("🚀 SIGNUP BUTTON CLICKED");
 
+    print("🟡 NAME: ${nameController.text}");
+    print("🟡 EMAIL: ${emailController.text}");
+    print("🟡 PASSWORD: ${passwordController.text}");
+    print("🟡 LOCATION: ${locationController.text}");
+    print("🟡 LAT: $selectedLat");
+    print("🟡 LNG: $selectedLng");
+    print("🟡 IMAGE: ${profileImage?.path}");
+
     if (!isFormValid) {
+      print("❌ FORM NOT VALID");
       _showSnack("Please fill all fields");
       return;
     }
 
-    /// ✅ EMAIL VALIDATION
     if (!isValidEmail(emailController.text.trim())) {
+      print("❌ EMAIL INVALID");
       _showSnack("Please enter a valid email address");
       return;
     }
 
     if (profileImage == null) {
+      print("❌ IMAGE NOT SELECTED");
       _showSnack("Please upload profile picture");
       return;
     }
 
-    if (passwordController.text.length < 1) {
-      _showSnack("Password must be at least 1 characters");
+    if (passwordController.text.trim().isEmpty) {
+      print("❌ PASSWORD EMPTY");
+      _showSnack("Please enter password");
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
+      print("❌ PASSWORD MISMATCH");
       _showSnack("Password mismatch");
       return;
     }
@@ -570,13 +583,16 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     setState(() => isLoggingIn = true);
 
     try {
+
+      print("📡 CALLING SIGNUP API...");
+
       final response = await ApiService().postMultipart(
         ApiEndpoints.singup,
         {
           "name": nameController.text.trim(),
           "email": emailController.text.trim(),
+           "user_type": "3",
           "password": passwordController.text.trim(),
-          "user_type": "3",
           "location": locationController.text.trim(),
           "lat": selectedLat.toString(),
           "lng": selectedLng.toString(),
@@ -584,11 +600,18 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         profileImage,
       );
 
+      print("📥 API RESPONSE: $response");
+
       if (response != null) {
+
+        print("📥 RESPONSE ERROR: ${response['error']}");
+        print("📥 RESPONSE CODE: ${response['code']}");
+        print("📥 RESPONSE MESSAGE: ${response['message']}");
+
         if (response['error'] == false &&
             (response['code'] == 200 || response['code'] == 201)) {
 
-    
+          print("✅ SIGNUP SUCCESS");
 
           Navigator.pushReplacement(
             context,
@@ -596,18 +619,28 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
           );
 
         } else {
-          // 🔥 Backend ka exact message show karo
+
+          print("❌ SIGNUP FAILED");
           _showSnack(response['message'] ?? "Signup failed");
+
         }
+
       } else {
+
+        print("❌ API RESPONSE NULL");
         _showSnack("No response from server");
+
       }
 
     } catch (e) {
+
+      print("❌ API ERROR: $e");
       _showSnack("Server error");
 
     } finally {
+
       setState(() => isLoggingIn = false);
+
     }
   }
 
@@ -786,7 +819,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                         child: Column(
                           children: [
 
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 22),
 
                             _buildField("Name", nameController),
                             const SizedBox(height: 16),
@@ -865,11 +898,12 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                                   isCrossBtnShown: true,
                                 ),
+
                               ],
                             ),
 
 
-                            SizedBox(height: 20),
+                            SizedBox(height:16),
 
                             /// 🗺️ MAP WITH FIXED HEIGHT
                             if (showMap)
@@ -957,7 +991,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                       width: 20,
                                       decoration: BoxDecoration(
                                         color: savePassword
-                                            ? ColorCode.black
+                                            ? ColorCode.kButtonColor
                                             : Colors.transparent,
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
@@ -968,7 +1002,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                           ? const Icon(
                                         Icons.check,
                                         size: 14,
-                                        color: ColorCode.kButtonColor,
+                                        color: ColorCode.black,
                                       )
                                           : null,
                                     ),
@@ -1310,7 +1344,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         color: const Color(0xFF1C1C1C),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: ColorCode.kGold40
+            color: ColorCode.kBorderLight
         ),
       ),
       child: Column(
@@ -1350,8 +1384,13 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                 backgroundColor: Colors.grey.shade800,
                 backgroundImage: profileImage != null
                     ? FileImage(profileImage!)
-                    : const AssetImage("assets/images/profile_placeholder.png")
-                as ImageProvider,
+                    : null,
+                child: profileImage == null
+                    ? SvgPicture.asset(
+                  "assets/svg/persone.svg",
+
+                )
+                    : null,
               ),
 
               const SizedBox(width: 14),
@@ -1428,12 +1467,15 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: ColorCode.k1D1D1B_Opacity70,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.06),
+                  width: 1,
+                ),
               ),
-              child: const Center(
-                child: Icon(
-                  Icons.person_outline,
-                  size: 18,
-                  color: ColorCode.kWhiteOpacity70,
+              child:  Center(
+                child: SvgPicture.asset(
+                  "assets/svg/persone.svg",
+
                 ),
               ),
             ),
@@ -1445,7 +1487,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
               style: TextStyle(
                 fontFamily: "Outfit",
                 fontSize: 12,
-                color: ColorCode.kWhiteOpacity70,
+                color: ColorCode.k5D5D5D,
               ),
             ),
           ],

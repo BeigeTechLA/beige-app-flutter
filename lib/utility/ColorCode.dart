@@ -22,7 +22,7 @@ class ColorCode {
   static const Color bcakgroundcolor = Color(0xFF1D1D1B);
   /// ⭐ Divider / Border Color (White 12% opacity)
     static const Color kDividerWhite12 = Color(0x1FFFFFFF);
-
+  static const Color k5D5D5D = Color(0xFF5D5D5D);
   static const Color k737373 = Color(0xFF737373); //Medium grey
   /// ⭐ Figma Border (#DDDDDD 50%)
   static const Color kBorderLight = Color(0x80DDDDDD);

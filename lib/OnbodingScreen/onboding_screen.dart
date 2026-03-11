@@ -26,7 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
-      "image": "assets/Onboding/Group 2087329238.png",
+      "image": "assets/Onboding/onboding4.png",
       "title": "Find Video & Photo\nWork",
       "description":
       "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
@@ -55,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Image.asset(
                             pages[index]['image']!,
                             width: double.infinity,
-                            fit: BoxFit.none,
+                            fit: BoxFit.cover,
                           ),
                         ),
 
@@ -189,32 +189,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
 
           /// ---------------- SKIP BUTTON ----------------
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20, right: 20),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const NewLoginScreen(),
+          /// ---------------- SKIP BUTTON ----------------
+          if (_currentPage == 0)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, right: 20),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NewLoginScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Skip",
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        color: ColorCode.white,
+                        fontSize: 14,
                       ),
-                    );
-                  },
-                  child: const Text(
-                    "Skip",
-                    style: TextStyle(
-                      fontFamily: "Outfit",
-                      color: ColorCode.white,
-                      fontSize: 14,
                     ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

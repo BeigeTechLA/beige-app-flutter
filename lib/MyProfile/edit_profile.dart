@@ -445,11 +445,22 @@ class _EditProfileState extends State<EditProfile> {
                                   : const AssetImage("assets/Icons/profile.png")
                               as ImageProvider,
                             ),*/
-                          CircleAvatar(
-                            radius: 48,
-                            backgroundColor: Colors.grey.shade200,
-                            backgroundImage: getProfileImage(), // ✅ FIXED
-                          ),
+                            CircleAvatar(
+                              radius: 48,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : (profileImageUrl != null && profileImageUrl!.isNotEmpty
+                                  ? NetworkImage(ApiService().getImageURL(profileImageUrl!))
+                                  : null) as ImageProvider?,
+                              child: (_profileImage == null &&
+                                  (profileImageUrl == null || profileImageUrl!.isEmpty))
+                                  ? SvgPicture.asset(
+                                "assets/svg/persone.svg",
+
+                              )
+                                  : null,
+                            )
                           ),
                         ),
 

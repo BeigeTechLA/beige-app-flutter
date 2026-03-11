@@ -112,10 +112,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       }
     }
   }
-
   bool isValidEmail(String email) {
     final emailRegex = RegExp(
-      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$',
     );
     return emailRegex.hasMatch(email);
   }
