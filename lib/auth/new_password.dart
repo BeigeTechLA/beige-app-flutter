@@ -9,8 +9,10 @@ import '../utility/ColorCode.dart';
 class NewPassword extends StatefulWidget {
   final String email;
 
+  final String otp;
 
-  const NewPassword({super.key, required this.email,});
+
+  const NewPassword({super.key, required this.email, required this.otp,});
 
   @override
   State<NewPassword> createState() => _NewPasswordState();

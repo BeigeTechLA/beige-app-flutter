@@ -28,9 +28,75 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
 
   bool isLoading = false;
 
+
   Future<void> _verifyOtp() async {
     if (!isOtpFilled) {
+      print("❌ OTP Not Filled Completely");
       _showSnack("Please enter complete OTP");
+      return;
+    }
+
+    print("📢 Verify OTP Clicked");
+    print("📧 Email => ${widget.email}");
+    print("🔢 Entered OTP => $enteredOtp");
+
+    setState(() => isLoading = true);
+
+    try {
+      final apiService = ApiService();
+
+      print("🚀 VERIFY OTP API CALL START");
+      print("📡 Endpoint => ${ApiEndpoints.forgotpassword_verify_otp}");
+
+      final response = await apiService.postData(
+        ApiEndpoints.forgotpassword_verify_otp,
+        {
+          "email": widget.email,
+          "otp": enteredOtp,
+        },
+      );
+
+      print("📩 API RESPONSE => $response");
+
+      if (response == null) {
+        print("❌ Response NULL");
+        _showSnack("Server error");
+        return;
+      }
+
+      if (response['error'] == false) {
+        print("✅ OTP Verified Successfully");
+
+        if (!mounted) return;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NewPassword(
+              otp: enteredOtp ,
+              email: widget.email,
+            ),
+          ),
+        );
+      } else {
+        print("❌ OTP Verification Failed => ${response['message']}");
+        _showSnack(response['message'] ?? "Invalid OTP");
+      }
+    } catch (e) {
+      print("🔥 Exception => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      print("🛑 VERIFY OTP API CALL END");
+    }
+  }
+
+  Future<void> _resendOtp() async {
+
+    if (seconds != 0) {
+      print("⛔ Wait for timer to finish");
       return;
     }
 
@@ -40,27 +106,27 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
       final apiService = ApiService();
 
       final response = await apiService.postData(
-        ApiEndpoints.forgotpassword_verify_otp,
+        ApiEndpoints.reset_otp,
         {
-          "email": widget.email,     // ✅ correct email
-          "otp": enteredOtp,         // ✅ correct OTP
+          "email": widget.email,
         },
       );
 
+      print("RESEND OTP RESPONSE => $response");
+
       if (response['error'] == false) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => NewPassword(
-              email: widget.email,
-              // ✅ pass email
-            ),
-          ),
-        );
+
+        timer?.cancel();
+        resetTimer();
+
+        _showSnack("OTP sent successfully");
+
       } else {
-        _showSnack(response['message'] ?? "Invalid OTP");
+        _showSnack(response['message'] ?? "Failed to resend OTP");
       }
+
     } catch (e) {
+      print("ERROR => $e");
       _showSnack("Something went wrong");
     } finally {
       setState(() => isLoading = false);
@@ -71,13 +137,11 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
-
-
 
 
 
@@ -99,6 +163,8 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
     });
     startTimer();        // start again
   }
+
+
 
 
   @override
@@ -230,7 +296,9 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
                       Row(
                         children: [
                           Text(
-                            "00:${seconds.toString().padLeft(2, '0')}",
+                            seconds == 0
+                                ? "00:00"
+                                : "00:${seconds.toString().padLeft(2, '0')}",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -249,23 +317,23 @@ class _EnterOtpScreenState extends State<EnterOtpScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    onTap: () {
-                      timer?.cancel();  // stop old timer
-                      resetTimer();     // restart new timer
-                    },
-                    child: Text(
-                      "Resend OTP",
-                      style: TextStyle(
-                        color: ColorCode.kWhiteOpacity60,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
+                  AbsorbPointer(
+                    absorbing: seconds != 0, // 60 sec sudhi click disable
+                    child: InkWell(
+                      onTap: _resendOtp,
+                      child: Text(
+                        "Resend OTP",
+                        style: TextStyle(
+                          color: seconds == 0
+                              ? ColorCode.kButtonColor
+                              : ColorCode.kWhiteOpacity60,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                  )
-
+                  ),
                 ],
               ),
 

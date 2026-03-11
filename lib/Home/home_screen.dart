@@ -1090,8 +1090,10 @@ class _HomeScreenState extends State<HomeScreen>
                                             ),
                                             child: const Text(
                                               "View Profile",
-                                              style: TextStyle(
-                                                fontSize: 11,
+                                              style: const TextStyle(
+                                                color: ColorCode.black,
+                                                fontFamily: "Outfit",
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),

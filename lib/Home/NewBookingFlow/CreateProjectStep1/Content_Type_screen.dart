@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart' show ApiService;
@@ -352,8 +353,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage: "assets/newbookflow/SelectAll_active.png",
-                          inactiveImage: "assets/newbookflow/slectall_inactive.png",
+                          activeImage: "assets/newbookflow/Selectall_active.svg",
+                          inactiveImage: "assets/newbookflow/Selectall_non.svg",
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -362,9 +363,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         _buildOption(
                           title: "Videography",
                           activeImage:
-                          "assets/newbookflow/Videocamera_Record_active.png",
+                          "assets/newbookflow/Videography_active.svg",
                           inactiveImage:
-                          "assets/newbookflow/Videocamera_Record_inactive.png",
+                          "assets/newbookflow/Videography_non.svg",
                           value: selectedContentTypeIds.contains(1),
                           onTap: () => _handleSelection(1),
                         ),
@@ -372,8 +373,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage: "assets/newbookflow/Camera_active.png",
-                          inactiveImage: "assets/newbookflow/Camera_inactive.png",
+                          activeImage: "assets/newbookflow/Photography_actvie.svg",
+                          inactiveImage: "assets/newbookflow/Photography_non.svg",
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
                         ),
@@ -383,8 +384,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Editing Only (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/edit-01.png",
-                          inactiveImage: "assets/newbookflow/edit-01.png",
+                          activeImage: "assets/newbookflow/Editing_actvie.svg",
+                          inactiveImage: "assets/newbookflow/Editing_non.svg",
                           onTap: null,
                         ),
 
@@ -393,8 +394,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Livestreaming (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/Play_Stream.png",
-                          inactiveImage: "assets/newbookflow/Play_Stream.png",
+                          activeImage: "assets/newbookflow/Livestreaming_active.svg",
+                          inactiveImage: "assets/newbookflow/Livestreaming_non.svg",
                           onTap: null,
                         ),
 
@@ -435,11 +436,11 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 color: Colors.white.withOpacity(0.06),
               ),
               child: Center(
-                child: Image.asset(
+                child:SvgPicture.asset(
                   value ? activeImage : inactiveImage,
                   height: 20,
                   width: 20,
-                ),
+                )
               ),
             ),
 

@@ -31,48 +31,76 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
 
   bool isLoading = false;
 
+
+
   Future<void> _verifyOtp() async {
     if (!isOtpFilled) {
+      print("❌ OTP Not Filled Completely");
       _showSnack("Please enter complete OTP");
       return;
     }
+
+    print("📢 Verify OTP Clicked");
+    print("📧 Email => ${widget.email}");
+    print("🔢 Entered OTP => $enteredOtp");
 
     setState(() => isLoading = true);
 
     try {
       final apiService = ApiService();
 
+      print("🚀 VERIFY OTP API CALL START");
+      print("📡 Endpoint => ${ApiEndpoints.forgotpassword_verify_otp}");
+
       final response = await apiService.postData(
         ApiEndpoints.forgotpassword_verify_otp,
         {
-          "email": widget.email,     // ✅ correct email
-          "otp": enteredOtp,         // ✅ correct OTP
+          "email": widget.email,
+          "otp": enteredOtp,
         },
       );
 
+      print("📩 API RESPONSE => $response");
+
+      if (response == null) {
+        print("❌ Response NULL");
+        _showSnack("Server error");
+        return;
+      }
+
       if (response['error'] == false) {
+        print("✅ OTP Verified Successfully");
+
+        if (!mounted) return;
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => MyprofileNewPasswordScreen(
+              otp: enteredOtp ,
               email: widget.email,
             ),
           ),
         );
       } else {
+        print("❌ OTP Verification Failed => ${response['message']}");
         _showSnack(response['message'] ?? "Invalid OTP");
       }
     } catch (e) {
+      print("🔥 Exception => $e");
       _showSnack("Something went wrong");
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+      print("🛑 VERIFY OTP API CALL END");
     }
   }
 
-
   Future<void> _resendOtp() async {
-    if (!isOtpFilled) {
-      _showSnack("Please enter complete OTP");
+
+    if (seconds != 0) {
+      print("⛔ Wait for timer to finish");
       return;
     }
 
@@ -84,33 +112,39 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
       final response = await apiService.postData(
         ApiEndpoints.reset_otp,
         {
-          "email": widget.email,     // ✅ correct email
+          "email": widget.email,
         },
       );
 
+      print("RESEND OTP RESPONSE => $response");
+
       if (response['error'] == false) {
 
+        timer?.cancel();
+        resetTimer();
+        
+
       } else {
-        _showSnack(response['message'] ?? "Invalid OTP");
+        _showSnack(response['message'] ?? "Failed to resend OTP");
       }
+
     } catch (e) {
+      print("ERROR => $e");
       _showSnack("Something went wrong");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
-
 
 
 
@@ -264,7 +298,9 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       Row(
                         children: [
                           Text(
-                            "00:${seconds.toString().padLeft(2, '0')}",
+                            seconds == 0
+                                ? "00:00"
+                                : "00:${seconds.toString().padLeft(2, '0')}",
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -284,18 +320,16 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   InkWell(
-                    onTap: () {
-                      timer?.cancel();  // stop old timer
-                      resetTimer();     // restart new timer
-                    },
+                    onTap: seconds == 0 ? _resendOtp : null,
                     child: Text(
                       "Resend OTP",
-                      style: TextStyle(
-                        color: ColorCode.kWhiteOpacity60,
+                      style:  TextStyle(
+                        color: seconds == 0
+                            ? ColorCode.kButtonColor
+                            : ColorCode.kWhiteOpacity60,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
                       ),
                     ),
                   )
