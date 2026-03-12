@@ -28,6 +28,7 @@ class ColorCode {
   static const Color kBorderLight = Color(0x80DDDDDD);
   // ⭐ Light Red / Remove Background
   static const Color kLightRed = Color(0xFFFFC9C9);
+  static const Color kIconBackground = Color(0xFF171717);
 
   static const Color kCreamSoft = Color(0xFFECE1CE);
   static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
@@ -38,6 +39,11 @@ class ColorCode {
   /// ⭐ Gold Gradient Colors (From Design)
   static const Color kGoldGradientLight = Color(0xFFE8D1AB); // #E8D1AB
   static const Color kGoldGradientDark  = Color(0xFFD4A14D); // #D4A14D
+
+  // ⭐ Divider Gradient Colors
+  static const Color kDividerStart = Color(0x17FFFFFF); // 9% opacity
+  static const Color kDividerCenter = Color(0xFFFFFFF); // full white
+  static const Color kDividerEnd = Color(0x17FFFFFF); // 9% opacity // #D4A14D
 
 
   static const Color kCircleGradientTop = Color(0xFF1D1D1B);

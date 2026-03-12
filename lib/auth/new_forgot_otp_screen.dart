@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -209,16 +210,16 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
 
                       Positioned(
-                        top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                        top: 50,
                         left: 16,
                         child: InkWell(
                           onTap: () {
-                            Navigator.pop(context); // 🔥 screen pop karega
+                            Navigator.pop(context);
                           },
-                          child: Image.asset(
-                            "assets/Icons/Reply.png",
+                          child: SvgPicture.asset(
+                            "assets/svg/back.svg",
                             height: 24,
-                            color: Colors.white, // agar white chahiye ho
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -244,7 +245,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                             SizedBox(height: 8),
 
                             Text(
-                              "Enter 6 digit OTP sent to your\nregistered email ID..",
+                              "Enter 6 digit OTP sent to your\nregistered email ID.",
 
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -360,18 +361,19 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                               ],
                             ),
                             const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                            Wrap(
+                              alignment: WrapAlignment.center,
                               children: [
-
-                                Text("Didn’t received the code?",style: TextStyle(
-                                  color: ColorCode.kWhiteOpacity70,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: "Outfit",
-                                  // decoration: TextDecoration.underline,
-                                  decorationThickness: 1.5,
-                                ),),
+                                Text(
+                                  "Didn’t received the code?",
+                                  style: TextStyle(
+                                    color: ColorCode.kWhiteOpacity70,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Outfit",
+                                    decorationThickness: 1.5,
+                                  ),
+                                ),
                                 InkWell(
                                   onTap: seconds == 0 ? _resendOtp : null,
                                   child: Text(
@@ -381,12 +383,12 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                           ? ColorCode.kButtonColor
                                           : ColorCode.kWhiteOpacity60,
                                       fontSize: 15,
+                                      fontFamily: "Outfit",
                                       fontWeight: FontWeight.bold,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
-                                )
-
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -402,7 +404,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                   ),
                                 ),
                                 child: const Text(
-                                  "Submit",
+                                  "Continue",
                                   style: TextStyle(
                                     fontFamily: "Unbounded",
                                     fontSize: 13,

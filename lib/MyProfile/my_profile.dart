@@ -180,20 +180,12 @@ class _MyProfileState extends State<MyProfile> {
 
                                 /// ❌ IF IMAGE FAILS
                                 errorBuilder: (context, error, stackTrace) {
-                                  return Image.asset(
-                                    "assets/Icons/profile.png",
-                                    width: 96,
-                                    height: 96,
-                                    fit: BoxFit.cover,
-                                  );
+                                  return SvgPicture.asset(
+                                      "assets/svg/persone.svg",);
                                 },
                               )
-                                  : Image.asset(
-                                "assets/Icons/profile.png",
-                                width: 96,
-                                height: 96,
-                                fit: BoxFit.cover,
-                              ),
+                                  : SvgPicture.asset(
+                                "assets/svg/persone.svg",),
                             ),
                           ),
 

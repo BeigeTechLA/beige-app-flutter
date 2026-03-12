@@ -419,52 +419,50 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     required VoidCallback? onTap,
     bool isDisabled = false,
   }) {
-    return InkWell(
-      onTap: isDisabled ? null : onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12), // ⭐ important
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
 
-            /// ICON
-            Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.06),
-              ),
-              child: Center(
-                child:SvgPicture.asset(
-                  value ? activeImage : inactiveImage,
-                  height: 20,
-                  width: 20,
-                )
+          /// ICON
+          Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: ColorCode.kIconBackground,
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                value ? activeImage : inactiveImage,
               ),
             ),
+          ),
 
-            const SizedBox(width: 16),
+          const SizedBox(width: 16),
 
-            /// TITLE
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontFamily: "Outfit",
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isDisabled
-                      ? ColorCode.kWhiteOpacity60
-                      : value
-                      ? ColorCode.kButtonColor
-                      : Colors.white,
-                ),
+          /// TITLE
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: isDisabled
+                    ? ColorCode.kWhiteOpacity60
+                    : value
+                    ? ColorCode.kButtonColor
+                    : Colors.white,
               ),
             ),
+          ),
 
-            /// CHECK BOX
-            Container(
+          /// CHECK BOX (CLICKABLE)
+          GestureDetector(
+            onTap: isDisabled ? null : onTap,
+            child: Container(
               height: 32,
               width: 32,
               decoration: BoxDecoration(
@@ -487,10 +485,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               )
                   : null,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
 }

@@ -207,7 +207,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorCode.bcakgroundcolor,
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,8 +223,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
         height: 360,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Image.asset(
-          "assets/images/Rectangle 34661070.png",
+        errorBuilder: (_, __, ___) => SvgPicture.asset(
+          "assets/svg/imag_placeholder.svg",
           height: 360,
           width: double.infinity,
           fit: BoxFit.cover,
@@ -284,7 +284,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  creative?['name'] ?? "-",
+                  creative?['name'] ?? "",
                   style: const TextStyle(
                     fontFamily: "Outfit",
                     fontSize: 16,
@@ -348,16 +348,31 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
               ),
             ),
 
-         Padding(
-       padding: const EdgeInsets.all(8.0),
-       child: Divider(color: Colors.white10,
-          ),
-     ),
+            SizedBox(height: 20,),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Divider(
+                  color: ColorCode.kDividerWhite12,
+                  thickness: 1,
+                ),
+              ),
+            ),
 
 
             /// 🔹 ABOUT
             sectionTitle("About Creator"),
             sectionText(about?['bio'] ?? "No information available"),
+            SizedBox(height: 20,),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Divider(
+                  color: ColorCode.kDividerWhite12,
+                  thickness: 1,
+                ),
+              ),
+            ),
             sectionTitle("Portfolio"),
             Column(
               children: [
@@ -365,9 +380,9 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   height: 260,
                   child: portfolio.isEmpty
                       ? Center(
-                    child: Image.asset(
-                      "assets/images/profile_detils.png",
-                      height: 200,
+                    child: SvgPicture.asset(
+                      "assets/svg/imag_placeholder.svg",
+                      fit: BoxFit.cover,
                     ),
                   )
                       : PageView.builder(
@@ -394,9 +409,10 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                             borderRadius: BorderRadius.circular(30),
                             child: Image.network(
                               imageUrl,
+                              height: 235,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(
-                                "assets/images/profile_detils.png",
+                              errorBuilder: (_, __, ___) => SvgPicture.asset(
+                                "assets/svg/imag_placeholder.svg",
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -409,6 +425,15 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
                 const SizedBox(height: 18),
               ],
+            ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Divider(
+                  color: ColorCode.kDividerWhite12,
+                  thickness: 1,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
@@ -454,8 +479,16 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                 ],
               ),
             ),
-
-            Padding(
+            SizedBox(height: 20,),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.85,
+                child: Divider(
+                  color: ColorCode.kDividerWhite12,
+                  thickness: 1,
+                ),
+              ),
+            ),            Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,15 +511,20 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                       color: const Color(0xFF2A2A2A),
                       borderRadius: BorderRadius.circular(20),
                     ),
-
                     child: weeklyAvailability.isEmpty
                         ? const Text(
                       "Not available",
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        height: 20 / 12,
+                        letterSpacing: 0,
+                        color: Colors.white54,
+                      ),
                     )
                         : Column(
                       children: weekDaysOrder.map((day) {
-
                         bool isActive = weeklyAvailability.contains(day);
 
                         return availabilityRow(
@@ -494,7 +532,6 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                           isActive,
                           "10:00 am - 10:00 pm",
                         );
-
                       }).toList(),
                     ),
                   ),
@@ -516,7 +553,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                         ),
                       ),
 
-                      Icon(Icons.chevron_right, color: Colors.white),
+                    /*  Icon(Icons.chevron_right, color: Colors.white),*/
                     ],
                   ),
 
@@ -595,15 +632,14 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                     ),
                   ),
 
-
-                  Column(
+                  SizedBox(height: 20),                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 14),
 
                       reviews.isEmpty
                           ? const Text(
-                        "No reviews yet",
+                        "No reviews ",
                         style: TextStyle(color: Colors.white54),
                       )
                           : SizedBox(
@@ -832,8 +868,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             child: Image.network(
               ApiService().getImageURL(image),
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Image.asset(
-                "assets/images/man2.png",
+              errorBuilder: (_, __, ___) => SvgPicture.asset(
+                "assets/svg/imag_placeholder.svg",
                 fit: BoxFit.cover,
               ),
             ),

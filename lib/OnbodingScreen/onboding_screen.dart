@@ -20,13 +20,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> pages = [
     {
-      "image": "assets/Onboding/Frame 2087328917.png",
+      "image": "assets/Onboding/img_1.png",
       "title": "Book Your Dream\nShoot",
       "description":
       "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
-      "image": "assets/Onboding/onboding@21.png",
+      "image": "assets/Onboding/img.png",
       "title": "Find Video & Photo\nWork",
       "description":
       "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
@@ -52,14 +52,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     return Column(
                       children: [
                         Expanded(
-                          child: Image.asset(
-                            pages[index]['image']!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 80), // yaha value change kar sakte ho
+                            child: Image.asset(
+                              pages[index]['image']!,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+
 
                         Text(
                           pages[index]['title']!,
