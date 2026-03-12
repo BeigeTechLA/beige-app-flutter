@@ -427,14 +427,18 @@ bool isLoading =true;
 
                       SizedBox(height: 10),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-
-                        children: [
-                          Text("Our AI will analyse your project and match you\nwith the perfect crew size and specialists",style: TextStyle(color: ColorCode.white, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Our AI will analyse your project and match you with the perfect crew size and specialists",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: ColorCode.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "Outfit",
                           ),
-
-                        ],
+                        ),
                       ),
 
                       SizedBox(height: 10),
@@ -479,14 +483,18 @@ bool isLoading =true;
 
 
                 SizedBox(height:20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-
-                  children: [
-                    Text("Our intelligent matching system considers multiple\nfactors to build your ideal crew:",style: TextStyle(color: ColorCode.kWhiteOpacity70, fontSize: 14,fontWeight: FontWeight.w400,fontFamily: "Outfit"),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Our intelligent matching system considers multiple factors to build your ideal crew:",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: "Outfit",
                     ),
-
-                  ],
+                  ),
                 ),
                 SizedBox(height:15),
 
@@ -526,7 +534,7 @@ bool isLoading =true;
                             ),
                             TextSpan(
                               text:
-                              "Different shoots require\n different team sizes",
+                              "Different shoots require different team sizes",
                               style: TextStyle(
                                 color: ColorCode.kWhiteOpacity70,
                                 fontSize: 12,
@@ -570,7 +578,7 @@ bool isLoading =true;
                             ),
                             TextSpan(
                               text:
-                              "We match crews that fit your \nbudget tier",
+                              "We match crews that fit your budget tier",
                               style: TextStyle(
                                 color: ColorCode.kWhiteOpacity70,
                                 fontSize: 12,
@@ -614,7 +622,7 @@ bool isLoading =true;
                             ),
                             TextSpan(
                               text:
-                              "Based on thousands of \n successful projects",
+                              "Based on thousands of successful projects",
                               style: TextStyle(
                                 color: ColorCode.kWhiteOpacity70,
                                 fontSize: 12,

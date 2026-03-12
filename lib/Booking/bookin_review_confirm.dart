@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:beige/Home/HomeSekect/payment_method.dart';
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
@@ -53,6 +54,12 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   Map<String, dynamic>? totals;
   List<dynamic> addons = [];
 
+
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "";
+    final d = DateTime.parse(date);
+    return DateFormat('EEE, dd MMM yyyy').format(d);
+  }
 
   @override
   void initState() {
@@ -250,10 +257,9 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: Image.asset(
-            "assets/Icons/Reply.png",
-            height: 22,
-            color: Colors.white,
+          child:  SvgPicture.asset(
+            "assets/svg/back.svg",
+            height: 24,
           ),
         ),
         actions: const [
@@ -297,10 +303,10 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                   Text(
                     "Review & Confirm",
                     style: TextStyle(
+                      fontFamily: "Unbounded ",
                       fontSize: 16,
-                      fontFamily: "Unbounded",
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: ColorCode.white,
                     ),
                   ),
                 ],
@@ -415,7 +421,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                     const SizedBox(height: 12),
 
                     Container(
-                      padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
@@ -425,24 +431,26 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                       ),
                       child: Column(
                         children: [
+
                           infoRowBlack(
-                            Icons.access_time,
-                            "${booking?['start_time']} - ${booking?['end_time']} "
-                                "(${pricing?['duration_hours'] ?? 0}h)",
+                            "assets/svg/Group 2087328870.svg",
+                            "${booking?['start_time']} to ${booking?['end_time']} "
+                                "(${pricing?['duration_hours']}h duration)",
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           infoRowBlack(
-                            Icons.calendar_month,
-                            booking?['event_date'] ?? '--',
+                            "assets/svg/Frame.svg",
+                            formatDate(booking?['event_date']),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           infoRowBlack(
-                            Icons.location_on,
-                            booking?['event_location'] ?? '--',
+                            "assets/svg/location.svg",
+                            booking?['event_location'] ?? "",
                           ),
+
                         ],
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -470,66 +478,87 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
                   Container(
-                    margin:  EdgeInsets.only(bottom: 12),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Color(0xFF282828),
+                      color: const Color(0xFF282828),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        /// 🔹 Title
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Text(
-
-                                "$creativeRole:",style: TextStyle(color: ColorCode.white,fontSize: 12,fontFamily: "Outfit",fontWeight:FontWeight.w400),
-
-                              )
-                            ],
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            "$creativeRole:",
+                            style: const TextStyle(
+                              color: ColorCode.white,
+                              fontSize: 12,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
-                        SizedBox(height: 10),
+
+                        /// 🔹 Grid
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: (booking?['edit_types'] ?? []).length,
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                            childAspectRatio: 2.4, // 🔥 wrap ke liye better
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2.3, // thoda slim card
                           ),
                           itemBuilder: (context, index) {
+
                             final edit = booking!['edit_types'][index];
+
+                            final parts = edit.split('(');
+                            final title = parts[0].trim();
+                            final duration = parts.length > 1 ? "(${parts[1]}" : "";
+
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                               decoration: BoxDecoration(
-                                color: ColorCode.kGoldGradientLight,
-                                borderRadius: BorderRadius.circular(8),
+                                color: ColorCode.kGoldLight20,   // ✅ background change
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Center(
-                                child: Text(
-                                  edit,
-                                  textAlign: TextAlign.center,
-                                  softWrap: true,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.visible,
-                                  style: const TextStyle(
-                                    color: ColorCode.black,
-                                    fontFamily: "Outfit",
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+
+                                  /// 🔹 Title
+                                  Text(
+                                    title,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: ColorCode.kButtonColor, // ✅ text color change
+                                      fontFamily: "Outfit",
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
+
+                                  /// 🔹 Duration
+                                  if (duration.isNotEmpty)
+                                    Text(
+                                      duration,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: ColorCode.kButtonColor, // ✅ text color change
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                ],
                               ),
                             );
                           },
                         ),
-
-
-
                       ],
                     ),
                   ),
@@ -869,28 +898,34 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
     );
   }
 
-  Widget infoRowBlack(IconData icon, String text) {
+  Widget infoRowBlack(String svgIcon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 16,
+
+        /// SVG ICON
+        SvgPicture.asset(
+          svgIcon,
+          height: 16,
+          width: 16,
           color: Colors.black87,
         ),
+
         const SizedBox(width: 8),
+
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
-                fontSize: 12,
-                color: ColorCode.black,
-                fontFamily: "Outfit",
-                fontWeight: FontWeight.w400
-
+              fontSize: 12,
+              color: ColorCode.black,
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w400,
             ),
           ),
+
         ),
+        const SizedBox(height: 8),
       ],
     );
   }

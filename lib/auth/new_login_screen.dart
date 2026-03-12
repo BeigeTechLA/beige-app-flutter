@@ -111,9 +111,26 @@ _showSnack(String message) {
     );
     return emailRegex.hasMatch(email);
   }
+  Future<void> _loadSavedLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? savedEmail = prefs.getString("email");
+    String? savedPassword = prefs.getString("password");
+
+    if (savedEmail != null && savedPassword != null) {
+      emailController.text = savedEmail;
+      passwordController.text = savedPassword;
+
+      setState(() {
+        savePassword = true;
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
+    _loadSavedCredentials(); //
+
 
     emailController.addListener(_updateUI);
     passwordController.addListener(_updateUI);
@@ -121,6 +138,33 @@ _showSnack(String message) {
 
   void _updateUI() {
     setState(() {});
+  }
+  void _checkSavedEmail(String email) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String savedEmail = prefs.getString("email") ?? "";
+    String savedPassword = prefs.getString("password") ?? "";
+
+    if (email.trim() == savedEmail.trim() && savedPassword.isNotEmpty) {
+      setState(() {
+        passwordController.text = savedPassword;
+      });
+    }
+  }
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    String? savedEmail = prefs.getString("email");
+    String? savedPassword = prefs.getString("password");
+
+    if (savedEmail != null && savedPassword != null) {
+      emailController.text = savedEmail;
+      passwordController.text = savedPassword;
+
+      setState(() {
+        savePassword = true;
+      });
+    }
   }
 
   @override
@@ -203,121 +247,131 @@ _showSnack(String message) {
                         width: 1,
                       ),
                     ),
-                    child: Column(
-                      children: [
+                    child: AutofillGroup(
+                      child: Column(
 
-                        const SizedBox(height: 12),
-
-
-                        _buildField("Email ID", emailController),
-
-
-
-
-                        SizedBox(height: 20),
-
-
-
-                        _buildPasswordField(
-                          "Password",
-                          showConfirmPassword,
-                              () => setState(() => showConfirmPassword = !showConfirmPassword),
-                          passwordController,
-                        ),
-
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  savePassword = !savePassword;
-                                });
-                              },
-                              child: Container(
-                                height: 20,
-                                width: 20,
-                                decoration: BoxDecoration(
-                                  color: savePassword
-                                      ? ColorCode.black
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: ColorCode.kWhiteOpacity70,
+                        children: [
+                      
+                          const SizedBox(height: 12),
+                      
+                      
+                          _buildField("Email ID", emailController),
+                      
+                      
+                      
+                      
+                          SizedBox(height: 20),
+                      
+                      
+                      
+                          _buildPasswordField(
+                            "Password",
+                            showConfirmPassword,
+                                () => setState(() => showConfirmPassword = !showConfirmPassword),
+                            passwordController,
+                          ),
+                      
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    savePassword = !savePassword;
+                                  });
+                      
+                                  if (savePassword) {
+                                    final prefs = await SharedPreferences.getInstance();
+                      
+                                    await prefs.setString("email", emailController.text.trim());
+                                    await prefs.setString("password", passwordController.text.trim());
+                                  }
+                                },
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    color: savePassword
+                                        ? ColorCode.black
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: ColorCode.kWhiteOpacity70,
+                                    ),
+                                  ),
+                                  child: savePassword
+                                      ? const Icon(Icons.check,
+                                      size: 14, color: ColorCode.kButtonColor)
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                "Save Password",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: ColorCode.kWhiteOpacity60,
+                                ),
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(context,
+                                      MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
+                                },
+                                child: const Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                      fontFamily: "Outfit",
+                                      color: ColorCode.kButtonColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                      decorationThickness: 1.8,
+                                      decorationColor: ColorCode.kButtonColor
                                   ),
                                 ),
-                                child: savePassword
-                                    ? const Icon(Icons.check,
-                                    size: 14, color: ColorCode.kButtonColor)
-                                    : null,
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              "Save Password",
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: ColorCode.kWhiteOpacity60,
-                              ),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
-                              },
-                              child: const Text(
-                                "Forgot Password?",
-                                style: TextStyle(
-                                    fontFamily: "Outfit",
-                                    color: ColorCode.kButtonColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    decoration: TextDecoration.underline,
-                                    decorationThickness: 1.8,
-                                    decorationColor: ColorCode.kButtonColor
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: (!isFormValid || isLoggingIn)
+                                  ? null
+                                  : _fetchLogin,
+                      
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isFormValid
+                                    ? ColorCode.kButtonColor
+                                    : ColorCode.kGoldGradientLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: (!isFormValid || isLoggingIn)
-                                ? null
-                                : _fetchLogin,
-
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isFormValid
-                                  ? ColorCode.kButtonColor
-                                  : ColorCode.kGoldGradientLight,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                fontFamily: "Unbounded",
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: isFormValid
-                                    ? ColorCode.kHeadingColor
-                                    : ColorCode.k282828,
+                      
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                  fontFamily: "Unbounded",
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: isFormValid
+                                      ? ColorCode.kHeadingColor
+                                      : ColorCode.k282828,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-
-
-
-                      ],
+                      
+                      
+                      
+                        ],
+                      ),
                     ),
                   ),
 
@@ -445,6 +499,15 @@ _showSnack(String message) {
   Widget _buildField(String title, TextEditingController controller) {
     return  TextField(
       controller: controller,
+      autofillHints: const [
+
+        AutofillHints.email,
+      ],
+      onChanged: (value) {
+        _checkSavedEmail(value);
+      },
+      keyboardType: TextInputType.emailAddress,
+
       cursorColor: ColorCode.white,
       style: const TextStyle(
         color: ColorCode.white,
@@ -511,6 +574,9 @@ _showSnack(String message) {
       style: const TextStyle(
         color: ColorCode.kWhiteOpacity70,
       ),
+      autofillHints: const [
+        AutofillHints.password,
+      ],
       decoration: InputDecoration(
         labelText: "$title*",
         floatingLabelBehavior: FloatingLabelBehavior.always,

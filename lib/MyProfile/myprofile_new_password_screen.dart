@@ -10,8 +10,9 @@ import 'my_profile.dart';
 
 class MyprofileNewPasswordScreen extends StatefulWidget {
   final String email;
+  final String otp;
 
-  const MyprofileNewPasswordScreen({super.key, required this.email});
+  const MyprofileNewPasswordScreen({super.key, required this.email, required this.otp});
 
   @override
   State<MyprofileNewPasswordScreen> createState() => _MyprofileNewPasswordScreenState();

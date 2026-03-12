@@ -22,12 +22,13 @@ class ColorCode {
   static const Color bcakgroundcolor = Color(0xFF1D1D1B);
   /// ⭐ Divider / Border Color (White 12% opacity)
     static const Color kDividerWhite12 = Color(0x1FFFFFFF);
-
+  static const Color k5D5D5D = Color(0xFF5D5D5D);
   static const Color k737373 = Color(0xFF737373); //Medium grey
   /// ⭐ Figma Border (#DDDDDD 50%)
   static const Color kBorderLight = Color(0x80DDDDDD);
   // ⭐ Light Red / Remove Background
   static const Color kLightRed = Color(0xFFFFC9C9);
+  static const Color kIconBackground = Color(0xFF171717);
 
   static const Color kCreamSoft = Color(0xFFECE1CE);
   static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
@@ -38,6 +39,11 @@ class ColorCode {
   /// ⭐ Gold Gradient Colors (From Design)
   static const Color kGoldGradientLight = Color(0xFFE8D1AB); // #E8D1AB
   static const Color kGoldGradientDark  = Color(0xFFD4A14D); // #D4A14D
+
+  // ⭐ Divider Gradient Colors
+  static const Color kDividerStart = Color(0x17FFFFFF); // 9% opacity
+  static const Color kDividerCenter = Color(0xFFFFFFF); // full white
+  static const Color kDividerEnd = Color(0x17FFFFFF); // 9% opacity // #D4A14D
 
 
   static const Color kCircleGradientTop = Color(0xFF1D1D1B);

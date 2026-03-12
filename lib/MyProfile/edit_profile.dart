@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:beige/MyProfile/my_profile.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -111,30 +113,10 @@ class _EditProfileState extends State<EditProfile> {
 
 
 
-
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings(); // 👈 THIS IS IMPORTANT
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
-        ),
-      );
-      await Geolocator.openAppSettings(); // 👈 Open app settings
-      return;
-    }
+    /// ❌ DON'T override profile location
+    if (currentLatLng != null) return;
 
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -147,12 +129,8 @@ class _EditProfileState extends State<EditProfile> {
 
 
   Future<void> _fetchMyProfile() async {
-    debugPrint("🟢 MY PROFILE API CALL STARTED");
-
     try {
       final response = await ApiService().fetchData(ApiEndpoints.my_profile);
-
-      debugPrint("🟡 API RESPONSE: $response");
 
       if (response != null && response['error'] == false) {
         final user = response['data']['user'];
@@ -166,16 +144,19 @@ class _EditProfileState extends State<EditProfile> {
 
           profileImageUrl = user['user_profile_image_url'];
 
+          /// ✅ SET MAP LOCATION FROM PROFILE
+          if (user['latitude'] != null && user['longitude'] != null) {
+            currentLatLng = LatLng(
+              double.parse(user['latitude'].toString()),
+              double.parse(user['longitude'].toString()),
+            );
+          }
 
           isLoading = false;
         });
-
-        debugPrint("✅ PROFILE DATA SET IN TEXTFIELDS");
-      } else {
-        isLoading = false;
       }
     } catch (e) {
-      debugPrint("🚨 FETCH ERROR: $e");
+      debugPrint("FETCH ERROR: $e");
       isLoading = false;
     }
   }
@@ -302,7 +283,7 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  ImageProvider getProfileImage() {
+  ImageProvider? getProfileImage() {
     if (_profileImage != null) {
       return FileImage(_profileImage!);
     }
@@ -312,7 +293,7 @@ class _EditProfileState extends State<EditProfile> {
       );
     }
     else {
-      return const AssetImage("assets/Icons/profile.png");
+      return null; // SVG ke liye null
     }
   }
 
@@ -369,148 +350,178 @@ class _EditProfileState extends State<EditProfile> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
+            Column(
               children: [
-        
-                /// 🔹 BACKGROUND HEADER
-                SizedBox(
-                  width: double.infinity,
-                  height: 200,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(28),
-                      bottomRight: Radius.circular(28),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+
+                    Container(
+                      height: 248,
+                      width: double.infinity,
+                      color: Colors.transparent, // ताकि पीछे कुछ दिखे नहीं
                     ),
-                    child: Image.asset(
-                      "assets/images/profile.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-        
-                /// 🔹 BACK BUTTON
-                Positioned(
-                  top: 90,
-                  left: 16,
-                  child:      InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: SvgPicture.asset(
-                      "assets/svg/back.svg",
-                      color: ColorCode.black,
-                      height: 24,
-                    ),
-                  ),
-                ),
-        
-                /// 🔹 TITLE (CENTERED)
-                const Positioned(
-                  top:90 ,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Text(
-                      "Edit Profile",
-                      style: TextStyle(
-                        color: ColorCode.kHeadingColor,
-                        fontSize: 16,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w500,
+
+                    /// 🔹 BACKGROUND HEADER (Height 200 ही रखी ताकि डिज़ाइन न बिगड़े)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 200,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(28),
+                          bottomRight: Radius.circular(28),
+                        ),
+                        child: Image.asset(
+                          "assets/images/profile.png",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                ),
 
-                /// 🔹 PROFILE IMAGE (CUT INTO CURVE)
-                Positioned(
-                  bottom: -48,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Stack(
-                      children: [
-                        InkWell(
-                          onTap: _pickImage, // ✅ PICK + UPLOAD
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child:/* CircleAvatar(
-                              radius: 48,
-                              backgroundColor: Colors.grey.shade200,
-                              backgroundImage: _profileImage != null
-                                  ? FileImage(_profileImage!)
-                                  : const AssetImage("assets/Icons/profile.png")
-                              as ImageProvider,
-                            ),*/
-                          CircleAvatar(
-                            radius: 48,
-                            backgroundColor: Colors.grey.shade200,
-                            backgroundImage: getProfileImage(), // ✅ FIXED
-                          ),
+                    /// 🔹 BACK BUTTON
+                    Positioned(
+                      top: 90,
+                      left: 16,
+                      child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: SvgPicture.asset(
+                          "assets/svg/back.svg",
+                          color: ColorCode.black,
+                          height: 24,
+                        ),
+                      ),
+                    ),
+
+                    /// 🔹 TITLE
+                    const Positioned(
+                      top: 90,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Text(
+                          "Edit Profile",
+                          style: TextStyle(
+                            color: ColorCode.kHeadingColor,
+                            fontSize: 16,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
+                      ),
+                    ),
 
-                        /// ✏️ EDIT ICON
-                        Positioned(
-                          bottom: 5,
-                          right: 2,
-                          child: GestureDetector(
-                            onTap: _pickImage,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
+                    /// 🔹 PROFILE IMAGE
+                    Positioned(
+                      bottom: 0, //
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child:  Icon(Icons.edit, size: 22,color:Colors.black,),
+                              child: CircleAvatar(
+                                radius: 48,
+                                backgroundColor: Colors.grey.shade200,
+                                backgroundImage: getProfileImage(),
+
+                                /// ✅ SVG fallback
+                                child: getProfileImage() == null
+                                    ? SvgPicture.asset(
+                                  "assets/svg/profile.svg",
+                                  fit: BoxFit.cover,
+                                )
+                                    : null,
+                              ),
                             ),
-                          ),
+
+
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque, // यह क्लिक एरिया को पक्का करता है
+                              onTap: () {
+                                debugPrint("EDIT CLICKED");
+                                _pickImage();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.black12),
+                                ),
+                                child: const Icon(
+                                  Icons.edit,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    )
+                  ],
+                ),
+
+
+                const SizedBox(height: 10),
+
+                /// 🔹 USER INFO
+                Text(
+
+                  myProfile?['name'] ?? '',
+                  style: TextStyle(
+                    fontFamily: "Outfit",
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-        
-        
-        
+                const SizedBox(height: 4),
+                Text(
+                  "${myProfile?['email'] ?? ''}",
+                  style: TextStyle(
+                    color: ColorCode.kWhiteOpacity60,
+                    fontFamily: "Outfit",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+
+
               ],
             ),
         
         
-        
-            const SizedBox(height: 60),
+
         
             /// 🔹 USER INFO
-             Text(
-        
-               myProfile?['name'] ?? '',
-              style: TextStyle(
-                fontFamily: "Outfit",
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 4),
-             Text(
-              "${myProfile?['email'] ?? ''}",
-              style: TextStyle(
-                color: ColorCode.kWhiteOpacity60,
-                fontFamily: "Outfit",
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-        
+
             const SizedBox(height: 14),
-            Padding(
-              padding:  EdgeInsets.all(15),
-              child: Divider(color: ColorCode.kDividerWhite12,),
+            Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                height: 1,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      ColorCode.kDividerStart,
+                      ColorCode.kDividerCenter,
+                      ColorCode.kDividerEnd,
+                    ],
+                    stops: [0.0, 0.49, 1.0],
+                  ),
+                ),
+              ),
             ),
-        
+            const SizedBox(height: 14),
             Padding(
               padding:  EdgeInsets.all(20.0),
               child: Column(
@@ -748,96 +759,112 @@ class _EditProfileState extends State<EditProfile> {
                           ?  Center(
                         child: CircularProgressIndicator(),
                       )
-                          : GoogleMap(
+                          :GoogleMap(
                         initialCameraPosition: CameraPosition(
                           target: currentLatLng!,
                           zoom: 14,
                         ),
+
                         myLocationEnabled: true,
                         myLocationButtonEnabled: true,
                         zoomControlsEnabled: true,
                         compassEnabled: true,
+
+
+                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                          Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                          ),
+                        },
+
                         onMapCreated: (controller) {
                           mapController = controller;
                           controller.setMapStyle(_darkMapStyle);
                         },
+
                         markers: {
                           Marker(
                             markerId: const MarkerId("selected"),
                             position: currentLatLng!,
                           ),
                         },
+
                         onTap: (latLng) async {
                           setState(() {
                             currentLatLng = latLng;
                           });
+
                           await getAddressFromLatLng(latLng);
+
                           locationController.text = selectedAddress;
                         },
-                      ),
+                      )
                     ),
 
                   ),
 
                   SizedBox(height: 20,),
-        
+
                   TextField(
-                    // controller: emailController,
-                      cursorColor: ColorCode.white,
-        
-                      style: const TextStyle(
-                        color: ColorCode.white, // typed text color
+                    readOnly: true,
+                    obscureText: true,
+                    obscuringCharacter: ".",
+                    cursorColor: ColorCode.white,
+
+                    decoration: InputDecoration(
+                      labelText: "Change Password*",
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                      hintText: "********",
+                      hintStyle: const TextStyle(
+                      color: ColorCode.white,
+                      fontFamily: "Outfit",
+                      fontSize: 14,
+                        letterSpacing: 4,
+
                       ),
-        
-                      decoration: InputDecoration(
-                        labelText: "Change Password*",
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-        
-                        labelStyle: const TextStyle(
-                          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                        ),
-                        suffixIcon: GestureDetector(
-                          onTap: () {
-        
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ChangePasswordScreen(),
-                              ),
-                            );
-                          },
-                          child: const Icon(
-                            Icons.edit,
-                            color: ColorCode.kWhiteOpacity70,
-                            size: 20,
-                          ),
-                        ),
-        
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 18,
-                        ),
-        
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                            width: 0.5,                       // 🔥 exact 0.5px
-                          ),
-                        ),
-        
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                            width: 0.5,                          // focus border thicker
-                          ),
-                        ),
-        
-                        floatingLabelStyle: const TextStyle(
+
+                      labelStyle: const TextStyle(
+                        color: ColorCode.kWhiteOpacity70,
+                      ),
+
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChangePasswordScreen(),
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.edit,
                           color: ColorCode.kWhiteOpacity70,
-                        ),)
-        
+                          size: 20,
+                        ),
+                      ),
+
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 18,
+                      ),
+
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
+                        ),
+                      ),
+
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: ColorCode.kWhiteOpacity70,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20,),
                 ],

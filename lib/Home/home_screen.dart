@@ -1,13 +1,16 @@
   import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../MyProfile/my_profile.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'HomeSekect/Home_view_profile.dart';
 import 'HomeSekect/change_location_screen.dart';
+import 'HomeSekect/home_booking_summary_details.dart';
 import 'HomeSekect/recommended_detils_screen.dart';
 import 'HomeSekect/select_location.dart';
 import 'SelectLocationMapScreen.dart';
@@ -27,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen>
   List specialties = [];
   bool isLoading = true;
   List featuredCreatives = [];
+  TextEditingController searchController = TextEditingController();
 
   List<dynamic> incomeList = [];
   List<dynamic> mainCreatives = [];
@@ -36,7 +40,8 @@ class _HomeScreenState extends State<HomeScreen>
   late Animation<Offset> _slideDown;
   late Animation<double> _scale;
   Map<String, dynamic>? myProfile;
-
+  List<dynamic> filteredMainCreatives = [];
+  List<dynamic> filteredFeaturedCreatives = [];
   double? selectedLat;
   double? selectedLng;
 
@@ -46,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   final int _initialPage = 1000;
 
-
+  bool isFavourite = false;
+  Set<int> favouriteUsers = {};
   @override
   void initState() {
     super.initState();
@@ -130,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen>
     /// 🌐 API call
     _fetchhome_data();
   }
-
+  List<dynamic> filteredCreatives = [];
 
   @override
   void dispose() {
@@ -164,6 +170,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 */
 
+
+
   String? getProfileImageUrl() {
     if (myProfile == null) return null;
 
@@ -173,28 +181,6 @@ class _HomeScreenState extends State<HomeScreen>
 
     return ApiService.imageURL + image;
   }
-
-  final List<Map<String, String>> items = [
-  {"title": "Events &\nParties", "icon": "assets/images/party.png"},
-  {"title": "Creative &\nMedia", "icon": "assets/images/Creative.png"},
-  {"title": "Travel &\nOutdoors", "icon": "assets/images/Travel.png"},
-  {"title": "Drone &\nAerial", "icon": "assets/images/drone.png"},
-  {"title": "Sports &\nAction", "icon": "assets/images/Creative.png"},
-  {"title": "Personal\nShoots", "icon": "assets/images/personal_photo.png"},
-  ];
-
-  final List<String> specialtyIcons = [
-    "assets/Book_shoot/Events.png",
-    "assets/Book_shoot/Commercial.png",
-    "assets/Book_shoot/music.png",
-    "assets/Book_shoot/Corporate.png",
-    "assets/Book_shoot/Short.png",
-    "assets/Book_shoot/Social_Media.png",
-    "assets/Book_shoot/user 1.png",
-    "assets/Book_shoot/drone 1.png",
-    "assets/Book_shoot/sports 1.png",
-    "assets/Book_shoot/graduation 1.png",
-  ];
 
 
 
@@ -226,29 +212,7 @@ class _HomeScreenState extends State<HomeScreen>
     "Nathan Grant"
   ];
 
-  final List<Map<String, String>> cards = [
-    {
-      "name": "Ethan Cole",
-      "role": "Photographer Specialist",
-      "image": "assets/images/home3.png",
-      "price": "From \$450/Hr",
-      "rating": "4.5 (120)"
-    },
-    {
-      "name": "Alex Morgan",
-      "role": "Videographer",
-      "image": "assets/images/home2.png",
-      "price": "From \$380/Hr",
-      "rating": "4.7 (98)"
-    },
-    {
-      "name": "Liam Walker",
-      "role": "Cinematic Director",
-      "image": "assets/images/home1.png",
-      "price": "From \$520/Hr",
-      "rating": "4.8 (140)"
-    },
-  ];
+
 
 
 
@@ -269,6 +233,13 @@ class _HomeScreenState extends State<HomeScreen>
 
           featuredCreatives = response['data']['featuredCreatives'] ?? [];
           myProfile = response['data'];
+          mainCreatives = response['data']['mainCreatives'] ?? [];
+          mainCreatives = response['data']['mainCreatives'] ?? [];
+          featuredCreatives = response['data']['featuredCreatives'] ?? [];
+
+          filteredMainCreatives = mainCreatives;
+          filteredFeaturedCreatives = featuredCreatives;
+          filteredCreatives = mainCreatives;
           isLoading = false;
         });
       }
@@ -278,13 +249,69 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  Future<void> _addFavourite(int userId) async {
+    try {
+      final response = await ApiService().postData(
+        "${ApiEndpoints.addfavourites}/$userId",
+        {},
+      );
 
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite added");
+      }
+    } catch (e) {
+      debugPrint("Add Favourite Error: $e");
+    }
+  }
+
+
+  Future<void> _removeFavourite(int userId) async {
+    try {
+      final response = await ApiService().deleteData(
+        "${ApiEndpoints.addfavourites}/$userId",
+
+      );
+
+      if (response != null && response['error'] == false) {
+        debugPrint("Favourite removed");
+      }
+    } catch (e) {
+      debugPrint("Remove Favourite Error: $e");
+    }
+  }
+  void searchCreatives(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredMainCreatives = mainCreatives;
+        filteredFeaturedCreatives = featuredCreatives;
+      });
+      return;
+    }
+
+    final q = query.toLowerCase();
+
+    setState(() {
+      filteredMainCreatives = mainCreatives.where((item) {
+        final name = (item["name"] ?? "").toString().toLowerCase();
+        final title = (item["primary_title"] ?? "").toString().toLowerCase();
+
+        return name.contains(q) || title.contains(q);
+      }).toList();
+
+      filteredFeaturedCreatives = featuredCreatives.where((item) {
+        final name = (item["name"] ?? "").toString().toLowerCase();
+        final title = (item["primary_title"] ?? "").toString().toLowerCase();
+
+        return name.contains(q) || title.contains(q);
+      }).toList();
+    });
+  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: ColorCode.bcakgroundcolor,
+
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -449,8 +476,16 @@ class _HomeScreenState extends State<HomeScreen>
                                 backgroundColor: Colors.grey.shade800,
                                 backgroundImage: getProfileImageUrl() != null
                                     ? NetworkImage(getProfileImageUrl()!)
-                                    : const AssetImage("assets/Icons/profile.png")
-                                as ImageProvider,
+                                    : null,
+                                child: getProfileImageUrl() == null
+                                    ? Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: SvgPicture.asset(
+                                    "assets/svg/persone.svg",
+
+                                  ),
+                                )
+                                    : null,
                               ),
                             ),
 
@@ -519,12 +554,11 @@ class _HomeScreenState extends State<HomeScreen>
                               ),
                             ),
 
-                            /// BELL ICON (RIGHT SIDE)
-                            Image.asset(
-                              "assets/Icons/notifactioin.png",
-                              width: 22,
-                              color: Colors.white,
+                            SvgPicture.asset(
+                              "assets/svg/notifaction.svg",
+
                             ),
+
                           ],
                         ),
                          SizedBox(height: 20),
@@ -539,26 +573,30 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                           child: Row(
                             children: [
-                              Image.asset(
-                                "assets/Icons/serch.png",
-                                width: 18,
-                                color: ColorCode.white,
+                              SvgPicture.asset(
+                                "assets/svg/serch.svg",
+
                               ),
                               const SizedBox(width: 10),
-                              const Expanded(
+                               Expanded(
                                 child: TextField(
-                                  decoration: InputDecoration(
+                                  controller: searchController,
+                                  onChanged: (value) {
+                                    searchCreatives(value);
+                                  },
+                                  style: const TextStyle(color: ColorCode.white),
+                                  decoration: const InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Search",
-                                    hintStyle: const TextStyle(
+                                    hintStyle: TextStyle(
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w400,
                                       fontSize: 12,
-                                    color: ColorCode.white
+                                      color: ColorCode.white,
                                     ),
                                   ),
-                                )
-                              ),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -739,7 +777,7 @@ class _HomeScreenState extends State<HomeScreen>
                     _controller.forward();
                   },
                   child: SizedBox(
-                    height: 420,
+                    height: 380,
                     child: Stack(
                       alignment: Alignment.center,
                       clipBehavior: Clip.none,
@@ -763,7 +801,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                         /// SECOND CARD
                         Transform.translate(
-                          offset: const Offset(0, -24),
+                          offset: const Offset(0, -20),
                           child: Transform.scale(
                             scale: 0.94,
                             child: Opacity(
@@ -800,24 +838,34 @@ class _HomeScreenState extends State<HomeScreen>
               SizedBox(height: 20),
 
               Center(
-                child: SizedBox(
+                child: Container(
                   width: MediaQuery.of(context).size.width * 0.85,
-                  child: Divider(
-                    color: ColorCode.kDividerWhite12,
-                    thickness: 1,
+                  height: 1,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        ColorCode.kDividerStart,
+                        ColorCode.kDividerCenter,
+                        ColorCode.kDividerEnd,
+                      ],
+                      stops: [0.0, 0.49, 1.0],
+                    ),
                   ),
                 ),
               ),
+              SizedBox(height: 20),
 
 
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:  [
-                        Text(
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:  [
+                      Padding(
+                        padding:  EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
                           "Featured Creatives",
                           style: TextStyle(
                             color: ColorCode.white,
@@ -827,87 +875,87 @@ class _HomeScreenState extends State<HomeScreen>
                             // Looks cleaner in Unbounded
                           ),
                         ),
-                        GestureDetector(
-            /*              onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Specialities(),
-                              ),
-                            );
-                          },*/
-                          child: Image.asset(
-                            "assets/Icons/rightside.png",
-                            height: 40,   // bigger height
-                            width: 40,
-                            color: ColorCode.white,
-                          ),
-                        )
+                      ),
+                   /*   GestureDetector(
+                          *//*              onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Specialities(),
+                            ),
+                          );
+                        },*//*
+                        child: Image.asset(
+                          "assets/Icons/rightside.png",
+                          height: 40,   // bigger height
+                          width: 40,
+                          color: ColorCode.white,
+                        ),
+                      )
+              */
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 260,
+                    child: AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        return PageView.builder(
+                          controller: _pageController,
+                          physics: const BouncingScrollPhysics(), // 🔥 smooth iOS feel
+                          itemBuilder: (context, index) {
 
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    SizedBox(
-                      height: 260,
-                      child: AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          return PageView.builder(
-                            controller: _pageController,
-                            physics: const BouncingScrollPhysics(), // 🔥 smooth iOS feel
-                            itemBuilder: (context, index) {
+                            final int actualIndex =
+                                index % featuredImages.length;
 
-                              final int actualIndex =
-                                  index % featuredImages.length;
+                            double page = _pageController.hasClients
+                                ? _pageController.page ?? _initialPage.toDouble()
+                                : _initialPage.toDouble();
 
-                              double page = _pageController.hasClients
-                                  ? _pageController.page ?? _initialPage.toDouble()
-                                  : _initialPage.toDouble();
+                            double difference = (page - index);
 
-                              double difference = (page - index);
+                            // 🔥 ultra smooth scale
+                            double scale = 1 -
+                                (difference.abs() * 0.15);
 
-                              // 🔥 ultra smooth scale
-                              double scale = 1 -
-                                  (difference.abs() * 0.15);
+                            scale = scale.clamp(0.85, 1.0);
 
-                              scale = scale.clamp(0.85, 1.0);
+                            // 🔥 smoother vertical movement
+                            double translateY =
+                            (difference.abs() * 25);
 
-                              // 🔥 smoother vertical movement
-                              double translateY =
-                              (difference.abs() * 25);
+                            translateY = translateY.clamp(0, 30);
 
-                              translateY = translateY.clamp(0, 30);
+                            // 🔥 smoother opacity
+                            double opacity =
+                                1 - (difference.abs() * 0.25);
 
-                              // 🔥 smoother opacity
-                              double opacity =
-                                  1 - (difference.abs() * 0.25);
+                            opacity = opacity.clamp(0.6, 1.0);
 
-                              opacity = opacity.clamp(0.6, 1.0);
-
-                              return Opacity(
-                                opacity: opacity,
-                                child: Transform.translate(
-                                  offset: Offset(0, translateY),
-                                  child: Transform.scale(
-                                    scale: scale,
-                                    child: teamCard(
-                                      image: featuredImages[actualIndex],
-                                      name: featuredNames[actualIndex],
-                                    ),
+                            return Opacity(
+                              opacity: opacity,
+                              child: Transform.translate(
+                                offset: Offset(0, translateY),
+                                child: Transform.scale(
+                                  scale: scale,
+                                  child: teamCard(
+                                    image: featuredImages[actualIndex],
+                                    name: featuredNames[actualIndex],
                                   ),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
+                  ),
 
 
 
 
-                  ],
-                ),
+                ],
               ),
 
 
@@ -921,15 +969,16 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
 
+              SizedBox(height: 20),
 
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:  [
-                        Text(
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:  [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
                           "We Think You’ll Love These ",
                           style: TextStyle(
                             color: ColorCode.white,
@@ -939,147 +988,185 @@ class _HomeScreenState extends State<HomeScreen>
                             // Looks cleaner in Unbounded
                           ),
                         ),
-                        Image.asset(
-                          "assets/Icons/rightside.png",
-                          height: 40,   // bigger height
-                          width: 40,
-                          color: ColorCode.white,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 280,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: featuredCreatives.length,
-                        itemBuilder: (context, index) {
+                      ),
+                  /*    Image.asset(
+                        "assets/Icons/rightside.png",
+                        height: 40,   // bigger height
+                        width: 40,
+                        color: ColorCode.white,
+                      ),*/
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 280,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: featuredCreatives.length,
+                      itemBuilder: (context, index) {
 
-                          final item = featuredCreatives[index];
+                        final item = featuredCreatives[index];
+                        final int userId = item["id"];
+                        bool isFavourite = favouriteUsers.contains(userId);
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 12, right: 4),
+                          child: Container(
+                            width: 210,
+                            height: 280,
+                            child: Stack(
+                              children: [
 
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 12, right: 4),
-                            child: Container(
-                              width: 210,
-                              height: 280,
-                              child: Stack(
-                                children: [
-
-                                  /// IMAGE
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: item["profile_image_url"] != null
-                                        ? Image.network(
-                                      ApiService().getImageURL(item["profile_image_url"]),
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    )
-                                        : Image.asset(
-                                      "assets/images/home1.png",
-                                      fit: BoxFit.cover,
-                                    ),
+                                /// IMAGE
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: item["profile_image_url"] != null
+                                      ? Image.network(
+                                    ApiService().getImageURL(item["profile_image_url"]),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  )
+                                      : Image.asset(
+                                    "assets/images/home1.png",
+                                    fit: BoxFit.cover,
                                   ),
+                                ),
 
-                                  /// BLACK GRADIENT
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Container(
-                                      height: 110,
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.vertical(
-                                            bottom: Radius.circular(18)),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black.withOpacity(0.8)
-                                          ],
-                                        ),
+                                /// BLACK GRADIENT
+                                Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Container(
+                                    height: 110,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.vertical(
+                                          bottom: Radius.circular(18)),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.8)
+                                        ],
                                       ),
                                     ),
                                   ),
+                                ),
 
-                                  /// ONLINE DOT
-                                  const Positioned(
-                                    top: 10,
-                                    left: 10,
-                                    child: CircleAvatar(
-                                      radius: 6,
-                                      backgroundColor: Colors.green,
-                                    ),
+                                /// ONLINE DOT
+                                const Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: CircleAvatar(
+                                    radius: 6,
+                                    backgroundColor: Colors.green,
                                   ),
+                                ),
 
-                                  /// HEART ICON
-                                  Positioned(
-                                    top: 10,
-                                    right: 10,
+                                /// HEART ICON
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child:     GestureDetector(
+                                    onTap: () async {
+                                      if (isFavourite) {
+                                        // ❌ REMOVE
+                                        setState(() {
+                                          favouriteUsers.remove(userId);
+                                        });
+
+                                        await _removeFavourite(userId);
+
+                                        _showFavouriteToast("Removed from Favourite");
+                                      } else {
+                                        // ✅ ADD
+                                        setState(() {
+                                          favouriteUsers.add(userId);
+                                        });
+
+                                        await _addFavourite(userId);
+
+                                        _showFavouriteToast("Added to Favourite");
+                                      }
+                                    },
                                     child: Image.asset(
-                                      "assets/images/Heart Angle.png",
+                                      isFavourite
+                                          ? "assets/Icons/Heart_Angl_COLOR.png"
+                                          : "assets/images/Heart Angle.png",
                                       height: 22,
-                                      color: Colors.white,
+                                      width: 22,
                                     ),
                                   ),
+                                ),
 
-                                  /// TEXT DATA
-                                  Positioned(
-                                    bottom: 12,
-                                    left: 12,
-                                    right: 12,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
+                                /// TEXT DATA
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  right: 12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
 
-                                        Row(
-                                          children: [
-                                            const Icon(Icons.star,
-                                                color: Colors.yellow, size: 16),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              item["average_rating"] != null
-                                                  ? item["average_rating"].toString()
-                                                  : "4.5",
-                                              style: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 12,
-                                              ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.star,
+                                              color: Colors.yellow, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            item["average_rating"] != null
+                                                ? item["average_rating"].toString()
+                                                : "4.5",
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
                                             ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 4),
-
-                                        /// NAME
-                                        Text(
-                                          item["name"] ?? "",
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
                                           ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 4),
+
+                                      /// NAME
+                                      Text(
+                                        item["name"] ?? "",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
                                         ),
+                                      ),
 
-                                        const SizedBox(height: 2),
+                                      const SizedBox(height: 2),
 
-                                        /// TITLE
-                                        Text(
-                                          item["primary_title"] ?? "",
-                                          style: const TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 11,
-                                          ),
+                                      /// TITLE
+                                      Text(
+                                        item["primary_title"] ?? "",
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 11,
                                         ),
+                                      ),
 
-                                        const SizedBox(height: 8),
+                                      const SizedBox(height: 8),
 
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
 
-                                            /// VIEW PROFILE BUTTON
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 18, vertical: 6),
+                                          /// VIEW PROFILE BUTTON
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => HomeViewProfile(
+                                                    id: item["id"], // 👈 ID pass here
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
                                               decoration: BoxDecoration(
                                                 color: ColorCode.kButtonColor,
                                                 borderRadius: BorderRadius.circular(20),
@@ -1087,33 +1174,33 @@ class _HomeScreenState extends State<HomeScreen>
                                               child: const Text(
                                                 "View Profile",
                                                 style: TextStyle(
-                                                  fontSize: 11,
+                                                  color: ColorCode.black,
+                                                  fontFamily: "Outfit",
+                                                  fontSize: 12,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                             ),
+                                          ),
 
-                                            /// ICON
-                                            Image.asset(
-                                              "assets/images/Group 2087328980.png",
-                                              width: 30,
-                                              height: 30,
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
+                                          /// ICON
+                                          SvgPicture.asset(
+                                            "assets/svg/home_view_profile.svg",
+
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ),
-
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                ],
               ),
             ],
           ),
@@ -1180,8 +1267,8 @@ class _HomeScreenState extends State<HomeScreen>
       offset: Offset(0, -index * 30),
       child: Container(
         key: key,
-        height: 376,
-        width: 335,
+        height: 360,
+        width: 340,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(35),
         ),
@@ -1200,7 +1287,7 @@ class _HomeScreenState extends State<HomeScreen>
                   fit: BoxFit.cover,
                 )
                     : Image.asset(
-                  "assets/images/home1.png",
+                  "assets/images/home2.png",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -1333,5 +1420,53 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  void _showFavouriteToast(String message) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry overlayEntry;
 
+    overlayEntry = OverlayEntry(
+      builder: (_) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: "Outfit",
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => overlayEntry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
+  }
 }

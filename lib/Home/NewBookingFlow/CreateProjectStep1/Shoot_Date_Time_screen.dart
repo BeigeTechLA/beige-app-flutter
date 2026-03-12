@@ -741,10 +741,17 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
                       suffixIcon: InkWell(
                         onTap: () => _selectDate(context),
-                        child: const Icon(
-                          Icons.calendar_today_outlined,
-                          size: 20,
-                          color: ColorCode.kWhiteOpacity70,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SvgPicture.asset(
+                            "assets/svg/calendar-03.svg",
+                            width: 20,
+                            height: 20,
+                            colorFilter: const ColorFilter.mode(
+                              ColorCode.kWhiteOpacity70,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
                       ),
 
@@ -1115,10 +1122,17 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
               fontFamily: "Outfit",
             ),
 
-            suffixIcon: const Icon(
-              Icons.watch_later,
-              size: 20,
-              color: ColorCode.kWhiteOpacity70,
+            suffixIcon:  Padding(
+              padding: const EdgeInsets.all(12),
+              child: SvgPicture.asset(
+                "assets/svg/Group 2087328870.svg",
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  ColorCode.white,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
 
             contentPadding:
