@@ -1089,7 +1089,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                           ),
                                         ),
                                         const TextSpan(
-                                          text: "Terms & Condition & Privacy Policy",
+                                          text: "Terms & Conditions and Privacy Policy",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             color: ColorCode.white,
