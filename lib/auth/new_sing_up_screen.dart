@@ -14,6 +14,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
@@ -821,9 +822,25 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                             const SizedBox(height: 22),
 
-                            _buildField("Name", nameController),
+                        /*    _buildField("Name", nameController),
                             const SizedBox(height: 16),
                             _buildField("Email ID", emailController),
+                            const SizedBox(height: 16),*/
+
+                            CustomInputField(
+                              title: "Name",
+                              controller: nameController,
+                              keyboardType: TextInputType.name,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            CustomInputField(
+                              title: "Email ID",
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              // autofillHints: const [AutofillHints.email],
+                            ),
                             const SizedBox(height: 16),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -956,7 +973,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                             const SizedBox(height: 16),
 
-                            _buildPasswordField(
+                       /*     _buildPasswordField(
                               "Create Password",
                               showPassword,
                                   () => setState(() => showPassword = !showPassword),
@@ -969,6 +986,52 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                               showConfirmPassword,
                                   () => setState(() => showConfirmPassword = !showConfirmPassword),
                               confirmPasswordController,
+                            ),*/
+
+
+                            CustomInputField(
+                              title: "Create Password",
+                              controller: passwordController,
+                              isPassword: true,
+                              isVisible: showPassword,
+                              // autofillHints: const [AutofillHints.newPassword],
+                              onToggle: () {
+                                setState(() {
+                                  showPassword = !showPassword;
+                                });
+                              },
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showConfirmPassword = !showConfirmPassword;
+                                  });
+                                },
+                                icon: SvgPicture.asset(
+                                  showConfirmPassword
+                                      ? "assets/svg/eyes1.svg"
+                                      : "assets/svg/eyes2.svg",
+                                  height: 22,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            CustomInputField(
+                              title: "Confirm Password",
+                              controller: confirmPasswordController,
+                              isPassword: true,
+                              isVisible: showConfirmPassword,
+                              // autofillHints: const [AutofillHints.password],
+                              onToggle: () {
+                                setState(() {
+                                  showConfirmPassword = !showConfirmPassword;
+                                });
+                              },
                             ),
                             SizedBox(height: 20),
                             _profilePictureCard(),

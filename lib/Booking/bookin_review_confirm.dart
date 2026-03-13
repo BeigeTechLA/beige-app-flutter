@@ -253,13 +253,15 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
       appBar: AppBar(
-        backgroundColor: ColorCode.bcakgroundcolor,
+
+
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child:  SvgPicture.asset(
-            "assets/svg/back.svg",
-            height: 24,
+          child: Image.asset(
+            "assets/Icons/Reply.png",
+            height: 22,
+            color: Colors.white,
           ),
         ),
         actions: const [

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
+import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
@@ -230,8 +231,10 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               child: Text(
                 "3/3",
                 style: TextStyle(
+                  fontFamily: "Outfit",
                   color: ColorCode.white,
                   fontSize: 14,
+
                 ),
               ),
             ),
@@ -307,7 +310,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                 ],
               ),
 
-
+              SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -676,15 +679,30 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     ],
                   ),
                   SizedBox(height: 14),
-                  _buildField("Full Name*", nameController),
+                  // _buildField("Full Name*", nameController),
+                  CustomInputField(
+                    title: "Full Name",
+                    controller: nameController,
+                  ),
+                  const SizedBox(height: 15),
+
+                  CustomInputField(
+                    title: "Email ID",
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
 
                   const SizedBox(height: 15),
 
-                  _buildField("Email ID", emailController),
-
-                  const SizedBox(height: 15),
-
-                  _buildField("Phone Number*", phoneController, isPhone: true),
+                  CustomInputField(
+                    title: "Phone Number",
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                  ),
 
                   const SizedBox(height: 15),
 

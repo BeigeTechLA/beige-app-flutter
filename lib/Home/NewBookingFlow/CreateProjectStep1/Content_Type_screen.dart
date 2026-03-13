@@ -37,11 +37,13 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
   List specialties = [];
 
-
+/*
   bool get isContinueEnabled {
     return selectedContentTypeIds.isNotEmpty && isShootTypeLoaded && !isLoading;
+  }*/
+  bool get isContinueEnabled {
+    return selectedContentTypeIds.isNotEmpty && !isLoading;
   }
-
   bool get isSelectAll =>
       selectedContentTypeIds.contains(1) &&
           selectedContentTypeIds.contains(2);
@@ -137,6 +139,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   }*/
 
 
+/*
   Future<void> _handleSelection(int contentTypeId) async {
 
     if (isLoading) return; // 🔥 multiple click stop
@@ -196,6 +199,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       }
     }
   }
+*/
 
 /*  Future<void> _handleSelection(int contentTypeId) async {
 
@@ -246,9 +250,62 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     }
   }*/
 
+  void _handleSelection(int contentTypeId) {
+    setState(() {
+      selectedContentTypeIds = contentTypeId == 3 ? [1, 2] : [contentTypeId];
+    });
+  }
 
+  Future<void> _continueBooking() async {
 
+    if (selectedContentTypeIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select content type")),
+      );
+      return;
+    }
 
+    int contentTypeToSend =
+    isSelectAll ? 3 : selectedContentTypeIds.first;
+
+    setState(() => isLoading = true);
+
+    try {
+
+      if (contentTypeToSend != 3) {
+        await _callBookingApi(contentTypeToSend);
+      }
+
+      final body = {
+        "specialty_id": widget.specialtyId,
+        "content_type": contentTypeToSend,
+        if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
+          "shoot_type_id": shootTypeIds.first,
+      };
+
+      final response =
+      await ApiService().postData(ApiEndpoints.booking, body);
+
+      final bookingId = response['data']?['booking_id'];
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoShootType(
+              contentTypeId: contentTypeToSend,
+              bookingId: bookingId,
+            ),
+          ),
+        );
+      }
+
+    } catch (e) {
+      debugPrint("Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,6 +324,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 style: TextStyle(
                   color: ColorCode.white,
                   fontSize: 16,
+                  fontFamily: "Outfit",
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -279,7 +337,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 "1/3",
                 style: TextStyle(
                   color: ColorCode.white,
-                  fontSize: 14,
+                  fontSize: 16,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -400,11 +460,41 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         ),
 
                         const Spacer(),
+
+                        SizedBox(
+                          width: 100,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: isContinueEnabled ? _continueBooking : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isContinueEnabled
+                                  ? ColorCode.kButtonColor
+                                  : Colors.grey.shade700,
+
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              "Continue",
+                              style: TextStyle(
+                                color: ColorCode.k1D1D1B_Opacity70,
+                                fontSize: 11,
+                                fontFamily: 'Outfit',
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
+
                 ),
+
               ),
+
+
             ),
           ],
         ));

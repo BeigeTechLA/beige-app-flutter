@@ -342,6 +342,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
               style: TextStyle(
                 color: ColorCode.white,
                 fontSize: 14,
+                fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -353,6 +354,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 style: TextStyle(
                   color: ColorCode.white,
                   fontSize: 14,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
@@ -1102,9 +1105,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                                 ),
                                               );
                                             },
-                                            child: Image.asset(
-                                              "assets/images/Group 2087328980.png",
-                                              height: 32,
+                                            child:  SvgPicture.asset(
+                                              "assets/svg/home_view_profile.svg",
+
                                             ),
                                           ),
                                         ],

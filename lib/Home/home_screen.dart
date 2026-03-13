@@ -283,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (query.isEmpty) {
       setState(() {
         filteredMainCreatives = mainCreatives;
-        filteredFeaturedCreatives = featuredCreatives;
+        currentIndex = 0; // important
       });
       return;
     }
@@ -292,13 +292,6 @@ class _HomeScreenState extends State<HomeScreen>
 
     setState(() {
       filteredMainCreatives = mainCreatives.where((item) {
-        final name = (item["name"] ?? "").toString().toLowerCase();
-        final title = (item["primary_title"] ?? "").toString().toLowerCase();
-
-        return name.contains(q) || title.contains(q);
-      }).toList();
-
-      filteredFeaturedCreatives = featuredCreatives.where((item) {
         final name = (item["name"] ?? "").toString().toLowerCase();
         final title = (item["primary_title"] ?? "").toString().toLowerCase();
 
@@ -750,7 +743,7 @@ class _HomeScreenState extends State<HomeScreen>
                   child: CircularProgressIndicator(),
                 ),
               )
-                  : mainCreatives.isEmpty
+                  : filteredMainCreatives.isEmpty
                   ? const Padding(
                 padding: EdgeInsets.symmetric(vertical: 80),
                 child: Center(
@@ -817,7 +810,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
 
                         /// CURRENT CARD
-                        SlideTransition(
+                   /*     SlideTransition(
                           position: _slideDown,
                           child: FadeTransition(
                             opacity: _fade,
@@ -826,6 +819,21 @@ class _HomeScreenState extends State<HomeScreen>
                               child: _buildCard(
                                 key: ValueKey(currentIndex),
                                 data: mainCreatives[currentIndex],
+                              ),
+                            ),
+                          ),
+                        ),*/
+                             SlideTransition(
+                          position: _slideDown,
+                          child: FadeTransition(
+                            opacity: _fade,
+                            child: ScaleTransition(
+                              scale: _scale,
+                              child: _buildCard(
+                                key: ValueKey(currentIndex),
+                                data: filteredMainCreatives[
+                                currentIndex % filteredMainCreatives.length
+                                ],
                               ),
                             ),
                           ),

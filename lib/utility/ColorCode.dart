@@ -6,7 +6,8 @@ class ColorCode {
 
   static const Color kGoldLight20 = Color(0x33E8D5B5); // #E8D5B5 with 20% opacity
   static const Color kDarkText = Color(0xFF4E4B44);    // #4E4B44
-
+  /// ⭐ Figma Border (#E8D1AB 50%)
+  static const Color kGoldBorder50 = Color(0x80E8D1AB);
   static const Color kButtonColor = Color(0xFFE8D1AB);
   static const Color kHeadingColor = Color(0xFF1D1D1B); // (dark)
   static  const Color kSubtextColor = Color(0xFF474746);

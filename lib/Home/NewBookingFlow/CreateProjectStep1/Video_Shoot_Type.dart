@@ -184,8 +184,9 @@ String getContentTypeTitle(int contentTypeId) {
               "Create Project",
               style: TextStyle(
                 color: ColorCode.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w400,
               ),
             ),
             // 🔹 Step Text (Right)
@@ -194,8 +195,11 @@ String getContentTypeTitle(int contentTypeId) {
               child: Text(
                 "1/3",
                 style: TextStyle(
-                  color: ColorCode.white,
                   fontSize: 14,
+                  fontFamily: "Outfit",
+                  color: ColorCode.white,
+                  fontWeight: FontWeight.w400,
+
                 ),
               ),
             ),
@@ -280,122 +284,135 @@ String getContentTypeTitle(int contentTypeId) {
                       children: [
 
                         /// 🔹 IMAGE CARD
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                              selectedShootTypeId = item['id'];
+                              selectedShootTypeName = item['name'];
+                            });
 
-
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-
-                              /// 🔹 LEFT IMAGE
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: SizedBox(
-                                  height: 125,
-                                  width: 120,
-                                  child: CachedNetworkImage(
-                                    imageUrl: fullImageUrl,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(
-                                      child: Lottie.asset(
-                                        "assets/lottie/Untitled_file.json",
-                                        width: 60,
-                                        height: 60,
+                            debugPrint("✅ Selected ID → $selectedShootTypeId");
+                            debugPrint("✅ Selected Name → $selectedShootTypeName");
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                          
+                          
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                          
+                                /// 🔹 LEFT IMAGE
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: SizedBox(
+                                    height: 125,
+                                    width: 120,
+                                    child: CachedNetworkImage(
+                                      imageUrl: fullImageUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(
+                                        child: Lottie.asset(
+                                          "assets/lottie/Untitled_file.json",
+                                          width: 60,
+                                          height: 60,
+                                        ),
                                       ),
+                                      errorWidget: (context, url, error) =>
+                                      const Icon(Icons.broken_image, color: Colors.grey),
                                     ),
-                                    errorWidget: (context, url, error) =>
-                                    const Icon(Icons.broken_image, color: Colors.grey),
                                   ),
                                 ),
-                              ),
-
-                              const SizedBox(width: 16),
-
-                              /// 🔹 CENTER TEXT SECTION
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-
-                                    /// Title
-                                    Text(
-                                      item['name'] ?? '',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                        fontFamily: "Outfit",
+                          
+                                const SizedBox(width: 16),
+                          
+                                /// 🔹 CENTER TEXT SECTION
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                          
+                                      /// Title
+                                      Text(
+                                        item['name'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontFamily: "Outfit",
+                                        ),
                                       ),
-                                    ),
-
-
-                                    Text(
-                                      tagsText,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: ColorCode.kWhiteOpacity70,
-                                        fontFamily: "Outfit",
+                          
+                          
+                                      Text(
+                                        tagsText,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: ColorCode.kWhiteOpacity70,
+                                          fontFamily: "Outfit",
+                                        ),
                                       ),
-                                    ),
-
-                                  ],
+                          
+                                    ],
+                                  ),
                                 ),
-                              ),
-
-                              const SizedBox(width: 12),
-
-                              /// 🔹 RIGHT RADIO BUTTON
-                              InkWell(
-                                splashColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                onTap: () {
-                                  setState(() {
-                                    selectedIndex = index;
-                                    selectedShootTypeId = item['id'];
-                                    selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
-                                  });
-
-                                  debugPrint("✅ Selected ID → $selectedShootTypeId");
-                                  debugPrint("✅ Selected Name → $selectedShootTypeName");
-                                },
-                                child: Container(
-                                  height: 25,
-                                  width: 30,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: selectedIndex == index
-                                        ? const LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Color(0xFFE8D1AB),
-                                        Color(0xFFD4A14D),
-                                      ],
+                          
+                                const SizedBox(width: 12),
+                          
+                                /// 🔹 RIGHT RADIO BUTTON
+                                InkWell(
+                             /*     splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  onTap: () {
+                                    setState(() {
+                                      selectedIndex = index;
+                                      selectedShootTypeId = item['id'];
+                                      selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
+                                    });
+                          
+                                    debugPrint("✅ Selected ID → $selectedShootTypeId");
+                                    debugPrint("✅ Selected Name → $selectedShootTypeName");
+                                  },*/
+                                  child: Container(
+                                    height: 25,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: selectedIndex == index
+                                          ? const LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Color(0xFFE8D1AB),
+                                          Color(0xFFD4A14D),
+                                        ],
+                                      )
+                                          : null,
+                                      border: Border.all(
+                                        color: Colors.white54,
+                                      ),
+                                    ),
+                                    child: selectedIndex == index
+                                        ? const Center(
+                                      child: CircleAvatar(
+                                        radius: 3,
+                                        backgroundColor: Colors.black,
+                                      ),
                                     )
                                         : null,
-                                    border: Border.all(
-                                      color: Colors.white54,
-                                    ),
                                   ),
-                                  child: selectedIndex == index
-                                      ? const Center(
-                                    child: CircleAvatar(
-                                      radius: 3,
-                                      backgroundColor: Colors.black,
-                                    ),
-                                  )
-                                      : null,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
 

@@ -127,6 +127,7 @@ bool isLoading =true;
                 color: ColorCode.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
+                fontFamily: "Outfit",
               ),
             ),
             // 🔹 Step Text (Right)
@@ -135,8 +136,10 @@ bool isLoading =true;
               child: Text(
                 "2/3",
                 style: TextStyle(
+                  fontFamily: "Outfit",
                   color: ColorCode.white,
                   fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
@@ -234,7 +237,10 @@ bool isLoading =true;
                                 color: Colors.black,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.info_outline, color: Colors.white),
+                              child: SvgPicture.asset(
+                                "assets/svg/Group_2087329363.svg",
+
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

@@ -1,7 +1,10 @@
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
@@ -253,10 +256,17 @@ _showSnack(String message) {
                         children: [
                       
                           const SizedBox(height: 12),
-                      
-                      
-                          _buildField("Email ID", emailController),
-                      
+
+
+                          CustomInputField(
+                            title: "Email ID",
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            autofillHints: const [
+                              AutofillHints.username,
+                              AutofillHints.email,
+                            ],
+                          ),
                       
                       
                       
@@ -264,17 +274,46 @@ _showSnack(String message) {
                       
                       
                       
-                          _buildPasswordField(
+                        /*  _buildPasswordField(
                             "Password",
                             showConfirmPassword,
                                 () => setState(() => showConfirmPassword = !showConfirmPassword),
                             passwordController,
+                          ),*/
+                          CustomInputField(
+                            title: "Password",
+                            controller: passwordController,
+                            isPassword: true,
+                            isVisible: showConfirmPassword,
+                            autofillHints: const [AutofillHints.password],
+                            onToggle: () {
+                              setState(() {
+                                showConfirmPassword = !showConfirmPassword;
+                              });
+                            },
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  showConfirmPassword = !showConfirmPassword;
+                                });
+                              },
+                              icon: SvgPicture.asset(
+                                showConfirmPassword
+                                    ? "assets/svg/eyes1.svg"
+                                    : "assets/svg/eyes2.svg",
+                                height: 22,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.white,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                           ),
-                      
-                          const SizedBox(height: 20),
+
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              GestureDetector(
+                             /* GestureDetector(
                                 onTap: () async {
                                   setState(() {
                                     savePassword = !savePassword;
@@ -315,7 +354,7 @@ _showSnack(String message) {
                                   color: ColorCode.kWhiteOpacity60,
                                 ),
                               ),
-                              const Spacer(),
+                              const Spacer(),*/
                               TextButton(
                                 onPressed: () {
                                   Navigator.push(context,
@@ -327,7 +366,7 @@ _showSnack(String message) {
                                       fontFamily: "Outfit",
                                       color: ColorCode.kButtonColor,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                      fontSize: 12,
                                       decoration: TextDecoration.underline,
                                       decorationThickness: 1.8,
                                       decorationColor: ColorCode.kButtonColor
@@ -336,14 +375,17 @@ _showSnack(String message) {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
                               onPressed: (!isFormValid || isLoggingIn)
                                   ? null
-                                  : _fetchLogin,
+                                  : () {
+                                TextInput.finishAutofillContext();
+                                _fetchLogin();
+                              },
                       
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: isFormValid
@@ -570,9 +612,9 @@ _showSnack(String message) {
     return TextField(
       controller: controller,
       obscureText: !isVisible,
-      cursorColor: ColorCode.kWhiteOpacity70,
+      cursorColor: ColorCode.white,
       style: const TextStyle(
-        color: ColorCode.kWhiteOpacity70,
+        color: ColorCode.white,
       ),
       autofillHints: const [
         AutofillHints.password,
@@ -587,7 +629,7 @@ _showSnack(String message) {
           fontSize: 12,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: ColorCode.white,
         ),
 
         floatingLabelStyle: const TextStyle(
@@ -596,7 +638,7 @@ _showSnack(String message) {
           fontSize: 15,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: ColorCode.white,
         ),
 
 
@@ -608,10 +650,11 @@ _showSnack(String message) {
         /// 👁️ EYE ICON
         suffixIcon: IconButton(
           onPressed: onToggle,
-          icon: Icon(
-            isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kWhiteOpacity70,
-            size: 20,
+          icon: SvgPicture.asset(
+            isVisible
+                ? "assets/svg/eyes1.svg"
+                : "assets/svg/eyes2.svg",
+
           ),
         ),
 

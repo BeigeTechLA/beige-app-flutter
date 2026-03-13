@@ -67,7 +67,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -75,17 +75,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
             children: [
               /// 🔙 BACK BUTTON
-              Padding(
-                padding:  EdgeInsets.all(16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Image.asset(
-                      "assets/Icons/Reply.png",
-                      height: 24,
-                      color: ColorCode.white,
-                    ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: Image.asset(
+                    "assets/Icons/Reply.png",
+                    height: 24,
+                    color: ColorCode.white,
                   ),
                 ),
               ),

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
+import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../service/google_config.dart';
@@ -392,7 +393,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
 
-            // 🔹 Back Button (Left)
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
@@ -407,8 +407,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               "Create Project",
               style: TextStyle(
                 color: ColorCode.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w400,
               ),
             ),
             // 🔹 Step Text (Right)
@@ -419,6 +420,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 style: TextStyle(
                   color: ColorCode.white,
                   fontSize: 14,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
@@ -767,8 +770,8 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: ColorCode.kWhiteOpacity70,
-                        width: 0.8,
+                        color: ColorCode.kGoldBorder50,
+                        width: 0.5,
                       ),
 
                     ),
@@ -914,7 +917,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
 
               SizedBox(height: 20),
-              TextField(
+      /*        TextField(
                 controller: additionalDetailsController,
         maxLines: 5,
         
@@ -955,9 +958,15 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 20),*/
+              CustomInputField(
+                title: "Additional Details",
+                controller: additionalDetailsController,
+                keyboardType: TextInputType.multiline,
+                maxLines: 5,
 
-              TextField(
+              ),
+              /*TextField(
 
                 controller: referenceLinksController,
                 decoration: InputDecoration(
@@ -996,6 +1005,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
                   ),
                 ),
+              ),*/
+              SizedBox(height: 20),
+              CustomInputField(
+                title: "Supporting Links",
+                controller: referenceLinksController,
+                keyboardType: TextInputType.url,
+
               ),
             ],
           ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../Customtextfiled/CustomInputField.dart';
 import 'bookin_review_confirm.dart';
 import 'booking_summary_view_summary.dart';
 
@@ -704,9 +706,8 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorCode.black,
       appBar: AppBar(
-        backgroundColor: ColorCode.black,
+
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
@@ -775,7 +776,7 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
 
                     SizedBox(height: 30,),
 
-                    TextField(
+                 /*   TextField(
                       controller: dateController,
                       readOnly: true, // 🔥 keyboard band
                       cursorColor: ColorCode.white,
@@ -829,11 +830,28 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                       ),
 
                       onTap: () => _selectDate(context), // 🔥 full field clickable
+                    ),*/
+
+                    CustomInputField(
+                      title: "Select Date",
+                      controller: dateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/calendar-03.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.kWhiteOpacity70,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
                     ),
-
-
                     SizedBox(height: 30,),
-                    timeField(
+               /*     timeField(
                       controller: startTimeController,
                       label: "Start Time*",
                       onTap: () {
@@ -846,11 +864,36 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                         // Updated call: 3 arguments (context, controller, isStartTime)
                         _selectTime(context, startTimeController, true);
                       },
+                    ),*/
+
+                    CustomInputField(
+                      title: "Start Time",
+                      controller: startTimeController,
+                      readOnly: true,
+                      onTap: () {
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        _selectTime(context, startTimeController, true);
+                      },
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/Group 2087328870.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
                     ),
-
-
                     SizedBox(height: 30,),
-                    timeField(
+                  /*  timeField(
                       controller: endTimeController,
                       label: "End Time*",
                       onTap: () {
@@ -864,8 +907,34 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
                         _selectTime(context, endTimeController, false);
                       },
                     ),
+*/
 
-                                      SizedBox(height: 30,),
+                    CustomInputField(
+                      title: "End Time",
+                      controller: endTimeController,
+                      readOnly: true,
+                      onTap: () {
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        _selectTime(context, endTimeController, false);
+                      },
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/Group 2087328870.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
       /*              Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

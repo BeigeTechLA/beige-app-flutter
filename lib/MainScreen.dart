@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
@@ -23,52 +26,6 @@ class _MainscreenState extends State<Mainscreen> {
     Center(child: Text("Message")),
   ];
   /// 🔐 LOGOUT DIALOG
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return AlertDialog(
-          backgroundColor: ColorCode.bcakgroundcolor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            "Logout",
-            style: TextStyle(color: Colors.white),
-          ),
-          content: const Text(
-            "Are you sure you want to logout?",
-            style: TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(color: Colors.white70),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-
-                /// 🔥 Yaha logout logic add karo
-                /// SharedPreferences clear
-                /// Navigator.pushReplacement(LoginScreen)
-
-                debugPrint("User Logged Out");
-              },
-              child: const Text(
-                "Logout",
-                style: TextStyle(color: Colors.redAccent),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,86 +103,88 @@ class _MainscreenState extends State<Mainscreen> {
       ),*/
 
 
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: ColorCode.bcakgroundcolor, // 🔥 background color
-           /* boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.35),
-                blurRadius: 10,
-                offset: const Offset(0, -3),
+        bottomNavigationBar: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.25), // top blur shade
+                   ColorCode.bcakgroundcolor
+                  ],
+                ),
               ),
-            ],*/
-          ),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            type: BottomNavigationBarType.fixed,
+              child: BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                elevation: 0,
+                backgroundColor: Colors.transparent,
+                type: BottomNavigationBarType.fixed,
 
-            selectedItemColor: Colors.white,
-            unselectedItemColor: ColorCode.kWhiteOpacity70,
+                selectedItemColor: Colors.white,
+                unselectedItemColor: Colors.white70,
 
-            /// 🔹 SELECTED TEXT STYLE
-            selectedLabelStyle: const TextStyle(
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
+                selectedLabelStyle: const TextStyle(
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
+
+                unselectedLabelStyle: const TextStyle(
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
+
+                onTap: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+
+                items: [
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      _selectedIndex == 0
+                          ? "assets/svg/Bottom_svg/Home_active.svg"
+                          : "assets/svg/Bottom_svg/Home_nonactive.svg",
+                      height: 28,
+                    ),
+                    label: "Home",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      _selectedIndex == 1
+                          ? "assets/svg/Bottom_svg/Book _Shoot_active.svg"
+                          : "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
+                      height: 28,
+                    ),
+                    label: "Book Shoot",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      _selectedIndex == 2
+                          ? "assets/svg/Bottom_svg/My Shoots_active.svg"
+                          : "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
+                      height: 28,
+                    ),
+                    label: "My Shoots",
+                  ),
+                  BottomNavigationBarItem(
+                    icon: SvgPicture.asset(
+                      _selectedIndex == 3
+                          ? "assets/svg/Bottom_svg/Messages_active.svg"
+                          : "assets/svg/Bottom_svg/Messages_nonactive.svg",
+                      height: 28,
+                    ),
+                    label: "Messages",
+                  ),
+                ],
+              ),
             ),
-
-            /// 🔹 UNSELECTED TEXT STYLE
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
-
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-
-            items: [
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  _selectedIndex == 0
-                      ? "assets/Icons/home_10.png"
-                      : "assets/Icons/inactive_home.png",
-                  height: 28,
-                ),
-                label: "Home",
-              ),
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  _selectedIndex == 1
-                      ? "assets/Icons/Group 2087328965.png"
-                      : "assets/Icons/inactive_book_shoot.png",
-                  height: 28,
-                ),
-                label: "Book Shoot",
-              ),
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  _selectedIndex == 2
-                      ? "assets/Icons/Calendar4.png"
-                      : "assets/Icons/inactive_booking.png",
-                  height: 28,
-                ),
-                label: "Booking",
-              ),
-              BottomNavigationBarItem(
-                icon: Image.asset(
-                  _selectedIndex == 3
-                      ? "assets/Icons/chat-1-line 1.png"
-                      : "assets/Icons/inactive_chat.png",
-                  height: 28,
-                ),
-                label: "Chat",
-              ),
-            ],
           ),
-
         ),
 
     );

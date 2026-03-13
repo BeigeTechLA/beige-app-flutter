@@ -745,7 +745,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         time: "${shoot['start_time']} - ${shoot['end_time']}",
         contentType: contentType,
         showEditIcon: true,
-        buttonText: "Manage Booking",
+        buttonText: "Manage Shoot",
         onButtonTap: () {
           Navigator.push(
             context,
