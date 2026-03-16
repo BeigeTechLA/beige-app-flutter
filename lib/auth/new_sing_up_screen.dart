@@ -20,6 +20,7 @@ import '../service/api_service.dart';
 import '../service/google_config.dart';
 import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'login_screen.dart';
 
 
@@ -195,7 +196,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                         onScaleUpdate: (details) {
                           setSheetState(() {
                             scale = (startScale * details.scale).clamp(1.0, 4.0);
-                            offset = startOffset + details.focalPointDelta;
+                            // offset = startOffset + details.focalPointDelta;
+                            offset += details.focalPointDelta;
                           });
                         },
                         child: Stack(
@@ -205,16 +207,20 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                             /// IMAGE (NOW CLIPPED)
                             ClipRect(
                               child: SizedBox(
-                                width: double.infinity,
+                                width: 320,
                                 height: 320,
-                                child: Transform(
-                                  alignment: Alignment.center,
-                                  transform: Matrix4.identity()
-                                    ..translate(offset.dx, offset.dy)
-                                    ..scale(scale),
-                                  child: Image.file(
-                                    imageFile,
-                                    fit: BoxFit.cover,
+                                child: ClipRect(
+                                  child: Transform(
+                                    alignment: Alignment.center,
+                                    transform: Matrix4.identity()
+                                      ..translate(offset.dx, offset.dy)
+                                      ..scale(scale),
+                                    child: Image.file(
+                                      imageFile,
+                                      width: 320,
+                                      height: 320,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -541,43 +547,66 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
   Future<void> _fetchSignup() async {
 
-    print("🚀 SIGNUP BUTTON CLICKED");
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final location = locationController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
 
-    print("🟡 NAME: ${nameController.text}");
-    print("🟡 EMAIL: ${emailController.text}");
-    print("🟡 PASSWORD: ${passwordController.text}");
-    print("🟡 LOCATION: ${locationController.text}");
-    print("🟡 LAT: $selectedLat");
-    print("🟡 LNG: $selectedLng");
-    print("🟡 IMAGE: ${profileImage?.path}");
-
-    if (!isFormValid) {
-      print("❌ FORM NOT VALID");
-      _showSnack("Please fill all fields");
+    /// 🔴 NAME
+    if (name.isEmpty) {
+      TopMessage.show(context, "Please enter your name");
       return;
     }
 
-    if (!isValidEmail(emailController.text.trim())) {
-      print("❌ EMAIL INVALID");
-      _showSnack("Please enter a valid email address");
+    /// 🔴 EMAIL
+    if (email.isEmpty) {
+      TopMessage.show(context, "Please enter your email address");
       return;
     }
 
+    if (!isValidEmail(email)) {
+      TopMessage.show(context, "Please enter a valid email address");
+      return;
+    }
+
+    /// 🔴 LOCATION
+    if (location.isEmpty) {
+      TopMessage.show(context, "Please select your location");
+      return;
+    }
+
+    /// 🔴 PROFILE IMAGE
     if (profileImage == null) {
-      print("❌ IMAGE NOT SELECTED");
-      _showSnack("Please upload profile picture");
+      TopMessage.show(context, "Please upload profile picture");
       return;
     }
 
-    if (passwordController.text.trim().isEmpty) {
-      print("❌ PASSWORD EMPTY");
-      _showSnack("Please enter password");
+    /// 🔴 PASSWORD
+    if (password.isEmpty) {
+      TopMessage.show(context, "Please enter password");
       return;
     }
 
-    if (passwordController.text != confirmPasswordController.text) {
-      print("❌ PASSWORD MISMATCH");
-      _showSnack("Password mismatch");
+    if (password.length < 6) {
+      TopMessage.show(context, "Password must be at least 6 characters");
+      return;
+    }
+
+    /// 🔴 CONFIRM PASSWORD
+    if (confirmPassword.isEmpty) {
+      TopMessage.show(context, "Please confirm your password");
+      return;
+    }
+
+    if (password != confirmPassword) {
+      TopMessage.show(context, "Passwords do not match");
+      return;
+    }
+
+    /// 🔴 TERMS CHECKBOX
+    if (!savePassword) {
+      TopMessage.show(context, "Please accept Terms & Conditions");
       return;
     }
 
@@ -585,63 +614,41 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
     try {
 
-      print("📡 CALLING SIGNUP API...");
-
       final response = await ApiService().postMultipart(
         ApiEndpoints.singup,
         {
-          "name": nameController.text.trim(),
-          "email": emailController.text.trim(),
-           "user_type": "3",
-          "password": passwordController.text.trim(),
-          "location": locationController.text.trim(),
+          "name": name,
+          "email": email,
+          "user_type": "3",
+          "password": password,
+          "location": location,
           "lat": selectedLat.toString(),
           "lng": selectedLng.toString(),
         },
         profileImage,
       );
 
-      print("📥 API RESPONSE: $response");
+      if (response == null) {
+        TopMessage.show(context, "No response from server");
+        return;
+      }
 
-      if (response != null) {
+      if (response['error'] == false &&
+          (response['code'] == 200 || response['code'] == 201)) {
 
-        print("📥 RESPONSE ERROR: ${response['error']}");
-        print("📥 RESPONSE CODE: ${response['code']}");
-        print("📥 RESPONSE MESSAGE: ${response['message']}");
-
-        if (response['error'] == false &&
-            (response['code'] == 200 || response['code'] == 201)) {
-
-          print("✅ SIGNUP SUCCESS");
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => NewLoginScreen()),
-          );
-
-        } else {
-
-          print("❌ SIGNUP FAILED");
-          _showSnack(response['message'] ?? "Signup failed");
-
-        }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const NewLoginScreen()),
+        );
 
       } else {
-
-        print("❌ API RESPONSE NULL");
-        _showSnack("No response from server");
-
+        TopMessage.show(context, response['message'] ?? "Signup failed");
       }
 
     } catch (e) {
-
-      print("❌ API ERROR: $e");
-      _showSnack("Server error");
-
+      TopMessage.show(context, "Server error");
     } finally {
-
       setState(() => isLoggingIn = false);
-
     }
   }
 
@@ -828,7 +835,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                             const SizedBox(height: 16),*/
 
                             CustomInputField(
-                              title: "Name",
+                              title: "Name*",
                               controller: nameController,
                               keyboardType: TextInputType.name,
                             ),
@@ -836,7 +843,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                             const SizedBox(height: 16),
 
                             CustomInputField(
-                              title: "Email ID",
+                              title: "Email ID*",
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                               // autofillHints: const [AutofillHints.email],
@@ -864,7 +871,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                   ),
 
                                   inputDecoration: InputDecoration(
-                                    hintText: "Location",
+                                    hintText: "Location*",
                                     hintStyle: const TextStyle(
                                       color: ColorCode.kWhiteOpacity70,
                                     ),
@@ -990,11 +997,10 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
 
                             CustomInputField(
-                              title: "Create Password",
+                              title: "Create Password*",
                               controller: passwordController,
                               isPassword: true,
                               isVisible: showPassword,
-                              // autofillHints: const [AutofillHints.newPassword],
                               onToggle: () {
                                 setState(() {
                                   showPassword = !showPassword;
@@ -1003,11 +1009,11 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    showConfirmPassword = !showConfirmPassword;
+                                    showPassword = !showPassword;   // ✅ correct variable
                                   });
                                 },
                                 icon: SvgPicture.asset(
-                                  showConfirmPassword
+                                  showPassword
                                       ? "assets/svg/eyes1.svg"
                                       : "assets/svg/eyes2.svg",
                                   height: 22,
@@ -1022,16 +1028,32 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                             const SizedBox(height: 16),
 
                             CustomInputField(
-                              title: "Confirm Password",
+                              title: "Confirm Password*",
                               controller: confirmPasswordController,
                               isPassword: true,
                               isVisible: showConfirmPassword,
-                              // autofillHints: const [AutofillHints.password],
                               onToggle: () {
                                 setState(() {
                                   showConfirmPassword = !showConfirmPassword;
                                 });
                               },
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    showConfirmPassword = !showConfirmPassword;  // ✅ correct
+                                  });
+                                },
+                                icon: SvgPicture.asset(
+                                  showConfirmPassword
+                                      ? "assets/svg/eyes1.svg"
+                                      : "assets/svg/eyes2.svg",
+                                  height: 22,
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
                             ),
                             SizedBox(height: 20),
                             _profilePictureCard(),

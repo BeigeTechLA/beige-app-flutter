@@ -9,6 +9,7 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'forgot_password.dart';
 import 'new_forgot_passwrod_screen.dart';
 import 'new_sing_up_screen.dart';
@@ -26,7 +27,10 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
   bool savePassword = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+
 bool isLoggingIn =false;
+
   bool get isFormValid {
     return emailController.text.trim().isNotEmpty &&
         passwordController.text.trim().isNotEmpty;
@@ -43,13 +47,21 @@ _showSnack(String message) {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showSnack("Please fill all fields");
+    /// 🔴 EMAIL EMPTY
+    if (email.isEmpty) {
+      TopMessage.show(context, "Please enter your email address");
       return;
     }
 
+    /// 🔴 EMAIL INVALID
     if (!isValidEmail(email)) {
-      _showSnack("Please enter a valid email address");
+      TopMessage.show(context, "Please enter a valid email address");
+      return;
+    }
+
+    /// 🔴 PASSWORD EMPTY
+    if (password.isEmpty) {
+      TopMessage.show(context, "Please enter your password");
       return;
     }
 
@@ -64,35 +76,38 @@ _showSnack(String message) {
         },
       );
 
+      /// 🔴 SERVER ERROR
       if (response == null) {
-        _showSnack("Server error, please try again");
+        TopMessage.show(context, "Server error, please try again");
         return;
       }
 
+      /// 🔴 API ERROR
       if (response["error"] == true) {
-        _showSnack(response["message"] ?? "Login failed");
+        TopMessage.show(context, response["message"] ?? "Login failed");
         return;
       }
 
+      /// 🔴 USER DATA ERROR
       if (response["data"] == null || response["data"]["user"] == null) {
-        _showSnack("User data not found");
+        TopMessage.show(context, "User data not found");
         return;
       }
+
+      /// ✅ SAVE LOGIN
       await SharedService.setLoginDetails(response);
 
-      /// ✅ Save password if checkbox checked
+      /// ✅ SAVE PASSWORD IF CHECKED
       final prefs = await SharedPreferences.getInstance();
 
       if (savePassword) {
         await prefs.setString("email", email);
         await prefs.setString("password", password);
       }
-      /// ✅ Save login
-      await SharedService.setLoginDetails(response);
 
       if (!mounted) return;
 
-      /// ✅ Direct Navigate
+      /// ✅ NAVIGATE
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => Mainscreen()),
@@ -100,7 +115,7 @@ _showSnack(String message) {
       );
 
     } catch (e) {
-      _showSnack("Something went wrong");
+      TopMessage.show(context, "Something went wrong");
     } finally {
       if (mounted) {
         setState(() => isLoggingIn = false);
@@ -259,7 +274,7 @@ _showSnack(String message) {
 
 
                           CustomInputField(
-                            title: "Email ID",
+                            title: "Email ID*",
                             controller: emailController,
                             keyboardType: TextInputType.emailAddress,
                             autofillHints: const [
@@ -281,7 +296,7 @@ _showSnack(String message) {
                             passwordController,
                           ),*/
                           CustomInputField(
-                            title: "Password",
+                            title: "Password*",
                             controller: passwordController,
                             isPassword: true,
                             isVisible: showConfirmPassword,

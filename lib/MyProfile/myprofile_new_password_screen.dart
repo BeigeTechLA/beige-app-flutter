@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
@@ -32,25 +34,45 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
 
   final TextEditingController newPassController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    newPassController.addListener(checkButtonState);
+    confirmPassController.addListener(checkButtonState);
+  }
   void checkButtonState() {
-    setState(() {
-      isButtonEnabled =
-          newPassController.text.isNotEmpty &&
-              confirmPassController.text.isNotEmpty &&
-              newPassController.text == confirmPassController.text;
-    });
+    bool enable =
+        newPassController.text.trim().isNotEmpty &&
+            confirmPassController.text.trim().isNotEmpty;
+
+    if (enable != isButtonEnabled) {
+      setState(() {
+        isButtonEnabled = enable;
+      });
+    }
+  }
+  @override
+  void dispose() {
+    newPassController.dispose();
+    confirmPassController.dispose();
+    super.dispose();
   }
 
-
-
   Future<void> _newpasswrod() async {
-    if (newPassController.text.isEmpty ||
-        confirmPassController.text.isEmpty) {
-      _showSnack("Please enter password");
+
+    if (newPassController.text.trim().isEmpty) {
+      _showSnack("Please enter new password");
       return;
     }
 
-    if (newPassController.text != confirmPassController.text) {
+    if (confirmPassController.text.trim().isEmpty) {
+      _showSnack("Please enter confirm password");
+      return;
+    }
+
+    if (newPassController.text.trim() != confirmPassController.text.trim()) {
       _showSnack("Passwords do not match");
       return;
     }
@@ -63,7 +85,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       final response = await apiService.postData(
         ApiEndpoints.reset_password,
         {
-          "otp":"111111",
+          "otp": widget.otp,
           "email": widget.email,
           "new_password": newPassController.text.trim(),
           "confirm_password": confirmPassController.text.trim(),
@@ -71,24 +93,22 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       );
 
       if (response['error'] == false) {
-        showSuccessDialog(); // ✅ SUCCESS POPUP
+        showSuccessDialog();
       } else {
         _showSnack(response['message'] ?? "Failed to reset password");
       }
+
     } catch (e) {
       _showSnack("Something went wrong");
-    } finally {
-      setState(() => isLoading = false);
     }
+
+    setState(() => isLoading = false);
   }
-
-
-  void _showSnack(String message) {
+  _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.black87,
-        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.red,
       ),
     );
   }
@@ -144,7 +164,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       SizedBox(height: 25),
 
                       // ⭐ NEW PASSWORD
-                      _buildPasswordField(
+                   /*   _buildPasswordField(
                         label: "New Password*",
                         controller: newPassController,
                         isVisible: showPassword,
@@ -167,7 +187,62 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                             showConfirmPassword = !showConfirmPassword;
                           });
                         },
+                      ),*/
+                      CustomInputField(
+                        title: "New Password*",
+                        controller: newPassController,
+                        isPassword: true,
+                        isVisible: showPassword,
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showPassword = !showPassword;
+                            });
+                          },
+                          icon: SvgPicture.asset(
+                            showPassword
+                                ? "assets/svg/eyes1.svg"
+                                : "assets/svg/eyes2.svg",
+                            height: 22,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      CustomInputField(
+                        title: "Confirm Password*",
+                        controller: confirmPassController,
+                        isPassword: true,
+                        isVisible: showConfirmPassword,
+                        onChanged: (value) {
+                          checkButtonState();
+                        },
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showConfirmPassword = !showConfirmPassword;
+                            });
+                          },
+                          icon: SvgPicture.asset(
+                            showConfirmPassword
+                                ? "assets/svg/eyes1.svg"
+                                : "assets/svg/eyes2.svg",
+                            height: 22,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+
+
+
                     ],
                   ),
                 ),
@@ -180,7 +255,8 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _newpasswrod,
+                  onPressed: isButtonEnabled ? _newpasswrod : null,
+
                   // if (newPassController.text == confirmPassController.text &&
                   //     newPassController.text.isNotEmpty) {
                   //   showSuccessDialog(); // ⭐ SUCCESS POPUP
@@ -193,8 +269,8 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isButtonEnabled
-                        ? ColorCode.kButtonColor      // Active
-                        : ColorCode.kCreamSoft,       // Inactive
+                        ? ColorCode.kButtonColor
+                        : ColorCode.kCreamSoft,      // Inactive
 
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -206,8 +282,8 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: isButtonEnabled
-                          ? ColorCode.kHeadingColor     // Active text
-                          : Colors.black38,     // ⭐ HERE I CHANGED THIS
+                          ? ColorCode.kHeadingColor
+                          : Colors.black38,    // ⭐ HERE I CHANGED THIS
                     ),
                   ),
                 ),
@@ -222,7 +298,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
     );
   }
 
-  Widget _buildPasswordField({
+/*  Widget _buildPasswordField({
     required String label,
     required TextEditingController controller,
     required bool isVisible,
@@ -286,7 +362,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
         ),
       ),
     );
-  }
+  }*/
 
   void showSuccessDialog() {
     showGeneralDialog(

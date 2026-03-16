@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -68,13 +70,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final apiService = ApiService();
     final email = emailController.text.trim();
 
+    /// EMAIL EMPTY VALIDATION
     if (email.isEmpty) {
-      _showSnack("Please enter email");
+      TopMessage.show(context, "Please enter your email");
       return;
     }
 
+    /// EMAIL FORMAT VALIDATION
     if (!isValidEmail(email)) {
-      _showSnack("Please enter a valid email address");
+      TopMessage.show(context, "Please enter a valid email address");
       return;
     }
 
@@ -86,11 +90,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         {"email": email},
       );
 
+      /// SERVER NULL RESPONSE
       if (response == null) {
-        _showSnack("Server error, please try again");
+        TopMessage.show(context, "Server error, please try again");
         return;
       }
 
+      /// SUCCESS CASE
       if (response['error'] == false) {
         if (!mounted) return;
 
@@ -101,11 +107,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         );
       } else {
-        /// ✅ BACKEND MESSAGE SHOW KARO
-        _showSnack(response['message'] ?? "Email not registered");
+        /// BACKEND ERROR MESSAGE
+        TopMessage.show(
+          context,
+          response['message'] ?? "Email not registered",
+        );
       }
     } catch (e) {
-      _showSnack("Please enter a valid email address");
+      /// API EXCEPTION
+      TopMessage.show(context, "Something went wrong");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -186,7 +196,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       const SizedBox(height: 25),
 
-                      _buildEmailField(),
+                      CustomInputField(
+                        title: "Email*",
+                        controller: emailController,
+                        onChanged: (value) {
+                          setState(() {
+                            isEmailFilled = value.trim().isNotEmpty;
+                          });
+                        },
+                      ),
+                      // _buildEmailField(),
                     ],
                   ),
                 ),
@@ -199,13 +218,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed:
-                  (isEmailFilled && !isLoading) ? _fetchForgotPassword : null,
+                  onPressed: (isEmailFilled && !isLoading)
+                      ? _fetchForgotPassword
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isEmailFilled
                         ? ColorCode.kButtonColor
-                        : ColorCode.kCreamSoft,
-                    disabledBackgroundColor: ColorCode.kCreamSoft,
+                        : ColorCode.kGoldGradientLight,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -219,8 +238,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       fontFamily: "Unbounded",
                       color: isEmailFilled
                           ? ColorCode.kHeadingColor
-                          : Colors.black38,
-
+                          : ColorCode.k282828,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

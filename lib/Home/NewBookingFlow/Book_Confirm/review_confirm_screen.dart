@@ -700,7 +700,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
                     ],
                   ),
 

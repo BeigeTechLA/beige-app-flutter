@@ -456,13 +456,14 @@ class _HomeScreenState extends State<HomeScreen>
 
                             /// PROFILE IMAGE (LEFT SIDE)
                             InkWell(
-                              onTap: () {
-                                Navigator.push(
+                              onTap: () async {
+                                await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => MyProfile(),
+                                    builder: (context) => const MyProfile(),
                                   ),
                                 );
+                                _fetchhome_data(); // refresh home profile image
                               },
                               child: CircleAvatar(
                                 radius: 20,
@@ -557,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen>
                          SizedBox(height: 20),
 
                         /// SEARCH BAR
-                        Container(
+               /*         Container(
                           height: 48,
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
@@ -592,7 +593,7 @@ class _HomeScreenState extends State<HomeScreen>
                               )
                             ],
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
@@ -1060,7 +1061,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
 
-                                /// ONLINE DOT
+                           /*     /// ONLINE DOT
                                 const Positioned(
                                   top: 10,
                                   left: 10,
@@ -1105,7 +1106,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     ),
                                   ),
                                 ),
-
+*/
                                 /// TEXT DATA
                                 Positioned(
                                   bottom: 12,
@@ -1401,20 +1402,33 @@ class _HomeScreenState extends State<HomeScreen>
 
                     const SizedBox(height: 8),
 
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEAD7B0),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        "From \$${double.tryParse(data["hourly_rate"].toString())?.toInt() ?? 0}/Hr",
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          color: ColorCode.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomeViewProfile(
+                              id: data["id"],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEAD7B0),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          /*"From \$${double.tryParse(data["hourly_rate"].toString())?.toInt() ?? 0}/Hr",*/
+                          "View Profile",
+                          style: const TextStyle(
+                            fontFamily: "Outfit",
+                            color: ColorCode.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
@@ -303,20 +304,20 @@ class _UpcomingEventSummaryManagebookingState
                           child: Column(
                             children: [
                               infoRowBlack(
-                                Icons.access_time,
+                                "assets/svg/Group 2087328870.svg",
                                 "${widget.startTime ?? '--'} to ${widget.endTime ?? '--'} "
                                     "(${widget.durationHours ?? 0}h duration)",
                               ),
 
                               const SizedBox(height: 10),
                               infoRowBlack(
-                                Icons.calendar_month,
+                                "assets/svg/Frame.svg",
                                 widget.eventDate ?? "Date not available",
                               ),
 
                               const SizedBox(height: 10),
                               infoRowBlack(
-                                Icons.location_on,
+                                "assets/svg/location.svg",
                                 widget.location ?? "Location not available",
                               ),
 
@@ -427,15 +428,16 @@ class _UpcomingEventSummaryManagebookingState
       ),
     );
   }
-  Widget infoRowBlack(IconData icon, String text) {
+  Widget infoRowBlack(String iconPath ,String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Colors.black87,
-        ),
+  SvgPicture.asset(
+  iconPath,
+  height: 16,
+  width: 16,
+  color: Colors.black87,
+  ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(

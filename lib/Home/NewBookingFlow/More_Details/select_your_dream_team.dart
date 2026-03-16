@@ -313,6 +313,21 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     }
     return int.tryParse(roleData.toString()) ?? 0;
   }
+
+  int getSelectedCountByRole(int roleId) {
+    int count = 0;
+
+    for (final match in crewMatches) {
+      final int uid = match['user']['id'];
+      final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
+
+      if (rId == roleId && addedCrewUserIds.contains(uid)) {
+        count++;
+      }
+    }
+
+    return count;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1583,7 +1598,82 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+         /*     if (!showLocationCard)   /// 🔥 ONLY SHOW WHEN CONTINUE BUTTON
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
 
+                    /// VIDEOGRAPHER CHIP
+                    if (getSelectedCountByRole(2) > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: Row(
+                          children: [
+
+                            SvgPicture.asset(
+                              "assets/svg/Icon_.svg",
+                              height: 16,
+                              color: Colors.white,
+                            ),
+
+                            const SizedBox(width: 6),
+
+                            Text(
+                              "Videographer(s): "
+                                  "${getSelectedCountByRole(2).toString().padLeft(2,'0')}/"
+                                  "${requiredCountByRole[2]?.toString().padLeft(2,'0') ?? '00'}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    if (getSelectedCountByRole(2) > 0 &&
+                        getSelectedCountByRole(1) > 0)
+                      const SizedBox(width: 10),
+
+                    /// PHOTOGRAPHER CHIP
+                    if (getSelectedCountByRole(1) > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: Row(
+                          children: [
+
+                            SvgPicture.asset(
+                              "assets/svg/CameraMinimalistic.svg",
+                              height: 16,
+                              color: Colors.white,
+                            ),
+
+                            const SizedBox(width: 6),
+
+                            Text(
+                              "Photographer(s): "
+                                  "${getSelectedCountByRole(1).toString().padLeft(2,'0')}/"
+                                  "${requiredCountByRole[1]?.toString().padLeft(2,'0') ?? '00'}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontFamily: "Outfit",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),*/
               /// 🔹 TEXT ABOVE BUTTON
               if (showLocationCard)
                  Padding(

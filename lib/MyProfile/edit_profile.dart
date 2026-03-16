@@ -13,6 +13,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
@@ -50,22 +51,37 @@ class _EditProfileState extends State<EditProfile> {
 
   Map<String, dynamic>? myProfile;
   final FocusNode locationFocusNode = FocusNode();
-
+  Set<Marker> markers = {};
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
-
+  bool isUploadingImage = false;
 
   @override
   void initState() {
     super.initState();
     _fetchMyProfile();
-    _getCurrentLocation();
+    // _getCurrentLocation();
   }
 
 
+  void _updateMarker(LatLng latLng) {
+    setState(() {
+      currentLatLng = latLng;
 
+      markers = {
+        Marker(
+          markerId: const MarkerId("selected_location"),
+          position: latLng,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueRed,
+          ),
+        )
+      };
+    });
+  }
 
+/*
   Future<void> searchLocation(String query) async {
     try {
       List<Location> locations = await locationFromAddress(query);
@@ -91,7 +107,32 @@ class _EditProfileState extends State<EditProfile> {
       );
     }
   }
+*/
 
+  Future<void> searchLocation(String query) async {
+    try {
+      List<Location> locations = await locationFromAddress(query);
+
+      if (locations.isNotEmpty) {
+        final loc = locations.first;
+
+        final latLng = LatLng(loc.latitude, loc.longitude);
+
+        /// 🔴 ADD THIS
+        _updateMarker(latLng);
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(latLng, 15),
+        );
+
+        await getAddressFromLatLng(latLng);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Location not found")),
+      );
+    }
+  }
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
       List<Placemark> placemarks =
@@ -111,20 +152,17 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 
-
-
   Future<void> _getCurrentLocation() async {
 
-    /// ❌ DON'T override profile location
     if (currentLatLng != null) return;
 
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    setState(() {
-      currentLatLng = LatLng(position.latitude, position.longitude);
-    });
+    final latLng = LatLng(position.latitude, position.longitude);
+
+    _updateMarker(latLng);
   }
 
 
@@ -146,10 +184,13 @@ class _EditProfileState extends State<EditProfile> {
 
           /// ✅ SET MAP LOCATION FROM PROFILE
           if (user['latitude'] != null && user['longitude'] != null) {
-            currentLatLng = LatLng(
+            final latLng = LatLng(
               double.parse(user['latitude'].toString()),
               double.parse(user['longitude'].toString()),
             );
+
+            _updateMarker(latLng);
+
           }
 
           isLoading = false;
@@ -224,7 +265,7 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> _uploadImage() async {
+ /* Future<void> _uploadImage() async {
     if (_profileImage == null) {
       debugPrint("❌ NO IMAGE FOUND");
       return;
@@ -272,6 +313,8 @@ class _EditProfileState extends State<EditProfile> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("✅ Profile image uploaded")),
         );
+        await _fetchMyProfile();
+
       }
     } catch (e) {
       debugPrint("❌ UPLOAD ERROR: $e");
@@ -281,8 +324,49 @@ class _EditProfileState extends State<EditProfile> {
     } finally {
       setState(() => isLoading = false);
     }
-  }
+  }*/
+  Future<void> _uploadImage() async {
+    if (_profileImage == null) return;
 
+    try {
+      setState(() {
+        isUploadingImage = true; // 🔥 start loader
+      });
+
+      final fileName = _profileImage!.path.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        "profile_photo": await MultipartFile.fromFile(
+          _profileImage!.path,
+          filename: fileName,
+        ),
+      });
+
+      final dio = Dio();
+      final headers = await ApiService().createAuthorizationHeader();
+
+      final response = await dio.post(
+        "${ApiService().baseUrl}auth/profile-photo",
+        data: formData,
+        options: Options(
+          headers: {
+            ...headers,
+            "Accept": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        await _fetchMyProfile(); // 🔥 refresh profile
+      }
+    } catch (e) {
+      debugPrint("Upload error: $e");
+    } finally {
+      setState(() {
+        isUploadingImage = false; // 🔥 stop loader
+      });
+    }
+  }
   ImageProvider? getProfileImage() {
     if (_profileImage != null) {
       return FileImage(_profileImage!);
@@ -383,7 +467,9 @@ class _EditProfileState extends State<EditProfile> {
                       top: 90,
                       left: 16,
                       child: InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () {
+                          Navigator.pop(context, true);
+                        },
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
                           color: ColorCode.black,
@@ -442,7 +528,7 @@ class _EditProfileState extends State<EditProfile> {
 
 
                             GestureDetector(
-                              behavior: HitTestBehavior.opaque, // यह क्लिक एरिया को पक्का करता है
+                              behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 debugPrint("EDIT CLICKED");
                                 _pickImage();
@@ -527,7 +613,7 @@ class _EditProfileState extends State<EditProfile> {
               child: Column(
                 children: [
         
-                  TextField(
+                 /* TextField(
                       controller: nameController,
                       cursorColor: ColorCode.white,
         
@@ -570,8 +656,14 @@ class _EditProfileState extends State<EditProfile> {
                     ),)
         
               ),
+                  */
+
+                  CustomInputField(
+                    title: "Name*",
+                    controller: nameController,
+                  ),
                   SizedBox(height: 20,),
-                  TextField(
+               /*   TextField(
                     controller: emailController,
         
                     cursorColor: ColorCode.white,
@@ -582,7 +674,7 @@ class _EditProfileState extends State<EditProfile> {
                       labelText: "Email ID*",
                       floatingLabelBehavior: FloatingLabelBehavior.always,
         
-                    /*  suffixIcon: GestureDetector(
+                    *//*  suffixIcon: GestureDetector(
                         onTap: () {
         
                           Navigator.push(
@@ -597,7 +689,7 @@ class _EditProfileState extends State<EditProfile> {
                           color: ColorCode.kWhiteOpacity70,
                           size: 20,
                         ),
-                      ),*/
+                      ),*//*
         
                       labelStyle: const TextStyle(
                         color: ColorCode.kWhiteOpacity70,
@@ -624,8 +716,13 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
                     ),
+                  ),*/
+                  CustomInputField(
+                    title: "Email ID*",
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
                   ),
-        
                   SizedBox(height: 20,),
                   // TextField(
                   //   controller: locationController,
@@ -677,7 +774,7 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                     child: GooglePlaceAutoCompleteTextField(
                       textEditingController: locationController,
-                      focusNode: locationFocusNode, // ✅ IMPORTANT
+                      focusNode: locationFocusNode,
                       googleAPIKey: GoogleConfig.placesApiKey,
                       debounceTime: 600,
                       isLatLngRequired: true,
@@ -692,17 +789,14 @@ class _EditProfileState extends State<EditProfile> {
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
-
-                        hintText: "Search or select location",
+                        hintText: "location*",
                         hintStyle: TextStyle(
                           color: ColorCode.kWhiteOpacity70,
                         ),
-
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
-
                         suffixIcon: Padding(
                           padding: EdgeInsets.only(right: 8),
                           child: Icon(
@@ -712,15 +806,17 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       ),
 
-                      /// ✅ ONLY when place is selected
+                      /// LOCATION SELECT
                       getPlaceDetailWithLatLng: (prediction) async {
+
                         final latLng = LatLng(
                           double.parse(prediction.lat!),
                           double.parse(prediction.lng!),
                         );
 
+                        _updateMarker(latLng);
+
                         setState(() {
-                          currentLatLng = latLng;
                           selectedAddress = prediction.description ?? "";
                         });
 
@@ -730,14 +826,13 @@ class _EditProfileState extends State<EditProfile> {
                           TextPosition(offset: locationController.text.length),
                         );
 
-                        locationFocusNode.unfocus(); // ✅ cursor stable
+                        locationFocusNode.unfocus();
 
                         mapController?.animateCamera(
                           CameraUpdate.newLatLngZoom(latLng, 14),
                         );
                       },
 
-                      /// ❌ YAHAN setState MAT LAGANA
                       itemClick: (prediction) {
                         locationController.text = prediction.description ?? "";
                         locationController.selection = TextSelection.fromPosition(
@@ -749,17 +844,18 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
 
+                  const SizedBox(height: 20),
 
-                  SizedBox(height: 20,),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: SizedBox(
                       height: 250,
                       child: currentLatLng == null
-                          ?  Center(
+                          ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                          :GoogleMap(
+                          : GoogleMap(
+
                         initialCameraPosition: CameraPosition(
                           target: currentLatLng!,
                           zoom: 14,
@@ -770,6 +866,7 @@ class _EditProfileState extends State<EditProfile> {
                         zoomControlsEnabled: true,
                         compassEnabled: true,
 
+                        markers: markers, // ✅ USE STATE MARKERS
 
                         gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
                           Factory<OneSequenceGestureRecognizer>(
@@ -780,32 +877,34 @@ class _EditProfileState extends State<EditProfile> {
                         onMapCreated: (controller) {
                           mapController = controller;
                           controller.setMapStyle(_darkMapStyle);
+
+                          /// 🔴 ADD THIS
+                          if (currentLatLng != null) {
+                            mapController!.animateCamera(
+                              CameraUpdate.newLatLngZoom(currentLatLng!, 14),
+                            );
+                          }
                         },
 
-                        markers: {
-                          Marker(
-                            markerId: const MarkerId("selected"),
-                            position: currentLatLng!,
-                          ),
-                        },
-
+                        /// MAP TAP
                         onTap: (latLng) async {
-                          setState(() {
-                            currentLatLng = latLng;
-                          });
+
+                          _updateMarker(latLng);
 
                           await getAddressFromLatLng(latLng);
 
                           locationController.text = selectedAddress;
-                        },
-                      )
-                    ),
 
+                          mapController?.animateCamera(
+                            CameraUpdate.newLatLngZoom(latLng, 14),
+                          );
+                        },
+                      ),
+                    ),
                   ),
 
-                  SizedBox(height: 20,),
-
-                  TextField(
+                  const SizedBox(height: 20),
+                 /* TextField(
                     readOnly: true,
                     obscureText: true,
                     obscuringCharacter: ".",
@@ -862,6 +961,31 @@ class _EditProfileState extends State<EditProfile> {
                         borderSide: const BorderSide(
                           color: ColorCode.kWhiteOpacity70,
                           width: 0.5,
+                        ),
+                      ),
+                    ),
+                  ),*/
+
+                  CustomInputField(
+                    title: "Change Password*",
+                    controller: TextEditingController(text: "********"),
+                    readOnly: true,
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChangePasswordScreen(),
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: SvgPicture.asset(
+                          "assets/svg/my_profile/edit.svg",
+                          fit: BoxFit.none,
+
                         ),
                       ),
                     ),

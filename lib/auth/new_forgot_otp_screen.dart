@@ -398,18 +398,23 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                               child: ElevatedButton(
                                 onPressed: isOtpFilled ? _verifyOtp : null,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorCode.kGoldGradientLight,
+                                  backgroundColor: isOtpFilled
+                                      ? ColorCode.kButtonColor
+                                      : ColorCode.kGoldGradientLight,
+
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child: const Text(
-                                  "Continue",
+                                child: Text(
+                                  isOtpFilled ? "Submit" : "Continue",
                                   style: TextStyle(
                                     fontFamily: "Unbounded",
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: ColorCode.kHeadingColor,
+                                    color: isOtpFilled
+                                        ? ColorCode.kHeadingColor
+                                        : Colors.black38,
                                   ),
                                 ),
                               ),

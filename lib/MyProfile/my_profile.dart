@@ -243,18 +243,24 @@ class _MyProfileState extends State<MyProfile> {
 
             /// 🔹 EDIT BUTTON
             InkWell(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditProfile(),
+                    builder: (context) => const EditProfile(),
                   ),
                 );
+
+                if (result == true) {
+                  _fetchMyProfile(); // 👈 Profile refresh
+                }
+
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                 decoration: BoxDecoration(
-                  color:  ColorCode.white,
+                  color: ColorCode.white,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: const Text(
@@ -315,7 +321,7 @@ class _MyProfileState extends State<MyProfile> {
             child: Column(
               children: [
                 _menuRow(
-                  "assets/images/Heart Angle.png",
+                  "assets/svg/my_profile/Favourites.svg",
                   "Favourites",
                   onTap: () {
                     Navigator.push(
@@ -328,7 +334,7 @@ class _MyProfileState extends State<MyProfile> {
                 ),
 
                 _divider(),
-                _menuRow("assets/Icons/calendar_search.png", "Booking History", onTap: () {
+                _menuRow("assets/svg/my_profile/BookingHistory.svg", "Booking History", onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -337,7 +343,10 @@ class _MyProfileState extends State<MyProfile> {
                   );
                 }),
                 _divider(),
-                _menuRow("assets/Icons/wallet.png", "Payment methods"),
+                _menuRow(
+                  "assets/svg/my_profile/Payment methods.svg",
+                  "Payment methods",
+                ),
               ],
             ),
           ),
@@ -369,11 +378,11 @@ class _MyProfileState extends State<MyProfile> {
             ),
             child: Column(
               children: [
-                _menuRow("assets/Icons/note.png", "Terms & Condition"),
+                _menuRow("assets/svg/my_profile/Terms & Condition.svg", "Terms & Condition"),
                 _divider(),
-                _menuRow("assets/Icons/help-circle.png", "Help & Support"),
+                _menuRow("assets/svg/my_profile/Help & Support.svg", "Help & Support"),
                 _divider(),
-                _menuRow("assets/Icons/elements.png", "Privacy Policy"),
+                _menuRow("assets/svg/my_profile/Privacy Policy.svg", "Privacy Policy"),
               ],
             ),
           ),
@@ -405,7 +414,7 @@ class _MyProfileState extends State<MyProfile> {
             ),
             child: Column(
               children: [
-                _menuRow("assets/Icons/mobile-navigator-01.png", "App Preferences",
+                _menuRow("assets/svg/my_profile/App_Preferences.svg", "App Preferences",
                 onTap: () {
           Navigator.push(
           context,
@@ -415,10 +424,10 @@ class _MyProfileState extends State<MyProfile> {
           );
           }),
                 _divider(),
-                _menuRow("assets/Icons/Settings Minimalistic.png" ,"Notifications Settings"),
+                _menuRow("assets/svg/my_profile/Notifications Settings.svg" ,"Notifications Settings"),
                 _divider(),
                 _menuRow(
-                  "assets/Icons/Exit.png",
+                  "assets/svg/my_profile/Logout.svg",
                   "Logout",
                   onTap: _showLogoutBottomSheet,
                 ),
@@ -449,7 +458,7 @@ class _MyProfileState extends State<MyProfile> {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Image.asset(
+                child: SvgPicture.asset(
                   iconPath,
                   height: 22,
                   width: 22,
@@ -468,9 +477,9 @@ class _MyProfileState extends State<MyProfile> {
                 ),
               ),
             ),
-            Image.asset(
-              "assets/Icons/rightside.png",
-              height: 20,
+            SvgPicture.asset(
+              "assets/svg/my_profile/layer1.svg",
+              height: 15,
               width: 20,
               color: ColorCode.white,
             ),

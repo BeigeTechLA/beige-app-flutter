@@ -2,9 +2,11 @@ import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'new_forgot_otp_screen.dart';
 
 class NewForgotPasswrodScreen extends StatefulWidget {
@@ -25,19 +27,19 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
     super.didChangeDependencies();
     isLoading = false;
   }
-  bool isEmailFilled = false;
+
   bool isLoading = false;
   Future<void> _fetchForgotPassword() async {
 
     if (emailController.text.trim().isEmpty) {
       print("❌ Email Empty");
-      _showSnack("Please enter email");
+      TopMessage.show(context, "Please enter email");
       return;
     }
 
     if (!isValidEmail(emailController.text.trim())) {
       print("❌ Invalid Email Format");
-      _showSnack("Please enter a valid email address");
+      TopMessage.show(context, "Please enter a valid email address");
       return;
     }
 
@@ -58,7 +60,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
       if (response == null) {
         print("❌ Response NULL");
-        _showSnack("Server error, please try again");
+        TopMessage.show(context, "Server error, please try again");
         return;
       }
 
@@ -75,13 +77,20 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
             ),
           ),
         );
+
       } else {
         print("❌ Backend Error => ${response['message']}");
-        _showSnack(response['message'] ?? "Email not registered");
+
+        /// backend ka message show karega
+        TopMessage.show(
+          context,
+          response['message'] ?? "Email not registered",
+        );
       }
+
     } catch (e) {
       print("🔥 Exception => $e");
-      _showSnack("Something went wrong");
+      TopMessage.show(context, "Something went wrong");
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -107,6 +116,11 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
       ),
     );
   }
+
+  bool get isFormValid {
+    return emailController.text.trim().isNotEmpty;
+  }
+
 
   @override
   void dispose() {
@@ -227,8 +241,17 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                             const SizedBox(height: 12),
 
 
-                            _buildField("Email ID", emailController),
+                          /*  _buildField("Email ID", emailController),*/
 
+                            CustomInputField(
+                              title: "Email ID*",
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              autofillHints: const [AutofillHints.email],
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+                            ),
 
                             /*
                           _buildPasswordField(
@@ -244,21 +267,32 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                               width: double.infinity,
                               height: 50,
                               child: ElevatedButton(
-                                onPressed: isLoading ? null : _fetchForgotPassword,
+                                // onPressed: isLoading ? null : _fetchForgotPassword,
+
+                                onPressed: (!isFormValid || isLoading)
+                                    ? null
+                                    : () {
+
+                                  _fetchForgotPassword();
+                                },
 
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorCode.kGoldGradientLight,
+                                  backgroundColor: isFormValid
+                                      ? ColorCode.kButtonColor
+                                      : ColorCode.kGoldGradientLight,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                 ),
-                                child: const Text(
+                                child:  Text(
                                   "Send OTP",
                                   style: TextStyle(
                                     fontFamily: "Unbounded",
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: ColorCode.kHeadingColor,
+                                    color: isFormValid
+                                        ? ColorCode.kHeadingColor
+                                        : ColorCode.k282828,
                                   ),
                                 ),
                               ),
@@ -407,6 +441,9 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
       controller: controller,
       cursorColor: ColorCode.white,
 
+      onChanged: (value) {
+        setState(() {}); // 🔥 UI refresh karega
+      },
       style: const TextStyle(
         color: ColorCode.white, // typed text color
       ),

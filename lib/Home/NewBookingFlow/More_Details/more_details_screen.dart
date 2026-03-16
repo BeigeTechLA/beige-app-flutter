@@ -191,7 +191,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     }
   }
 
-  IconData getContentTypeIcon(int contentTypeId) {
+  /*IconData getContentTypeIcon(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
         return Icons.videocam;
@@ -201,6 +201,18 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         return Icons.video_camera_back; // or Icons.photo_camera
       default:
         return Icons.work_outline;
+    }
+  }*/
+  String getContentTypeIcon(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "assets/svg/video.svg";   // Videography
+      case 2:
+        return "assets/svg/Photo.svg";   // Photography
+      case 3:
+        return "assets/svg/video_photo.svg"; // Both
+      default:
+        return "assets/svg/default.svg";
     }
   }
 
@@ -404,7 +416,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               ),
             ),
             Text(
-              "Create Project",
+              "More Details",
               style: TextStyle(
                 color: ColorCode.white,
                 fontSize: 14,
@@ -493,81 +505,146 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 ),
               ],
             ),
-        
-        
+
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-        
 
-        
+
+
               const SizedBox(height: 12),
-        
+
               /// 🔹 INCLUDED CARD
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2B2B2B),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    /// ICON
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        getContentTypeIcon(widget.contentTypeId),
-                        color: Colors.white,
-                      ),
-                    ),
+              const SizedBox(height: 12),
 
-                    const SizedBox(width: 12),
+              /// 🎥 VIDEOGRAPHY CARD
+              if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2B2B2B),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
 
-                    /// TITLE
-                    Expanded(
-                      child: Text(
-                        getTopSummaryText(),
-
-
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                      /// ICON BOX
+                      Container(
+                        height: 40,
+                        width: 40,
+                       /* decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10),
+                        ),*/
+                        child: Center(
+                          child: SvgPicture.asset(
+                            "assets/svg/video.svg",
+                          ),
                         ),
                       ),
-                    ),
 
-                    /// INCLUDED BADGE
-                   /* Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        "Included",
-                        style: TextStyle(
-                          color: Color(0xFFE7C38A),
-                          fontSize: 12,
+                      const SizedBox(width: 12),
+
+                      /// TITLE
+                      Expanded(
+                        child: Text(
+                          "Videographer X${includedVideoQty + additionalVideoQty}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                    ),*/
-                  ],
+
+                      /// INCLUDED BADGE
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: ColorCode.kButtonColor),
+                        ),
+                        child: const Text(
+                          "Included",
+                          style: TextStyle(
+                            color: ColorCode.kButtonColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+
+              /// 📷 PHOTOGRAPHY CARD
+              if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2B2B2B),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+
+                      /// ICON BOX
+                      Container(
+                        height: 40,
+                        width: 40,
+                     /*   decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(10),
+                        ),*/
+                        child: Center(
+                          child: SvgPicture.asset(
+                            "assets/svg/Photo.svg",
+                            // height: 20,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 12),
+
+                      /// TITLE
+                      Expanded(
+                        child: Text(
+                          "Photographer X${includedPhotoQty + additionalPhotoQty}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+
+                      /// INCLUDED BADGE
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: ColorCode.kButtonColor),
+                        ),
+                        child: const Text(
+                          "Included",
+                          style: TextStyle(
+                            color: ColorCode.kButtonColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
 
               const SizedBox(height: 24),
 
 
-        
+
               /// 🔹 QUESTION
               Text(
-                "Would you like to Add Additional\ncreatives?",
+                "Would you like to Add Additional creatives?",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: "Unbounded",
@@ -575,9 +652,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-        
+
               const SizedBox(height: 12),
-        
+
 
               Row(
                 children: [
@@ -586,9 +663,9 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   _radioOption("No", false),
                 ],
               ),
-        
+
               const SizedBox(height: 16),
-        
+
               /// 🔹 ADDITIONAL SHOOTER CARD
               if (loding)
                 Container(
@@ -920,21 +997,21 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       /*        TextField(
                 controller: additionalDetailsController,
         maxLines: 5,
-        
+
                 decoration: InputDecoration(
                   labelText:"Additional Details",
-        
+
                   floatingLabelBehavior: FloatingLabelBehavior.always,
-        
+
                   labelStyle: const TextStyle(
                     color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
                   ),
-        
+
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 18,
                   ),
-        
+
                   /// ⭐ 0.5px BORDER + OPACITY COLOR
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -943,7 +1020,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       width: 0.5,                       // 🔥 exact 0.5px
                     ),
                   ),
-        
+
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
@@ -951,10 +1028,10 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                       width: 0.5,                          // focus border thicker
                     ),
                   ),
-        
+
                   floatingLabelStyle: const TextStyle(
                     color: ColorCode.kWhiteOpacity70,
-        
+
                   ),
                 ),
               ),

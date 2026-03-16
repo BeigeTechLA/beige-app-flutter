@@ -1,5 +1,6 @@
 import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
@@ -161,9 +162,13 @@ class _UpcomingBookingEventSummaryState
                       children: [
                         InkWell(
                           onTap: () => Navigator.pop(context),
-                          child: Image.asset("assets/Icons/Reply.png", height: 24),
+                          child: SvgPicture.asset(
+                            "assets/svg/back.svg",
+                            height: 24,
+                            color: Colors.white,
+                          ),
                         ),
-                        Row(
+                     /*   Row(
                           children: [
                             Image.asset("assets/Icons/Share 2.png",
                                 height: 24, width: 24, color: Colors.white),
@@ -171,7 +176,7 @@ class _UpcomingBookingEventSummaryState
                             Image.asset("assets/images/Heart Angle.png",
                                 height: 24, width: 24, color: Colors.white),
                           ],
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
@@ -229,7 +234,7 @@ class _UpcomingBookingEventSummaryState
       
       
                     infoRow(
-                      Icons.access_time,
+                      "assets/svg/Group 2087328870.svg",
                       "${bookingData?['event']?['start_time']} - "
                           "${bookingData?['event']?['end_time']} "
                           "(${bookingData?['event']?['duration_hours']}h)",
@@ -238,12 +243,13 @@ class _UpcomingBookingEventSummaryState
       
       
                     infoRow(
-                      Icons.calendar_month,
+                      "assets/svg/Frame.svg",
+
                       bookingData?['event']?['event_date'] ?? "",
                     ),
       
                     infoRow(
-                      Icons.location_on,
+                      "assets/svg/location.svg",
                       bookingData?['event']?['location'] ?? "",
                     ),
       
@@ -370,7 +376,9 @@ class _UpcomingBookingEventSummaryState
                                   child: infoItem(
                                     icon: Icons.group,
                                     title: "Crew Size Needed",
-                                    value: "2 members",
+                                    value: bookingData?['event']?['crew_size_needed'] != null
+                                        ? "${bookingData?['event']?['crew_size_needed']} members"
+                                        : "-",
                                   ),
                                 ),
                               ],
@@ -458,7 +466,7 @@ class _UpcomingBookingEventSummaryState
               ),
               child:
               Text(
-                "Manage Boosssssking",
+                "Manage Shoot",
                 style: TextStyle(
                   fontFamily: "Unbounded",
                   fontWeight: FontWeight.w500,
@@ -474,12 +482,17 @@ class _UpcomingBookingEventSummaryState
   }
 
   /// 🔹 INFO ROW WIDGET
-  Widget infoRow(IconData icon, String text) {
+  Widget infoRow(String iconPath, String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white70),
+          SvgPicture.asset(
+            iconPath,
+           /* height: 16,
+            width: 16,*/
+            color: ColorCode.white,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

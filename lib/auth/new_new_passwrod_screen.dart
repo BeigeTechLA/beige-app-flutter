@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
@@ -23,20 +24,27 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
+
+  bool isPasswordFilled = false;
+  void _checkPassword() { setState(() { isPasswordFilled = newPasswordController.text.isNotEmpty && confirmPasswordController.text.isNotEmpty; }); }
+
   Future<void> _newpasswrod() async {
     print("📢 Reset Password Clicked");
     print("📧 Email => ${widget.email}");
 
     if (newPasswordController.text.trim().isEmpty ||
         confirmPasswordController.text.trim().isEmpty) {
-      print("❌ Password fields empty");
       _showSnack("Please enter password");
+      return;
+    }
+
+    if (newPasswordController.text.trim().length < 6) {
+      _showSnack("Password must be at least 6 characters");
       return;
     }
 
     if (newPasswordController.text.trim() !=
         confirmPasswordController.text.trim()) {
-      print("❌ Passwords do not match");
       _showSnack("Passwords do not match");
       return;
     }
@@ -212,7 +220,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                         const SizedBox(height: 12),
 
 
-                        _buildField(
+                      /*  _buildField(
                           "New Password*",
                           newPasswordController,
                           true,
@@ -234,6 +242,62 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                               showConfirmPassword = !showConfirmPassword;
                             });
                           },
+                        ),*/
+
+                        CustomInputField(
+                          title: "New Password*",
+                          controller: newPasswordController,
+                          isPassword: true,
+                          isVisible: showNewPassword,
+                          onChanged: (value) {
+                            _checkPassword();
+                          },
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showNewPassword = !showNewPassword;
+                              });
+                            },
+                            icon: SvgPicture.asset(
+                              showNewPassword
+                                  ? "assets/svg/eyes1.svg"
+                                  : "assets/svg/eyes2.svg",
+                              height: 22,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        CustomInputField(
+                          title: "Confirm Password*",
+                          controller: confirmPasswordController,
+                          isPassword: true,
+                          isVisible: showConfirmPassword,
+                          onChanged: (value) {
+                            _checkPassword();
+                          },
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showConfirmPassword = !showConfirmPassword;
+                              });
+                            },
+                            icon: SvgPicture.asset(
+                              showConfirmPassword
+                                  ? "assets/svg/eyes1.svg"
+                                  : "assets/svg/eyes2.svg",
+                              height: 22,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
                         ),
 
 
@@ -243,21 +307,25 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: isLoading ? null : _newpasswrod,
+                            onPressed: isPasswordFilled && !isLoading ? _newpasswrod : null,
 
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorCode.kGoldGradientLight,
+                              backgroundColor: isPasswordFilled
+                                  ? ColorCode.kButtonColor
+                                  : ColorCode.kGoldGradientLight,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text(
+                            child:  Text(
                               "Save New Password",
                               style: TextStyle(
                                 fontFamily: "Unbounded",
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: ColorCode.kHeadingColor,
+                                color: isPasswordFilled
+                                    ? ColorCode.kHeadingColor
+                                    : ColorCode.k282828,
                               ),
                             ),
                           ),
@@ -354,72 +422,5 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
     );
   }
 
-  Widget _buildField(
-      String title,
-      TextEditingController controller,
-      bool isPassword,
-      bool showPassword,
-      VoidCallback onToggle,
-      ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextField(
-        controller: controller,
-        cursorColor: ColorCode.white,
-        obscureText: isPassword ? !showPassword : false,
-
-        style: const TextStyle(
-          color: ColorCode.white,
-        ),
-
-        decoration: InputDecoration(
-          labelText: title,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-
-          labelStyle: const TextStyle(
-            color: ColorCode.kWhiteOpacity70,
-          ),
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
-          ),
-
-          /// 👁️ Eye Icon
-          suffixIcon: isPassword
-              ? IconButton(
-            icon: Icon(
-              showPassword
-                  ? Icons.visibility
-                  : Icons.visibility_off,
-              color: ColorCode.kWhiteOpacity70,
-            ),
-            onPressed: onToggle,
-          )
-              : null,
-
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: ColorCode.kWhiteOpacity70,
-              width: 0.5,
-            ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: ColorCode.kWhiteOpacity70,
-              width: 0.5,
-            ),
-          ),
-
-          floatingLabelStyle: const TextStyle(
-            color: ColorCode.kWhiteOpacity70,
-          ),
-        ),
-      ),
-    );
-  }
 
 }

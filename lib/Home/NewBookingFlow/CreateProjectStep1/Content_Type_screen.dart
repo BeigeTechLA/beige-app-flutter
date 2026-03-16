@@ -252,7 +252,19 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
   void _handleSelection(int contentTypeId) {
     setState(() {
-      selectedContentTypeIds = contentTypeId == 3 ? [1, 2] : [contentTypeId];
+
+      /// SELECT ALL
+      if (contentTypeId == 3) {
+        selectedContentTypeIds = [1, 2];
+        return;
+      }
+
+      /// NORMAL MULTI SELECT
+      if (selectedContentTypeIds.contains(contentTypeId)) {
+        selectedContentTypeIds.remove(contentTypeId);
+      } else {
+        selectedContentTypeIds.add(contentTypeId);
+      }
     });
   }
 

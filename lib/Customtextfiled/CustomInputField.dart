@@ -16,6 +16,7 @@ class CustomInputField extends StatefulWidget {
   final bool readOnly;
   final int maxLines;
   final List<TextInputFormatter>? inputFormatters;
+  final Function(String)? onChanged;
   const CustomInputField({
     super.key,
     required this.title,
@@ -24,7 +25,8 @@ class CustomInputField extends StatefulWidget {
     this.isVisible = false,
     this.onToggle,
     this.keyboardType = TextInputType.text,
-    this.autofillHints, this.suffixIcon, this.onTap,  this.readOnly =false,   this.maxLines = 1, this.inputFormatters  });
+    this.autofillHints, this.suffixIcon, this.onTap,  this.readOnly =false,   this.maxLines = 1, this.inputFormatters,
+    this.onChanged, });
 
   @override
   State<CustomInputField> createState() => _CustomInputFieldState();
@@ -63,6 +65,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
       keyboardType: widget.keyboardType,
       cursorColor: ColorCode.kButtonColor,
       autofillHints: widget.autofillHints,
+      onChanged: widget.onChanged,
       maxLines: widget.maxLines,
       style: const TextStyle(
         color: ColorCode.white,
@@ -71,7 +74,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
       ),
 
       decoration: InputDecoration(
-        labelText: "${widget.title}*",
+        labelText: "${widget.title}",
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: TextStyle(
