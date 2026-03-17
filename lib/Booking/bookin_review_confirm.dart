@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'Shoot_updated_screen.dart';
 import 'booking_summary_view_summary.dart';
 
@@ -176,17 +177,16 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
       } else {
         // ❌ API ERROR
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? "Something went wrong")),
-        );
+          TopMessage.show(context,response['message'] ?? "Something went wrong");
       }
     } catch (e) {
       print("🔥 EXCEPTION OCCURRED:");
       print(e);
+      TopMessage.show(context,'Network error');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Network error")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Network error")),
+      // );
     } finally {
       setState(() => loding = false);
     }

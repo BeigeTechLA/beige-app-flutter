@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 
 
 class CancelBooking extends StatefulWidget {
@@ -56,9 +57,8 @@ class _CancelBookingState extends State<CancelBooking> {
     }
   }
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    TopMessage.show(context, message);
+
   }
 
   String getFullImageUrl() {

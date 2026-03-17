@@ -8,6 +8,7 @@ import '../MainScreen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
+import '../widgets/TopMessage.dart';
 import 'forgot_password.dart';
 import 'new_sing_up_screen.dart';
 
@@ -29,12 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    TopMessage.show(context, message);
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.red,
+    //   ),
+    // );
   }
   Future<void> _fetchLogin() async {
     /// 🔴 EMPTY CHECK

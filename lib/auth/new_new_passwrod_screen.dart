@@ -1,3 +1,4 @@
+import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -103,13 +104,8 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    TopMessage.show(context, message);
+
   }
 
 

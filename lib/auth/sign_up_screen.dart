@@ -14,6 +14,7 @@ import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
 import '../service/shared_service.dart';
+import '../widgets/TopMessage.dart';
 import 'new_sing_up_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -123,11 +124,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Location permission permanently denied. Enable from settings."),
+      //   ),
+      // );
+
+      _showSnack('Location permission permanently denied. Enable from settings.');
       await Geolocator.openAppSettings(); // 👈 Open app settings
       return;
     }
@@ -263,9 +266,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    TopMessage.show(context, message);
+
   }
 
   @override

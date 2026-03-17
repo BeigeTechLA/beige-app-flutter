@@ -11,6 +11,7 @@ import 'package:open_file/open_file.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../../widgets/TopMessage.dart';
 
 class SocialEngagementSingup extends StatefulWidget {
   final int ?crewMemberId;
@@ -237,9 +238,11 @@ class _SocialEngagementSingupState extends State<SocialEngagementSingup> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text(message), backgroundColor: Colors.red),
+    // );
+    TopMessage.show(context, message);
+
   }
 
   void viewFile(File file) {

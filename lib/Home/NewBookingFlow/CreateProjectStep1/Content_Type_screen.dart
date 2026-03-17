@@ -523,72 +523,73 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
+      child: GestureDetector(
+        onTap: isDisabled ? null : onTap,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
 
-          /// ICON
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: ColorCode.kIconBackground,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                value ? activeImage : inactiveImage,
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          /// TITLE
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontFamily: "Outfit",
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDisabled
-                    ? ColorCode.kWhiteOpacity60
-                    : value
-                    ? ColorCode.kButtonColor
-                    : Colors.white,
-              ),
-            ),
-          ),
-
-          /// CHECK BOX (CLICKABLE)
-          GestureDetector(
-            onTap: isDisabled ? null : onTap,
-            child: Container(
-              height: 32,
-              width: 32,
+            /// ICON
+            Container(
+              height: 50,
+              width: 50,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
+                shape: BoxShape.circle,
+                color: ColorCode.kIconBackground,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  value ? activeImage : inactiveImage,
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 16),
+
+            /// TITLE
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontFamily: "Outfit",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isDisabled
+                      ? ColorCode.kWhiteOpacity60
+                      : value
+                      ? ColorCode.kButtonColor
+                      : Colors.white,
+                ),
+              ),
+            ),
+
+            /// CHECK BOX (CLICKABLE)
+            Container(
+                height: 32,
+                width: 32,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: value
+                        ? ColorCode.kButtonColor
+                        : ColorCode.kBorderLight,
+                    width: 0.5,
+                  ),
                   color: value
                       ? ColorCode.kButtonColor
-                      : ColorCode.kBorderLight,
-                  width: 0.5,
+                      : Colors.transparent,
                 ),
-                color: value
-                    ? ColorCode.kButtonColor
-                    : Colors.transparent,
+                child: value
+                    ? const Icon(
+                  Icons.check,
+                  size: 16,
+                  color: Colors.black,
+                )
+                    : null,
               ),
-              child: value
-                  ? const Icon(
-                Icons.check,
-                size: 16,
-                color: Colors.black,
-              )
-                  : null,
-            ),
-          ),
-        ],
+
+          ],
+        ),
       ),
     );
   }

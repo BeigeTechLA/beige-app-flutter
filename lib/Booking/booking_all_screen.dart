@@ -507,7 +507,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "My Shoots",
+                    "My Shoots",//
                     style: TextStyle(
                       color: ColorCode.white,
                       fontFamily: 'Unbounded',

@@ -16,12 +16,12 @@ class TopMessage {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(
-                  sigmaX: 1,
+                  sigmaX: 1,//
                   sigmaY: 1,
 
               ),
               child: Container(
-                color: Colors.black.withOpacity(0.6),
+                color: Colors.black.withOpacity(0.8),
               ),
             ),
           ),
@@ -39,16 +39,17 @@ class TopMessage {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5A0000),
+
+                  color: const Color(0xff100B03),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.red),
+                  border: Border.all(color:Color(0xffF66E6E)),
                 ),
                 child: Row(
                   children: [
 
                     const Icon(
-                      Icons.block,
-                      color: ColorCode.red,
+                      Icons.do_not_disturb,
+                      color: Color(0xffF66E6E),
                     ),
 
                     const SizedBox(width: 10),
@@ -58,7 +59,7 @@ class TopMessage {
                         message,
                         style: const TextStyle(
                           fontFamily: "Outfit",
-                          color: ColorCode.white,
+                          color: Color(0xffF66E6E),
                           fontSize: 11,
                         ),
                       ),

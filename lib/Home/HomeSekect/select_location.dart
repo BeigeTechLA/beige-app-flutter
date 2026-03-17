@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
+import '../../widgets/TopMessage.dart';
 import 'change_location_screen.dart';
 
 class SelectLocation extends StatefulWidget {
@@ -59,9 +60,11 @@ class _SelectLocationState extends State<SelectLocation> {
         await getAddressFromLatLng(latLng);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location not found")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Location not found")),
+      // );
+      TopMessage.show(context,'Location not found');
+
     }
   }
 
@@ -102,11 +105,14 @@ class _SelectLocationState extends State<SelectLocation> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Location permission permanently denied. Enable from settings."),
+      //   ),
+      // );
+
+      TopMessage.show(context,"Location permission permanently denied. Enable from settings.");
+
       await Geolocator.openAppSettings(); // 👈 Open app settings
       return;
     }

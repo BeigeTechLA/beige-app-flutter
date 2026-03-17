@@ -131,12 +131,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    TopMessage.show(context, message);
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.red,
+    //   ),
+    // );
+
   }
 
   @override
@@ -197,6 +200,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 25),
 
                       CustomInputField(
+
                         title: "Email*",
                         controller: emailController,
                         onChanged: (value) {

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
@@ -105,12 +106,13 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
     setState(() => isLoading = false);
   }
   _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.red,
+    //   ),
+    // );
+    TopMessage.show(context, message);
   }
 
 

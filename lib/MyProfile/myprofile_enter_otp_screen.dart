@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -137,13 +138,14 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    TopMessage.show(context, message);
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.red,
+    //     behavior: SnackBarBehavior.floating,
+    //   ),
+    // );
   }
 
 
@@ -221,7 +223,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       SizedBox(height: 10),
 
                       Text(
-                        "Enter OTP code",
+                        "Enter OTP codefd",
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
