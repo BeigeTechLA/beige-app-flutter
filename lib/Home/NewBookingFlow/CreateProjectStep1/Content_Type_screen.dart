@@ -322,42 +322,42 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
+        appBar: AppBar(
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Stack(
+            alignment: Alignment.center,
+            children: [
 
-            /// Center Title
-            Center(
-              child: Text(
-                "Create Project",
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: 16,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
+              /// Center Title
+              Center(
+                child: Text(
+                  "Create Project",
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
 
-            /// Right Step Text
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "1/3",
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: 16,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
+              /// Right Step Text
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "1/3",
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
 
         body: Stack(
           children: [
@@ -523,48 +523,48 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
+      child: GestureDetector(
+        onTap: isDisabled ? null : onTap,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
 
-          /// ICON
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: ColorCode.kIconBackground,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                value ? activeImage : inactiveImage,
+            /// ICON
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorCode.kIconBackground,
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  value ? activeImage : inactiveImage,
+                ),
               ),
             ),
-          ),
 
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
 
-          /// TITLE
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontFamily: "Outfit",
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDisabled
-                    ? ColorCode.kWhiteOpacity60
-                    : value
-                    ? ColorCode.kButtonColor
-                    : Colors.white,
+            /// TITLE
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontFamily: "Outfit",
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isDisabled
+                      ? ColorCode.kWhiteOpacity60
+                      : value
+                      ? ColorCode.kButtonColor
+                      : Colors.white,
+                ),
               ),
             ),
-          ),
 
-          /// CHECK BOX (CLICKABLE)
-          GestureDetector(
-            onTap: isDisabled ? null : onTap,
-            child: Container(
+            /// CHECK BOX (CLICKABLE)
+            Container(
               height: 32,
               width: 32,
               decoration: BoxDecoration(
@@ -587,8 +587,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               )
                   : null,
             ),
-          ),
-        ],
+
+          ],
+        ),
       ),
     );
   }

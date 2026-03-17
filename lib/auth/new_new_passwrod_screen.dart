@@ -5,6 +5,7 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'Password_successfull.dart';
 import 'new_forgot_otp_screen.dart';
 
@@ -101,16 +102,11 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
   }
 
 
-
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    TopMessage.show(context, message);
+
   }
+
 
 
   @override

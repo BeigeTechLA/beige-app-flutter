@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'new_login_screen.dart';
 import 'new_new_passwrod_screen.dart';
 
@@ -163,13 +164,8 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    TopMessage.show(context, message);
+
   }
 
   @override
