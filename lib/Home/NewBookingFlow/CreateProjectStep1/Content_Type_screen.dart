@@ -322,42 +322,42 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
+        appBar: AppBar(
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Stack(
+            alignment: Alignment.center,
+            children: [
 
-            /// Center Title
-            Center(
-              child: Text(
-                "Create Project",
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: 16,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
+              /// Center Title
+              Center(
+                child: Text(
+                  "Create Project",
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
 
-            /// Right Step Text
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "1/3",
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: 16,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
+              /// Right Step Text
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "1/3",
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
 
         body: Stack(
           children: [
@@ -565,28 +565,28 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
             /// CHECK BOX (CLICKABLE)
             Container(
-                height: 32,
-                width: 32,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: value
-                        ? ColorCode.kButtonColor
-                        : ColorCode.kBorderLight,
-                    width: 0.5,
-                  ),
+              height: 32,
+              width: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
                   color: value
                       ? ColorCode.kButtonColor
-                      : Colors.transparent,
+                      : ColorCode.kBorderLight,
+                  width: 0.5,
                 ),
-                child: value
-                    ? const Icon(
-                  Icons.check,
-                  size: 16,
-                  color: Colors.black,
-                )
-                    : null,
+                color: value
+                    ? ColorCode.kButtonColor
+                    : Colors.transparent,
               ),
+              child: value
+                  ? const Icon(
+                Icons.check,
+                size: 16,
+                color: Colors.black,
+              )
+                  : null,
+            ),
 
           ],
         ),

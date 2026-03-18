@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:beige/MyProfile/my_profile.dart';
 import 'package:dio/dio.dart';
@@ -12,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
@@ -48,6 +50,13 @@ class _EditProfileState extends State<EditProfile> {
   final ImagePicker _picker = ImagePicker();
 
   String? profileImageUrl;
+  double cropScale = 1.0;
+
+  double scale = 1.0;
+  double startScale = 1.0;
+
+  Offset offset = Offset.zero;
+  Offset startOffset = Offset.zero;
 
   Map<String, dynamic>? myProfile;
   final FocusNode locationFocusNode = FocusNode();
@@ -246,26 +255,334 @@ class _EditProfileState extends State<EditProfile> {
       setState(() => isLoading = false);
     }
   }
-
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      imageQuality: 100,
     );
 
     if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
-      });
+      File file = File(pickedFile.path);
 
       debugPrint("🟢 IMAGE PICKED: ${pickedFile.path}");
 
-      // ✅ IMAGE SELECT HOTE HI API CALL
-      await _uploadImage();
+      /// 🔥 OPEN CROP SHEET
+      openCustomCropSheet(file);
+    }
+  }
+  void openCustomCropSheet(File imageFile) {
+    Offset offset = Offset.zero;
+    double scale = 1.0;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.85,
+              decoration: const BoxDecoration(
+                color: Color(0xFF1C1C1C),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+
+
+                  Center(
+                    child: Container(
+                      width: 35,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color:ColorCode.kWhiteOpacity70,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Crop your Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+
+                      InkWell(
+                        onTap: () => Navigator.pop(context), // ❌ close bottom sheet
+                        borderRadius: BorderRadius.circular(20),
+                        child:  Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+                  SizedBox(height: 20),
+
+                  Divider(color: ColorCode.kDividerWhite12,),
+
+                  /// 🔥 CIRCULAR PREVIEW AREA
+                  Expanded(
+                    child: Center(
+                      child:GestureDetector(
+                        onScaleStart: (details) {
+                          startScale = scale;
+                          startOffset = offset;
+                        },
+                        onScaleUpdate: (details) {
+                          setSheetState(() {
+                            scale = (startScale * details.scale).clamp(1.0, 4.0);
+                            // offset = startOffset + details.focalPointDelta;
+                            offset += details.focalPointDelta;
+                          });
+                        },
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+
+                            /// IMAGE (NOW CLIPPED)
+                            ClipRect(
+                              child: SizedBox(
+                                width: 320,
+                                height: 320,
+                                child: ClipRect(
+                                  child: Transform(
+                                    alignment: Alignment.center,
+                                    transform: Matrix4.identity()
+                                      ..translate(offset.dx, offset.dy)
+                                      ..scale(scale),
+                                    child: Image.file(
+                                      imageFile,
+                                      width: 340,
+                                      height: 340,
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            /// CIRCLE OVERLAY
+                            IgnorePointer(
+                              child: CustomPaint(
+                                size: const Size(320, 320),
+                                painter: CircleHolePainter(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+
+                    ),
+                  ),
+
+
+
+
+
+
+                  const SizedBox(height: 16),
+
+                  /// 🔥 ZOOM SLIDER
+                  Padding(
+                    padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: [
+                        /// 🔹 LEFT IMAGE ICON
+                        SvgPicture.asset(
+                          "assets/svg/crop_image.svg", // 👈 your image
+
+                          height: 20,
+                          width: 20,
+                          /*  color: Colors.white.withOpacity(0.7), */// optional
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        /// 🔹 SLIDER
+                        Expanded(
+                          child: SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              trackHeight: 6,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 10,
+                              ),
+                              overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 14,
+                              ),
+                              activeTrackColor: ColorCode.kButtonColor,
+                              inactiveTrackColor: Colors.white.withOpacity(0.3),
+                              thumbColor: ColorCode.kButtonColor,
+                            ),
+                            child: Slider(
+                              min: 1,
+                              max: 5,
+                              value: scale,
+                              onChanged: (v) {
+                                setSheetState(() => scale = v);
+                              },
+                            ),
+                          ),
+
+                        ),
+
+                        const SizedBox(width: 10),
+
+
+                        /// 🔹 LEFT IMAGE ICON
+                        SvgPicture.asset(
+                          "assets/svg/crop_image.svg", // 👈 your image
+
+                          height: 26,
+                          width: 26,
+                          /*  color: Colors.white.withOpacity(0.7), */// optional
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                  const SizedBox(height: 10),
+
+                  /// 🔥 SAVE BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorCode.kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () async {
+                        final cropped = await _cropImage(
+                          imageFile,
+                          scale,
+                          offset,
+                        );
+
+                        if (cropped != null) {
+                          setState(() {
+                            _profileImage = cropped; // 🔥 IMPORTANT
+                          });
+
+                          debugPrint("✅ CROPPED IMAGE PATH: ${cropped.path}");
+
+                          /// 🔥 UPLOAD AFTER CROP
+                          await _uploadImage();
+                        }
+
+                        Navigator.pop(context);
+                      },
+                      child:  Text(
+                        "Save",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+  Future<File?> _cropImage(
+      File imageFile,
+      double scale,
+      Offset offset,
+      ) async {
+    try {
+      final bytes = await imageFile.readAsBytes();
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final ui.Image image = frame.image;
+
+      // UI size (crop widget size)
+      const double uiSize = 360;
+      const double cropUI = 260; // jitna UI me crop box hai
+
+      final imgW = image.width.toDouble();
+      final imgH = image.height.toDouble();
+
+      // Ratio (safe for portrait + landscape)
+      final ratioX = imgW / uiSize;
+      final ratioY = imgH / uiSize;
+      final ratio = ratioX < ratioY ? ratioX : ratioY;
+
+      // Real image crop size
+      final cropSize = (cropUI * ratio) / scale;
+
+      // Center based crop
+      double dx = (imgW / 2) - (cropSize / 2) - (offset.dx * ratio);
+      double dy = (imgH / 2) - (cropSize / 2) - (offset.dy * ratio);
+
+      // Prevent overflow
+      dx = dx.clamp(0.0, imgW - cropSize);
+      dy = dy.clamp(0.0, imgH - cropSize);
+
+      // Canvas
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+
+      final paint = Paint()
+        ..isAntiAlias = true
+        ..filterQuality = FilterQuality.high;
+
+      // ✅ NO CLIP — PURE RECTANGLE IMAGE
+      canvas.drawImageRect(
+        image,
+        Rect.fromLTWH(dx, dy, cropSize, cropSize),
+        Rect.fromLTWH(0, 0, cropSize, cropSize),
+        paint,
+      );
+
+      final pic = recorder.endRecording();
+      final cropped =
+      await pic.toImage(cropSize.toInt(), cropSize.toInt());
+
+      final data =
+      await cropped.toByteData(format: ui.ImageByteFormat.png);
+
+      final dir = await getTemporaryDirectory();
+      final file = File(
+        "${dir.path}/crop_${DateTime.now().millisecondsSinceEpoch}.png",
+      );
+
+      await file.writeAsBytes(data!.buffer.asUint8List());
+      return file;
+    } catch (e) {
+      debugPrint("❌ Crop failed: $e");
+      return null;
     }
   }
 
- /* Future<void> _uploadImage() async {
+
+  /* Future<void> _uploadImage() async {
     if (_profileImage == null) {
       debugPrint("❌ NO IMAGE FOUND");
       return;
@@ -582,10 +899,10 @@ class _EditProfileState extends State<EditProfile> {
 
               ],
             ),
-        
-        
 
-        
+
+
+
             /// 🔹 USER INFO
 
             const SizedBox(height: 14),
@@ -612,28 +929,28 @@ class _EditProfileState extends State<EditProfile> {
               padding:  EdgeInsets.all(20.0),
               child: Column(
                 children: [
-        
+
                  /* TextField(
                       controller: nameController,
                       cursorColor: ColorCode.white,
-        
+
                   style: const TextStyle(
                     color: ColorCode.white, // typed text color
                   ),
-        
+
                   decoration: InputDecoration(
                     labelText: "Name*",
                     floatingLabelBehavior: FloatingLabelBehavior.always,
-        
+
                     labelStyle: const TextStyle(
                       color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
                     ),
-        
+
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 18,
                     ),
-        
+
                     /// ⭐ 0.5px BORDER + OPACITY COLOR
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -642,7 +959,7 @@ class _EditProfileState extends State<EditProfile> {
                         width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
-        
+
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
@@ -650,11 +967,11 @@ class _EditProfileState extends State<EditProfile> {
                         width: 0.5,                          // focus border thicker
                       ),
                     ),
-        
+
                     floatingLabelStyle: const TextStyle(
                       color: ColorCode.kWhiteOpacity70,
                     ),)
-        
+
               ),
                   */
 
@@ -665,7 +982,7 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(height: 20,),
                /*   TextField(
                     controller: emailController,
-        
+
                     cursorColor: ColorCode.white,
                     style: const TextStyle(
                       color: ColorCode.white,
@@ -673,10 +990,10 @@ class _EditProfileState extends State<EditProfile> {
                     decoration: InputDecoration(
                       labelText: "Email ID*",
                       floatingLabelBehavior: FloatingLabelBehavior.always,
-        
+
                     *//*  suffixIcon: GestureDetector(
                         onTap: () {
-        
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -690,16 +1007,16 @@ class _EditProfileState extends State<EditProfile> {
                           size: 20,
                         ),
                       ),*//*
-        
+
                       labelStyle: const TextStyle(
                         color: ColorCode.kWhiteOpacity70,
                       ),
-        
+
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 18,
                       ),
-        
+
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
@@ -707,7 +1024,7 @@ class _EditProfileState extends State<EditProfile> {
                           width: 0.5,
                         ),
                       ),
-        
+
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
@@ -994,9 +1311,9 @@ class _EditProfileState extends State<EditProfile> {
                 ],
               ),
             )
-        
-        
-        
+
+
+
           ],
         ),
       ),
@@ -1028,4 +1345,44 @@ class _EditProfileState extends State<EditProfile> {
       ),
     );
   }
+}
+class CircleHolePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.saveLayer(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint(),
+    );
+
+    /// dark overlay
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = Colors.black.withOpacity(0.6),
+    );
+
+    /// clear circle
+    final center = Offset(size.width / 2, size.height / 2);
+    const radius = 120.0;
+
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()..blendMode = BlendMode.clear,
+    );
+
+    canvas.restore();
+
+    /// white border
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

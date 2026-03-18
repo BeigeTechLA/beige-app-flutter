@@ -16,8 +16,8 @@ class TopMessage {
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(
-                  sigmaX: 1,//
-                  sigmaY: 1,
+                sigmaX: 1,//
+                sigmaY: 1,
 
               ),
               child: Container(

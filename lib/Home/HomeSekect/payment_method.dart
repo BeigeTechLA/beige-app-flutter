@@ -112,25 +112,20 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
     }
   }
 
-
   Future<void> _openStripeSheet() async {
     try {
       print("=== STRIPE START ===");
       setState(() => loading = true);
 
-      // 1. Create SetupIntent
-      print("1️⃣ Calling setup intent API");
+      /// 1️⃣ Create SetupIntent
       final setupData = await _createSetupIntent();
-
       final String? clientSecret = setupData['client_secret'];
-      print("Client Secret: $clientSecret");
 
       if (clientSecret == null || clientSecret.isEmpty) {
         throw "Client secret missing";
       }
 
-      // 2. Init Payment Sheet
-      print("2️⃣ Initializing payment sheet");
+      /// 2️⃣ Init Payment Sheet
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           setupIntentClientSecret: clientSecret,
@@ -139,48 +134,77 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         ),
       );
 
-      // 3. Present Payment Sheet
-      print("3️⃣ Presenting payment sheet");
+      /// 3️⃣ Present Payment Sheet
       await Stripe.instance.presentPaymentSheet();
-      print("Payment sheet completed");
 
-      // 4. Retrieve SetupIntent
-      print("4️⃣ Retrieving setup intent");
+      print("✅ Payment Sheet Completed");
+
+      /// 4️⃣ Get SetupIntent
       final setupIntent =
       await Stripe.instance.retrieveSetupIntent(clientSecret);
 
       final String? paymentMethodId = setupIntent.paymentMethodId;
-      print("Payment Method ID: $paymentMethodId");
 
       if (paymentMethodId == null || paymentMethodId.isEmpty) {
         throw "Payment method id not found";
       }
 
-      // 5. Attach to backend
-      print("5️⃣ Attaching payment method to backend");
+      /// 5️⃣ Attach to Backend
       await _attachPaymentMethodToBackend(paymentMethodId);
 
-      // 6. Refresh list
-      print("6️⃣ Refreshing payment list");
+      /// 6️⃣ Refresh UI
       await _fetchBookSummary();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Card saved successfully")),
-      );
+      /// ✅ SUCCESS MESSAGE
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("✅ Card saved successfully")),
+        );
+      }
 
       print("=== STRIPE SUCCESS ===");
+
+    } on StripeException catch (e) {
+
+      /// 🔥 HANDLE CANCEL PROPERLY
+      if (e.error.code == FailureCode.Canceled) {
+        print("⚠️ User cancelled payment");
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("⚠️ Payment cancelled")),
+          );
+        }
+
+      } else {
+        print("❌ Stripe Error: ${e.error.localizedMessage}");
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                e.error.localizedMessage ?? "Payment failed",
+              ),
+            ),
+          );
+        }
+      }
+
     } catch (e) {
-      print("❌ STRIPE ERROR: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+
+      print("❌ Unknown Error: $e");
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+
     } finally {
       if (mounted) setState(() => loading = false);
       print("=== STRIPE END ===");
     }
   }
-
-
 
 
   Future<void> _attachPaymentMethodToBackend(String paymentMethodId) async {
@@ -228,16 +252,16 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
 
-                  child: Image.asset("assets/Icons/Reply.png", height: 24),
+                child: Image.asset("assets/Icons/Reply.png", height: 24),
               ),
 
               const SizedBox(height: 14),
-               Text(
+              Text(
                 "Payment Method",
                 style: TextStyle(
                   fontFamily: "Unbounded",
@@ -252,10 +276,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               const Text(
                 "Manage your saved payment options for\nfaster and secure checkouts.",
                 style: TextStyle(
-                  fontFamily: "Outfit",
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: ColorCode.kWhiteOpacity70
+                    fontFamily: "Outfit",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: ColorCode.kWhiteOpacity70
                 ),
               ),
 
@@ -318,7 +342,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
 
               /// ===== CARD SECTION =====
-               Text(
+              Text(
                 "Card",
                 style: TextStyle(
                     fontFamily: "Unbounded",
@@ -397,7 +421,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 title: "Stripe",
                 icon: "assets/Icons/stripe.png",
               ),
-             /* _paymentTile(
+              /* _paymentTile(
                 title: "Apple Pay",
                 icon: "assets/Icons/apple.png",
               ),

@@ -303,7 +303,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                             ),
                           ],
                         ),
-                        Text(
+                       /* Text(
                           creative?['hourly_rate'] != null
                               ? "From \$${creative?['hourly_rate']}/Hr"
                               : "",
@@ -313,7 +313,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                             fontWeight: FontWeight.bold,
                             color: ColorCode.kButtonColor,
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
