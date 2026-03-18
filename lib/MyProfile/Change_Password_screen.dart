@@ -7,7 +7,9 @@ import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+  final String myemail;
+
+  const ChangePasswordScreen({super.key, required this.myemail});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -64,7 +66,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
     );
   }*/
-
+@override
+  void initState() {
+    super.initState();
+    emailController.text=widget.myemail;//
+  }
 
   Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
@@ -175,7 +181,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 20),
 
                       Text(
-                        "Change your Password",
+                        "Change your Password",//
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: "Unbounded",
@@ -186,24 +192,30 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       const SizedBox(height: 6),
 
-                      const Text(
-                        "Enter your email ID to receive an OTP code to change\n your password.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: "Outfit",
-                          fontWeight: FontWeight.w400,
-
-                          color: ColorCode.kWhiteOpacity60,
-                        ),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Text(
+                            "Enter your email ID to receive an OTP code to change your password.",
+                            textAlign: TextAlign.left,
+                            softWrap: true,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                              color: ColorCode.kWhiteOpacity60,
+                            ),
+                          );
+                        },
                       ),
-
                       const SizedBox(height: 25),
 
                       AutofillGroup(
                         child: CustomInputField(
+                          readOnly: true,
                           //autofillHints: ema,
-                          title: "Email*",
-                          controller: emailController,
+                          title: "Email ID*",
+                          controller:TextEditingController(text:widget.myemail),
                           onChanged: (value) {
                             setState(() {
                               isEmailFilled = value.trim().isNotEmpty;
@@ -224,9 +236,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: (isEmailFilled && !isLoading)
-                      ? _fetchForgotPassword
-                      : null,
+                  // onPressed: (isEmailFilled && !isLoading)
+                  //     ? _fetchForgotPassword
+                  //     : null,
+                  onPressed: _fetchForgotPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isEmailFilled
                         ? ColorCode.kButtonColor

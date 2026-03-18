@@ -1,3 +1,4 @@
+import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -97,13 +98,17 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     }
   }
 
+void _snakbar(String message){
+    TopMessage.show(context, message);
 
+}
 
   Future<void> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill required fields")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Please fill required fields")),
+      // );
+      _snakbar('Please fill required fields');
       return;
     }
 
@@ -921,11 +926,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       borderRadius: BorderRadius.circular(14),
       onTap: isDisabled
           ? () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Please add a card first"),
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text("Please add a card first"),
+        //   ),
+        // );
+        TopMessage.show(context,'Please add a card first');
 
         Navigator.push(
           context,

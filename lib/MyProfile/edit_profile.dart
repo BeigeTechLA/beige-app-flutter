@@ -1292,7 +1292,7 @@ class _EditProfileState extends State<EditProfile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ChangePasswordScreen(),
+                            builder: (_) => ChangePasswordScreen(myemail: emailController.text,),
                           ),
                         );
                       },

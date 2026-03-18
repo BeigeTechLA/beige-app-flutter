@@ -1,103 +1,3 @@
-// import 'dart:async';
-// import 'package:flutter/material.dart';
-// import 'package:beige/OnbodingScreen/onboding_screen.dart';
-//
-// import '../utility/ColorCode.dart';
-//
-// class SplashScreen extends StatefulWidget {
-//   const SplashScreen({super.key});
-//
-//   @override
-//   State<SplashScreen> createState() => _SplashScreenState();
-// }
-//
-// class _SplashScreenState extends State<SplashScreen> {
-//   int currentIndex = 0;
-//
-//   final List<String> centerImages = [
-//     "assets/Splash/Property_1.png",
-//     "assets/Splash/Property_2.png",
-//     "assets/Splash/Property_3.png",
-//     "assets/Splash/Property_4.png",
-//     "assets/Splash/Propety_5.png",
-//     "assets/Splash/Property_6.png",
-//   ];
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _startImageSwap();
-//   }
-//
-//   void _startImageSwap() {
-//     Timer.periodic(const Duration(milliseconds: 200), (timer) {
-//       if (currentIndex < centerImages.length - 1) {
-//         setState(() {
-//           currentIndex++;
-//         });
-//       } else {
-//         timer.cancel();
-//
-//         Future.delayed(const Duration(milliseconds: 500), () {
-//           Navigator.pushReplacement(
-//             context,
-//             MaterialPageRoute(
-//               builder: (_) => const SplashScreen(),
-//             ),
-//           );
-//         });
-//       }
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Stack(
-//         fit: StackFit.expand,
-//         children: [
-//           /// 🔹 BACKGROUND IMAGE (STATIC)
-//        /*   Image.asset(
-//             "assets/splash/bg.png",
-//             fit: BoxFit.cover,
-//           ),*/
-//
-//           /// 🔹 DARK OVERLAY (optional – premium look)
-//           Container(
-//             color: ColorCode.kHeadingColor
-//           ),
-//
-//           /// 🔹 CENTER IMAGE (ONLY THIS CHANGES)
-//           Center(
-//             child: Image.asset(
-//               centerImages[currentIndex],
-//               fit: BoxFit.fill,
-//               width: 220, // adjust as per design
-//             ),
-//           ),
-//
-//           /// 🔹 TAGLINE (optional)
-//      /*     Positioned(
-//             bottom: 40,
-//             left: 0,
-//             right: 0,
-//             child: Text(
-//               "Streamline your crew, equipment, & projects",
-//               textAlign: TextAlign.center,
-//               style: TextStyle(
-//                 color: Colors.white.withOpacity(0.8),
-//                 fontSize: 12,
-//                 letterSpacing: 1,
-//               ),
-//             ),
-//           ),*/
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:beige/OnbodingScreen/onboding_screen.dart';
@@ -113,6 +13,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   int currentIndex = 0;
   Timer? _timer;
+  bool _precacheDone = false; // ✅ double call rokne ke liye
 
   final List<String> centerImages = [
     "assets/Splash/Property_1.png",
@@ -124,9 +25,27 @@ class _SplashScreenState extends State<SplashScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _startImageSwap();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // ✅ Context safe hai yahan, aur sirf ek baar chalega
+    if (!_precacheDone) {
+      _precacheDone = true;
+      _precacheAndStart();
+    }
+  }
+
+  Future<void> _precacheAndStart() async {
+    try {
+      for (final path in centerImages) {
+        await precacheImage(AssetImage(path), context);
+      }
+    } catch (e) {
+      debugPrint("Precache error: $e");
+    } finally {
+      // ✅ Error aaye ya na aaye, animation ZAROOR chalegi
+      if (mounted) _startImageSwap();
+    }
   }
 
   void _startImageSwap() {
@@ -138,13 +57,12 @@ class _SplashScreenState extends State<SplashScreen> {
       } else {
         timer.cancel();
 
-        // hold last frame & navigate
         Future.delayed(const Duration(milliseconds: 600), () {
           if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) =>  OnboardingScreen(),
+              builder: (_) => OnboardingScreen(),
             ),
           );
         });
@@ -164,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          /// 🔹 SOLID BACKGROUND (same as design)
+          /// 🔹 SOLID BACKGROUND
           Container(
             color: ColorCode.kHeadingColor,
           ),
@@ -174,10 +92,11 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Image.asset(
               centerImages[currentIndex],
               width: 240,
-              fit: BoxFit.contain, // ✅ no distortion
+              fit: BoxFit.contain,
             ),
           ),
 
+          /// 🔹 TAGLINE
           Positioned(
             bottom: 40,
             left: 0,
@@ -188,7 +107,6 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 color: ColorCode.white,
                 fontSize: 12,
-
                 fontFamily: "Unbounded",
               ),
             ),
