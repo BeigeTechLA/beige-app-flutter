@@ -199,15 +199,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       const SizedBox(height: 25),
 
-                      CustomInputField(
-
-                        title: "Email*",
-                        controller: emailController,
-                        onChanged: (value) {
-                          setState(() {
-                            isEmailFilled = value.trim().isNotEmpty;
-                          });
-                        },
+                      AutofillGroup(
+                        child: CustomInputField(
+                          //autofillHints: ema,
+                          title: "Email*",
+                          controller: emailController,
+                          onChanged: (value) {
+                            setState(() {
+                              isEmailFilled = value.trim().isNotEmpty;
+                            });
+                          },
+                        ),
                       ),
                       // _buildEmailField(),
                     ],

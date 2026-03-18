@@ -173,7 +173,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
     return Scaffold(
       // backgroundColor: ColorCode.white,
       body: Stack(
-        children: [
+        children:[
           SingleChildScrollView(
             child: Column(
               children: [
