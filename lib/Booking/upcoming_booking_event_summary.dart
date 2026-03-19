@@ -100,379 +100,377 @@ class _UpcomingBookingEventSummaryState
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color(0xFF121212),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-      
-              Stack(
-                children: [
-                  SizedBox(
-                    height: 280, // 👈 image ki height control yahin se
-                    width: double.infinity,
-                    child: Image(
-                      fit: BoxFit.cover, // 👈 image crop hogi, stretch nahi
-                      image: (getCreativeImage().isNotEmpty)
-                          ? NetworkImage(getCreativeImage())
-                          : const AssetImage(
-                        "assets/images/Rectangle 34661070.png",
-                      ) as ImageProvider,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(
-                          child: CircularProgressIndicator(color: Colors.white),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.broken_image, color: Colors.white, size: 40),
-                        );
-                      },
-                    ),
+    return Scaffold(
+      backgroundColor: const Color(0xFF121212),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            Stack(
+              children: [
+                SizedBox(
+                  height: 280, // 👈 image ki height control yahin se
+                  width: double.infinity,
+                  child: Image(
+                    fit: BoxFit.cover, // 👈 image crop hogi, stretch nahi
+                    image: (getCreativeImage().isNotEmpty)
+                        ? NetworkImage(getCreativeImage())
+                        : const AssetImage(
+                      "assets/images/Rectangle 34661070.png",
+                    ) as ImageProvider,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(Icons.broken_image, color: Colors.white, size: 40),
+                      );
+                    },
                   ),
-      
-                  /// Gradient overlay
-                  SizedBox(
-                    height: 280,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.5),
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.85),
-                          ],
-                        ),
+                ),
+
+                /// Gradient overlay
+                SizedBox(
+                  height: 280,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.5),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.85),
+                        ],
                       ),
                     ),
                   ),
-      
-                  /// BACK + FAVORITE
-                  Positioned(
-                    top: 40,
-                    left: 16,
-                    right: 16,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: SvgPicture.asset(
-                            "assets/svg/back.svg",
-                            height: 24,
-                            color: Colors.white,
-                          ),
+                ),
+
+                /// BACK + FAVORITE
+                Positioned(
+                  top: 40,
+                  left: 16,
+                  right: 16,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: SvgPicture.asset(
+                          "assets/svg/back.svg",
+                          height: 24,
+                          color: Colors.white,
                         ),
-                     /*   Row(
-                          children: [
-                            Image.asset("assets/Icons/Share 2.png",
-                                height: 24, width: 24, color: Colors.white),
-                            const SizedBox(width: 10),
-                            Image.asset("assets/images/Heart Angle.png",
-                                height: 24, width: 24, color: Colors.white),
-                          ],
-                        ),*/
-                      ],
-                    ),
+                      ),
+                   /*   Row(
+                        children: [
+                          Image.asset("assets/Icons/Share 2.png",
+                              height: 24, width: 24, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/Heart Angle.png",
+                              height: 24, width: 24, color: Colors.white),
+                        ],
+                      ),*/
+                    ],
                   ),
-      
-                  /// NAME + ROLE (neeche clearly dikhega)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
+                ),
+
+                /// NAME + ROLE (neeche clearly dikhega)
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        bookingData?['creative']?['name'] ?? "",
+                        style: const TextStyle(
+                          fontFamily: "outfit",
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        bookingData?['event']?['type'] ?? "",
+                        style: const TextStyle(
+                          fontFamily: "outfit",
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      Text(
+                      widget.contentType!,
+                        style: const TextStyle(
+                          fontFamily: "outfit",
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+
+            /// 🟢 MAIN CARD
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                   Divider(color: Colors.white12),
+
+
+
+                  infoRow(
+                    "assets/svg/Group 2087328870.svg",
+                    "${bookingData?['event']?['start_time']} - "
+                        "${bookingData?['event']?['end_time']} "
+                        "(${bookingData?['event']?['duration_hours']}h)",
+                  ),
+
+
+
+                  infoRow(
+                    "assets/svg/Frame.svg",
+
+                    bookingData?['event']?['event_date'] ?? "",
+                  ),
+
+                  infoRow(
+                    "assets/svg/location.svg",
+                    bookingData?['event']?['location'] ?? "",
+                  ),
+
+
+                  const SizedBox(height: 12),
+
+                  /// 📄 DESCRIPTION
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 10,
+                    ),
+
+                    decoration: BoxDecoration(
+                      color: ColorCode.k282828,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        /// 🔹 EVENT NAME & TYPE
                         Text(
-                          bookingData?['creative']?['name'] ?? "",
+                          bookingData?['event']?['name'] ?? "",
                           style: const TextStyle(
-                            fontFamily: "outfit",
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontFamily: "Outfit",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+
+                        SizedBox(height: 6),
+                        Text(
+                          bookingData?['event']?['type'] ?? "",
+                          style: const TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 12,
+                            color: Colors.white70,
+                          ),
+                        ),
+                       /*  Text(
+                          "Wedding / 01",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white70,
+                          ),
+                        ),*/
+
+                        const SizedBox(height: 14),
+
+                        /// 🔹 DESCRIPTION
+                         Text(
+                          "Description",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                             color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Text(
-                          bookingData?['event']?['type'] ?? "",
-                          style: const TextStyle(
-                            fontFamily: "outfit",
-                            fontSize: 14,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        Text(
-                        widget.contentType!,
-                          style: const TextStyle(
-                            fontFamily: "outfit",
-                            fontSize: 14,
+                         Text(
+                          bookingData?['event']?['description'] ?? "No description available",
+
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
                             color: Colors.white70,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-      
-      
-              /// 🟢 MAIN CARD
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-      
-                     Divider(color: Colors.white12),
-      
-      
-      
-                    infoRow(
-                      "assets/svg/Group 2087328870.svg",
-                      "${bookingData?['event']?['start_time']} - "
-                          "${bookingData?['event']?['end_time']} "
-                          "(${bookingData?['event']?['duration_hours']}h)",
-                    ),
-      
-      
-      
-                    infoRow(
-                      "assets/svg/Frame.svg",
+                  SizedBox(height: 20,),
 
-                      bookingData?['event']?['event_date'] ?? "",
-                    ),
-      
-                    infoRow(
-                      "assets/svg/location.svg",
-                      bookingData?['event']?['location'] ?? "",
-                    ),
-      
-      
-                    const SizedBox(height: 12),
-      
-                    /// 📄 DESCRIPTION
+                Column(
+                  children: [
+
+                    /// 🔹 TOP INFO CARD
                     Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 10,
-                      ),
-      
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: ColorCode.k282828,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-      
-                          /// 🔹 EVENT NAME & TYPE
-                          Text(
-                            bookingData?['event']?['name'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isSmallWidth = constraints.maxWidth < 320;
 
-                          SizedBox(height: 6),
+                          return isSmallWidth
+                              ? Column(
+                            children: [
+                              infoItem(
+                                icon: Icons.attach_money,
+                                title: "Event Budget",
+                                value: "₹${bookingData?['event']?['budget']}",
+                              ),
+                              const SizedBox(height: 12),
+                              infoItem(
+                                icon: Icons.group,
+                                title: "Crew Size Needed",
+                                value:
+                                "${bookingData?['event']?['crew_size_needed']} members",
+                              ),
+                            ],
+                          )
+                              : Row(
+                            children: [
+                              Expanded(
+                                child: infoItem(
+                                  icon: Icons.attach_money,
+                                  title: "Event Budget",
+                                  value: formatBudget(),
+                                ),
+                              ),
+
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: infoItem(
+                                  icon: Icons.group,
+                                  title: "Crew Size Needed",
+                                  value: bookingData?['event']?['crew_size_needed'] != null
+                                      ? "${bookingData?['event']?['crew_size_needed']} members"
+                                      : "-",
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    /// 🔹 VIEW PROJECT TIMELINE (PIXEL PERFECT)
+              /*      InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () {
+                        showProjectTimelineDialog(context);
+
+                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Text(
-                            bookingData?['event']?['type'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                          ),
-                         /*  Text(
-                            "Wedding / 01",
+                            "View Project Timeline",
+                            textScaleFactor: 1.0, // 👈 prevents pixel/text overflow
                             style: TextStyle(
                               fontFamily: "Outfit",
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: Colors.white70,
-                            ),
-                          ),*/
-      
-                          const SizedBox(height: 14),
-      
-                          /// 🔹 DESCRIPTION
-                           Text(
-                            "Description",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: ColorCode.white,
+                              height: 1.2,
                             ),
                           ),
-                          const SizedBox(height: 6),
-                           Text(
-                            bookingData?['event']?['description'] ?? "No description available",
-      
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white70,
-                            ),
+                           SizedBox(height: 2),
+                          Container(
+                            height: 1,
+                            width: 110,
+                            color: ColorCode.kButtonColor,
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 20,),
-      
-                  Column(
-                    children: [
-      
-                      /// 🔹 TOP INFO CARD
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: ColorCode.k282828,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isSmallWidth = constraints.maxWidth < 320;
-      
-                            return isSmallWidth
-                                ? Column(
-                              children: [
-                                infoItem(
-                                  icon: Icons.attach_money,
-                                  title: "Event Budget",
-                                  value: "₹${bookingData?['event']?['budget']}",
-                                ),
-                                const SizedBox(height: 12),
-                                infoItem(
-                                  icon: Icons.group,
-                                  title: "Crew Size Needed",
-                                  value:
-                                  "${bookingData?['event']?['crew_size_needed']} members",
-                                ),
-                              ],
-                            )
-                                : Row(
-                              children: [
-                                Expanded(
-                                  child: infoItem(
-                                    icon: Icons.attach_money,
-                                    title: "Event Budget",
-                                    value: formatBudget(),
-                                  ),
-                                ),
+                    ),*/
 
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: infoItem(
-                                    icon: Icons.group,
-                                    title: "Crew Size Needed",
-                                    value: bookingData?['event']?['crew_size_needed'] != null
-                                        ? "${bookingData?['event']?['crew_size_needed']} members"
-                                        : "-",
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-      
-                      const SizedBox(height: 14),
-      
-                      /// 🔹 VIEW PROJECT TIMELINE (PIXEL PERFECT)
-                /*      InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: () {
-                          showProjectTimelineDialog(context);
-      
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "View Project Timeline",
-                              textScaleFactor: 1.0, // 👈 prevents pixel/text overflow
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: ColorCode.white,
-                                height: 1.2,
-                              ),
-                            ),
-                             SizedBox(height: 2),
-                            Container(
-                              height: 1,
-                              width: 110,
-                              color: ColorCode.kButtonColor,
-                            ),
-                          ],
-                        ),
-                      ),*/
-      
-                    ],
-                  ),
-      
                   ],
                 ),
+
+                ],
               ),
-      
-            ],
-          ),
+            ),
+
+          ],
         ),
-      
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(20),
-          child:    SizedBox(
-            width: double.infinity,
-            height: 55,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UpcomingEventSummaryManagebooking(
-                      projectName: bookingData?['event']?['name'] ?? '',
-                      eventDate: bookingData?['event']?['event_date'] ?? '',
-                      startTime: bookingData?['event']?['start_time'] ?? '',
-                      endTime: bookingData?['event']?['end_time'] ?? '',
-                      durationHours:
-                      bookingData?['event']?['duration_hours'] ?? 0,
-                      location: bookingData?['event']?['location'] ?? '',
-                      imageUrl: getCreativeImage().isNotEmpty
-                          ? getCreativeImage()
-                          : "assets/images/home2.png",
-                      bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
-                      contentType: widget.contentType,
-                    ),
+      ),
+
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(20),
+        child:    SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpcomingEventSummaryManagebooking(
+                    projectName: bookingData?['event']?['name'] ?? '',
+                    eventDate: bookingData?['event']?['event_date'] ?? '',
+                    startTime: bookingData?['event']?['start_time'] ?? '',
+                    endTime: bookingData?['event']?['end_time'] ?? '',
+                    durationHours:
+                    bookingData?['event']?['duration_hours'] ?? 0,
+                    location: bookingData?['event']?['location'] ?? '',
+                    imageUrl: getCreativeImage().isNotEmpty
+                        ? getCreativeImage()
+                        : "assets/images/home2.png",
+                    bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
+                    contentType: widget.contentType,
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:  ColorCode.kButtonColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:  ColorCode.kButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              child:
-              Text(
-                "Manage Shoot",
-                style: TextStyle(
-                  fontFamily: "Unbounded",
-                  fontWeight: FontWeight.w500,
-                  color: ColorCode.kHeadingColor,
-                  fontSize: 14,
-                ),
+            ),
+            child:
+            Text(
+              "Manage Shoot",
+              style: TextStyle(
+                fontFamily: "Unbounded",
+                fontWeight: FontWeight.w500,
+                color: ColorCode.kHeadingColor,
+                fontSize: 14,
               ),
             ),
           ),

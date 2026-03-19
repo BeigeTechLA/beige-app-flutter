@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -22,7 +24,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
   GoogleMapController? mapController;
 
   LatLng? selectedLatLng;
-  String selectedAddress = "Search or select location";
+  String selectedAddress = "select location";
   bool isManualSelection = false;
 
   final TextEditingController searchController = TextEditingController();
@@ -135,166 +137,352 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+
 
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
+
           // ================= SEARCH (PLACES AUTOCOMPLETE) =================
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF121212),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(22),
+            width: double.infinity,
+            padding: const EdgeInsets.only(
+              top: 70,   // 👈 status bar spacing
+              bottom: 20,
+              left: 16,
+              right: 16,
+            ),
+            decoration:  BoxDecoration(
+              color: ColorCode.k282828,
+              border: Border.all(color: Colors.transparent),
+
+              /// ❌ REMOVE SHADOW
+              boxShadow: const [],
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+
               ),
             ),
+
             child: GooglePlaceAutoCompleteTextField(
               textEditingController: searchController,
-              focusNode: searchFocusNode, // ✅ IMPORTANT
+              focusNode: searchFocusNode,
               googleAPIKey: GoogleConfig.placesApiKey,
               debounceTime: 800,
               isLatLngRequired: true,
 
+              /// ✅ MAIN FIX HERE
+              boxDecoration: BoxDecoration(
+                color: ColorCode.kHeadingColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.transparent),
+              ),
+
               textStyle: const TextStyle(
-                color: Colors.white,
+                color: ColorCode.kWhiteOpacity70,
                 fontFamily: "Outfit",
                 fontSize: 14,
               ),
 
               inputDecoration: InputDecoration(
                 hintText: "Search location",
-                hintStyle: const TextStyle(
-                  color: Colors.white54,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
+                hintStyle: TextStyle(color: ColorCode.kWhiteOpacity70,),
+
                 filled: true,
-                fillColor: const Color(0xFF1E1E1E),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+                fillColor: Colors.transparent, // ⚠️ important
+
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SvgPicture.asset(
+                    "assets/svg/serch.svg",
+                    color: Colors.white,
+                    height: 20,
+                    width: 20,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? GestureDetector(
+                  onTap: () {
+                    searchController.clear();
+                    searchFocusNode.unfocus();
+                    setState(() {});
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      Icons.close,
+                      color: ColorCode.kWhiteOpacity70,
+                      size: 20,
+                    ),
+                  ),
+                )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
 
-              /// ✅ ONLY when place is selected
-              getPlaceDetailWithLatLng: (prediction) {
+              isCrossBtnShown: false,
+              getPlaceDetailWithLatLng: (prediction) async {
                 if (prediction.lat != null && prediction.lng != null) {
-                  final LatLng latLng = LatLng(
+
+                  final latLng = LatLng(
                     double.parse(prediction.lat!),
                     double.parse(prediction.lng!),
                   );
 
+                  /// 🔥 FIRST: close keyboard
+                  searchFocusNode.unfocus();
+
+                  /// 🔥 SECOND: delay (important)
+                  await Future.delayed(const Duration(milliseconds: 200));
+
                   setState(() {
                     selectedLatLng = latLng;
                     selectedAddress = prediction.description ?? "";
+                    searchController.text = selectedAddress;
                   });
 
-                  searchController.text = selectedAddress;
-                  searchController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: searchController.text.length),
-                  );
-
-                  searchFocusNode.unfocus(); // ✅ cursor/focus fix
-
+                  /// 🔥 move map
                   mapController?.animateCamera(
                     CameraUpdate.newLatLngZoom(latLng, 16),
                   );
                 }
               },
 
-              /// ❌ yahan setState MAT lagana
-              itemClick: (prediction) {
+              itemClick: (prediction) async {
                 searchController.text = prediction.description ?? "";
+
+                /// 🔥 important (cursor fix)
                 searchController.selection = TextSelection.fromPosition(
                   TextPosition(offset: searchController.text.length),
                 );
-              },
 
-              seperatedBuilder: const Divider(color: Colors.white24),
-              isCrossBtnShown: true,
+                searchFocusNode.unfocus();
+              },
             ),
           ),
 
 
           // ================= MAP =================
           Expanded(
-            child: selectedLatLng == null
-                ? const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            )
-                : GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: selectedLatLng!,
-                zoom: 15,
-              ),
-              onMapCreated: (controller) {
-                mapController = controller;
-                _mapController.complete(controller);
-                controller.setMapStyle(_darkMapStyle);
-              },
-              onTap: (latLng) async {
-                setState(() => selectedLatLng = latLng);
-                await _getAddressFromLatLng(latLng);
-              },
-              markers: {
-                Marker(
-                  markerId: const MarkerId("selected"),
-                  position: selectedLatLng!,
-                ),
-              },
-              zoomControlsEnabled: false,
-            ),
-          ),
+            child: Stack(
+              children: [
 
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              selectedAddress,
-              style: const TextStyle(color: Colors.white70),
-              textAlign: TextAlign.center,
+                /// ================= MAP =================
+                selectedLatLng == null
+                    ? const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                )
+                    : GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: selectedLatLng!,
+                    zoom: 15,
+                  ),
+                  onMapCreated: (controller) {
+                    mapController = controller;
+                    _mapController.complete(controller);
+                    controller.setMapStyle(_darkMapStyle);
+                  },
+                  onTap: (latLng) async {
+                    setState(() => selectedLatLng = latLng);
+                    await _getAddressFromLatLng(latLng);
+                  },
+                  markers: {
+                    Marker(
+                      markerId: const MarkerId("selected"),
+                      position: selectedLatLng!,
+                    ),
+                  },
+                  zoomControlsEnabled: false,
+                ),
+
+                /// ================= ZOOM BUTTONS =================
+                Positioned(
+                  right: 16,
+                  bottom: 20,
+                  child: Column(
+                    children: [
+
+                      /// 🔍 ZOOM IN
+                      GestureDetector(
+                        onTap: () async {
+                          final controller = await _mapController.future;
+                          controller.animateCamera(CameraUpdate.zoomIn());
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 55,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: SvgPicture.asset(
+                                "assets/svg/zoom+.svg", // 👈 tumhara svg path
+                                color: Colors.black,
+                                height: 20,
+                                width: 20,
+                              ),
+                            )
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      /// 🔍 ZOOM OUT
+                      GestureDetector(
+                        onTap: () async {
+                          final controller = await _mapController.future;
+                          controller.animateCamera(CameraUpdate.zoomOut());
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 55,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: SvgPicture.asset(
+                                "assets/svg/zoom-.svg", // 👈 tumhara svg path
+                                color: Colors.black,
+                                height: 20,
+                                width: 20,
+                              ),
+                            ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
+     /*     Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    selectedAddress,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      decoration: TextDecoration.underline,
+                      fontSize: 14,
+                      fontFamily: "Outfit",
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),*/
         ],
       ),
+      bottomNavigationBar: ClipRRect(
+      /*  borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),*/
+        child: Stack(
+          children: [
 
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ColorCode.kButtonColor,
-            minimumSize: const Size(double.infinity, 52),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+            /// 🔥 BACKGROUND BLUR (MAIN)
+            BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 40,  // 👈 side blur
+                sigmaY: 60,  // 👈 MORE vertical blur (bottom heavy 🔥)
+              ),
+              /*child: Container(
+                height: 160,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1D1D1B).withOpacity(0.6), // 👈 figma color
+                ),
+              ),*/
             ),
-          ),
-          onPressed: () async {
-            if (selectedLatLng == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Please select a location")),
-              );
-              return;
-            }
 
-            print("SAVE CLICKED");
-            print("SAVE_ADDRESS = $selectedAddress");
-            print("SAVE_LAT = ${selectedLatLng!.latitude}");
-            print("SAVE_LNG = ${selectedLatLng!.longitude}");
+            /// 🔥 TOP FADE (important for smooth merge)
+            Container(
+              height: 160,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.7),
+                  ],
+                ),
+              ),
+            ),
 
-            await changeLocationApi(); // 🔥 API HIT HERE
-          },
+            /// 🔥 CONTENT (TEXT + BUTTON)
+            Positioned.fill(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
 
+                  /// LOCATION TEXT
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      selectedAddress,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        decoration: TextDecoration.underline,
+                        fontSize: 14,
+                        fontFamily: "Outfit",
+                      ),
+                    ),
+                  ),
 
+                  const SizedBox(height: 20),
 
-          child: const Text(
-            "Save",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-          ),
+                  /// SAVE BUTTON
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD6C29C),
+                        minimumSize: const Size(double.infinity, 52),
+                        elevation: 10,
+                        shadowColor: Colors.black.withOpacity(0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      onPressed: () async {
+                        if (selectedLatLng == null) return;
+                        await changeLocationApi();
+                      },
+                      child: const Text(
+                        "Save",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "Unbounded",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

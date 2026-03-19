@@ -103,90 +103,109 @@ class _MainscreenState extends State<Mainscreen> {
       ),*/
 
 
-        bottomNavigationBar: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.25), // top blur shade
-                   ColorCode.bcakgroundcolor
-                  ],
-                ),
-              ),
-              child: BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                type: BottomNavigationBarType.fixed,
-
-                selectedItemColor: Colors.white,
-                unselectedItemColor: Colors.white70,
-
-                selectedLabelStyle: const TextStyle(
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                ),
-
-                unselectedLabelStyle: const TextStyle(
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                ),
-
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-
-                items: [
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 0
-                          ? "assets/svg/Bottom_svg/Home_active.svg"
-                          : "assets/svg/Bottom_svg/Home_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "Home",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 1
-                          ? "assets/svg/Bottom_svg/Book _Shoot_active.svg"
-                          : "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
-                      height: 28,
-                    ),
-                    label: "Book Shoot",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 2
-                          ? "assets/svg/Bottom_svg/My Shoots_active.svg"
-                          : "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "My Shoots",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 3
-                          ? "assets/svg/Bottom_svg/Messages_active.svg"
-                          : "assets/svg/Bottom_svg/Messages_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "Messages",
-                  ),
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.25),
+                  ColorCode.bcakgroundcolor,
                 ],
               ),
             ),
+            child: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              type: BottomNavigationBarType.fixed,
+
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white70,
+
+              selectedLabelStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+
+              items: [
+                /// HOME
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    isSelected: _selectedIndex == 0,
+                    active: "assets/svg/Bottom_svg/Home_active.svg",
+                    inactive: "assets/svg/Bottom_svg/Home_nonactive.svg",
+                  ),
+                  label: "Home",
+                ),
+
+                /// BOOK SHOOT
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    isSelected: _selectedIndex == 1,
+                    active: "assets/svg/Bottom_svg/Book _Shoot_active.svg",
+                    inactive: "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
+                  ),
+                  label: "Book Shoot",
+                ),
+
+                /// MY SHOOTS
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    isSelected: _selectedIndex == 2,
+                    active: "assets/svg/Bottom_svg/My Shoots_active.svg",
+                    inactive: "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
+                  ),
+                  label: "My Shoots",
+                ),
+
+                /// MESSAGES
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    isSelected: _selectedIndex == 3,
+                    active: "assets/svg/Bottom_svg/Messages_active.svg",
+                    inactive: "assets/svg/Bottom_svg/Messages_nonactive.svg",
+                  ),
+                  label: "Messages",
+                ),
+              ],
+            ),
           ),
         ),
+      ),
 
+    );
+  }
+  Widget _buildIcon({
+    required bool isSelected,
+    required String active,
+    required String inactive,
+  }) {
+    return Container(
+      height: 28,
+      width: 28,
+      alignment: Alignment.center, // ✅ FIX alignment
+      child: SvgPicture.asset(
+        isSelected ? active : inactive,
+        height: 28,
+        width: 28,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }

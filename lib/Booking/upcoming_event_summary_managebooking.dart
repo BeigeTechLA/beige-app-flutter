@@ -60,7 +60,6 @@ class _UpcomingEventSummaryManagebookingState
       body: Stack(
         children: [
           /// 🔹 BACKGROUND IMAGE
-          /// 🔹 BACKGROUND IMAGE (DYNAMIC)
           /// 🔹 BACKGROUND IMAGE (FULL + BLUR)
           Positioned.fill(
             child: Stack(

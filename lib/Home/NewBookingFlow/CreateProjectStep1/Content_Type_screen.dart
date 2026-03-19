@@ -250,16 +250,36 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     }
   }*/
 
+  // void _handleSelection(int contentTypeId) {
+  //   setState(() {
+  //
+  //     /// SELECT ALL
+  //     if (contentTypeId == 3) {
+  //       selectedContentTypeIds = [1, 2];
+  //       return;
+  //     }
+  //
+  //     /// NORMAL MULTI SELECT
+  //     if (selectedContentTypeIds.contains(contentTypeId)) {
+  //       selectedContentTypeIds.remove(contentTypeId);
+  //     } else {
+  //       selectedContentTypeIds.add(contentTypeId);
+  //     }
+  //   });
+  // }
   void _handleSelection(int contentTypeId) {
     setState(() {
-
-      /// SELECT ALL
       if (contentTypeId == 3) {
-        selectedContentTypeIds = [1, 2];
+        // ✅ Toggle Select All: if both already selected → clear, else select both
+        if (isSelectAll) {
+          selectedContentTypeIds.clear();
+        } else {
+          selectedContentTypeIds = [1, 2];
+        }
         return;
       }
 
-      /// NORMAL MULTI SELECT
+      // ✅ Individual toggle — works independently of Select All
       if (selectedContentTypeIds.contains(contentTypeId)) {
         selectedContentTypeIds.remove(contentTypeId);
       } else {

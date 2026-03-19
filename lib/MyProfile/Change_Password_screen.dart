@@ -7,7 +7,9 @@ import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+  final String email;
+
+  const ChangePasswordScreen({super.key, required this.email});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -19,7 +21,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool isEmailFilled = false;
   bool isLoading = false;
 
- /* Future<void> _fetchForgotPassword() async {
+  /* Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
 
     if (emailController.text.trim().isEmpty) {
@@ -64,8 +66,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
     );
   }*/
+  @override
+  void initState() {
+    super.initState();
+    emailController.text = widget.email;
 
-
+    isEmailFilled = widget.email.isNotEmpty; //
+  }
   Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
     final email = emailController.text.trim();
@@ -131,12 +138,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    TopMessage.show(context, message);
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.red,
+    //   ),
+    // );
+
   }
 
   @override
@@ -172,7 +182,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       const SizedBox(height: 20),
 
                       Text(
-                        "Change your Password",
+                        "Change your Password",//
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: "Unbounded",
@@ -183,22 +193,28 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       const SizedBox(height: 6),
 
-                      const Text(
-                        "Enter your email ID to receive an OTP code to change\n your password.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: "Outfit",
-                          fontWeight: FontWeight.w400,
-
-                          color: ColorCode.kWhiteOpacity60,
-                        ),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          return Text(
+                            "Enter your email ID to receive an OTP code to change your password.",
+                            textAlign: TextAlign.left,
+                            softWrap: true,
+                            maxLines: 3,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                              color: ColorCode.kWhiteOpacity60,
+                            ),
+                          );
+                        },
                       ),
-
                       const SizedBox(height: 25),
 
                       CustomInputField(
-                        title: "Email*",
-                        controller: emailController,
+                        readOnly: true,
+                        title: "Email ID*",
+                        controller: emailController, //
                         onChanged: (value) {
                           setState(() {
                             isEmailFilled = value.trim().isNotEmpty;
@@ -218,9 +234,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: (isEmailFilled && !isLoading)
-                      ? _fetchForgotPassword
-                      : null,
+                  // onPressed: (isEmailFilled && !isLoading)
+                  //     ? _fetchForgotPassword
+                  //     : null,
+                  onPressed: _fetchForgotPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isEmailFilled
                         ? ColorCode.kButtonColor

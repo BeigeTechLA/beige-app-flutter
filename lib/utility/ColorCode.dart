@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ColorCode {
 
   // ⭐ New Colors from UI/UX
-
+  static const Color kBlackDark = Color(0xFF0A0A0A); // #0A0A0A
   static const Color kGoldLight20 = Color(0x33E8D5B5); // #E8D5B5 with 20% opacity
   static const Color kDarkText = Color(0xFF4E4B44);    // #4E4B44
   /// ⭐ Figma Border (#E8D1AB 50%)
