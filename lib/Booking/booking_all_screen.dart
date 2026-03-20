@@ -394,7 +394,10 @@
 //
 //   // ================= FILTER BOTTOM SHEET =================
 //
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 
 import '../service/api_service.dart';
@@ -493,7 +496,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -538,7 +541,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               height: 60,
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF1F1F1F),
+                color: ColorCode.k282828,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
@@ -710,7 +713,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
   Widget upcomingBookingCard(Map shoot) {
     final String fallbackImage =
-        "assets/images/Rectangle 34661070.png";
+        "assets/svg/imag_placeholder.svg";
 
     final String imageUrl = ApiService().getImageURL(
       shoot['creative']?['profile_image_url'] ?? '',
@@ -804,24 +807,61 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     final isNetwork = imagePath.startsWith("http");
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: ColorCode.kBlackDark,
+          //  width: 2,
+          ),
+        ),
+      margin: const EdgeInsets.only(bottom: 10),
       height: 280,
       child: Stack(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(22),
-            child: isNetwork
+            child: (imagePath.isEmpty)
+
+            /// ✅ 1. EMPTY IMAGE → SVG
+                ? Container(
+              color: Colors.black12,
+              child: Center(
+                child: SvgPicture.asset(
+                  "assets/svg/imag_placeholder.svg",
+                  height: 80,
+                ),
+              ),
+            )
+
+            /// ✅ 2. NETWORK IMAGE
+                : isNetwork
                 ? Image.network(
               imagePath,
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
+
+              /// 🔥 ERROR → SVG SHOW
               errorBuilder: (context, error, stackTrace) {
-                return Image.asset(
-                  "assets/images/Rectangle 34661070.png",
-                  fit: BoxFit.cover,
+                return Container(
+                  color: Colors.black12,
+                  child: Center(
+                    child: SvgPicture.asset(
+                      "assets/svg/imag_placeholder.svg",
+                      height: 80,
+                    ),
+                  ),
                 );
               },
+            )
+
+            /// ✅ 3. ASSET IMAGE OR SVG
+                : imagePath.endsWith(".svg")
+                ? Center(
+              child: SvgPicture.asset(
+                imagePath,
+                height: 80,
+              ),
             )
                 : Image.asset(
               imagePath,
@@ -835,80 +875,121 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.65),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(22),
-                ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title ?? "",
-                    style:  TextStyle(
-                        color: ColorCode.white,
-                        fontFamily: "Outfit",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "$date | $time",
-                    style:
-                     TextStyle(
-                         color: ColorCode.kWhiteOpacity70,
-                        fontFamily: "Outfit",
-                        fontSize: 10 ,
-                        fontWeight: FontWeight.w400
-                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      /// 🔹 MAIN BUTTON
-                      Expanded(
-                        child: SizedBox(
-                          height: 45,
-                          child: ElevatedButton(
-                            onPressed: onButtonTap,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorCode.kButtonColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
-                              ),
-                            ),
-                            child: Text(
-                              buttonText,
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontFamily: "Outfit",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
+              child: SizedBox(
+                height: 120, // ✅ SAME HEIGHT EVERYWHERE
+                child: Stack(
+                  children: [
+
+                    /// 🔥 1. BLUR (FIXED AREA ONLY)
+                    BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 26,
+                        sigmaY: 20,
+                      ),
+                      child: Container(
+                        height: 100,
+                        color: Colors.black.withOpacity(0.2), // important
+                      ),
+                    ),
+
+                    /// 🔥 2. GRADIENT (SMOOTH TOP → BOTTOM)
+                    Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,              // 👈 FIX (top blur smooth)
+                            ColorCode.kBlackDark,
+                            ColorCode.kBlackDark
+                          ],
                         ),
                       ),
+                    ),
 
-                      /// 🔹 EDIT IMAGE (ONLY IF UPCOMING)
-                      if (showEditIcon) ...[
-                        const SizedBox(width: 10),
-                        InkWell(
-                          onTap: onEditTap,
-                          child: Image.asset(
-                            "assets/Icons/Group 2087329022.png",
-                            height: 45,
+                    /// 🔥 3. CONTENT
+                    Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Text(
+                            title ?? "",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
-                    ],
-                  ),
+
+                          const SizedBox(height: 4),
+
+                          Text(
+                            "$date • $time",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+
+                              color:ColorCode.kWhiteOpacity70,
+                              fontSize: 12,
+                            ),
+                          ),
+
+                          const Spacer(),
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 44,
+                                  child: ElevatedButton(
+                                    onPressed: onButtonTap,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: ColorCode.kButtonColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      buttonText,
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        color: ColorCode.kHeadingColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              if (showEditIcon) ...[
+                                const SizedBox(width: 10),
+                                Container(
 
 
-                ],
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      "assets/svg/home_view_profile.svg", // 👈 apna svg path
+
+                                         height: 38,
+                                         width: 38,                         ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

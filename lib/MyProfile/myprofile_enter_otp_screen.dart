@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'myprofile_new_password_screen.dart';
 
 class EnterOtpCodeScreen extends StatefulWidget {
@@ -137,13 +138,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    TopMessage.show(context, message);
   }
 
 

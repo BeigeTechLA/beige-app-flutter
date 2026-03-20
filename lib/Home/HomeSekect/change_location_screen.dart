@@ -71,19 +71,37 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
 
   // ================= ADDRESS FROM LAT LNG =================
   Future<void> _getAddressFromLatLng(LatLng latLng) async {
-    List<Placemark> placemarks =
-    await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
 
-    if (placemarks.isNotEmpty) {
-      final p = placemarks.first;
-      setState(() {
-        selectedAddress =
-        "${p.subLocality ?? ""}, ${p.locality ?? ""}, ${p.administrativeArea ?? ""}";
-        searchController.text = selectedAddress;
-      });
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+
+        String fullAddress = [
+          p.name,            // house / building
+          // p.street,          // road 🔥 important
+          // p.subLocality,
+          p.locality,
+          // p.subAdministrativeArea,
+          // p.administrativeArea,
+          p.postalCode,
+          p.country,
+        ]
+            .where((e) => e != null && e.isNotEmpty)
+            .join(', ');
+
+        setState(() {
+          selectedAddress = fullAddress;
+          searchController.text = fullAddress;
+        });
+      }
+    } catch (e) {
+      debugPrint("Address error: $e");
     }
   }
-
 
   Future<void> changeLocationApi() async {
     if (selectedLatLng == null) return;

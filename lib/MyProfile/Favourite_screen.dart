@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -68,219 +69,217 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 40,left: 10,right: 10),
+        child: Column(
 
-            children: [
-              /// 🔙 BACK BUTTON
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    "assets/Icons/Reply.png",
-                    height: 24,
+          children: [
+            /// 🔙 BACK BUTTON
+            Align(
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Image.asset(
+                  "assets/Icons/Reply.png",
+                  height: 24,
+                  color: ColorCode.white,
+                ),
+              ),
+            ),
+SizedBox(height: 10,),
+            /// 🏷 TITLE
+             Row(
+               mainAxisAlignment: MainAxisAlignment.start,
+               children: [
+                 Text(
+                  "  Favourites",
+                  style: TextStyle(
+                    fontFamily: "Unbounded",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: ColorCode.white,
                   ),
-                ),
-              ),
-
-              /// 🏷 TITLE
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.start,
-                 children: [
-                   Text(
-                    "       Favourites",
-                    style: TextStyle(
-                      fontFamily: "Unbounded",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: ColorCode.white,
-                    ),
-                               ),
-                 ],
-               ),
+                             ),
+               ],
+             ),
 
 
 
-              Expanded(
-                child: ListView.builder(
-                  padding:  EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: favourites.length,
-                  itemBuilder: (context, index) {
-                    final item = favourites[index];
-                    final int creatorId = item['creator_id'];
+            Expanded(
+              child: ListView.builder(
+                padding:  EdgeInsets.symmetric(horizontal: 10),
+                itemCount: favourites.length,
+                itemBuilder: (context, index) {
+                  final item = favourites[index];
+                  final int creatorId = item['creator_id'];
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
 
-                        child: SizedBox(
-                          height: 220,
-                          child: Stack(
-                            children: [
+                      child: SizedBox(
+                        height: 220,
+                        child: Stack(
+                          children: [
 
-                              /// ✅ IMAGE (NULL SAFE)
-                              item['profile_image_url'] != null
-                                  ? Image.network(
-                                ApiService().getImageURL(item['profile_image_url']),
-                                width: double.infinity,
-                                height: 220,
-                                fit: BoxFit.cover,
-                              )
-                                  : Image.asset(
-                                "assets/images/Rectangle 34661070.png",
-                                width: double.infinity,
-                                height: 220,
-                                fit: BoxFit.cover,
+                            /// ✅ IMAGE (NULL SAFE)
+                            item['profile_image_url'] != null
+                                ? Image.network(
+                              ApiService().getImageURL(item['profile_image_url']),
+                              width: double.infinity,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            )
+                                : SvgPicture.asset(
+                              "assets/svg/imag_placeholder.svg",
+                              width: double.infinity,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            ),
+
+                            /// DARK GRADIENT
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 110,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.85),
+                                    ],
+                                  ),
+                                ),
                               ),
+                            ),
 
-                              /// DARK GRADIENT
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 110,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.black.withOpacity(0.85),
-                                      ],
+                            /// ACTIVE
+                    /*        Positioned(
+                              top: 12,
+                              left: 12,
+                              child: Row(
+                                children: const [
+                                  CircleAvatar(radius: 6, backgroundColor: Colors.green),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    "Active",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontFamily: "Outfit",
                                     ),
-                                  ),
+                                  )
+                                ],
+                              ),
+                            ),*/
+
+                            /// ❤️ REMOVE FAVOURITE
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: GestureDetector(
+                                onTap: () => _removeFavourite(
+                                  creatorId: creatorId,
+                                  index: index,
+                                ),
+                                child: Image.asset(
+                                  "assets/Icons/Heart_Angl_COLOR.png",
+                                  height: 22,
                                 ),
                               ),
+                            ),
 
-                              /// ACTIVE
-                      /*        Positioned(
-                                top: 12,
-                                left: 12,
-                                child: Row(
-                                  children: const [
-                                    CircleAvatar(radius: 6, backgroundColor: Colors.green),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      "Active",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontFamily: "Outfit",
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),*/
+                            /// TEXT DATA
+                            Positioned(
+                              bottom: 20,
+                              left: 16,
+                              right: 16,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
 
-                              /// ❤️ REMOVE FAVOURITE
-                              Positioned(
-                                top: 12,
-                                right: 12,
-                                child: GestureDetector(
-                                  onTap: () => _removeFavourite(
-                                    creatorId: creatorId,
-                                    index: index,
-                                  ),
-                                  child: Image.asset(
-                                    "assets/Icons/Heart_Angl_COLOR.png",
-                                    height: 22,
-                                  ),
-                                ),
-                              ),
-
-                              /// TEXT DATA
-                              Positioned(
-                                bottom: 20,
-                                left: 16,
-                                right: 16,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-
-                                    /// ⭐ RATING (NULL SAFE)
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.star, color: Colors.yellow, size: 16),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          item['rating'] != null
-                                              ? "${item['rating']} (${item['total_reviews'] ?? 0})"
-                                              : "No ratings",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: ColorCode.kWhiteOpacity70,
-                                            fontFamily: "Outfit",
-                                          ),
+                                  /// ⭐ RATING (NULL SAFE)
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.yellow, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        item['rating'] != null
+                                            ? "${item['rating']} (${item['total_reviews'] ?? 0})"
+                                            : "No ratings",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: ColorCode.kWhiteOpacity70,
+                                          fontFamily: "Outfit",
                                         ),
-                                      ],
-                                    ),
-
-                                    const SizedBox(height: 6),
-
-                                    /// NAME
-                                    Text(
-                                      item['name'] ?? "Unknown",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                        fontFamily: "Outfit",
-                                        fontWeight: FontWeight.w600,
                                       ),
-                                    ),
-
-                                    /// ROLE (NULL SAFE)
-                                    Text(
-                                      item['primary_title'] ?? "Creative Professional",
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: ColorCode.kWhiteOpacity70,
-                                        fontFamily: "Outfit",
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              /// PRICE
-                       /*       Positioned(
-                                bottom: 16,
-                                right: 16,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: ColorCode.kButtonColor,
-                                    borderRadius: BorderRadius.circular(22),
+                                    ],
                                   ),
-                                  child: Text(
-                                    item['hourly_rate'] != null
-                                        ? "From \$${item['hourly_rate']}/Hr"
-                                        : "Price on request",
+
+                                  const SizedBox(height: 6),
+
+                                  /// NAME
+                                  Text(
+                                    item['name'] ?? "Unknown",
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
+                                      color: Colors.white,
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w600,
-                                      color: ColorCode.kCircleGradientTop,
                                     ),
                                   ),
+
+                                  /// ROLE (NULL SAFE)
+                                  Text(
+                                    item['primary_title'] ?? "Creative Professional",
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: ColorCode.kWhiteOpacity70,
+                                      fontFamily: "Outfit",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            /// PRICE
+                     /*       Positioned(
+                              bottom: 16,
+                              right: 16,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.kButtonColor,
+                                  borderRadius: BorderRadius.circular(22),
                                 ),
-                              ),*/
-                            ],
-                          ),
+                                child: Text(
+                                  item['hourly_rate'] != null
+                                      ? "From \$${item['hourly_rate']}/Hr"
+                                      : "Price on request",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorCode.kCircleGradientTop,
+                                  ),
+                                ),
+                              ),
+                            ),*/
+                          ],
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
 
-                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

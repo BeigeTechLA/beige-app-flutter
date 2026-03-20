@@ -693,16 +693,15 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   ),
 
                   const SizedBox(height: 15),
-
                   CustomInputField(
                     title: "Phone Number",
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10), // 🔥 IMPORTANT
                     ],
                   ),
-
                   const SizedBox(height: 15),
 
                   Padding(

@@ -928,9 +928,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                     left: 12,
                                     right: 12,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-
+/*
                                         Row(
                                           children: const [
                                             CircleAvatar(
@@ -946,7 +946,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                               ),
                                             ),
                                           ],
-                                        ),
+                                        ),*/
 
                                         GestureDetector(
                                           onTap: () async {
@@ -1520,12 +1520,11 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ),
             if (isLoading)
               Positioned.fill(
-                child: Container(
-                  color: Colors.black.withOpacity(0.5), // dark overlay
+                child:  Container(
+                  color: Colors.black, // ya transparent bhi rakh sakte ho
                   child: const Center(
                     child: CircularProgressIndicator(
-                      color: ColorCode.kButtonColor, // loader color
-                      strokeWidth: 3,
+                      color: ColorCode.kGold40,
                     ),
                   ),
                 ),

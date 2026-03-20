@@ -8,6 +8,7 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'my_profile.dart';
 
 class MyprofileNewPasswordScreen extends StatefulWidget {
@@ -105,12 +106,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
     setState(() => isLoading = false);
   }
   _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
+    TopMessage.show(context, message);
   }
 
 

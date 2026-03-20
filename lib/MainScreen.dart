@@ -105,16 +105,20 @@ class _MainscreenState extends State<Mainscreen> {
 
       bottomNavigationBar: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          filter: ImageFilter.blur(
+            sigmaX: 100, // 🔥 Figma match blur
+            sigmaY: 100,
+          ),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.25),
-                  ColorCode.bcakgroundcolor,
+                  Colors.black.withOpacity(0.20),
+                  ColorCode.kBlackDark,
                 ],
+
               ),
             ),
             child: BottomNavigationBar(
@@ -196,15 +200,16 @@ class _MainscreenState extends State<Mainscreen> {
     required String active,
     required String inactive,
   }) {
-    return Container(
-      height: 28,
-      width: 28,
-      alignment: Alignment.center, // ✅ FIX alignment
-      child: SvgPicture.asset(
-        isSelected ? active : inactive,
-        height: 28,
-        width: 28,
-        fit: BoxFit.contain,
+    return SizedBox(
+      height: 30,
+      width: 30,
+      child: Center(
+        child: SvgPicture.asset(
+          isSelected ? active : inactive,
+          height: 28, // 👈 adjust this
+          width: 28,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }

@@ -218,7 +218,7 @@ bool isLoading =true;
                   // padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
-                    border: Border.all(color: ColorCode.white)
+                    border: Border.all(color: ColorCode.kWhiteOpacity70,width: 0.5)
                   ),
                   child: Column(
                     children: [
