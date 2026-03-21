@@ -66,7 +66,9 @@ class _CustomInputFieldState extends State<CustomInputField> {
       cursorColor: ColorCode.kButtonColor,
       autofillHints: widget.autofillHints,
       onChanged: widget.onChanged,
+      inputFormatters: widget.inputFormatters,
       maxLines: widget.maxLines,
+
       style: const TextStyle(
         color: ColorCode.white,
         fontFamily: "Outfit",
