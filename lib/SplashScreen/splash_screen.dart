@@ -105,13 +105,16 @@ class _SplashScreenState extends State<SplashScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05, // 👈 side spacing
               ),
-              child: Text(
-                "—  Streamline your crew, equipment, & projects  —",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: MediaQuery.of(context).size.width * 0.03, // 👈 responsive font
-                  fontFamily: "Unbounded",
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  "— Streamline your crew, equipment, & projects  —",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Unbounded",
+                  ),
                 ),
               ),
             ),
