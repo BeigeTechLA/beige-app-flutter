@@ -484,121 +484,117 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   ],
                 ),
               ),
+              SizedBox(height: 20),
               Divider(color: ColorCode.kDividerWhite12,),
-              SizedBox(height: 28),
+              SizedBox(height: 30),
 
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Editing Services",
-                        style: TextStyle(
+                  /// ✅ CHECK: agar data hai tabhi show karo
+                  if ((booking?['edit_types'] ?? []).isNotEmpty) ...[
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Editing Services",
+                          style: TextStyle(
                             fontSize: 14,
                             color: ColorCode.white,
                             fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500
-                        ),),
-                    ],
-                  ),
-                  SizedBox(height: 14),
-
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF282828),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        /// 🔹 Title
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Text(
-                            "$creativeRole:",
-                            style: const TextStyle(
-                              color: ColorCode.white,
-                              fontSize: 12,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-
-                        /// 🔹 Grid
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: (booking?['edit_types'] ?? []).length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 2.3, // thoda slim card
-                          ),
-                          itemBuilder: (context, index) {
-
-                            final edit = booking!['edit_types'][index];
-
-                            final parts = edit.split('(');
-                            final title = parts[0].trim();
-                            final duration = parts.length > 1 ? "(${parts[1]}" : "";
-
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: ColorCode.kGoldLight20,   // ✅ background change
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-
-                                  /// 🔹 Title
-                                  Text(
-                                    title,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: ColorCode.kButtonColor, // ✅ text color change
-                                      fontFamily: "Outfit",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-
-                                  /// 🔹 Duration
-                                  if (duration.isNotEmpty)
-                                    Text(
-                                      duration,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: ColorCode.kButtonColor, // ✅ text color change
-                                        fontFamily: "Outfit",
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
                         ),
                       ],
                     ),
-                  ),
 
-                  Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Divider(color: ColorCode.kDividerWhite12,),
-                  ),
+                    SizedBox(height: 14),
 
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF282828),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              "$creativeRole:",
+                              style: const TextStyle(
+                                color: ColorCode.white,
+                                fontSize: 12,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: (booking?['edit_types'] ?? []).length,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 2.3,
+                            ),
+                            itemBuilder: (context, index) {
+                              final edit = booking!['edit_types'][index];
+
+                              final parts = edit.split('(');
+                              final title = parts[0].trim();
+                              final duration = parts.length > 1 ? "(${parts[1]}" : "";
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.kGoldLight20,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      title,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: ColorCode.kButtonColor,
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    if (duration.isNotEmpty)
+                                      Text(
+                                        duration,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: ColorCode.kButtonColor,
+                                          fontFamily: "Outfit",
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Divider(color: ColorCode.kDividerWhite12),
+                    ),
+                  ],
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
