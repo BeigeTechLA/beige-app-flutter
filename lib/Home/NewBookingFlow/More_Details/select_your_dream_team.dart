@@ -164,7 +164,6 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       debugPrint("Remove Favourite Error: $e");
     }
   }
-
   Future<bool> _addHolds({
     required int creativeUserId,
     required int roleId,
@@ -172,25 +171,38 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     try {
       final url = "${ApiEndpoints.booking}/${widget.bookingId}/hold";
 
-      debugPrint("👉 ADD HOLD URL: $url");
-      debugPrint("👉 BODY: creative_user_id=$creativeUserId role_id=$roleId");
+      /// 🔥 PRINT START
+      debugPrint("═══════════════════════════════");
+      debugPrint("📤 ADD HOLD API CALL");
+      debugPrint("👉 URL: $url");
 
-      final response = await ApiService().postData(
-        url,
-        {
-          "creative_user_id": creativeUserId,
-          "role_id": roleId,
-        },
-      );
+      final body = {
+        "creative_user_id": creativeUserId,
+        "role_id": roleId,
+      };
 
-      debugPrint("✅ ADD HOLD RESPONSE: $response");
+      debugPrint("👉 PAYLOAD:");
+      body.forEach((key, value) {
+        debugPrint("   $key : $value");
+      });
+
+      debugPrint("═══════════════════════════════");
+
+      final response = await ApiService().postData(url, body);
+
+      /// 🔥 RESPONSE PRINT
+      debugPrint("📥 RESPONSE:");
+      debugPrint(response.toString());
+      debugPrint("═══════════════════════════════");
 
       if (response != null && response['error'] == false) {
+        debugPrint("✅ SUCCESS");
         return true;
       } else {
         final msg = response?['message'] ?? "Something went wrong";
 
-        /// 🔥 UI ERROR SHOW
+        debugPrint("❌ FAILED: $msg");
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg)),
         );
@@ -198,7 +210,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Add Holds Error: $e");
+      debugPrint("❌ EXCEPTION: $e");
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
