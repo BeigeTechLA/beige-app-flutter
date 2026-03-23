@@ -162,9 +162,9 @@ class _MyProfileState extends State<MyProfile> {
                                   ? Center(
                                 child: SvgPicture.asset(
                                   "assets/svg/persone.svg",
-                                  height: 40,
-                                  width: 40,
-                                  color: Colors.grey,
+                                  width: 96,
+                                  height: 96,
+
                                 ),
                               )
 
@@ -181,8 +181,8 @@ class _MyProfileState extends State<MyProfile> {
 
                                   return Center(
                                     child: SizedBox(
-                                      height: 50,
-                                      width: 50,
+                                      width: 96,
+                                      height: 96,
                                       child: Lottie.asset(
                                         "assets/lottie/Untitled_file.json",
                                         fit: BoxFit.contain,
@@ -196,9 +196,9 @@ class _MyProfileState extends State<MyProfile> {
                                   return Center(
                                     child: SvgPicture.asset(
                                       "assets/svg/persone.svg",
-                                      height: 40,
-                                      width: 40,
-                                      color: Colors.grey,
+                                      width: 96,
+                                      height: 96,
+
                                     ),
                                   );
                                 },

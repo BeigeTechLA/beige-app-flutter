@@ -338,16 +338,16 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                   width: 126,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
-                    return Image.asset(
-                      "assets/images/Rectangle 34661070.png",
+                    return SvgPicture.asset(
+                      "assets/svg/imag_placeholder.svg",
                       height: 144,
                       width: 126,
                       fit: BoxFit.cover,
                     );
                   },
                 )
-                    : Image.asset(
-                  "assets/images/Rectangle 34661070.png",
+                    : SvgPicture.asset(
+                  "assets/svg/imag_placeholder.svg",
                   height: 144,
                   width: 126,
                   fit: BoxFit.cover,

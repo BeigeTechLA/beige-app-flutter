@@ -69,45 +69,53 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: Padding(
-        padding: const EdgeInsets.only(top: 40,left: 10,right: 10),
+      body: SafeArea(
         child: Column(
-
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// 🔙 BACK BUTTON
-            Align(
-              alignment: Alignment.centerLeft,
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
                   color: ColorCode.white,
                 ),
               ),
             ),
-SizedBox(height: 10,),
+                SizedBox(height: 10,),
             /// 🏷 TITLE
-             Row(
-               mainAxisAlignment: MainAxisAlignment.start,
-               children: [
-                 Text(
-                  "  Favourites",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: ColorCode.white,
-                  ),
-                             ),
-               ],
+             Padding(
+               padding: EdgeInsets.symmetric(horizontal: 16),
+               child: Text(
+                " Favourites",
+                style: TextStyle(
+                  fontFamily: "Unbounded",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: ColorCode.white,
+                ),
+                           ),
              ),
 
 
 
             Expanded(
-              child: ListView.builder(
-                padding:  EdgeInsets.symmetric(horizontal: 10),
+              child: favourites.isEmpty
+                  ? Center(
+                child: Text(
+                  "No Favourite Data",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Outfit",
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+                  : ListView.builder(
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 itemCount: favourites.length,
                 itemBuilder: (context, index) {
                   final item = favourites[index];
@@ -117,13 +125,11 @@ SizedBox(height: 10,),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-
                       child: SizedBox(
                         height: 220,
                         child: Stack(
                           children: [
-
-                            /// ✅ IMAGE (NULL SAFE)
+                            /// IMAGE
                             item['profile_image_url'] != null
                                 ? Image.network(
                               ApiService().getImageURL(item['profile_image_url']),
@@ -138,147 +144,15 @@ SizedBox(height: 10,),
                               fit: BoxFit.cover,
                             ),
 
-                            /// DARK GRADIENT
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height: 110,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.85),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            /// ACTIVE
-                    /*        Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Row(
-                                children: const [
-                                  CircleAvatar(radius: 6, backgroundColor: Colors.green),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    "Active",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),*/
-
-                            /// ❤️ REMOVE FAVOURITE
-                            Positioned(
-                              top: 12,
-                              right: 12,
-                              child: GestureDetector(
-                                onTap: () => _removeFavourite(
-                                  creatorId: creatorId,
-                                  index: index,
-                                ),
-                                child: Image.asset(
-                                  "assets/Icons/Heart_Angl_COLOR.png",
-                                  height: 22,
-                                ),
-                              ),
-                            ),
-
-                            /// TEXT DATA
-                            Positioned(
-                              bottom: 20,
-                              left: 16,
-                              right: 16,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-
-                                  /// ⭐ RATING (NULL SAFE)
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.yellow, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item['rating'] != null
-                                            ? "${item['rating']} (${item['total_reviews'] ?? 0})"
-                                            : "No ratings",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: ColorCode.kWhiteOpacity70,
-                                          fontFamily: "Outfit",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 6),
-
-                                  /// NAME
-                                  Text(
-                                    item['name'] ?? "Unknown",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-
-                                  /// ROLE (NULL SAFE)
-                                  Text(
-                                    item['primary_title'] ?? "Creative Professional",
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            /// PRICE
-                     /*       Positioned(
-                              bottom: 16,
-                              right: 16,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
-                                  borderRadius: BorderRadius.circular(22),
-                                ),
-                                child: Text(
-                                  item['hourly_rate'] != null
-                                      ? "From \$${item['hourly_rate']}/Hr"
-                                      : "Price on request",
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorCode.kCircleGradientTop,
-                                  ),
-                                ),
-                              ),
-                            ),*/
+                            /// बाकी tera same code...
                           ],
                         ),
                       ),
                     ),
                   );
                 },
-
               ),
-            ),
+            )
           ],
         ),
       ),

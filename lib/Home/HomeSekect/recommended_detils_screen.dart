@@ -305,7 +305,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                               ),
                             ],
                           ),
-                          Text(
+                     /*     Text(
                             creative?['hourly_rate'] != null
                                 ? "From \$${creative?['hourly_rate']}/Hr"
                                 : "",
@@ -315,7 +315,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                               fontWeight: FontWeight.bold,
                               color: ColorCode.kButtonColor,
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),
