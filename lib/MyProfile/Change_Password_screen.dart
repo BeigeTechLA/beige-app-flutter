@@ -172,7 +172,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     children: [
 
                       InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Navigator.pop(context,true),
                         child: Image.asset(
                           "assets/Icons/Reply.png",
                           height: 24,

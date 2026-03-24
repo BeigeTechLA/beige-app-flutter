@@ -61,7 +61,33 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         return "nearest";
     }
   }
+  int getRoleIdByContentType(int contentTypeId, String roleName) {
+    final name = roleName.toLowerCase();
 
+    /// VIDEO ONLY
+    if (contentTypeId == 1) return 1;
+
+    /// PHOTO ONLY
+    if (contentTypeId == 2) return 2;
+
+    /// BOTH
+    if (contentTypeId == 3) {
+      if (name.contains("photographer")) return 2;
+      if (name.contains("video")) return 1;
+    }
+
+    return 1;
+  }
+
+  /// 🔥 ROLE NAME → ROLE ID mapping
+  int _mapRoleName(String roleName) {
+    final name = roleName.toLowerCase();
+
+    if (name.contains("video")) return 1;
+    if (name.contains("photo")) return 2;
+
+    return 1; // default (kabhi 0 nahi)
+  }
   @override
   void initState() {
     super.initState();
@@ -1214,8 +1240,11 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                               InkWell(
                           onTap: () async {
                           final int creativeUserId = item['user']['id'];
-                          final int roleId = getRoleId(item['role_id']);
-
+                         // final int roleId = getRoleId(item['role_id']);
+                          final int roleId = getRoleIdByContentType(
+                            widget.contentTypeId,
+                            item['role_name'] ?? '',
+                          );
                           /// 🔴 REMOVE
                           if (addedCrewUserIds.contains(creativeUserId)) {
                           final success = await _removeHolds(
@@ -1903,16 +1932,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                       if (matches.isEmpty) continue;
 
+                    /*  final roleId =
+                          int.tryParse(matches.first['role_id'].toString()) ?? 0;*/
                       final roleId =
                           int.tryParse(matches.first['role_id'].toString()) ?? 0;
-
                       await _addHolds(
                         creativeUserId: userId,
                         roleId: roleId,
                       );
                     }
 
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => ReviewConfirmScreen(

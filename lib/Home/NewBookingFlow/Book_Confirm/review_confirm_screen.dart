@@ -47,6 +47,29 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     int selectedIndex = 0;
      bool isLoading =true;
 
+  String getRoleName(String roleId) {
+    switch (roleId) {
+      case "1":
+        return "Videographer";
+      case "2":
+        return "Photographer";
+      default:
+        return "Crew";
+    }
+  }
+  List<String> getAdditionalCrewSubtitles() {
+    final extra = crewSummary?['extra_by_role'] ?? {};
+
+    List<String> list = [];
+
+    extra.forEach((key, value) {
+      if (value > 0) {
+        list.add("${getRoleName(key)}: $value");
+      }
+    });
+
+    return list;
+  }
   @override
   void initState() {
     super.initState();
@@ -693,12 +716,23 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                     title: "Phone Number",
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).unfocus(); // ✅ Done button
+                    },
+
+                    onChanged: (value) {
+                      if (value.length == 10) {
+                        FocusScope.of(context).unfocus(); // ✅ Auto close after 10 digit
+                      }
+                    },
+
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10), // 🔥 IMPORTANT
+                      LengthLimitingTextInputFormatter(10),
                     ],
-                  ),
-                  const SizedBox(height: 15),
+                  ),            const SizedBox(height: 15),
 
                   Padding(
                     padding: EdgeInsets.all(12.0),
@@ -778,12 +812,20 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ),
 
 // --- ADDITIONAL CREW CARD ---
+                      if (getAdditionalCrewSubtitles().isNotEmpty)
+                        builderPricingCard(
+                          title: "Additional Crew",
+                          amount: calculateAdditionalCrew(),
+                          subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
+                        ),
+
+/*
                       if (calculateAdditionalCrew() > 0)
                         builderPricingCard(
                           title: "Additional Crew",
                           amount: calculateAdditionalCrew(),
                           subtitles: [],
-                        ),
+                        ),*/
 
                       const SizedBox(height: 10),
                       const Divider(color: ColorCode.kDividerWhite12),

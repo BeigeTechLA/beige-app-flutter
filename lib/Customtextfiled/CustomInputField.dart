@@ -17,6 +17,9 @@ class CustomInputField extends StatefulWidget {
   final int maxLines;
   final List<TextInputFormatter>? inputFormatters;
   final Function(String)? onChanged;
+
+  final TextInputAction? textInputAction;
+  final Function(String)? onFieldSubmitted;
   const CustomInputField({
     super.key,
     required this.title,
@@ -26,7 +29,10 @@ class CustomInputField extends StatefulWidget {
     this.onToggle,
     this.keyboardType = TextInputType.text,
     this.autofillHints, this.suffixIcon, this.onTap,  this.readOnly =false,   this.maxLines = 1, this.inputFormatters,
-    this.onChanged, });
+    this.onChanged,
+    this.textInputAction,
+    this.onFieldSubmitted,
+  });
 
   @override
   State<CustomInputField> createState() => _CustomInputFieldState();
@@ -63,11 +69,14 @@ class _CustomInputFieldState extends State<CustomInputField> {
       onTap: widget.onTap,
       obscureText: widget.isPassword ? !widget.isVisible : false,
       keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,        // ✅
+      onSubmitted: widget.onFieldSubmitted,           // ✅
       cursorColor: ColorCode.kButtonColor,
       autofillHints: widget.autofillHints,
       onChanged: widget.onChanged,
       inputFormatters: widget.inputFormatters,
       maxLines: widget.maxLines,
+
 
       style: const TextStyle(
         color: ColorCode.white,

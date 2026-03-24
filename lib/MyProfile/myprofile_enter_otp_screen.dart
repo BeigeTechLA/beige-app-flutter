@@ -74,7 +74,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
 
         if (!mounted) return;
 
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => MyprofileNewPasswordScreen(

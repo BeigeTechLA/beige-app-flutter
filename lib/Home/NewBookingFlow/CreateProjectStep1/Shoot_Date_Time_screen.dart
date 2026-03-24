@@ -638,7 +638,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.pop(context,true),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,

@@ -19,58 +19,80 @@ class VideoShootType extends StatefulWidget {
   State<VideoShootType> createState() => _VideoShootTypeState();
 }
 class _VideoShootTypeState extends State<VideoShootType>
-    with AutomaticKeepAliveClientMixin {
+{
 
 bool  isLoading =true;
 
-  int selectedIndex = -1;
+  // int selectedIndex = -1;
 List<Map<String, dynamic>> shootTypes = [];
 
-
+int? selectedContentTypeId; //
+/*
 int? selectedShootTypeId;
 String? selectedShootTypeName;
+*/
 
-@override
-bool get wantKeepAlive => true; //
+
+  int selectedIndex = -1;
+  int? selectedShootTypeId;
+  String? selectedShootTypeName;
+
+
 @override
 void initState() {
   super.initState();
-  _callBookingApi(widget.contentTypeId);
-}
 
-
-Future<void> _callBookingApi(int contentTypeId) async {
-  setState(() => isLoading = true);
-
-  try {
-    final response = await ApiService().fetchData(
-      "${ApiEndpoints.booking_shoot_types}$contentTypeId",
-    );
-
-    if (response != null &&
-        response['error'] == false &&
-        response['data'] is List) {
-
-      shootTypes = response['data']
-          .map<Map<String, dynamic>>((e) => {
-        "id": e['shoot_type_id'],
-        "name": e['name'],
-        "image": e['image_url'],
-        "content_type": e['content_type'],
-        "tags": _parseTags(e['tags']),
-      })
-          .toList();
-
-      debugPrint("✅ ShootTypes Loaded → ${shootTypes.length}");
-    }
-  } catch (e) {
-    debugPrint("❌ ShootType API Error → $e");
-  } finally {
-    setState(() => isLoading = false);
+  if (shootTypes.isEmpty) {
+    _callBookingApi(widget.contentTypeId);
   }
 }
+  Future<void> _callBookingApi(int contentTypeId) async {
+    setState(() {
+      isLoading = true;
+      // shootTypes.clear();
+    });
 
-int? selectedContentTypeId; //
+    try {
+      final response = await ApiService().fetchData(
+        "${ApiEndpoints.booking_shoot_types}$contentTypeId",
+      );
+
+      if (response != null &&
+          response['error'] == false &&
+          response['data'] is List) {
+
+        // ✅ DATA LOAD
+        shootTypes = response['data']
+            .map<Map<String, dynamic>>((e) => {
+          "id": e['shoot_type_id'],
+          "name": e['name'],
+          "image": e['image_url'],
+          "content_type": e['content_type'],
+          "tags": _parseTags(e['tags']),
+        })
+            .toList();
+
+        debugPrint("✅ ShootTypes Loaded → ${shootTypes.length}");
+
+        // 🔥🔥 MOST IMPORTANT FIX (RESTORE SELECTION AFTER DATA)
+        if (selectedShootTypeId != null) {
+          final index = shootTypes.indexWhere(
+                (e) => e['id'] == selectedShootTypeId,
+          );
+
+          if (index != -1) {
+            selectedIndex = index;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ ShootType API Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
+
 
 List<dynamic> _parseTags(dynamic tags) {
   if (tags == null) return [];
@@ -120,17 +142,51 @@ Future<void> select_shoottype() async {
 
     if (response != null && response['error'] == false) {
       final bookingId = response['data']?['booking_id'];
-
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ShootDateTimeScreen(
-            // specialtyId: widget.specialtyId,
             ShootTypeId: selectedShootTypeId!,
-            bookingId: bookingId, contentTypeId: widget.contentTypeId,
+            bookingId: bookingId,
+            contentTypeId: widget.contentTypeId,
           ),
         ),
       );
+
+      if (result != null && result is Map) {
+        setState(() {
+          selectedShootTypeId = result["id"];
+          selectedShootTypeName = result["name"];
+
+          final index = shootTypes.indexWhere(
+                (e) => e['id'] == selectedShootTypeId,
+          );
+
+          if (index != -1) {
+            selectedIndex = index;
+          }
+        });
+      }
+
+      if (result != null) {
+        setState(() {
+          selectedShootTypeId = result["id"];
+          selectedShootTypeName = result["name"];
+
+          final index = shootTypes.indexWhere(
+                (e) => e['id'] == selectedShootTypeId,
+          );
+
+          if (index != -1) {
+            selectedIndex = index;
+          }
+        });
+      }
+
+      if (result == true) {
+        // 🔥 DO NOTHING (state preserve)
+        return;
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response['message'] ?? "Something went wrong")),
@@ -160,7 +216,7 @@ String getContentTypeTitle(int contentTypeId) {
 
 @override
   Widget build(BuildContext context) {
-     super.build(context);
+
     return Scaffold(
 
       appBar: AppBar(
@@ -173,7 +229,7 @@ String getContentTypeTitle(int contentTypeId) {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.pop(context, widget.bookingId),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,
@@ -437,7 +493,7 @@ String getContentTypeTitle(int contentTypeId) {
           children: [
             Expanded(
               child:  OutlinedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.pop(context, widget.bookingId),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.grey),

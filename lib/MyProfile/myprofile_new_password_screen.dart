@@ -122,10 +122,10 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context,true);
                 },
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
                   width: 24,
                 ),
@@ -369,12 +369,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       pageBuilder: (_, __, ___) {
 
         Future.delayed(const Duration(seconds: 2), () {
-          if (Navigator.canPop(context)) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) =>  MyProfile()),
-            );
-          }
+          Navigator.popUntil(context, (route) => route.isFirst);
         });
 
         return Stack(

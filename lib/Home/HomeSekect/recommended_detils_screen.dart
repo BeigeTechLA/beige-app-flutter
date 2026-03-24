@@ -690,7 +690,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
 
       /// 🔹 BOTTOM BUTTON
-      bottomNavigationBar: Padding(
+    /*  bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child:    SizedBox(
           width: double.infinity,
@@ -715,7 +715,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
           ),
         ),
-      )
+      )*/
     );
   }
 

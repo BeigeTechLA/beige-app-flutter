@@ -144,8 +144,8 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                       onTap: () {
                         Navigator.pop(context); // 🔥 screen pop karega
                       },
-                      child: Image.asset(
-                        "assets/Icons/Reply.png",
+                      child: SvgPicture.asset(
+                        "assets/svg/back.svg",
                         height: 24,
                         color: Colors.white, // agar white chahiye ho
                       ),

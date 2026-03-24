@@ -79,7 +79,7 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+
 
       body: SingleChildScrollView(
         child: Column(
@@ -111,7 +111,9 @@ class _MyProfileState extends State<MyProfile> {
                   top: 90,
                   left: 16,
                   child:  InkWell(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     child:SvgPicture.asset(
                       "assets/svg/back.svg",
                       color: ColorCode.black,

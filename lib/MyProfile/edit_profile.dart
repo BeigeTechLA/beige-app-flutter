@@ -1315,11 +1315,13 @@ class _EditProfileState extends State<EditProfile> {
                     controller: TextEditingController(text: "********"),
                     readOnly: true,
                     suffixIcon: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ChangePasswordScreen(email:emailController.text),
+                            builder: (_) => ChangePasswordScreen(
+                              email: emailController.text,
+                            ),
                           ),
                         );
                       },
