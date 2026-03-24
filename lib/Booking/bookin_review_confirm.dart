@@ -303,7 +303,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               Row(
                 children: [
                   Text(
-                    "Review & Confirm",
+                    "Review & Cdonfirm",
                     style: TextStyle(
                       fontFamily: "Unbounded ",
                       fontSize: 16,

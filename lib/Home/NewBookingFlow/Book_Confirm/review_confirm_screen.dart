@@ -70,6 +70,24 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
     return list;
   }
+
+  List<String> getEditingSubtitles() {
+    List<String> list = [];
+
+    /// 🔹 1. edit_types (Edited Photos)
+    final editTypes = booking?['edit_types'] ?? [];
+    for (var type in editTypes) {
+      list.add(type.toString());
+    }
+
+    /// 🔹 2. editing_breakdown (price wali details)
+    /*final breakdown = pricing?['editing_breakdown'] ?? [];
+    for (var item in breakdown) {
+      list.add("${item['label']}: \$${item['amount']}");
+    }*/
+
+    return list;
+  }
   @override
   void initState() {
     super.initState();
@@ -805,10 +823,16 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ),
 
 // --- EDITING SERVICES CARD ---
+                     /* builderPricingCard(
+                        title: "Editing Services",
+                        amount: calculateEditingCost(),
+                        subtitles: [],
+                      ),*/
                       builderPricingCard(
                         title: "Editing Services",
                         amount: calculateEditingCost(),
                         subtitles: [],
+                        // subtitles: getEditingSubtitles(),
                       ),
 
 // --- ADDITIONAL CREW CARD ---
@@ -1252,7 +1276,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   }
 
   double calculateAdditionalCrew() {
-    return (pricing?['creative_base_total'] ?? 0).toDouble();
+    return (pricing?['extra_creatives_amount'] ?? 0).toDouble();
   }
 
 /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
