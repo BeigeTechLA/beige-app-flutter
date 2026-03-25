@@ -101,6 +101,42 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     super.dispose();
   }
 
+  List<String> getShootSubtitles() {
+    final breakdown = pricing?['pricing_sections']?['shoot_cost']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+  List<String> getEditingSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['editing_services']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+  List<String> getAdditionalCrewSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['additional_crew']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+
+  double getShootAmount() {
+    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
+  }
+
+  double getEditingAmount() {
+    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
+  }
+
+  double getAdditionalCrewAmount() {
+    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
+  }
   Future<void> _fetchHomeReview() async {
     setState(() => isLoading = true);
 
@@ -818,7 +854,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       // --- SHOOT COST CARD ---
                       builderPricingCard(
                         title: "Shoot Cost",
-                        amount: calculateShootCost(),
+                        amount: getShootAmount(),
                         subtitles: [],
                       ),
 
@@ -830,7 +866,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       ),*/
                       builderPricingCard(
                         title: "Editing Services",
-                        amount: calculateEditingCost(),
+                        amount: getEditingAmount(),
                         subtitles: [],
                         // subtitles: getEditingSubtitles(),
                       ),
@@ -839,7 +875,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       if (getAdditionalCrewSubtitles().isNotEmpty)
                         builderPricingCard(
                           title: "Additional Crew",
-                          amount: calculateAdditionalCrew(),
+                          amount: getAdditionalCrewAmount(),
                           subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
                         ),
 

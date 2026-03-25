@@ -12,6 +12,8 @@ class ColorCode {
   static const Color kHeadingColor = Color(0xFF1D1D1B); // (dark)
   static  const Color kSubtextColor = Color(0xFF474746);
   static const Color kSubtextOpacity = Color(0x991D1D1B); // 60% opacity
+
+  static const Color kWhiteOpacity30 = Color(0x4DFFFFFF); // 30% white
   // static  const Color kBackgroundColor = Color(0xFFFAF9F6);
   static const Color kCircleBorder = Color(0xFFDDDDDD);
   static const Color k262624 = Color(0xFF262624);

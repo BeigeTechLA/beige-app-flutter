@@ -80,18 +80,18 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
 
-        String fullAddress = [
-          p.name,            // house / building
-          // p.street,          // road 🔥 important
-          // p.subLocality,
-          p.locality,
-          // p.subAdministrativeArea,
-          // p.administrativeArea,
-          p.postalCode,
-          p.country,
-        ]
-            .where((e) => e != null && e.isNotEmpty)
-            .join(', ');
+        // 🔥 use Set to remove duplicates
+        final addressParts = <String>{
+          if (p.street != null && p.street!.isNotEmpty) p.street!,
+          if (p.subLocality != null && p.subLocality!.isNotEmpty) p.subLocality!,
+          if (p.locality != null && p.locality!.isNotEmpty) p.locality!,
+          if (p.administrativeArea != null && p.administrativeArea!.isNotEmpty)
+            p.administrativeArea!,
+          if (p.postalCode != null && p.postalCode!.isNotEmpty) p.postalCode!,
+          if (p.country != null && p.country!.isNotEmpty) p.country!,
+        };
+
+        String fullAddress = addressParts.join(', ');
 
         setState(() {
           selectedAddress = fullAddress;
@@ -306,6 +306,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                     _mapController.complete(controller);
                     controller.setMapStyle(_darkMapStyle);
                   },
+
+              /*    myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  compassEnabled: true,*/
                   onTap: (latLng) async {
                     setState(() => selectedLatLng = latLng);
                     await _getAddressFromLatLng(latLng);
@@ -316,7 +320,9 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                       position: selectedLatLng!,
                     ),
                   },
-                  zoomControlsEnabled: false,
+
+                  zoomGesturesEnabled: false,
+                  // scrollGesturesEnabled: true,
                 ),
 
                 /// ================= ZOOM BUTTONS =================
@@ -325,8 +331,6 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   bottom: 20,
                   child: Column(
                     children: [
-
-                      /// 🔍 ZOOM IN
                       GestureDetector(
                         onTap: () async {
                           final controller = await _mapController.future;
@@ -339,21 +343,16 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: SvgPicture.asset(
-                                "assets/svg/zoom+.svg", // 👈 tumhara svg path
-                                color: Colors.black,
-                                height: 20,
-                                width: 20,
-                              ),
-                            )
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: SvgPicture.asset(
+                              "assets/svg/zoom+.svg",
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
-                      /// 🔍 ZOOM OUT
                       GestureDetector(
                         onTap: () async {
                           final controller = await _mapController.future;
@@ -366,15 +365,13 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: SvgPicture.asset(
-                                "assets/svg/zoom-.svg", // 👈 tumhara svg path
-                                color: Colors.black,
-                                height: 20,
-                                width: 20,
-                              ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: SvgPicture.asset(
+                              "assets/svg/zoom-.svg",
+                              color: Colors.black,
                             ),
+                          ),
                         ),
                       ),
                     ],

@@ -462,6 +462,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+              if ((booking?['edit_types'] ?? []).isNotEmpty) ...[
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -565,7 +566,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                     ),
                   ),
 
-
+],
                   SizedBox(height: 14),
                   // _buildField("Full Name*", nameController),
                   //
@@ -639,25 +640,42 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                       // --- SHOOT COST CARD ---
                       builderPricingCard(
                         title: "Shoot Cost",
+                        amount: getShootAmount(),
+                        subtitles: [],
+                      ),
+
+                      /*     builderPricingCard(
+                        title: "Shoot Cost",
                         amount: calculateShootCost()['total'],
                         subtitles: [
                           if (calculateShootCost()['hasPreProd']) "",
                           if (calculateShootCost()['hasRush']) "• Rush Fee",
 
                         ],
-                      ),
-
-                      // --- EDITING SERVICES CARD ---
+                      ),*/
                       builderPricingCard(
+                        title: "Editing Services",
+                        amount: getEditingAmount(),
+                        subtitles: [],
+                        // subtitles: getEditingSubtitles(),
+                      ),
+                      // --- EDITING SERVICES CARD ---
+                  /*    builderPricingCard(
                         title: "Editing Services",
                         amount: (pricing?['editing_amount'] ?? 0).toDouble(),
                         subtitles: (pricing?['editing_breakdown'] as List? ?? [])
                             .map((e) => "• ${e['label']}")
                             .toList(),
-                      ),
+                      ),*/
+                      if (getAdditionalCrewAmount() > 0)
+                        builderPricingCard(
+                          title: "Additional Crew",
+                          amount: getAdditionalCrewAmount(),
+                          subtitles: getAdditionalCrewSubtitlesNew(),
+                        ),
 
                       // --- ADDITIONAL CREW CARD ---
-                      if (calculateAdditionalCrew()['total'] > 0)
+                    /*  if (calculateAdditionalCrew()['total'] > 0)
                         builderPricingCard(
                           title: "Additional Crew",
                           amount: calculateAdditionalCrew()['total'],
@@ -665,7 +683,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                               .entries
                               .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
                               .toList(),
-                        ),
+                        ),*/
 
                       const SizedBox(height: 10),
                       const Divider(color: ColorCode.kDividerWhite12),
@@ -1190,62 +1208,40 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
       ),
     );
   }
-  /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
-  Map<String, dynamic> calculateShootCost() {
-    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
-    double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
-    double shootCost = preProd + rushFee;
+  List<String> getShootSubtitles() {
+    final breakdown = pricing?['pricing_sections']?['shoot_cost']?['breakdown'] ?? [];
 
-    // Use crewSummary instead of bookingSummaryData
-    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
-    Map<int, int> processedCount = {};
-
-    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
-
-    for (var c in creatives) {
-      int roleId = c['role_id'];
-      // API keys are strings "1", "2", so we convert to string for lookup
-      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
-      int current = processedCount[roleId] ?? 0;
-
-      if (current < required) {
-        shootCost += (c['amount'] ?? 0).toDouble();
-        processedCount[roleId] = current + 1;
-      }
-    }
-
-    return {
-      "total": shootCost,
-      "hasPreProd": preProd > 0,
-      "hasRush": rushFee > 0,
-    };
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
   }
 
-  Map<String, dynamic> calculateAdditionalCrew() {
-    double additionalTotal = 0;
-    Map<int, int> extraCount = {};
+  List<String> getEditingSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['editing_services']?['breakdown'] ?? [];
 
-    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
-    Map<int, int> processedCount = {};
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
 
-    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+  List<String> getAdditionalCrewSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['additional_crew']?['breakdown'] ?? [];
 
-    for (var c in creatives) {
-      int roleId = c['role_id'];
-      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
-      int current = processedCount[roleId] ?? 0;
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
 
-      if (current < required) {
-        processedCount[roleId] = current + 1;
-      } else {
-        additionalTotal += (c['amount'] ?? 0).toDouble();
-        extraCount[roleId] = (extraCount[roleId] ?? 0) + 1;
-      }
-    }
 
-    return {
-      "total": additionalTotal,
-      "counts": extraCount,
-    };
+  double getShootAmount() {
+    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
+  }
+
+  double getEditingAmount() {
+    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
+  }
+
+  double getAdditionalCrewAmount() {
+    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
   }
 }

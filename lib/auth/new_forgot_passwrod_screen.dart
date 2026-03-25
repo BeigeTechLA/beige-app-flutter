@@ -142,7 +142,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                   height: MediaQuery
                       .of(context)
                       .size
-                      .height * 0.29,
+                      .height * 0.35,
                   child: Stack(
                     children: [
 
@@ -216,7 +216,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
                 /// 📦 FORM CONTAINER (NICHE)
                 Transform.translate(
-                  offset: const Offset(0, -40),
+                  offset: const Offset(0, -70),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -224,7 +224,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                        padding: const EdgeInsets.fromLTRB(20, 32,20, 20),
                         // 👈 top extra
                         margin: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
@@ -262,7 +262,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                           ),*/
 
 
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 30),
                             SizedBox(
                               width: double.infinity,
                               height: 50,
@@ -384,7 +384,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
               ],
             ),
           ),
-          if (isLoading)
+        /*  if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
@@ -392,45 +392,46 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                   color: ColorCode.kGoldGradientLight,
                 ),
               ),
-            ),
-
+            ),*/
         ],
 
       ),
 
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "I Remember my Password. ",
-              style: TextStyle(
-                color: ColorCode.kWhiteOpacity60,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const NewLoginScreen(),
-                  ),
-                );
-              },
-              child: const Text(
-                "Login",
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "I Remember my Password. ",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: ColorCode.kWhiteOpacity60,
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-          ],
+              InkWell(
+                onTap: () {
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NewLoginScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Login",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

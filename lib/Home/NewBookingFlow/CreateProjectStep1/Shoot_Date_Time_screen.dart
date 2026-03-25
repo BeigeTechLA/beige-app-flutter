@@ -51,6 +51,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     _edittype();
   }
   String _apiDateFormat(DateTime date) {
+
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
