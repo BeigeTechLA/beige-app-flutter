@@ -223,7 +223,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       SizedBox(height: 10),
 
                       Text(
-                        "Enter OTP codefd",
+                        "Enter OTP code",
                         style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

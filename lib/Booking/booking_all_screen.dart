@@ -394,6 +394,8 @@
 //
 //   // ================= FILTER BOTTOM SHEET =================
 //
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 
@@ -789,7 +791,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   }
 
   // ================= COMMON CARD =================
-
   Widget bookingCard({
     required String imagePath,
     String? title,
@@ -797,10 +798,10 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     String? time,
     int? hours,
     String? location,
-    String? contentType, //
+    String? contentType,
     required String buttonText,
     required VoidCallback onButtonTap,
-    bool showEditIcon = false, // 👈 NEW FLAG
+    bool showEditIcon = false,
     VoidCallback? onEditTap,
   }) {
     final isNetwork = imagePath.startsWith("http");
@@ -808,116 +809,125 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       height: 280,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: isNetwork
-                ? Image.network(
-              imagePath,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Image.asset(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Stack(
+          children: [
+            // ✅ IMAGE (NO BLUR)
+            Positioned.fill(
+              child: isNetwork
+                  ? Image.network(
+                imagePath,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Image.asset(
                   "assets/images/Rectangle 34661070.png",
                   fit: BoxFit.cover,
-                );
-              },
-            )
-                : Image.asset(
-              imagePath,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.65),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(22),
                 ),
+              )
+                  : Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title ?? "",
-                    style:  TextStyle(
-                        color: ColorCode.white,
-                        fontFamily: "Outfit",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "$date | $time",
-                    style:
-                     TextStyle(
-                         color: ColorCode.kWhiteOpacity70,
-                        fontFamily: "Outfit",
-                        fontSize: 10 ,
-                        fontWeight: FontWeight.w400
-                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      /// 🔹 MAIN BUTTON
-                      Expanded(
-                        child: SizedBox(
-                          height: 45,
-                          child: ElevatedButton(
-                            onPressed: onButtonTap,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorCode.kButtonColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
-                              ),
-                            ),
-                            child: Text(
-                              buttonText,
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontFamily: "Outfit",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+            ),
+
+            // ❌ TOP BLUR REMOVED COMPLETELY
+
+            // ✅ BOTTOM BLUR (Glass Effect)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: ClipRRect(
+                borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(22)),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 0, sigmaY: 8), // 🔥 blur here
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          Colors.black.withOpacity(0.3),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+
+                    // 👇 CONTENT
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title ?? "",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-
-                      /// 🔹 EDIT IMAGE (ONLY IF UPCOMING)
-                      if (showEditIcon) ...[
-                        const SizedBox(width: 10),
-                        InkWell(
-                          onTap: onEditTap,
-                          child: Image.asset(
-                            "assets/Icons/Group 2087329022.png",
-                            height: 45,
+                        const SizedBox(height: 4),
+                        Text(
+                          "$date | $time",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 10,
                           ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 45,
+                                child: ElevatedButton(
+                                  onPressed: onButtonTap,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE8C99A),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    buttonText,
+                                    style: const TextStyle(
+                                      color: Color(0xFF1D1D1B),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            if (showEditIcon) ...[
+                              const SizedBox(width: 10),
+                              InkWell(
+                                onTap: onEditTap,
+                                child: Image.asset(
+                                  "assets/Icons/Group 2087329022.png",
+                                  height: 45,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
-                    ],
+                    ),
                   ),
-
-
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  ////////////////////////////////////////////
 
   void openFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(

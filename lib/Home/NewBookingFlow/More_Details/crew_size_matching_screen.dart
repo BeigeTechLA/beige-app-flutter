@@ -414,15 +414,32 @@ bool isLoading =true;
                     children: [
                       Row(
                         children: [
-                          Image.asset(
-                            "assets/newbookflow/ai_matchmaker.png",
-                            fit: BoxFit.cover,
+                          // Image.asset(
+                          //   "assets/newbookflow/ai_matchmaker.png",
+                          //   fit: BoxFit.cover,
+                          // ),
+                          Container(
+                            padding: EdgeInsets.all(9),
+                            decoration: BoxDecoration(
+                             shape: BoxShape.circle,
+                                color:Color(0xffE8D1AB)
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/svg/Stars.svg',
+                              width: 21,
+                              height: 21,
+                              fit: BoxFit.cover,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xff1D1D1B),
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
                            SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               "AI Matchmaker",
-                              style: TextStyle(color: ColorCode.kButtonColor, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),
+                              style: TextStyle(color: ColorCode.kButtonColor, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
                             ),
                           ),
                         ],

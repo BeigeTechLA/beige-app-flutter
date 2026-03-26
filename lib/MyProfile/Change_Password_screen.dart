@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../utility/images.dart';
 import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
@@ -172,11 +174,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       InkWell(
                         onTap: () => Navigator.pop(context),
-                        child: Image.asset(
-                          "assets/Icons/Reply.png",
+                        child: SvgPicture.asset(
+                          images.back,
                           height: 24,
+                          width: 24,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      ),
+                      ),//
 
                       const SizedBox(height: 20),
 

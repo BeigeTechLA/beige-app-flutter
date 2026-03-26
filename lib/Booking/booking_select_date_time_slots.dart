@@ -4,6 +4,7 @@ import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import '../Customtextfiled/CustomInputField.dart';
+import '../utility/images.dart';
 import 'bookin_review_confirm.dart';
 import 'booking_summary_view_summary.dart';
 
@@ -706,27 +707,25 @@ class _BookingSelectDateTimeSlotsState extends State<BookingSelectDateTimeSlots>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-
-        elevation: 0,
-        leading: InkWell(
-          onTap: () => Navigator.pop(context),
-          child: Image.asset(
-            "assets/Icons/Reply.png",
-            height: 22,
-            color: Colors.white,
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text("1/2", style: TextStyle(color: Colors.white)),
+        appBar: AppBar(
+          elevation: 0,
+          leadingWidth: 40, // 🔥 important
+          leading: InkWell(
+            onTap: () => Navigator.pop(context),
+            child: Padding(
+              padding: const EdgeInsets.all(7),
+              child: SvgPicture.asset(
+                images.back,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
-          )
-        ],
-      ),
+          ),
 
+          actions: const [ Padding( padding: EdgeInsets.only(right: 16), child: Center( child: Text("1/2", style: TextStyle(color: Colors.white)), ), ) ],
+        ),
 
 
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../utility/ColorCode.dart';
+import '../utility/images.dart';
 import 'DeleteAccount/delete_account.dart';
 import 'DeleteAccount/delete_account_otp_screen.dart';
 
@@ -27,10 +29,14 @@ class _AppPreferencesState extends State<AppPreferences> {
               /// 🔙 BACK BUTTON
               InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  images.back,
                   height: 24,
-                  color: ColorCode.white,
+                  width: 24,
+                  colorFilter: const ColorFilter.mode(
+                    ColorCode.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
 
@@ -42,7 +48,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                 style: TextStyle(
                   fontFamily: "Unbounded",
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: ColorCode.white,
                 ),
               ),
@@ -56,7 +62,7 @@ class _AppPreferencesState extends State<AppPreferences> {
 
                   /// 🌙 DARK MODE
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
                     ),
                       color: ColorCode.k282828,
@@ -66,9 +72,16 @@ class _AppPreferencesState extends State<AppPreferences> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.dark_mode_outlined,
-                                color: ColorCode.white),
-                            const SizedBox(width: 10),
+                            SvgPicture.asset(
+                              images.chando1,
+                              height: 24,
+                              width: 24,
+                              colorFilter: const ColorFilter.mode(
+                                ColorCode.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 15),
                             Text(
                               "Dark Mode",
                               style: TextStyle(
@@ -78,18 +91,26 @@ class _AppPreferencesState extends State<AppPreferences> {
                             ),
                           ],
                         ),
-                        Switch(
-                          value: isDarkMode,
-                          activeColor: Colors.amber,
-                          onChanged: (value) {
-                            setState(() {
-                              isDarkMode = value;
-                            });
-                          },
+                        SizedBox(
+                          width: 41,
+                          height: 26,
+                          child: Switch(
+                            value: isDarkMode,
+                            activeColor: Colors.amber,
+                            onChanged: (value) {
+                              setState(() {
+                                isDarkMode = value;
+                              });
+                            },
+                          ),
                         ),
                       ],
                     ),
                   ),
+
+
+
+
                   SizedBox(height: 20,),
 
                   /// 🗑 DELETE ACCOUNT
@@ -111,9 +132,16 @@ class _AppPreferencesState extends State<AppPreferences> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.delete_outline,
-                                  color: Colors.redAccent),
-                              const SizedBox(width: 10),
+                              SvgPicture.asset(
+                                images.delete2,
+                                height: 24,
+                                width: 24,
+                                colorFilter: const ColorFilter.mode(
+                                  ColorCode.white,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: 15),
                               Text(
                                 "Delete Account",
                                 style: TextStyle(
@@ -130,6 +158,9 @@ class _AppPreferencesState extends State<AppPreferences> {
                     ),
                   ),
 
+
+
+
                   SizedBox(height: 20,),
 
                   /// ℹ APP VERSION
@@ -141,9 +172,16 @@ class _AppPreferencesState extends State<AppPreferences> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline,
-                            color: ColorCode.white),
-                        const SizedBox(width: 10),
+                        SvgPicture.asset(
+                          images.appversion3,
+                          height: 24,
+                          width: 24,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.white,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
                         Text(
                           "App Version V1.0",
                           style: TextStyle(
@@ -154,6 +192,10 @@ class _AppPreferencesState extends State<AppPreferences> {
                       ],
                     ),
                   ),
+
+
+
+
                   SizedBox(height: 20,),
                 ],
               ),

@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:beige/utility/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -330,17 +331,17 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     infoCard(
-                      icon: Icons.group_outlined,
+                     icon: images.clients,
                       value: "${stats?['clients_count'] ?? 0}",
                       title: "Clients",
                     ),
                     infoCard(
-                      icon: Icons.verified_outlined,
+                      icon: images.experience,
                       value: "${stats?['years_experience'] ?? 0} yrs",
                       title: "Experience",
                     ),
                     infoCard(
-                      icon: Icons.star_border,
+                      icon: images.ratings,
                       value: "${creative?['bookings_count'] ?? 0}",
                       title: "Ratings",
                     ),
@@ -715,7 +716,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
 
   /// 🔹 SMALL WIDGETS
   Widget infoCard({
-    required IconData icon,
+    required String icon,
     required String value,
     required String title,
   }) {
@@ -741,7 +742,9 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
       child: Padding(
         padding: const EdgeInsets.all(0.6), // 👈 border thickness (0.5px feel)
         child: Container(
+          
           decoration: BoxDecoration(
+            
             color: const Color(0xFF1E1E1E),
             borderRadius: BorderRadius.circular(11.5),
           ),
@@ -752,6 +755,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
               Positioned(
                 top: -1,
                 child: Container(
+                  padding: EdgeInsets.all(8),
                   width: 38,
                   height: 42,
                   decoration: BoxDecoration(
@@ -760,11 +764,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                       bottom: Radius.circular(14),
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 20,
-                    color: Colors.black,
-                  ),
+                  child: SvgPicture.asset(icon,width: 18,height: 18,)
                 ),
               ),
 

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../utility/images.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
   const BookingHistoryScreen({super.key});
@@ -54,11 +56,16 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
               padding: const EdgeInsets.all(16),
               child: InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  images.back,
                   height: 24,
-                  color: ColorCode.white,
+                  width: 24,
+                  colorFilter: const ColorFilter.mode(
+                    ColorCode.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
+
               ),
             ),
 

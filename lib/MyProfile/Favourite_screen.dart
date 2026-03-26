@@ -1,4 +1,6 @@
+import 'package:beige/utility/images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -70,29 +72,39 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// 🔙 BACK BUTTON
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Image.asset(
-                    "assets/Icons/Reply.png",
-                    height: 24,
-                    color: ColorCode.white,
+             //  Align(
+             //    alignment: Alignment.centerLeft,
+             //    child: InkWell(
+             //      onTap: () => Navigator.pop(context),
+             // child: SvgPicture.asset(
+             //          "assets/svg/back.svg",
+             //          height: 24,
+             //          width: 24,
+             //        ),
+             //
+             //
+             //    ),
+             //  ),
+
+          InkWell(
+              onTap: () => Navigator.pop(context),
+           child: SvgPicture.asset(
+                   "assets/svg/back.svg",
+                  // height: 24,
+                 //  width: 24,
                   ),
-                ),
-              ),
+          ),
+
+              SizedBox(height: 12,),
 
               /// 🏷 TITLE
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.start,
-                 children: [
                    Text(
-                    "       Favourites",
+                    "Favourites",
                     style: TextStyle(
                       fontFamily: "Unbounded",
                       fontSize: 16,
@@ -100,14 +112,14 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       color: ColorCode.white,
                     ),
                                ),
-                 ],
-               ),
+
+
 
 
 
               Expanded(
                 child: ListView.builder(
-                  padding:  EdgeInsets.symmetric(horizontal: 16),
+                //  padding:  EdgeInsets.symmetric(horizontal: 16),
                   itemCount: favourites.length,
                   itemBuilder: (context, index) {
                     final item = favourites[index];
