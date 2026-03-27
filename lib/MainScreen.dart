@@ -112,6 +112,8 @@ class _MainscreenState extends State<Mainscreen> {
           ),
           child: Container(
             decoration: BoxDecoration(
+
+
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

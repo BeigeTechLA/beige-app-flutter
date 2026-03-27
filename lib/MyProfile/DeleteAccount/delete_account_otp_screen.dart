@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:beige/auth/login_screen.dart';
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../../widgets/TopMessage.dart';
 
 class DeleteAccountOtpScreen extends StatefulWidget {
   const DeleteAccountOtpScreen({super.key});
@@ -63,12 +65,7 @@ void resetTimer() {
 
   Future<void> _confirmDeleteAccount() async {
     if (enteredOtp.length != 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter valid OTP"),
-          backgroundColor: Colors.red,
-        ),
-      );
+      TopMessage.show(context, "Please enter valid OTP");
       return;
     }
 
@@ -96,12 +93,7 @@ void resetTimer() {
               (route) => false,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response['message'] ?? "Invalid OTP"),
-            backgroundColor: Colors.red,
-          ),
-        );
+        TopMessage.show(context, response['message'] ?? "Invalid OTP");
       }
     } catch (e) {
       debugPrint("🚨 DELETE CONFIRM ERROR: $e");
@@ -115,7 +107,45 @@ void resetTimer() {
       setState(() => isLoading = false);
     }
   }
+  /*Future<void> _resendOtp() async {
 
+    if (seconds != 0) {
+      print("⛔ Wait for timer to finish");
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final apiService = ApiService();
+
+      final response = await apiService.postData(
+        ApiEndpoints.reset_otp,
+        {
+          "email": widget.email,
+        },
+      );
+
+      print("RESEND OTP RESPONSE => $response");
+
+      if (response['error'] == false) {
+
+        timer?.cancel();
+        resetTimer();
+
+        ("OTP sent successfully");
+
+      } else {
+        _showSnack(response['message'] ?? "Failed to resend OTP");
+      }
+
+    } catch (e) {
+      print("ERROR => $e");
+      _showSnack("Something went wrong");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -130,11 +160,11 @@ void resetTimer() {
             /// 🔙 BACK BUTTON
             InkWell(
               onTap: () => Navigator.pop(context),
-              child: Image.asset(
-                "assets/Icons/Reply.png",
+              child:  SvgPicture.asset(
+                "assets/svg/back.svg",
                 height: 24,
                 color: ColorCode.white,
-              ),
+              )
             ),
 
              SizedBox(height: 16),

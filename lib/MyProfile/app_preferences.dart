@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../utility/ColorCode.dart';
 import 'DeleteAccount/delete_account.dart';
 import 'DeleteAccount/delete_account_otp_screen.dart';
@@ -27,11 +28,11 @@ class _AppPreferencesState extends State<AppPreferences> {
               /// 🔙 BACK BUTTON
               InkWell(
                 onTap: () => Navigator.pop(context),
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child:  SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
                   color: ColorCode.white,
-                ),
+                )
               ),
 
               const SizedBox(height: 16),

@@ -248,9 +248,9 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                                   border: Border.all(
                                     color: (focusNodes[index].hasFocus ||
                                         controllers[index].text.isNotEmpty)
-                                        ? ColorCode.kButtonColor
+                                        ? ColorCode.kGoldBorder50
                                         : ColorCode.kWhiteOpacity60,
-                                    width: 1.5,
+                                    width: 0.5,
                                   ),
                                 ),
                                 child: TextField(
@@ -299,6 +299,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              fontFamily: "Outfit",
                               color: ColorCode.kWhiteOpacity60,
                             ),
                           ),
@@ -320,8 +321,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       "Resend OTP",
                       style:  TextStyle(
                         color: seconds == 0
-                            ? ColorCode.kButtonColor
-                            : ColorCode.kWhiteOpacity60,
+                            ? ColorCode.white
+                            : ColorCode.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -347,9 +348,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
+                  child: Text(
                     "Verify OTP",
                     style: TextStyle(
                       fontSize: 18,

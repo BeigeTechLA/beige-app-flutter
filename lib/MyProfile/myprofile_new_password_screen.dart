@@ -149,7 +149,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       SizedBox(height: 6),
 
                       const Text(
-                        "You're almost done! Set a new password to secure\nyour account. Make sure it's strong and unique.",
+                        "You're almost done! Set a new password to secure your account. Make sure it's strong and unique.",
                         style: TextStyle(
                           fontFamily: "Outfit",
                           fontSize: 14,

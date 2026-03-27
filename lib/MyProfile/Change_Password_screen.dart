@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -173,8 +174,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                       InkWell(
                         onTap: () => Navigator.pop(context,true),
-                        child: Image.asset(
-                          "assets/Icons/Reply.png",
+                        child: SvgPicture.asset(
+                          "assets/svg/back.svg",
                           height: 24,
                         ),
                       ),
@@ -246,9 +247,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : Text(
+                  child: Text(
                     "Send OTP",
                     style: TextStyle(
                       fontSize: 14,

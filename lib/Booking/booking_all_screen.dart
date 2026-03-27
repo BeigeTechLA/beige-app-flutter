@@ -498,11 +498,11 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     return Scaffold(
 
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             /// HEADER
         Row(
@@ -534,12 +534,10 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
              SizedBox(height: 20),
 
 
-            const SizedBox(height: 20),
-
             /// TOGGLE
             Container(
-              height: 60,
-              padding: const EdgeInsets.all(6),
+              height: 55,
+              padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: ColorCode.k282828,
                 borderRadius: BorderRadius.circular(10),
@@ -618,7 +616,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
 
 
-            const SizedBox(height: 20),
 
             /// LIST
             Expanded(
@@ -710,21 +707,29 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   }
 
   // ================= UPCOMING CARD =================
+// ================= UPCOMING CARD =================
 
   Widget upcomingBookingCard(Map shoot) {
-    final String fallbackImage =
-        "assets/svg/imag_placeholder.svg";
+    final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
     final String imageUrl = ApiService().getImageURL(
       shoot['creative']?['profile_image_url'] ?? '',
     );
 
-    /// 🔥 Final Image Logic
-    final String finalImage =
-    (imageUrl.isNotEmpty) ? imageUrl : fallbackImage;
+    /// ✅ SAFE DATA
+    final int bookingId = shoot['booking_id'] ?? 0;
+    final int shootTypeId = shoot['shoot_type_id'] ?? 0;
 
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
+
+    final String eventDate = shoot['event_date'] ?? '';
+    final String startTime = shoot['start_time'] ?? '';
+    final String endTime = shoot['end_time'] ?? '';
+
+    /// ✅ FINAL IMAGE
+    final String finalImage =
+    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
 
     return GestureDetector(
       onTap: () {
@@ -732,9 +737,9 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           context,
           MaterialPageRoute(
             builder: (_) => UpcomingBookingEventSummary(
-              bookingId: shoot['booking_id'],
+              bookingId: bookingId,
               contentType: contentType,
-              shootTypeId: shoot['shoot_type_id'],
+              shootTypeId: shootTypeId,
             ),
           ),
         );
@@ -742,8 +747,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       child: bookingCard(
         imagePath: finalImage,
         title: projectName,
-        date: shoot['event_date'],
-        time: "${shoot['start_time']} - ${shoot['end_time']}",
+        date: eventDate,
+        time: "$startTime - $endTime",
         contentType: contentType,
         showEditIcon: true,
         buttonText: "Manage Shoot",
@@ -752,16 +757,16 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             context,
             MaterialPageRoute(
               builder: (_) => UpcomingEventSummaryManagebooking(
-                bookingId: shoot['booking_id'],
+                bookingId: bookingId,
                 projectName: projectName,
                 contentType: contentType,
-                eventDate: shoot['event_date'],
-                startTime: shoot['start_time'],
-                endTime: shoot['end_time'],
-                durationHours: shoot['duration_hours'],
-                location: shoot['location'],
+                eventDate: eventDate,
+                startTime: startTime,
+                endTime: endTime,
+                durationHours: shoot['duration_hours'] ?? '',
+                location: shoot['location'] ?? '',
                 imageUrl: finalImage,
-                shootTypeId: shoot['shoot_type_id'],
+                shootTypeId: shootTypeId,
               ),
             ),
           );
@@ -770,27 +775,41 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     );
   }
 
-
-
-
-
-  // ================= COMPLETED CARD =================
+// ================= COMPLETED CARD =================
 
   Widget completedBookingCard(Map shoot) {
-    return bookingCard(
-      imagePath: "assets/images/home1.png",
-      title: shoot['project_name'],
-      date: shoot['event_date'],
-      time: "${shoot['start_time']} - ${shoot['end_time']}",
-      buttonText: "Book Again",
+    final String fallbackImage = "assets/images/home1.png";
 
+    final String imageUrl = ApiService().getImageURL(
+      shoot['creative']?['profile_image_url'] ?? '',
+    );
+
+    /// ✅ SAFE DATA
+    final int bookingId = shoot['booking_id'] ?? 0;
+
+    final String projectName = shoot['project_name'] ?? '';
+    final String eventDate = shoot['event_date'] ?? '';
+    final String startTime = shoot['start_time'] ?? '';
+    final String endTime = shoot['end_time'] ?? '';
+
+    /// ✅ FINAL IMAGE
+    final String finalImage =
+    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
+
+    return bookingCard(
+      imagePath: finalImage,
+      title: projectName,
+      date: eventDate,
+      time: "$startTime - $endTime",
+      buttonText: "Book Again",
       showEditIcon: false,
-      onButtonTap: () {},
+      onButtonTap: () {
+        // 👉 Add navigation if needed
+        // Navigator.push(...)
+      },
     );
   }
-
   // ================= COMMON CARD =================
-
   Widget bookingCard({
     required String imagePath,
     String? title,
@@ -798,206 +817,145 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     String? time,
     int? hours,
     String? location,
-    String? contentType, //
+    String? contentType,
     required String buttonText,
     required VoidCallback onButtonTap,
-    bool showEditIcon = false, // 👈 NEW FLAG
+    bool showEditIcon = false,
     VoidCallback? onEditTap,
   }) {
     final isNetwork = imagePath.startsWith("http");
 
     return Container(
-        decoration: BoxDecoration(
+        margin: const EdgeInsets.only(bottom: 16,top: 20),
+        height: 280,
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: ColorCode.kBlackDark,
-          //  width: 2,
-          ),
-        ),
-      margin: const EdgeInsets.only(bottom: 10),
-      height: 280,
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: (imagePath.isEmpty)
-
-            /// ✅ 1. EMPTY IMAGE → SVG
-                ? Container(
-              color: Colors.black12,
-              child: Center(
-                child: SvgPicture.asset(
-                  "assets/svg/imag_placeholder.svg",
-                  height: 80,
-                ),
-              ),
-            )
-
-            /// ✅ 2. NETWORK IMAGE
-                : isNetwork
-                ? Image.network(
-              imagePath,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-
-              /// 🔥 ERROR → SVG SHOW
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.black12,
-                  child: Center(
-                    child: SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
-                      height: 80,
-                    ),
-                  ),
-                );
-              },
-            )
-
-            /// ✅ 3. ASSET IMAGE OR SVG
-                : imagePath.endsWith(".svg")
-                ? Center(
-              child: SvgPicture.asset(
-                imagePath,
-                height: 80,
-              ),
-            )
-                : Image.asset(
-              imagePath,
-              width: double.infinity,
-              height: double.infinity,
+          child: Stack(
+            children: [
+          // ✅ IMAGE (NO BLUR)
+          Positioned.fill(
+          child: isNetwork
+          ? Image.network(
+            imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+              "assets/svg/imag_placeholder.svg",
               fit: BoxFit.cover,
             ),
-          ),
+        )
+            : Image.asset(imagePath, fit: BoxFit.cover),
+    ),
 
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(22),
-              ),
-              child: SizedBox(
-                height: 120, // ✅ SAME HEIGHT EVERYWHERE
-                child: Stack(
-                  children: [
+    // ❌ TOP BLUR REMOVED COMPLETELY
 
-                    /// 🔥 1. BLUR (FIXED AREA ONLY)
-                    BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: 26,
-                        sigmaY: 20,
-                      ),
-                      child: Container(
-                        height: 100,
-                        color: Colors.black.withOpacity(0.2), // important
-                      ),
-                    ),
+    Container(
+    height: 280,
+    width: double.infinity,
+    decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(22),
+    gradient: LinearGradient(
+    colors: [
+    Colors.black,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    // Colors.black54,
+    // Colors.black87,
+    Colors.black,
+    Colors.black,
+    ],
+    begin: AlignmentGeometry.topCenter,
+    end: AlignmentGeometry.bottomCenter,
+    ),
+    ),
+    ),
+    // ✅ BOTTOM BLUR (Glass Effect)
+    Positioned(
+    bottom: 0,
+    left: 0,
+    right: 0,
+    child: ClipRRect(
+    borderRadius: const BorderRadius.vertical(
+    bottom: Radius.circular(22),
+    ),
+    child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    Text(
+    title ?? "",
+    style: const TextStyle(
+    color: Colors.white,
+    fontFamily: "Outfit"
+      ,
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    const SizedBox(height: 4),
+    Text(
+    "$date | $time",
+    style: const TextStyle(
+    color: Colors.white70,
+    fontSize: 10,
+    ),
+    ),
+    const SizedBox(height: 10),
 
-                    /// 🔥 2. GRADIENT (SMOOTH TOP → BOTTOM)
-                    Container(
-                      height: 120,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,              // 👈 FIX (top blur smooth)
-                            ColorCode.kBlackDark,
-                            ColorCode.kBlackDark
-                          ],
-                        ),
-                      ),
-                    ),
+    Row(
+    children: [
+    Expanded(
+    child: SizedBox(
+    height: 45,
+    child: ElevatedButton(
+    onPressed: onButtonTap,
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFFE8C99A),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+    ),
+    ),
+    child: Text(
+    buttonText,
+    style: const TextStyle(
+    color:ColorCode.kHeadingColor,
+    fontSize: 14,
+      fontFamily: "Outfit"
+      ,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    ),
+    ),
+    ),
 
-                    /// 🔥 3. CONTENT
-                    Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+    if (showEditIcon) ...[
+    const SizedBox(width: 10),
+    InkWell(
+    onTap: onEditTap,
+    child:SvgPicture.asset(
+    "assets/svg/home_view_profile.svg",
+    height: 45,
+    ),
+    ),
+    ],
+    ],
+    ),
+    ],
+    ),
+    ),
+    ),
+    ),
 
-                          Text(
-                            title ?? "",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          Text(
-                            "$date • $time",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-
-                              color:ColorCode.kWhiteOpacity70,
-                              fontSize: 12,
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: SizedBox(
-                                  height: 44,
-                                  child: ElevatedButton(
-                                    onPressed: onButtonTap,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: ColorCode.kButtonColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      buttonText,
-                                      style: TextStyle(
-                                        fontFamily: "Outfit",
-                                        color: ColorCode.kHeadingColor,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              if (showEditIcon) ...[
-                                const SizedBox(width: 10),
-                                Container(
-
-
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      "assets/svg/home_view_profile.svg", // 👈 apna svg path
-
-                                         height: 38,
-                                         width: 38,                         ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    ],
+    ),
+    ),
     );
   }
-
   void openFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,

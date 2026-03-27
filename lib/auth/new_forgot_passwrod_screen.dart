@@ -142,7 +142,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                   height: MediaQuery
                       .of(context)
                       .size
-                      .height * 0.35,
+                      .height * 0.32,
                   child: Stack(
                     children: [
 

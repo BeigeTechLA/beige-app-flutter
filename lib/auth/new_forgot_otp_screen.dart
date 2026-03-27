@@ -300,9 +300,9 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                         border: Border.all(
                                           color: (focusNodes[index].hasFocus ||
                                               controllers[index].text.isNotEmpty)
-                                              ? ColorCode.kButtonColor
+                                              ? ColorCode.kGoldBorder50
                                               : ColorCode.kWhiteOpacity60,
-                                          width: 1.5,
+                                          width: 0.5,
                                         ),
                                       ),
                                       child: TextField(
