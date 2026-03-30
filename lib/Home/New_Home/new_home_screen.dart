@@ -14,6 +14,8 @@ class NewHomeScreen extends StatefulWidget {
 
 class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  final PageController _featuredController = PageController(initialPage: 1000, viewportFraction: 0.65);
+
   final int _initialPage = 1000;
   // --- DATA LISTS FOR TEXT & COLORS ---
   final List<String> _searchTexts = [
@@ -128,7 +130,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      // backgroundColor: Colors.green,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -511,159 +513,242 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
                   ),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 320,
-                  child: AnimatedBuilder(
-                    animation: _pageController,
-                    builder: (context, child) {
-                      return PageView.builder(
-                        controller: _pageController,
-                        clipBehavior: Clip.none,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final int actualIndex = index % featuredImages.length;
+                  Container(
+                    // color: ColorCode.red,
+                    child: SizedBox(
+                       height: 260,
+                      child: AnimatedBuilder(
+                        animation: _pageController,
+                        builder: (context, child) {
+                          return PageView.builder(
+                            controller: _pageController,
+                            clipBehavior: Clip.none,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final int actualIndex = index % featuredImages.length;
 
-                          double page = _pageController.hasClients
-                              ? _pageController.page ?? _initialPage.toDouble()
-                              : _initialPage.toDouble();
+                              double page = _pageController.hasClients
+                                  ? _pageController.page ?? _initialPage.toDouble()
+                                  : _initialPage.toDouble();
 
-                          double difference = (index - page);
+                              double difference = (index - page);
 
-                          // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
-                          double perspective = 0.0015;
+                              // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
+                              double perspective = 0.0025;
 
-                          // 2. Rotation Logic (Blue box jaisa effect):
-                          // Right waali image (difference > 0) ke liye positive rotation
-                          // jisse uska right side peeche jaye.
-                          double rotation = difference * 0.5; // Is value ko 0.4 se 0.7 tak change karke dekhein
-                          rotation = rotation.clamp(-0.8, 0.8);
+                              // 2. Rotation Logic (Blue box jaisa effect):
+                              // Right waali image (difference > 0) ke liye positive rotation
+                              // jisse uska right side peeche jaye.
+                              double rotation = difference * 0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
+                              rotation = rotation.clamp(-0.8, 0.8);
 
-                          // 3. Scale & Opacity
-                          double scale = (1 - (difference.abs() * 0.15)).clamp(0.8, 1.0);
-                          double opacity = (1 - (difference.abs() * 0.35)).clamp(0.5, 1.0);
+                              // 3. Scale & Opacity
+                              double scale = (1 - (difference.abs() * 0.10)).clamp(0.0, 1.0);
+                              double opacity = (1 - (difference.abs() * 0.40)).clamp(0.6, 2.0);
 
-                          // 4. Translate (Cards ko center ke paas laane ke liye)
-                          // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
-                          double translateX = difference * -50;
+                              // 4. Translate (Cards ko center ke paas laane ke liye)
+                              // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
+                              double translateX = difference * -90;
 
-                          return Opacity(
-                            opacity: opacity,
-                            child: Transform(
-                              // Alignment center se hi 3D look sabse acha aata hai
-                              alignment: Alignment.center,
-                              transform: Matrix4.identity()
-                                ..setEntry(3, 2, perspective) // 3D depth
-                                ..translate(translateX)       // Paas lane ke liye
-                                ..rotateY(rotation)           // Aapke blue box jaisa fold karne ke liye
-                                ..scale(scale),               // Chota karne ke liye
-                              child: teamCard(
-                                image: featuredImages[actualIndex],
-                                name: featuredNames[actualIndex],
-                              ),
-                            ),
+                              return Opacity(
+                                opacity: opacity,
+                                child: Transform(
+                                  // Alignment center se hi 3D look sabse acha aata hai
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.identity()
+                                    ..setEntry(3, 2, perspective) // 3D depth
+                                    ..translate(translateX)       // Paas lane ke liye
+                                    ..rotateY(rotation)           // Aapke blue box jaisa fold karne ke liye
+                                    ..scale(scale),               // Chota karne ke liye
+                                  child: teamCard(
+                                    image: featuredImages[actualIndex],
+                                    name: featuredNames[actualIndex],
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
+                      ),
+                    ),
                   ),
+
+                Stack(
+                  alignment: Alignment.center,
+
+                  children: [
+                    CustomPaint(
+                      size: Size(MediaQuery.of(context).size.width, 70),
+                      painter: BeveledTrayPainter(),
+                    ),
+                    AnimatedBuilder(
+                      animation: _pageController,
+                      builder: (context, child) {
+                        // Current page calculate karne ke liye (Looping ke liye modulo use kiya hai)
+                        double page = 0;
+                        if (_pageController.hasClients) {
+                          page = _pageController.page ?? _initialPage.toDouble();
+                        } else {
+                          page = _initialPage.toDouble();
+                        }
+                        int activeIndex = page.round() % featuredImages.length;
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(featuredImages.length, (index) {
+                            bool isActive = index == activeIndex;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              height: 7,
+                              width: 7, // Round dots ke liye height/width same rakhi hai
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                // Active dot beige hai, baki dark grey
+                                color: isActive
+                                    ? const Color(0xFFE8D1AB)
+                                    : Colors.white.withOpacity(0.2),
+                                boxShadow: isActive ? [
+                                  BoxShadow(
+                                    color: const Color(0xFFE8D1AB).withOpacity(0.4),
+                                    blurRadius: 4,
+                                  )
+                                ] : [],
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    ),
+                  ],
+
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  // margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  padding: const EdgeInsets.only(top: 35, bottom: 25),
-                  decoration: BoxDecoration(
-                    // Top Beige to Bottom Dark Gradient
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFFE8D1AB).withOpacity(0.4),
-                        Colors.black.withOpacity(0.95),
-                      ],
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      painter: BorderAnimationPainter(_controller.value),
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    // margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    padding: const EdgeInsets.only(top: 35, bottom: 25),
+                    decoration: BoxDecoration(
+                      // Top Beige to Bottom Dark Gradient
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFFE8D1AB),             // 👈 top beige
+                          const Color(0xFF0D0D0D).withOpacity(0.0), // 👈 fade to transparent
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(40),
+                  
+                      border: const Border(
+                        bottom: BorderSide(
+                          color: Color(0xFFE8D1AB), // 👈 bottom border color
+                          width: 1,
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Beige Studios",
-                        style: TextStyle(
-                          color: ColorCode.kBlackOpacity16, // 👈 use here
-                          fontSize: 38,
-                          fontWeight: FontWeight.w500, // Medium = 500
-                          fontFamily: "Unbounded", // 👈 Figma font
-                          letterSpacing: 0,
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Beige Studios",
+                          style: TextStyle(
+                            color: ColorCode.kBlackOpacity16, // 👈 use here
+                            fontSize: 38,
+                            fontWeight: FontWeight.w500, // Medium = 500
+                            fontFamily: "Unbounded", // 👈 Figma font
+                            letterSpacing: 0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 30),
+                        // const SizedBox(height: 30),
+                  
+                        // Studio Images Carousel
+                        SizedBox(
+                          height: 330,
+                          child: PageView.builder(
+                            controller: _studioController,
+                            itemBuilder: (context, index) {
+                              final int actualIndex = index % studioList.length;
 
-                      // Studio Images Carousel
-                      SizedBox(
-                        height: 350,
-                        child: PageView.builder(
-                          controller: _studioController,
-                          itemCount: studioList.length,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _activeStudioIndex = index;
-                            });
-                          },
-                          itemBuilder: (context, index) {
-                            return AnimatedBuilder(
-                              animation: _studioController,
-                              builder: (context, child) {
-                                double value = 1.0;
-                                if (_studioController.position.haveDimensions) {
-                                  value = _studioController.page! - index;
-                                  value = (1 - (value.abs() * 0.1)).clamp(0.9, 1.0);
-                                }
-                                return Transform.scale(
-                                  scale: value,
-                                  child: _buildStudioCard(studioList[index]),
-                                );
-                              },
-                            );
-                          },
+                              return AnimatedBuilder(
+                                animation: _studioController,
+                                builder: (context, child) {
+                                  double value = 1.0;
+
+                                  double scale = 1.0;
+                                  double translate = 0;
+
+                                  if (_studioController.position.haveDimensions) {
+                                    double page = _studioController.page ?? _currentPage.toDouble();
+                                    double diff = (index - page);
+
+                                    // 🔥 Smooth scale
+                                    scale = (1 - (diff.abs() * 0.20)).clamp(0.80, 1.0);
+
+                                    // 🔥 little vertical lift (premium feel)
+                                    translate = diff.abs() * 20;
+                                  }
+
+                                  return Center(
+                                    child: Transform.translate(
+                                      offset: Offset(0, translate), // 👈 niche side wale thoda niche
+                                      child: Transform.scale(
+                                        scale: scale,
+                                        child: _buildStudioCard(studioList[actualIndex]),
+                                      ),
+                                    ),
+                                  );
+
+                                },
+                              );
+                            },
+                          ),
                         ),
-                      ),
-
-                      // Dynamic Text Info below the image
-                      const SizedBox(height: 20),
-                      Text(
-                        studioList[_activeStudioIndex]['name']!,
-                        style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold, fontFamily: "Outfit"),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Text(
-                          studioList[_activeStudioIndex]['desc']!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: "Outfit"),
+                  
+                        // Dynamic Text Info below the image
+                        const SizedBox(height: 20),
+                        Text(
+                          studioList[_activeStudioIndex]['name']!,
+                          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold, fontFamily: "Outfit"),
                         ),
-                      ),
-                      Text(
-                        studioList[_activeStudioIndex]['location']!,
-                        style: const TextStyle(color: Colors.white38, fontSize: 12, fontFamily: "Outfit"),
-                      ),
-
-                      // Dots Indicator
-                      const SizedBox(height: 25),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          studioList.length,
-                              (index) => Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: _activeStudioIndex == index ? 28 : 15,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: _activeStudioIndex == index ? const Color(0xFFE8D1AB) : Colors.white24,
-                              borderRadius: BorderRadius.circular(10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: Text(
+                            studioList[_activeStudioIndex]['desc']!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white70, fontSize: 13, fontFamily: "Outfit"),
+                          ),
+                        ),
+                        Text(
+                          studioList[_activeStudioIndex]['location']!,
+                          style: const TextStyle(color: Colors.white38, fontSize: 12, fontFamily: "Outfit"),
+                        ),
+                  
+                        // Dots Indicator
+                        const SizedBox(height: 25),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            studioList.length,
+                                (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _activeStudioIndex == index ? 28 : 15,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: _activeStudioIndex == index ? const Color(0xFFE8D1AB) : Colors.white24,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1147,33 +1232,28 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
                                       // Book Again Button
                                       Expanded(
                                         child: Container(
-                                          height: 52,
+                                          height: 30,
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFE8D1AB), // Aapka beige color
+                                            color: ColorCode.kButtonColor,// Aapka beige color
                                             borderRadius: BorderRadius.circular(30),
                                           ),
                                           child: const Text(
                                             "Book Again",
                                             style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
+                                              color: ColorCode.black,
+                                              fontSize: 12,
                                               fontWeight: FontWeight.w700,
-                                              fontFamily: "Outfit",
+                                              fontFamily: "Helvetica Neue",
                                             ),
                                           ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       // Circular Arrow Button
-                                      Container(
-                                        height: 52,
-                                        width: 52,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.15),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(Icons.call_made_rounded, color: Colors.white, size: 22),
+                                      SvgPicture.asset(
+                                        "assets/svg/home_view_profile.svg",
+
                                       ),
                                     ],
                                   ),
@@ -1217,6 +1297,205 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
                     ],
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Get Inspired",
+                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: "Unbounded"),
+                      ),
+                      const SizedBox(height: 15),
+
+                      Column(
+                        children: [
+                          AnimatedBuilder(
+                            animation: _featuredController,
+                            builder: (context, child) {
+                              double page = _featuredController.hasClients ? _featuredController.page! : _initialPage.toDouble();
+                              int activeIndex = page.round() % featuredImages.length;
+
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(featuredImages.length, (index) {
+                                  bool isActive = index == activeIndex;
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                                    height: 7, width: 7,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isActive ? const Color(0xFFE8D1AB) : Colors.white.withOpacity(0.2),
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+
+                const SizedBox(height: 50),
+
+
+
+
+
+                    ],
+                  ),
+                ),
+
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Top Creatives Near you",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "Unbounded"),
+                      ),
+                      const SizedBox(height: 30), // Stack ke liye thodi jagah
+
+                      // --- Stacked Cards Start ---
+                      SizedBox(
+                        height: 480, // Card ki total height
+                        width: double.infinity,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            // 3rd Card (Sabse piche wala - Sabse chota)
+                            Positioned(
+                              top: 0,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
+                                height: 400,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                              ),
+                            ),
+
+                            // 2nd Card (Beech wala)
+                            Positioned(
+                              top: 15,
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.83,
+                                height: 420,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                              ),
+                            ),
+
+                            // 1st Card (Main Front Card with Image)
+                            Container(
+                              margin: const EdgeInsets.only(top: 30),
+                              width: double.infinity,
+                              height: 450,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(40),
+                                image: const DecorationImage(
+                                  image: NetworkImage("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop"),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40),
+                                child: Stack(
+                                  children: [
+                                    // Black Gradient Overlay
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.black.withOpacity(0.1),
+                                            Colors.black.withOpacity(0.7),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                    // Card Content
+                                    Padding(
+                                      padding: const EdgeInsets.all(25.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Status & Rating
+                                          Row(
+                                            children: [
+                                              const CircleAvatar(radius: 6, backgroundColor: Colors.green),
+                                              const SizedBox(width: 10),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withOpacity(0.2),
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Row(
+                                                  children: const [
+                                                    Icon(Icons.star, color: Colors.yellow, size: 14),
+                                                    SizedBox(width: 4),
+                                                    Text("4.5 (120)", style: TextStyle(color: Colors.white, fontSize: 12)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Spacer(),
+                                          // Name
+                                          const Text(
+                                            "Ethan Cole",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: "Unbounded",
+                                            ),
+                                          ),
+                                          // Subtitle
+                                          const Text(
+                                            "Model, Entrepreneur & Media\nPersonality.",
+                                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          // Button
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE5D1B2), // Image wala beige color
+                                              borderRadius: BorderRadius.circular(30),
+                                            ),
+                                            child: const Text(
+                                              "View Profile",
+                                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // --- Stacked Cards End ---
+                    ],
+                  ),
+                ),
           ]
             )
           ],
@@ -1231,37 +1510,66 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(25),
+        color: const Color(0xFF222222), // 👈 Figma background
+        borderRadius: BorderRadius.circular(22),
+
+        // 👇 Gradient Border Trick
+        border: Border.all(
+          width: 0.5,
+          color: Colors.white.withOpacity(0.10), // fallback
+        ),
+
+        // 👇 Shadow for premium look (optional)
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
+
+      // 👇 Gradient Border Overlay
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             child: Image.asset(
-              "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png", // Replace with your image
+              img,
               height: 80,
               width: 80,
               fit: BoxFit.cover,
             ),
           ),
           const SizedBox(width: 15),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                Text(date, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold)),
+                Text(date,
+                    style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12)),
                 const SizedBox(height: 8),
-                Text(files, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(files,
+                    style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12)),
               ],
             ),
           ),
+
           Column(
             children: [
-              _buildSmallCircleBtn(Icons.share_outlined),
+              _buildSmallCircleBtn("assets/svg/eyes1.svg"),
               const SizedBox(height: 8),
-              _buildSmallCircleBtn(Icons.file_download_outlined),
+              _buildSmallCircleBtn("assets/svg/install.svg"),
             ],
           )
         ],
@@ -1269,11 +1577,19 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildSmallCircleBtn(IconData icon) {
+  Widget _buildSmallCircleBtn(String svgPath) {
     return Container(
       padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.08), shape: BoxShape.circle),
-      child: Icon(icon, color: Colors.white, size: 18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        shape: BoxShape.circle,
+      ),
+      child: SvgPicture.asset(
+        svgPath,
+        height: 18,
+        width: 18,
+        color: Colors.white, // optional (remove if original color chahiye)
+      ),
     );
   }
 
@@ -1326,12 +1642,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
   }
   Widget _buildStudioCard(Map<String, String> data) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      // margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        boxShadow: [
+        /*boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 15, offset: const Offset(0, 10))
-        ],
+        ],*/
       ),
       child: Stack(
         children: [
@@ -1342,7 +1658,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
           ),
 
           // Green Online Dot
-          Positioned(
+        /*  Positioned(
             top: 18, left: 18,
             child: Container(
               width: 12, height: 12,
@@ -1352,7 +1668,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
                 boxShadow: [BoxShadow(color: Colors.greenAccent, blurRadius: 8)],
               ),
             ),
-          ),
+          ),*/
 
           // Heart/Favorite Icon
           const Positioned(
@@ -1360,18 +1676,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
             child: Icon(Icons.favorite_border, color: Colors.white, size: 24),
           ),
 
-          // Blue Badge with 'D'
-          Positioned(
-            bottom: 60, right: 35,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(color: Colors.blueAccent, shape: BoxShape.circle),
-              child: const Text("D", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-            ),
-          ),
+
 
           // Rating and Price Overlay
-          Positioned(
+       /*   Positioned(
             bottom: 20, left: 18, right: 18,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1400,7 +1708,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
                 ),
               ],
             ),
-          ),
+          ),*/
         ],
       ),
     );
@@ -1416,20 +1724,20 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           AnimatedContainer(
-            duration: const Duration(milliseconds:600),
+            duration: const Duration(milliseconds:800),
             curve: Curves.easeOutCubic,
 
             height: 212,
-            width: 180,
+            width: 190,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(26),
-              boxShadow: [
+             /* boxShadow: [
                 BoxShadow(
                   // color: Colors.black.withOpacity(0.45),
                   blurRadius: 12,
                   // offset: const Offset(0, 10),
                 ),
-              ],
+              ],*/
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(19),
@@ -1456,10 +1764,155 @@ class _NewHomeScreenState extends State<NewHomeScreen> with SingleTickerProvider
   }
 }
 
+Widget creativeCard() {
+  return Container(
+    margin: const EdgeInsets.only(right: 15),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(40),
+      image: const DecorationImage(
+        image: NetworkImage("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop"), // Apni image link daalein
+        fit: BoxFit.cover,
+      ),
+    ),
+    child: Stack(
+      children: [
+        // Dark overlay for text readability
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(40),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withOpacity(0.2),
+                Colors.black.withOpacity(0.6),
+              ],
+            ),
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row: Online dot and Rating
+              Row(
+                children: [
+                  // Green Dot
+                  Container(
+                    height: 12,
+                    width: 12,
+                    decoration: const BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: Colors.green, blurRadius: 10)]
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Rating Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.star, color: Colors.yellow, size: 16),
+                        SizedBox(width: 4),
+                        Text("4.5 (120)", style: TextStyle(color: Colors.white, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const Spacer(), // Content ko niche dhakelne ke liye
+
+              // Name
+              const Text(
+                "Ethan Cole",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Unbounded",
+                ),
+              ),
+
+              // Bio
+              const Text(
+                "Model, Entrepreneur & Media\nPersonality.",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // View Profile Button
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5D1B2), // Beige color from image
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Text(
+                  "View Profile",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class BeveledTrayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = const Color(0xFF0D0D0D)..style = PaintingStyle.fill;
+
+    double w = size.width;
+    double bevel = 25;
+    double shoulder = w * 0.22;
+
+    Path path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(shoulder, 0);
+    path.lineTo(shoulder + bevel, bevel);
+    path.lineTo(w - shoulder - bevel, bevel);
+    path.lineTo(w - shoulder, 0);
+    path.lineTo(w, 0);
+    path.lineTo(w, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Subtle line for depth
+    final linePaint = Paint()..color = Colors.white.withOpacity(0.04)..style = PaintingStyle.stroke..strokeWidth = 1;
+    canvas.drawPath(path, linePaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
 // --- BORDER PAINTER (LEFT-TO-RIGHT) ---
 class BorderAnimationPainter extends CustomPainter {
   final double animationValue;
   BorderAnimationPainter(this.animationValue);
+  final double radius = 40.0;
 
   @override
   void paint(Canvas canvas, Size size) {
