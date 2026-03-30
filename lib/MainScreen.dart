@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
+import 'Home/New_Home/new_home_screen.dart';
 import 'Home/Specialities/specialities.dart';
 import 'Home/home_screen.dart';
 
@@ -20,7 +21,7 @@ class _MainscreenState extends State<Mainscreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomeScreen(),
+    NewHomeScreen(),
     ContentTypeScreen(),
     BookingAllScreen(),
     Center(child: Text("Message")),

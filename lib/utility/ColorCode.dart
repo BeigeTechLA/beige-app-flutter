@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorCode {
-
+  static const Color kBlackOpacity16 = Color(0x29000000);
   // ⭐ New Colors from UI/UX
   static const Color kBlackDark = Color(0xFF0A0A0A); // #0A0A0A
   static const Color kGoldLight20 = Color(0x33E8D5B5); // #E8D5B5 with 20% opacity
@@ -32,10 +32,17 @@ class ColorCode {
   // ⭐ Light Red / Remove Background
   static const Color kLightRed = Color(0xFFFFC9C9);
   static const Color kIconBackground = Color(0xFF171717);
-
+  static const Color kBlackOpacity70 = Color(0xB2000000);
   static const Color kCreamSoft = Color(0xFFECE1CE);
   static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
   static const Color kBlackOpacity12 = Color(0x1F000000);
+
+
+  static const Color kCardTop = Color(0xFFE8D1AB);
+  static const Color kCardBottom = Color(0xFF0D0D0D);
+
+  /// ⭐ Bottom Border Gold
+  static const Color kGoldBorder = Color(0xFFE8D1AB);
 
   /// ⭐ NEW COLOR ADDED (#FFFFFFB2 → 70% white)
   static const Color kWhiteOpacity70 = Color(0xB2FFFFFF);
