@@ -3,7 +3,9 @@ import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../Model/HomeModel.dart';
 import '../HomeSekect/Home_view_profile.dart';
+import 'home_controller .dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -13,6 +15,12 @@ class NewHomeScreen extends StatefulWidget {
 }
 
 class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateMixin {
+
+  final HomeController controller = HomeController();
+
+  HomeModel? homeData;
+  bool isLoading = true;
+
   int _currentCard = 0;
   late AnimationController _controller;
   final PageController _featuredController = PageController(
@@ -20,7 +28,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   final PageController _creativesController = PageController();
   late PageController _bookingController;
   late PageController _cardController;
-
+  int _currentBookingIndex = 0;
+  late AnimationController _bookingSwipeController;
 
   final PageController _inspiredController = PageController(
     initialPage: 1000,
@@ -32,6 +41,19 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   int _currentCreativeIndex = 0;
 
   final int _initialPage = 1000;
+
+  Future<void> fetchData() async {
+    final data = await controller.fetchHomeData();
+
+    if (data != null) {
+      setState(() {
+        homeData = data;
+        isLoading = false;
+      });
+    } else {
+      setState(() => isLoading = false);
+    }
+  }
 
   // --- DATA LISTS FOR TEXT & COLORS ---
   final List<String> _searchTexts = [
@@ -143,7 +165,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   ];
 
 
-  int _currentPage = 0;
+
   final PageController _studioController = PageController(
       viewportFraction: 0.75);
   int _activeStudioIndex = 0;
@@ -154,7 +176,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     viewportFraction: 0.65, // Isse side ke cards screen ke paas aayenge
 
   );
-  int _activeStudio = 0;
 
 
   final List<Color> _textColors = [
@@ -166,6 +187,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
+    fetchData();
     _controller = AnimationController(
       vsync: this,
 
@@ -182,8 +204,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
 
     _cardController = PageController(viewportFraction: 0.8);
-
-
+    _bookingSwipeController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 400),
+    );
   }
 
   @override
@@ -191,7 +215,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     _controller.dispose();
     _swipeController.dispose(); // ✅ MUST
     _inspiredController.dispose(); // ✅ ADD THIS
-
+    _bookingSwipeController.dispose();
     super.dispose();
   }
 
@@ -206,7 +230,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
               alignment: Alignment.bottomCenter,
               clipBehavior: Clip.none,
               children: [
-                // --- 1. ANIMATED BORDER ---
+
                 // --- 1. ANIMATED BORDER SECTION ---
                 AnimatedBuilder(
                   animation: _controller,
@@ -373,43 +397,27 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                   // --- 1. PROMO BANNER ---
                   SizedBox(
-                    height: 200,
+                    height: 160, // 🔥 thoda bada
                     child: PageView.builder(
-                      controller: _cardController,
-                      itemCount: 1000, // 🔥 infinite feel
+                      controller: PageController(
+                        viewportFraction: 0.92, // 🔥 FULL WIDTH EFFECT
+                      ),
+                      itemCount: 1000,
                       onPageChanged: (index) {
                         setState(() {
-                          _currentCard = index % 3; // 🔥 loop fix
+                          _currentCard = index % 3;
                         });
                       },
                       itemBuilder: (context, index) {
-                        final actualIndex = index % 3; // 🔥 repeat 3 items
-
-                        return AnimatedBuilder(
-                          animation: _cardController,
-                          builder: (context, child) {
-                            double value = 1.0;
-
-                            if (_cardController.position.haveDimensions) {
-                              value = _cardController.page! - index;
-                              value = (1 - (value.abs() * 0.2)).clamp(0.85, 1.0);
-                            }
-
-                            return Center(
-                              child: Transform.scale(
-                                scale: value,
-                                child: _buildCardbook(), // 🔥 same card repeat
-                              ),
-                            );
-                          },
-                        );
+                        return _buildCardbook(); // ❌ AnimatedBuilder hata diya (smooth & clean)
                       },
                     ),
                   ),
                   // Banner Dots Indicator
                   Transform.translate(
-                    offset: const Offset(0, -20), // 🔥 thoda upar float
-                    child: Center(
+                    offset: const Offset(0, -1), // 🔥 thoda upar float
+                    child:
+                    Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                         decoration: BoxDecoration(
@@ -436,7 +444,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.symmetric(horizontal: 4),
                                 height: 4, // 🔥 slim
-                                width: isActive ? 18 : 6,
+                                width: isActive ? 20 : 6,
                                 decoration: BoxDecoration(
                                   color: isActive
                                       ? const Color(0xFFE8D1AB)
@@ -503,14 +511,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       children: [
 
                         _buildServiceCard(
-                            "Photo", "assets/new_home/photo.png", false),
+                            "Photo", "assets/new_home/photo_new.png", false),
                         // Isme purple badge aayega
                         _buildServiceCard(
                             "Video", "assets/new_home/Image_fx (5) 1.png", false),
                         _buildServiceCard(
-                            "Editing", "assets/new_home/Editing.png", false),
+                            "Editing", "assets/new_home/edit_new.png", false),
                         _buildServiceCard(
-                            "Livestream", "assets/new_home/live.png", false),
+                            "Livestream", "assets/new_home/Livestream_new.png", false),
                         _buildServiceCard(
                             "stuido", "assets/new_home/stuido.png", false),
                       ],
@@ -1002,72 +1010,83 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     ),
                   ),
                   const SizedBox(height: 30), // Thoda space stack look ke liye
+                  GestureDetector(
+                    onTap: () {
+                      if (!_bookingSwipeController.isAnimating) {
+                        _bookingSwipeController.forward().then((_) {
+                          setState(() {
+                            _currentBookingIndex =
+                                (_currentBookingIndex + 1) % bookingList.length;
+                            _bookingSwipeController.reset();
+                          });
+                        });
+                      }
+                    },
+                    child: SizedBox(
+                      height: 400,
+                      child: AnimatedBuilder(
+                        animation: _bookingSwipeController,
+                        builder: (context, child) {
+                          double slide = _bookingSwipeController.value * -500;
+                          double rotate = _bookingSwipeController.value * 0.3;
+                          double opacity = 1 - _bookingSwipeController.value;
 
-          SizedBox(
-            height: 400,
-            child: PageView.builder(
-              controller: _bookingController,
-              itemCount: bookingList.length,
-              clipBehavior: Clip.none,
-              physics: const BouncingScrollPhysics(),
+                          return Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              /// 🔹 BACK CARD
+                              Transform.translate(
+                                offset: const Offset(0, -40),
+                                child: Transform.rotate(
+                                  angle: 0.08,
+                                  child: Transform.scale(
+                                    scale: 0.85,
+                                    child: Opacity(
+                                      opacity: 0.3,
+                                      child: _buildBookingCard(
+                                        (_currentBookingIndex + 2) % bookingList.length,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
 
+                              /// 🔹 MIDDLE CARD
+                              Transform.translate(
+                                offset: const Offset(0, -20),
+                                child: Transform.rotate(
+                                  angle: -0.06,
+                                  child: Transform.scale(
+                                    scale: 0.92,
+                                    child: Opacity(
+                                      opacity: 0.6,
+                                      child: _buildBookingCard(
+                                        (_currentBookingIndex + 1) % bookingList.length,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
 
-              itemBuilder: (context, index) {
-                double slide = _swipeController.value * -600;
-                double rotate = _swipeController.value * 0.4;
-                double opacity = 1 - _swipeController.value;
-
-
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // --- 3. SABSE PICHE WALA CARD (Back Card) ---
-                    Transform.translate(
-                      offset: const Offset(0, -40), // 👈 Thoda aur upar
-                      child: Transform.rotate(
-                        angle: 0.08, // Right Tilt
-                        child: Transform.scale(
-                          scale: 0.85, // 👈 Sabse chota scale
-                          child: Opacity(
-                            opacity: 0.3,
-                            child: _buildBookingCard((_currentCreativeIndex + 2) % creatives.length),
-                          ),
-                        ),
+                              /// 🔥 MAIN CARD (SWIPE)
+                              Transform.translate(
+                                offset: Offset(0, slide),
+                                child: Transform.rotate(
+                                  angle: rotate,
+                                  child: Opacity(
+                                    opacity: opacity,
+                                    child: _buildBookingCard(
+                                      _currentBookingIndex % bookingList.length,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
-
-                    // --- 2. BEECH WALA CARD (Middle Card) ---
-                    Transform.translate(
-                      offset: const Offset(0, -20),
-                      child: Transform.rotate(
-                        angle: -0.06, // Left Tilt
-                        child: Transform.scale(
-                          scale: 0.92, // 👈 Medium scale
-                          child: Opacity(
-                            opacity: 0.6,
-                            child: _buildBookingCard((_currentCreativeIndex + 1) % creatives.length),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // --- 1. MAIN TOP INTERACTIVE CARD ---
-                    Transform.translate(
-                      offset: Offset(0, slide),
-                      child: Transform.rotate(
-                        angle: rotate,
-                        child: Opacity(
-                          opacity: opacity,
-                          child: _buildBookingCard(_currentCreativeIndex),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-
+                  ),
 
 
 
@@ -1839,7 +1858,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   }
   Widget _buildCardbook() {
     return Container(
-      height: 160,
+        margin: const EdgeInsets.symmetric(horizontal: 6),
 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
@@ -1956,26 +1975,27 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
   Widget _buildBookingCard(int index) {
-    final booking = bookingList[index]; // Ab ye error nahi dega
+    final booking = bookingList[index % bookingList.length]; // ✅ SAFE
+
     return Container(
-      margin: const EdgeInsets.only(right: 15),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Figma Dark Gray
+        color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: Colors.white.withOpacity(0.08)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.6),
+            blurRadius: 25,
+            offset: const Offset(0, 15),
           )
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// --- IMAGE ---
+          /// IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.asset(
@@ -1985,74 +2005,77 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
               fit: BoxFit.cover,
             ),
           ),
+
           const SizedBox(height: 15),
 
-          /// --- TITLE ---
+          /// TITLE
           Text(
             booking['title']!,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              fontFamily: "Outfit",
             ),
           ),
 
-          const Divider(color: Colors.white10, height: 25),
+          const Divider(color: Colors.white10),
 
-          /// --- DATE & TIME ---
+          /// DATE
           Row(
             children: [
-              const Icon(Icons.calendar_month_outlined, color: Colors.white54, size: 20),
-              const SizedBox(width: 10),
-              Text(booking['date']!, style: const TextStyle(color: Colors.white70)),
+              const Icon(Icons.calendar_today, color: Colors.white54, size: 18),
+              const SizedBox(width: 8),
+              Text(booking['date']!,
+                  style: const TextStyle(color: Colors.white70)),
             ],
           ),
-          const SizedBox(height: 10),
+
+          const SizedBox(height: 8),
+
+          /// TIME
           Row(
             children: [
-              const Icon(Icons.access_time_outlined, color: Colors.white54, size: 20),
-              const SizedBox(width: 10),
-              Text(booking['time']!, style: const TextStyle(color: Colors.white70)),
+              const Icon(Icons.access_time, color: Colors.white54, size: 18),
+              const SizedBox(width: 8),
+              Text(booking['time']!,
+                  style: const TextStyle(color: Colors.white70)),
             ],
           ),
 
           const Spacer(),
 
-          /// --- FOOTER (Completed & Icon) ---
+          /// BUTTON
           Row(
             children: [
               Expanded(
                 child: Container(
-                  height: 48,
+                  height: 45,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green.withOpacity(0.5)),
                     borderRadius: BorderRadius.circular(25),
-                    color: const Color(0xFF142418), // Dark Greenish bg
+                    border: Border.all(color: Colors.green),
+                    color: const Color(0xFF142418),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check_circle_outline, color: Colors.green, size: 20),
-                      SizedBox(width: 8),
-                      Text("Completed",
-                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                    ],
+                  child: const Center(
+                    child: Text(
+                      "Completed",
+                      style: TextStyle(
+                          color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Container(
-                height: 48,
-                width: 48,
+                height: 45,
+                width: 45,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
                   shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.1),
                 ),
-                child: const Icon(Icons.call_made_rounded, color: Colors.white, size: 20),
-              ),
+                child: const Icon(Icons.arrow_forward, color: Colors.white),
+              )
             ],
-          ),
+          )
         ],
       ),
     );
@@ -2805,25 +2828,3 @@ class BorderAnimationPainter extends CustomPainter {
 }
 
 
-class TicketPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF0D0D0D) // Background dark color
-      ..style = PaintingStyle.fill;
-
-    double radius = 10; // Cutout ka size
-    double gap = size.height / 4; // Charo cuts ke beech barabar jagah
-
-    for (int i = 1; i <= 3; i++) {
-      double y = gap * i;
-      // Left Cut
-      canvas.drawCircle(Offset(0, y), radius, paint);
-      // Right Cut
-      canvas.drawCircle(Offset(size.width, y), radius, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
