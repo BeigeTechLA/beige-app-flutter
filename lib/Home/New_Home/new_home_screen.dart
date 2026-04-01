@@ -37,6 +37,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   late PageController _cardController;
   int _currentBookingIndex = 0;
   late AnimationController _bookingSwipeController;
+  late AnimationController _borderController;
 
   final PageController _inspiredController = PageController(
     initialPage: 1000,
@@ -218,6 +219,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       duration: const Duration(seconds: 10),
     )
       ..repeat();
+    _borderController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(); // 🔥 continuous animation
 
     _swipeController = AnimationController( // ✅ ADD THIS
       vsync: this,
@@ -227,7 +232,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       viewportFraction: 0.82, // 👈 right side card visible
     );
 
-    _cardController = PageController(viewportFraction: 0.8);
+    _cardController = PageController(viewportFraction: 0.88);
     _bookingSwipeController = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 400),
@@ -240,6 +245,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     _swipeController.dispose(); // ✅ MUST
     _inspiredController.dispose(); // ✅ ADD THIS
     _bookingSwipeController.dispose();
+    _borderController.dispose();
+
     super.dispose();
   }
 
@@ -401,7 +408,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     width: MediaQuery
                         .of(context)
                         .size
-                        .width * 0.80,
+                        .width * 0.70,
                     height: 50,
                     decoration: BoxDecoration(
                       color: const Color(0xFF282828),
@@ -488,17 +495,23 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   ),
                   // Banner Dots Indicator
                   Transform.translate(
-                    offset: const Offset(0, -1), // 🔥 thoda upar float
-                    child:
-                    Center(
+                    offset: const Offset(0, -7), // 🔥 thoda aur upar (perfect alignment)
+                    child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF212121),
+                          color: const Color(0xFF1F1F1F),
                           borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(40),
                             bottomRight: Radius.circular(40),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            )
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -514,15 +527,20 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 );
                               },
                               child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
-                                height: 5, // 🔥 slim
-                                width: isActive ? 22 : 12,
+                                duration: const Duration(milliseconds: 350),
+                                curve: Curves.easeInOut,
+
+                                margin: const EdgeInsets.symmetric(horizontal: 5),
+
+                                height: 6, // 🔥 thoda better thickness
+                                width: isActive ? 26 : 14, // 🔥 smooth pill effect
+
                                 decoration: BoxDecoration(
                                   color: isActive
                                       ? const Color(0xFFE8D1AB)
-                                      : Colors.white24,
-                                  borderRadius: BorderRadius.circular(10),
+                                      : Colors.white.withOpacity(0.25),
+
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
                             );
@@ -580,7 +598,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   // Services Horizontal List
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    // padding: const EdgeInsets.only(left: 20),
+                     padding: const EdgeInsets.only(left: 10),
                     child: Row(
                       children: [
 
@@ -640,11 +658,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   ),
 
 
-                  const SizedBox(height: 10),
                   // Main Card
                   Container(
                     padding: const EdgeInsets.all(20),
-                    margin: EdgeInsets.all(15),
+                    margin: EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8D1AB), // Tan/Beige background
                       borderRadius: BorderRadius.circular(22),
@@ -804,19 +821,19 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               double difference = (index - page);
 
                               // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
-                              double perspective = 0.0032;
+                              double perspective = 0.0028;
 
                               // 2. Rotation Logic (Blue box jaisa effect):
                               // Right waali image (difference > 0) ke liye positive rotation
                               // jisse uska right side peeche jaye.
                               double rotation = difference *
-                                  0.9; // Is value ko 0.4 se 0.7 tak change karke dekhein
-                              rotation = rotation.clamp(-0.8, 0.8);
+                                  0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
+                              rotation = rotation.clamp(-0.8, 0.9);
 
                               // 3. Scale & Opacity
                               double scale = (1 - (difference.abs() * 0.10))
                                   .clamp(0.0, 1.0);
-                              double opacity = (1 - (difference.abs() * 0.20))
+                              double opacity = (1 - (difference.abs() * 0.10))
                                   .clamp(0.6, 2.0);
 
                               // 4. Translate (Cards ko center ke paas laane ke liye)
@@ -859,50 +876,54 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             .width, 70),
                         painter: BeveledTrayPainter(),
                       ),
-                      AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          // Current page calculate karne ke liye (Looping ke liye modulo use kiya hai)
-                          double page = 0;
-                          if (_pageController.hasClients) {
-                            page =
-                                _pageController.page ?? _initialPage.toDouble();
-                          } else {
-                            page = _initialPage.toDouble();
-                          }
-                          int activeIndex = page.round() %
-                              featuredImages.length;
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12), // Bevel height jitna ya thoda zyada
 
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(featuredImages.length, (
-                                index) {
-                              bool isActive = index == activeIndex;
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 4),
-                                height: 7,
-                                width: 7,
-                                // Round dots ke liye height/width same rakhi hai
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  // Active dot beige hai, baki dark grey
-                                  color: isActive
-                                      ? const Color(0xFFE8D1AB)
-                                      : Colors.white.withOpacity(0.2),
-                                  boxShadow: isActive ? [
-                                    BoxShadow(
-                                      color: const Color(0xFFE8D1AB)
-                                          .withOpacity(0.4),
-                                      blurRadius: 4,
-                                    )
-                                  ] : [],
-                                ),
-                              );
-                            }),
-                          );
-                        },
+                        child: AnimatedBuilder(
+                          animation: _pageController,
+                          builder: (context, child) {
+                            // Current page calculate karne ke liye (Looping ke liye modulo use kiya hai)
+                            double page = 0;
+                            if (_pageController.hasClients) {
+                              page =
+                                  _pageController.page ?? _initialPage.toDouble();
+                            } else {
+                              page = _initialPage.toDouble();
+                            }
+                            int activeIndex = page.round() %
+                                featuredImages.length;
+
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(featuredImages.length, (
+                                  index) {
+                                bool isActive = index == activeIndex;
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 400),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4),
+                                  height: 7,
+                                  width: 7,
+                                  // Round dots ke liye height/width same rakhi hai
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    // Active dot beige hai, baki dark grey
+                                    color: isActive
+                                        ? const Color(0xFFE8D1AB)
+                                        : Colors.white.withOpacity(0.2),
+                                    boxShadow: isActive ? [
+                                      BoxShadow(
+                                        color: const Color(0xFFE8D1AB)
+                                            .withOpacity(0.4),
+                                        blurRadius: 4,
+                                      )
+                                    ] : [],
+                                  ),
+                                );
+                              }),
+                            );
+                          },
+                        ),
                       ),
                     ],
 
@@ -920,8 +941,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
             },
             child: Container(
               width: double.infinity,
-
-              padding: const EdgeInsets.only(top: 30, bottom: 69, left: 15, right: 15),
+              padding: const EdgeInsets.only(top: 40, bottom: 69, left: 15, right: 15),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -938,57 +958,57 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
               child: Column(
                 children: [
                   const Text(
-                      "Beige Studios",
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                        color: Color(0x29000000),
-                        fontSize: 42,
-                        fontWeight: FontWeight.w900, // Extra Bold look
-                        fontFamily: "Unbounded",
-                        letterSpacing: -2.0, // Isse words ke beech ka space khatam ho jayega
-                        height: 1.0, // Line height kam karne ke liye
-                      ),),
+                    "Beige Studios",
 
-                  const SizedBox(height: 10), // Text aur Carousel ke beech thoda gap
+                    style: TextStyle(
+                      color: Color(0x29000000),
+                      fontSize: 35,
+                      fontWeight: FontWeight.w900, // Extra Bold look
+                      fontFamily: "Unbounded",
+                    ),),
+
 
                   // Carousel Section
-                  SizedBox(
-                    height: 350, // Height thodi badhayi hai
-                    child: PageView.builder(
-                      controller: _studioController, // Isme viewportFraction: 0.75 hona chahiye
-                      clipBehavior: Clip.none, // Taaki side images cut na ho
-                      onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
-                      itemBuilder: (context, index) {
-                        final int actualIndex = index % studioList.length;
-                        return AnimatedBuilder(
-                          animation: _studioController,
-                          builder: (context, child) {
-                            double scale = 1.0;
-                            double translate = 0;
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: SizedBox(
+                      height: 350, // Height thodi badhayi hai
+                      child: PageView.builder(
+                        controller: _studioController, // Isme viewportFraction: 0.75 hona chahiye
+                        clipBehavior: Clip.none, // Taaki side images cut na ho
+                        onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
+                        itemBuilder: (context, index) {
+                          final int actualIndex = index % studioList.length;
+                          return AnimatedBuilder(
+                            animation: _studioController,
+                            builder: (context, child) {
+                              double scale = 1.0;
+                              double translate = 0;
 
-                            if (_studioController.position.haveDimensions) {
-                              double page = _studioController.page!;
-                              double diff = (index - page);
-                              // Scale logic for smooth effect
-                              scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
-                              translate = diff.abs() * 10;
-                            } else {
-                              // Initial state for first build
-                              if(index != 0) scale = 0.85;
-                            }
+                              if (_studioController.position.haveDimensions) {
+                                double page = _studioController.page!;
+                                double diff = (index - page);
+                                // Scale logic for smooth effect
+                                scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
+                                translate = diff.abs() * 10;
+                              } else {
+                                // Initial state for first build
+                                if(index != 0) scale = 0.85;
+                              }
 
-                            return Center(
-                              child: Transform.translate(
-                                offset: Offset(0, translate),
-                                child: Transform.scale(
-                                  scale: scale,
-                                  child: _buildStudioCard(studioList[actualIndex]),
+                              return Center(
+                                child: Transform.translate(
+                                  offset: Offset(0, translate),
+                                  child: Transform.scale(
+                                    scale: scale,
+                                    child: _buildStudioCard(studioList[actualIndex]),
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
 
@@ -1067,7 +1087,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         gradient: LinearGradient(
                           colors: [
                             Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
+                            Colors.white24,
                             Colors.white.withOpacity(0.09), // right
                           ],
                           begin: Alignment.centerLeft,
@@ -1092,7 +1112,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             fontFamily: "Unbounded",
                           ),
                         ),
-                        Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.5), size: 18),
+                        SvgPicture.asset(
+                          "assets/svg/home_vecto.svg",
+
+                        ),
                       ],
                     ),
                   ),
@@ -1138,7 +1161,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       child: AnimatedBuilder(
                         animation: _bookingSwipeController,
                         builder: (context, child) {
-                          double slide = _bookingSwipeController.value * -500;
+                          double slide = _bookingSwipeController.value * 500;
                           double rotate = _bookingSwipeController.value * 0.3;
                           double opacity = 1 - _bookingSwipeController.value;
 
@@ -1147,7 +1170,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             children: [
                               /// 🔹 BACK CARD
                               Transform.translate(
-                                offset: const Offset(0, -40),
+                                offset: const Offset(0, -20),
                                 child: Transform.rotate(
                                   angle: 0.08,
                                   child: Transform.scale(
@@ -1913,7 +1936,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   }
   Widget _buildCardbook(Map<String, String> data) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal:12),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
@@ -2230,41 +2253,89 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       ),
     );
   }
-
   Widget _buildServiceCard(String title, String imagePath, bool hasBadge) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                height: 85,
-                width: 85,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
-                  borderRadius: BorderRadius.circular(20),
-                  border: hasBadge
-                      ? Border.all(
-                      color: const Color(0xFFE8D1AB).withOpacity(0.5), width: 1)
-                      : null,
-                ),
-                child: Image.asset(
-                    imagePath, fit: BoxFit.contain), // Icon image
-              ),
-              // Purple Badge (D Pin)
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              double scale = hasBadge ? 1.05 : 1.0; // 🔥 slight zoom
 
-            ],
+              return Transform.scale(
+                scale: scale,
+                child: Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+
+                    /// 🔥 SOFT ANIMATED GRADIENT
+                    gradient: SweepGradient(
+                      transform: GradientRotation(_controller.value * 5.28),
+                      colors: [
+                        Colors.transparent,
+                        const Color(0xFFE8D1AB).withOpacity(0.4),
+                        const Color(0xFFE8D1AB),
+                        const Color(0xFFE8D1AB).withOpacity(0.4),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                    ),
+
+                    /// 🔥 SOFT GLOW
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.6),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+
+                      /// 🔥 TOP LIGHT (premium highlight)
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(-2, -2),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    height: 85,
+                    width: 85,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1F1F1F), // 🔥 darker = premium
+                      borderRadius: BorderRadius.circular(22),
+
+                      /// 🔥 INNER SHADOW LOOK
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.05),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
+
           const SizedBox(height: 10),
+
           Text(
             title,
-            style: TextStyle(color: Colors.white.withOpacity(0.7),
-                fontSize: 14,
-                fontFamily: "Outfit"),
-          )
+            style: TextStyle(
+              color: hasBadge
+                  ? const Color(0xFFE8D1AB)
+                  : Colors.white.withOpacity(0.6), // 🔥 active text color
+              fontSize: 14,
+              fontFamily: "Outfit",
+              fontWeight: hasBadge ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
         ],
       ),
     );
@@ -2612,7 +2683,7 @@ Widget _sideDot() {
     width: 20,
     height: 20,
     decoration: BoxDecoration(
-      color: Colors.black,
+      color: ColorCode.bcakgroundcolor,
       borderRadius: BorderRadius.circular(50),
     ),
   );
@@ -2625,11 +2696,12 @@ class BeveledTrayPainter extends CustomPainter {
     double w = size.width;
     double h = size.height;
 
-    // Figma proportions
-    double bevelHeight = 15;
-    double slopeWidth = 20;
-    double shoulderWidth = w * 0.20;
+    // Dimensions (Aap inhe adjust kar sakte hain)
+    double bevelHeight = 12; // Kitna neeche jayega
+    double slopeWidth = 15;  // Tirchi line ki width
+    double shoulderWidth = w * 0.18; // Side ki strips ki width
 
+    // Main Path define karna
     Path path = Path();
     path.moveTo(0, 0);
     path.lineTo(shoulderWidth, 0);
@@ -2641,58 +2713,84 @@ class BeveledTrayPainter extends CustomPainter {
     path.lineTo(0, h);
     path.close();
 
-    // --- 1. Background Gradient (Dark Material) ---
+    // 1. Background Base Color (Dark Gradient)
     final paint = Paint()
       ..shader = const LinearGradient(
-        colors: [Color(0xFF131313), Color(0xFF242424)],
+        colors: [Color(0xFF1A1A1A), Color(0xFF121212)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawPath(path, paint);
 
-    // --- 2. Vertical Recessed Shadows (Jo "gehrai" dikhayenge) ---
-    final shadowPaint = Paint()
+    // 2. Vertical Side Shadows (Depth create karne ke liye)
+    // Left Wall Shadow
+    final leftWallPaint = Paint()
       ..shader = LinearGradient(
-        colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+        colors: [Colors.black.withOpacity(0.6), Colors.transparent],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-      ).createShader(Rect.fromLTWH(shoulderWidth, 0, 40, h));
+      ).createShader(Rect.fromLTWH(shoulderWidth, 0, slopeWidth, h));
 
-    // Left shadow marker
-    canvas.drawRect(Rect.fromLTWH(shoulderWidth, 0, 15, h), shadowPaint);
-
-    final shadowPaintRight = Paint()
-      ..shader = LinearGradient(
-        colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ).createShader(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h));
-
-    // Right shadow marker
-    canvas.drawRect(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h), shadowPaintRight);
-
-    // --- 3. Subtle Top Highlight (White border ko soft karne ke liye) ---
-    // Hum sirf top flat area aur slopes par line khichenge
-    final highlightPath = Path()
-      ..moveTo(0, 0)
-      ..lineTo(shoulderWidth, 0)
+    Path leftWallPath = Path()
+      ..moveTo(shoulderWidth, 0)
       ..lineTo(shoulderWidth + slopeWidth, bevelHeight)
-      ..lineTo(w - (shoulderWidth + slopeWidth), bevelHeight)
-      ..lineTo(w - shoulderWidth, 0)
-      ..lineTo(w, 0);
+      ..lineTo(shoulderWidth + slopeWidth, h)
+      ..lineTo(shoulderWidth, h)
+      ..close();
+    canvas.drawPath(leftWallPath, leftWallPaint);
 
+    // Right Wall Shadow
+    final rightWallPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(Rect.fromLTWH(w - shoulderWidth - slopeWidth, 0, slopeWidth, h));
+
+    Path rightWallPath = Path()
+      ..moveTo(w - shoulderWidth, 0)
+      ..lineTo(w - shoulderWidth - slopeWidth, bevelHeight)
+      ..lineTo(w - shoulderWidth - slopeWidth, h)
+      ..lineTo(w - shoulderWidth, h)
+      ..close();
+    canvas.drawPath(rightWallPath, rightWallPaint);
+
+    // 3. Inner Top Shadow (Sunken area ko gehra dikhane ke liye)
+    final topInnerShadow = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, bevelHeight, w, 20));
+
+    canvas.drawRect(
+        Rect.fromLTWH(shoulderWidth + slopeWidth, bevelHeight,
+            w - 2 * (shoulderWidth + slopeWidth), 15),
+        topInnerShadow
+    );
+
+    // 4. Sharp Highlights (Border lines)
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.06) // Bahut light white
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
 
-    canvas.drawPath(highlightPath, highlightPaint);
+    // Top horizontal edges
+    highlightPaint.color = Colors.white.withOpacity(0.12);
+    canvas.drawLine(Offset(0, 0), Offset(shoulderWidth, 0), highlightPaint);
+    canvas.drawLine(Offset(w - shoulderWidth, 0), Offset(w, 0), highlightPaint);
+
+    // Bottom "sunken" edge highlight
+    highlightPaint.color = Colors.white.withOpacity(0.05);
+    canvas.drawLine(
+        Offset(shoulderWidth + slopeWidth, bevelHeight),
+        Offset(w - (shoulderWidth + slopeWidth), bevelHeight),
+        highlightPaint
+    );
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
-
 // --- BORDER PAINTER (LEFT-TO-RIGHT) ---
 class BorderAnimationPainter extends CustomPainter {
   final double animationValue;
