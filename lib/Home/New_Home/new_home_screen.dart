@@ -5,10 +5,13 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../Model/HomeModel.dart';
 import '../HomeSekect/Home_view_profile.dart';
+import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import 'home_controller .dart';
 
 class NewHomeScreen extends StatefulWidget {
-  const NewHomeScreen({super.key});
+  final Function(int,int)? onTabChange; // 👈 add this
+
+  const NewHomeScreen({super.key, this.onTabChange});
 
   @override
   State<NewHomeScreen> createState() => _NewHomeScreenState();
@@ -54,7 +57,38 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       setState(() => isLoading = false);
     }
   }
+  void showTopToast(BuildContext context, String message) {
+    OverlayEntry? overlayEntry;
 
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+color: Colors.white,              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(overlayEntry);
+
+    // ⏱ Auto remove after 2 sec
+    Future.delayed(Duration(seconds: 2), () {
+      overlayEntry?.remove();
+    });
+  }
   // --- DATA LISTS FOR TEXT & COLORS ---
   final List<String> _searchTexts = [
     "I want a Wedding Photographer",
@@ -163,21 +197,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       "img": "assets/images/Nathan+Grant.png"
     },
   ];
-
-
-
   final PageController _studioController = PageController(
       viewportFraction: 0.75);
   int _activeStudioIndex = 0;
-
-
   final PageController _pageController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65, // Isse side ke cards screen ke paas aayenge
 
   );
-
-
   final List<Color> _textColors = [
     Colors.white.withOpacity(0.5), // Wedding ke liye normal white
     const Color(0xFFE8D1AB), // Corporate ke liye aapka golden color
@@ -511,16 +538,41 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       children: [
 
                         _buildServiceCard(
-                            "Photo", "assets/new_home/photo_new.png", false),
+                            "Photo", "assets/new_home/photo_new.png", false,       onTap: () {
+
+                          widget.onTabChange?.call(1,2); // 👈 yaha call karna hai
+
+                        },),
                         // Isme purple badge aayega
                         _buildServiceCard(
-                            "Video", "assets/new_home/Image_fx (5) 1.png", false),
+                            "Video", "assets/new_home/Image_fx (5) 1.png", false,
+                          onTap: () {
+
+                           widget.onTabChange?.call(1,1); // 👈 yaha call karna hai
+
+                        },
+                        ),
                         _buildServiceCard(
-                            "Editing", "assets/new_home/edit_new.png", false),
+                            "Editing", "assets/new_home/edit_new.png", false,
+                          onTap: () {
+                            showTopToast(context, "Coming Soon 🚀");
+
+                          },
+                        ),
                         _buildServiceCard(
-                            "Livestream", "assets/new_home/Livestream_new.png", false),
+                            "Livestream", "assets/new_home/Livestream_new.png", false,
+                          onTap: () {
+                            showTopToast(context, "Coming Soon 🚀");
+
+                          },
+                        ),
                         _buildServiceCard(
-                            "stuido", "assets/new_home/stuido.png", false),
+                            "stuido", "assets/new_home/stuido.png", false,
+                          onTap: () {
+                            showTopToast(context, "Coming Soon 🚀");
+
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -776,54 +828,77 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                   Stack(
                     alignment: Alignment.center,
-
                     children: [
                       CustomPaint(
-                        size: Size(MediaQuery
-                            .of(context)
-                            .size
-                            .width, 70),
+                        size: Size(MediaQuery.of(context).size.width, 65),
                         painter: BeveledTrayPainter(),
                       ),
+                      // Left depth shadow
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.7),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Right depth shadow
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.7),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Dot indicator
                       AnimatedBuilder(
                         animation: _pageController,
                         builder: (context, child) {
-                          // Current page calculate karne ke liye (Looping ke liye modulo use kiya hai)
-                          double page = 0;
+                          double page = _initialPage.toDouble();
                           if (_pageController.hasClients) {
-                            page =
-                                _pageController.page ?? _initialPage.toDouble();
-                          } else {
-                            page = _initialPage.toDouble();
+                            page = _pageController.page ?? page;
                           }
-                          int activeIndex = page.round() %
-                              featuredImages.length;
-
+                          final activeIndex = page.round() % featuredImages.length;
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(featuredImages.length, (
-                                index) {
-                              bool isActive = index == activeIndex;
+                            children: List.generate(featuredImages.length, (index) {
+                              final isActive = index == activeIndex;
                               return AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 4),
-                                height: 7,
-                                width: 7,
-                                // Round dots ke liye height/width same rakhi hai
+                                margin: const EdgeInsets.symmetric(horizontal: 5),
+                                height: 8,
+                                width: 8,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  // Active dot beige hai, baki dark grey
                                   color: isActive
                                       ? const Color(0xFFE8D1AB)
                                       : Colors.white.withOpacity(0.2),
-                                  boxShadow: isActive ? [
+                                  boxShadow: isActive
+                                      ? [
                                     BoxShadow(
-                                      color: const Color(0xFFE8D1AB)
-                                          .withOpacity(0.4),
-                                      blurRadius: 4,
-                                    )
-                                  ] : [],
+                                      color: const Color(0xFFE8D1AB).withOpacity(0.6),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ]
+                                      : [],
                                 ),
                               );
                             }),
@@ -831,7 +906,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         },
                       ),
                     ],
-
                   ),
                   const SizedBox(height: 10),
 
@@ -2183,45 +2257,61 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildServiceCard(String title, String imagePath, bool hasBadge) {
-    return Padding(
+// ✅ Sahi tarika — gradient border ke liye
+  Widget _buildServiceCard(
+      String title,
+      String imagePath,
+      bool hasBadge, {
+        VoidCallback? onTap, // optional onTap callback
+      }) {    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                height: 85,
-                width: 85,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
-                  borderRadius: BorderRadius.circular(20),
-                  border: hasBadge
-                      ? Border.all(
-                      color: const Color(0xFFE8D1AB).withOpacity(0.5), width: 1)
-                      : null,
+          GestureDetector(
+            onTap: onTap,
+            child: Container(
+              height: 85,
+              width: 85,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                border:  Border(
+                  top: BorderSide(
+                    color: Colors.amber.shade700,
+                  )
+            // left side no border
                 ),
-                child: Image.asset(
-                    imagePath, fit: BoxFit.contain), // Icon image
-              ),
-              // Purple Badge (D Pin)
 
-            ],
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(19.5),   // thoda kam radius inner ke liye
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF2E2E2E),
+                      Color(0xFF1A1A1A),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.all(14),
+                child: Image.asset(imagePath, fit: BoxFit.contain),
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             title,
-            style: TextStyle(color: Colors.white.withOpacity(0.7),
-                fontSize: 14,
-                fontFamily: "Outfit"),
-          )
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 14,
+              fontFamily: "Outfit",
+            ),
+          ),
         ],
       ),
     );
   }
-
   Widget _buildStudioCard(Map<String, String> data) {
     return Container(
       // margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -2685,18 +2775,20 @@ Widget _sideDot() {
   );
 }
 
-
 class BeveledTrayPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     double w = size.width;
     double h = size.height;
 
-    // Figma proportions
-    double bevelHeight = 15;
+    double bevelHeight = 10;
     double slopeWidth = 20;
-    double shoulderWidth = w * 0.20;
 
+    // --- Make the pillars square (height == width) and full height ---
+    double blockHeight = h - bevelHeight; // total pillar height
+    double shoulderWidth = blockHeight;   // width equals height → square
+
+    // --- Define the outer tray shape (with beveled top corners) ---
     Path path = Path();
     path.moveTo(0, 0);
     path.lineTo(shoulderWidth, 0);
@@ -2708,7 +2800,7 @@ class BeveledTrayPainter extends CustomPainter {
     path.lineTo(0, h);
     path.close();
 
-    // --- 1. Background Gradient (Dark Material) ---
+    // --- 1. Background Gradient ---
     final paint = Paint()
       ..shader = const LinearGradient(
         colors: [Color(0xFF131313), Color(0xFF242424)],
@@ -2717,15 +2809,53 @@ class BeveledTrayPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawPath(path, paint);
 
-    // --- 2. Vertical Recessed Shadows (Jo "gehrai" dikhayenge) ---
+    // --- 2. Left pillar (square) ---
+    final leftBlock = Path()
+      ..moveTo(0, h)
+      ..lineTo(shoulderWidth, h)
+      ..lineTo(shoulderWidth, h - blockHeight)
+      ..lineTo(shoulderWidth - slopeWidth, h - blockHeight - bevelHeight)
+      ..lineTo(0, h - blockHeight - bevelHeight)
+      ..close();
+
+    canvas.drawPath(
+      leftBlock,
+      Paint()
+        ..shader = LinearGradient(
+          colors: const [Color(0xFF2a2a2a), Color(0xFF1a1a1a)],
+          begin: Alignment.centerRight,
+          end: Alignment.centerLeft,
+        ).createShader(Rect.fromLTWH(
+            0, h - blockHeight - bevelHeight, shoulderWidth, blockHeight + bevelHeight)),
+    );
+
+    // --- 3. Right pillar (square) ---
+    final rightBlock = Path()
+      ..moveTo(w, h)
+      ..lineTo(w - shoulderWidth, h)
+      ..lineTo(w - shoulderWidth, h - blockHeight)
+      ..lineTo(w - shoulderWidth + slopeWidth, h - blockHeight - bevelHeight)
+      ..lineTo(w, h - blockHeight - bevelHeight)
+      ..close();
+
+    canvas.drawPath(
+      rightBlock,
+      Paint()
+        ..shader = LinearGradient(
+          colors: const [Color(0xFF1a1a1a), Color(0xFF2a2a2a)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ).createShader(Rect.fromLTWH(w - shoulderWidth,
+            h - blockHeight - bevelHeight, shoulderWidth, blockHeight + bevelHeight)),
+    );
+
+    // --- 4. Vertical Recessed Shadows (optional) ---
     final shadowPaint = Paint()
       ..shader = LinearGradient(
         colors: [Colors.black.withOpacity(0.8), Colors.transparent],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ).createShader(Rect.fromLTWH(shoulderWidth, 0, 40, h));
-
-    // Left shadow marker
     canvas.drawRect(Rect.fromLTWH(shoulderWidth, 0, 15, h), shadowPaint);
 
     final shadowPaintRight = Paint()
@@ -2734,12 +2864,9 @@ class BeveledTrayPainter extends CustomPainter {
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ).createShader(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h));
-
-    // Right shadow marker
     canvas.drawRect(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h), shadowPaintRight);
 
-    // --- 3. Subtle Top Highlight (White border ko soft karne ke liye) ---
-    // Hum sirf top flat area aur slopes par line khichenge
+    // --- 5. Subtle Top Highlight ---
     final highlightPath = Path()
       ..moveTo(0, 0)
       ..lineTo(shoulderWidth, 0)
@@ -2749,16 +2876,16 @@ class BeveledTrayPainter extends CustomPainter {
       ..lineTo(w, 0);
 
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.06) // Bahut light white
+      ..color = Colors.white.withOpacity(0.06)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
-
     canvas.drawPath(highlightPath, highlightPaint);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
+
 
 // --- BORDER PAINTER (LEFT-TO-RIGHT) ---
 class BorderAnimationPainter extends CustomPainter {

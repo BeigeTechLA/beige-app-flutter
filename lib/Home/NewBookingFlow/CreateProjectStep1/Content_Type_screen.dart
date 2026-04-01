@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:beige/utility/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -7,14 +10,36 @@ import '../../../utility/ColorCode.dart';
 import 'Video_Shoot_Type.dart';
 
 class ContentTypeScreen extends StatefulWidget {
+  final int? value;
   final int ?specialtyId;
-  const ContentTypeScreen({super.key,  this.specialtyId});
+  const ContentTypeScreen({super.key,  this.specialtyId, this.value});
 
   @override
   State<ContentTypeScreen> createState() => _ContentTypeScreenState();
 }
 
 class _ContentTypeScreenState extends State<ContentTypeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.value!=null){
+      selectedContentTypeIds=[widget.value!];
+
+      debugPrint("value is: ${widget.value.toString()}");
+
+    }
+    if(widget.value==null){
+      selectedContentTypeIds=[-1];
+
+      debugPrint("value is: ${widget.value.toString()}");
+
+    }
+
+
+  }
+
+
 
 
   String? selectedContentType;
@@ -512,8 +537,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage: "assets/newbookflow/Selectall_active.svg",
-                          inactiveImage: "assets/newbookflow/Selectall_non.svg",
+                          activeImage: images.selectall,
+                          inactiveImage: images.selectall,
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -521,10 +546,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// VIDEOGRAPHY
                         _buildOption(
                           title: "Videography",
-                          activeImage:
-                          "assets/newbookflow/Videography_active.svg",
-                          inactiveImage:
-                          "assets/newbookflow/Videography_non.svg",
+                          activeImage: images.videography,
+                          inactiveImage: images.videography,
                           value: selectedContentTypeIds.contains(1),
                           onTap: () => _handleSelection(1),
                         ),
@@ -532,10 +555,21 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage: "assets/newbookflow/Photography_actvie.svg",
-                          inactiveImage: "assets/newbookflow/Photography_non.svg",
+                          activeImage: images.photography,
+                          inactiveImage: images.photography,
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
+                        ),
+
+                        _buildOption(
+                          title: "Studios (Coming Soon)",
+                          value: false,
+                          isDisabled: true,
+                          // activeImage: "assets/newbookflow/Editing_actvie.svg",
+                          // inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          activeImage: images.studios,
+                          inactiveImage: images.studios,
+                          onTap: null,
                         ),
 
                         /// EDITING
@@ -543,8 +577,10 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Editing Only (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/Editing_actvie.svg",
-                          inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          // activeImage: "assets/newbookflow/Editing_actvie.svg",
+                          // inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          activeImage: images.editing,
+                          inactiveImage: images.editing,
                           onTap: null,
                         ),
 
@@ -553,8 +589,10 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Livestreaming (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/Livestreaming_active.svg",
-                          inactiveImage: "assets/newbookflow/Livestreaming_non.svg",
+                          // activeImage: "assets/newbookflow/Livestreaming_active.svg",
+                          // inactiveImage: "assets/newbookflow/Livestreaming_non.svg",
+                          activeImage: images.livestreaming,
+                          inactiveImage: images.livestreaming,
                           onTap: null,
                         ),
 
@@ -622,11 +660,29 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorCode.kIconBackground,
+                color: isDisabled?
+                    Color(0xff171717).withOpacity(0.3):
+
+                ColorCode.kIconBackground,
               ),
+              // child: Center(
+              //   child: SvgPicture.asset(
+              //     value ? activeImage : inactiveImage,
+              //   ),
+              // ),
               child: Center(
-                child: SvgPicture.asset(
-                  value ? activeImage : inactiveImage,
+                child: ImageFiltered(
+                  imageFilter: isDisabled
+                      ? ImageFilter.blur(sigmaX: 0.6, sigmaY: 0.6)
+                      : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                  child: Opacity(
+                    opacity: isDisabled ? 0.7 : 1,
+                    child: Image.asset(
+                      width: 30,
+                      height: 22,
+                      value ? activeImage : inactiveImage,
+                    ),
+                  ),
                 ),
               ),
             ),
