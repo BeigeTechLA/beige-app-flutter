@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'myprofile_new_password_screen.dart';
 
 class EnterOtpCodeScreen extends StatefulWidget {
@@ -74,7 +75,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
 
         if (!mounted) return;
 
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => MyprofileNewPasswordScreen(
@@ -139,13 +140,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
 
   void _showSnack(String message) {
     TopMessage.show(context, message);
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text(message),
-    //     backgroundColor: Colors.red,
-    //     behavior: SnackBarBehavior.floating,
-    //   ),
-    // );
+
   }
 
 
@@ -255,9 +250,9 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                                   border: Border.all(
                                     color: (focusNodes[index].hasFocus ||
                                         controllers[index].text.isNotEmpty)
-                                        ? ColorCode.kButtonColor
+                                        ? ColorCode.kGoldBorder50
                                         : ColorCode.kWhiteOpacity60,
-                                    width: 1.5,
+                                    width: 0.5,
                                   ),
                                 ),
                                 child: TextField(
@@ -306,6 +301,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              fontFamily: "Outfit",
                               color: ColorCode.kWhiteOpacity60,
                             ),
                           ),
@@ -327,8 +323,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       "Resend OTP",
                       style:  TextStyle(
                         color: seconds == 0
-                            ? ColorCode.kButtonColor
-                            : ColorCode.kWhiteOpacity60,
+                            ? ColorCode.white
+                            : ColorCode.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -354,9 +350,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
+                  child: Text(
                     "Verify OTP",
                     style: TextStyle(
                       fontSize: 18,

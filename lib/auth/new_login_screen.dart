@@ -195,7 +195,7 @@ _showSnack(String message) {
 
             /// 🔝 TOP IMAGE + TITLE SECTION
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.29,
+              height: MediaQuery.of(context).size.height * 0.35,
               child: Stack(
                 children: [
 
@@ -247,7 +247,7 @@ _showSnack(String message) {
 
             /// 📦 FORM CONTAINER (NICHE)
             Transform.translate(
-              offset: const Offset(0, -40),
+              offset: const Offset(0, -70),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -255,7 +255,7 @@ _showSnack(String message) {
 
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                    padding: const EdgeInsets.fromLTRB(20, 32,20, 20),
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: ColorCode.bcakgroundcolor,

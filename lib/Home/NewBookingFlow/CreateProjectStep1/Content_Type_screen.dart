@@ -20,7 +20,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   String? selectedContentType;
 
   bool get isOptionSelected => selectedContentType != null;
-
+  int? bookingId;
   String selectedShoot = "";
   List<String> selectedEdits = [];
 
@@ -288,7 +288,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     });
   } 
 
-  Future<void> _continueBooking() async {
+/*  Future<void> _continueBooking() async {
 
     if (selectedContentTypeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -321,7 +321,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       final bookingId = response['data']?['booking_id'];
 
       if (response != null && response['error'] == false) {
-        Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => VideoShootType(
@@ -330,6 +330,73 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
             ),
           ),
         );
+
+        if (result == true) {
+          // 🔥 screen refresh
+          setState(() {
+            selectedContentTypeIds.clear(); // optional reset
+          });
+        }
+
+      }
+
+    } catch (e) {
+      debugPrint("Error → $e");
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }*/
+
+  Future<void> _continueBooking() async {
+
+    if (selectedContentTypeIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select content type")),
+      );
+      return;
+    }
+
+    int contentTypeToSend =
+    isSelectAll ? 3 : selectedContentTypeIds.first;
+
+    setState(() => isLoading = true);
+
+    try {
+
+      if (contentTypeToSend != 3) {
+        await _callBookingApi(contentTypeToSend);
+      }
+
+      final body = {
+        if (bookingId != null) "booking_id": bookingId, // 🔥 KEY LINE
+        "specialty_id": widget.specialtyId,
+        "content_type": contentTypeToSend,
+        if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
+          "shoot_type_id": shootTypeIds.first,
+      };
+
+      final response =
+      await ApiService().postData(ApiEndpoints.booking, body);
+
+      if (response != null && response['error'] == false) {
+
+        /// 🔥 FIRST TIME SAVE
+        bookingId = response['data']?['booking_id'];
+
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoShootType(
+              contentTypeId: contentTypeToSend,
+              bookingId: bookingId!,
+            ),
+          ),
+        );
+
+        /// 🔥 BACK SE ID LE
+        if (result != null && result is int) {
+          bookingId = result;
+        }
       }
 
     } catch (e) {

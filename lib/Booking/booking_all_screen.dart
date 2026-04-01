@@ -1,402 +1,8 @@
-// import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
-// import 'package:flutter/material.dart';
-// import '../service/api_endpoints.dart';
-// import '../service/api_service.dart';
-// import '../utility/ColorCode.dart';
-// import 'booking_select_date_time_slots.dart';
-// import 'upcoming_booking_event_summary.dart';
-//
-// class BookingAllScreen extends StatefulWidget {
-//   const BookingAllScreen({super.key});
-//
-//   @override
-//   State<BookingAllScreen> createState() => _BookingAllScreenState();
-// }
-//
-// class _BookingAllScreenState extends State<BookingAllScreen> {
-//   bool isUpcomingSelected = true;
-//   String? selectedPayment;
-//   int selectedIndex = 0;
-//
-//   bool isLoading = true;
-//
-//
-//   List<dynamic> upcomingShoots = [];
-//   List<dynamic> completedShoots = [];
-//
-//   bool isUpcomingLoading = true;
-//   bool isCompletedLoading = true;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchUpcoming();
-//     _fetchCompleted();
-//   }
-//   Future<void> _fetchUpcoming() async {
-//     try {
-//       final response = await ApiService().fetchData(
-//         "${ApiEndpoints.creatives_myshoots}?status=upcoming",
-//       );
-//
-//       if (response != null && response['error'] == false) {
-//         upcomingShoots = response['data'];
-//       }
-//     } catch (e) {
-//       debugPrint("Upcoming Error: $e");
-//     }
-//
-//     setState(() => isUpcomingLoading = false);
-//   }
-//
-//   Future<void> _fetchCompleted() async {
-//     try {
-//       final response = await ApiService().fetchData(
-//         "${ApiEndpoints.creatives_myshoots}?status=completed",
-//       );
-//
-//       if (response != null && response['error'] == false) {
-//         completedShoots = response['data'];
-//       }
-//     } catch (e) {
-//       debugPrint("Completed Error: $e");
-//     }
-//
-//     setState(() => isCompletedLoading = false);
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Scaffold(
-//         body: Padding(
-//           padding: const EdgeInsets.all(20),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//
-//               const SizedBox(height: 20),
-//
-//               /// 🔹 HEADER
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Text(
-//                     "My Shoots",
-//                     style: TextStyle(
-//                       color: ColorCode.white,
-//                       fontFamily: 'Unbounded',
-//                       fontSize: 16,
-//                       fontWeight: FontWeight.w500,
-//                     ),
-//                   ),
-//                   InkWell(
-//                     onTap: () {
-//                       openFilterBottomSheet(context);
-//                     },
-//                     child: Image.asset(
-//                       "assets/Icons/Filter.png",
-//                       height: 40,
-//                       width: 40,
-//                       color: ColorCode.white,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//
-//               const SizedBox(height: 20),
-//
-//               /// 🔹 TOGGLE
-//               Container(
-//                 height: 50,
-//                 padding: const EdgeInsets.all(4),
-//                 decoration: BoxDecoration(
-//                   color: ColorCode.k282828,
-//                   borderRadius: BorderRadius.circular(60),
-//                 ),
-//                 child: Row(
-//                   children: [
-// /*
-//                     /// UPCOMING
-//                     Expanded(
-//                       child: GestureDetector(
-//                         onTap: () {
-//                           setState(() => isUpcomingSelected = true);
-//                         },
-//                         child: toggleButton(
-//                           title: "Upcoming",
-//                           isSelected: isUpcomingSelected,
-//                         ),
-//                       ),
-//                     ),
-//
-//                     /// COMPLETED
-//                     Expanded(
-//                       child: GestureDetector(
-//                         onTap: () {
-//                           setState(() => isUpcomingSelected = false);
-//                         },
-//                         child: toggleButton(
-//                           title: "Completed",
-//                           isSelected: !isUpcomingSelected,
-//                         ),
-//                       ),
-//                     ),*/
-//
-//                     Expanded(
-//                       child: isUpcomingSelected
-//                           ? isUpcomingLoading
-//                           ? const Center(child: CircularProgressIndicator())
-//                           : upcomingShoots.isEmpty
-//                           ? const Center(
-//                         child: Text(
-//                           "No Upcoming Shoots",
-//                           style: TextStyle(color: Colors.white),
-//                         ),
-//                       )
-//                           : ListView.builder(
-//                         itemCount: upcomingShoots.length,
-//                         itemBuilder: (context, index) {
-//                           return upcomingBookingCard(upcomingShoots[index]);
-//                         },
-//                       )
-//                           : isCompletedLoading
-//                           ? const Center(child: CircularProgressIndicator())
-//                           : completedShoots.isEmpty
-//                           ? const Center(
-//                         child: Text(
-//                           "No Completed Shoots",
-//                           style: TextStyle(color: Colors.white),
-//                         ),
-//                       )
-//                           : ListView.builder(
-//                         itemCount: completedShoots.length,
-//                         itemBuilder: (context, index) {
-//                           return completedBookingCard(completedShoots[index]);
-//                         },
-//                       ),
-//                     ),
-//
-//                   ],
-//                 ),
-//               ),
-//
-//               const SizedBox(height: 20),
-//
-//               /// 🔹 BODY
-//               if (isUpcomingSelected) upcomingBookingCard(),
-//               if (!isUpcomingSelected) completedBookingCard(),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   // ================= TOGGLE BUTTON =================
-//
-//   Widget toggleButton({required String title, required bool isSelected}) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         gradient: isSelected
-//             ? const LinearGradient(
-//           colors: [
-//             Color(0xFFE8D1AB),
-//             Color(0xFFD4A14D),
-//           ],
-//         )
-//             : null,
-//         borderRadius: BorderRadius.circular(20),
-//       ),
-//       child: Center(
-//         child: Text(
-//           title,
-//           style: TextStyle(
-//             fontFamily: "Outfit",
-//             color: isSelected ? Colors.black : Colors.white70,
-//             fontSize: 14,
-//             fontWeight: FontWeight.w500,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   // ================= UPCOMING CARD =================
-//
-//   Widget upcomingBookingCard(Map shoot) {
-//     final imageUrl = ApiService.getImageURL(
-//       shoot['creative']?['profile_image_url'],
-//     );
-//
-//     return GestureDetector(
-//       onTap: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (_) => UpcomingBookingEventSummary(
-//               // bookingId: shoot['booking_id'],
-//             ),
-//           ),
-//         );
-//       },
-//       child: bookingCard(
-//         imagePath: imageUrl.isNotEmpty
-//             ? imageUrl
-//             : "assets/images/home2.png",
-//         buttonText: "Manage Booking",
-//         filledButton: true,
-//         showActiveDot: true,
-//         onButtonTap: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(
-//               builder: (_) => UpcomingEventSummaryManagebooking(
-//                 // bookingId: shoot['booking_id'],
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//
-//
-//
-//
-//   // ================= COMPLETED CARD =================
-//
-//   Widget completedBookingCard() {
-//     return bookingCard(
-//       imagePath: "assets/images/home1.png",
-//       buttonText: "Book Again",
-//       filledButton: false,
-//       showActiveDot: false,
-//     );
-//   }
-//
-//   // ================= COMMON CARD =================
-//
-//   Widget bookingCard({
-//     required String imagePath,
-//     required String buttonText,
-//     required bool filledButton,
-//     required bool showActiveDot,
-//     VoidCallback? onButtonTap,
-//   }) {
-//     final bool isNetwork = imagePath.startsWith("http");
-//
-//     return Container(
-//       width: double.infinity,
-//       height: 280,
-//       child: Stack(
-//           children: [
-//       ClipRRect(
-//       borderRadius: BorderRadius.circular(22),
-//       child: Image(
-//         width: double.infinity,
-//         height: double.infinity,
-//         fit: BoxFit.cover,
-//         image: isNetwork
-//             ? NetworkImage(imagePath)
-//             : AssetImage(imagePath) as ImageProvider,
-//       ),
-//     ),
-//
-//
-//   // ================= BOTTOM CONTENT =================
-//
-//   Widget bookingBottomContent({
-//     required String buttonText,
-//     required bool filledButton,
-//     VoidCallback? onButtonTap,
-//
-//   }) {
-//     return Positioned(
-//       bottom: 12,
-//       left: 12,
-//       right: 12,
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Row(
-//             children: const [
-//               Icon(Icons.star, color: Colors.yellow, size: 18),
-//               SizedBox(width: 4),
-//               Text(
-//                 "4.5 (120)",
-//                 style: TextStyle(
-//                   color: Colors.white,
-//                   fontSize: 13,
-//                   fontWeight: FontWeight.w600,
-//                 ),
-//               ),
-//             ],
-//           ),
-//           const Text(
-//             "Angela Kia",
-//             style: TextStyle(
-//               color: Colors.white,
-//               fontSize: 16,
-//               fontWeight: FontWeight.w700,
-//             ),
-//           ),
-//           const SizedBox(height: 2),
-//           const Text(
-//             "Videography Specialist",
-//             style: TextStyle(
-//               color: Colors.white70,
-//               fontSize: 12,
-//             ),
-//           ),
-//           const SizedBox(height: 10),
-//           Row(
-//             children: [
-//               Expanded(
-//                 child: InkWell(
-//                   borderRadius: BorderRadius.circular(28),
-//                   onTap: onButtonTap, // 👈 BUTTON CLICK
-//                   child: Container(
-//                     height: 44,
-//                     decoration: BoxDecoration(
-//                       color: filledButton ? ColorCode.kButtonColor : null,
-//                       borderRadius: BorderRadius.circular(28),
-//                       border: filledButton
-//                           ? null
-//                           : Border.all(color: ColorCode.kWhiteOpacity70),
-//                     ),
-//                     alignment: Alignment.center,
-//                     child: Text(
-//                       buttonText,
-//                       style: TextStyle(
-//                         fontFamily: "Outfit",
-//                         color: filledButton ? Colors.black : Colors.white,
-//                         fontSize: 14,
-//                         fontWeight: FontWeight.w600,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(width: 10),
-//               Image.asset(
-//                 'assets/images/Group 2087328980.png',
-//                 height: 44,
-//               ),
-//             ],
-//           ),
-//
-//         ],
-//       ),
-//     );
-//   }
-//
-//   // ================= FILTER BOTTOM SHEET =================
-//
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+
 
 import '../service/api_service.dart';
 
@@ -421,24 +27,26 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   bool isUpcomingLoading = true;
   bool isCompletedLoading = true;
 
-  String? selectedPayment;
+
+    String? selectedPayment;
   int selectedIndex = 0;
 
   bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
     _fetchUpcoming();
     _fetchCompleted();
+
   }
+
 
   Future<void> _fetchUpcoming() async {
     try {
       final response = await ApiService().fetchData(
         "${ApiEndpoints.creatives_myshoots}?status=upcoming",
       );
-      print("upcoming DATA =$response");
+   print("upcoming DATA =$response");
       if (response != null && response['error'] == false) {
         upcomingShoots = response['data'];
       }
@@ -463,7 +71,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     setState(() => isCompletedLoading = false);
   }
 
-  /*
+
+/*
 
   Future<void> _fetchHomeReview() async {
     setState(() => isLoading = true);
@@ -490,192 +99,186 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade900,
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
+    return Scaffold(
 
-              /// HEADER
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 40),
+
+            /// HEADER
+        Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "My Shoots",
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontFamily: 'Unbounded',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+           /*     InkWell(
+                  onTap: () {
+                    openFilterBottomSheet(context);
+                  },
+                  child: Image.asset(
+                    "assets/Icons/Filter.png",
+                    height: 40,
+                    width: 40,
+                    color: ColorCode.white,
+                  ),
+                ),*/
+              ],
+            ),
+
+             SizedBox(height: 20),
+
+
+            /// TOGGLE
+            Container(
+              height: 55,
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: ColorCode.k282828,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    "My Shoots", //
-                    style: TextStyle(
-                      color: ColorCode.white,
-                      fontFamily: 'Unbounded',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+
+                  /// 🔹 UPCOMING TAB
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isUpcomingSelected = true;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: isUpcomingSelected
+                              ? const Color(0xFFE8D8BD) // selected bg
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Upcoming",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isUpcomingSelected
+                                ? Colors.black
+                                : Colors.white70,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  /*     InkWell(
-                    onTap: () {
-                      openFilterBottomSheet(context);
-                    },
-                    child: Image.asset(
-                      "assets/Icons/Filter.png",
-                      height: 40,
-                      width: 40,
-                      color: ColorCode.white,
+
+                  /// 🔹 COMPLETED TAB
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isUpcomingSelected = false;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: !isUpcomingSelected
+                              ? const Color(0xFFE8D8BD)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Completed",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: !isUpcomingSelected
+                                ? Colors.black
+                                : Colors.white70,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),*/
+                  ),
                 ],
               ),
+            ),
 
-              SizedBox(height: 20),
 
-              const SizedBox(height: 20),
 
-              /// TOGGLE
-              Container(
-                height: 60,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1F1F1F),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
+
+            /// LIST
+            Expanded(
+              child: isUpcomingSelected
+                  ? isUpcomingLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : upcomingShoots.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    /// 🔹 UPCOMING TAB
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isUpcomingSelected = true;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeInOut,
-                          decoration: BoxDecoration(
-                            color: isUpcomingSelected
-                                ? const Color(0xFFE8D8BD) // selected bg
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Upcoming",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: isUpcomingSelected
-                                  ? Colors.black
-                                  : Colors.white70,
-                            ),
-                          ),
-                        ),
+                    /// 🔹 IMAGE
+                    Image.asset(
+                      "assets/Icons/booking_serch.png",
+                      fit: BoxFit.contain,
+                    ),
+                    Text("No Booking Found",
+                        style:
+                        TextStyle(color: ColorCode.kButtonColor,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
+                    ),
+
+                    Text(
+                      "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: ColorCode.kWhiteOpacity70,
+                        fontFamily: "Outfit",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
 
-                    /// 🔹 COMPLETED TAB
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isUpcomingSelected = false;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeInOut,
-                          decoration: BoxDecoration(
-                            color: !isUpcomingSelected
-                                ? const Color(0xFFE8D8BD)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Completed",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: !isUpcomingSelected
-                                  ? Colors.black
-                                  : Colors.white70,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
+              )
+                  : ListView.builder(
+                itemCount: upcomingShoots.length,
+                itemBuilder: (context, index) {
+                  return upcomingBookingCard(
+                      upcomingShoots[index]);
+                },
+              )
+                  : isCompletedLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : completedShoots.isEmpty
+                  ? const Center(
+                child: Text("No Completed Shoots",
+                    style:
+                    TextStyle(color: Colors.white)),
+              )
+                  : ListView.builder(
+                itemCount: completedShoots.length,
+                itemBuilder: (context, index) {
+                  return completedBookingCard(
+                      completedShoots[index]);
+                },
               ),
-
-              const SizedBox(height: 20),
-
-              /// LIST
-              Expanded(
-                child: isUpcomingSelected
-                    ? isUpcomingLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : upcomingShoots.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  /// 🔹 IMAGE
-                                  Image.asset(
-                                    "assets/Icons/booking_serch.png",
-                                    fit: BoxFit.contain,
-                                  ),
-                                  Text(
-                                    "No Booking Found",
-                                    style: TextStyle(
-                                      color: ColorCode.kButtonColor,
-                                      fontFamily: "Unbounded",
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-
-                                  Text(
-                                    "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: "Outfit",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: upcomingShoots.length,
-                              itemBuilder: (context, index) {
-                                return upcomingBookingCard(
-                                  upcomingShoots[index],
-                                );
-                              },
-                            )
-                    : isCompletedLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : completedShoots.isEmpty
-                    ? const Center(
-                        child: Text(
-                          "No Completed Shoots",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: completedShoots.length,
-                        itemBuilder: (context, index) {
-                          return completedBookingCard(completedShoots[index]);
-                        },
-                      ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -683,7 +286,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
   // ================= TOGGLE BUTTON =================
 
-  Widget toggleButton({required String title, required bool isSelected}) {
+  Widget toggleButton(
+      {required String title, required bool isSelected}) {
     return Container(
       height: 45,
       alignment: Alignment.center,
@@ -691,8 +295,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         borderRadius: BorderRadius.circular(30),
         gradient: isSelected
             ? const LinearGradient(
-                colors: [Color(0xFFE8D1AB), Color(0xFFD4A14D)],
-              )
+          colors: [Color(0xFFE8D1AB), Color(0xFFD4A14D)],
+        )
             : null,
         border: Border.all(color: Colors.white24),
       ),
@@ -707,19 +311,29 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   }
 
   // ================= UPCOMING CARD =================
+// ================= UPCOMING CARD =================
 
   Widget upcomingBookingCard(Map shoot) {
-    final String fallbackImage = "assets/images/Rectangle 34661070.png";
+    final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
     final String imageUrl = ApiService().getImageURL(
       shoot['creative']?['profile_image_url'] ?? '',
     );
 
-    /// 🔥 Final Image Logic
-    final String finalImage = (imageUrl.isNotEmpty) ? imageUrl : fallbackImage;
+    /// ✅ SAFE DATA
+    final int bookingId = shoot['booking_id'] ?? 0;
+    final int shootTypeId = shoot['shoot_type_id'] ?? 0;
 
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
+
+    final String eventDate = shoot['event_date'] ?? '';
+    final String startTime = shoot['start_time'] ?? '';
+    final String endTime = shoot['end_time'] ?? '';
+
+    /// ✅ FINAL IMAGE
+    final String finalImage =
+    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
 
     return GestureDetector(
       onTap: () {
@@ -727,9 +341,9 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           context,
           MaterialPageRoute(
             builder: (_) => UpcomingBookingEventSummary(
-              bookingId: shoot['booking_id'],
+              bookingId: bookingId,
               contentType: contentType,
-              shootTypeId: shoot['shoot_type_id'],
+              shootTypeId: shootTypeId,
             ),
           ),
         );
@@ -737,8 +351,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       child: bookingCard(
         imagePath: finalImage,
         title: projectName,
-        date: shoot['event_date'],
-        time: "${shoot['start_time']} - ${shoot['end_time']}",
+        date: eventDate,
+        time: "$startTime - $endTime",
         contentType: contentType,
         showEditIcon: true,
         buttonText: "Manage Shoot",
@@ -747,16 +361,16 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             context,
             MaterialPageRoute(
               builder: (_) => UpcomingEventSummaryManagebooking(
-                bookingId: shoot['booking_id'],
+                bookingId: bookingId,
                 projectName: projectName,
                 contentType: contentType,
-                eventDate: shoot['event_date'],
-                startTime: shoot['start_time'],
-                endTime: shoot['end_time'],
-                durationHours: shoot['duration_hours'],
-                location: shoot['location'],
+                eventDate: eventDate,
+                startTime: startTime,
+                endTime: endTime,
+                durationHours: shoot['duration_hours'] ?? '',
+                location: shoot['location'] ?? '',
                 imageUrl: finalImage,
-                shootTypeId: shoot['shoot_type_id'],
+                shootTypeId: shootTypeId,
               ),
             ),
           );
@@ -765,21 +379,40 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     );
   }
 
-  // ================= COMPLETED CARD =================
+// ================= COMPLETED CARD =================
 
   Widget completedBookingCard(Map shoot) {
-    return bookingCard(
-      imagePath: "assets/images/home1.png",
-      title: shoot['project_name'],
-      date: shoot['event_date'],
-      time: "${shoot['start_time']} - ${shoot['end_time']}",
-      buttonText: "Book Again",
+    final String fallbackImage = "assets/images/home1.png";
 
+    final String imageUrl = ApiService().getImageURL(
+      shoot['creative']?['profile_image_url'] ?? '',
+    );
+
+    /// ✅ SAFE DATA
+    final int bookingId = shoot['booking_id'] ?? 0;
+
+    final String projectName = shoot['project_name'] ?? '';
+    final String eventDate = shoot['event_date'] ?? '';
+    final String startTime = shoot['start_time'] ?? '';
+    final String endTime = shoot['end_time'] ?? '';
+
+    /// ✅ FINAL IMAGE
+    final String finalImage =
+    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
+
+    return bookingCard(
+      imagePath: finalImage,
+      title: projectName,
+      date: eventDate,
+      time: "$startTime - $endTime",
+      buttonText: "Book Again",
       showEditIcon: false,
-      onButtonTap: () {},
+      onButtonTap: () {
+        // 👉 Add navigation if needed
+        // Navigator.push(...)
+      },
     );
   }
-
   // ================= COMMON CARD =================
   Widget bookingCard({
     required String imagePath,
@@ -797,135 +430,136 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     final isNetwork = imagePath.startsWith("http");
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16,top: 20),
-      height: 280,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: Stack(
-          children: [
-            // ✅ IMAGE (NO BLUR)
-            Positioned.fill(
-              child: isNetwork
-                  ? Image.network(
-                      imagePath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        "assets/images/Rectangle 34661070.png",
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Image.asset(imagePath, fit: BoxFit.cover),
+        margin: const EdgeInsets.only(bottom: 16,top: 20),
+        height: 280,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(
+            children: [
+          // ✅ IMAGE (NO BLUR)
+          Positioned.fill(
+          child: isNetwork
+          ? Image.network(
+            imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+              "assets/svg/imag_placeholder.svg",
+              fit: BoxFit.cover,
             ),
+        )
+            : Image.asset(imagePath, fit: BoxFit.cover),
+    ),
 
-            // ❌ TOP BLUR REMOVED COMPLETELY
+    // ❌ TOP BLUR REMOVED COMPLETELY
 
-            Container(
-              height: 280,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.black,
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.black54,
-                    Colors.black87,
-                    Colors.black,
-                    Colors.black,
-                  ],
-                  begin: AlignmentGeometry.topCenter,
-                  end: AlignmentGeometry.bottomCenter,
-                ),
-              ),
-            ),
-            // ✅ BOTTOM BLUR (Glass Effect)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(22),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        title ?? "",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "$date | $time",
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 10,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+    Container(
+    height: 280,
+    width: double.infinity,
+    decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(22),
+    gradient: LinearGradient(
+    colors: [
+    Colors.black,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    Colors.transparent,
+    // Colors.black54,
+    // Colors.black87,
+    Colors.black,
+    Colors.black,
+    ],
+    begin: AlignmentGeometry.topCenter,
+    end: AlignmentGeometry.bottomCenter,
+    ),
+    ),
+    ),
+    // ✅ BOTTOM BLUR (Glass Effect)
+    Positioned(
+    bottom: 0,
+    left: 0,
+    right: 0,
+    child: ClipRRect(
+    borderRadius: const BorderRadius.vertical(
+    bottom: Radius.circular(22),
+    ),
+    child: Padding(
+    padding: const EdgeInsets.all(16),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    children: [
+    Text(
+    title ?? "",
+    style: const TextStyle(
+    color: Colors.white,
+    fontFamily: "Outfit"
+      ,
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    const SizedBox(height: 4),
+    Text(
+    "$date | $time",
+    style: const TextStyle(
+    color: Colors.white70,
+    fontSize: 10,
+    ),
+    ),
+    const SizedBox(height: 10),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: 45,
-                              child: ElevatedButton(
-                                onPressed: onButtonTap,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE8C99A),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                  ),
-                                ),
-                                child: Text(
-                                  buttonText,
-                                  style: const TextStyle(
-                                    color: Color(0xFF1D1D1B),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+    Row(
+    children: [
+    Expanded(
+    child: SizedBox(
+    height: 45,
+    child: ElevatedButton(
+    onPressed: onButtonTap,
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFFE8C99A),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(28),
+    ),
+    ),
+    child: Text(
+    buttonText,
+    style: const TextStyle(
+    color:ColorCode.kHeadingColor,
+    fontSize: 14,
+      fontFamily: "Outfit"
+      ,
+    fontWeight: FontWeight.w600,
+    ),
+    ),
+    ),
+    ),
+    ),
 
-                          if (showEditIcon) ...[
-                            const SizedBox(width: 10),
-                            InkWell(
-                              onTap: onEditTap,
-                              child: Image.asset(
-                                "assets/Icons/Group 2087329022.png",
-                                height: 45,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+    if (showEditIcon) ...[
+    const SizedBox(width: 10),
+    InkWell(
+    onTap: onEditTap,
+    child:SvgPicture.asset(
+    "assets/svg/home_view_profile.svg",
+    height: 45,
+    ),
+    ),
+    ],
+    ],
+    ),
+    ],
+    ),
+    ),
+    ),
+    ),
 
-          ],
-        ),
-      ),
+    ],
+    ),
+    ),
     );
   }
-
-  ////////////////////////////////////////////
-
   void openFilterBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -947,9 +581,12 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               child: SafeArea(
                 top: false,
                 child: Column(
+
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
+
                     Center(
                       child: Container(
                         width: 35,
@@ -961,7 +598,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                         ),
                       ),
                     ),
-
                     /// HEADER
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -993,37 +629,40 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
                     const SizedBox(height: 20),
 
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(18),
+
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      /// 🔹 TITLE
+                      const Text(
+                        "Sort By Payment",
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /// 🔹 TITLE
-                          const Text(
-                            "Sort By Payment",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
 
-                          const SizedBox(height: 14),
+                      const SizedBox(height: 14),
 
-                          /// 🔹 OPTIONS
-                          _paymentTile("Paid", 0),
-                          _paymentTile("Pending", 1),
-                          _paymentTile("Refunded", 2),
-                        ],
-                      ),
-                    ),
+                      /// 🔹 OPTIONS
+                      _paymentTile("Paid", 0),
+                      _paymentTile("Pending", 1),
+                      _paymentTile("Refunded", 2),
+                    ],
+                  ),
+                ),
 
-                    const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                     Row(
                       children: [
@@ -1032,8 +671,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                             height: 55,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: ColorCode.kWhiteOpacity60,
+                              border:
+                              Border.all(color: ColorCode.kWhiteOpacity60
                               ),
                             ),
                             child: TextButton(
@@ -1069,13 +708,13 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                                 Navigator.pop(context);
                               },
                               child: const Text(
-                                "Apply",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: ColorCode.black,
-                                ),
+                                  "Apply",
+                                  style: TextStyle(
+                                    fontFamily: "Unbounded",
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: ColorCode.black,
+                                  )
                               ),
                             ),
                           ),
@@ -1133,11 +772,13 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           });
         },
         activeColor: ColorCode.kButtonColor,
-        title: Text(title, style: const TextStyle(color: Colors.white)),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
-
   Widget _paymentTile(String title, int index) {
     return InkWell(
       onTap: () {
@@ -1150,6 +791,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+
             /// TEXT
             Text(
               title,
@@ -1167,19 +809,22 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white38, width: 1.2),
+                border: Border.all(
+                  color: Colors.white38,
+                  width: 1.2,
+                ),
               ),
               child: selectedIndex == index
                   ? Center(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                ),
+              )
                   : null,
             ),
           ],

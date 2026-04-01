@@ -98,16 +98,24 @@ class _SplashScreenState extends State<SplashScreen> {
 
           /// 🔹 TAGLINE
           Positioned(
-            bottom: 40,
+            bottom: MediaQuery.of(context).size.height * 0.05, // 👈 responsive bottom
             left: 0,
             right: 0,
-            child: Text(
-              "—  Streamline your crew, equipment, & projects  —",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: ColorCode.white,
-                fontSize: 12,
-                fontFamily: "Unbounded",
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05, // 👈 side spacing
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  "— Streamline your crew, equipment, & projects  —",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Unbounded",
+                  ),
+                ),
               ),
             ),
           ),

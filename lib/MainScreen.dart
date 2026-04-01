@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
+import 'Home/New_Home/new_home_screen.dart';
 import 'Home/Specialities/specialities.dart';
 import 'Home/home_screen.dart';
 
@@ -20,11 +21,12 @@ class _MainscreenState extends State<Mainscreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomeScreen(),
+    NewHomeScreen(),
     ContentTypeScreen(),
     BookingAllScreen(),
     Center(child: Text("Message")),
   ];
+
   /// 🔐 LOGOUT DIALOG
 
   @override
@@ -34,7 +36,7 @@ class _MainscreenState extends State<Mainscreen> {
       body: _pages[_selectedIndex],
 
       // ⭐ No overflow — BottomNavigationBar directly use
-    /*  bottomNavigationBar: BottomNavigationBar(
+      /*  bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         elevation: 0,
 
@@ -103,94 +105,114 @@ class _MainscreenState extends State<Mainscreen> {
       ),*/
 
 
-        bottomNavigationBar: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.25), // top blur shade
-                   ColorCode.bcakgroundcolor
-                  ],
-                ),
-              ),
-              child: BottomNavigationBar(
-                currentIndex: _selectedIndex,
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                type: BottomNavigationBarType.fixed,
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 100,
+            sigmaY: 100,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
 
-                selectedItemColor: Colors.white,
-                unselectedItemColor: Colors.white70,
 
-                selectedLabelStyle: const TextStyle(
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                ),
-
-                unselectedLabelStyle: const TextStyle(
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                ),
-
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-
-                items: [
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 0
-                          ? "assets/svg/Bottom_svg/Home_active.svg"
-                          : "assets/svg/Bottom_svg/Home_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "Home",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 1
-                          ? "assets/svg/Bottom_svg/Book _Shoot_active.svg"
-                          : "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
-                      height: 28,
-                    ),
-                    label: "Book Shoot",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 2
-                          ? "assets/svg/Bottom_svg/My Shoots_active.svg"
-                          : "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "My Shoots",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: SvgPicture.asset(
-                      _selectedIndex == 3
-                          ? "assets/svg/Bottom_svg/Messages_active.svg"
-                          : "assets/svg/Bottom_svg/Messages_nonactive.svg",
-                      height: 28,
-                    ),
-                    label: "Messages",
-                  ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.20),
+                  ColorCode.kBlackDark,
                 ],
               ),
             ),
+            child: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              type: BottomNavigationBarType.fixed,
+
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white70,
+
+              /// 🔥 FIX ICON SIZE SAME
+              selectedIconTheme: const IconThemeData(size: 26),
+              unselectedIconTheme: const IconThemeData(size: 26),
+
+              selectedLabelStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontFamily: "Outfit",
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+
+              items: [
+
+                /// HOME
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    _selectedIndex == 0
+                        ? "assets/svg/Bottom_svg/Home_active.svg"
+                        : "assets/svg/Bottom_svg/Home_nonactive.svg",
+                  ),
+                  label: "Home",
+                ),
+
+                /// BOOK SHOOT
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    _selectedIndex == 1
+                        ? "assets/svg/Bottom_svg/Book _Shoot_active.svg"
+                        : "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
+                  ),
+                  label: "Book Shoot",
+                ),
+
+                /// MY SHOOTS
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    _selectedIndex == 2
+                        ? "assets/svg/Bottom_svg/My Shoots_active.svg"
+                        : "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
+                  ),
+                  label: "My Shoots",
+                ),
+
+                /// MESSAGES
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    _selectedIndex == 3
+                        ? "assets/svg/Bottom_svg/Messages_active.svg"
+                        : "assets/svg/Bottom_svg/Messages_nonactive.svg",
+                  ),
+                  label: "Messages",
+                ),
+              ],
+            ),
           ),
         ),
+      ),
 
     );
   }
-}
 
+  Widget _buildIcon(String path) {
+    return SvgPicture.asset(
+      path,
+      height: 26,
+      width: 26,
+      fit: BoxFit.contain,
+    );
+  }
+}
 
 
 

@@ -9,6 +9,7 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'my_profile.dart';
 
 class MyprofileNewPasswordScreen extends StatefulWidget {
@@ -106,12 +107,6 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
     setState(() => isLoading = false);
   }
   _showSnack(String message) {
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(
-    //     content: Text(message),
-    //     backgroundColor: Colors.red,
-    //   ),
-    // );
     TopMessage.show(context, message);
   }
 
@@ -128,10 +123,10 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context,true);
                 },
-                child: Image.asset(
-                  "assets/Icons/Reply.png",
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
                   height: 24,
                   width: 24,
                 ),
@@ -155,7 +150,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       SizedBox(height: 6),
 
                       const Text(
-                        "You're almost done! Set a new password to secure\nyour account. Make sure it's strong and unique.",
+                        "You're almost done! Set a new password to secure your account. Make sure it's strong and unique.",
                         style: TextStyle(
                           fontFamily: "Outfit",
                           fontSize: 14,
@@ -375,12 +370,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       pageBuilder: (_, __, ___) {
 
         Future.delayed(const Duration(seconds: 2), () {
-          if (Navigator.canPop(context)) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) =>  MyProfile()),
-            );
-          }
+          Navigator.popUntil(context, (route) => route.isFirst);
         });
 
         return Stack(

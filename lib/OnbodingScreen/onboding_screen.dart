@@ -52,13 +52,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     return Column(
                       children: [
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 80), // yaha value change kar sakte ho
-                            child: Image.asset(
-                              pages[index]['image']!,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  top: constraints.maxHeight * 0.05, // 👈 responsive top space
+                                  left: 12,
+                                  right: 12,
+                                ),
+                                child: Image.asset(
+                                  pages[index]['image']!,
+                                  width: double.infinity,
+                                  height: constraints.maxHeight * 0.6, // 👈 responsive height
+                                  fit: BoxFit.contain, // 👈 NO CUT guaranteed
+                                ),
+                              );
+                            },
                           ),
                         ),
 

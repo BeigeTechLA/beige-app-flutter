@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
@@ -184,7 +185,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                   height: MediaQuery
                       .of(context)
                       .size
-                      .height * 0.29,
+                      .height * 0.32,
                   child: Stack(
                     children: [
 
@@ -260,7 +261,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
                 /// 📦 FORM CONTAINER (NICHE)
                 Transform.translate(
-                  offset: const Offset(0, -40),
+                  offset: const Offset(0, -70),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -268,7 +269,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                        padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
                         // 👈 top extra
                         margin: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
@@ -300,9 +301,9 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                         border: Border.all(
                                           color: (focusNodes[index].hasFocus ||
                                               controllers[index].text.isNotEmpty)
-                                              ? ColorCode.kButtonColor
+                                              ? ColorCode.kGoldBorder50
                                               : ColorCode.kWhiteOpacity60,
-                                          width: 1.5,
+                                          width: 0.5,
                                         ),
                                       ),
                                       child: TextField(
@@ -352,7 +353,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: ColorCode.kWhiteOpacity60,
+                                    color: ColorCode.kButtonColor,
                                   ),
                                 )
                               ],
@@ -378,7 +379,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                     style: TextStyle(
                                       color: seconds == 0
                                           ? ColorCode.kButtonColor
-                                          : ColorCode.kWhiteOpacity60,
+                                          : ColorCode.kButtonColor,
                                       fontSize: 15,
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.bold,
@@ -503,7 +504,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
               ],
             ),
           ),
-          if (isLoading)
+         /* if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
@@ -516,13 +517,13 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                   ),
                 ),
               ),
-            ),
+            ),*/
 
         ],
 
       ),
 
-      bottomNavigationBar: Padding(
+   /*   bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +557,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
             ),
           ],
         ),
-      ),
+      ),*/
     );
   }
 

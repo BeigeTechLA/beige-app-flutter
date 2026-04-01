@@ -1,4 +1,4 @@
-  import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
- /* void startAutoScroll() {
+  /* void startAutoScroll() {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!_scrollController.hasClients) return;
 
@@ -329,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen>
                       children: [
 
                         /// TOP ROW
-                      /*  Row(
+                        /*  Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -555,10 +555,10 @@ class _HomeScreenState extends State<HomeScreen>
 
                           ],
                         ),
-                         SizedBox(height: 20),
+                        SizedBox(height: 20),
 
                         /// SEARCH BAR
-               /*         Container(
+                        /*         Container(
                           height: 48,
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
@@ -603,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen>
 
 
               SizedBox(height: 30),
-   /*         Padding(
+              /*         Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
@@ -811,7 +811,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
 
                         /// CURRENT CARD
-                   /*     SlideTransition(
+                        /*     SlideTransition(
                           position: _slideDown,
                           child: FadeTransition(
                             opacity: _fade,
@@ -824,7 +824,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
                         ),*/
-                             SlideTransition(
+                        SlideTransition(
                           position: _slideDown,
                           child: FadeTransition(
                             opacity: _fade,
@@ -885,7 +885,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-                   /*   GestureDetector(
+                      /*   GestureDetector(
                           *//*              onTap: () {
                           Navigator.push(
                             context,
@@ -998,7 +998,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-                  /*    Image.asset(
+                      /*    Image.asset(
                         "assets/Icons/rightside.png",
                         height: 40,   // bigger height
                         width: 40,
@@ -1061,7 +1061,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
 
-                           /*     /// ONLINE DOT
+                                /*     /// ONLINE DOT
                                 const Positioned(
                                   top: 10,
                                   left: 10,
@@ -1159,43 +1159,54 @@ class _HomeScreenState extends State<HomeScreen>
                                       const SizedBox(height: 8),
 
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
 
-                                          /// VIEW PROFILE BUTTON
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => HomeViewProfile(
-                                                    id: item["id"], // 👈 ID pass here
+                                          /// 🔥 VIEW PROFILE BUTTON
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => HomeViewProfile(
+                                                      id: item["id"],
+                                                    ),
                                                   ),
+                                                );
+                                              },
+                                              child: Container(
+                                                height: 30, // 👈 FIX (important)
+                                                alignment: Alignment.center, // 👈 center text
+                                                decoration: BoxDecoration(
+                                                  color: ColorCode.kButtonColor,
+                                                  borderRadius: BorderRadius.circular(40), // 👈 pill shape
                                                 ),
-                                              );
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-                                              decoration: BoxDecoration(
-                                                color: ColorCode.kButtonColor,
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              child: const Text(
-                                                "View Profile",
-                                                style: TextStyle(
-                                                  color: ColorCode.black,
-                                                  fontFamily: "Outfit",
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
+                                                child: const Text(
+                                                  "View Profile",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: ColorCode.black,
+                                                    fontFamily: "Outfit",
+                                                    fontSize: 14, //
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
 
-                                          /// ICON
-                                          SvgPicture.asset(
-                                            "assets/svg/home_view_profile.svg",
+                                          const SizedBox(width: 10),
 
+                                          /// 🔥 ICON BUTTON (CIRCLE)
+                                          Container(
+
+
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                "assets/svg/home_view_profile.svg",
+
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       )

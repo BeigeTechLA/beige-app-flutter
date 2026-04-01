@@ -15,22 +15,40 @@ class InternetHelper {
   static Future<void> _checkInternet() async {
     bool hasInternet = await _hasRealInternet();
 
+    final context = navigatorKey.currentState?.overlay?.context;
+
     if (!hasInternet) {
-      if (!_isDialogShowing) {
+      if (!_isDialogShowing && context != null) {
         _isDialogShowing = true;
 
-        showDialog(
-          context: navigatorKey.currentContext!,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text("No Internet"),
-            content: const Text("Please check your internet connection."),
+        // 🔥 USE ROOT NAVIGATOR + PUSH (NOT JUST SHOW DIALOG)
+        Navigator.of(context, rootNavigator: true).push(
+          PageRouteBuilder(
+            opaque: false,
+            barrierDismissible: false,
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return WillPopScope(
+                onWillPop: () async => false, // 🔥 BACK COMPLETELY DISABLED
+                child: Scaffold(
+                  backgroundColor: Colors.black54,
+                  body: Center(
+                    child: AlertDialog(
+                      title: const Text("No Internet"),
+                      content: const Text(
+                        "Please check your internet connection.",
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         );
       }
     } else {
-      if (_isDialogShowing) {
-        Navigator.of(navigatorKey.currentContext!).pop();
+      if (_isDialogShowing && context != null) {
+        // 🔥 CLOSE ONLY IF DIALOG IS OPEN
+        Navigator.of(context, rootNavigator: true).pop();
         _isDialogShowing = false;
       }
     }

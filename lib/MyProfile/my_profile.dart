@@ -2,6 +2,7 @@ import 'package:beige/Home/home_screen.dart';
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:lottie/lottie.dart' show Lottie;
 import '../auth/login_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -78,7 +79,7 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+
 
       body: SingleChildScrollView(
         child: Column(
@@ -110,7 +111,9 @@ class _MyProfileState extends State<MyProfile> {
                   top: 90,
                   left: 16,
                   child:  InkWell(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                     child:SvgPicture.asset(
                       "assets/svg/back.svg",
                       color: ColorCode.black,
@@ -155,58 +158,56 @@ class _MyProfileState extends State<MyProfile> {
                             radius: 48,
                             backgroundColor: Colors.grey.shade200,
                             child: ClipOval(
-                              child: getProfileImageUrl() != null
-                                  ? Image.network(
+                              child: getProfileImageUrl() == null
+
+                              /// ❌ NO IMAGE → PERSON ICON
+                                  ? Center(
+                                child: SvgPicture.asset(
+                                  "assets/svg/persone.svg",
+                                  width: 96,
+                                  height: 96,
+
+                                ),
+                              )
+
+                              /// ✅ IMAGE AVAILABLE
+                                  : Image.network(
                                 getProfileImageUrl()!,
                                 width: 96,
                                 height: 96,
                                 fit: BoxFit.cover,
 
-                                /// 🔄 LOADER UNTIL IMAGE LOADS
+                                /// 🔄 LOADING → LOTTIE
                                 loadingBuilder: (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
 
                                   return Center(
                                     child: SizedBox(
-                                      height: 22,
-                                      width: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.grey,
+                                      width: 96,
+                                      height: 96,
+                                      child: Lottie.asset(
+                                        "assets/lottie/Untitled_file.json",
+                                        fit: BoxFit.contain,
                                       ),
                                     ),
                                   );
                                 },
 
-                                /// ❌ IF IMAGE FAILS
+                                /// ❌ ERROR → PERSON ICON
                                 errorBuilder: (context, error, stackTrace) {
-                                  return SvgPicture.asset(
-                                      "assets/svg/persone.svg",);
+                                  return Center(
+                                    child: SvgPicture.asset(
+                                      "assets/svg/persone.svg",
+                                      width: 96,
+                                      height: 96,
+
+                                    ),
+                                  );
                                 },
-                              )
-                                  : SvgPicture.asset(
-                                "assets/svg/persone.svg",),
+                              ),
                             ),
                           ),
-
-
                         ),
-                        /*Positioned(
-                          bottom: 2,
-                          right: 2,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.edit,
-                              size: 16,
-                              color: ColorCode.black
-                            ),
-                          ),
-                        ),*/
                       ],
                     ),
                   ),

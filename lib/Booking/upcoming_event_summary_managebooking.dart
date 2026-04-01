@@ -60,7 +60,6 @@ class _UpcomingEventSummaryManagebookingState
       body: Stack(
         children: [
           /// 🔹 BACKGROUND IMAGE
-          /// 🔹 BACKGROUND IMAGE (DYNAMIC)
           /// 🔹 BACKGROUND IMAGE (FULL + BLUR)
           Positioned.fill(
             child: Stack(
@@ -72,14 +71,14 @@ class _UpcomingEventSummaryManagebookingState
                   getFullImageUrl(),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
-                    return Image.asset(
-                      "assets/images/background_booking_event_summey.jpeg",
+                    return SvgPicture.asset(
+                      "assets/svg/imag_placeholder.svg",
                       fit: BoxFit.cover,
                     );
                   },
                 )
-                    : Image.asset(
-                  "assets/images/background_booking_event_summey.jpeg",
+                    : SvgPicture.asset(
+                  "assets/svg/imag_placeholder.svg",
                   fit: BoxFit.cover,
                 ),
 
@@ -203,16 +202,16 @@ class _UpcomingEventSummaryManagebookingState
                                 },
 
                                 errorBuilder: (_, __, ___) {
-                                  return Image.asset(
-                                    "assets/images/Rectangle 34661070.png",
+                                  return SvgPicture.asset(
+                                    "assets/svg/imag_placeholder.svg",
                                     height: 144,
                                     width: 126,
                                     fit: BoxFit.cover,
                                   );
                                 },
                               )
-                                  : Image.asset(
-                                "assets/images/Rectangle 34661070.png",
+                                  : SvgPicture.asset(
+                                "assets/svg/imag_placeholder.svg",
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,

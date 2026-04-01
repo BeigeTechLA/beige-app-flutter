@@ -48,6 +48,47 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     int selectedIndex = 0;
      bool isLoading =true;
 
+  String getRoleName(String roleId) {
+    switch (roleId) {
+      case "1":
+        return "Videographer";
+      case "2":
+        return "Photographer";
+      default:
+        return "Crew";
+    }
+  }
+  List<String> getAdditionalCrewSubtitles() {
+    final extra = crewSummary?['extra_by_role'] ?? {};
+
+    List<String> list = [];
+
+    extra.forEach((key, value) {
+      if (value > 0) {
+        list.add("${getRoleName(key)}: $value");
+      }
+    });
+
+    return list;
+  }
+
+  List<String> getEditingSubtitles() {
+    List<String> list = [];
+
+    /// 🔹 1. edit_types (Edited Photos)
+    final editTypes = booking?['edit_types'] ?? [];
+    for (var type in editTypes) {
+      list.add(type.toString());
+    }
+
+    /// 🔹 2. editing_breakdown (price wali details)
+    /*final breakdown = pricing?['editing_breakdown'] ?? [];
+    for (var item in breakdown) {
+      list.add("${item['label']}: \$${item['amount']}");
+    }*/
+
+    return list;
+  }
   @override
   void initState() {
     super.initState();
@@ -61,6 +102,42 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     super.dispose();
   }
 
+  List<String> getShootSubtitles() {
+    final breakdown = pricing?['pricing_sections']?['shoot_cost']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+  List<String> getEditingSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['editing_services']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+  List<String> getAdditionalCrewSubtitlesNew() {
+    final breakdown = pricing?['pricing_sections']?['additional_crew']?['breakdown'] ?? [];
+
+    return breakdown
+        .map<String>((item) => "${item['label']} : \$${item['amount']}")
+        .toList();
+  }
+
+
+  double getShootAmount() {
+    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
+  }
+
+  double getEditingAmount() {
+    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
+  }
+
+  double getAdditionalCrewAmount() {
+    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
+  }
   Future<void> _fetchHomeReview() async {
     setState(() => isLoading = true);
 
@@ -489,121 +566,117 @@ void _snakbar(String message){
                   ],
                 ),
               ),
+              SizedBox(height: 20),
               Divider(color: ColorCode.kDividerWhite12,),
-              SizedBox(height: 28),
+              SizedBox(height: 30),
 
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Editing Services",
-                        style: TextStyle(
+                  /// ✅ CHECK: agar data hai tabhi show karo
+                  if ((booking?['edit_types'] ?? []).isNotEmpty) ...[
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Editing Services",
+                          style: TextStyle(
                             fontSize: 14,
                             color: ColorCode.white,
                             fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500
-                        ),),
-                    ],
-                  ),
-                  SizedBox(height: 14),
-
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF282828),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        /// 🔹 Title
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Text(
-                            "$creativeRole:",
-                            style: const TextStyle(
-                              color: ColorCode.white,
-                              fontSize: 12,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-
-                        /// 🔹 Grid
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: (booking?['edit_types'] ?? []).length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 2.3, // thoda slim card
-                          ),
-                          itemBuilder: (context, index) {
-
-                            final edit = booking!['edit_types'][index];
-
-                            final parts = edit.split('(');
-                            final title = parts[0].trim();
-                            final duration = parts.length > 1 ? "(${parts[1]}" : "";
-
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: ColorCode.kGoldLight20,   // ✅ background change
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-
-                                  /// 🔹 Title
-                                  Text(
-                                    title,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: ColorCode.kButtonColor, // ✅ text color change
-                                      fontFamily: "Outfit",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-
-                                  /// 🔹 Duration
-                                  if (duration.isNotEmpty)
-                                    Text(
-                                      duration,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: ColorCode.kButtonColor, // ✅ text color change
-                                        fontFamily: "Outfit",
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
                         ),
                       ],
                     ),
-                  ),
 
-                  Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Divider(color: ColorCode.kDividerWhite12,),
-                  ),
+                    SizedBox(height: 14),
 
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF282828),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              "$creativeRole:",
+                              style: const TextStyle(
+                                color: ColorCode.white,
+                                fontSize: 12,
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: (booking?['edit_types'] ?? []).length,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 2.3,
+                            ),
+                            itemBuilder: (context, index) {
+                              final edit = booking!['edit_types'][index];
+
+                              final parts = edit.split('(');
+                              final title = parts[0].trim();
+                              final duration = parts.length > 1 ? "(${parts[1]}" : "";
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.kGoldLight20,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      title,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: ColorCode.kButtonColor,
+                                        fontFamily: "Outfit",
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    if (duration.isNotEmpty)
+                                      Text(
+                                        duration,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: ColorCode.kButtonColor,
+                                          fontFamily: "Outfit",
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.all(12.0),
+                      child: Divider(color: ColorCode.kDividerWhite12),
+                    ),
+                  ],
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -698,17 +771,27 @@ void _snakbar(String message){
                   ),
 
                   const SizedBox(height: 15),
-
                   CustomInputField(
                     title: "Phone Number",
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+
+                    onFieldSubmitted: (_) {
+                      FocusScope.of(context).unfocus(); // ✅ Done button
+                    },
+
+                    onChanged: (value) {
+                      if (value.length == 10) {
+                        FocusScope.of(context).unfocus(); // ✅ Auto close after 10 digit
+                      }
+                    },
+
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
                     ],
-                  ),
-
-                  const SizedBox(height: 15),
+                  ),            const SizedBox(height: 15),
 
                   Padding(
                     padding: EdgeInsets.all(12.0),
@@ -776,24 +859,38 @@ void _snakbar(String message){
                       // --- SHOOT COST CARD ---
                       builderPricingCard(
                         title: "Shoot Cost",
-                        amount: calculateShootCost(),
+                        amount: getShootAmount(),
                         subtitles: [],
                       ),
 
 // --- EDITING SERVICES CARD ---
-                      builderPricingCard(
+                     /* builderPricingCard(
                         title: "Editing Services",
                         amount: calculateEditingCost(),
                         subtitles: [],
+                      ),*/
+                      builderPricingCard(
+                        title: "Editing Services",
+                        amount: getEditingAmount(),
+                        subtitles: [],
+                        // subtitles: getEditingSubtitles(),
                       ),
 
 // --- ADDITIONAL CREW CARD ---
+                      if (getAdditionalCrewSubtitles().isNotEmpty)
+                        builderPricingCard(
+                          title: "Additional Crew",
+                          amount: getAdditionalCrewAmount(),
+                          subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
+                        ),
+
+/*
                       if (calculateAdditionalCrew() > 0)
                         builderPricingCard(
                           title: "Additional Crew",
                           amount: calculateAdditionalCrew(),
                           subtitles: [],
-                        ),
+                        ),*/
 
                       const SizedBox(height: 10),
                       const Divider(color: ColorCode.kDividerWhite12),
@@ -1221,7 +1318,7 @@ void _snakbar(String message){
   }
 
   double calculateAdditionalCrew() {
-    return (pricing?['creative_base_total'] ?? 0).toDouble();
+    return (pricing?['extra_creatives_amount'] ?? 0).toDouble();
   }
 
 /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush

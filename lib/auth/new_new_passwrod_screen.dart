@@ -124,10 +124,15 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
               height: MediaQuery
                   .of(context)
                   .size
-                  .height * 0.29,
+                  .height * 0.32,
               child: Stack(
                 children: [
-
+                  Positioned.fill(
+                    child: Image.asset(
+                      "assets/images/Rectangle_574057023.png",
+                      fit: BoxFit.fill,
+                    ),
+                  ),
                   /// 🖼️ BACKGROUND IMAGE
        
 
@@ -146,17 +151,11 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                       onTap: () {
                         Navigator.pop(context); // 🔥 screen pop karega
                       },
-                   child: SizedBox(
-                     height: 24,
-                     width: 24,
-                     child: SvgPicture.asset(
-                       images.back,
-                       colorFilter: const ColorFilter.mode(
-                         Colors.white,
-                         BlendMode.srcIn,
-                       ),
-                     ),
-                   ),
+                      child: SvgPicture.asset(
+                        "assets/svg/back.svg",
+                        height: 24,
+                        color: Colors.white, // agar white chahiye ho
+                      ),
                     ),
                   ),
 
@@ -199,7 +198,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
             /// 📦 FORM CONTAINER (NICHE)
             Transform.translate(
-              offset: const Offset(0, -40),
+              offset: const Offset(0, -70),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -207,7 +206,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 36, 20, 20),
+                    padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
                     // 👈 top extra
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(

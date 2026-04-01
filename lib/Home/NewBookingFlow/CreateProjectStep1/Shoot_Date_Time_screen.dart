@@ -51,6 +51,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     _edittype();
   }
   String _apiDateFormat(DateTime date) {
+
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
@@ -60,19 +61,19 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     return endMinutes > startMinutes;
   }
   bool get isFormValid {
+    debugPrint("DATE: $selectedDate");
+    debugPrint("START: $startTime");
+    debugPrint("END: $endTime");
+
     if (selectedDate == null) return false;
     if (startTime == null || endTime == null) return false;
 
-    // 🔥 TIME VALIDATION
-    if (!isEndTimeAfterStart(startTime!, endTime!)) return false;
+    // ❌ REMOVE strict time check (allow overnight)
 
-    if (isEditNeeded == true && selectedEditTypeIds.isEmpty) {
-      return false;
-    }
+    if (isEditNeeded && selectedEditTypeIds.isEmpty) return false;
 
     return true;
   }
-
   String getEditingDescription() {
 
     // 🎬 Video Content
@@ -89,6 +90,8 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     // 📷 Default Photo
     return "25 edited photos per hour";
   }
+
+
   @override
   void dispose() {
     startTimeController.dispose();
@@ -173,12 +176,17 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
     setState(() => isSubmitting = true);
 
+    if (!isEditNeeded) {
+      selectedEditTypeIds.clear();
+      selectedEditTypeNames.clear();
+    }
+
     final payload = {
       "event_date": _apiDateFormat(selectedDate!),
       "start_time": startTimeController.text,
       "end_time": endTimeController.text,
-      "edits_needed": isEditNeeded == true ? 1 : 0,
-      "edit_types": isEditNeeded == true ? selectedEditTypeIds : [],
+      "edits_needed": isEditNeeded ? 1 : 0,
+      "edit_types": isEditNeeded ? selectedEditTypeIds : null,
     };
 
     debugPrint("📤 REQUEST BODY → $payload");
@@ -631,7 +639,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => Navigator.pop(context,true),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,
@@ -721,68 +729,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
                   SizedBox(height: 30,),
 
-          /*        TextField(
-                    controller: dateController,
-                    readOnly: true, // 🔥 keyboard band
-                    cursorColor: ColorCode.white,
 
-                    style: const TextStyle(
-                      color: ColorCode.white,
-                      fontFamily: "Outfit",
-                      fontSize: 14,
-                    ),
-
-                    decoration: InputDecoration(
-                      labelText: "Select Date",
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                      labelStyle: TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                        fontSize: 12,
-                        fontFamily: "Outfit",
-                        fontWeight: FontWeight.w400,
-                      ),
-
-                      suffixIcon: InkWell(
-                        onTap: () => _selectDate(context),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: SvgPicture.asset(
-                            "assets/svg/calendar-03.svg",
-                            width: 20,
-                            height: 20,
-                            colorFilter: const ColorFilter.mode(
-                              ColorCode.kWhiteOpacity70,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 18,
-                      ),
-
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
-                          width: 0.5,
-                        ),
-                      ),
-
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-
-                    onTap: () => _selectDate(context), // 🔥 full field clickable
-                  ),*/
 
                   CustomInputField(
                     title: "Select Date",
@@ -925,6 +872,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
 
                                 // 🔥 CLEAR OLD DATA
                                 resetEditTypes();
+
                               });
                             },
 

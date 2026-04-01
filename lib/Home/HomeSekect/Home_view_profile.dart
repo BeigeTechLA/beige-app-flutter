@@ -1,7 +1,5 @@
-
 import 'dart:convert';
 
-import 'package:beige/utility/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -209,343 +207,242 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// 🔹 TOP IMAGE + ACTIONS
-              Stack(
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    creative?['profile_image_url'] != null
-                        ? ApiService().getImageURL(creative?['profile_image_url'])
-                        : "",
-                    height: 360,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
-                      height: 360,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
 
-                  Container(
-                    height: 360,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.5),
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.85),
-                        ],
+                  /// 🔹 TOP IMAGE + ACTIONS
+                  Stack(
+                    children: [
+                      Image.network(
+                        creative?['profile_image_url'] != null
+                            ? ApiService().getImageURL(creative?['profile_image_url'])
+                            : "",
+                        height: 360,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => SvgPicture.asset(
+                          "assets/svg/imag_placeholder.svg",
+                          height: 360,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                  ),
 
-                  Positioned(
-                    top: 40,
-                    left: 16,
-                    right: 16,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () => Navigator.pop(context),
-                          child: SvgPicture.asset(
-                            "assets/svg/back.svg",
-                            height: 24,
+                      Container(
+                        height: 360,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.5),
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.85),
+                            ],
                           ),
                         ),
-                        /*   Row(
-              children: [
-                Image.asset("assets/Icons/Share 2.png",
-                    height: 24, color: Colors.white),
-                const SizedBox(width: 10),
-                Image.asset("assets/images/Heart Angle.png",
-                    height: 24, color: Colors.white),
-              ],
-            ),*/
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  Positioned(
-                    left: 16,
-                    bottom: 24,
-                    right: 16,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Positioned(
+                        top: 40,
+                        left: 16,
+                        right: 16,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              creative?['name'] ?? "",
-                              style: const TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: SvgPicture.asset(
+                                "assets/svg/back.svg",
+                                height: 24,
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              creative?['primary_title'] ?? "",
-                              style: const TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 14,
-                                color: ColorCode.kWhiteOpacity70,
-                              ),
-                            ),
+                            /*   Row(
+                children: [
+                  Image.asset("assets/Icons/Share 2.png",
+                      height: 24, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Image.asset("assets/images/Heart Angle.png",
+                      height: 24, color: Colors.white),
+                ],
+              ),*/
                           ],
                         ),
-                       /* Text(
-                          creative?['hourly_rate'] != null
-                              ? "From \$${creative?['hourly_rate']}/Hr"
-                              : "",
-                          style: const TextStyle(
-                            fontFamily: "Outfit",
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: ColorCode.kButtonColor,
-                          ),
-                        ),*/
+                      ),
+
+                      Positioned(
+                        left: 16,
+                        bottom: 24,
+                        right: 16,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  creative?['name'] ?? "",
+                                  style: const TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  creative?['primary_title'] ?? "",
+                                  style: const TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 14,
+                                    color: ColorCode.kWhiteOpacity70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            /* Text(
+                            creative?['hourly_rate'] != null
+                                ? "From \$${creative?['hourly_rate']}/Hr"
+                                : "",
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: ColorCode.kButtonColor,
+                            ),
+                          ),*/
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+                  // const SizedBox(height: 20),
+
+                  /// 🔹 INFO STATS
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        infoCard(
+                          icon: Icons.group_outlined,
+                          value: "${stats?['clients_count'] ?? 0}",
+                          title: "Clients",
+                        ),
+                        infoCard(
+                          icon: Icons.verified_outlined,
+                          value: "${stats?['years_experience'] ?? 0} yrs",
+                          title: "Experience",
+                        ),
+                        infoCard(
+                          icon: Icons.star_border,
+                          value: "${creative?['bookings_count'] ?? 0}",
+                          title: "Ratings",
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
 
-
-              // const SizedBox(height: 20),
-
-              /// 🔹 INFO STATS
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child:  Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    infoCard(
-                     icon: images.clients,
-                      value: "${stats?['clients_count'] ?? 0}",
-                      title: "Clients",
-                    ),
-                    infoCard(
-                      icon: images.experience,
-                      value: "${stats?['years_experience'] ?? 0} yrs",
-                      title: "Experience",
-                    ),
-                    infoCard(
-                      icon: images.ratings,
-                      value: "${creative?['bookings_count'] ?? 0}",
-                      title: "Ratings",
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20,),
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Divider(
-                    color: ColorCode.kDividerWhite12,
-                    thickness: 1,
-                  ),
-                ),
-              ),
-
-
-              /// 🔹 ABOUT
-              sectionTitle("About Creator"),
-              sectionText(about?['bio'] ?? "No information available"),
-              SizedBox(height: 20,),
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Divider(
-                    color: ColorCode.kDividerWhite12,
-                    thickness: 1,
-                  ),
-                ),
-              ),
-              sectionTitle("Portfolio"),
-              Column(
-                children: [
-                  SizedBox(
-                    height: 260,
-                    child: portfolio.isEmpty
-                        ? Center(
-                      child: SvgPicture.asset(
-                        "assets/svg/imag_placeholder.svg",
-                        fit: BoxFit.cover,
+                  SizedBox(height: 20,),
+                  Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: Divider(
+                        color: ColorCode.kDividerWhite12,
+                        thickness: 1,
                       ),
-                    )
-                        : PageView.builder(
-                      controller: _portfolioController,
-                      itemCount: 10000, // 👈 infinite feeling
-                      itemBuilder: (context, index) {
+                    ),
+                  ),
 
-                        final realIndex = index % portfolio.length;
-                        final item = portfolio[realIndex];
 
-                        final imageUrl = ApiService().getImageURL(
-                          item["file_path"] ?? "",
-                        );
+                  /// 🔹 ABOUT
+                  sectionTitle("About Creator"),
+                  sectionText(about?['bio'] ?? "No information available"),
+                  SizedBox(height: 20,),
+                  Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: Divider(
+                        color: ColorCode.kDividerWhite12,
+                        thickness: 1,
+                      ),
+                    ),
+                  ),
+                  sectionTitle("Portfolio"),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 260,
+                        child: portfolio.isEmpty
+                            ? Center(
+                          child: SvgPicture.asset(
+                            "assets/svg/imag_placeholder.svg",
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                            : PageView.builder(
+                          controller: _portfolioController,
+                          itemCount: 10000, // 👈 infinite feeling
+                          itemBuilder: (context, index) {
 
-                        double difference = (_currentPage - index).abs();
-                        double scale = 1 - (difference * 0.25);
-                        scale = scale.clamp(0.8, 1.0);
+                            final realIndex = index % portfolio.length;
+                            final item = portfolio[realIndex];
 
-                        return Transform.scale(
-                          scale: scale,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: Image.network(
-                                imageUrl,
-                                height: 235,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => SvgPicture.asset(
-                                  "assets/svg/imag_placeholder.svg",
-                                  fit: BoxFit.cover,
+                            final imageUrl = ApiService().getImageURL(
+                              item["file_path"] ?? "",
+                            );
+
+                            double difference = (_currentPage - index).abs();
+                            double scale = 1 - (difference * 0.25);
+                            scale = scale.clamp(0.8, 1.0);
+
+                            return Transform.scale(
+                              scale: scale,
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Image.network(
+                                    imageUrl,
+                                    height: 235,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => SvgPicture.asset(
+                                      "assets/svg/imag_placeholder.svg",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-                ],
-              ),
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Divider(
-                    color: ColorCode.kDividerWhite12,
-                    thickness: 1,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Team",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    team.isEmpty
-                        ? const Text(
-                      "No team members",
-                      style: TextStyle(color: Colors.white54),
-                    )
-                        : SizedBox(
-                      height: 150,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: team.length,
-                        itemBuilder: (context, index) {
-                          final m = team[index];
-
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 22),
-                            child: teamCard(
-                              image: m['avatar_url'] ?? "",
-                              name: m['name'] ?? "",
-                              role: m['role'] ?? "",
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20,),
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Divider(
-                    color: ColorCode.kDividerWhite12,
-                    thickness: 1,
-                  ),
-                ),
-              ),            Padding(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Weekly Availability",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: weeklyAvailability.isEmpty
-                          ? const Text(
-                        "Not available",
-                        style: TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          height: 20 / 12,
-                          letterSpacing: 0,
-                          color: Colors.white54,
+                            );
+                          },
                         ),
-                      )
-                          : Column(
-                        children: weekDaysOrder.map((day) {
-                          bool isActive = weeklyAvailability.contains(day);
+                      ),
 
-                          return availabilityRow(
-                            day,
-                            isActive,
-                            "10:00 am - 10:00 pm",
-                          );
-                        }).toList(),
+                      const SizedBox(height: 18),
+                    ],
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: Divider(
+                        color: ColorCode.kDividerWhite12,
+                        thickness: 1,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Divider(color: Colors.white10,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Reviews",
+                        const Text(
+                          "Team",
                           style: TextStyle(
                             fontFamily: "Outfit",
                             fontSize: 18,
@@ -554,123 +451,238 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                           ),
                         ),
 
-                        /*  Icon(Icons.chevron_right, color: Colors.white),*/
-                      ],
-                    ),
+                        const SizedBox(height: 12),
 
-                    SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      padding:  EdgeInsets.fromLTRB(16, 24, 16, 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Color(0xFFE8D1AB), // light gold
-                            Color(0xFFF7E7C6), // lighter gold
-                          ],
-                        ),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-
-                          /// LEFT TEXT
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${creative?['average_rating'] ?? "0"} Star",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "(${creative?['total_reviews'] ?? 0} Reviews)",
-                                style: const TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const Spacer(),
-
-                          /// RIGHT STARS
-                          Row(
-                            children: List.generate(5, (index) {
-                              double rating =
-                                  double.tryParse(creative?['average_rating']?.toString() ?? "0") ?? 0;
-
-                              if (index < rating.floor()) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(left: 6),
-                                  child: Icon(Icons.star, size: 26, color: Color(0xFFE6B800)),
-                                );
-                              } else if (index < rating) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(left: 6),
-                                  child: Icon(Icons.star_half, size: 26, color: Color(0xFFE6B800)),
-                                );
-                              } else {
-                                return const Padding(
-                                  padding: EdgeInsets.only(left: 6),
-                                  child: Icon(Icons.star_border, size: 26, color: Color(0xFFE6B800)),
-                                );
-                              }
-                            }),
-                          )
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(height: 20),                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 14),
-
-                        reviews.isEmpty
+                        team.isEmpty
                             ? const Text(
-                          "No reviews ",
+                          "No team members",
                           style: TextStyle(color: Colors.white54),
                         )
                             : SizedBox(
-                          height: 180,
+                          height: 150,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: reviews.length,
+                            itemCount: team.length,
                             itemBuilder: (context, index) {
-                              final r = reviews[index];
+                              final m = team[index];
 
-                              return reviewCard(
-                                name: r['client_name'] ?? "",
-                                rating: r['rating']?.toString() ?? "0",
-                                text: r['review_text'] ?? "",
-                                image: r['client_profile_image_url'],
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 22),
+                                child: teamCard(
+                                  image: m['avatar_url'] ?? "",
+                                  name: m['name'] ?? "",
+                                  role: m['role'] ?? "",
+                                ),
                               );
                             },
                           ),
                         ),
                       ],
-                    )
-                  ],
+                    ),
+                  ),
+                  SizedBox(height: 20,),
+                  Center(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      child: Divider(
+                        color: ColorCode.kDividerWhite12,
+                        thickness: 1,
+                      ),
+                    ),
+                  ),            Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Weekly Availability",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
 
-                ),
+                        const SizedBox(height: 14),
 
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: weeklyAvailability.isEmpty
+                              ? const Text(
+                            "Not available",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              height: 20 / 12,
+                              letterSpacing: 0,
+                              color: Colors.white54,
+                            ),
+                          )
+                              : Column(
+                            children: weekDaysOrder.map((day) {
+                              bool isActive = weeklyAvailability.contains(day);
+
+                              return availabilityRow(
+                                day,
+                                isActive,
+                                "10:00 am - 10:00 pm",
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Divider(color: Colors.white10,
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Reviews",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            /*  Icon(Icons.chevron_right, color: Colors.white),*/
+                          ],
+                        ),
+
+                        SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          padding:  EdgeInsets.fromLTRB(16, 24, 16, 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            gradient: const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color(0xFFE8D1AB), // light gold
+                                Color(0xFFF7E7C6), // lighter gold
+                              ],
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+
+                              /// LEFT TEXT
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${creative?['average_rating'] ?? "0"} Star",
+                                    style: TextStyle(
+                                      fontFamily: "Unbounded",
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "(${creative?['total_reviews'] ?? 0} Reviews)",
+                                    style: const TextStyle(
+                                      fontFamily: "Outfit",
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const Spacer(),
+
+                              /// RIGHT STARS
+                              Row(
+                                children: List.generate(5, (index) {
+                                  double rating =
+                                      double.tryParse(creative?['average_rating']?.toString() ?? "0") ?? 0;
+
+                                  if (index < rating.floor()) {
+                                    return const Padding(
+                                      padding: EdgeInsets.only(left: 6),
+                                      child: Icon(Icons.star, size: 26, color: Color(0xFFE6B800)),
+                                    );
+                                  } else if (index < rating) {
+                                    return const Padding(
+                                      padding: EdgeInsets.only(left: 6),
+                                      child: Icon(Icons.star_half, size: 26, color: Color(0xFFE6B800)),
+                                    );
+                                  } else {
+                                    return const Padding(
+                                      padding: EdgeInsets.only(left: 6),
+                                      child: Icon(Icons.star_border, size: 26, color: Color(0xFFE6B800)),
+                                    );
+                                  }
+                                }),
+                              )
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),                  Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 14),
+
+                            reviews.isEmpty
+                                ? const Text(
+                              "No reviews ",
+                              style: TextStyle(color: Colors.white54),
+                            )
+                                : SizedBox(
+                              height: 180,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: reviews.length,
+                                itemBuilder: (context, index) {
+                                  final r = reviews[index];
+
+                                  return reviewCard(
+                                    name: r['client_name'] ?? "",
+                                    rating: r['rating']?.toString() ?? "0",
+                                    text: r['review_text'] ?? "",
+                                    image: r['client_profile_image_url'],
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+
+                    ),
+
+                  ),
+
+                  SizedBox(height: 40),
+                ],
               ),
 
-              SizedBox(height: 40),
-            ],
-          ),
+            ),
+            if (isLoading)
+            Container(
+              color: Colors.black, // ya transparent bhi rakh sakte ho
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: ColorCode.kGold40,
+                ),
+              ),
+            ),
+          ],
 
         ),
 
@@ -716,7 +728,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
 
   /// 🔹 SMALL WIDGETS
   Widget infoCard({
-    required String icon,
+    required IconData icon,
     required String value,
     required String title,
   }) {
@@ -742,9 +754,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
       child: Padding(
         padding: const EdgeInsets.all(0.6), // 👈 border thickness (0.5px feel)
         child: Container(
-          
           decoration: BoxDecoration(
-            
             color: const Color(0xFF1E1E1E),
             borderRadius: BorderRadius.circular(11.5),
           ),
@@ -755,7 +765,6 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
               Positioned(
                 top: -1,
                 child: Container(
-                  padding: EdgeInsets.all(8),
                   width: 38,
                   height: 42,
                   decoration: BoxDecoration(
@@ -764,7 +773,11 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                       bottom: Radius.circular(14),
                     ),
                   ),
-                  child: SvgPicture.asset(icon,width: 18,height: 18,)
+                  child: Icon(
+                    icon,
+                    size: 20,
+                    color: Colors.black,
+                  ),
                 ),
               ),
 

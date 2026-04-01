@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
-import '../utility/images.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
   const BookingHistoryScreen({super.key});
@@ -46,7 +45,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,15 +56,10 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
               child: InkWell(
                 onTap: () => Navigator.pop(context),
                 child: SvgPicture.asset(
-                  images.back,
+                  "assets/svg/back.svg",
                   height: 24,
-                  width: 24,
-                  colorFilter: const ColorFilter.mode(
-                    ColorCode.white,
-                    BlendMode.srcIn,
-                  ),
+                  color: ColorCode.white,
                 ),
-
               ),
             ),
 

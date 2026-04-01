@@ -4,14 +4,13 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
-import '../utility/images.dart';
 import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  final String myemail;
+  final String email;
 
-  const ChangePasswordScreen({super.key, required this.myemail});
+  const ChangePasswordScreen({super.key, required this.email});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -23,7 +22,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool isEmailFilled = false;
   bool isLoading = false;
 
- /* Future<void> _fetchForgotPassword() async {
+  /* Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
 
     if (emailController.text.trim().isEmpty) {
@@ -68,12 +67,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
     );
   }*/
-@override
+  @override
   void initState() {
     super.initState();
-    emailController.text=widget.myemail;//
-  }
+    emailController.text = widget.email;
 
+    isEmailFilled = widget.email.isNotEmpty; //
+  }
   Future<void> _fetchForgotPassword() async {
     final apiService = ApiService();
     final email = emailController.text.trim();
@@ -173,17 +173,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     children: [
 
                       InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Navigator.pop(context,true),
                         child: SvgPicture.asset(
-                          images.back,
+                          "assets/svg/back.svg",
                           height: 24,
-                          width: 24,
-                          colorFilter: const ColorFilter.mode(
-                            Colors.white,
-                            BlendMode.srcIn,
-                          ),
                         ),
-                      ),//
+                      ),
 
                       const SizedBox(height: 20),
 
@@ -217,18 +212,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                       const SizedBox(height: 25),
 
-                      AutofillGroup(
-                        child: CustomInputField(
-                          readOnly: true,
-                          //autofillHints: ema,
-                          title: "Email ID*",
-                          controller:TextEditingController(text:widget.myemail),
-                          onChanged: (value) {
-                            setState(() {
-                              isEmailFilled = value.trim().isNotEmpty;
-                            });
-                          },
-                        ),
+                      CustomInputField(
+                        readOnly: true,
+                        title: "Email ID*",
+                        controller: emailController, //
+                        onChanged: (value) {
+                          setState(() {
+                            isEmailFilled = value.trim().isNotEmpty;
+                          });
+                        },
                       ),
                       // _buildEmailField(),
                     ],
@@ -255,9 +247,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : Text(
+                  child: Text(
                     "Send OTP",
                     style: TextStyle(
                       fontSize: 14,

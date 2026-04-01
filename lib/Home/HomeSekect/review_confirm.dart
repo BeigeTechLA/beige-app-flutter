@@ -147,7 +147,7 @@ class _ReviewConfirmState extends State<ReviewConfirm> {
               const SizedBox(height: 20),
 
               const Text(
-                "Review & Confirxxxxxm",
+                "Review & Confirm",
                 style: TextStyle(
                   fontFamily: "Unbounded",
                   fontSize: 15,

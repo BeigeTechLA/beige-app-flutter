@@ -61,7 +61,33 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         return "nearest";
     }
   }
+  int getRoleIdByContentType(int contentTypeId, String roleName) {
+    final name = roleName.toLowerCase();
 
+    /// VIDEO ONLY
+    if (contentTypeId == 1) return 1;
+
+    /// PHOTO ONLY
+    if (contentTypeId == 2) return 2;
+
+    /// BOTH
+    if (contentTypeId == 3) {
+      if (name.contains("photographer")) return 2;
+      if (name.contains("video")) return 1;
+    }
+
+    return 1;
+  }
+
+  /// 🔥 ROLE NAME → ROLE ID mapping
+  int _mapRoleName(String roleName) {
+    final name = roleName.toLowerCase();
+
+    if (name.contains("video")) return 1;
+    if (name.contains("photo")) return 2;
+
+    return 1; // default (kabhi 0 nahi)
+  }
   @override
   void initState() {
     super.initState();
@@ -164,57 +190,100 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       debugPrint("Remove Favourite Error: $e");
     }
   }
-
   Future<bool> _addHolds({
     required int creativeUserId,
     required int roleId,
   }) async {
     try {
-      final response = await ApiService().postData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/hold",
-        {
-          "creative_user_id": creativeUserId,
-          "role_id": roleId,
-        },
-      );
+      final url = "${ApiEndpoints.booking}/${widget.bookingId}/hold";
+
+      /// 🔥 PRINT START
+      debugPrint("═══════════════════════════════");
+      debugPrint("📤 ADD HOLD API CALL");
+      debugPrint("👉 URL: $url");
+
+      final body = {
+        "creative_user_id": creativeUserId,
+        "role_id": roleId,
+      };
+
+      debugPrint("👉 PAYLOAD:");
+      body.forEach((key, value) {
+        debugPrint("   $key : $value");
+      });
+
+      debugPrint("═══════════════════════════════");
+
+      final response = await ApiService().postData(url, body);
+
+      /// 🔥 RESPONSE PRINT
+      debugPrint("📥 RESPONSE:");
+      debugPrint(response.toString());
+      debugPrint("═══════════════════════════════");
 
       if (response != null && response['error'] == false) {
-        debugPrint("✅ Crew added successfully");
+        debugPrint("✅ SUCCESS");
         return true;
       } else {
-        debugPrint("❌ Add crew failed: $response");
+        final msg = response?['message'] ?? "Something went wrong";
+
+        debugPrint("❌ FAILED: $msg");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+
         return false;
       }
     } catch (e) {
-      debugPrint("❌ Add Holds Error: $e");
+      debugPrint("❌ EXCEPTION: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+
       return false;
     }
   }
-
   Future<bool> _removeHolds({
     required int creativeUserId,
   }) async {
     try {
+      final url = "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove";
+
+      debugPrint("👉 REMOVE HOLD URL: $url");
+      debugPrint("👉 BODY: creative_user_id=$creativeUserId");
+
       final response = await ApiService().postData(
-          "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove",
-          {
-            "creative_user_id": creativeUserId,
-          }
+        url,
+        {
+          "creative_user_id": creativeUserId,
+        },
       );
 
+      debugPrint("✅ REMOVE RESPONSE: $response");
+
       if (response != null && response['error'] == false) {
-        debugPrint("✅ Crew removed successfully");
         return true;
       } else {
-        debugPrint("❌ Remove crew failed: $response");
+        final msg = response?['message'] ?? "Remove failed";
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+
         return false;
       }
     } catch (e) {
       debugPrint("❌ Remove Holds Error: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+
       return false;
     }
   }
-
   Future<void> _holds() async {
     try {
       final response = await ApiService().fetchData(
@@ -928,9 +997,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                     left: 12,
                                     right: 12,
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-
+/*
                                         Row(
                                           children: const [
                                             CircleAvatar(
@@ -946,7 +1015,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                               ),
                                             ),
                                           ],
-                                        ),
+                                        ),*/
 
                                         GestureDetector(
                                           onTap: () async {
@@ -1030,7 +1099,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                           ],
                                         ),
 
-                                        /// RIGHT BUTTONS
+                                 /*       /// RIGHT BUTTONS
                                         Row(
                                           children: [
 
@@ -1038,67 +1107,86 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             if (!showLocationCard)
                                               InkWell(
                                                 onTap: () async {
+                                                  try {
+                                                    /// 🔥 SAFE ROLE ID FIX
+                                                    final int roleId = (item['role_id'] is List)
+                                                        ? item['role_id'][0]
+                                                        : item['role_id'];
 
-                                                  if (!allowedRoleIds.contains(roleId)) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text("This role is already booked for this shoot"),
-                                                      ),
-                                                    );
-                                                    return;
-                                                  }
+                                                    /// ================= REMOVE =================
+                                                    if (isAdded) {
+                                                      final success = await _removeHolds(
+                                                        creativeUserId: creativeUserId,
+                                                      );
 
-                                                  /// REMOVE
-                                                  if (isAdded) {
-                                                    final success = await _removeHolds(
+                                                      if (success) {
+                                                        setState(() {
+                                                          addedCrewUserIds.remove(creativeUserId);
+                                                        });
+
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(content: Text("Removed successfully")),
+                                                        );
+                                                      }
+
+                                                      return;
+                                                    }
+
+                                                    /// ================= ADD =================
+
+                                                    int selectedForThisRole = 0;
+
+                                                    for (final match in crewMatches) {
+                                                      final int uid = match['user']['id'];
+
+                                                      final int rId = (match['role_id'] is List)
+                                                          ? match['role_id'][0]
+                                                          : match['role_id'];
+
+                                                      if (addedCrewUserIds.contains(uid) && rId == roleId) {
+                                                        selectedForThisRole++;
+                                                      }
+                                                    }
+
+                                                    final int maxAllowed = requiredCountByRole[roleId] ?? 0;
+
+                                                    /// ❌ LIMIT ERROR
+                                                    if (selectedForThisRole >= maxAllowed) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            "You can add only $maxAllowed ${item['role_name']}",
+                                                          ),
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+
+                                                    /// 🔥 CALL ADD API
+                                                    final success = await _addHolds(
                                                       creativeUserId: creativeUserId,
+                                                      roleId: roleId,
                                                     );
 
                                                     if (success) {
                                                       setState(() {
-                                                        addedCrewUserIds.remove(creativeUserId);
+                                                        addedCrewUserIds.add(creativeUserId);
                                                       });
+
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(content: Text("Added successfully")),
+                                                      );
                                                     }
-                                                    return;
-                                                  }
 
-                                                  /// ADD
-                                                  int selectedForThisRole = 0;
+                                                  } catch (e) {
+                                                    debugPrint("❌ BUTTON ERROR: $e");
 
-                                                  for (final match in crewMatches) {
-                                                    final int uid = match['user']['id'];
-                                                    final int rId =
-                                                        int.tryParse(match['role_id'][0].toString()) ?? 0;
-
-                                                    if (addedCrewUserIds.contains(uid) && rId == roleId) {
-                                                      selectedForThisRole++;
-                                                    }
-                                                  }
-
-                                                  final int maxAllowed = requiredCountByRole[roleId] ?? 0;
-
-                                                  if (selectedForThisRole >= maxAllowed) {
                                                     ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "You can add only $maxAllowed ${item['role_name']}",
-                                                        ),
-                                                      ),
+                                                      SnackBar(content: Text("Error: $e")),
                                                     );
-                                                    return;
-                                                  }
-
-                                                  final success = await _addHolds(
-                                                    creativeUserId: creativeUserId,
-                                                    roleId: roleId,
-                                                  );
-
-                                                  if (success) {
-                                                    setState(() {
-                                                      addedCrewUserIds.add(creativeUserId);
-                                                    });
                                                   }
                                                 },
+
                                                 child: Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                                   decoration: BoxDecoration(
@@ -1143,7 +1231,106 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                               ),
                                             ),
                                           ],
-                                        ),
+                                        ),*/
+                                             /// RIGHT BUTTONS
+                                        Row(
+                                          children: [
+
+                                            if (!showLocationCard)
+                                              InkWell(
+                          onTap: () async {
+                          final int creativeUserId = item['user']['id'];
+                         // final int roleId = getRoleId(item['role_id']);
+                          final int roleId = getRoleIdByContentType(
+                            widget.contentTypeId,
+                            item['role_name'] ?? '',
+                          );
+                          /// 🔴 REMOVE
+                          if (addedCrewUserIds.contains(creativeUserId)) {
+                          final success = await _removeHolds(
+                          creativeUserId: creativeUserId,
+                          );
+
+                          if (success) {
+                          await _holds(); // ✅ refresh from backend
+                          }
+
+                          return;
+                          }
+
+                          /// 🟢 ADD
+                          int selectedForThisRole = getSelectedCountByRole(roleId);
+                          final int maxAllowed = requiredCountByRole[roleId] ?? 1;
+
+                      /*    if (maxAllowed > 0 && selectedForThisRole >= maxAllowed) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                          content: Text(
+                          "You can add only $maxAllowed ${item['role_name']}",
+                          ),
+                          ),
+                          );
+                          return;
+                          }*/
+
+                          final success = await _addHolds(
+                          creativeUserId: creativeUserId,
+                          roleId: roleId,
+                          );
+
+                          if (success) {
+                          await _holds(); // ✅ refresh from backend
+                          }
+                          },
+
+                                                child: Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: addedCrewUserIds.contains(item['user']['id'])
+                                                        ? ColorCode.kLightRed
+                                                        : ColorCode.kButtonColor,
+                                                    borderRadius: BorderRadius.circular(30),
+                                                    border: addedCrewUserIds.contains(item['user']['id'])
+                                                        ? Border.all(color: Colors.red)
+                                                        : null,
+                                                  ),
+                                                  child: Text(
+                                                    addedCrewUserIds.contains(item['user']['id'])
+                                                        ? "Remove"
+                                                        : "Add to Crew",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w600,
+                                                      color: addedCrewUserIds.contains(item['user']['id'])
+                                                          ? Colors.red
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+
+                                            if (!showLocationCard) const SizedBox(width: 8),
+
+                                            /// DETAILS BUTTON
+                                            InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => RecommendedDetilsScreen(
+                                                      id: item['id'],
+                                                      bookingId: widget.bookingId,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: SvgPicture.asset(
+                                                "assets/svg/home_view_profile.svg",
+                                              ),
+                                            ),
+                                          ],
+                                        )
                                       ],
                                     ),
                                   ),
@@ -1520,12 +1707,11 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ),
             if (isLoading)
               Positioned.fill(
-                child: Container(
-                  color: Colors.black.withOpacity(0.5), // dark overlay
+                child:  Container(
+                  color: Colors.black, // ya transparent bhi rakh sakte ho
                   child: const Center(
                     child: CircularProgressIndicator(
-                      color: ColorCode.kButtonColor, // loader color
-                      strokeWidth: 3,
+                      color: ColorCode.kGold40,
                     ),
                   ),
                 ),
@@ -1746,16 +1932,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                       if (matches.isEmpty) continue;
 
+                    /*  final roleId =
+                          int.tryParse(matches.first['role_id'].toString()) ?? 0;*/
                       final roleId =
                           int.tryParse(matches.first['role_id'].toString()) ?? 0;
-
                       await _addHolds(
                         creativeUserId: userId,
                         roleId: roleId,
                       );
                     }
 
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => ReviewConfirmScreen(

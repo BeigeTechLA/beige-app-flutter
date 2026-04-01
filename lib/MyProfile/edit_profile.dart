@@ -45,7 +45,7 @@ class _EditProfileState extends State<EditProfile> {
   LatLng? currentLatLng;
 
   String selectedAddress = "Search or select location";
-
+  bool isSaving = false;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -472,7 +472,7 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                         elevation: 0,
                       ),
-                      onPressed: () async {
+                  /*    onPressed: () async {
                         final cropped = await _cropImage(
                           imageFile,
                           scale,
@@ -489,6 +489,33 @@ class _EditProfileState extends State<EditProfile> {
                           /// 🔥 UPLOAD AFTER CROP
                           await _uploadImage();
                         }
+
+                        Navigator.pop(context);
+                      },*/
+                      onPressed: () async {
+                        setSheetState(() {
+                          isSaving = true;
+                        });
+
+                        final cropped = await _cropImage(
+                          imageFile,
+                          scale,
+                          offset,
+                        );
+
+                        if (cropped != null) {
+                          setState(() {
+                            _profileImage = cropped;
+                          });
+
+                          debugPrint("✅ CROPPED IMAGE PATH: ${cropped.path}");
+
+                          await _uploadImage();
+                        }
+
+                        setSheetState(() {
+                          isSaving = false;
+                        });
 
                         Navigator.pop(context);
                       },
@@ -760,10 +787,10 @@ class _EditProfileState extends State<EditProfile> {
                     Container(
                       height: 248,
                       width: double.infinity,
-                      color: Colors.transparent, // ताकि पीछे कुछ दिखे नहीं
+                      color: Colors.transparent,
                     ),
 
-                    /// 🔹 BACKGROUND HEADER (Height 200 ही रखी ताकि डिज़ाइन न बिगड़े)
+
                     SizedBox(
                       width: double.infinity,
                       height: 200,
@@ -1288,11 +1315,13 @@ class _EditProfileState extends State<EditProfile> {
                     controller: TextEditingController(text: "********"),
                     readOnly: true,
                     suffixIcon: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ChangePasswordScreen(myemail: emailController.text,),
+                            builder: (_) => ChangePasswordScreen(
+                              email: emailController.text,
+                            ),
                           ),
                         );
                       },

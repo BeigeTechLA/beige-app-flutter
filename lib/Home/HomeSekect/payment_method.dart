@@ -1,6 +1,7 @@
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
@@ -31,7 +32,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   String? setupIntentClientSecret;
 
 
-
+  bool isProcessing = false;
   Future<void> _fetchBookSummary() async {
     setState(() => loading = true);
 
@@ -113,6 +114,13 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   }
 
   Future<void> _openStripeSheet() async {
+
+    if (isProcessing) {
+      print("⛔ Already Processing");
+      return;
+    }
+
+    isProcessing = true;
     try {
       print("=== STRIPE START ===");
       setState(() => loading = true);
@@ -166,30 +174,27 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
     } on StripeException catch (e) {
 
-      /// 🔥 HANDLE CANCEL PROPERLY
-      if (e.error.code == FailureCode.Canceled) {
-        print("⚠️ User cancelled payment");
+      final errorCode = e.error.code;
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("⚠️ Payment cancelled")),
-          );
-        }
+      print("Stripe Error Code: $errorCode");
 
-      } else {
-        print("❌ Stripe Error: ${e.error.localizedMessage}");
+      /// ✅ ONLY show cancel when actual cancel
+      if (errorCode == FailureCode.Canceled) {
+        print("⚠️ User actually cancelled");
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                e.error.localizedMessage ?? "Payment failed",
-              ),
-            ),
-          );
-        }
+        return; // ❗ STOP here (NO snackbar needed)
       }
 
+      /// ❌ Other errors
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.error.localizedMessage ?? "Payment failed",
+            ),
+          ),
+        );
+      }
     } catch (e) {
 
       print("❌ Unknown Error: $e");
@@ -199,8 +204,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           SnackBar(content: Text(e.toString())),
         );
       }
-
     } finally {
+      isProcessing = false; // ✅ MUST ADD
       if (mounted) setState(() => loading = false);
       print("=== STRIPE END ===");
     }
@@ -257,7 +262,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   Navigator.pop(context);
                 },
 
-                child: Image.asset("assets/Icons/Reply.png", height: 24),
+                child: SvgPicture.asset("assets/svg/back.svg", height: 24),
               ),
 
               const SizedBox(height: 14),
@@ -354,7 +359,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
               const SizedBox(height: 12),
 
               InkWell(
-                onTap: _openStripeSheet,
+                onTap: isProcessing ? null : _openStripeSheet,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
@@ -439,7 +444,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   /// ===== PAYMENT TILE =====
   Widget _paymentTile({required String title, required String icon}) {
     return InkWell(
-      onTap: _openStripeSheet,
+      onTap: isProcessing ? null : _openStripeSheet,
 
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
