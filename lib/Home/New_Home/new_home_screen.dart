@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../Model/HomeModel.dart';
+import '../../MyProfile/my_profile.dart';
+import '../../service/api_service.dart';
 import '../HomeSekect/Home_view_profile.dart';
+import '../HomeSekect/change_location_screen.dart';
+import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import 'home_controller .dart';
 
 class NewHomeScreen extends StatefulWidget {
@@ -17,6 +21,9 @@ class NewHomeScreen extends StatefulWidget {
 class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateMixin {
 
   final HomeController controller = HomeController();
+  final GlobalKey featuredKey = GlobalKey();
+  final GlobalKey topCreativeKey = GlobalKey();
+  List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
 
   HomeModel? homeData;
   bool isLoading = true;
@@ -48,6 +55,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     if (data != null) {
       setState(() {
         homeData = data;
+
         isLoading = false;
       });
     } else {
@@ -55,11 +63,42 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     }
   }
 
+
+  void scrollTo(GlobalKey key) {
+    final context = key.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
   // --- DATA LISTS FOR TEXT & COLORS ---
   final List<String> _searchTexts = [
     "I want a Wedding Photographer",
-    "Corporate Event Photos",
-    "Birthday Party Shoot",
+      "I want a Wedding Vidoegrapher",
+  ];
+
+  final List<Map<String, String>> cardData = [
+    {
+      "bg": "assets/new_home/Group 2087329746.png",
+      "image": "assets/new_home/home_book1.png",
+      "title": "Find Your Perfect Creator\nAnywhere, Anytime.",
+      "button": "Book a Shoot",
+    },
+    {
+      "bg": "assets/new_home/homebackground_new.png",
+      "image": "assets/new_home/home_book_2.png",
+      "title": "Trusted by Leading\nBrands.",
+      "button": " Explore Creatives",
+    },
+    {
+      "bg": "assets/new_home/homebackground_new.png",
+      "image": "assets/new_home/home_book3.png",
+      "title": "Instant Pricing &\nIntelligent Matchmaking.",
+      "button": "Find Your Creative",
+    },
   ];
   final List<String> featuredNames = [
     "Alec H",
@@ -129,22 +168,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     },
   ];
 
-  final List<Map<String, String>> bookingList = [
-    {
-      "image": "assets/new_home/photo.png", // Apni booking image dalein
-      "title": "Wedding Photography",
-      "date": "16 Jun, 2024",
-      "time": "10:00 PM to 13:00 PM",
-      "status": "Completed"
-    },
-    {
-      "image": "assets/new_home/Editing.png",
-      "title": "Corporate Shoot",
-      "date": "20 Jun, 2024",
-      "time": "11:00 AM to 02:00 PM",
-      "status": "Pending"
-    },
-  ];
+
 
   List<Map<String, String>> creatives = [
     {
@@ -242,7 +266,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 95),
+                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 80),
                     decoration: const BoxDecoration(
                       color: Color(0xFF1C1C1C),
                       borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
@@ -251,7 +275,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       image: DecorationImage(
                         image: AssetImage("assets/images/mappp.png"), // Aapki image ka path
                          // opacity: 0.2, // Subtle look ke liye opacity kam rakhi hai
-                        fit: BoxFit.none,
+                        fit: BoxFit.contain,
+                        alignment: Alignment(0, 0.7),
                       ),
                     ),
                     child: Column(
@@ -264,25 +289,47 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("Hello Divaish 👋,",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22,
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.w500)),
+                                   Text(
+                                    "Hello ${homeData?.name ?? "User"} 👋",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Flexible(
-                                          child: Text("Westheimer Santa Ana, Illinois",
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  color: Colors.white.withOpacity(0.6),
-                                                  fontSize: 15,
-                                                  fontFamily: "Outfit"))),
-                                      const Icon(Icons.expand_more,
-                                          color: Colors.white, size: 20),
-                                    ],
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const ChangeLocationScreen(),
+                                        ),
+                                      );
+
+                                      if (result != null && result is Map<String, dynamic>) {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+                                        fetchData();
+                                      }
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                            child:
+                                            Text(
+                                                homeData?.location ?? "Loading...",
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.6),
+                                                    fontSize: 15,
+                                                    fontFamily: "Outfit"))),
+                                        const Icon(Icons.expand_more,
+                                            color: Colors.white, size: 20),
+                                      ],
+                                    ),
                                   )
                                 ],
                               ),
@@ -304,9 +351,38 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                     child: Icon(Icons.notifications_none_rounded,
                                         color: Colors.white, size: 26),
                                   ),
-                                  const CircleAvatar(
+                                   GestureDetector(
+                                     onTap: () async{
+                                       await Navigator.push(
+                                         context,
+                                         MaterialPageRoute(
+                                           builder: (context) => const MyProfile(),
+                                         ),
+                                       );
+                                       fetchData();
+                                     },
+
+                                     child: CircleAvatar(
                                       radius: 20,
-                                      backgroundImage: AssetImage("assets/images/home2.png"))
+                                      backgroundColor: Colors.transparent,
+                                      child: ClipOval(
+                                        child: homeData != null &&
+                                            homeData!.profileImageUrl.isNotEmpty
+                                            ? Image.network(
+                                          ApiService.imageURL + homeData!.profileImageUrl,
+                                         /* width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,*/
+                                        )
+                                            : SvgPicture.asset(
+                                          "assets/svg/persone.svg",
+                                         /* width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,*/
+                                        ),
+                                      ),
+                                                                       ),
+                                   ),
                                 ],
                               ),
                             )
@@ -320,12 +396,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                 // --- 2. DYNAMIC SEARCH BAR (Text & Color Change) ---
                 Positioned(
-                  bottom: -25,
+                  bottom: -20,
                   child: Container(
                     width: MediaQuery
                         .of(context)
                         .size
-                        .width * 0.85,
+                        .width * 0.80,
                     height: 50,
                     decoration: BoxDecoration(
                       color: const Color(0xFF282828),
@@ -380,7 +456,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                 gradient: LinearGradient(
                   colors: [
                     Colors.white.withOpacity(0.09), // left
-                    Colors.white.withOpacity(0.09), // center
+                    Colors.white24,
                     Colors.white.withOpacity(0.09), // right
                   ],
                   begin: Alignment.centerLeft,
@@ -389,27 +465,24 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
               ),
             ),
           ),
-
+            SizedBox(height: 20),
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-
                   // --- 1. PROMO BANNER ---
                   SizedBox(
-                    height: 160, // 🔥 thoda bada
+                    height: 160,
                     child: PageView.builder(
-                      controller: PageController(
-                        viewportFraction: 0.92, // 🔥 FULL WIDTH EFFECT
-                      ),
-                      itemCount: 1000,
+                      controller: _cardController,
+                      itemCount: 1000, // 🔥 infinite feel
                       onPageChanged: (index) {
                         setState(() {
-                          _currentCard = index % 3;
+                          _currentCard = index % cardData.length; // 👈 loop indicator
                         });
                       },
                       itemBuilder: (context, index) {
-                        return _buildCardbook(); // ❌ AnimatedBuilder hata diya (smooth & clean)
+                        final data = cardData[index % cardData.length]; // 👈 loop data
+                        return _buildCardbook(data);
                       },
                     ),
                   ),
@@ -443,8 +516,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
                                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                                height: 4, // 🔥 slim
-                                width: isActive ? 20 : 6,
+                                height: 5, // 🔥 slim
+                                width: isActive ? 22 : 12,
                                 decoration: BoxDecoration(
                                   color: isActive
                                       ? const Color(0xFFE8D1AB)
@@ -458,7 +531,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       ),
                     ),
                   ),
-
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Container(
@@ -468,7 +541,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         gradient: LinearGradient(
                           colors: [
                             Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
+                            Colors.white24,
                             Colors.white.withOpacity(0.09), // right
                           ],
                           begin: Alignment.centerLeft,
@@ -487,7 +560,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                          Text(
                           "Explore Services",
                           style: TextStyle(color: ColorCode.white,
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               fontFamily: "Unbounded",
                             height: 1.2,
@@ -495,18 +568,19 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
 
                         ),
-                        Icon(Icons.arrow_forward_ios,
-                            color: Colors.white.withOpacity(0.5), size: 18),
+                        SvgPicture.asset(
+                          "assets/svg/home_vecto.svg",
+                        ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
 
                   // Services Horizontal List
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
+                    // padding: const EdgeInsets.only(left: 20),
                     child: Row(
                       children: [
 
@@ -520,11 +594,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         _buildServiceCard(
                             "Livestream", "assets/new_home/Livestream_new.png", false),
                         _buildServiceCard(
-                            "stuido", "assets/new_home/stuido.png", false),
+                            "studio", "assets/new_home/stuido_new.png", false),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -535,7 +608,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         gradient: LinearGradient(
                           colors: [
                             Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
+                            Colors.white24,
                             Colors.white.withOpacity(0.09), // right
                           ],
                           begin: Alignment.centerLeft,
@@ -677,7 +750,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         gradient: LinearGradient(
                           colors: [
                             Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
+                            Colors.white24,
                             Colors.white.withOpacity(0.09), // right
                           ],
                           begin: Alignment.centerLeft,
@@ -688,6 +761,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   ),
                   const SizedBox(height: 10),
                   Padding(
+                    key: featuredKey,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -695,7 +769,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         const Text(
                           "Featured Creatives",
                           style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             fontFamily: "Unbounded",
                             height: 1.2,
@@ -710,7 +784,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   Container(
                     // color: ColorCode.red,
                     child: SizedBox(
-                      height: 260,
+                      height: 280,
                       child: AnimatedBuilder(
                         animation: _pageController,
                         builder: (context, child) {
@@ -730,24 +804,24 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               double difference = (index - page);
 
                               // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
-                              double perspective = 0.0025;
+                              double perspective = 0.0032;
 
                               // 2. Rotation Logic (Blue box jaisa effect):
                               // Right waali image (difference > 0) ke liye positive rotation
                               // jisse uska right side peeche jaye.
                               double rotation = difference *
-                                  0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
+                                  0.9; // Is value ko 0.4 se 0.7 tak change karke dekhein
                               rotation = rotation.clamp(-0.8, 0.8);
 
                               // 3. Scale & Opacity
                               double scale = (1 - (difference.abs() * 0.10))
                                   .clamp(0.0, 1.0);
-                              double opacity = (1 - (difference.abs() * 0.40))
+                              double opacity = (1 - (difference.abs() * 0.20))
                                   .clamp(0.6, 2.0);
 
                               // 4. Translate (Cards ko center ke paas laane ke liye)
                               // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
-                              double translateX = difference * -90;
+                              double translateX = difference * -100;
 
                               return Opacity(
                                 opacity: opacity,
@@ -836,140 +910,153 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   const SizedBox(height: 10),
 
 
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return CustomPaint(
-                        painter: BorderAnimationPainter(_controller.value),
-                        child: child,
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(top: 45, bottom: 29),
-                      decoration: BoxDecoration(
-                        // 🔥 Exact Figma Gradient
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: const [0.0, 2.0],
-                          colors: [
-                            const Color(0xFFE8D1AB),
-                            const Color(0xFF0D0D0D),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(45),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: BorderAnimationPainter(_controller.value),
+                child: child,
+              );
+            },
+            child: Container(
+              width: double.infinity,
 
-                      ),
-                      child: Column(
-                        children: [
-                          // Title Text
-                          const Text(
-                            "Beige Studios",
-                            style: TextStyle(
-                              color: Color(0x29000000), // Figma 16% Opacity Black
-                              fontSize: 38,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Unbounded",
+              padding: const EdgeInsets.only(top: 30, bottom: 69, left: 15, right: 15),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  // Stops ko correct kiya hai smooth look ke liye
+                  stops: const [0.0, 0.7],
+                  colors: [
+                    const Color(0xFFE8D1AB),
+                    const Color(0xFF0D0D0D),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(45),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                      "Beige Studios",
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                        color: Color(0x29000000),
+                        fontSize: 42,
+                        fontWeight: FontWeight.w900, // Extra Bold look
+                        fontFamily: "Unbounded",
+                        letterSpacing: -2.0, // Isse words ke beech ka space khatam ho jayega
+                        height: 1.0, // Line height kam karne ke liye
+                      ),),
 
-                            ),
-                          ),
+                  const SizedBox(height: 10), // Text aur Carousel ke beech thoda gap
 
+                  // Carousel Section
+                  SizedBox(
+                    height: 350, // Height thodi badhayi hai
+                    child: PageView.builder(
+                      controller: _studioController, // Isme viewportFraction: 0.75 hona chahiye
+                      clipBehavior: Clip.none, // Taaki side images cut na ho
+                      onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
+                      itemBuilder: (context, index) {
+                        final int actualIndex = index % studioList.length;
+                        return AnimatedBuilder(
+                          animation: _studioController,
+                          builder: (context, child) {
+                            double scale = 1.0;
+                            double translate = 0;
 
+                            if (_studioController.position.haveDimensions) {
+                              double page = _studioController.page!;
+                              double diff = (index - page);
+                              // Scale logic for smooth effect
+                              scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
+                              translate = diff.abs() * 10;
+                            } else {
+                              // Initial state for first build
+                              if(index != 0) scale = 0.85;
+                            }
 
-                          // Carousel Section
-                          SizedBox(
-                            height: 330,
-                            child: PageView.builder(
-                              controller: _studioController,
-                              onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
-                              itemBuilder: (context, index) {
-                                final int actualIndex = index % studioList.length;
-                                return AnimatedBuilder(
-                                  animation: _studioController,
-                                  builder: (context, child) {
-                                    double scale = 1.0;
-                                    double translate = 0;
-                                    if (_studioController.position.haveDimensions) {
-                                      double page = _studioController.page!;
-                                      double diff = (index - page);
-                                      scale = (1 - (diff.abs() * 0.22)).clamp(0.89, 2.0);
-                                      translate = diff.abs() * 30;
-                                    }
-                                    return Center(
-                                      child: Transform.translate(
-                                        offset: Offset(0, translate),
-                                        child: Transform.scale(
-                                          scale: scale,
-                                          child: _buildStudioCard(studioList[actualIndex]),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          // Studio Info & Dots
-                          Text(
-                            studioList[_activeStudioIndex]['name']!,
-                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 30),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Container(
-                              height: 1,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.09), // left
-                                    Colors.white.withOpacity(0.09), // center
-                                    Colors.white.withOpacity(0.09), // right
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                            return Center(
+                              child: Transform.translate(
+                                offset: Offset(0, translate),
+                                child: Transform.scale(
+                                  scale: scale,
+                                  child: _buildStudioCard(studioList[actualIndex]),
                                 ),
                               ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Studio Info
+                  Text(
+                    studioList[_activeStudioIndex]['name']!,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+
+                  // Agar address ya description hai to:
+                  if(studioList[_activeStudioIndex]['desc'] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Text(
+                        studioList[_activeStudioIndex]['desc']!,
+                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                      ),
+                    ),
+
+                  const SizedBox(height: 25),
+
+                  // Divider Line
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Custom Page Indicator
+                  Center(
+                    child: Container(
+                      width: 60,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            // Indicator smooth move hoga
+                            left: (_activeStudioIndex * (60 / studioList.length)),
+                            child: Container(
+                              width: 60 / studioList.length,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8D1AB),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
-                          Center(
-                            child: Container(
-                              width: 60, // Track ki poori width
-                              height: 8, // Track ki height
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1), // Background track ka color
-                                borderRadius: BorderRadius.circular(22),
-                              ),
-                              child: Stack(
-                                children: [
-                                  AnimatedPositioned(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                    // Calculation: Active index ke hisaab se position change hogi
-                                    left: (_activeStudioIndex * (80 / studioList.length)),
-                                    child: Container(
-                                      width: 60 / studioList.length, // Indicator ki width
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFE8D1AB), // Aapka beige color
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
                         ],
                       ),
                     ),
-                  ),
+                  )
+                ],
+              ),
+            ),
+          ),
                   const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -1010,6 +1097,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     ),
                   ),
                   const SizedBox(height: 30), // Thoda space stack look ke liye
+
                   GestureDetector(
                     onTap: () {
                       if (!_bookingSwipeController.isAnimating) {
@@ -1022,6 +1110,29 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         });
                       }
                     },
+
+                    onHorizontalDragEnd: (details) {
+                      if (_bookingSwipeController.isAnimating) return;
+
+                      if (details.primaryVelocity! < 0) {
+                        _bookingSwipeController.forward().then((_) {
+                          setState(() {
+                            _currentBookingIndex =
+                                (_currentBookingIndex + 1) % bookingList.length;
+                            _bookingSwipeController.reset();
+                          });
+                        });
+                      } else if (details.primaryVelocity! > 0) {
+                        _bookingSwipeController.forward().then((_) {
+                          setState(() {
+                            _currentBookingIndex =
+                                (_currentBookingIndex - 1 + bookingList.length) % bookingList.length;
+                            _bookingSwipeController.reset();
+                          });
+                        });
+                      }
+                    },
+
                     child: SizedBox(
                       height: 400,
                       child: AnimatedBuilder(
@@ -1132,12 +1243,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   const SizedBox(height: 10),
 
                   SizedBox(
-                    height: 280,
+                     height: 280,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: 3,
+                      itemCount: homeData?.featuredCreatives.length ?? 0,
                       itemBuilder: (context, index) {
-
+                        final data = homeData!.featuredCreatives[index];
                         /*  final item = featuredCreatives[index];
                       final int userId = item["id"];
                       bool isFavourite = favouriteUsers.contains(userId);*/
@@ -1146,136 +1257,80 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           child: Container(
                             width: 210,
                             height: 280,
+                            clipBehavior: Clip.antiAlias, // Ensures child contents don't bleed out of corners
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                            ),
                             child: Stack(
                               children: [
-
-                                /// IMAGE
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child
-                                      : Image.asset(
-                                    "assets/images/home1.png",
-                                    fit: BoxFit.cover,
+                                /// 1. FULL BACKGROUND IMAGE
+                                Positioned.fill(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(22),
+                                    child: data.profileImage.isNotEmpty
+                                        ? Image.network(
+                                      ApiService.imageURL + data.profileImage,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[900],
+                                          child: SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.scaleDown),
+                                        );
+                                      },
+                                    )
+                                        : SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.cover),
                                   ),
                                 ),
 
-                                /// BLACK GRADIENT
-                                Align(
-                                  alignment: Alignment.bottomCenter,
+                                /// 2. BOTTOM GRADIENT (The "Black Blur" effect for text readability)
+                                Positioned.fill(
                                   child: Container(
-                                    height: 110,
                                     decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.vertical(
-                                          bottom: Radius.circular(18)),
+                                      borderRadius: BorderRadius.circular(22),
                                       gradient: LinearGradient(
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
+                                        stops: const [0.4, 1.0], // Starts getting dark near the middle/bottom
                                         colors: [
                                           Colors.transparent,
-                                          Colors.black.withOpacity(0.8)
+                                          Colors.black
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
 
-                                /*     /// ONLINE DOT
-                                const Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: CircleAvatar(
-                                    radius: 6,
-                                    backgroundColor: Colors.green,
-                                  ),
-                                ),
 
-                                /// HEART ICON
+
+                                /// 5. BOTTOM CONTENT (Text & Buttons)
                                 Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child:     GestureDetector(
-                                    onTap: () async {
-                                      if (isFavourite) {
-                                        // ❌ REMOVE
-                                        setState(() {
-                                          favouriteUsers.remove(userId);
-                                        });
-
-                                        await _removeFavourite(userId);
-
-                                        _showFavouriteToast("Removed from Favourite");
-                                      } else {
-                                        // ✅ ADD
-                                        setState(() {
-                                          favouriteUsers.add(userId);
-                                        });
-
-                                        await _addFavourite(userId);
-
-                                        _showFavouriteToast("Added to Favourite");
-                                      }
-                                    },
-                                    child: Image.asset(
-                                      isFavourite
-                                          ? "assets/Icons/Heart_Angl_COLOR.png"
-                                          : "assets/images/Heart Angle.png",
-                                      height: 22,
-                                      width: 22,
-                                    ),
-                                  ),
-                                ),
-*/
-
-                                /// TEXT DATA
-                                Positioned(
-                                  bottom: 12,
+                                  bottom: 15,
                                   left: 12,
                                   right: 12,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.star,
-                                              color: Colors.yellow, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            "4.5",
-                                            style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      /// NAME
                                       Text(
-                                        "Angela Kia",
+                                        data.name,
                                         style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
+                                          color: ColorCode.white,
+                                          fontSize: 12,
+                                          fontFamily: "Helvetica Neue",
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-
-                                      const SizedBox(height: 2),
-
-                                      /// TITLE
                                       Text(
-                                        "Videography Specialist",
+                                        data.title ?? "Creative Professional",
                                         style: const TextStyle(
                                           color: Colors.white70,
-                                          fontSize: 11,
+                                          fontSize: 10,
+                                          fontFamily: "Helvetica Neue",
+                                          fontWeight: FontWeight.w400,
+
                                         ),
                                       ),
-
-                                      const SizedBox(height: 8),
-
+                                      const SizedBox(height: 12),
                                       Row(
                                         children: [
 
@@ -1288,13 +1343,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         HomeViewProfile(
-                                                            id: 2
+                                                            id:data.id
                                                         ),
                                                   ),
                                                 );
                                               },
                                               child: Container(
-                                                height: 30,
+                                                height: 35,
                                                 // 👈 FIX (important)
                                                 alignment: Alignment.center,
                                                 // 👈 center text
@@ -1322,7 +1377,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                                           /// 🔥 ICON BUTTON (CIRCLE)
                                           Container(
-
 
                                             child: Center(
                                               child: SvgPicture.asset(
@@ -1825,6 +1879,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                   // --- Top Creatives Section ---
                   Padding(
+                    key: topCreativeKey,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
                     child: Column(
@@ -1839,14 +1894,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             height: 1.2,
                           ),
                         ),
-
-
+                        const SizedBox(height: 10),
                         // AB YE CALL KAREIN:
                         _buildTopCreativesStack(context),
 
                       ],
                     ),
                   ),
+
                 ]
             )
           ],
@@ -1856,9 +1911,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       ),
     );
   }
-  Widget _buildCardbook() {
+  Widget _buildCardbook(Map<String, String> data) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 6),
+        margin: const EdgeInsets.symmetric(horizontal:12),
 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
@@ -1869,100 +1924,84 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
           width: 0.5, // 🔥 exact figma
         ),
 
-        /// 🔥 OPTIONAL SHADOW (aur premium)
-       /* boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          )
-        ],*/
+
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(22),
         child: Stack(
           children: [
 
             /// BACKGROUND
             Image.asset(
-              "assets/images/home_background.png",
+              data["bg"]!,
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
             ),
 
-            /// GRADIENT OVERLAY
-           /* Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.75),
-                      Colors.black.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
-              ),
-            ),*/
+
 
             /// RIGHT IMAGE
             Positioned(
-              right: -5,
+              right: -7,
               bottom: 0,
               top: 0,
-              child: ShaderMask(
-                shaderCallback: (bounds) {
-                  return const LinearGradient(
-                    colors: [Colors.transparent, Colors.black],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(bounds);
-                },
-                blendMode: BlendMode.dstIn,
-                child: Image.asset(
-                  "assets/images/man2.png",
-                  fit: BoxFit.cover,
-                  height: 180,
-                ),
+              child: Image.asset(
+                data["image"]!,
+                fit: BoxFit.fill,
+
               ),
             ),
 
             /// TEXT
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Find Your Perfect Creator\nAnywhere, Anytime.",
+                   Text(
+                    data["title"]!,
                     style: TextStyle(
                       color: ColorCode.white,
-                      fontSize: 16,
+                      fontSize: 11,
                       fontWeight: FontWeight.w500,
-
                       fontFamily: "Helvetica Neue"
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 11),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8D1AB),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      "Book a Shoot",
-                      style: TextStyle(
-                        color: ColorCode.kHeadingColor,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                  GestureDetector(
+                    onTap: () {
+                      if (data["button"] == "Book a Shoot") {
+                        // 🔥 New Screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ContentTypeScreen(), //
+                          ),
+                        );
+                      } else if (data["button"] == " Explore Creatives") {
+                        // 🔥 Scroll to Featured
+                        scrollTo(featuredKey);
+                      } else if (data["button"] == "Find Your Creative") {
+                        // 🔥 Scroll to Top Creatives
+                        scrollTo(topCreativeKey);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8D1AB),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        data["button"]!,
+                        style: TextStyle(
+                          color: ColorCode.kHeadingColor,
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   )
@@ -1975,8 +2014,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
   Widget _buildBookingCard(int index) {
-    final booking = bookingList[index % bookingList.length]; // ✅ SAFE
 
+    final booking = bookingList[index % bookingList.length];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(18),
@@ -1998,8 +2037,15 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
           /// IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              booking['image']!,
+            child: booking.imageUrl != null && booking.imageUrl!.isNotEmpty
+                ? Image.network(
+              ApiService.imageURL + booking.imageUrl!,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            )
+                : Image.asset(
+              "assets/svg/imag_placeholder.svg",
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -2010,7 +2056,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
           /// TITLE
           Text(
-            booking['title']!,
+            booking.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -2025,7 +2071,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
             children: [
               const Icon(Icons.calendar_today, color: Colors.white54, size: 18),
               const SizedBox(width: 8),
-              Text(booking['date']!,
+              Text(
+              booking.eventDate ?? "",
                   style: const TextStyle(color: Colors.white70)),
             ],
           ),
@@ -2037,7 +2084,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
             children: [
               const Icon(Icons.access_time, color: Colors.white54, size: 18),
               const SizedBox(width: 8),
-              Text(booking['time']!,
+              Text(
+                  "${booking.startTime ?? ""} - ${booking.endTime ?? ""}",
                   style: const TextStyle(color: Colors.white70)),
             ],
           ),
@@ -2235,58 +2283,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                 width: double.infinity,
                 height: double.infinity),
           ),
-
-          // Green Online Dot
-          /*  Positioned(
-            top: 18, left: 18,
-            child: Container(
-              width: 12, height: 12,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.greenAccent, blurRadius: 8)],
-              ),
-            ),
-          ),*/
-
-          // Heart/Favorite Icon
-       /*   const Positioned(
-            top: 15, right: 18,
-            child: Icon(Icons.favorite_border, color: Colors.white, size: 24),
-          ),*/
-
-
-          // Rating and Price Overlay
-          /*   Positioned(
-            bottom: 20, left: 18, right: 18,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Rating Pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(18)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
-                      const SizedBox(width: 5),
-                      Text(data['rating']!, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                // Price
-                Text(
-                  "From ${data['price']}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ],
-            ),
-          ),*/
         ],
       ),
     );
@@ -2342,12 +2338,42 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   }
 
   Widget _buildTopCreativesStack(BuildContext context) {
+    final list = homeData?.mainCreatives ?? [];
+    // if (list.isEmpty) return const SizedBox();
+
     return GestureDetector(
       onTap: () {
-        if (!_swipeController.isAnimating) {
+        if (_swipeController.isAnimating) return;
+
+        _swipeController.forward().then((_) {
+          setState(() {
+            _currentCreativeIndex =
+                (_currentCreativeIndex + 1) % list.length;
+            _swipeController.reset();
+          });
+        });
+      },
+
+      onHorizontalDragEnd: (details) {
+        if (_swipeController.isAnimating) return;
+
+        // 👉 LEFT
+        if (details.primaryVelocity! < 0) {
           _swipeController.forward().then((_) {
             setState(() {
-              _currentCreativeIndex = (_currentCreativeIndex + 1) % creatives.length;
+              _currentCreativeIndex =
+                  (_currentCreativeIndex + 1) % list.length;
+              _swipeController.reset();
+            });
+          });
+        }
+
+        // 👉 RIGHT
+        else if (details.primaryVelocity! > 0) {
+          _swipeController.forward().then((_) {
+            setState(() {
+              _currentCreativeIndex =
+                  (_currentCreativeIndex - 1 + list.length) % list.length;
               _swipeController.reset();
             });
           });
@@ -2359,51 +2385,51 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         child: AnimatedBuilder(
           animation: _swipeController,
           builder: (context, child) {
-            double slide = _swipeController.value * -600;
+            double slide = _swipeController.value * 700;
             double rotate = _swipeController.value * 0.4;
             double opacity = 1 - _swipeController.value;
 
             return Stack(
               alignment: Alignment.center,
               children: [
-                // --- 3. SABSE PICHE WALA CARD (Back Card) ---
+                // --- 3. BACK CARD (Slightly more tilt to the right) ---
                 Transform.translate(
-                  offset: const Offset(0, -40), // 👈 Thoda aur upar
+                  offset: const Offset(0, -45),
                   child: Transform.rotate(
-                    angle: 0.08, // Right Tilt
+                    angle: 0.06,
                     child: Transform.scale(
-                      scale: 0.85, // 👈 Sabse chota scale
+                      scale: 0.88,
                       child: Opacity(
                         opacity: 0.3,
-                        child: _buildCreativeCard((_currentCreativeIndex + 2) % creatives.length),
+                        child: _buildCreativeCard((_currentCreativeIndex + 2) % list.length),
                       ),
                     ),
                   ),
                 ),
 
-                // --- 2. BEECH WALA CARD (Middle Card) ---
+                // --- 2. MIDDLE CARD (Slight tilt to the left) ---
                 Transform.translate(
-                  offset: const Offset(0, -20),
+                  offset: const Offset(0, -25),
                   child: Transform.rotate(
-                    angle: -0.06, // Left Tilt
+                    angle: -0.04,
                     child: Transform.scale(
-                      scale: 0.92, // 👈 Medium scale
+                      scale: 0.94,
                       child: Opacity(
                         opacity: 0.6,
-                        child: _buildCreativeCard((_currentCreativeIndex + 1) % creatives.length),
+                        child: _buildCreativeCard((_currentCreativeIndex + 1) % list.length),
                       ),
                     ),
                   ),
                 ),
 
-                // --- 1. MAIN TOP INTERACTIVE CARD ---
+                // --- 1. FRONT INTERACTIVE CARD ---
                 Transform.translate(
                   offset: Offset(0, slide),
                   child: Transform.rotate(
                     angle: rotate,
                     child: Opacity(
                       opacity: opacity,
-                      child: _buildCreativeCard(_currentCreativeIndex),
+                      child: _buildCreativeCard(_currentCreativeIndex % list.length),
                     ),
                   ),
                 ),
@@ -2415,17 +2441,22 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
   Widget _buildCreativeCard(int index) {
-    final item = creatives[index];
+    final item = homeData!.mainCreatives[index];
+
 
     return Container(
       height: 400, // Card ki apni height
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(45), // 👈 Zyada rounded corners premium dikhte hain
+        border: Border.all(color: ColorCode.kGoldBorder50,width: 0.5),
+        borderRadius: BorderRadius.circular(40),
         image: DecorationImage(
-          image: AssetImage(item["img"]!),
+          image: NetworkImage(
+            ApiService.imageURL + item.profileImage,
+          ),
           fit: BoxFit.cover,
         ),
+
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -2435,7 +2466,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(45),
+        borderRadius: BorderRadius.circular(40),
         child: Stack(
           children: [
             // Gradient Overlay
@@ -2443,7 +2474,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
+                    begin: Alignment.topRight,
                     end: Alignment.bottomCenter,
                     stops: const [0.3, 0.9],
                     colors: [
@@ -2466,7 +2497,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                   // Name & Bio
                   Text(
-                    item["name"]!,
+                    item.name,
                     style: const TextStyle(
                       color: ColorCode.white,
                       fontSize: 22, // Headline size
@@ -2476,7 +2507,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item["bio"]!,
+                    item.title ?? "Creative Professional",
                     style: const TextStyle(
                       color: ColorCode.kWhiteOpacity70,
                       fontSize: 14,
@@ -2489,20 +2520,33 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                   const SizedBox(height: 25),
 
                   // View Profile Button
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ColorCode.kButtonColor,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Text(
-                      "View Profile",
-                      style: TextStyle(
-                        color: ColorCode.black,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        fontFamily: "Helvetica Neue ",
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HomeViewProfile(
+                                  id:item.id
+                              ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: ColorCode.kButtonColor,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Text(
+                        "View Profile",
+                        style: TextStyle(
+                          color: ColorCode.black,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          fontFamily: "Helvetica Neue",
 
+                        ),
                       ),
                     ),
                   ),
@@ -2515,118 +2559,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
 }
-Widget creativeCard() {
-  return Container(
-    // margin: const EdgeInsets.only(right: 15),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(40),
-     /* image: const DecorationImage(
-        image: NetworkImage("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop"), // Apni image link daalein
-        fit: BoxFit.cover,
-      ),*/
-    ),
-    child: Stack(
-      children: [
-        // Dark overlay for text readability
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.black.withOpacity(0.6),
-              ],
-            ),
-          ),
-        ),
 
-        Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Row: Online dot and Rating
-              Row(
-                children: [
-                  // Green Dot
-                  Container(
-                    height: 12,
-                    width: 12,
-                    decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.green, blurRadius: 10)]
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Rating Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.star, color: Colors.yellow, size: 16),
-                        SizedBox(width: 4),
-                        Text("4.5 (120)", style: TextStyle(color: Colors.white, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const Spacer(), // Content ko niche dhakelne ke liye
-
-              // Name
-              const Text(
-                "Ethan Cole",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Unbounded",
-                ),
-              ),
-
-              // Bio
-              const Text(
-                "Model, Entrepreneur & Media\nPersonality.",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // View Profile Button
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5D1B2), // Beige color from image
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Text(
-                  "View Profile",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
 Widget _buildItem(IconData icon, String title, String subtitle) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
