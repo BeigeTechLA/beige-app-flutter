@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -7,14 +10,36 @@ import '../../../utility/ColorCode.dart';
 import 'Video_Shoot_Type.dart';
 
 class ContentTypeScreen extends StatefulWidget {
+  final int? value;
   final int ?specialtyId;
-  const ContentTypeScreen({super.key,  this.specialtyId});
+  const ContentTypeScreen({super.key,  this.specialtyId, this.value});
 
   @override
   State<ContentTypeScreen> createState() => _ContentTypeScreenState();
 }
 
 class _ContentTypeScreenState extends State<ContentTypeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.value!=null){
+      selectedContentTypeIds=[widget.value!];
+
+      debugPrint("value is: ${widget.value.toString()}");
+
+    }
+    if(widget.value==null){
+      selectedContentTypeIds=[];
+
+      debugPrint("value is: ${widget.value.toString()}");
+
+    }
+
+
+  }
+
+
 
 
   String? selectedContentType;
@@ -89,6 +114,75 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     }
   }
 
+
+
+
+/*  Future<void> _handleSelection(int contentTypeId) async {
+
+    setState(() {
+      selectedContentTypeIds = contentTypeId == 3 ? [1,2] : [contentTypeId];
+    });
+
+    /// Select All → API nahi
+    if (contentTypeId != 3) {
+      await _callBookingApi(contentTypeId);
+    } else {
+      setState(() {
+        isShootTypeLoaded = true;
+      });
+    }
+
+    if (!isShootTypeLoaded) return;
+
+    int contentTypeToSend = contentTypeId == 3 ? 3 : contentTypeId;
+
+    final body = {
+      "specialty_id": widget.specialtyId,
+      "content_type": contentTypeToSend,
+      if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
+        "shoot_type_id": shootTypeIds.first,
+    };
+
+    try {
+      final response =
+      await ApiService().postData(ApiEndpoints.booking, body);
+
+      final bookingId = response['data']?['booking_id'];
+
+      if (response != null && response['error'] == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoShootType(
+              contentTypeId: contentTypeToSend,
+              bookingId: bookingId,
+            ),
+          ),
+        );
+      }
+
+    } catch (e) {
+      debugPrint("❌ Error → $e");
+    }
+  }*/
+
+  // void _handleSelection(int contentTypeId) {
+  //   setState(() {
+  //
+  //     /// SELECT ALL
+  //     if (contentTypeId == 3) {
+  //       selectedContentTypeIds = [1, 2];
+  //       return;
+  //     }
+  //
+  //     /// NORMAL MULTI SELECT
+  //     if (selectedContentTypeIds.contains(contentTypeId)) {
+  //       selectedContentTypeIds.remove(contentTypeId);
+  //     } else {
+  //       selectedContentTypeIds.add(contentTypeId);
+  //     }
+  //   });
+  // }
   void _handleSelection(int contentTypeId) {
     setState(() {
       if (contentTypeId == 3) {
@@ -109,6 +203,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       }
     });
   }
+
+
 
   Future<void> _continueBooking() async {
 
@@ -275,8 +371,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage: "assets/newbookflow/Selectall_active.svg",
-                          inactiveImage: "assets/newbookflow/Selectall_non.svg",
+                          activeImage:"assets/new_home/select_all.png",
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -284,10 +379,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// VIDEOGRAPHY
                         _buildOption(
                           title: "Videography",
-                          activeImage:
-                          "assets/newbookflow/Videography_active.svg",
-                          inactiveImage:
-                          "assets/newbookflow/Videography_non.svg",
+                          activeImage:"assets/new_home/video2.png",
+                          // inactiveImage: images.videography,
                           value: selectedContentTypeIds.contains(1),
                           onTap: () => _handleSelection(1),
                         ),
@@ -295,10 +388,19 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage: "assets/newbookflow/Photography_actvie.svg",
-                          inactiveImage: "assets/newbookflow/Photography_non.svg",
+                          activeImage:"assets/new_home/photo_new.png",
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
+                        ),
+
+                        _buildOption(
+                          title: "Studios (Coming Soon)",
+                          value: false,
+                          isDisabled: true,
+                          // activeImage: "assets/newbookflow/Editing_actvie.svg",
+                          // inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          activeImage:"assets/new_home/stuido_new.png",
+                          onTap: null,
                         ),
 
                         /// EDITING
@@ -306,8 +408,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Editing Only (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/Editing_actvie.svg",
-                          inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          // activeImage: "assets/newbookflow/Editing_actvie.svg",
+                          // inactiveImage: "assets/newbookflow/Editing_non.svg",
+                          activeImage:"assets/new_home/edit_new.png",
                           onTap: null,
                         ),
 
@@ -316,8 +419,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           title: "Livestreaming (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage: "assets/newbookflow/Livestreaming_active.svg",
-                          inactiveImage: "assets/newbookflow/Livestreaming_non.svg",
+                          // activeImage: "assets/newbookflow/Livestreaming_active.svg",
+                          // inactiveImage: "assets/newbookflow/Livestreaming_non.svg",
+                          activeImage:"assets/new_home/Livestream_new.png",
                           onTap: null,
                         ),
 
@@ -341,7 +445,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                               "Continue",
                               style: TextStyle(
                                 color: ColorCode.k1D1D1B_Opacity70,
-                                fontSize: 11,
+                                fontSize: 12,
                                 fontFamily: 'Outfit',
                                 fontWeight: FontWeight.bold,
                               ),
@@ -366,7 +470,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   Widget _buildOption({
     required String title,
     required String activeImage,
-    required String inactiveImage,
+    // required String inactiveImage,
     required bool value,
     required VoidCallback? onTap,
     bool isDisabled = false,
@@ -385,11 +489,29 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorCode.kIconBackground,
+                color: isDisabled?
+                Color(0xff171717).withOpacity(0.3):
+
+                ColorCode.kIconBackground,
               ),
+              // child: Center(
+              //   child: SvgPicture.asset(
+              //     value ? activeImage : inactiveImage,
+              //   ),
+              // ),
               child: Center(
-                child: SvgPicture.asset(
-                  value ? activeImage : inactiveImage,
+                child: ImageFiltered(
+                  imageFilter: isDisabled
+                      ? ImageFilter.blur(sigmaX: 0.6, sigmaY: 0.6)
+                      : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                  child: Opacity(
+                    opacity: isDisabled ? 0.7 : 1,
+                    child: Image.asset(
+                      width: 30,
+                      height: 22,
+                      value ? activeImage : activeImage,
+                    ),
+                  ),
                 ),
               ),
             ),

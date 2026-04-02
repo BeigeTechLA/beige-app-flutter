@@ -220,6 +220,7 @@ String getContentTypeTitle(int contentTypeId) {
     return Scaffold(
 
       appBar: AppBar(
+
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
