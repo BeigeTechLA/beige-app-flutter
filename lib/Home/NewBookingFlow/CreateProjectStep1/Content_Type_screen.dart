@@ -29,12 +29,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       debugPrint("value is: ${widget.value.toString()}");
 
     }
-    if(widget.value==null){
-      selectedContentTypeIds=[-1];
 
-      debugPrint("value is: ${widget.value.toString()}");
-
-    }
 
 
   }

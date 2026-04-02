@@ -20,34 +20,9 @@ class Mainscreen extends StatefulWidget {
 class _MainscreenState extends State<Mainscreen> {
   int _selectedIndex = 0;
 
-  int? selectedvalue;
-
-  Widget _getPage() {
-    switch (_selectedIndex) {
-      case 0:
-        return NewHomeScreen(onTabChange: changeTab);
-
-      case 1:
-        return ContentTypeScreen(value: selectedvalue); // ✅ fresh value
-
-      case 2:
-        return BookingAllScreen();
-
-      default:
-        return Center(child: Text("Message"));
-    }
-  }
-
-  void changeTab(int index, int value) {
-    setState(() {
-      _selectedIndex = index;
-      selectedvalue = value; // ✅ ab correct
-    });
-  }
-
-  late final List<Widget> _pages = [
-    NewHomeScreen(onTabChange: changeTab), // 👈 yaha pass kiya
-    ContentTypeScreen(value: selectedvalue,),
+  final List<Widget> _pages = [
+    NewHomeScreen(),
+    ContentTypeScreen(),
     BookingAllScreen(),
     Center(child: Text("Message")),
   ];
@@ -58,8 +33,7 @@ class _MainscreenState extends State<Mainscreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: _getPage(),
-      //body: _pages[_selectedIndex],
+      body: _pages[_selectedIndex],
 
       // ⭐ No overflow — BottomNavigationBar directly use
       /*  bottomNavigationBar: BottomNavigationBar(
@@ -176,12 +150,6 @@ class _MainscreenState extends State<Mainscreen> {
 
               onTap: (index) {
                 setState(() {
-                  if(index==1){
-                    selectedvalue=null;
-                  }
-
-
-
                   _selectedIndex = index;
                 });
               },

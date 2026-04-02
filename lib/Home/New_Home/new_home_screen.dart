@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../Model/HomeModel.dart';
+import '../../MyProfile/my_profile.dart';
+import '../../service/api_service.dart';
 import '../HomeSekect/Home_view_profile.dart';
+import '../HomeSekect/change_location_screen.dart';
 import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import 'home_controller .dart';
 
 class NewHomeScreen extends StatefulWidget {
-  final Function(int,int)? onTabChange; // 👈 add this
-
-  const NewHomeScreen({super.key, this.onTabChange});
+  const NewHomeScreen({super.key});
 
   @override
   State<NewHomeScreen> createState() => _NewHomeScreenState();
@@ -20,6 +21,9 @@ class NewHomeScreen extends StatefulWidget {
 class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateMixin {
 
   final HomeController controller = HomeController();
+  final GlobalKey featuredKey = GlobalKey();
+  final GlobalKey topCreativeKey = GlobalKey();
+  List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
 
   HomeModel? homeData;
   bool isLoading = true;
@@ -33,6 +37,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   late PageController _cardController;
   int _currentBookingIndex = 0;
   late AnimationController _bookingSwipeController;
+  late AnimationController _borderController;
 
   final PageController _inspiredController = PageController(
     initialPage: 1000,
@@ -51,49 +56,50 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     if (data != null) {
       setState(() {
         homeData = data;
+
         isLoading = false;
       });
     } else {
       setState(() => isLoading = false);
     }
   }
-  void showTopToast(BuildContext context, String message) {
-    OverlayEntry? overlayEntry;
 
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-color: Colors.white,              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              message,
-              style: TextStyle(color: Colors.black54),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
 
-    Overlay.of(context).insert(overlayEntry);
-
-    // ⏱ Auto remove after 2 sec
-    Future.delayed(Duration(seconds: 2), () {
-      overlayEntry?.remove();
-    });
+  void scrollTo(GlobalKey key) {
+    final context = key.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    }
   }
   // --- DATA LISTS FOR TEXT & COLORS ---
   final List<String> _searchTexts = [
     "I want a Wedding Photographer",
-    "Corporate Event Photos",
-    "Birthday Party Shoot",
+    "I want a Wedding Vidoegrapher",
+  ];
+
+  final List<Map<String, String>> cardData = [
+    {
+      "bg": "assets/new_home/Group 2087329746.png",
+      "image": "assets/new_home/home_book1.png",
+      "title": "Find Your Perfect Creator\nAnywhere, Anytime.",
+      "button": "Book a Shoot",
+    },
+    {
+      "bg": "assets/new_home/homebackground_new.png",
+      "image": "assets/new_home/home_book_2.png",
+      "title": "Trusted by Leading\nBrands.",
+      "button": " Explore Creatives",
+    },
+    {
+      "bg": "assets/new_home/homebackground_new.png",
+      "image": "assets/new_home/home_book3.png",
+      "title": "Instant Pricing &\nIntelligent Matchmaking.",
+      "button": "Find Your Creative",
+    },
   ];
   final List<String> featuredNames = [
     "Alec H",
@@ -163,22 +169,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
     },
   ];
 
-  final List<Map<String, String>> bookingList = [
-    {
-      "image": "assets/new_home/photo.png", // Apni booking image dalein
-      "title": "Wedding Photography",
-      "date": "16 Jun, 2024",
-      "time": "10:00 PM to 13:00 PM",
-      "status": "Completed"
-    },
-    {
-      "image": "assets/new_home/Editing.png",
-      "title": "Corporate Shoot",
-      "date": "20 Jun, 2024",
-      "time": "11:00 AM to 02:00 PM",
-      "status": "Pending"
-    },
-  ];
+
 
   List<Map<String, String>> creatives = [
     {
@@ -197,14 +188,21 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
       "img": "assets/images/Nathan+Grant.png"
     },
   ];
+
+
+
   final PageController _studioController = PageController(
       viewportFraction: 0.75);
   int _activeStudioIndex = 0;
+
+
   final PageController _pageController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65, // Isse side ke cards screen ke paas aayenge
 
   );
+
+
   final List<Color> _textColors = [
     Colors.white.withOpacity(0.5), // Wedding ke liye normal white
     const Color(0xFFE8D1AB), // Corporate ke liye aapka golden color
@@ -221,6 +219,10 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
       duration: const Duration(seconds: 10),
     )
       ..repeat();
+    _borderController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(); // 🔥 continuous animation
 
     _swipeController = AnimationController( // ✅ ADD THIS
       vsync: this,
@@ -230,10 +232,10 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
       viewportFraction: 0.82, // 👈 right side card visible
     );
 
-    _cardController = PageController(viewportFraction: 0.8);
+    _cardController = PageController(viewportFraction: 0.88);
     _bookingSwipeController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 400),
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
     );
   }
 
@@ -243,6 +245,8 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
     _swipeController.dispose(); // ✅ MUST
     _inspiredController.dispose(); // ✅ ADD THIS
     _bookingSwipeController.dispose();
+    _borderController.dispose();
+
     super.dispose();
   }
 
@@ -250,58 +254,80 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
             Stack(
-              alignment: Alignment.bottomCenter,
-              clipBehavior: Clip.none,
-              children: [
+            alignment: Alignment.bottomCenter,
+            clipBehavior: Clip.none,
+            children: [
 
-                // --- 1. ANIMATED BORDER SECTION ---
-                AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return CustomPaint(
-                      painter: BorderAnimationPainter(_controller.value,),
-                      child: child,
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 60, 20, 95),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF1C1C1C),
-                      borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
+              // --- 1. ANIMATED BORDER SECTION ---
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: BorderAnimationPainter(_controller.value,),
+                    child: child,
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 80),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF1C1C1C),
+                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
 
-                      // ✅ IMAGE ADDED HERE
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/mappp.png"), // Aapki image ka path
-                         // opacity: 0.2, // Subtle look ke liye opacity kam rakhi hai
-                        fit: BoxFit.none,
-                      ),
+                    // ✅ IMAGE ADDED HERE
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/mappp.png"), // Aapki image ka path
+                      // opacity: 0.2, // Subtle look ke liye opacity kam rakhi hai
+                      fit: BoxFit.contain,
+                      alignment: Alignment(0, 0.7),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text("Hello Divaish 👋,",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 22,
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.w500)),
-                                  const SizedBox(height: 4),
-                                  Row(
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Hello ${homeData?.name ?? "User"} 👋",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                GestureDetector(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const ChangeLocationScreen(),
+                                      ),
+                                    );
+
+                                    if (result != null && result is Map<String, dynamic>) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                      fetchData();
+                                    }
+                                  },
+                                  child: Row(
                                     children: [
                                       Flexible(
-                                          child: Text("Westheimer Santa Ana, Illinois",
+                                          child:
+                                          Text(
+                                              homeData?.location ?? "Loading...",
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
                                                   color: Colors.white.withOpacity(0.6),
@@ -310,94 +336,896 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
                                       const Icon(Icons.expand_more,
                                           color: Colors.white, size: 20),
                                     ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            // Profile Pill
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Colors.white.withOpacity(0.08),
-                                border: Border.all(
-                                    color: const Color(0xFFE8D1AB).withOpacity(0.3),
-                                    width: 0.5),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10),
-                                    child: Icon(Icons.notifications_none_rounded,
-                                        color: Colors.white, size: 26),
                                   ),
-                                  const CircleAvatar(
-                                      radius: 20,
-                                      backgroundImage: AssetImage("assets/images/home2.png"))
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 60),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // --- 2. DYNAMIC SEARCH BAR (Text & Color Change) ---
-                Positioned(
-                  bottom: -25,
-                  child: Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.85,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF282828),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                          color: const Color(0xFFE8D1AB).withOpacity(0.4),
-                          width: 0.5),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8))
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        // Logic to change text based on animation progress
-                        int index = (_controller.value * _searchTexts.length)
-                            .floor() % _searchTexts.length;
-
-                        return AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 800),
-                          // Smooth Fade
-                          child: Text(
-                            _searchTexts[index],
-                            key: ValueKey<int>(index),
-                            // Key badalne par hi animation hoga
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: _textColors[index], // DYNAMIC COLOR
-                              fontSize: 15,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
+                                )
+                              ],
                             ),
                           ),
+                          // Profile Pill
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.white.withOpacity(0.08),
+                              border: Border.all(
+                                  color: const Color(0xFFE8D1AB).withOpacity(0.3),
+                                  width: 0.5),
+                            ),
+                            child: Row(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Icon(Icons.notifications_none_rounded,
+                                      color: Colors.white, size: 26),
+                                ),
+                                GestureDetector(
+                                  onTap: () async{
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const MyProfile(),
+                                      ),
+                                    );
+                                    fetchData();
+                                  },
+
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundColor: Colors.transparent,
+                                    child: ClipOval(
+                                      child: homeData != null &&
+                                          homeData!.profileImageUrl.isNotEmpty
+                                          ? Image.network(
+                                        ApiService.imageURL + homeData!.profileImageUrl,
+                                        /* width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,*/
+                                      )
+                                          : SvgPicture.asset(
+                                        "assets/svg/persone.svg",
+                                        /* width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,*/
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 60),
+                    ],
+                  ),
+                ),
+              ),
+
+              // --- 2. DYNAMIC SEARCH BAR (Text & Color Change) ---
+              Positioned(
+                bottom: -20,
+                child: Container(
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.70,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF282828),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                        color: const Color(0xFFE8D1AB).withOpacity(0.4),
+                        width: 0.5),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.4),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8))
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      // Logic to change text based on animation progress
+                      int index = (_controller.value * _searchTexts.length)
+                          .floor() % _searchTexts.length;
+
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 800),
+                        // Smooth Fade
+                        child: Text(
+                          _searchTexts[index],
+                          key: ValueKey<int>(index),
+                          // Key badalne par hi animation hoga
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: _textColors[index], // DYNAMIC COLOR
+                            fontSize: 15,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white24,
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            // --- 1. PROMO BANNER ---
+            SizedBox(
+            height: 160,
+            child: PageView.builder(
+              controller: _cardController,
+              itemCount: 1000, // 🔥 infinite feel
+              onPageChanged: (index) {
+                setState(() {
+                  _currentCard = index % cardData.length; // 👈 loop indicator
+                });
+              },
+              itemBuilder: (context, index) {
+                final data = cardData[index % cardData.length]; // 👈 loop data
+                return _buildCardbook(data);
+              },
+            ),
+          ),
+          // Banner Dots Indicator
+          Transform.translate(
+            offset: const Offset(0, -7), // 🔥 thoda aur upar (perfect alignment)
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1F1F1F),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    )
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (index) {
+                    bool isActive = index == _currentCard;
+
+                    return GestureDetector(
+                      onTap: () {
+                        _cardController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
                         );
                       },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeInOut,
+
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+
+                        height: 6, // 🔥 thoda better thickness
+                        width: isActive ? 26 : 14, // 🔥 smooth pill effect
+
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? const Color(0xFFE8D1AB)
+                              : Colors.white.withOpacity(0.25),
+
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white24,
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // --- 2. EXPLORE SERVICES SECTION ---
+          Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Explore Services",
+                  style: TextStyle(color: ColorCode.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Unbounded",
+                    height: 1.2,
+                  ),
+
+
+                ),
+                SvgPicture.asset(
+                  "assets/svg/home_vecto.svg",
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Services Horizontal List
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: 10),
+            child: Row(
+              children: [
+
+                _buildServiceCard(
+                    "Photo", "assets/new_home/photo_new.png", false),
+                // Isme purple badge aayega
+                _buildServiceCard(
+                    "Video", "assets/new_home/Image_fx (5) 1.png", false),
+                _buildServiceCard(
+                    "Editing", "assets/new_home/edit_new.png", false),
+                _buildServiceCard(
+                    "Livestream", "assets/new_home/Livestream_new.png", false),
+                _buildServiceCard(
+                    "studio", "assets/new_home/stuido_new.png", false),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white24,
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Continue Your Booking",
+                  style: TextStyle(color: ColorCode.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Unbounded",
+                    height: 1.2,
+                  ),
+
+
+                ),
+
+              ],
+            ),
+          ),
+
+
+          // Main Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            margin: EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8D1AB), // Tan/Beige background
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Column(
+              children: [
+                // Top Row: Image and Text Info
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png",
+                        // Replace with your image
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                      ),
                     ),
+                    const SizedBox(width: 15),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Wedding Photography",
+                            style: TextStyle(
+                              color: ColorCode.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "HelveticaNeue",
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Step 2 of 3: Select Creative",
+                            style: TextStyle(
+                              color: ColorCode.kBlackOpacity70,
+                              fontSize: 15,
+                              fontFamily: "Outfit",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 25),
+
+                // Progress Indicators
+                Row(
+                  children: [
+                    _buildProgressBar(isActive: true),
+                    const SizedBox(width: 8),
+                    _buildProgressBar(isActive: false),
+                    const SizedBox(width: 8),
+                    _buildProgressBar(isActive: false),
+                  ],
+                ),
+
+                const SizedBox(height: 25),
+
+                // Resume Button
+                Container(
+                  width: double.infinity,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: ColorCode.kHeadingColor, // Dark background
+                    borderRadius: BorderRadius.circular(23),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Resume",
+                        style: TextStyle(
+                          color: ColorCode.kButtonColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: "Unbounded",
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.arrow_forward,
+                        color: ColorCode.kButtonColor,
+                        size: 24,
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 40),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white24,
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            key: featuredKey,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Featured Creatives",
+                  style: TextStyle(color: ColorCode.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Unbounded",
+                    height: 1.2,
+                  ),
 
+                ),
+
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            // color: ColorCode.red,
+            child: SizedBox(
+              height: 280,
+              child: AnimatedBuilder(
+                animation: _pageController,
+                builder: (context, child) {
+                  return PageView.builder(
+                    controller: _pageController,
+                    clipBehavior: Clip.none,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final int actualIndex = index %
+                          featuredImages.length;
+
+                      double page = _pageController.hasClients
+                          ? _pageController.page ??
+                          _initialPage.toDouble()
+                          : _initialPage.toDouble();
+
+                      double difference = (index - page);
+
+                      // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
+                      double perspective = 0.0028;
+
+                      // 2. Rotation Logic (Blue box jaisa effect):
+                      // Right waali image (difference > 0) ke liye positive rotation
+                      // jisse uska right side peeche jaye.
+                      double rotation = difference *
+                          0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
+                      rotation = rotation.clamp(-0.8, 0.9);
+
+                      // 3. Scale & Opacity
+                      double scale = (1 - (difference.abs() * 0.10))
+                          .clamp(0.0, 1.0);
+                      double opacity = (1 - (difference.abs() * 0.10))
+                          .clamp(0.6, 2.0);
+
+                      // 4. Translate (Cards ko center ke paas laane ke liye)
+                      // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
+                      double translateX = difference * -100;
+
+                      return Opacity(
+                        opacity: opacity,
+                        child: Transform(
+                          // Alignment center se hi 3D look sabse acha aata hai
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, perspective) // 3D depth
+                            ..translate(translateX) // Paas lane ke liye
+                            ..rotateY(
+                                rotation) // Aapke blue box jaisa fold karne ke liye
+                            ..scale(scale), // Chota karne ke liye
+                          child: teamCard(
+                            image: featuredImages[actualIndex],
+                            name: featuredNames[actualIndex],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+
+              ),
+            ),
+          ),
+
+          Stack(
+            alignment: Alignment.center,
+
+            children: [
+              CustomPaint(
+                size: Size(MediaQuery
+                    .of(context)
+                    .size
+                    .width, 70),
+                painter: BeveledTrayPainter(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12), // Bevel height jitna ya thoda zyada
+
+                child: AnimatedBuilder(
+                  animation: _pageController,
+                  builder: (context, child) {
+                    // Current page calculate karne ke liye (Looping ke liye modulo use kiya hai)
+                    double page = 0;
+                    if (_pageController.hasClients) {
+                      page =
+                          _pageController.page ?? _initialPage.toDouble();
+                    } else {
+                      page = _initialPage.toDouble();
+                    }
+                    int activeIndex = page.round() %
+                        featuredImages.length;
+
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(featuredImages.length, (
+                          index) {
+                        bool isActive = index == activeIndex;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 4),
+                          height: 7,
+                          width: 7,
+                          // Round dots ke liye height/width same rakhi hai
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            // Active dot beige hai, baki dark grey
+                            color: isActive
+                                ? const Color(0xFFE8D1AB)
+                                : Colors.white.withOpacity(0.2),
+                            boxShadow: isActive ? [
+                              BoxShadow(
+                                color: const Color(0xFFE8D1AB)
+                                    .withOpacity(0.4),
+                                blurRadius: 4,
+                              )
+                            ] : [],
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                ),
+              ),
+            ],
+
+          ),
+          const SizedBox(height: 10),
+
+
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: BorderAnimationPainter(_controller.value),
+                child: child,
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 40, bottom: 69, left: 15, right: 15),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  // Stops ko correct kiya hai smooth look ke liye
+                  stops: const [0.0, 0.7],
+                  colors: [
+                    const Color(0xFFE8D1AB),
+                    const Color(0xFF0D0D0D),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(45),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    "Beige Studios",
+
+                    style: TextStyle(
+                      color: Color(0x29000000),
+                      fontSize: 35,
+                      fontWeight: FontWeight.w900, // Extra Bold look
+                      fontFamily: "Unbounded",
+                    ),),
+
+
+                  // Carousel Section
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: SizedBox(
+                      height: 350, // Height thodi badhayi hai
+                      child: PageView.builder(
+                        controller: _studioController, // Isme viewportFraction: 0.75 hona chahiye
+                        clipBehavior: Clip.none, // Taaki side images cut na ho
+                        onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
+                        itemBuilder: (context, index) {
+                          final int actualIndex = index % studioList.length;
+                          return AnimatedBuilder(
+                            animation: _studioController,
+                            builder: (context, child) {
+                              double scale = 1.0;
+                              double translate = 0;
+
+                              if (_studioController.position.haveDimensions) {
+                                double page = _studioController.page!;
+                                double diff = (index - page);
+                                // Scale logic for smooth effect
+                                scale = (1 - (diff.abs() * 0.15)).clamp(0.8, 1.0);
+                                translate = diff.abs() * 10;
+                              } else {
+                                // Initial state for first build
+                                if(index != 0) scale = 0.85;
+                              }
+
+                              return Center(
+                                child: Transform.translate(
+                                  offset: Offset(0, translate),
+                                  child: Transform.scale(
+                                    scale: scale,
+                                    child: _buildStudioCard(studioList[actualIndex]),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Studio Info
+                  Text(
+                    studioList[_activeStudioIndex]['name']!,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+
+                  // Agar address ya description hai to:
+                  if(studioList[_activeStudioIndex]['desc'] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Text(
+                        studioList[_activeStudioIndex]['desc']!,
+                        style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                      ),
+                    ),
+
+                  const SizedBox(height: 25),
+
+                  // Divider Line
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Divider(color: Colors.white.withOpacity(0.1), thickness: 1),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Custom Page Indicator
+                  Center(
+                    child: Container(
+                      width: 60,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Stack(
+                        children: [
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            // Indicator smooth move hoga
+                            left: (_activeStudioIndex * (60 / studioList.length)),
+                            child: Container(
+                              width: 60 / studioList.length,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE8D1AB),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white24,
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // --- YOUR BOOKINGS SECTION (STACK SWIPE UI) ---
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Your Bookings",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Unbounded",
+                  ),
+                ),
+                SvgPicture.asset(
+                  "assets/svg/home_vecto.svg",
+
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30), // Thoda space stack look ke liye
+
+          GestureDetector(
+            onTap: () {
+              if (!_bookingSwipeController.isAnimating) {
+                _bookingSwipeController.forward().then((_) {
+                  setState(() {
+                    _currentBookingIndex =
+                        (_currentBookingIndex + 1) % bookingList.length;
+                    _bookingSwipeController.reset();
+                  });
+                });
+              }
+            },
+
+            onHorizontalDragEnd: (details) {
+              if (_bookingSwipeController.isAnimating) return;
+
+              if (details.primaryVelocity! < 0) {
+                _bookingSwipeController.forward().then((_) {
+                  setState(() {
+                    _currentBookingIndex =
+                        (_currentBookingIndex + 1) % bookingList.length;
+                    _bookingSwipeController.reset();
+                  });
+                });
+              } else if (details.primaryVelocity! > 0) {
+                _bookingSwipeController.forward().then((_) {
+                  setState(() {
+                    _currentBookingIndex =
+                        (_currentBookingIndex - 1 + bookingList.length) % bookingList.length;
+                    _bookingSwipeController.reset();
+                  });
+                });
+              }
+            },
+
+            child: SizedBox(
+              height: 400,
+              child: AnimatedBuilder(
+                animation: _bookingSwipeController,
+                builder: (context, child) {
+                  double slide = _bookingSwipeController.value * 500;
+                  double rotate = _bookingSwipeController.value * 0.3;
+                  double opacity = 1 - _bookingSwipeController.value;
+
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      /// 🔹 BACK CARD
+                      Transform.translate(
+                        offset: const Offset(0, -20),
+                        child: Transform.rotate(
+                          angle: 0.08,
+                          child: Transform.scale(
+                            scale: 0.85,
+                            child: Opacity(
+                              opacity: 0.3,
+                              child: _buildBookingCard(
+                                (_currentBookingIndex + 2) % bookingList.length,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// 🔹 MIDDLE CARD
+                      Transform.translate(
+                        offset: const Offset(0, -20),
+                        child: Transform.rotate(
+                          angle: -0.06,
+                          child: Transform.scale(
+                            scale: 0.92,
+                            child: Opacity(
+                              opacity: 0.6,
+                              child: _buildBookingCard(
+                                (_currentBookingIndex + 1) % bookingList.length,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// 🔥 MAIN CARD (SWIPE)
+                      Transform.translate(
+                        offset: Offset(0, slide),
+                        child: Transform.rotate(
+                          angle: rotate,
+                          child: Opacity(
+                            opacity: opacity,
+                            child: _buildBookingCard(
+                              _currentBookingIndex % bookingList.length,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+
+
+
+
+          const SizedBox(height: 40),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Container(
@@ -416,1523 +1244,699 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
-
-            Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-
-                  // --- 1. PROMO BANNER ---
-                  SizedBox(
-                    height: 160, // 🔥 thoda bada
-                    child: PageView.builder(
-                      controller: PageController(
-                        viewportFraction: 0.92, // 🔥 FULL WIDTH EFFECT
-                      ),
-                      itemCount: 1000,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentCard = index % 3;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        return _buildCardbook(); // ❌ AnimatedBuilder hata diya (smooth & clean)
-                      },
-                    ),
-                  ),
-                  // Banner Dots Indicator
-                  Transform.translate(
-                    offset: const Offset(0, -1), // 🔥 thoda upar float
-                    child:
-                    Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF212121),
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(40),
-                            bottomRight: Radius.circular(40),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: List.generate(3, (index) {
-                            bool isActive = index == _currentCard;
-
-                            return GestureDetector(
-                              onTap: () {
-                                _cardController.animateToPage(
-                                  index,
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
-                                height: 4, // 🔥 slim
-                                width: isActive ? 20 : 6,
-                                decoration: BoxDecoration(
-                                  color: isActive
-                                      ? const Color(0xFFE8D1AB)
-                                      : Colors.white24,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // --- 2. EXPLORE SERVICES SECTION ---
-                  Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                         Text(
-                          "Explore Services",
-                          style: TextStyle(color: ColorCode.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Unbounded",
-                            height: 1.2,
-                          ),
-
-
-                        ),
-                        Icon(Icons.arrow_forward_ios,
-                            color: Colors.white.withOpacity(0.5), size: 18),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Services Horizontal List
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: [
-
-                        _buildServiceCard(
-                            "Photo", "assets/new_home/photo_new.png", false,       onTap: () {
-
-                          widget.onTabChange?.call(1,2); // 👈 yaha call karna hai
-
-                        },),
-                        // Isme purple badge aayega
-                        _buildServiceCard(
-                            "Video", "assets/new_home/Image_fx (5) 1.png", false,
-                          onTap: () {
-
-                           widget.onTabChange?.call(1,1); // 👈 yaha call karna hai
-
-                        },
-                        ),
-                        _buildServiceCard(
-                            "Editing", "assets/new_home/edit_new.png", false,
-                          onTap: () {
-                            showTopToast(context, "Coming Soon 🚀");
-
-                          },
-                        ),
-                        _buildServiceCard(
-                            "Livestream", "assets/new_home/Livestream_new.png", false,
-                          onTap: () {
-                            showTopToast(context, "Coming Soon 🚀");
-
-                          },
-                        ),
-                        _buildServiceCard(
-                            "stuido", "assets/new_home/stuido.png", false,
-                          onTap: () {
-                            showTopToast(context, "Coming Soon 🚀");
-
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Continue Your Booking",
-                          style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                            height: 1.2,
-                          ),
-
-
-                        ),
-
-                      ],
-                    ),
-                  ),
-
-
-                  const SizedBox(height: 10),
-                  // Main Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    margin: EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8D1AB), // Tan/Beige background
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: Column(
-                      children: [
-                        // Top Row: Image and Text Info
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(
-                                "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png",
-                                // Replace with your image
-                                height: 80,
-                                width: 80,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Wedding Photography",
-                                    style: TextStyle(
-                                      color: ColorCode.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "HelveticaNeue",
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Step 2 of 3: Select Creative",
-                                    style: TextStyle(
-                                      color: ColorCode.kBlackOpacity70,
-                                      fontSize: 15,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 25),
-
-                        // Progress Indicators
-                        Row(
-                          children: [
-                            _buildProgressBar(isActive: true),
-                            const SizedBox(width: 8),
-                            _buildProgressBar(isActive: false),
-                            const SizedBox(width: 8),
-                            _buildProgressBar(isActive: false),
-                          ],
-                        ),
-
-                        const SizedBox(height: 25),
-
-                        // Resume Button
-                        Container(
-                          width: double.infinity,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: ColorCode.kHeadingColor, // Dark background
-                            borderRadius: BorderRadius.circular(23),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Resume",
-                                style: TextStyle(
-                                  color: ColorCode.kButtonColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: "Unbounded",
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(
-                                Icons.arrow_forward,
-                                color: ColorCode.kButtonColor,
-                                size: 24,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Featured Creatives",
-                          style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                            height: 1.2,
-                          ),
-
-                        ),
-
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    // color: ColorCode.red,
-                    child: SizedBox(
-                      height: 260,
-                      child: AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          return PageView.builder(
-                            controller: _pageController,
-                            clipBehavior: Clip.none,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              final int actualIndex = index %
-                                  featuredImages.length;
-
-                              double page = _pageController.hasClients
-                                  ? _pageController.page ??
-                                  _initialPage.toDouble()
-                                  : _initialPage.toDouble();
-
-                              double difference = (index - page);
-
-                              // 1. Perspective (3D depth) - 0.001 se 0.002 best rehta hai
-                              double perspective = 0.0025;
-
-                              // 2. Rotation Logic (Blue box jaisa effect):
-                              // Right waali image (difference > 0) ke liye positive rotation
-                              // jisse uska right side peeche jaye.
-                              double rotation = difference *
-                                  0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
-                              rotation = rotation.clamp(-0.8, 0.8);
-
-                              // 3. Scale & Opacity
-                              double scale = (1 - (difference.abs() * 0.10))
-                                  .clamp(0.0, 1.0);
-                              double opacity = (1 - (difference.abs() * 0.40))
-                                  .clamp(0.6, 2.0);
-
-                              // 4. Translate (Cards ko center ke paas laane ke liye)
-                              // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
-                              double translateX = difference * -90;
-
-                              return Opacity(
-                                opacity: opacity,
-                                child: Transform(
-                                  // Alignment center se hi 3D look sabse acha aata hai
-                                  alignment: Alignment.center,
-                                  transform: Matrix4.identity()
-                                    ..setEntry(3, 2, perspective) // 3D depth
-                                    ..translate(translateX) // Paas lane ke liye
-                                    ..rotateY(
-                                        rotation) // Aapke blue box jaisa fold karne ke liye
-                                    ..scale(scale), // Chota karne ke liye
-                                  child: teamCard(
-                                    image: featuredImages[actualIndex],
-                                    name: featuredNames[actualIndex],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-
-                      ),
-                    ),
-                  ),
-
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CustomPaint(
-                        size: Size(MediaQuery.of(context).size.width, 65),
-                        painter: BeveledTrayPainter(),
-                      ),
-                      // Left depth shadow
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 100,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withOpacity(0.7),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Right depth shadow
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: Container(
-                          width: 100,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.7),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Dot indicator
-                      AnimatedBuilder(
-                        animation: _pageController,
-                        builder: (context, child) {
-                          double page = _initialPage.toDouble();
-                          if (_pageController.hasClients) {
-                            page = _pageController.page ?? page;
-                          }
-                          final activeIndex = page.round() % featuredImages.length;
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(featuredImages.length, (index) {
-                              final isActive = index == activeIndex;
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(horizontal: 5),
-                                height: 8,
-                                width: 8,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isActive
-                                      ? const Color(0xFFE8D1AB)
-                                      : Colors.white.withOpacity(0.2),
-                                  boxShadow: isActive
-                                      ? [
-                                    BoxShadow(
-                                      color: const Color(0xFFE8D1AB).withOpacity(0.6),
-                                      blurRadius: 8,
-                                      spreadRadius: 1,
-                                    ),
-                                  ]
-                                      : [],
-                                ),
-                              );
-                            }),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-
-
-                  AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      return CustomPaint(
-                        painter: BorderAnimationPainter(_controller.value),
-                        child: child,
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.only(top: 45, bottom: 29),
-                      decoration: BoxDecoration(
-                        // 🔥 Exact Figma Gradient
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: const [0.0, 2.0],
-                          colors: [
-                            const Color(0xFFE8D1AB),
-                            const Color(0xFF0D0D0D),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(45),
-
-                      ),
-                      child: Column(
-                        children: [
-                          // Title Text
-                          const Text(
-                            "Beige Studios",
-                            style: TextStyle(
-                              color: Color(0x29000000), // Figma 16% Opacity Black
-                              fontSize: 38,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Unbounded",
-
-                            ),
-                          ),
-
-
-
-                          // Carousel Section
-                          SizedBox(
-                            height: 330,
-                            child: PageView.builder(
-                              controller: _studioController,
-                              onPageChanged: (i) => setState(() => _activeStudioIndex = i % studioList.length),
-                              itemBuilder: (context, index) {
-                                final int actualIndex = index % studioList.length;
-                                return AnimatedBuilder(
-                                  animation: _studioController,
-                                  builder: (context, child) {
-                                    double scale = 1.0;
-                                    double translate = 0;
-                                    if (_studioController.position.haveDimensions) {
-                                      double page = _studioController.page!;
-                                      double diff = (index - page);
-                                      scale = (1 - (diff.abs() * 0.22)).clamp(0.89, 2.0);
-                                      translate = diff.abs() * 30;
-                                    }
-                                    return Center(
-                                      child: Transform.translate(
-                                        offset: Offset(0, translate),
-                                        child: Transform.scale(
-                                          scale: scale,
-                                          child: _buildStudioCard(studioList[actualIndex]),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 25),
-
-                          // Studio Info & Dots
-                          Text(
-                            studioList[_activeStudioIndex]['name']!,
-                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 30),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Container(
-                              height: 1,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.09), // left
-                                    Colors.white.withOpacity(0.09), // center
-                                    Colors.white.withOpacity(0.09), // right
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Center(
-                            child: Container(
-                              width: 60, // Track ki poori width
-                              height: 8, // Track ki height
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1), // Background track ka color
-                                borderRadius: BorderRadius.circular(22),
-                              ),
-                              child: Stack(
-                                children: [
-                                  AnimatedPositioned(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                    // Calculation: Active index ke hisaab se position change hogi
-                                    left: (_activeStudioIndex * (80 / studioList.length)),
-                                    child: Container(
-                                      width: 60 / studioList.length, // Indicator ki width
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFE8D1AB), // Aapka beige color
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // --- YOUR BOOKINGS SECTION (STACK SWIPE UI) ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Your Bookings",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                          ),
-                        ),
-                        Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.5), size: 18),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 30), // Thoda space stack look ke liye
-                  GestureDetector(
-                    onTap: () {
-                      if (!_bookingSwipeController.isAnimating) {
-                        _bookingSwipeController.forward().then((_) {
-                          setState(() {
-                            _currentBookingIndex =
-                                (_currentBookingIndex + 1) % bookingList.length;
-                            _bookingSwipeController.reset();
-                          });
-                        });
-                      }
-                    },
-                    child: SizedBox(
-                      height: 400,
-                      child: AnimatedBuilder(
-                        animation: _bookingSwipeController,
-                        builder: (context, child) {
-                          double slide = _bookingSwipeController.value * -500;
-                          double rotate = _bookingSwipeController.value * 0.3;
-                          double opacity = 1 - _bookingSwipeController.value;
-
-                          return Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              /// 🔹 BACK CARD
-                              Transform.translate(
-                                offset: const Offset(0, -40),
-                                child: Transform.rotate(
-                                  angle: 0.08,
-                                  child: Transform.scale(
-                                    scale: 0.85,
-                                    child: Opacity(
-                                      opacity: 0.3,
-                                      child: _buildBookingCard(
-                                        (_currentBookingIndex + 2) % bookingList.length,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              /// 🔹 MIDDLE CARD
-                              Transform.translate(
-                                offset: const Offset(0, -20),
-                                child: Transform.rotate(
-                                  angle: -0.06,
-                                  child: Transform.scale(
-                                    scale: 0.92,
-                                    child: Opacity(
-                                      opacity: 0.6,
-                                      child: _buildBookingCard(
-                                        (_currentBookingIndex + 1) % bookingList.length,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              /// 🔥 MAIN CARD (SWIPE)
-                              Transform.translate(
-                                offset: Offset(0, slide),
-                                child: Transform.rotate(
-                                  angle: rotate,
-                                  child: Opacity(
-                                    opacity: opacity,
-                                    child: _buildBookingCard(
-                                      _currentBookingIndex % bookingList.length,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-
-
-
-
-                  const SizedBox(height: 40),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "We Think You’ll Love These ",
-                      style: TextStyle(color: ColorCode.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: "Unbounded",
-                        height: 1.2,
-                      ),)
-
-
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  SizedBox(
-                    height: 280,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-
-                        /*  final item = featuredCreatives[index];
-                      final int userId = item["id"];
-                      bool isFavourite = favouriteUsers.contains(userId);*/
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 12, right: 4),
-                          child: Container(
-                            width: 210,
-                            height: 280,
-                            child: Stack(
-                              children: [
-
-                                /// IMAGE
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(18),
-                                  child
-                                      : Image.asset(
-                                    "assets/images/home1.png",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                /// BLACK GRADIENT
-                                Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Container(
-                                    height: 110,
-                                    decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.vertical(
-                                          bottom: Radius.circular(18)),
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.transparent,
-                                          Colors.black.withOpacity(0.8)
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                /*     /// ONLINE DOT
-                                const Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: CircleAvatar(
-                                    radius: 6,
-                                    backgroundColor: Colors.green,
-                                  ),
-                                ),
-
-                                /// HEART ICON
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child:     GestureDetector(
-                                    onTap: () async {
-                                      if (isFavourite) {
-                                        // ❌ REMOVE
-                                        setState(() {
-                                          favouriteUsers.remove(userId);
-                                        });
-
-                                        await _removeFavourite(userId);
-
-                                        _showFavouriteToast("Removed from Favourite");
-                                      } else {
-                                        // ✅ ADD
-                                        setState(() {
-                                          favouriteUsers.add(userId);
-                                        });
-
-                                        await _addFavourite(userId);
-
-                                        _showFavouriteToast("Added to Favourite");
-                                      }
-                                    },
-                                    child: Image.asset(
-                                      isFavourite
-                                          ? "assets/Icons/Heart_Angl_COLOR.png"
-                                          : "assets/images/Heart Angle.png",
-                                      height: 22,
-                                      width: 22,
-                                    ),
-                                  ),
-                                ),
-*/
-
-                                /// TEXT DATA
-                                Positioned(
-                                  bottom: 12,
-                                  left: 12,
-                                  right: 12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    children: [
-
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.star,
-                                              color: Colors.yellow, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            "4.5",
-                                            style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      /// NAME
-                                      Text(
-                                        "Angela Kia",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 2),
-
-                                      /// TITLE
-                                      Text(
-                                        "Videography Specialist",
-                                        style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 8),
-
-                                      Row(
-                                        children: [
-
-                                          /// 🔥 VIEW PROFILE BUTTON
-                                          Expanded(
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomeViewProfile(
-                                                            id: 2
-                                                        ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Container(
-                                                height: 30,
-                                                // 👈 FIX (important)
-                                                alignment: Alignment.center,
-                                                // 👈 center text
-                                                decoration: BoxDecoration(
-                                                  color: ColorCode.kButtonColor,
-                                                  borderRadius: BorderRadius
-                                                      .circular(
-                                                      40), // 👈 pill shape
-                                                ),
-                                                child: const Text(
-                                                  "View Profile",
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: ColorCode.black,
-                                                    fontFamily: "Outfit",
-                                                    fontSize: 14, //
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-
-                                          const SizedBox(width: 10),
-
-                                          /// 🔥 ICON BUTTON (CIRCLE)
-                                          Container(
-
-
-                                            child: Center(
-                                              child: SvgPicture.asset(
-                                                "assets/svg/home_view_profile.svg",
-
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          "Rebook Your Shoots",
-                          style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                            height: 1.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Container(
-                          height: 280,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              )
-                            ],
-                          ),
-                          child: Stack(
-                            children: [
-                              // 1. MAIN BACKGROUND IMAGE
-                              Positioned.fill(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: Image.asset(
-                                    "assets/new_home/RebookYourShoots_img.jpg",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-
-                              // 2. BLACK GRADIENT (Bottom to Top)
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter,
-                                      colors: [
-                                        Colors.black.withOpacity(0.9),
-                                        Colors.black.withOpacity(0.4),
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              // 3. CONTENT (Icon, Text, Buttons)
-                              Positioned(
-                                bottom: 20,
-                                left: 20,
-                                right: 20,
-                                child: Column(
-                                  children: [
-                                    // --- MUSIC INFO ROW ---
-                                    Row(
-                                      children: [
-                                        // Dark Circular Icon Background
-                                        Container(
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                                0.12),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(Icons.music_note,
-                                              color: Colors.white, size: 20),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment
-                                              .start,
-                                          children: const [
-                                            Text(
-                                              "Music Video",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: "Outfit",
-                                              ),
-                                            ),
-                                            Text(
-                                              "March 18, 2026 • Las Vegas, USA",
-                                              style: TextStyle(
-                                                color: Colors.white60,
-                                                fontSize: 12,
-                                                fontFamily: "Outfit",
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-
-                                    const SizedBox(height: 20),
-
-                                    // --- ACTION BUTTONS ROW ---
-                                    Row(
-                                      children: [
-                                        // Book Again Button
-                                        Expanded(
-                                          child: Container(
-                                            height: 30,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kButtonColor,
-                                              // Aapka beige color
-                                              borderRadius: BorderRadius
-                                                  .circular(30),
-                                            ),
-                                            child: const Text(
-                                              "Book Again",
-                                              style: TextStyle(
-                                                color: ColorCode.black,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                fontFamily: "Helvetica Neue",
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        // Circular Arrow Button
-                                        SvgPicture.asset(
-                                          "assets/svg/home_view_profile.svg",
-
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // --- RECENT PROJECT SECTION ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Recent Project",
-                          style: TextStyle(color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Unbounded"),
-                        ),
-                        const SizedBox(height: 15),
-
-                        // Card 1 with "D" Badge
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            _buildProjectCard(
-                                "Private Event", "Mar 10, 2025", "136 Files",
-                                "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
-
-                          ],
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Card 2
-                        _buildProjectCard(
-                            "Wedding Photography", "Feb 15, 2025", "150 Files",
-                            "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "How It Works",
+                Text(
+                  "We Think You’ll Love These ",
                   style: TextStyle(color: ColorCode.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     fontFamily: "Unbounded",
                     height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 15),
+                  ),)
 
-                /// 🔥 MAIN CARD
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCC7A1), // beige color
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Stack(
-                    children: [
-                      /// 🔥 Vertical Line
-                      Positioned(
-                        left: 45,
-                        top: 20,
-                        bottom: 20,
-                        child: Container(
-                          width: 2,
-                          color: Colors.black26,
-                        ),
-                      ),
 
-                      /// 🔥 Timeline Items
-                      Column(
-                        children: [
-                          _buildItem(
-                            Icons.memory,
-                            "AI Matchmaking",
-                            "The right creative. Every time.",
-                          ),
-                          _buildItem(
-                            Icons.movie_creation_outlined,
-                            "Pre-Production",
-                            "Zero back-and-forth. Full clarity.",
-                          ),
-                          _buildItem(
-                            Icons.videocam_outlined,
-                            "Production",
-                            "Show up. Shoot. Done.",
-                          ),
-                          _buildItem(
-                            Icons.auto_awesome,
-                            "AI-Powered Post-Production",
-                            "Edited, optimized, and ready to ship.",
-                          ),
-                        ],
-                      ),
-
-                      /// 🔥 Left side dots
-                      Positioned(
-                        left: -10,
-                        top: 60,
-                        child: _sideDot(),
-                      ),
-                      Positioned(
-                        left: -10,
-                        top: 140,
-                        child: _sideDot(),
-                      ),
-                      Positioned(
-                        left: -10,
-                        top: 220,
-                        child: _sideDot(),
-                      ),
-
-                      /// 🔥 Right side dots
-                      Positioned(
-                        right: -10,
-                        top: 60,
-                        child: _sideDot(),
-                      ),
-                      Positioned(
-                        right: -10,
-                        top: 140,
-                        child: _sideDot(),
-                      ),
-                      Positioned(
-                        right: -10,
-                        top: 220,
-                        child: _sideDot(),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
+          const SizedBox(height: 10),
+
+          SizedBox(
+            height: 280,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: homeData?.featuredCreatives.length ?? 0,
+              itemBuilder: (context, index) {
+                final data = homeData!.featuredCreatives[index];
+                /*  final item = featuredCreatives[index];
+                      final int userId = item["id"];
+                      bool isFavourite = favouriteUsers.contains(userId);*/
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12, right: 4),
+                  child: Container(
+                    width: 210,
+                    height: 280,
+                    clipBehavior: Clip.antiAlias, // Ensures child contents don't bleed out of corners
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        const Text(
-                          "Get Inspired",
-                          style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                            height: 1.2,
+                        /// 1. FULL BACKGROUND IMAGE
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: data.profileImage.isNotEmpty
+                                ? Image.network(
+                              ApiService.imageURL + data.profileImage,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[900],
+                                  child: SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.scaleDown),
+                                );
+                              },
+                            )
+                                : SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.cover),
                           ),
                         ),
-                        const SizedBox(height: 15),
 
-                        SizedBox(
-                          height: 300,
-                          child: PageView.builder(
-                            controller: _featuredController,
-                            itemCount: 10000,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              final actualIndex = index % featuredImages.length;
+                        /// 2. BOTTOM GRADIENT (The "Black Blur" effect for text readability)
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                stops: const [0.4, 1.0], // Starts getting dark near the middle/bottom
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
 
-                              return AnimatedBuilder(
-                                animation: _featuredController,
-                                builder: (context, child) {
-                                  double page = 0;
 
-                                  if (_featuredController.hasClients &&
-                                      _featuredController.position.haveDimensions) {
-                                    page = _featuredController.page!;
-                                  }
 
-                                  double diff = index - page;
+                        /// 5. BOTTOM CONTENT (Text & Buttons)
+                        Positioned(
+                          bottom: 15,
+                          left: 12,
+                          right: 12,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                data.name,
+                                style: const TextStyle(
+                                  color: ColorCode.white,
+                                  fontSize: 12,
+                                  fontFamily: "Helvetica Neue",
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                data.title ?? "Creative Professional",
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10,
+                                  fontFamily: "Helvetica Neue",
+                                  fontWeight: FontWeight.w400,
 
-                                  /// 🔥 Smooth Effects
-                                  double scale = (1 - (diff.abs() * 0.2)).clamp(0.7, 1.0);
-                                  double rotation = (diff * 0.5).clamp(-0.5, 0.8);
-                                  double translate = diff * -20;
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
 
-                                  return Center(
-                                    child: Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.identity()
-                                        ..setEntry(3, 2, 0.0015) // perspective (3D feel)
-                                        ..translate(translate)
-                                        ..rotateY(rotation)
-                                        ..scale(scale),
-                                      child: Opacity(
-                                        opacity: (1 - diff.abs() * 0.3).clamp(0.5, 1.0),
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(vertical: 10),
-                                          width: 250,
-                                          height: 300,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(30),
-                                            image: DecorationImage(
-                                              image: AssetImage(featuredImages[actualIndex]),
-                                              fit: BoxFit.cover,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(0.5),
-                                                blurRadius: 20,
-                                                offset: const Offset(0, 10),
-                                              ),
-                                            ],
+                                  /// 🔥 VIEW PROFILE BUTTON
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                HomeViewProfile(
+                                                    id:data.id
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 35,
+                                        // 👈 FIX (important)
+                                        alignment: Alignment.center,
+                                        // 👈 center text
+                                        decoration: BoxDecoration(
+                                          color: ColorCode.kButtonColor,
+                                          borderRadius: BorderRadius
+                                              .circular(
+                                              40), // 👈 pill shape
+                                        ),
+                                        child: const Text(
+                                          "View Profile",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: ColorCode.black,
+                                            fontFamily: "Outfit",
+                                            fontSize: 14, //
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
                                     ),
-                                  );
-                                },
-                              );
-                            },
+                                  ),
+
+                                  const SizedBox(width: 10),
+
+                                  /// 🔥 ICON BUTTON (CIRCLE)
+                                  Container(
+
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        "assets/svg/home_view_profile.svg",
+
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
                         ),
-
-
-
-
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.09), // left
+                    Colors.white.withOpacity(0.09), // center
+                    Colors.white.withOpacity(0.09), // right
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+          Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            "Rebook Your Shoots",
+            style: TextStyle(color: ColorCode.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Unbounded",
+              height: 1.2,
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Container(
+            height: 280,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                )
+              ],
+            ),
+            child: Stack(
+                children: [
+            // 1. MAIN BACKGROUND IMAGE
+            Positioned.fill(
+            child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.asset(
+              "assets/new_home/RebookYourShoots_img.jpg",
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+        // 2. BLACK GRADIENT (Bottom to Top)
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withOpacity(0.9),
+                  Colors.black.withOpacity(0.4),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // 3. CONTENT (Icon, Text, Buttons)
+        Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
+          child: Column(
+              children: [
+          // --- MUSIC INFO ROW ---
+          Row(
+          children: [
+          // Dark Circular Icon Background
+          Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(
+                0.12),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.music_note,
+              color: Colors.white, size: 20),
+        ),
+        const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment
+                  .start,
+              children: const [
+                Text(
+                  "Music Video",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Outfit",
+                  ),
+                ),
+                Text(
+                  "March 18, 2026 • Las Vegas, USA",
+                  style: TextStyle(
+                    color: Colors.white60,
+                    fontSize: 12,
+                    fontFamily: "Outfit",
+                  ),
+                ),
+              ],
+            ),
+          ],
+          ),
+
+                const SizedBox(height: 20),
+
+                // --- ACTION BUTTONS ROW ---
+                Row(
+                  children: [
+                    // Book Again Button
+                    Expanded(
+                      child: Container(
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: ColorCode.kButtonColor,
+                          // Aapka beige color
+                          borderRadius: BorderRadius
+                              .circular(30),
+                        ),
+                        child: const Text(
+                          "Book Again",
+                          style: TextStyle(
+                            color: ColorCode.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: "Helvetica Neue",
+                          ),
                         ),
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    // Circular Arrow Button
+                    SvgPicture.asset(
+                      "assets/svg/home_view_profile.svg",
+
+                    ),
+                  ],
+                ),
+              ],
+          ),
+        ),
+                ],
+            ),
+          ),
+        ),
+
+              ],
+          ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  height: 1,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.09), // left
+                        Colors.white.withOpacity(0.09), // center
+                        Colors.white.withOpacity(0.09), // right
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
                   ),
-                  const SizedBox(height: 20),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // --- RECENT PROJECT SECTION ---
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Recent Project",
+                      style: TextStyle(color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: "Unbounded"),
+                    ),
+                    const SizedBox(height: 15),
 
-                  // --- Top Creatives Section ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // Card 1 with "D" Badge
+                    Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        const Text(
-                          "Top Creatives Near you",
-                          style: TextStyle(color: ColorCode.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Unbounded",
-                            height: 1.2,
-                          ),
-                        ),
-
-
-                        // AB YE CALL KAREIN:
-                        _buildTopCreativesStack(context),
+                        _buildProjectCard(
+                            "Private Event", "Mar 10, 2025", "136 Files",
+                            "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
 
                       ],
                     ),
+
+                    const SizedBox(height: 12),
+
+                    // Card 2
+                    _buildProjectCard(
+                        "Wedding Photography", "Feb 15, 2025", "150 Files",
+                        "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  height: 1,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.09), // left
+                        Colors.white.withOpacity(0.09), // center
+                        Colors.white.withOpacity(0.09), // right
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
                   ),
-                ]
-            )
-          ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "How It Works",
+                      style: TextStyle(color: ColorCode.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Unbounded",
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    /// 🔥 MAIN CARD
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCC7A1), // beige color
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Stack(
+                        children: [
+                          /// 🔥 Vertical Line
+                          Positioned(
+                            left: 45,
+                            top: 20,
+                            bottom: 20,
+                            child: Container(
+                              width: 2,
+                              color: Colors.black26,
+                            ),
+                          ),
+
+                          /// 🔥 Timeline Items
+                          Column(
+                            children: [
+                              _buildItem(
+                                Icons.memory,
+                                "AI Matchmaking",
+                                "The right creative. Every time.",
+                              ),
+                              _buildItem(
+                                Icons.movie_creation_outlined,
+                                "Pre-Production",
+                                "Zero back-and-forth. Full clarity.",
+                              ),
+                              _buildItem(
+                                Icons.videocam_outlined,
+                                "Production",
+                                "Show up. Shoot. Done.",
+                              ),
+                              _buildItem(
+                                Icons.auto_awesome,
+                                "AI-Powered Post-Production",
+                                "Edited, optimized, and ready to ship.",
+                              ),
+                            ],
+                          ),
+
+                          /// 🔥 Left side dots
+                          Positioned(
+                            left: -10,
+                            top: 60,
+                            child: _sideDot(),
+                          ),
+                          Positioned(
+                            left: -10,
+                            top: 140,
+                            child: _sideDot(),
+                          ),
+                          Positioned(
+                            left: -10,
+                            top: 220,
+                            child: _sideDot(),
+                          ),
+
+                          /// 🔥 Right side dots
+                          Positioned(
+                            right: -10,
+                            top: 60,
+                            child: _sideDot(),
+                          ),
+                          Positioned(
+                            right: -10,
+                            top: 140,
+                            child: _sideDot(),
+                          ),
+                          Positioned(
+                            right: -10,
+                            top: 220,
+                            child: _sideDot(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  height: 1,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.09), // left
+                        Colors.white.withOpacity(0.09), // center
+                        Colors.white.withOpacity(0.09), // right
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Get Inspired",
+                      style: TextStyle(color: ColorCode.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Unbounded",
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    SizedBox(
+                      height: 300,
+                      child: PageView.builder(
+                        controller: _featuredController,
+                        itemCount: 10000,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final actualIndex = index % featuredImages.length;
+
+                          return AnimatedBuilder(
+                            animation: _featuredController,
+                            builder: (context, child) {
+                              double page = 0;
+
+                              if (_featuredController.hasClients &&
+                                  _featuredController.position.haveDimensions) {
+                                page = _featuredController.page!;
+                              }
+
+                              double diff = index - page;
+
+                              /// 🔥 Smooth Effects
+                              double scale = (1 - (diff.abs() * 0.2)).clamp(0.7, 1.0);
+                              double rotation = (diff * 0.5).clamp(-0.5, 0.8);
+                              double translate = diff * -20;
+
+                              return Center(
+                                child: Transform(
+                                  alignment: Alignment.center,
+                                  transform: Matrix4.identity()
+                                    ..setEntry(3, 2, 0.0015) // perspective (3D feel)
+                                    ..translate(translate)
+                                    ..rotateY(rotation)
+                                    ..scale(scale),
+                                  child: Opacity(
+                                    opacity: (1 - diff.abs() * 0.3).clamp(0.5, 1.0),
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 10),
+                                      width: 250,
+                                      height: 300,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(30),
+                                        image: DecorationImage(
+                                          image: AssetImage(featuredImages[actualIndex]),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.5),
+                                            blurRadius: 20,
+                                            offset: const Offset(0, 10),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+
+
+
+
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  height: 1,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.09), // left
+                        Colors.white.withOpacity(0.09), // center
+                        Colors.white.withOpacity(0.09), // right
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // --- Top Creatives Section ---
+              Padding(
+                key: topCreativeKey,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Top Creatives Near you",
+                      style: TextStyle(color: ColorCode.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Unbounded",
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // AB YE CALL KAREIN:
+                    _buildTopCreativesStack(context),
+
+                  ],
+                ),
+              ),
+
+            ]
+          )
+            ],
+          ),
+
+
         ),
-
-
-      ),
     );
   }
-  Widget _buildCardbook() {
+  Widget _buildCardbook(Map<String, String> data) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
@@ -1943,100 +1947,84 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
           width: 0.5, // 🔥 exact figma
         ),
 
-        /// 🔥 OPTIONAL SHADOW (aur premium)
-       /* boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          )
-        ],*/
+
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(22),
         child: Stack(
           children: [
 
             /// BACKGROUND
             Image.asset(
-              "assets/images/home_background.png",
+              data["bg"]!,
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
             ),
 
-            /// GRADIENT OVERLAY
-           /* Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.75),
-                      Colors.black.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
-              ),
-            ),*/
+
 
             /// RIGHT IMAGE
             Positioned(
-              right: -5,
+              right: -7,
               bottom: 0,
               top: 0,
-              child: ShaderMask(
-                shaderCallback: (bounds) {
-                  return const LinearGradient(
-                    colors: [Colors.transparent, Colors.black],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(bounds);
-                },
-                blendMode: BlendMode.dstIn,
-                child: Image.asset(
-                  "assets/images/man2.png",
-                  fit: BoxFit.cover,
-                  height: 180,
-                ),
+              child: Image.asset(
+                data["image"]!,
+                fit: BoxFit.fill,
+
               ),
             ),
 
             /// TEXT
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Find Your Perfect Creator\nAnywhere, Anytime.",
+                  Text(
+                    data["title"]!,
                     style: TextStyle(
-                      color: ColorCode.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-
-                      fontFamily: "Helvetica Neue"
+                        color: ColorCode.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Helvetica Neue"
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 11),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8D1AB),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      "Book a Shoot",
-                      style: TextStyle(
-                        color: ColorCode.kHeadingColor,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                  GestureDetector(
+                    onTap: () {
+                      if (data["button"] == "Book a Shoot") {
+                        // 🔥 New Screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ContentTypeScreen(), //
+                          ),
+                        );
+                      } else if (data["button"] == " Explore Creatives") {
+                        // 🔥 Scroll to Featured
+                        scrollTo(featuredKey);
+                      } else if (data["button"] == "Find Your Creative") {
+                        // 🔥 Scroll to Top Creatives
+                        scrollTo(topCreativeKey);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8D1AB),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        data["button"]!,
+                        style: TextStyle(
+                          color: ColorCode.kHeadingColor,
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
                       ),
                     ),
                   )
@@ -2049,8 +2037,8 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
     );
   }
   Widget _buildBookingCard(int index) {
-    final booking = bookingList[index % bookingList.length]; // ✅ SAFE
 
+    final booking = bookingList[index % bookingList.length];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(18),
@@ -2072,8 +2060,15 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
           /// IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              booking['image']!,
+            child: booking.imageUrl != null && booking.imageUrl!.isNotEmpty
+                ? Image.network(
+              ApiService.imageURL + booking.imageUrl!,
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            )
+                : Image.asset(
+              "assets/svg/imag_placeholder.svg",
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -2084,7 +2079,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
 
           /// TITLE
           Text(
-            booking['title']!,
+            booking.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -2099,7 +2094,8 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
             children: [
               const Icon(Icons.calendar_today, color: Colors.white54, size: 18),
               const SizedBox(width: 8),
-              Text(booking['date']!,
+              Text(
+                  booking.eventDate ?? "",
                   style: const TextStyle(color: Colors.white70)),
             ],
           ),
@@ -2111,7 +2107,8 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
             children: [
               const Icon(Icons.access_time, color: Colors.white54, size: 18),
               const SizedBox(width: 8),
-              Text(booking['time']!,
+              Text(
+                  "${booking.startTime ?? ""} - ${booking.endTime ?? ""}",
                   style: const TextStyle(color: Colors.white70)),
             ],
           ),
@@ -2256,62 +2253,94 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
       ),
     );
   }
-
-// ✅ Sahi tarika — gradient border ke liye
-  Widget _buildServiceCard(
-      String title,
-      String imagePath,
-      bool hasBadge, {
-        VoidCallback? onTap, // optional onTap callback
-      }) {    return Padding(
+  Widget _buildServiceCard(String title, String imagePath, bool hasBadge) {
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          GestureDetector(
-            onTap: onTap,
-            child: Container(
-              height: 85,
-              width: 85,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                border:  Border(
-                  top: BorderSide(
-                    color: Colors.amber.shade700,
-                  )
-            // left side no border
-                ),
+          AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              double scale = hasBadge ? 1.05 : 1.0; // 🔥 slight zoom
 
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(19.5),   // thoda kam radius inner ke liye
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF2E2E2E),
-                      Color(0xFF1A1A1A),
+              return Transform.scale(
+                scale: scale,
+                child: Container(
+                  padding: const EdgeInsets.all(1.5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+
+                    /// 🔥 SOFT ANIMATED GRADIENT
+                    gradient: SweepGradient(
+                      transform: GradientRotation(_controller.value * 5.28),
+                      colors: [
+                        Colors.transparent,
+                        const Color(0xFFE8D1AB).withOpacity(0.4),
+                        const Color(0xFFE8D1AB),
+                        const Color(0xFFE8D1AB).withOpacity(0.4),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                    ),
+
+                    /// 🔥 SOFT GLOW
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.6),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+
+                      /// 🔥 TOP LIGHT (premium highlight)
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(-2, -2),
+                      ),
                     ],
                   ),
+                  child: Container(
+                    height: 85,
+                    width: 85,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1F1F1F), // 🔥 darker = premium
+                      borderRadius: BorderRadius.circular(22),
+
+                      /// 🔥 INNER SHADOW LOOK
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.05),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-                padding: const EdgeInsets.all(14),
-                child: Image.asset(imagePath, fit: BoxFit.contain),
-              ),
-            ),
+              );
+            },
           ),
+
           const SizedBox(height: 10),
+
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: hasBadge
+                  ? const Color(0xFFE8D1AB)
+                  : Colors.white.withOpacity(0.6), // 🔥 active text color
               fontSize: 14,
               fontFamily: "Outfit",
+              fontWeight: hasBadge ? FontWeight.w600 : FontWeight.w400,
             ),
           ),
         ],
       ),
     );
   }
+
   Widget _buildStudioCard(Map<String, String> data) {
     return Container(
       // margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -2325,58 +2354,6 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
                 width: double.infinity,
                 height: double.infinity),
           ),
-
-          // Green Online Dot
-          /*  Positioned(
-            top: 18, left: 18,
-            child: Container(
-              width: 12, height: 12,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.greenAccent, blurRadius: 8)],
-              ),
-            ),
-          ),*/
-
-          // Heart/Favorite Icon
-       /*   const Positioned(
-            top: 15, right: 18,
-            child: Icon(Icons.favorite_border, color: Colors.white, size: 24),
-          ),*/
-
-
-          // Rating and Price Overlay
-          /*   Positioned(
-            bottom: 20, left: 18, right: 18,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Rating Pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(18)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 14),
-                      const SizedBox(width: 5),
-                      Text(data['rating']!, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                // Price
-                Text(
-                  "From ${data['price']}",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ],
-            ),
-          ),*/
         ],
       ),
     );
@@ -2432,12 +2409,42 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
   }
 
   Widget _buildTopCreativesStack(BuildContext context) {
+    final list = homeData?.mainCreatives ?? [];
+    // if (list.isEmpty) return const SizedBox();
+
     return GestureDetector(
       onTap: () {
-        if (!_swipeController.isAnimating) {
+        if (_swipeController.isAnimating) return;
+
+        _swipeController.forward().then((_) {
+          setState(() {
+            _currentCreativeIndex =
+                (_currentCreativeIndex + 1) % list.length;
+            _swipeController.reset();
+          });
+        });
+      },
+
+      onHorizontalDragEnd: (details) {
+        if (_swipeController.isAnimating) return;
+
+        // 👉 LEFT
+        if (details.primaryVelocity! < 0) {
           _swipeController.forward().then((_) {
             setState(() {
-              _currentCreativeIndex = (_currentCreativeIndex + 1) % creatives.length;
+              _currentCreativeIndex =
+                  (_currentCreativeIndex + 1) % list.length;
+              _swipeController.reset();
+            });
+          });
+        }
+
+        // 👉 RIGHT
+        else if (details.primaryVelocity! > 0) {
+          _swipeController.forward().then((_) {
+            setState(() {
+              _currentCreativeIndex =
+                  (_currentCreativeIndex - 1 + list.length) % list.length;
               _swipeController.reset();
             });
           });
@@ -2449,51 +2456,51 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
         child: AnimatedBuilder(
           animation: _swipeController,
           builder: (context, child) {
-            double slide = _swipeController.value * -600;
+            double slide = _swipeController.value * 700;
             double rotate = _swipeController.value * 0.4;
             double opacity = 1 - _swipeController.value;
 
             return Stack(
               alignment: Alignment.center,
               children: [
-                // --- 3. SABSE PICHE WALA CARD (Back Card) ---
+                // --- 3. BACK CARD (Slightly more tilt to the right) ---
                 Transform.translate(
-                  offset: const Offset(0, -40), // 👈 Thoda aur upar
+                  offset: const Offset(0, -45),
                   child: Transform.rotate(
-                    angle: 0.08, // Right Tilt
+                    angle: 0.06,
                     child: Transform.scale(
-                      scale: 0.85, // 👈 Sabse chota scale
+                      scale: 0.88,
                       child: Opacity(
                         opacity: 0.3,
-                        child: _buildCreativeCard((_currentCreativeIndex + 2) % creatives.length),
+                        child: _buildCreativeCard((_currentCreativeIndex + 2) % list.length),
                       ),
                     ),
                   ),
                 ),
 
-                // --- 2. BEECH WALA CARD (Middle Card) ---
+                // --- 2. MIDDLE CARD (Slight tilt to the left) ---
                 Transform.translate(
-                  offset: const Offset(0, -20),
+                  offset: const Offset(0, -25),
                   child: Transform.rotate(
-                    angle: -0.06, // Left Tilt
+                    angle: -0.04,
                     child: Transform.scale(
-                      scale: 0.92, // 👈 Medium scale
+                      scale: 0.94,
                       child: Opacity(
                         opacity: 0.6,
-                        child: _buildCreativeCard((_currentCreativeIndex + 1) % creatives.length),
+                        child: _buildCreativeCard((_currentCreativeIndex + 1) % list.length),
                       ),
                     ),
                   ),
                 ),
 
-                // --- 1. MAIN TOP INTERACTIVE CARD ---
+                // --- 1. FRONT INTERACTIVE CARD ---
                 Transform.translate(
                   offset: Offset(0, slide),
                   child: Transform.rotate(
                     angle: rotate,
                     child: Opacity(
                       opacity: opacity,
-                      child: _buildCreativeCard(_currentCreativeIndex),
+                      child: _buildCreativeCard(_currentCreativeIndex % list.length),
                     ),
                   ),
                 ),
@@ -2505,17 +2512,22 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
     );
   }
   Widget _buildCreativeCard(int index) {
-    final item = creatives[index];
+    final item = homeData!.mainCreatives[index];
+
 
     return Container(
       height: 400, // Card ki apni height
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(45), // 👈 Zyada rounded corners premium dikhte hain
+        border: Border.all(color: ColorCode.kGoldBorder50,width: 0.5),
+        borderRadius: BorderRadius.circular(40),
         image: DecorationImage(
-          image: AssetImage(item["img"]!),
+          image: NetworkImage(
+            ApiService.imageURL + item.profileImage,
+          ),
           fit: BoxFit.cover,
         ),
+
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -2525,7 +2537,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(45),
+        borderRadius: BorderRadius.circular(40),
         child: Stack(
           children: [
             // Gradient Overlay
@@ -2533,7 +2545,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
+                    begin: Alignment.topRight,
                     end: Alignment.bottomCenter,
                     stops: const [0.3, 0.9],
                     colors: [
@@ -2556,7 +2568,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
 
                   // Name & Bio
                   Text(
-                    item["name"]!,
+                    item.name,
                     style: const TextStyle(
                       color: ColorCode.white,
                       fontSize: 22, // Headline size
@@ -2566,7 +2578,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item["bio"]!,
+                    item.title ?? "Creative Professional",
                     style: const TextStyle(
                       color: ColorCode.kWhiteOpacity70,
                       fontSize: 14,
@@ -2579,20 +2591,33 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
                   const SizedBox(height: 25),
 
                   // View Profile Button
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: ColorCode.kButtonColor,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Text(
-                      "View Profile",
-                      style: TextStyle(
-                        color: ColorCode.black,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        fontFamily: "Helvetica Neue ",
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              HomeViewProfile(
+                                  id:item.id
+                              ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: ColorCode.kButtonColor,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Text(
+                        "View Profile",
+                        style: TextStyle(
+                          color: ColorCode.black,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          fontFamily: "Helvetica Neue",
 
+                        ),
                       ),
                     ),
                   ),
@@ -2605,118 +2630,7 @@ color: Colors.white,              borderRadius: BorderRadius.circular(10),
     );
   }
 }
-Widget creativeCard() {
-  return Container(
-    // margin: const EdgeInsets.only(right: 15),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(40),
-     /* image: const DecorationImage(
-        image: NetworkImage("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop"), // Apni image link daalein
-        fit: BoxFit.cover,
-      ),*/
-    ),
-    child: Stack(
-      children: [
-        // Dark overlay for text readability
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.black.withOpacity(0.6),
-              ],
-            ),
-          ),
-        ),
 
-        Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Row: Online dot and Rating
-              Row(
-                children: [
-                  // Green Dot
-                  Container(
-                    height: 12,
-                    width: 12,
-                    decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.green, blurRadius: 10)]
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Rating Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.star, color: Colors.yellow, size: 16),
-                        SizedBox(width: 4),
-                        Text("4.5 (120)", style: TextStyle(color: Colors.white, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const Spacer(), // Content ko niche dhakelne ke liye
-
-              // Name
-              const Text(
-                "Ethan Cole",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Unbounded",
-                ),
-              ),
-
-              // Bio
-              const Text(
-                "Model, Entrepreneur & Media\nPersonality.",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // View Profile Button
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5D1B2), // Beige color from image
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const Text(
-                  "View Profile",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
 Widget _buildItem(IconData icon, String title, String subtitle) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
@@ -2769,11 +2683,12 @@ Widget _sideDot() {
     width: 20,
     height: 20,
     decoration: BoxDecoration(
-      color: Colors.black,
+      color: ColorCode.bcakgroundcolor,
       borderRadius: BorderRadius.circular(50),
     ),
   );
 }
+
 
 class BeveledTrayPainter extends CustomPainter {
   @override
@@ -2781,14 +2696,12 @@ class BeveledTrayPainter extends CustomPainter {
     double w = size.width;
     double h = size.height;
 
-    double bevelHeight = 10;
-    double slopeWidth = 20;
+    // Dimensions (Aap inhe adjust kar sakte hain)
+    double bevelHeight = 12; // Kitna neeche jayega
+    double slopeWidth = 15;  // Tirchi line ki width
+    double shoulderWidth = w * 0.18; // Side ki strips ki width
 
-    // --- Make the pillars square (height == width) and full height ---
-    double blockHeight = h - bevelHeight; // total pillar height
-    double shoulderWidth = blockHeight;   // width equals height → square
-
-    // --- Define the outer tray shape (with beveled top corners) ---
+    // Main Path define karna
     Path path = Path();
     path.moveTo(0, 0);
     path.lineTo(shoulderWidth, 0);
@@ -2800,93 +2713,84 @@ class BeveledTrayPainter extends CustomPainter {
     path.lineTo(0, h);
     path.close();
 
-    // --- 1. Background Gradient ---
+    // 1. Background Base Color (Dark Gradient)
     final paint = Paint()
       ..shader = const LinearGradient(
-        colors: [Color(0xFF131313), Color(0xFF242424)],
+        colors: [Color(0xFF1A1A1A), Color(0xFF121212)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawPath(path, paint);
 
-    // --- 2. Left pillar (square) ---
-    final leftBlock = Path()
-      ..moveTo(0, h)
-      ..lineTo(shoulderWidth, h)
-      ..lineTo(shoulderWidth, h - blockHeight)
-      ..lineTo(shoulderWidth - slopeWidth, h - blockHeight - bevelHeight)
-      ..lineTo(0, h - blockHeight - bevelHeight)
-      ..close();
-
-    canvas.drawPath(
-      leftBlock,
-      Paint()
-        ..shader = LinearGradient(
-          colors: const [Color(0xFF2a2a2a), Color(0xFF1a1a1a)],
-          begin: Alignment.centerRight,
-          end: Alignment.centerLeft,
-        ).createShader(Rect.fromLTWH(
-            0, h - blockHeight - bevelHeight, shoulderWidth, blockHeight + bevelHeight)),
-    );
-
-    // --- 3. Right pillar (square) ---
-    final rightBlock = Path()
-      ..moveTo(w, h)
-      ..lineTo(w - shoulderWidth, h)
-      ..lineTo(w - shoulderWidth, h - blockHeight)
-      ..lineTo(w - shoulderWidth + slopeWidth, h - blockHeight - bevelHeight)
-      ..lineTo(w, h - blockHeight - bevelHeight)
-      ..close();
-
-    canvas.drawPath(
-      rightBlock,
-      Paint()
-        ..shader = LinearGradient(
-          colors: const [Color(0xFF1a1a1a), Color(0xFF2a2a2a)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ).createShader(Rect.fromLTWH(w - shoulderWidth,
-            h - blockHeight - bevelHeight, shoulderWidth, blockHeight + bevelHeight)),
-    );
-
-    // --- 4. Vertical Recessed Shadows (optional) ---
-    final shadowPaint = Paint()
+    // 2. Vertical Side Shadows (Depth create karne ke liye)
+    // Left Wall Shadow
+    final leftWallPaint = Paint()
       ..shader = LinearGradient(
-        colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+        colors: [Colors.black.withOpacity(0.6), Colors.transparent],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-      ).createShader(Rect.fromLTWH(shoulderWidth, 0, 40, h));
-    canvas.drawRect(Rect.fromLTWH(shoulderWidth, 0, 15, h), shadowPaint);
+      ).createShader(Rect.fromLTWH(shoulderWidth, 0, slopeWidth, h));
 
-    final shadowPaintRight = Paint()
-      ..shader = LinearGradient(
-        colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ).createShader(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h));
-    canvas.drawRect(Rect.fromLTWH(w - shoulderWidth - 15, 0, 15, h), shadowPaintRight);
-
-    // --- 5. Subtle Top Highlight ---
-    final highlightPath = Path()
-      ..moveTo(0, 0)
-      ..lineTo(shoulderWidth, 0)
+    Path leftWallPath = Path()
+      ..moveTo(shoulderWidth, 0)
       ..lineTo(shoulderWidth + slopeWidth, bevelHeight)
-      ..lineTo(w - (shoulderWidth + slopeWidth), bevelHeight)
-      ..lineTo(w - shoulderWidth, 0)
-      ..lineTo(w, 0);
+      ..lineTo(shoulderWidth + slopeWidth, h)
+      ..lineTo(shoulderWidth, h)
+      ..close();
+    canvas.drawPath(leftWallPath, leftWallPaint);
 
+    // Right Wall Shadow
+    final rightWallPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(Rect.fromLTWH(w - shoulderWidth - slopeWidth, 0, slopeWidth, h));
+
+    Path rightWallPath = Path()
+      ..moveTo(w - shoulderWidth, 0)
+      ..lineTo(w - shoulderWidth - slopeWidth, bevelHeight)
+      ..lineTo(w - shoulderWidth - slopeWidth, h)
+      ..lineTo(w - shoulderWidth, h)
+      ..close();
+    canvas.drawPath(rightWallPath, rightWallPaint);
+
+    // 3. Inner Top Shadow (Sunken area ko gehra dikhane ke liye)
+    final topInnerShadow = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, bevelHeight, w, 20));
+
+    canvas.drawRect(
+        Rect.fromLTWH(shoulderWidth + slopeWidth, bevelHeight,
+            w - 2 * (shoulderWidth + slopeWidth), 15),
+        topInnerShadow
+    );
+
+    // 4. Sharp Highlights (Border lines)
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.06)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-    canvas.drawPath(highlightPath, highlightPaint);
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+
+    // Top horizontal edges
+    highlightPaint.color = Colors.white.withOpacity(0.12);
+    canvas.drawLine(Offset(0, 0), Offset(shoulderWidth, 0), highlightPaint);
+    canvas.drawLine(Offset(w - shoulderWidth, 0), Offset(w, 0), highlightPaint);
+
+    // Bottom "sunken" edge highlight
+    highlightPaint.color = Colors.white.withOpacity(0.05);
+    canvas.drawLine(
+        Offset(shoulderWidth + slopeWidth, bevelHeight),
+        Offset(w - (shoulderWidth + slopeWidth), bevelHeight),
+        highlightPaint
+    );
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
-
-
 // --- BORDER PAINTER (LEFT-TO-RIGHT) ---
 class BorderAnimationPainter extends CustomPainter {
   final double animationValue;
@@ -2953,5 +2857,3 @@ class BorderAnimationPainter extends CustomPainter {
   @override
   bool shouldRepaint(BorderAnimationPainter oldDelegate) => true;
 }
-
-
