@@ -401,7 +401,7 @@ class _UpcomingEventSummaryManagebookingState
                                     );
                                   },
                                   child: const Text(
-                                    "Reschedule",
+                                    "Reschedule",//
                                     style: TextStyle(
                                       color: ColorCode.kHeadingColor,
                                       fontFamily: 'Unbounded',   // ← Add this

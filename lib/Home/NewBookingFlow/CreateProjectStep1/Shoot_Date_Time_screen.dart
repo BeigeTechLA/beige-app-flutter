@@ -1,7 +1,10 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 import '../../../Customtextfiled/CustomInputField.dart';
+import '../../../main.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
@@ -21,6 +24,37 @@ class ShootDateTimeScreen extends StatefulWidget {
 }
 
 class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
+  late final screenHeight = MediaQuery.of(context).size.height;
+
+
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime(
+    DateTime.now().year,
+    DateTime.now().month + 1,
+    DateTime.now().day,
+  );
+
+  void generateDates() {
+    DateTime current = startDate;
+
+    while (current.isBefore(endDate) || current == endDate) {
+      allDates.add(current);
+      current = current.add(Duration(days: 1));
+    }
+  }
+
+  List<DateTime> allDates = [];
+  List<DateTime> selectedDates = [];
+
+  List<int>counts=[0,0,0];
+  int get totalReels => counts.reduce((a, b) => a + b);
+  List<String> titles = [
+    "Social Media Reel (15 sec-30 sec)",
+    "Social Media Reel (30 sec-90 sec)",
+    "Social Media Reel (2 min-4 min)",
+  ];
+
+  int selectedIndex=1;
 
   List<dynamic> editTypes = [];              // API data
   List<int> selectedEditTypeIds = [];        // selected ids
@@ -714,10 +748,13 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                   SizedBox(
                     height: 20,
                   ),
+
                   Row(
                     children: [
                       Text(
-                        "Shoot Date & Time",
+
+                           textAlign: TextAlign.start,
+                        "Select Booking Type",
                         style: TextStyle(
                           fontFamily: "Unbounded",
                           fontSize: 16,
@@ -726,31 +763,270 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 12,),
+                  //////////////////////////////////////////////////////////////////////////
 
-                  SizedBox(height: 30,),
+      Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedIndex = 1;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                decoration: BoxDecoration(
+                  color: selectedIndex == 1
+                      ? Color(0xFFE6D5B8)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: selectedIndex == 1
+                      ? null
+                      :Border.all(color: Colors.white.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Single Day",
+                      style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: selectedIndex == 1
+                            ? Colors.black
+                            : Colors.grey,
+                      ),
+                    ),
+                selectedIndex==1?
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: selectedIndex == 1
+                            ? LinearGradient(
+                          colors: [
+                            Color(0xFF000000),
+                            Color(0xFF363131),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                            : null,
+                        border: selectedIndex == 1
+                            ? Border.all(color: Colors.grey)
+                            : null,
+                      ),
+                      child: selectedIndex == 1
+                          ? Center(
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFE6D5B8),
+                          ),
+                        ),
+                      )
+                          : null,
+                    ):Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+
+                    ),
+                  ),
+                ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: 12),
+
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedIndex = 2;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                decoration: BoxDecoration(
+                  color: selectedIndex == 2
+                      ? Color(0xFFE6D5B8)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  border: selectedIndex == 2
+                      ? null
+                      :Border.all(color: Colors.white.withOpacity(0.3)),
+
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Multiple Days",
+                      style: TextStyle(
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: selectedIndex == 2
+                            ? Colors.black
+                            : Colors.grey,
+                      ),
+                    ),
+
+                    selectedIndex==2?
+                    Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        // color: selectedIndex == 1
+                        //     ? Colors.black
+                        //     : Colors.transparent,
+                        gradient: selectedIndex == 2
+                            ? LinearGradient(
+                          colors: [
+                            Color(0xFF000000),
+                            Color(0xFF363131),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                            : null,
+
+                        border: selectedIndex == 2
+                            ? Border.all(color: Colors.grey)
+                            : null,
+                      ),
+                      child: selectedIndex == 2
+                          ? Center(
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFFE6D5B8),
+                          ),
+                        ),
+                      )
+                          : null,
+                    ):Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                        )
+                      )
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
 
 
 
-                  CustomInputField(
-                    title: "Select Date",
-                    controller: dateController,
-                    readOnly: true,
-                    onTap: () => _selectDate(context),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        "assets/svg/calendar-03.svg",
-                        width: 20,
-                        height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          ColorCode.kWhiteOpacity70,
-                          BlendMode.srcIn,
+
+                  SizedBox(
+                    height: 50,
+                  ),
+
+        if (selectedIndex==2) ...[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Select Date",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              buildDateSelector(
+                context: context,
+                selectedDates: selectedDates,
+                onChanged: (dates) {
+                  setState(() {
+                    selectedDates = dates;
+                  });
+                },
+              ),
+
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color(0xff322F2A),
+
+                ),
+
+              ),
+              Text(
+                "Total Days: ${selectedDates.length}",
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            ],
+          ),
+          ],
+
+
+                  if (selectedIndex==1) ...[
+                    Row(
+                      children: [
+                        Text(
+                          "Shoot Date & Time",
+                          style: TextStyle(
+                            fontFamily: "Unbounded",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 30,),
+
+
+
+                    CustomInputField(
+                      title: "Select Date",
+                      controller: dateController,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/calendar-03.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.kWhiteOpacity70,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 30,),
-               /*   timeField(
+                    SizedBox(height: 30,),
+                    /*   timeField(
                     controller: startTimeController,
                     label: "Start Time*",
                     onTap: () {
@@ -765,34 +1041,34 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                     },
                   ),*/
 
-                  CustomInputField(
-                    title: "Start Time",
-                    controller: startTimeController,
-                    readOnly: true,
-                    onTap: () {
-                      if (!isDateSelected()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Please select date first")),
-                        );
-                        return;
-                      }
-                      _selectTime(context, startTimeController, true);
-                    },
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        "assets/svg/Group 2087328870.svg",
-                        width: 20,
-                        height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          ColorCode.white,
-                          BlendMode.srcIn,
+                    CustomInputField(
+                      title: "Start Time",
+                      controller: startTimeController,
+                      readOnly: true,
+                      onTap: () {
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        _selectTime(context, startTimeController, true);
+                      },
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/Group 2087328870.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 30,),
-                /*  timeField(
+                    SizedBox(height: 30,),
+                    /*  timeField(
                     controller: endTimeController,
                     label: "End Time*",
                     onTap: () {
@@ -806,32 +1082,36 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                       _selectTime(context, endTimeController, false);
                     },
                   ),*/
-                  CustomInputField(
-                    title: "End Time",
-                    controller: endTimeController,
-                    readOnly: true,
-                    onTap: () {
-                      if (!isDateSelected()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Please select date first")),
-                        );
-                        return;
-                      }
-                      _selectTime(context, endTimeController, false);
-                    },
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        "assets/svg/Group 2087328870.svg",
-                        width: 20,
-                        height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          ColorCode.white,
-                          BlendMode.srcIn,
+                    CustomInputField(
+                      title: "End Time",
+                      controller: endTimeController,
+                      readOnly: true,
+                      onTap: () {
+                        if (!isDateSelected()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select date first")),
+                          );
+                          return;
+                        }
+                        _selectTime(context, endTimeController, false);
+                      },
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/svg/Group 2087328870.svg",
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            ColorCode.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
+
+
+
                   SizedBox(height: 30,),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -959,6 +1239,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                                 floatingLabelBehavior: FloatingLabelBehavior.always,
                                 suffixIcon: const Icon(
                                   Icons.keyboard_arrow_down,
+
                                   color: ColorCode.kWhiteOpacity70,
                                 ),
                                 contentPadding:
@@ -977,6 +1258,57 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                             ),
                           ),
                         ),
+                        VideoEdits('Video Edits'),
+                        VideoEdits2('Photo Edits'),
+
+                        SizedBox(height: 12,),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffE8D1AB), // Beige/Cream color
+                            borderRadius: BorderRadius.circular(8), // Fully rounded like the image
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // Sparkle Icon Container
+                              Container(
+                                width: 34,
+                                height: 34,
+                                padding: EdgeInsets.all(8),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                                child:  Center(
+                                  child: Image.asset('assets/images/star.png'),
+                                ),
+                              ),
+
+                              const SizedBox(width: 5),
+
+                              // Text
+                              const Expanded(
+                                child: Text(
+                                  "You’ll Receive 125 Photos + 2 Videos",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff101010),
+
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
 
                         if (selectedEditTypeNames.isNotEmpty) ...[
                           const SizedBox(height: 14),
@@ -1118,6 +1450,662 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
       ),
     );
   }
+  /////////////////////////////////////////////////////////////////////////////////////
+  Widget buildDateSelector({
+    required BuildContext context,
+    required List<DateTime> selectedDates,
+    required Function(List<DateTime>) onChanged,
+  }) {
+    DateTime today = DateTime.now();
+    List<DateTime> allDates = List.generate(60, (index) => today.add(Duration(days: index)));
+
+    bool isSameDate(DateTime a, DateTime b) {
+      return a.year == b.year && a.month == b.month && a.day == b.day;
+    }
+
+    String getHeaderMonth() {
+      return selectedDates.isNotEmpty
+          ? DateFormat('MMM yyyy').format(selectedDates.first)
+          : DateFormat('MMM yyyy').format(today);
+    }
+
+    // Show multi‑date picker with local state
+    Future<void> showMultiDatePicker() async {
+      // Temporary local list to hold selections inside the dialog
+      List<DateTime> tempSelected = List.from(selectedDates);
+
+      await showDialog(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          backgroundColor: const Color(0xFF1C1C1C),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: StatefulBuilder(
+            builder: (dialogContext, setDialogState) {
+              // Get valid screen height inside the dialog
+              final double dialogScreenHeight = MediaQuery.of(dialogContext).size.height;
+
+              return Padding(
+                padding: const EdgeInsets.all(0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 7,),
+                    const Text(
+                      "Select Multiple Dates",
+                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ✅ Fixed height calendar – no pixel error
+                    SizedBox(
+                      height: dialogScreenHeight * 0.6,
+                      child: CalendarDatePicker2(
+                        config: CalendarDatePicker2Config(
+                          calendarType: CalendarDatePicker2Type.multi,
+                          selectedDayHighlightColor: const Color(0xFFE8D1AB),
+                          selectedDayTextStyle: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(dialogContext).size.width * 0.04,
+                          ),
+                          dayTextStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: MediaQuery.of(dialogContext).size.width * 0.035,
+                          ),
+                          weekdayLabelTextStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: MediaQuery.of(dialogContext).size.width * 0.035,
+                          ),
+                        ),
+                        value: tempSelected,
+                        onValueChanged: (dates) {
+                          setDialogState(() {
+                            tempSelected = dates;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE8D1AB)),
+                          onPressed: () {
+                            Navigator.pop(dialogContext, tempSelected);
+                          },
+                          child: const Text("Done", style: TextStyle(color: Colors.black)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ).then((result) {
+        if (result != null && result is List<DateTime>) {
+          onChanged(result);
+        }
+      });
+    }
+
+    return Container(
+      // padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xff282828),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 9),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  getHeaderMonth(),
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                GestureDetector(
+                  onTap: showMultiDatePicker,
+                  child: const Icon(Icons.calendar_today, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          Container(
+          //  color: Colors.red,
+            child: SizedBox(
+              height:58 ,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: allDates.length,
+                itemBuilder: (context, index) {
+                  final date = allDates[index];
+                  final isSelected = selectedDates.any((d) => isSameDate(d, date));
+
+                  return GestureDetector(
+                    onTap: () {
+                      List<DateTime> updated = List.from(selectedDates);
+                      if (isSelected) {
+                        updated.removeWhere((d) => isSameDate(d, date));
+                      } else {
+                        updated.add(date);
+                      }
+                      onChanged(updated);
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical:4),//
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFFE8D1AB) : Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(38),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${date.day}",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? Colors.black : Colors.white,
+                            ),
+                          ),
+                          Text(
+                            DateFormat('EEE').format(date),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isSelected ? Colors.black87 : Colors.grey[400],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "Total Days: ${selectedDates.length}",
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2723),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    selectedDates.isEmpty
+                        ? "No dates selected"
+                        : selectedDates.map((e) => DateFormat('d MMM').format(e)).join(', '),
+                    style: const TextStyle(color: Color(0xFFE8D1AB), fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+        ],
+      ),
+    );
+  }
+  ////////////////////////////////////////////////////////////////////////////////////
+
+
+  Widget VideoEdits(String title) {
+    bool _isOpen = true;
+    int _count1 = 0;
+    int _count2 = 0;
+    int _count3 = 0;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          margin: EdgeInsets.only(top: 17, bottom: 17),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 0.5,
+            ),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header - alag color
+              GestureDetector(
+                onTap: () => setState(() => _isOpen = !_isOpen),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xff282828),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(14),
+                      topRight: Radius.circular(14),
+                      bottomLeft: _isOpen ? Radius.circular(23) : Radius.circular(14),
+                      bottomRight: _isOpen ? Radius.circular(23) : Radius.circular(14),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                       Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      AnimatedRotation(
+                        turns: _isOpen ? 0 : 0.5,
+                        duration: const Duration(milliseconds: 250),
+                        child: const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_isOpen) ...[
+                // Row 1
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                  child: Row(
+                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Text('Social Media Reel (15 sec–30 sec)',
+                            style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 12,fontFamily:'Outfit',
+                            fontWeight:FontWeight.w500,
+                            )),
+                      ),
+                      Container(
+                        width: 80,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffE8D1AB),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () => setState(() {
+                                if (_count1 > 0) _count1--;
+
+
+                              }),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.remove, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                            Text(
+                              _count1.toString().padLeft(2, '0'),
+                              style: const TextStyle(
+                                color: Color(0xFF1A1A1A),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => setState(() => _count1++),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.add, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+               // const Divider(height: 1, thickness: 1, indent: 20, endIndent: 20, color: Color(0xFF333333)),
+
+                // Row 2
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                  child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Text('Social Media Reel (30 sec–90 sec)',
+                            style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 12,fontFamily:'Outfit',
+                              fontWeight:FontWeight.w500,
+                            )),
+                      ),
+                      Container(
+                        width: 80,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffE8D1AB),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () => setState(() { if (_count2 > 0) _count2--; }),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.remove, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                            Text(
+                              _count2.toString().padLeft(2, '0'),
+                              style: const TextStyle(
+                                color: Color(0xFF1A1A1A),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => setState(() => _count2++),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.add, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              //  const Divider(height: 1, thickness: 1, indent: 20, endIndent: 20, color: Color(0xFF333333)),
+
+                // Row 3
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                  child: Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Expanded(
+                        child: Text('Social Media Reel (2 min–4 min)',
+                            style: TextStyle(color: Color(0xFFCCCCCC), fontSize: 12,fontFamily:'Outfit',
+                              fontWeight:FontWeight.w500,
+                            )),
+                      ),
+                      Container(
+                        width: 80,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffE8D1AB),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () => setState(() { if (_count3 > 0) _count3--; }),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.remove, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                            Text(
+                              _count3.toString().padLeft(2, '0'),
+                              style: const TextStyle(
+                                color: Color(0xFF1A1A1A),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => setState(() => _count3++),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.add, size: 10, color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+  //////////////////////////////////////////
+  Widget VideoEdits2(String title) {
+    bool _isOpen = true;
+    int _count1 = 0;
+
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          margin: EdgeInsets.only(top: 17, bottom: 17),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
+              width: 0.5,
+            ),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header - alag color
+              GestureDetector(
+                onTap: () => setState(() => _isOpen = !_isOpen),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xff282828),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(14),
+                      topRight: Radius.circular(14),
+                      bottomLeft: _isOpen ? Radius.circular(23) : Radius.circular(14),
+                      bottomRight: _isOpen ? Radius.circular(23) : Radius.circular(14),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      AnimatedRotation(
+                        turns: _isOpen ? 0 : 0.5,
+                        duration: const Duration(milliseconds: 250),
+                        child: const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_isOpen) ...[
+                // Row 1
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                  child: Column(
+                    children: [
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Edited Photos',style: TextStyle(fontFamily: 'Outfit',fontWeight: FontWeight.w500,fontSize: 12),),
+
+                              Text('+25 photos Per Set',style: TextStyle(fontFamily: 'Outfit',fontWeight: FontWeight.w300,fontSize: 10),),
+                            ],
+                          ),
+                          Spacer(),
+                          Container(
+                            width: 80,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: const Color(0xffE8D1AB),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => setState(() { if (_count1 > 0) _count1--; }),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8),
+                                    child: Icon(Icons.remove, size: 10, color: Color(0xFF1A1A1A)),
+                                  ),
+                                ),
+                                Text(
+                                  _count1.toString().padLeft(2, '0'),
+                                  style: const TextStyle(
+                                    color: Color(0xFF1A1A1A),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => setState(() => _count1++),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8),
+                                    child: Icon(Icons.add, size: 10, color: Color(0xFF1A1A1A)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 7,),
+                      Divider(
+                      thickness: 2,
+                        color: Colors.white.withOpacity(0.20),
+                      ),
+
+                      SizedBox(height: 7,),
+
+                      Container(
+                        padding: EdgeInsetsGeometry.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0xff322F2A),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('📸 Includes 100 free photo edits',style: TextStyle(
+                              fontSize: 10,
+                              color: Color(0xffE8D1AB),
+                              fontWeight: FontWeight.w500,
+                            ),),
+
+                            Container(
+
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                "4 Hour Duration",
+                                style: TextStyle(
+                                  fontSize: 10,
+
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+
+                        ),
+                      ),
+                      SizedBox(height: 18,),
+
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 13,
+                              vertical: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xff322F2A),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text('➕ 25 Added Extra',style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xffE8D1AB),
+                            ),),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 7,),
+
+                      
+                    ],
+                  ),
+                ),
+
+
+
+
+
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget timeField({
     required TextEditingController controller,
     required String label,

@@ -482,11 +482,13 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
-        ),
-      );
+
+      _showSnack('Location permission permanently denied. Enable from settings.');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Location permission permanently denied. Enable from settings."),
+      //   ),
+      // );
       await Geolocator.openAppSettings(); // 👈 Open app settings
       return;
     }
@@ -658,9 +660,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+   TopMessage.show(context, message);
   }
 
   @override

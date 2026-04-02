@@ -22,6 +22,7 @@ import '../../service/api_service.dart';
 import '../../service/google_config.dart';
 import '../../utility/ColorCode.dart';
 import '../../utility/location_helper.dart';
+import '../../widgets/TopMessage.dart';
 
 class BuildYourCreativeProfileSignUp extends StatefulWidget {
   const BuildYourCreativeProfileSignUp({super.key});
@@ -134,9 +135,12 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
         await getAddressFromLatLng(latLng);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location not found")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Location not found")),
+      // );
+     // TopMessage.show(context,'Location not found');
+      _showSnack('Location not found');
+
     }
   }
 
@@ -179,11 +183,12 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
     }
 
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Location permission permanently denied. Enable from settings."),
+      //   ),
+      // );
+      _showSnack('Location permission permanently denied. Enable from settings.');
       await Geolocator.openAppSettings(); // 👈 Open app settings
       return;
     }
@@ -697,9 +702,11 @@ class _BuildYourCreativeProfileSignUpState extends State<BuildYourCreativeProfil
 
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text(message), backgroundColor: Colors.red),
+    // );
+    TopMessage.show(context, message);
+
   }
 
 

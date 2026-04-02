@@ -236,7 +236,7 @@ String getContentTypeTitle(int contentTypeId) {
                   height: 24,
                 ),
               ),
-            ),
+            ),//
             Text(
               "Create Project",
               style: TextStyle(

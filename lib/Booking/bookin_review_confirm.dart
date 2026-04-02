@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 import 'Shoot_updated_screen.dart';
 import 'booking_summary_view_summary.dart';
 
@@ -176,6 +177,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
       } else {
         // ❌ API ERROR
+        TopMessage.show(context,response['message'] ?? "Something went wrong");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'] ?? "Something went wrong")),
         );
@@ -183,10 +185,11 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
     } catch (e) {
       print("🔥 EXCEPTION OCCURRED:");
       print(e);
+      TopMessage.show(context,'Network error');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Network error")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("Network error")),
+      // );
     } finally {
       setState(() => loding = false);
     }
@@ -253,15 +256,23 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
       appBar: AppBar(
-
-
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: Image.asset(
-            "assets/Icons/Reply.png",
-            height: 22,
-            color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16), // 🔥 control position
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: SvgPicture.asset(
+                images.back, // 🔥 updated path
+                height: 22,
+                width: 22,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
           ),
         ),
         actions: const [
@@ -354,7 +365,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                 ),
               ),
 
-        const SizedBox(width: 14),
+                        const SizedBox(width: 14),
 
                         Expanded(
                           child: Column(
@@ -613,23 +624,27 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                             const Divider(color: ColorCode.black),
 
                             _buildCheckRow(
+                              index: 1,
                               text: "Unlimited Usage Rights",
                               iconPath: "assets/newbookflow/security-wifi (1).png",
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
+                              index: 2,
                               text: "All Raw Content",
-                              iconPath: "assets/newbookflow/File Image.png",
+                              iconPath: images.all,
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
+                              index: 3,
                               text: "Include Edited Deliverable",
-                              iconPath: "assets/newbookflow/Box.png",
+                              iconPath:images.include,
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
+                              index: 4,
                               text: "Up to 2 Sets of Revisions",
-                              iconPath: "assets/newbookflow/Refresh.png",
+                              iconPath:images.up,
                             ),
                           ],
                         ),
@@ -721,7 +736,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
                 ],
               ),
-             /* Column(
+              /* Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
@@ -832,7 +847,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
           children: [
 
             /// 🔹 PRICE + DETAILS
-           /* Column(
+            /* Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children:  [
@@ -1110,6 +1125,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   }
 
   Widget _buildCheckRow({
+    required int index,
     required String text,
     required String iconPath,
   }) {
@@ -1124,11 +1140,18 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
             shape: BoxShape.circle,
           ),
           child: Center(
-            child: Image.asset(
-              iconPath,
+            child: index==1
+                ?
+            Image.asset( iconPath, height: 14, width: 14, color: Colors.white, )
+
+            :SvgPicture.asset(
+              iconPath, // 👈 now this should be .svg path
               height: 14,
               width: 14,
-              color: Colors.white,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
             ),
           ),
         ),

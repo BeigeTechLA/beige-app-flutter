@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/TopMessage.dart';
 
 class NewPassword extends StatefulWidget {
   final String email;
@@ -84,6 +85,15 @@ class _NewPasswordState extends State<NewPassword> {
 
 
   void _showSnack(String message) {
+    TopMessage.show(context, message);
+
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.black87,
+    //     behavior: SnackBarBehavior.floating,
+    //   ),
+    // );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

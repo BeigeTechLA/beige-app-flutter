@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -174,7 +175,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
     return Scaffold(
       // backgroundColor: ColorCode.white,
       body: Stack(
-        children: [
+        children:[
           SingleChildScrollView(
             child: Column(
               children: [
