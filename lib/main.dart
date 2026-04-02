@@ -56,20 +56,56 @@ class _MyAppState extends State<MyApp> {
        navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'BEIGE',
-      theme: ThemeData(
+    /*  theme: ThemeData(
 
         scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
         appBarTheme:  AppBarTheme(
           backgroundColor: ColorCode.bcakgroundcolor,
           iconTheme: IconThemeData(color: Colors.white),
+          elevation: 0, // 🔥 remove shadow
+          scrolledUnderElevation: 0, // 🔥 FIX (scroll pe color change nahi hoga)
+          surfaceTintColor: Colors.transparent, // 🔥 extra fix (Material 3)
         ),
         colorScheme: ColorScheme.dark(
           background: ColorCode.bcakgroundcolor,
           primary: Colors.white,
         ),
+      ),*/
+
+
+      theme: ThemeData(
+        useMaterial3: true, // 🔥 latest UI behavior control
+
+        scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: ColorCode.bcakgroundcolor,
+          iconTheme: IconThemeData(color: Colors.white),
+
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent, // 🔥 extra safety
+        ),
+
+        colorScheme: ColorScheme.dark(
+          background: ColorCode.bcakgroundcolor,
+          primary: Colors.white,
+        ),
+
+        // 🔥 remove splash/highlight unwanted effects
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+
+        // 🔥 smooth page transitions (optional but pro)
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
       ),
-
-
       // ✅ Correct navigation logic
       home: widget.isLoggedIn
           ?  Mainscreen()

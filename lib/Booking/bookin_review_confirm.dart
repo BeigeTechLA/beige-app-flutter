@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
-import '../widgets/TopMessage.dart';
 import 'Shoot_updated_screen.dart';
 import 'booking_summary_view_summary.dart';
 
@@ -177,7 +176,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
       } else {
         // ❌ API ERROR
-        TopMessage.show(context,response['message'] ?? "Something went wrong");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'] ?? "Something went wrong")),
         );
@@ -185,11 +183,10 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
     } catch (e) {
       print("🔥 EXCEPTION OCCURRED:");
       print(e);
-      TopMessage.show(context,'Network error');
 
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text("Network error")),
-      // );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Network error")),
+      );
     } finally {
       setState(() => loding = false);
     }
@@ -256,23 +253,15 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
       appBar: AppBar(
+
+
         elevation: 0,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16), // 🔥 control position
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SvgPicture.asset(
-                images.back, // 🔥 updated path
-                height: 22,
-                width: 22,
-                colorFilter: const ColorFilter.mode(
-                  Colors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
+          child: Image.asset(
+            "assets/Icons/Reply.png",
+            height: 22,
+            color: Colors.white,
           ),
         ),
         actions: const [
@@ -340,30 +329,30 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                     /// 🔹 TOP PROFILE ROW
                     Row(
                       children: [
-                 ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: getShootTypeImage().isNotEmpty
-                    ? Image.network(
-                  getShootTypeImage(),
-                  height: 144,
-                  width: 126,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
-                      height: 144,
-                      width: 126,
-                      fit: BoxFit.cover,
-                    );
-                  },
-                )
-                    : SvgPicture.asset(
-                  "assets/svg/imag_placeholder.svg",
-                  height: 144,
-                  width: 126,
-                  fit: BoxFit.cover,
-                ),
-              ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: getShootTypeImage().isNotEmpty
+                              ? Image.network(
+                            getShootTypeImage(),
+                            height: 144,
+                            width: 126,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) {
+                              return SvgPicture.asset(
+                                "assets/svg/imag_placeholder.svg",
+                                height: 144,
+                                width: 126,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                              : SvgPicture.asset(
+                            "assets/svg/imag_placeholder.svg",
+                            height: 144,
+                            width: 126,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
 
                         const SizedBox(width: 14),
 
@@ -473,7 +462,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              if ((booking?['edit_types'] ?? []).isNotEmpty) ...[
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -577,7 +565,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                     ),
                   ),
 
-],
+
                   SizedBox(height: 14),
                   // _buildField("Full Name*", nameController),
                   //
@@ -624,27 +612,23 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                             const Divider(color: ColorCode.black),
 
                             _buildCheckRow(
-                              index: 1,
                               text: "Unlimited Usage Rights",
                               iconPath: "assets/newbookflow/security-wifi (1).png",
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
-                              index: 2,
                               text: "All Raw Content",
-                              iconPath: images.all,
+                              iconPath: "assets/newbookflow/File Image.png",
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
-                              index: 3,
                               text: "Include Edited Deliverable",
-                              iconPath:images.include,
+                              iconPath: "assets/newbookflow/Box.png",
                             ),
                             const SizedBox(height: 12),
                             _buildCheckRow(
-                              index: 4,
                               text: "Up to 2 Sets of Revisions",
-                              iconPath:images.up,
+                              iconPath: "assets/newbookflow/Refresh.png",
                             ),
                           ],
                         ),
@@ -655,42 +639,25 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                       // --- SHOOT COST CARD ---
                       builderPricingCard(
                         title: "Shoot Cost",
-                        amount: getShootAmount(),
-                        subtitles: [],
-                      ),
-
-                      /*     builderPricingCard(
-                        title: "Shoot Cost",
                         amount: calculateShootCost()['total'],
                         subtitles: [
                           if (calculateShootCost()['hasPreProd']) "",
                           if (calculateShootCost()['hasRush']) "• Rush Fee",
 
                         ],
-                      ),*/
-                      builderPricingCard(
-                        title: "Editing Services",
-                        amount: getEditingAmount(),
-                        subtitles: [],
-                        // subtitles: getEditingSubtitles(),
                       ),
+
                       // --- EDITING SERVICES CARD ---
-                  /*    builderPricingCard(
+                      builderPricingCard(
                         title: "Editing Services",
                         amount: (pricing?['editing_amount'] ?? 0).toDouble(),
                         subtitles: (pricing?['editing_breakdown'] as List? ?? [])
                             .map((e) => "• ${e['label']}")
                             .toList(),
-                      ),*/
-                      if (getAdditionalCrewAmount() > 0)
-                        builderPricingCard(
-                          title: "Additional Crew",
-                          amount: getAdditionalCrewAmount(),
-                          subtitles: getAdditionalCrewSubtitlesNew(),
-                        ),
+                      ),
 
                       // --- ADDITIONAL CREW CARD ---
-                    /*  if (calculateAdditionalCrew()['total'] > 0)
+                      if (calculateAdditionalCrew()['total'] > 0)
                         builderPricingCard(
                           title: "Additional Crew",
                           amount: calculateAdditionalCrew()['total'],
@@ -698,7 +665,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                               .entries
                               .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
                               .toList(),
-                        ),*/
+                        ),
 
                       const SizedBox(height: 10),
                       const Divider(color: ColorCode.kDividerWhite12),
@@ -1125,7 +1092,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   }
 
   Widget _buildCheckRow({
-    required int index,
     required String text,
     required String iconPath,
   }) {
@@ -1140,18 +1106,11 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
             shape: BoxShape.circle,
           ),
           child: Center(
-            child: index==1
-                ?
-            Image.asset( iconPath, height: 14, width: 14, color: Colors.white, )
-
-            :SvgPicture.asset(
-              iconPath, // 👈 now this should be .svg path
+            child: Image.asset(
+              iconPath,
               height: 14,
               width: 14,
-              colorFilter: const ColorFilter.mode(
-                Colors.white,
-                BlendMode.srcIn,
-              ),
+              color: Colors.white,
             ),
           ),
         ),
@@ -1231,40 +1190,62 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
       ),
     );
   }
-  List<String> getShootSubtitles() {
-    final breakdown = pricing?['pricing_sections']?['shoot_cost']?['breakdown'] ?? [];
+  /// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
+  Map<String, dynamic> calculateShootCost() {
+    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
+    double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
+    double shootCost = preProd + rushFee;
 
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
+    // Use crewSummary instead of bookingSummaryData
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
+
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
+
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      // API keys are strings "1", "2", so we convert to string for lookup
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
+
+      if (current < required) {
+        shootCost += (c['amount'] ?? 0).toDouble();
+        processedCount[roleId] = current + 1;
+      }
+    }
+
+    return {
+      "total": shootCost,
+      "hasPreProd": preProd > 0,
+      "hasRush": rushFee > 0,
+    };
   }
 
-  List<String> getEditingSubtitlesNew() {
-    final breakdown = pricing?['pricing_sections']?['editing_services']?['breakdown'] ?? [];
+  Map<String, dynamic> calculateAdditionalCrew() {
+    double additionalTotal = 0;
+    Map<int, int> extraCount = {};
 
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
-  }
+    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
+    Map<int, int> processedCount = {};
 
-  List<String> getAdditionalCrewSubtitlesNew() {
-    final breakdown = pricing?['pricing_sections']?['additional_crew']?['breakdown'] ?? [];
+    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
 
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
-  }
+    for (var c in creatives) {
+      int roleId = c['role_id'];
+      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
+      int current = processedCount[roleId] ?? 0;
 
+      if (current < required) {
+        processedCount[roleId] = current + 1;
+      } else {
+        additionalTotal += (c['amount'] ?? 0).toDouble();
+        extraCount[roleId] = (extraCount[roleId] ?? 0) + 1;
+      }
+    }
 
-  double getShootAmount() {
-    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
-  }
-
-  double getEditingAmount() {
-    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
-  }
-
-  double getAdditionalCrewAmount() {
-    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
+    return {
+      "total": additionalTotal,
+      "counts": extraCount,
+    };
   }
 }

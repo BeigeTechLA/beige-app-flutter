@@ -377,73 +377,6 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     controller.text = "$hour:$minute $period";
   }
 
-  // Updated timeField usage in build method:
-  // For Start Time:
-  // timeField(
-  //   controller: startTimeController,
-  //   label: "Start Time*",
-  //   onTap: () => _selectTime(context, true),
-  // ),
-
-  // For End Time:
-  // timeField(
-  //   controller: endTimeController,
-  //   label: "End Time*",
-  //   onTap: () => _selectTime(context, false),
-  // ),
-
-// ... (Rest of your build method and existing helpers like isEndTimeAfterStart)
-  //
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: selectedDate ?? DateTime.now(),
-  //     firstDate: DateTime.now(), // 🔥 past date disable
-  //     lastDate: DateTime(2100),
-  //
-  //     builder: (context, child) {
-  //       return Theme(
-  //         data: ThemeData.dark().copyWith(
-  //           dialogBackgroundColor: const Color(0xFF121212),
-  //
-  //           colorScheme: const ColorScheme.dark(
-  //             primary: ColorCode.kButtonColor,      // selected date bg
-  //             onPrimary: Colors.black,               // selected date text
-  //             surface: Color(0xFF1E1E1E),             // calendar bg
-  //             onSurface: Colors.white,                // normal date text
-  //           ),
-  //
-  //           datePickerTheme: const DatePickerThemeData(
-  //             headerBackgroundColor: ColorCode.kButtonColor,
-  //             headerForegroundColor: Colors.black,
-  //             dayForegroundColor: MaterialStatePropertyAll(Colors.white),
-  //             weekdayStyle: TextStyle(color: Colors.grey),
-  //             todayForegroundColor: MaterialStatePropertyAll(Colors.white),
-  //             todayBackgroundColor: MaterialStatePropertyAll(Colors.transparent),
-  //           ),
-  //
-  //           textButtonTheme: TextButtonThemeData(
-  //             style: TextButton.styleFrom(
-  //               foregroundColor: ColorCode.kButtonColor, // OK / CANCEL
-  //             ),
-  //           ),
-  //         ),
-  //         child: child!,
-  //       );
-  //     },
-  //
-  //   );
-  //
-  //   if (picked != null && mounted) {
-  //     setState(() {
-  //       selectedDate = picked;
-  //       dateController.text =
-  //       "${picked.day.toString().padLeft(2, '0')}-"
-  //           "${picked.month.toString().padLeft(2, '0')}-"
-  //           "${picked.year}";
-  //     });
-  //   }
-  // }
   Future<void> _selectTime(
       BuildContext context,
       TextEditingController controller,
@@ -537,127 +470,6 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
       }
     });
   }
- /* Future<void> _selectTime(
-      BuildContext context,
-      TextEditingController controller,
-      TimeOfDay? initialTime,
-      Function(TimeOfDay) onTimeSelected,
-      ) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: initialTime ?? TimeOfDay.now(),
-
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            dialogBackgroundColor: const Color(0xFF121212),
-
-            colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor, // selected bg
-              onPrimary: Colors.white,         // selected text
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
-            ),
-
-            timePickerTheme: const TimePickerThemeData(
-              backgroundColor: Color(0xFF121212),
-              dialBackgroundColor: Color(0xFF121212),
-              dialHandColor: Colors.white,
-              dialTextColor: Colors.grey, // normal numbers thode soft
-              // 🔥 Hour / Minute box
-              hourMinuteColor: ColorCode.kButtonColor,
-              hourMinuteTextColor: Colors.black, // ✅ BLACK text inside time
-
-              // 🔥 AM / PM
-              dayPeriodColor: ColorCode.kButtonColor,
-              dayPeriodTextColor: Colors.white, // ✅ WHITE text in AM / PM
-
-
-
-              // 🔥 Buttons
-              confirmButtonStyle: ButtonStyle(
-                foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
-              ),
-              cancelButtonStyle: ButtonStyle(
-                foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
-              ),
-            ),
-
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        onTimeSelected(picked);
-
-        final hour = picked.hourOfPeriod.toString().padLeft(2, '0');
-        final minute = picked.minute.toString().padLeft(2, '0');
-        final period = picked.period == DayPeriod.am ? "AM" : "PM";
-
-        controller.text = "$hour:$minute $period";
-      });
-    }
-  }
-*/
-
-  // Future<void> _selectTime(
-  //     BuildContext context,
-  //     TextEditingController controller,
-  //     TimeOfDay? initialTime,
-  //     Function(TimeOfDay) onTimeSelected,
-  //     ) async {
-  //
-  //   // 🔥 Aaj ke liye initial time = NOW
-  //   TimeOfDay initial = TimeOfDay.now();
-  //
-  //   final picked = await showTimePicker(
-  //     context: context,
-  //     initialTime: initial,
-  //     builder: (context, child) {
-  //       return Theme(
-  //         data: ThemeData.dark(),
-  //         child: child!,
-  //       );
-  //     },
-  //   );
-  //
-  //   if (picked == null || !mounted) return;
-  //
-  //   // 🔒 HARD BLOCK PAST TIME (ONLY FOR TODAY)
-  //   if (isTodaySelected()) {
-  //     final now = TimeOfDay.now();
-  //
-  //     final pickedMinutes = picked.hour * 60 + picked.minute;
-  //     final nowMinutes = now.hour * 60 + now.minute;
-  //
-  //     if (pickedMinutes <= nowMinutes) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text(
-  //             "Please select a future time",
-  //           ),
-  //         ),
-  //       );
-  //       return; // ❌ past time blocked
-  //     }
-  //   }
-  //
-  //   // ✅ SAFE TO SET
-  //   setState(() {
-  //     onTimeSelected(picked);
-  //
-  //     final hour = picked.hourOfPeriod.toString().padLeft(2, '0');
-  //     final minute = picked.minute.toString().padLeft(2, '0');
-  //     final period = picked.period == DayPeriod.am ? "AM" : "PM";
-  //
-  //     controller.text = "$hour:$minute $period";
-  //   });
-  // }
-  //
-
 
 
   @override
@@ -766,7 +578,7 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
                   SizedBox(height: 12,),
                   //////////////////////////////////////////////////////////////////////////
 
-      Row(
+               Row(
         children: [
           Expanded(
             child: GestureDetector(
@@ -938,9 +750,6 @@ class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
           ),
         ],
       ),
-
-
-
 
                   SizedBox(
                     height: 50,
