@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../../widgets/loding.dart';
 
 class HomeViewProfile extends StatefulWidget {
   final int id;
@@ -223,12 +224,12 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                             : "",
                         height: 360,
                         width: double.infinity,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                         errorBuilder: (_, __, ___) => SvgPicture.asset(
                           "assets/svg/imag_placeholder.svg",
                           height: 360,
                           width: double.infinity,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                         ),
                       ),
 
@@ -328,7 +329,8 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child:  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         infoCard(
                           icon: Icons.group_outlined,
@@ -340,22 +342,31 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                           value: "${stats?['years_experience'] ?? 0} yrs",
                           title: "Experience",
                         ),
-                        infoCard(
+                      /*  infoCard(
                           icon: Icons.star_border,
                           value: "${creative?['bookings_count'] ?? 0}",
                           title: "Ratings",
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
 
                   SizedBox(height: 20,),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: Divider(
-                        color: ColorCode.kDividerWhite12,
-                        thickness: 1,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Container(
+                      height: 1,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.09), // left
+                            Colors.white.withOpacity(0.09), // center
+                            Colors.white.withOpacity(0.09), // right
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
                       ),
                     ),
                   ),
@@ -365,12 +376,21 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                   sectionTitle("About Creator"),
                   sectionText(about?['bio'] ?? "No information available"),
                   SizedBox(height: 20,),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: Divider(
-                        color: ColorCode.kDividerWhite12,
-                        thickness: 1,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Container(
+                      height: 1,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.09), // left
+                            Colors.white.withOpacity(0.09), // center
+                            Colors.white.withOpacity(0.09), // right
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
                       ),
                     ),
                   ),
@@ -427,16 +447,25 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                       const SizedBox(height: 18),
                     ],
                   ),
-                  Center(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      child: Divider(
-                        color: ColorCode.kDividerWhite12,
-                        thickness: 1,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Container(
+                      height: 1,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withOpacity(0.09), // left
+                            Colors.white.withOpacity(0.09), // center
+                            Colors.white.withOpacity(0.09), // right
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
                       ),
                     ),
                   ),
-                  Padding(
+              /*    Padding(
                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,7 +518,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                         thickness: 1,
                       ),
                     ),
-                  ),            Padding(
+                  ),    */        Padding(
                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -513,17 +542,12 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: weeklyAvailability.isEmpty
-                              ? const Text(
-                            "Not available",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              height: 20 / 12,
-                              letterSpacing: 0,
-                              color: Colors.white54,
-                            ),
-                          )
+                              ? Center(
+                                child: const Text(
+                                                            "Not available",
+                                                            style:  TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                                                          )),
+                              )
                               : Column(
                             children: weekDaysOrder.map((day) {
                               bool isActive = weeklyAvailability.contains(day);
@@ -536,7 +560,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                             }).toList(),
                           ),
                         ),
-                        Padding(
+                      /*  Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Divider(color: Colors.white10,
                           ),
@@ -554,7 +578,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                               ),
                             ),
 
-                            /*  Icon(Icons.chevron_right, color: Colors.white),*/
+                            *//*  Icon(Icons.chevron_right, color: Colors.white),*//*
                           ],
                         ),
 
@@ -633,7 +657,8 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                           ),
                         ),
 
-                        SizedBox(height: 20),                  Column(
+                        SizedBox(height: 20), */
+                  /*      Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 14),
@@ -661,7 +686,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
                               ),
                             ),
                           ],
-                        )
+                        )*/
                       ],
 
                     ),
@@ -674,14 +699,7 @@ class _HomeViewProfileState extends State<HomeViewProfile> {
 
             ),
             if (isLoading)
-            Container(
-              color: Colors.black, // ya transparent bhi rakh sakte ho
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: ColorCode.kGold40,
-                ),
-              ),
-            ),
+              const AppLoader(),
           ],
 
         ),

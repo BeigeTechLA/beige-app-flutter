@@ -12,7 +12,8 @@ import 'Video_Shoot_Type.dart';
 class ContentTypeScreen extends StatefulWidget {
   final int? value;
   final int ?specialtyId;
-  const ContentTypeScreen({super.key,  this.specialtyId, this.value});
+  final bool fromHome;
+  const ContentTypeScreen({super.key,  this.specialtyId, this.value,  this.fromHome =false});
 
   @override
   State<ContentTypeScreen> createState() => _ContentTypeScreenState();
@@ -274,7 +275,18 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
           title: Stack(
             alignment: Alignment.center,
             children: [
-
+              Align(
+                alignment: Alignment.centerLeft,
+                child: widget.fromHome   // 👈 condition
+                    ? InkWell(
+                  onTap: () => Navigator.pop(context),
+                  child: SvgPicture.asset(
+                    "assets/svg/back.svg",
+                    height: 24,
+                  ),
+                )
+                    : const SizedBox(), // 👈 hide
+              ),
               /// Center Title
               Center(
                 child: Text(
@@ -366,12 +378,12 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
 
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage:"assets/new_home/select_all.png",
+                          activeImage:"assets/newbookflow/Select_all.png",
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -388,7 +400,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage:"assets/new_home/photo_new.png",
+                          activeImage:"assets/newbookflow/Photography1.png",
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
                         ),
@@ -428,7 +440,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         const Spacer(),
 
                         SizedBox(
-                          width: 100,
+
                           height: 56,
                           child: ElevatedButton(
                             onPressed: isContinueEnabled ? _continueBooking : null,
@@ -490,9 +502,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDisabled?
-                Color(0xff171717).withOpacity(0.3):
-
-                ColorCode.kIconBackground,
+                ColorCode.circular:
+                ColorCode.circular,
               ),
               // child: Center(
               //   child: SvgPicture.asset(

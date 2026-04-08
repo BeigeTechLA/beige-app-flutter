@@ -54,11 +54,9 @@ dependencies:
   cached_network_image: ^3.3.1
   connectivity_plus: ^7.0.0
   flutter_svg: ^2.0.10
-
-
-
-
-
+  url_launcher: ^6.2.5
+#  flutter_native_timezone: ^1.0.8
+#  flutter_timezone: ^3.0.1
 
 
 
@@ -108,6 +106,8 @@ flutter:
     - assets/svg/Bottom_svg/
     - assets/svg/my_profile/
     - assets/new_home/
+    - assets/svg/new_bottom_image/
+    - assets/new_home/Topwrods/
 
 
 

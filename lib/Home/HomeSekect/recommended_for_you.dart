@@ -53,7 +53,6 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
     }
   }
 
-
   Future<void> _addFavourite(int userId) async {
     try {
       final response = await ApiService().postData(
@@ -69,7 +68,6 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
     }
   }
 
-
   Future<void> _removeFavourite(int userId) async {
     try {
       final response = await ApiService().deleteData(
@@ -84,7 +82,6 @@ class _RecommendedForYouState extends State<RecommendedForYou> {
       debugPrint("Remove Favourite Error: $e");
     }
   }
-
 
   Future<void> _fetch_RecommendedForYou() async {
     if (minRate == null || maxRate == null) return;

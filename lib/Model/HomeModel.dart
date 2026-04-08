@@ -95,7 +95,7 @@ class Creative {
 
   factory Creative.fromJson(Map<String, dynamic> json) {
     return Creative(
-      id: json['id'] ?? 0,
+      id: json['crew_member_id'] ?? 0,
       name: json['name'] ?? "",
       profileImage: json['profile_image_url'] ?? "",
       hourlyRate: json['hourly_rate']?.toString(),

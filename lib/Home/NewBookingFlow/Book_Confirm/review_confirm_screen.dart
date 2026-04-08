@@ -41,6 +41,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   String creativeImage = "";
   String creativeRate = "";
   String creativeRatingText = "";
+  String videoedittypesdata = "";
+  String photedittypesdata = "";
   Map<String, dynamic>? crewSummary;
 
   int currentStep = 2;
@@ -72,24 +74,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     return list;
   }
 
-  List<String> getEditingSubtitles() {
-    List<String> list = [];
-
-    /// 🔹 1. edit_types (Edited Photos)
-    final editTypes = booking?['edit_types'] ?? [];
-    for (var type in editTypes) {
-      list.add(type.toString());
-    }
-
-    /// 🔹 2. editing_breakdown (price wali details)
-    /*final breakdown = pricing?['editing_breakdown'] ?? [];
-    for (var item in breakdown) {
-      list.add("${item['label']}: \$${item['amount']}");
-    }*/
-
-    return list;
-  }
-  @override
   void initState() {
     super.initState();
     _fetchHomeReview();
@@ -148,44 +132,69 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
       if (response != null && response['error'] == false) {
         final data = response['data'];
+        final bookingData = data['booking'];
 
-        booking = data['booking'];
-        pricing = data['pricing'];
-        heldCreatives = data['held_creatives'] ?? [];
-        crewSummary = data['crew_summary'];
+        setState(() {
+          /// 🔹 MAIN DATA
+          booking = bookingData;
+          pricing = data['pricing'];
+          heldCreatives = data['held_creatives'] ?? [];
+          crewSummary = data['crew_summary'];
 
-        /// ✅ CHECK SAVED CARD
-        List savedCards = data['payment_methods']?['saved_cards'] ?? [];
-        hasSavedCard = savedCards.isNotEmpty;
+          /// 🔹 EDIT TYPES
+          videoedittypesdata =
+              (bookingData['video_edit_types'] ?? []).toString();
+          photedittypesdata =
+              (bookingData['photo_edit_types'] ?? []).toString();
 
-        if (!hasSavedCard) {
-          selectedIndex = 0; // force default to card
-        }
+          /// 🔹 PAYMENT
+          List savedCards = data['payment_methods']?['saved_cards'] ?? [];
+          hasSavedCard = savedCards.isNotEmpty;
 
-        creativeName = booking?['shoot_type_name'] ?? "—";
-        creativeImage = booking?['shoot_type_image_url'] ?? "";
-        creativeRole = getContentTypeTitle(
-          int.tryParse(booking?['content_type'] ?? "0") ?? 0,
-        );
+          if (!hasSavedCard) {
+            selectedIndex = 0;
+          }
+
+          /// 🔥 IMPORTANT (NAME + IMAGE)
+          creativeName = bookingData['shoot_type_name'] ?? "No Name";
+          creativeImage = bookingData['shoot_type_image_url'] ?? "";
+
+          creativeRole = getContentTypeTitle(
+            int.tryParse(bookingData['content_type'] ?? "0") ?? 0,
+          );
+        });
+
+        /// 🔍 DEBUG (check in console)
+        debugPrint("✅ NAME: $creativeName");
+        debugPrint("✅ IMAGE: $creativeImage");
+        debugPrint("✅ FULL BOOKING: $bookingData");
       }
     } catch (e) {
-      debugPrint("Review API Error: $e");
+      debugPrint("❌ Review API Error: $e");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-void _snakbar(String message){
+/*void _snakbar(String message){
     TopMessage.show(context, message);
 
-}
+}*/
+  Map<String, int> groupEditTypes(List list) {
+    Map<String, int> grouped = {};
 
+    for (var item in list) {
+      grouped[item] = (grouped[item] ?? 0) + 1;
+    }
+
+    return grouped;
+  }
   Future<void> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text("Please fill required fields")),
-      // );
-      _snakbar('Please fill required fields');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill required fields")),
+      );
+      // _snakbar('Please fill required fields');
       return;
     }
 
@@ -230,10 +239,16 @@ void _snakbar(String message){
 
   String formatDate(String? date) {
     if (date == null || date.isEmpty) return "";
-    final d = DateTime.parse(date);
-    return DateFormat('EEE, dd MMM yyyy').format(d);
-  }
 
+    final d = DateTime.parse(date);
+    return DateFormat('MM,dd,yyyy').format(d); // 👉 04 08, 2026
+  }
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "";
+
+    final parsedTime = DateFormat("HH:mm:ss").parse(time);
+    return DateFormat("hh:mm a").format(parsedTime); // 👉 03:27 PM
+  }
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -324,617 +339,688 @@ void _snakbar(String message){
         ),
       ),
 
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
+      body:  Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
 
-              Row(
-                children: List.generate(3, (index) {
-                  double fillWidth = 0;
+                Row(
+                  children: List.generate(3, (index) {
+                    double fillWidth = 0;
 
-                  if (index < currentStep) {
-                    // ✅ Completed step (FULL)
-                    fillWidth = double.infinity;
-                  } else if (index == currentStep) {
-                    // 🟡 Current step (HALF)
-                    fillWidth = 140.44;
-                  } else {
-                    fillWidth = 0;
-                  }
+                    if (index < currentStep) {
+                      // ✅ Completed step (FULL)
+                      fillWidth = double.infinity;
+                    } else if (index == currentStep) {
+                      // 🟡 Current step (HALF)
+                      fillWidth = 140.44;
+                    } else {
+                      fillWidth = 0;
+                    }
 
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: ColorCode.kSubtextColor, // grey background
-                        borderRadius: BorderRadius.circular(64),
-                      ),
-                      child: fillWidth > 0
-                          ? Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          height: 5,
-                          width: fillWidth == double.infinity
-                              ? null
-                              : fillWidth,
-                          decoration: BoxDecoration(
-                            color: ColorCode.kButtonColor,
-                            borderRadius: BorderRadius.circular(64),
-                          ),
+                    return Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: ColorCode.kSubtextColor, // grey background
+                          borderRadius: BorderRadius.circular(64),
                         ),
-                      )
-                          : const SizedBox(),
-                    ),
-                  );
-                }),
-              ),
-
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Review & Confirm",
-                    style: TextStyle(
-                      fontFamily: "Unbounded ",
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: ColorCode.white,
-                    ),
-                  ),
-
-
-                ],
-              ),
-
-              SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: ColorCode.k282828,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    /// 🔹 TOP PROFILE ROW
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
+                        child: fillWidth > 0
+                            ? Align(
+                          alignment: Alignment.centerLeft,
                           child: Container(
-                            height: 144,
-                            width: 126,
-                            color: Colors.black12, // optional bg
-                            child: creativeImage.isNotEmpty
-                                ? Image.network(
-                              "${ApiService.imageURL}$creativeImage",
-                              fit: BoxFit.cover, // 🔥 proper crop
-                              alignment: Alignment.center, // 🔥 center focus
-                              errorBuilder: (_, __, ___) {
-                                return Image.asset(
-                                  "assets/images/Rectangle 34661070.png",
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center,
-                                );
-                              },
-                            )
-                                : Image.asset(
-                              "assets/images/Rectangle 34661070.png",
-                              fit: BoxFit.cover,
-                              alignment: Alignment.center,
+                            height: 5,
+                            width: fillWidth == double.infinity
+                                ? null
+                                : fillWidth,
+                            decoration: BoxDecoration(
+                              color: ColorCode.kButtonColor,
+                              borderRadius: BorderRadius.circular(64),
                             ),
                           ),
-                        ),
+                        )
+                            : const SizedBox(),
+                      ),
+                    );
+                  }),
+                ),
+
+                SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Review & Confirm",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.white,
+                      ),
+                    ),
 
 
-                        SizedBox(width: 14),
+                  ],
+                ),
 
-                        Expanded(
+                SizedBox(height: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: ColorCode.k282828,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
 
-                              /// ⭐ Rating
-                              /*     Row(
+                              /// 🔹 TOP PROFILE ROW
+                              Row(
                                 children: [
-                                  const Icon(Icons.star, size: 14, color: Colors.amber),
-                                  const SizedBox(width: 4),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: Container(
+                                      height: 144,
+                                      width: 126,
+                                      color: Colors.black12, // optional bg
+                                      child: creativeImage.isNotEmpty
+                                          ? Image.network(
+                                        "${ApiService.imageURL}$creativeImage",
+                                        fit: BoxFit.cover, // 🔥 proper crop
+                                        alignment: Alignment.center, // 🔥 center focus
+                                        errorBuilder: (_, __, ___) {
+                                          return SvgPicture.asset(
+                                            "assets/svg/imag_placeholder.svg",
+
+                                            alignment: Alignment.center,
+                                          );
+                                        },
+                                      )
+                                          : SvgPicture.asset(
+                                        "assets/svg/imag_placeholder.svg",
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                      ),
+                                    ),
+                                  ),
+
+
+                                  SizedBox(width: 14),
+
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+
+                                        /// ⭐ Rating
+                                        /*     Row(
+                                        children: [
+                                          const Icon(Icons.star, size: 14, color: Colors.amber),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            creativeRatingText,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: ColorCode.kWhiteOpacity70,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: "Outfit",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                            */
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          // Content Type:creativeRole,
+                                          "Content Type: $creativeRole",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: ColorCode.kButtonColor,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          creativeName,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+
+
+                                        /// 🎥 ROLE
+
+
+                                        const SizedBox(height: 10),
+
+                                        /*       /// 💰 RATE
+                                      creativeRate.isNotEmpty
+                                          ? Text(
+                                        "From \$$creativeRate/Hr",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: ColorCode.kButtonColor,
+                                          fontFamily: "Outfit",
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      )
+                                          : const SizedBox(),
+                            */
+                                      ],
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+
+                              SizedBox(height: 14),
+
+                              SizedBox(
+                                height: 1,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: List.generate(
+                                        (constraints.maxWidth / 14).floor(),
+                                            (index) =>
+                                            Container(
+                                              width: 6,
+                                              height: 1,
+                                              color: Colors.white30,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+
+                              const SizedBox(height: 12),
+
+                              /// ⬜ WHITE INFO BOX
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+
+                                    infoRowBlack(
+                                      "assets/svg/Group 2087328870.svg",
+                                        "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
+                                            " (${pricing?['duration_hours']}h duration)",
+                                    ),
+                                    const SizedBox(height: 8),
+                                    infoRowBlack(
+                                      "assets/svg/Frame.svg",
+                                      formatDate(booking?['event_date']),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    infoRowBlack(
+                                      "assets/svg/location.svg",
+                                      booking?['event_location'] ?? "",
+                                    ),
+
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Divider(color: ColorCode.kDividerWhite12,),
+                        SizedBox(height: 30),
+
+
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            if ((booking?['video_edit_types'] ?? []).isNotEmpty ||
+                                (booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
                                   Text(
-                                    creativeRatingText,
-                                    style: const TextStyle(
+                                    "Editing Services",
+                                    style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: ColorCode.white,
+                                      fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w500,
-                                      fontFamily: "Outfit",
                                     ),
                                   ),
                                 ],
                               ),
-*/
-                              const SizedBox(height: 6),
-                              Text(
-                                // Content Type:creativeRole,
-                                "Content Type: $creativeRole",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: ColorCode.kButtonColor,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                creativeName,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  fontFamily: "Outfit",
-                                ),
-                              ),
 
+                              SizedBox(height: 14),
 
-                              /// 🎥 ROLE
-
-
-                              const SizedBox(height: 10),
-
-                              /*       /// 💰 RATE
-                              creativeRate.isNotEmpty
-                                  ? Text(
-                                "From \$$creativeRate/Hr",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: ColorCode.kButtonColor,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              )
-                                  : const SizedBox(),
-*/
-                            ],
-                          ),
-                        ),
-
-                      ],
-                    ),
-
-                    SizedBox(height: 14),
-
-                    SizedBox(
-                      height: 1,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List.generate(
-                              (constraints.maxWidth / 14).floor(),
-                                  (index) =>
-                                  Container(
-                                    width: 6,
-                                    height: 1,
-                                    color: Colors.white30,
-                                  ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-
-
-                    const SizedBox(height: 12),
-
-                    /// ⬜ WHITE INFO BOX
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-
-                          infoRowBlack(
-                            "assets/svg/Group 2087328870.svg",
-                            "${booking?['start_time']} to ${booking?['end_time']} "
-                                "(${pricing?['duration_hours']}h duration)",
-                          ),
-                          const SizedBox(height: 8),
-                          infoRowBlack(
-                            "assets/svg/Frame.svg",
-                            formatDate(booking?['event_date']),
-                          ),
-                          const SizedBox(height: 8),
-                          infoRowBlack(
-                            "assets/svg/location.svg",
-                            booking?['event_location'] ?? "",
-                          ),
-
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Divider(color: ColorCode.kDividerWhite12,),
-              SizedBox(height: 30),
-
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// ✅ CHECK: agar data hai tabhi show karo
-                  if ((booking?['edit_types'] ?? []).isNotEmpty) ...[
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Editing Services",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: ColorCode.white,
-                            fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 14),
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF282828),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Text(
-                              "$creativeRole:",
-                              style: const TextStyle(
-                                color: ColorCode.white,
-                                fontSize: 12,
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: (booking?['edit_types'] ?? []).length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 2.3,
-                            ),
-                            itemBuilder: (context, index) {
-                              final edit = booking!['edit_types'][index];
-
-                              final parts = edit.split('(');
-                              final title = parts[0].trim();
-                              final duration = parts.length > 1 ? "(${parts[1]}" : "";
-
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kGoldLight20,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: const Color(0xFF282828),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      title,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: ColorCode.kButtonColor,
-                                        fontFamily: "Outfit",
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    if (duration.isNotEmpty)
-                                      Text(
-                                        duration,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: ColorCode.kButtonColor,
-                                          fontFamily: "Outfit",
-                                          fontSize: 12,
+
+                                    /// ================= VIDEO EDITS =================
+                                    if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
+
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          "Video Edits:",
+                                          style: TextStyle(
+                                            color: ColorCode.white,
+                                            fontSize: 12,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ),
+
+                                      Builder(
+                                        builder: (context) {
+                                          final rawList =
+                                          List<String>.from(booking?['video_edit_types'] ?? []);
+
+                                          final Map<String, int> countMap = {};
+
+                                          for (var item in rawList) {
+                                            countMap[item] = (countMap[item] ?? 0) + 1;
+                                          }
+
+                                          final uniqueList = countMap.keys.toList();
+
+                                          return Column(
+                                            children: uniqueList.map((edit) {
+                                              final count = countMap[edit];
+
+                                              return Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                   // width: double.infinity,
+                                                  margin: const EdgeInsets.only(bottom: 8),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: ColorCode.kGoldLight20,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    "${(edit)} x$count",
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: ColorCode.kButtonColor,
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w500, // 🔥 better look
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          );
+                                        },
+                                      ),
+
+                                      SizedBox(height: 12),
+                                    ],
+
+                                    /// ================= PHOTO EDITS =================
+                                    if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          "Photo Edits:",
+                                          style: TextStyle(
+                                            color: ColorCode.white,
+                                            fontSize: 12,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Builder(
+                                        builder: (context) {
+                                          final rawList =
+                                          List<String>.from(booking?['photo_edit_types'] ?? []);
+
+                                          final Map<String, int> countMap = {};
+
+                                          for (var item in rawList) {
+                                            countMap[item] = (countMap[item] ?? 0) + 1;
+                                          }
+
+                                          final uniqueList = countMap.keys.toList();
+
+                                          return Column(
+                                            children: uniqueList.map((edit) {
+                                              final count = countMap[edit];
+
+                                              return Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                   // width: double.infinity,
+                                                  margin: const EdgeInsets.only(bottom: 8),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: ColorCode.kGoldLight20,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    "${(edit)} x$count",
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: ColorCode.kButtonColor,
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w500, // 🔥 better look
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ],
                                 ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Divider(color: ColorCode.kDividerWhite12),
-                    ),
-                  ],
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Payment Method",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: ColorCode.white,
-                                fontFamily: "Unbounded",
-                                fontWeight: FontWeight.w500
-                            ),),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      PaymentMethodScreen(
-                                        bookingId: widget.bookingId,),
-                                ),
-                              );
-                            },
-                            child: Image.asset(
-                              "assets/Icons/rightside.png",
-                              height: 40, // bigger height
-                              width: 40,
-                              color: ColorCode.white,
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 14),
-
-                      /// 🔹 PAY AT VENUE
-                      /*  paymentRadioTile(
-                        title: "Pay By Credit or Debit Card",
-                        value: 0,
-                      ),
-
-                      paymentRadioTile(
-                        title: "Pay Via Stripe",
-                        value: 1,
-                      ),*/
-                      paymentRadioTile(
-                        title: hasSavedCard
-                            ? "Pay Via Stripe"
-                            : "Pay Via Stripe (Add Card First)",
-                        value: 1,
-                        isDisabled: !hasSavedCard,
-                      ),
-
-
-                    ],
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Divider(color: ColorCode.kDividerWhite12,),
-                  ),
-
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Contact Information",
-
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: ColorCode.white,
-                            fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500
-                        ),),
-                    ],
-                  ),
-                  SizedBox(height: 14),
-                  // _buildField("Full Name*", nameController),
-                  CustomInputField(
-                    title: "Full Name",
-                    controller: nameController,
-                  ),
-                  const SizedBox(height: 15),
-
-                  CustomInputField(
-                    title: "Email ID",
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-
-                  const SizedBox(height: 15),
-                  CustomInputField(
-                    title: "Phone Number",
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.done,
-
-                    onFieldSubmitted: (_) {
-                      FocusScope.of(context).unfocus(); // ✅ Done button
-                    },
-
-                    onChanged: (value) {
-                      if (value.length == 10) {
-                        FocusScope.of(context).unfocus(); // ✅ Auto close after 10 digit
-                      }
-                    },
-
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                  ),            const SizedBox(height: 15),
-
-                  Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Divider(color: ColorCode.kDividerWhite12,),
-                  ),
-
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Pricing Summary",
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: ColorCode.white,
-                            fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 14),
-                      Container(
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          color: ColorCode.kCreamSoft,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Package Offer",
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Outfit",
                               ),
-                            ),
-                            const Divider(color: ColorCode.black),
 
-                            _buildCheckRow(
-                              text: "Unlimited Usage Rights",
-                              iconPath: "assets/newbookflow/security-wifi (1).png",
-                            ),
-                            const SizedBox(height: 12),
-                            _buildCheckRow(
-                              text: "All Raw Content",
-                              iconPath: "assets/newbookflow/File Image.png",
-                            ),
-                            const SizedBox(height: 12),
-                            _buildCheckRow(
-                              text: "Include Edited Deliverable",
-                              iconPath: "assets/newbookflow/Box.png",
-                            ),
-                            const SizedBox(height: 12),
-                            _buildCheckRow(
-                              text: "Up to 2 Sets of Revisions",
-                              iconPath: "assets/newbookflow/Refresh.png",
-                            ),
-                          ],
-                        ),
-                      ),
+                              Padding(
+                                padding: EdgeInsets.all(12.0),
+                                child: Divider(color: ColorCode.kDividerWhite12),
+                              ),
+                            ],
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
 
-                      const SizedBox(height: 14),
-                      Divider(color: ColorCode.kDividerWhite12),
-                      // --- SHOOT COST CARD ---
-                      // --- SHOOT COST CARD ---
-                      builderPricingCard(
-                        title: "Shoot Cost",
-                        amount: getShootAmount(),
-                        subtitles: [],
-                      ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Payment Method",
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: ColorCode.white,
+                                          fontFamily: "Unbounded",
+                                          fontWeight: FontWeight.w500
+                                      ),),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                PaymentMethodScreen(
+                                                  bookingId: widget.bookingId,),
+                                          ),
+                                        );
+                                      },
+                                      child: Image.asset(
+                                        "assets/Icons/rightside.png",
+                                        height: 40, // bigger height
+                                        width: 40,
+                                        color: ColorCode.white,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 14),
 
-// --- EDITING SERVICES CARD ---
-                     /* builderPricingCard(
-                        title: "Editing Services",
-                        amount: calculateEditingCost(),
-                        subtitles: [],
-                      ),*/
-                      builderPricingCard(
-                        title: "Editing Services",
-                        amount: getEditingAmount(),
-                        subtitles: [],
-                        // subtitles: getEditingSubtitles(),
-                      ),
-
-// --- ADDITIONAL CREW CARD ---
-                      if (getAdditionalCrewSubtitles().isNotEmpty)
-                        builderPricingCard(
-                          title: "Additional Crew",
-                          amount: getAdditionalCrewAmount(),
-                          subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
+                                /// 🔹 PAY AT VENUE
+                                /*  paymentRadioTile(
+                          title: "Pay By Credit or Debit Card",
+                          value: 0,
                         ),
 
-/*
-                      if (calculateAdditionalCrew() > 0)
-                        builderPricingCard(
-                          title: "Additional Crew",
-                          amount: calculateAdditionalCrew(),
+                        paymentRadioTile(
+                          title: "Pay Via Stripe",
+                          value: 1,
+                        ),*/
+                                paymentRadioTile(
+                                  title: hasSavedCard
+                                      ? "Pay Via Stripe"
+                                      : "Pay Via Stripe (Add Card First)",
+                                  value: 1,
+                                  isDisabled: !hasSavedCard,
+                                ),
+
+
+                              ],
+                            ),
+
+                            Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Divider(color: ColorCode.kDividerWhite12,),
+                            ),
+
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Contact Information",
+
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: ColorCode.white,
+                                      fontFamily: "Unbounded",
+                                      fontWeight: FontWeight.w500
+                                  ),),
+                              ],
+                            ),
+                            SizedBox(height: 14),
+                            // _buildField("Full Name*", nameController),
+                            CustomInputField(
+                              title: "Full Name",
+                              controller: nameController,
+                            ),
+                            const SizedBox(height: 15),
+
+                            CustomInputField(
+                              title: "Email ID",
+                              controller: emailController,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+
+                            const SizedBox(height: 15),
+                            CustomInputField(
+                              title: "Phone Number",
+                              controller: phoneController,
+                              keyboardType: TextInputType.phone,
+                              textInputAction: TextInputAction.done,
+
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context).unfocus(); // ✅ Done button
+                              },
+
+                              onChanged: (value) {
+                                if (value.length == 10) {
+                                  FocusScope.of(context).unfocus(); // ✅ Auto close after 10 digit
+                                }
+                              },
+
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                            ),            const SizedBox(height: 15),
+
+                            Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Divider(color: ColorCode.kDividerWhite12,),
+                            ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Pricing Summary",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: ColorCode.white,
+                                      fontFamily: "Unbounded",
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 14),
+                                Container(
+                                  padding: const EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                    color: ColorCode.kCreamSoft,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Package Offer",
+                                        style: TextStyle(
+                                          color: ColorCode.kHeadingColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: "Outfit",
+                                        ),
+                                      ),
+                                      const Divider(color: ColorCode.black),
+
+                                      _buildCheckRow(
+                                        text: "Unlimited Usage Rights",
+                                        iconPath: "assets/newbookflow/security-wifi (1).png",
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildCheckRow(
+                                        text: "All Raw Content",
+                                        iconPath: "assets/newbookflow/File Image.png",
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildCheckRow(
+                                        text: "Include Edited Deliverable",
+                                        iconPath: "assets/newbookflow/Box.png",
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildCheckRow(
+                                        text: "Up to 2 Sets of Revisions",
+                                        iconPath: "assets/newbookflow/Refresh.png",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 14),
+                                Divider(color: ColorCode.kDividerWhite12),
+                                // --- SHOOT COST CARD ---
+                                // --- SHOOT COST CARD ---
+                                builderPricingCard(
+                                  title: "Shoot Cost",
+                                  amount: getShootAmount(),
+                                  subtitles: [],
+                                ),
+
+                                // --- EDITING SERVICES CARD ---
+                                /* builderPricingCard(
+                          title: "Editing Services",
+                          amount: calculateEditingCost(),
                           subtitles: [],
                         ),*/
+                                builderPricingCard(
+                                  title: "Editing Services",
+                                  amount: getEditingAmount(),
+                                  subtitles: [],
+                                  // subtitles: getEditingSubtitles(),
+                                ),
 
-                      const SizedBox(height: 10),
-                      const Divider(color: ColorCode.kDividerWhite12),
+                                // --- ADDITIONAL CREW CARD ---
+                                if (getAdditionalCrewSubtitles().isNotEmpty)
+                                  builderPricingCard(
+                                    title: "Additional Crew",
+                                    amount: getAdditionalCrewAmount(),
+                                    subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
+                                  ),
 
-                      /// 🔹 TOTAL
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Total Amount",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: ColorCode.white,
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: ColorCode.kButtonColor,
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                                /*
+                        if (calculateAdditionalCrew() > 0)
+                          builderPricingCard(
+                            title: "Additional Crew",
+                            amount: calculateAdditionalCrew(),
+                            subtitles: [],
+                          ),*/
+
+                                const SizedBox(height: 10),
+                                const Divider(color: ColorCode.kDividerWhite12),
+
+                                /// 🔹 TOTAL
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Total Amount",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: ColorCode.white,
+                                          fontFamily: "Outfit",
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: ColorCode.kButtonColor,
+                                          fontFamily: "Outfit",
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ],
+                            )
+
+
                           ],
                         ),
-                      ),
-
-                    ],
-                  )
-
-
-                ],
-              ),
+                      ],
+                    ),
+                  ),
+                ),
 
 
-            ],
+
+              ],
+            ),
           ),
+        ],
 
-        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
@@ -977,7 +1063,15 @@ void _snakbar(String message){
       ),
     );
   }
-
+ /* String _cleanText(String text) {
+    return text
+        .replaceAll('_', ' ')
+        .replaceAllMapped(RegExp(r'(\d+)'), (match) => match.group(0)!) // numbers safe
+        .split(' ')
+        .map((word) =>
+    word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
+        .join(' ');
+  }*/
 
   Widget infoRowBlack(String svgIcon, String text) {
     return Row(

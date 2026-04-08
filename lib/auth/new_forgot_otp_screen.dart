@@ -293,7 +293,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4),
                                     child: Container(
-                                      height: 60,
+                                      height: 50,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
 
@@ -365,11 +365,11 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                 Text(
                                   "Didn’t received the code?",
                                   style: TextStyle(
-                                    color: ColorCode.kWhiteOpacity70,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: "Outfit",
-                                    decorationThickness: 1.5,
+                                    color: const Color(0xFFD5D5D5),
+                                    fontSize: 14,
+                                    fontFamily: 'Outfit',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.60,
                                   ),
                                 ),
                                 InkWell(
@@ -504,7 +504,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
               ],
             ),
           ),
-         /* if (isLoading)
+          /* if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
               child: const Center(
@@ -523,7 +523,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
       ),
 
-   /*   bottomNavigationBar: Padding(
+      /*   bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -9,6 +9,7 @@ import '../service/api_service.dart';
 
 import '../service/api_endpoints.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/loding.dart';
 import 'upcoming_event_summary_managebooking.dart';
 import 'upcoming_booking_event_summary.dart';
 
@@ -36,12 +37,20 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchUpcoming();
-    _fetchCompleted();
+    fetchAll();
 
   }
 
+  Future<void> fetchAll() async {
+    setState(() => isLoading = true);
 
+    await Future.wait([
+      _fetchUpcoming(),
+      _fetchCompleted(),
+    ]);
+
+    setState(() => isLoading = false);
+  }
   Future<void> _fetchUpcoming() async {
     try {
       final response = await ApiService().fetchData(
@@ -102,185 +111,193 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-
-            /// HEADER
-        Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "My Shoots",
-                  style: TextStyle(
-                    color: ColorCode.white,
-                    fontFamily: 'Unbounded',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-           /*     InkWell(
-                  onTap: () {
-                    openFilterBottomSheet(context);
-                  },
-                  child: Image.asset(
-                    "assets/Icons/Filter.png",
-                    height: 40,
-                    width: 40,
-                    color: ColorCode.white,
-                  ),
-                ),*/
-              ],
-            ),
+                const SizedBox(height: 40),
 
-             SizedBox(height: 20),
-
-
-            /// TOGGLE
-            Container(
-              height: 55,
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: ColorCode.k282828,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-
-                  /// 🔹 UPCOMING TAB
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isUpcomingSelected = true;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: isUpcomingSelected
-                              ? const Color(0xFFE8D8BD) // selected bg
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Upcoming",
-                          style: TextStyle(
-                            fontFamily: "Outfit",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: isUpcomingSelected
-                                ? Colors.black
-                                : Colors.white70,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  /// 🔹 COMPLETED TAB
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isUpcomingSelected = false;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                          color: !isUpcomingSelected
-                              ? const Color(0xFFE8D8BD)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Completed",
-                          style: TextStyle(
-                            fontFamily: "Outfit",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: !isUpcomingSelected
-                                ? Colors.black
-                                : Colors.white70,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-
-
-
-            /// LIST
-            Expanded(
-              child: isUpcomingSelected
-                  ? isUpcomingLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : upcomingShoots.isEmpty
-                  ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                /// HEADER
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    /// 🔹 IMAGE
-                    Image.asset(
-                      "assets/Icons/booking_serch.png",
-                      fit: BoxFit.contain,
-                    ),
-                    Text("No Booking Found",
-                        style:
-                        TextStyle(color: ColorCode.kButtonColor,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
-                    ),
-
                     Text(
-                      "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
-                      textAlign: TextAlign.center,
+                      "My Shoots",
                       style: TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
-                        fontFamily: "Outfit",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                        color: ColorCode.white,
+                        fontFamily: 'Unbounded',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-
+                    /*     InkWell(
+                    onTap: () {
+                      openFilterBottomSheet(context);
+                    },
+                    child: Image.asset(
+                      "assets/Icons/Filter.png",
+                      height: 40,
+                      width: 40,
+                      color: ColorCode.white,
+                    ),
+                  ),*/
                   ],
                 ),
-              )
-                  : ListView.builder(
-                itemCount: upcomingShoots.length,
-                itemBuilder: (context, index) {
-                  return upcomingBookingCard(
-                      upcomingShoots[index]);
-                },
-              )
-                  : isCompletedLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : completedShoots.isEmpty
-                  ? const Center(
-                child: Text("No Completed Shoots",
-                    style:
-                    TextStyle(color: Colors.white)),
-              )
-                  : ListView.builder(
-                itemCount: completedShoots.length,
-                itemBuilder: (context, index) {
-                  return completedBookingCard(
-                      completedShoots[index]);
-                },
-              ),
+
+                SizedBox(height: 20),
+
+
+                /// TOGGLE
+                Container(
+                  height: 55,
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: ColorCode.k282828,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+
+                      /// 🔹 UPCOMING TAB
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isUpcomingSelected = true;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: isUpcomingSelected
+                                  ? const Color(0xFFE8D8BD) // selected bg
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Upcoming",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: isUpcomingSelected
+                                    ? Colors.black
+                                    : Colors.white70,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// 🔹 COMPLETED TAB
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isUpcomingSelected = false;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              color: !isUpcomingSelected
+                                  ? const Color(0xFFE8D8BD)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Completed",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: !isUpcomingSelected
+                                    ? Colors.black
+                                    : Colors.white70,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+
+
+
+                /// LIST
+                Expanded(
+                  child: isUpcomingSelected
+                      ? isUpcomingLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : upcomingShoots.isEmpty
+                      ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        /// 🔹 IMAGE
+                        Image.asset(
+                          "assets/Icons/booking_serch.png",
+                          fit: BoxFit.contain,
+                        ),
+                        Text("No Booking Found",
+                            style:
+                            TextStyle(color: ColorCode.kButtonColor,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
+                        ),
+
+                        Text(
+                          "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: ColorCode.kWhiteOpacity70,
+                            fontFamily: "Outfit",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  )
+                      : ListView.builder(
+                    itemCount: upcomingShoots.length,
+                    itemBuilder: (context, index) {
+                      return upcomingBookingCard(
+                          upcomingShoots[index]);
+                    },
+                  )
+                      : isCompletedLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : completedShoots.isEmpty
+                      ? const Center(
+                    child: Text("No Completed Shoots",
+                        style:
+                        TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                        )),
+                  )
+                      : ListView.builder(
+                    itemCount: completedShoots.length,
+                    itemBuilder: (context, index) {
+                      return completedBookingCard(
+                          completedShoots[index]);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (isLoading)
+            const AppLoader(),
+        ],
+
       ),
     );
   }

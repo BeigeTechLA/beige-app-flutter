@@ -20,183 +20,110 @@ class Mainscreen extends StatefulWidget {
 class _MainscreenState extends State<Mainscreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
+ /* final List<Widget> _pages = [
     NewHomeScreen(),
-    ContentTypeScreen(),
+    ContentTypeScreen(
+      fromHome: false,
+    ),
     BookingAllScreen(),
     Center(child: Text("Message")),
-  ];
+  ];*/
+  Widget get _currentPage {
+    switch (_selectedIndex) {
+      case 0:
+        return NewHomeScreen();
 
-  /// 🔐 LOGOUT DIALOG
+      case 1:
+        return ContentTypeScreen(
+          fromHome: false, // bottom nav
+        );
+  
+      case 2:
+        return BookingAllScreen();
+
+      case 3:
+        return const Center(child: Text("Message"));
+
+      default:
+        return NewHomeScreen();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: _pages[_selectedIndex],
-
-      // ⭐ No overflow — BottomNavigationBar directly use
-      /*  bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        elevation: 0,
-
-        selectedItemColor: ColorCode.white,
-        unselectedItemColor:ColorCode.kWhiteOpacity70,
-
-        selectedLabelStyle:
-        TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-        unselectedLabelStyle:
-        TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-
-        type: BottomNavigationBarType.fixed,
-
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Icons/Home.png",
-              height: 28,
-              color: _selectedIndex == 0 ? ColorCode.white : ColorCode.kWhiteOpacity60,
-              colorBlendMode: BlendMode.srcIn,
-            ),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Icons/booking.png",
-              height: 28,
-              color: _selectedIndex == 1 ? ColorCode.kHeadingColor : Colors.grey,
-            ),
-            label: "Bookings",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Icons/Capture.png",
-              height: 28,
-              color: _selectedIndex == 1? ColorCode.kHeadingColor : Colors.grey,
-            ),
-            label: "Book Shoot",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Icons/booking.png",
-              height: 28,
-              color: _selectedIndex == 2? ColorCode.kHeadingColor : Colors.grey,
-            ),
-            label: "Booking",
-          ),
-
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              "assets/Icons/messge.png",
-              height: 28,
-              color: _selectedIndex == 3? ColorCode.kHeadingColor : Colors.grey,
-            ),
-            label: "Chat",
-          ),
-// ⭐ Circle Profile icon
-
-        ],
-      ),*/
-
+      body: _currentPage ,
 
       bottomNavigationBar: ClipRect(
+
         child: BackdropFilter(
           filter: ImageFilter.blur(
-            sigmaX: 100,
-            sigmaY: 100,
+            sigmaX: 80,
+            sigmaY: 70,
           ),
-          child: Container(
-            decoration: BoxDecoration(
+          child: BottomNavigationBar(
 
+            currentIndex: _selectedIndex,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            type: BottomNavigationBarType.fixed,
 
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.20),
-                  ColorCode.kBlackDark,
-                ],
-              ),
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+
+            selectedLabelStyle: const TextStyle(
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
             ),
-            child: BottomNavigationBar(
-              currentIndex: _selectedIndex,
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              type: BottomNavigationBarType.fixed,
-
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white70,
-
-              /// 🔥 FIX ICON SIZE SAME
-              selectedIconTheme: const IconThemeData(size: 26),
-              unselectedIconTheme: const IconThemeData(size: 26),
-
-              selectedLabelStyle: const TextStyle(
-                fontFamily: "Outfit",
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontFamily: "Outfit",
-                fontWeight: FontWeight.w500,
-                fontSize: 12,
-              ),
-
-              onTap: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-
-              items: [
-
-                /// HOME
-                BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    _selectedIndex == 0
-                        ? "assets/svg/Bottom_svg/Home_active.svg"
-                        : "assets/svg/Bottom_svg/Home_nonactive.svg",
-                  ),
-                  label: "Home",
-                ),
-
-                /// BOOK SHOOT
-                BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    _selectedIndex == 1
-                        ? "assets/svg/Bottom_svg/Book _Shoot_active.svg"
-                        : "assets/svg/Bottom_svg/Book_Shoot_non_active.svg",
-                  ),
-                  label: "Book Shoot",
-                ),
-
-                /// MY SHOOTS
-                BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    _selectedIndex == 2
-                        ? "assets/svg/Bottom_svg/My Shoots_active.svg"
-                        : "assets/svg/Bottom_svg/My_Shoots_nonactive.svg",
-                  ),
-                  label: "My Shoots",
-                ),
-
-                /// MESSAGES
-                BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    _selectedIndex == 3
-                        ? "assets/svg/Bottom_svg/Messages_active.svg"
-                        : "assets/svg/Bottom_svg/Messages_nonactive.svg",
-                  ),
-                  label: "Messages",
-                ),
-              ],
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
             ),
+
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  _selectedIndex == 0
+                      ? "assets/svg/new_bottom_image/active_Home.svg"
+                      : "assets/svg/new_bottom_image/in_active_Home.svg",
+                ),
+                label: "Home",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  _selectedIndex == 1
+                      ? "assets/svg/new_bottom_image/active_Book a Shoot.svg"
+                      : "assets/svg/new_bottom_image/in_active_Book_Shoot.svg",
+                ),
+                label: "Book Shoot",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  _selectedIndex == 2
+                      ? "assets/svg/new_bottom_image/active_My Shoots.svg"
+                      : "assets/svg/new_bottom_image/in_active_My Shoots.svg",
+                ),
+                label: "My Shoots",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  _selectedIndex == 3
+                      ? "assets/svg/new_bottom_image/active_Messages.svg"
+                      : "assets/svg/new_bottom_image/in_active_Messages.svg",
+                ),
+                label: "Messages",
+              ),
+            ],
           ),
         ),
       ),
@@ -207,8 +134,8 @@ class _MainscreenState extends State<Mainscreen> {
   Widget _buildIcon(String path) {
     return SvgPicture.asset(
       path,
-      height: 26,
-      width: 26,
+      height: 28,
+      width: 28,
       fit: BoxFit.contain,
     );
   }

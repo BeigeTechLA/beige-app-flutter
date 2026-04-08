@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
+import '../../widgets/loding.dart';
 import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 import 'add_on_services.dart';
 
@@ -73,7 +74,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
     "Saturday",
   ];
   PageController _portfolioController =
-  PageController(viewportFraction: 0.75);
+  PageController(viewportFraction: 0.60);
 
   int _initialPage = 1000;
   double _currentPage = 0;
@@ -85,7 +86,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
     _portfolioController = PageController(
       initialPage: _initialPage,
-      viewportFraction: 0.75,
+      viewportFraction: 0.45,
     );
 
     _portfolioController.addListener(() {
@@ -224,12 +225,12 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                           : "",
                       height: 360,
                       width: double.infinity,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fill,
                       errorBuilder: (_, __, ___) => SvgPicture.asset(
                         "assets/svg/imag_placeholder.svg",
                         height: 360,
                         width: double.infinity,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
                     ),
 
@@ -239,15 +240,16 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
+                          stops: const [0.0, 0.4, 0.7, 1.0],
                           colors: [
-                            Colors.black.withOpacity(0.5),
+                            Colors.black.withOpacity(0.4),
                             Colors.transparent,
-                            Colors.black.withOpacity(0.85),
+                            Colors.black.withOpacity(0.6),
+                            Colors.black, // Fades completely to black at bottom
                           ],
                         ),
                       ),
                     ),
-
                     Positioned(
                       top: 40,
                       left: 16,
@@ -329,7 +331,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child:  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       infoCard(
                         icon: Icons.group_outlined,
@@ -341,11 +343,11 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                         value: "${stats?['years_experience'] ?? 0} yrs",
                         title: "Experience",
                       ),
-                      infoCard(
+                   /*   infoCard(
                         icon: Icons.star_border,
                         value: "${creative?['bookings_count'] ?? 0}",
                         title: "Ratings",
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -376,58 +378,80 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   ),
                 ),
                 sectionTitle("Portfolio"),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 260,
-                      child: portfolio.isEmpty
-                          ? Center(
-                        child: SvgPicture.asset(
-                          "assets/svg/imag_placeholder.svg",
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                          : PageView.builder(
-                        controller: _portfolioController,
-                        itemCount: 10000, // 👈 infinite feeling
-                        itemBuilder: (context, index) {
+        Column(
+          children: [
+            SizedBox(
+              height: 260,
+              child: portfolio.isEmpty
+                  ? Center(
+                child: SvgPicture.asset(
+                  "assets/svg/imag_placeholder.svg",
+                ),
+              )
+                  : PageView.builder(
+                controller: _portfolioController,
+                itemCount: 10000,
+                clipBehavior: Clip.none,
+                itemBuilder: (context, index) {
 
-                          final realIndex = index % portfolio.length;
-                          final item = portfolio[realIndex];
+                  final realIndex = index % portfolio.length;
+                  final item = portfolio[realIndex];
 
-                          final imageUrl = ApiService().getImageURL(
-                            item["file_path"] ?? "",
-                          );
+                  final imageUrl = ApiService().getImageURL(
+                    item["file_path"] ?? "",
+                  );
 
-                          double difference = (_currentPage - index).abs();
-                          double scale = 1 - (difference * 0.25);
-                          scale = scale.clamp(0.8, 1.0);
+                  return AnimatedBuilder(
+                    animation: _portfolioController,
+                    builder: (context, child) {
 
-                          return Transform.scale(
-                            scale: scale,
+                      double value = 0;
+                      if (_portfolioController.position.haveDimensions) {
+                        value = index - (_portfolioController.page ?? 0);
+                      }
+
+                      /// 🔥 SCALE
+                      double scale =
+                      (1 - (value.abs() * 0.8)).clamp(0.85, 1.0);
+
+                      /// 🔥 OPACITY
+                      double opacity =
+                      (1 - (value.abs() * 0.9)).clamp(0.6, 1.0);
+
+                      return Transform.scale(
+
+                        scale: scale,
+                        child: Opacity(
+                          opacity: opacity,
+                          child: Center(
                             child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              width: 176,
+                              height: 236,
+                              margin: const EdgeInsets.symmetric(horizontal: 4), // 🔥 LESS GAP
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(22),
                                 child: Image.network(
                                   imageUrl,
-                                  height: 235,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => SvgPicture.asset(
-                                    "assets/svg/imag_placeholder.svg",
-                                    fit: BoxFit.cover,
-                                  ),
+                                  errorBuilder: (_, __, ___) =>
+                                      SvgPicture.asset(
+                                        "assets/svg/imag_placeholder.svg",
+                                        fit: BoxFit.cover,
+                                      ),
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 18),
-                  ],
-                ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            
+          ],
+        ),
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -437,7 +461,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                     ),
                   ),
                 ),
-                Padding(
+              /*  Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,8 +504,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 20,),
+                ),*/
+               /* SizedBox(height: 20,),
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -490,7 +514,8 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                       thickness: 1,
                     ),
                   ),
-                ),            Padding(
+                ),   */
+                Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,17 +539,12 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: weeklyAvailability.isEmpty
-                            ? const Text(
-                          "Not available",
-                          style: TextStyle(
-                            fontFamily: "Outfit",
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            height: 20 / 12,
-                            letterSpacing: 0,
-                            color: Colors.white54,
-                          ),
-                        )
+                            ? Center(
+                              child: const Text(
+                                                        "Not available",
+                              style:  TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                              )),
+                            )
                             : Column(
                           children: weekDaysOrder.map((day) {
                             bool isActive = weeklyAvailability.contains(day);
@@ -542,7 +562,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                         child: Divider(color: Colors.white10,
                         ),
                       ),
-                      Row(
+                   /*   Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
@@ -555,7 +575,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                             ),
                           ),
 
-                          /*  Icon(Icons.chevron_right, color: Colors.white),*/
+                          *//*  Icon(Icons.chevron_right, color: Colors.white),*//*
                         ],
                       ),
 
@@ -663,7 +683,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                             ),
                           ),
                         ],
-                      )
+                      )*/
                     ],
 
                   ),
@@ -676,14 +696,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
           ),
           if (isLoading)
-            Container(
-              color: Colors.black,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: ColorCode.kGold40,
-                ),
-              ),
-            ),
+            const AppLoader(),
         ],
 
       ),

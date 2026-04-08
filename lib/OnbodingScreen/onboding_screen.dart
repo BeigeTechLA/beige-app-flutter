@@ -1,10 +1,6 @@
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
-
-import '../ChooseYourRole/choose_your_role_screen.dart';
-import '../auth/login_screen.dart';
-import '../auth/sign_up_screen.dart';
 import '../utility/ColorCode.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -22,14 +18,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "image": "assets/Onboding/img_1.png",
       "title": "Book Your Dream\nShoot",
-      "description":
-      "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
+      "description": "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
       "image": "assets/Onboding/img.png",
       "title": "Find Video & Photo\nWork",
-      "description":
-      "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
+      "description": "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
     },
   ];
 
@@ -51,28 +45,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   itemBuilder: (context, index) {
                     return Column(
                       children: [
+                        /// ---------------- IMAGE ----------------
+
+
+                        _currentPage != pages.length - 1?
+
+
                         Expanded(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  top: constraints.maxHeight * 0.05, // 👈 responsive top space
-                                  left: 12,
-                                  right: 12,
-                                ),
-                                child: Image.asset(
-                                  pages[index]['image']!,
-                                  width: double.infinity,
-                                  height: constraints.maxHeight * 0.6, // 👈 responsive height
-                                  fit: BoxFit.contain, // 👈 NO CUT guaranteed
-                                ),
-                              );
-                            },
+                          child: FractionallySizedBox(
+                            heightFactor: 1.28, // 👈 1.1 = 10% niche, 1.2 = 20% niche — try karo
+                            alignment: Alignment.topCenter,
+                            child: Image.asset(
+                              pages[index]['image']!,
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          ),
+                        ):Expanded(
+                          child: FractionallySizedBox(
+                            heightFactor: 1.15, // 👈 1.1 = 10% niche, 1.2 = 20% niche — try karo
+                            alignment: Alignment.topCenter,
+                            child: Image.asset(
+                              pages[index]['image']!,
+                              width: double.infinity,
+                              fit: BoxFit.fitWidth,
+                            ),
                           ),
                         ),
 
-
-
+                        /// ---------------- TITLE ----------------
                         Text(
                           pages[index]['title']!,
                           textAlign: TextAlign.center,
@@ -86,6 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         const SizedBox(height: 10),
 
+                        /// ---------------- DESCRIPTION ----------------
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Text(
@@ -169,7 +171,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>  NewSingUpScreen(),
+                      builder: (_) => NewSingUpScreen(),
                     ),
                   );
                 },
@@ -177,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding: EdgeInsets.only(bottom: 20),
                   child: Text.rich(
                     TextSpan(
-                      text: "Don’t have an account? ",
+                      text: "Don't have an account? ",
                       style: TextStyle(
                         fontFamily: "Outfit",
                         color: ColorCode.kWhiteOpacity60,

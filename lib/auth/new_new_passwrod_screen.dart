@@ -134,7 +134,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                     ),
                   ),
                   /// 🖼️ BACKGROUND IMAGE
-       
+
 
                   /// 🌫️ DARK OVERLAY
                   /*    Positioned.fill(
@@ -165,28 +165,30 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children:  [
 
                         Text(
-                          "Secure your Account",
+                          'Secure your Account',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: "Unbounded",
+                            color: Colors.white,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: ColorCode.white,
+                            fontFamily: 'Unbounded',
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
 
                         SizedBox(height: 8),
 
                         Text(
-                          "You're almost done! Set a new password \nto secure your account..",
-
+                          'You\'re almost done! Set a new password\nto secure your account.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: "Outfit",
+                            color: Colors.white.withValues(alpha: 0.60),
                             fontSize: 14,
-                            color: ColorCode.kWhiteOpacity70,
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w400,
+                            height: 1.29,
                           ),
                         ),
                       ],
@@ -206,24 +208,24 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
+                    padding: const EdgeInsets.fromLTRB(20, 25 , 20, 20),
                     // 👈 top extra
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: ColorCode.bcakgroundcolor,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.06),
-                        width: 1,
+                        color: Colors.white.withValues(alpha: 0.10),
+                        width: 0.50,
                       ),
                     ),
                     child: Column(
                       children: [
 
-                        const SizedBox(height: 12),
+                        //   const SizedBox(height: 12),
 
 
-                      /*  _buildField(
+                        /*  _buildField(
                           "New Password*",
                           newPasswordController,
                           true,
@@ -274,7 +276,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 25),
 
                         CustomInputField(
                           title: "Confirm Password*",
@@ -308,7 +310,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                         const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: 56,
                           child: ElevatedButton(
                             onPressed: isPasswordFilled && !isLoading ? _newpasswrod : null,
 
@@ -340,7 +342,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                   ),
 
                   /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-        /*          Positioned(
+                  /*          Positioned(
                     top: -24,
                     left: 0,
                     right: 0,

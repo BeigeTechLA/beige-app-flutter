@@ -99,12 +99,12 @@ class _MyAppState extends State<MyApp> {
         hoverColor: Colors.transparent,
 
         // 🔥 smooth page transitions (optional but pro)
-        pageTransitionsTheme: const PageTransitionsTheme(
+      /*  pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
             TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           },
-        ),
+        ),*/
       ),
       // ✅ Correct navigation logic
       home: widget.isLoggedIn

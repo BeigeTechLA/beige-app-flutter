@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import 'MY_SelectBookingType.dart';
 import 'booking_select_date_time_slots.dart';
 import 'cancel_booking.dart';
 
@@ -392,7 +393,7 @@ class _UpcomingEventSummaryManagebookingState
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => BookingSelectDateTimeSlots(
+                                        builder: (_) => MySelectbookingtype(
                                           bookingId: widget.bookingId,
                                       /*    contentType: widget.contentType ?? '',
                                           shootTypeId: widget.shootTypeId,*/

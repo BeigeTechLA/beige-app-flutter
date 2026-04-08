@@ -10,7 +10,6 @@ import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
-import 'forgot_password.dart';
 import 'new_forgot_passwrod_screen.dart';
 import 'new_sing_up_screen.dart';
 
@@ -29,13 +28,13 @@ class _NewLoginScreenState extends State<NewLoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
 
-bool isLoggingIn =false;
+  bool isLoggingIn =false;
 
   bool get isFormValid {
     return emailController.text.trim().isNotEmpty &&
         passwordController.text.trim().isNotEmpty;
   }
-_showSnack(String message) {
+  _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -215,27 +214,29 @@ _showSnack(String message) {
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
 
-                        Text(
+                        const Text(
                           "Welcome Back",
                           style: TextStyle(
                             fontFamily: "Unbounded",
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             color: ColorCode.white,
                           ),
                         ),
 
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
 
                         Text(
-                          "Enter your details to access your account. Continue\nmanaging your bookings and profile.",
+                          'Enter your details to access your account. Continue\nmanaging your bookings and profile.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontFamily: "Outfit",
+                            color: Colors.white.withValues(alpha: 0.60),
                             fontSize: 14,
-                            color: ColorCode.kWhiteOpacity70,
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w400,
+                            height: 1.29,
                           ),
                         ),
                       ],
@@ -259,7 +260,7 @@ _showSnack(String message) {
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: ColorCode.bcakgroundcolor,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(22),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.06),
                         width: 1,
@@ -269,8 +270,8 @@ _showSnack(String message) {
                       child: Column(
 
                         children: [
-                      
-                          const SizedBox(height: 12),
+
+                          //   const SizedBox(height: 12),
 
 
                           CustomInputField(
@@ -282,14 +283,14 @@ _showSnack(String message) {
                               AutofillHints.email,
                             ],
                           ),
-                      
-                      
-                      
+
+
+
                           SizedBox(height: 20),
-                      
-                      
-                      
-                        /*  _buildPasswordField(
+
+
+
+                          /*  _buildPasswordField(
                             "Password",
                             showConfirmPassword,
                                 () => setState(() => showConfirmPassword = !showConfirmPassword),
@@ -328,15 +329,15 @@ _showSnack(String message) {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                             /* GestureDetector(
+                              /* GestureDetector(
                                 onTap: () async {
                                   setState(() {
                                     savePassword = !savePassword;
                                   });
-                      
+
                                   if (savePassword) {
                                     final prefs = await SharedPreferences.getInstance();
-                      
+
                                     await prefs.setString("email", emailController.text.trim());
                                     await prefs.setString("password", passwordController.text.trim());
                                   }
@@ -401,7 +402,7 @@ _showSnack(String message) {
                                 TextInput.finishAutofillContext();
                                 _fetchLogin();
                               },
-                      
+
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: isFormValid
                                     ? ColorCode.kButtonColor
@@ -410,7 +411,7 @@ _showSnack(String message) {
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                      
+
                               child: Text(
                                 "Login",
                                 style: TextStyle(
@@ -424,16 +425,16 @@ _showSnack(String message) {
                               ),
                             ),
                           ),
-                      
-                      
-                      
+
+
+
                         ],
                       ),
                     ),
                   ),
 
                   /// 🏷️ FLOATING CHIP (BORDER PE STUCK)
-         /*         Positioned(
+                  /*         Positioned(
                     top: -24,
                     left: 0,
                     right: 0,
@@ -693,5 +694,4 @@ _showSnack(String message) {
       ),
     );
   }
-  }
-
+}

@@ -40,7 +40,7 @@ class PaymentSuccessScreen extends StatelessWidget {
               Lottie.asset(
                 "assets/lottie/Untitled file.json",
                 height: 180,
-                repeat: false,
+
               ),
 
               const SizedBox(height: 20),

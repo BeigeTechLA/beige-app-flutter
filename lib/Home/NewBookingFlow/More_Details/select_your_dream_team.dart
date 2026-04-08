@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
@@ -5,6 +7,7 @@ import 'package:lottie/lottie.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
+import '../../../widgets/loding.dart' show AppLoader;
 import '../../HomeSekect/recommended_detils_screen.dart';
 import '../Book_Confirm/review_confirm_screen.dart';
 
@@ -20,6 +23,20 @@ class SelectYourDreamTeam extends StatefulWidget {
 }
 
 class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
+
+  int getRequired(int roleId) {
+    return requiredByRole[roleId.toString()] ??
+        requiredByRole[roleId] ??
+        0;
+  }
+
+  int getHeld(int roleId) {
+    return heldByRole[roleId.toString()] ??
+        heldByRole[roleId] ??
+        0;
+  }
+  Map<String, dynamic> heldByRole = {};
+  Map<String,dynamic>requiredByRole={};
 
   int currentStep = 1;
   bool isAdded = false;
@@ -100,9 +117,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
     try {
       final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=50",
+        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=400",
       );
-      print("📥 FULL RESPONSE => $response");
+      print("📥 FULL RESPONSE of the API => $response");
 
       if (response != null && response['error'] == false) {
         /*  setState(() {
@@ -170,6 +187,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       if (response != null && response['error'] == false) {
         debugPrint("Favourite added");
       }
+      print("📥 FULL RESPONSE => $response");
+
     } catch (e) {
       debugPrint("Add Favourite Error: $e");
     }
@@ -202,12 +221,14 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       debugPrint("📤 ADD HOLD API CALL");
       debugPrint("👉 URL: $url");
 
+
       final body = {
-        "creative_user_id": creativeUserId,
+        "crew_member_id": creativeUserId,
         "role_id": roleId,
       };
 
       debugPrint("👉 PAYLOAD:");
+
       body.forEach((key, value) {
         debugPrint("   $key : $value");
       });
@@ -220,11 +241,15 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       debugPrint("📥 RESPONSE:");
       debugPrint(response.toString());
       debugPrint("═══════════════════════════════");
+      print("📥 FULL RESPONSE OK => $response");
+
 
       if (response != null && response['error'] == false) {
         debugPrint("✅ SUCCESS");
         return true;
-      } else {
+      }
+
+      else {
         final msg = response?['message'] ?? "Something went wrong";
 
         debugPrint("❌ FAILED: $msg");
@@ -245,6 +270,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       return false;
     }
   }
+
   Future<bool> _removeHolds({
     required int creativeUserId,
   }) async {
@@ -257,11 +283,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       final response = await ApiService().postData(
         url,
         {
-          "creative_user_id": creativeUserId,
+          "crew_member_id": creativeUserId,
         },
       );
 
       debugPrint("✅ REMOVE RESPONSE: $response");
+
 
       if (response != null && response['error'] == false) {
         return true;
@@ -293,23 +320,31 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       if (response != null && response['error'] == false) {
         final creatives = response['data']['creatives'] as List;
 
+        final summary=response['data']['summary'];
+
         setState(() {
           addedCrewUserIds =
               creatives.map<int>((e) => e['creative_user_id']).toSet();
+
+          requiredByRole = Map<String, dynamic>.from(summary['required_by_role']);
+          heldByRole = Map<String, dynamic>.from(summary['held_by_role']);
+
         });
 
         debugPrint("🟢 HOLDS FROM BACKEND: $addedCrewUserIds");
+        print("📥 FULL RESPONSE2 => $response");
+
       }
     } catch (e) {
       debugPrint("❌ Holds API Error: $e");
     }
   }
 
-  int get totalRequiredCount {
+  /* int get totalRequiredCount {
     return requiredCountByRole.values.fold(0, (a, b) => a + b);
-  }
+  }*/
 
-  bool get isRoleWiseSelectionComplete {
+/*  bool get isRoleWiseSelectionComplete {
 
     if (requiredCountByRole.isEmpty) {
       return true;
@@ -322,7 +357,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       int selected = 0;
 
       for (final match in crewMatches) {
-        final int uid = match['user']['id'];
+        final int uid =
+            match['crew_member_id'] ?? match['user']?['id'] ?? 0;
         final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
 
         if (rId == roleId && addedCrewUserIds.contains(uid)) {
@@ -336,7 +372,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     }
 
     return true;
-  }
+  }*/
 
 
   Future<void> _filterCrew({required String sort}) async {
@@ -365,6 +401,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         debugPrint(
           "✅ FILTER APPLIED: $sort | ITEMS COUNT: ${items.length}",
         );
+
       } else {
         debugPrint("❌ FILTER API FAILED => $response");
       }
@@ -388,10 +425,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
     int count = 0;
 
     for (final match in crewMatches) {
-      final int uid = match['user']['id'];
-      final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
+      final int uid =
+          match['crew_member_id'] ?? match['user']?['id'] ?? 0;
 
-      if (rId == roleId && addedCrewUserIds.contains(uid)) {
+      final roleData = match['role_id'];
+
+      final List roles = roleData is List ? roleData : [roleData];
+
+      /// 🔥 MULTI ROLE SUPPORT
+      bool hasRole = roles.any((r) => int.tryParse(r.toString()) == roleId);
+
+      if (hasRole && addedCrewUserIds.contains(uid)) {
         count++;
       }
     }
@@ -401,7 +445,6 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
@@ -447,11 +490,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ],
           ),
         ),
-
         body: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 15,right: 15,bottom: 15),
               child: Column(
                 children: [
 
@@ -508,7 +550,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       Text(
                         "Select Your Dream Team",
                         style: TextStyle(
-                          fontFamily: "Unbounded ",
+                          fontFamily: "Unbounded",
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: ColorCode.white,
@@ -864,8 +906,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       children: [
 
                         /// 🔥 LOCATION NOT FOUND CARD
-                        if (crewMatches.isNotEmpty &&
-                            (crewMatches.first['distance_km'] ?? 0) > 100)
+                        /// 🔥 LOCATION NOT FOUND CARD
+                        if (showLocationCard)
                           Container(
                             width: double.infinity,
                             margin: const EdgeInsets.only(bottom: 16),
@@ -887,7 +929,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 const SizedBox(height: 10),
 
                                 const Text(
-                                  "Our Creators Around Your Location Are Booked",
+                                  "No user found in this location",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: "Unbounded",
@@ -910,6 +952,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 ),
 
                                 SizedBox(height: 10),
+
                                 Center(
                                   child: SizedBox(
                                     width: MediaQuery.of(context).size.width * 0.85,
@@ -920,7 +963,6 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   ),
                                 ),
                               ],
-
                             ),
                           ),
 
@@ -930,7 +972,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Text(
-                              "  Browse Other Creative Partners",
+                              "  Browse Other Creative Partners",//
                               style: TextStyle(
                                 fontFamily: "Unbounded",
                                 fontSize: 14,
@@ -943,10 +985,17 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                         /// CREW LIST
                         ...crewMatches.map((item) {
 
-                          final int userId = item['user']['id'];
-                          final int creativeUserId = item['user']['id'];
-                          final int roleId =
-                              int.tryParse(item['role_id'][0].toString()) ?? 0;
+                          /// ✅ SAFE ID (NO CRASH)
+                          final int creativeUserId =
+                              item['crew_member_id'] ?? item['user']?['id'] ?? 0;
+
+                          final int userId = creativeUserId;
+
+                          /// ✅ SAFE ROLE ID
+                          final roleData = item['role_id'];
+                          final int roleId = (roleData is List)
+                              ? int.tryParse(roleData.first.toString()) ?? 0
+                              : int.tryParse(roleData.toString()) ?? 0;
 
                           final bool isAdded = addedCrewUserIds.contains(creativeUserId);
                           final bool isFavourite = favouriteUsers.contains(creativeUserId);
@@ -960,22 +1009,27 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: Stack(
-                                children: [
+                                children: [//
 
-                                  /// IMAGE
+                                  /// 🔹 IMAGE
                                   Positioned.fill(
                                     child: item['profile_image_url'] != null
                                         ? Image.network(
                                       ApiService().getImageURL(item['profile_image_url']),
                                       fit: BoxFit.cover,
+                                      alignment: Alignment.topCenter, // 🔥 important
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return SvgPicture.asset('assets/svg/imag_placeholder.svg',fit: BoxFit.contain, height: 25,);
+                                      },
                                     )
                                         : Image.asset(
                                       "assets/images/Rectangle 34661070.png",
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
+                                      height: 25,
                                     ),
                                   ),
 
-                                  /// GRADIENT
+                                  /// 🔹 GRADIENT
                                   Positioned.fill(
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -990,80 +1044,65 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                       ),
                                     ),
                                   ),
-
-                                  /// ACTIVE + FAV ICON
+                                      Container(
+                                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.5, 0.75, 1],
+                          colors: [
+                          Colors.transparent,
+                          const Color(0xFF090909).withOpacity(0.6),
+                          const Color(0xFF090909),
+                          ],
+                          ),
+                          ),),
+                                  /// 🔹 FAV ICON
                                   Positioned(
                                     top: 12,
-                                    left: 12,
                                     right: 12,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-/*
-                                        Row(
-                                          children: const [
-                                            CircleAvatar(
-                                              radius: 4,
-                                              backgroundColor: Colors.green,
-                                            ),
-                                            SizedBox(width: 6),
-                                            Text(
-                                              "Active",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),*/
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        if (isFavourite) {
+                                          setState(() {
+                                            favouriteUsers.remove(userId);
+                                          });
 
-                                        GestureDetector(
-                                          onTap: () async {
-                                            if (isFavourite) {
-                                              setState(() {
-                                                favouriteUsers.remove(userId);
-                                              });
+                                          await _removeFavourite(userId);
+                                          _showFavouriteToast("Removed from Favourite");
+                                        } else {
+                                          setState(() {
+                                            favouriteUsers.add(userId);
+                                          });
 
-                                              await _removeFavourite(userId);
-                                              _showFavouriteToast("Removed from Favourite");
-
-                                            } else {
-                                              setState(() {
-                                                favouriteUsers.add(userId);
-                                              });
-
-                                              await _addFavourite(userId);
-                                              _showFavouriteToast("Added to Favourite");
-                                            }
-                                          },
-                                          child: Image.asset(
-                                            isFavourite
-                                                ? "assets/Icons/Heart_Angl_COLOR.png"
-                                                : "assets/images/Heart Angle.png",
-                                            height: 22,
-                                            width: 22,
-                                          ),
-                                        ),
-                                      ],
+                                          await _addFavourite(userId);
+                                          _showFavouriteToast("Added to Favourite");
+                                        }
+                                      },
+                                      child: SvgPicture.asset(
+                                        isFavourite
+                                            ? "assets/svg/Heart_COLOR.svg"
+                                            : "assets/svg/Heart.svg",
+                                        height: 22,
+                                        width: 22,
+                                      ),
                                     ),
                                   ),
 
-                                  /// BOTTOM INFO
+                                  /// 🔹 BOTTOM INFO
                                   Positioned(
                                     left: 14,
                                     right: 14,
                                     bottom: 14,
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
 
                                         /// LEFT INFO
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-
-                                            Row(
+                                         /*   Row(
                                               children: [
                                                 const Icon(Icons.star,
                                                     color: Colors.amber, size: 14),
@@ -1076,82 +1115,81 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                                   ),
                                                 ),
                                               ],
-                                            ),
-
+                                            ),*/
                                             const SizedBox(height: 6),
-
                                             Text(
                                               item['name'] ?? '',
                                               style: const TextStyle(
                                                 fontSize: 14,
+                                                fontFamily: "Outfit",
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.white,
                                               ),
                                             ),
-
                                             Text(
                                               item['role_name'] ?? '',
                                               style: const TextStyle(
                                                 fontSize: 11,
+                                                fontFamily: "Outfit",
                                                 color: Colors.white70,
                                               ),
                                             ),
                                           ],
                                         ),
 
-                                 /*       /// RIGHT BUTTONS
+                                        /// RIGHT BUTTONS
                                         Row(
                                           children: [
 
-                                            /// 🔥 SHOW ONLY WHEN LOCATION DATA AVAILABLE
+                                            /// 🔥 ADD / REMOVE BUTTON
                                             if (!showLocationCard)
                                               InkWell(
                                                 onTap: () async {
                                                   try {
-                                                    /// 🔥 SAFE ROLE ID FIX
-                                                    final int roleId = (item['role_id'] is List)
-                                                        ? item['role_id'][0]
-                                                        : item['role_id'];
+                                                    final int creativeUserId =
+                                                        item['crew_member_id'] ?? item['user']?['id'] ?? 0;
 
-                                                    /// ================= REMOVE =================
-                                                    if (isAdded) {
+                                                    final roleData = item['role_id'];
+
+                                                    /// 🔥 SAFE ROLE ID
+                                                    final int roleId = (roleData is List)
+                                                        ? int.tryParse(roleData.first.toString()) ?? 0
+                                                        : int.tryParse(roleData.toString()) ?? 0;
+
+                                                    if (creativeUserId == 0) return;
+
+                                                    /// 🔴 REMOVE
+                                                    if (addedCrewUserIds.contains(creativeUserId)) {
+                                                      setState(() {
+                                                        addedCrewUserIds.remove(creativeUserId);
+                                                      });
+
                                                       final success = await _removeHolds(
                                                         creativeUserId: creativeUserId,
                                                       );
 
                                                       if (success) {
+                                                        await _holds();
+                                                      } else {
                                                         setState(() {
-                                                          addedCrewUserIds.remove(creativeUserId);
+                                                          addedCrewUserIds.add(creativeUserId);
                                                         });
-
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          const SnackBar(content: Text("Removed successfully")),
-                                                        );
                                                       }
 
                                                       return;
                                                     }
 
-                                                    /// ================= ADD =================
+                                                    /// 🟢 ADD FLOW
 
-                                                    int selectedForThisRole = 0;
+                                                    int selectedCount = getSelectedCountByRole(roleId);
 
-                                                    for (final match in crewMatches) {
-                                                      final int uid = match['user']['id'];
+                                                    /// 🔥 MAIN FIX (IMPORTANT)
+                                                    final int maxAllowed =
+                                                    (requiredCountByRole[roleId] ?? 0) == 0
+                                                        ? 10 // 👉 fallback allow selection
+                                                        : requiredCountByRole[roleId]!;
 
-                                                      final int rId = (match['role_id'] is List)
-                                                          ? match['role_id'][0]
-                                                          : match['role_id'];
-
-                                                      if (addedCrewUserIds.contains(uid) && rId == roleId) {
-                                                        selectedForThisRole++;
-                                                      }
-                                                    }
-
-                                                    final int maxAllowed = requiredCountByRole[roleId] ?? 0;
-
-                                                    /// ❌ LIMIT ERROR
-                                                    if (selectedForThisRole >= maxAllowed) {
+                                                    if (selectedCount >= maxAllowed) {
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
                                                           content: Text(
@@ -1162,33 +1200,32 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                                       return;
                                                     }
 
-                                                    /// 🔥 CALL ADD API
+                                                    /// ✅ UI FIRST
+                                                    setState(() {
+                                                      addedCrewUserIds.add(creativeUserId);
+                                                    });
+
                                                     final success = await _addHolds(
                                                       creativeUserId: creativeUserId,
                                                       roleId: roleId,
                                                     );
 
                                                     if (success) {
+                                                      await _holds();
+                                                    } else {
                                                       setState(() {
-                                                        addedCrewUserIds.add(creativeUserId);
+                                                        addedCrewUserIds.remove(creativeUserId);
                                                       });
-
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(content: Text("Added successfully")),
-                                                      );
                                                     }
 
                                                   } catch (e) {
-                                                    debugPrint("❌ BUTTON ERROR: $e");
-
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text("Error: $e")),
-                                                    );
+                                                    print("❌ ERROR: $e");
                                                   }
                                                 },
 
                                                 child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 14, vertical: 8),
                                                   decoration: BoxDecoration(
                                                     color: isAdded
                                                         ? ColorCode.kLightRed
@@ -1202,107 +1239,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                                     isAdded ? "Remove" : "Add to Crew",
                                                     style: TextStyle(
                                                       fontSize: 12,
-                                                      fontFamily: "Outfit",
+                                                      fontFamily: 'Outfit',
+
                                                       fontWeight: FontWeight.w600,
-                                                      color: isAdded ? Colors.red : Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-
-                                            /// spacing only if button visible
-                                            if (!showLocationCard) const SizedBox(width: 8),
-
-                                            /// DETAILS BUTTON (ALWAYS SHOW)
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => RecommendedDetilsScreen(
-                                                      id: item['id'],
-                                                      bookingId: widget.bookingId,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: SvgPicture.asset(
-                                                "assets/svg/home_view_profile.svg",
-                                              ),
-                                            ),
-                                          ],
-                                        ),*/
-                                             /// RIGHT BUTTONS
-                                        Row(
-                                          children: [
-
-                                            if (!showLocationCard)
-                                              InkWell(
-                          onTap: () async {
-                          final int creativeUserId = item['user']['id'];
-                         // final int roleId = getRoleId(item['role_id']);
-                          final int roleId = getRoleIdByContentType(
-                            widget.contentTypeId,
-                            item['role_name'] ?? '',
-                          );
-                          /// 🔴 REMOVE
-                          if (addedCrewUserIds.contains(creativeUserId)) {
-                          final success = await _removeHolds(
-                          creativeUserId: creativeUserId,
-                          );
-
-                          if (success) {
-                          await _holds(); // ✅ refresh from backend
-                          }
-
-                          return;
-                          }
-
-                          /// 🟢 ADD
-                          int selectedForThisRole = getSelectedCountByRole(roleId);
-                          final int maxAllowed = requiredCountByRole[roleId] ?? 1;
-
-                      /*    if (maxAllowed > 0 && selectedForThisRole >= maxAllowed) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                          content: Text(
-                          "You can add only $maxAllowed ${item['role_name']}",
-                          ),
-                          ),
-                          );
-                          return;
-                          }*/
-
-                          final success = await _addHolds(
-                          creativeUserId: creativeUserId,
-                          roleId: roleId,
-                          );
-
-                          if (success) {
-                          await _holds(); // ✅ refresh from backend
-                          }
-                          },
-
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: addedCrewUserIds.contains(item['user']['id'])
-                                                        ? ColorCode.kLightRed
-                                                        : ColorCode.kButtonColor,
-                                                    borderRadius: BorderRadius.circular(30),
-                                                    border: addedCrewUserIds.contains(item['user']['id'])
-                                                        ? Border.all(color: Colors.red)
-                                                        : null,
-                                                  ),
-                                                  child: Text(
-                                                    addedCrewUserIds.contains(item['user']['id'])
-                                                        ? "Remove"
-                                                        : "Add to Crew",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w600,
-                                                      color: addedCrewUserIds.contains(item['user']['id'])
+                                                      color: isAdded
                                                           ? Colors.red
                                                           : Colors.black,
                                                     ),
@@ -1312,14 +1252,14 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                                             if (!showLocationCard) const SizedBox(width: 8),
 
-                                            /// DETAILS BUTTON
+                                            /// 🔹 DETAILS BUTTON
                                             InkWell(
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (_) => RecommendedDetilsScreen(
-                                                      id: item['id'],
+                                                      id: item['crew_member_id'],
                                                       bookingId: widget.bookingId,
                                                     ),
                                                   ),
@@ -1327,10 +1267,12 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                               },
                                               child: SvgPicture.asset(
                                                 "assets/svg/home_view_profile.svg",
+                                                color: Colors.white,
+                                                height: 36,
                                               ),
                                             ),
                                           ],
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -1390,8 +1332,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                   //
                   //               const SizedBox(height: 10),
                   //
-                  //               const Text(
-                  //                 "Looks like no creators are available right now, but our sales \nexpert can help you find a great match.",
+                  //               const Text(Looks
+                  //                 "like no creators are available right now, but our sales \nexpert can help you find a great match.",
                   //                 textAlign: TextAlign.center,
                   //                 style: TextStyle(
                   //                   fontSize: 12,
@@ -1706,16 +1648,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
             ),
             if (isLoading)
-              Positioned.fill(
-                child:  Container(
-                  color: Colors.black, // ya transparent bhi rakh sakte ho
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: ColorCode.kGold40,
-                    ),
-                  ),
-                ),
-              ),
+              const AppLoader(),
           ],
         ),
 
@@ -1796,186 +1729,384 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           ],
         ),
       ),*/
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /*     if (!showLocationCard)   /// 🔥 ONLY SHOW WHEN CONTINUE BUTTON
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    /// VIDEOGRAPHER CHIP
-                    if (getSelectedCountByRole(2) > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        child: Row(
-                          children: [
-
-                            SvgPicture.asset(
-                              "assets/svg/Icon_.svg",
-                              height: 16,
-                              color: Colors.white,
-                            ),
-
-                            const SizedBox(width: 6),
-
-                            Text(
-                              "Videographer(s): "
-                                  "${getSelectedCountByRole(2).toString().padLeft(2,'0')}/"
-                                  "${requiredCountByRole[2]?.toString().padLeft(2,'0') ?? '00'}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontFamily: "Outfit",
+        // bottomNavigationBar: Padding(
+        //   padding: const EdgeInsets.all(10),
+        //   child: Container(
+        //     child: Column(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: [
+        //         /*     if (!showLocationCard)   /// 🔥 ONLY SHOW WHEN CONTINUE BUTTON
+        //           Row(
+        //             mainAxisAlignment: MainAxisAlignment.center,
+        //             children: [
+        //
+        //               /// VIDEOGRAPHER CHIP
+        //               if (getSelectedCountByRole(2) > 0)
+        //                 Container(
+        //                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        //                   decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(10),
+        //                     border: Border.all(color: Colors.white24),
+        //                   ),
+        //                   child: Row(
+        //                     children: [
+        //
+        //                       SvgPicture.asset(
+        //                         "assets/svg/Icon_.svg",
+        //                         height: 16,
+        //                         color: Colors.white,
+        //                       ),
+        //
+        //                       const SizedBox(width: 6),
+        //
+        //                       Text(
+        //                         "Videographer(s): "
+        //                             "${getSelectedCountByRole(2).toString().padLeft(2,'0')}/"
+        //                             "${requiredCountByRole[2]?.toString().padLeft(2,'0') ?? '00'}",
+        //                         style: const TextStyle(
+        //                           fontSize: 12,
+        //                           color: Colors.white,
+        //                           fontFamily: "Outfit",
+        //                         ),
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //
+        //               if (getSelectedCountByRole(2) > 0 &&
+        //                   getSelectedCountByRole(1) > 0)
+        //                 const SizedBox(width: 10),
+        //
+        //               /// PHOTOGRAPHER CHIP
+        //               if (getSelectedCountByRole(1) > 0)
+        //                 Container(
+        //                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        //                   decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(10),
+        //                     border: Border.all(color: Colors.white24),
+        //                   ),
+        //                   child: Row(
+        //                     children: [
+        //
+        //                       SvgPicture.asset(
+        //                         "assets/svg/CameraMinimalistic.svg",
+        //                         height: 16,
+        //                         color: Colors.white,
+        //                       ),
+        //
+        //                       const SizedBox(width: 6),
+        //
+        //                       Text(
+        //                         "Photographer(s): "
+        //                             "${getSelectedCountByRole(1).toString().padLeft(2,'0')}/"
+        //                             "${requiredCountByRole[1]?.toString().padLeft(2,'0') ?? '00'}",
+        //                         style: const TextStyle(
+        //                           fontSize: 12,
+        //                           color: Colors.white,
+        //                           fontFamily: "Outfit",
+        //                         ),
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //             ],
+        //           ),*/
+        //
+        //
+        //         //       if(showLocationCard==false){
+        //         //
+        //         // Text('Hey whats Up',style: TextStyle(
+        //         // color: Colors.red
+        //         // ),);
+        //         // },
+        //
+        //
+        //         if (showLocationCard == false)
+        //      /*     Row(
+        //             children: [
+        //               Expanded(
+        //                 child: Container(
+        //
+        //              padding: EdgeInsets.all(10),
+        //                   // margin: EdgeInsets.symmetric(vertical: 12,),
+        //
+        //                   //margin: EdgeInsets.symmetric(vertical: 12, horizontal: 7),
+        //                   decoration: BoxDecoration(
+        //
+        //                     borderRadius: BorderRadius.circular(12),
+        //                     border: Border.all(
+        //                       color: Colors.white.withOpacity(0.5),
+        //                       width: 0.5,
+        //                     ),
+        //                   ),
+        //                   child: Row(
+        //                     children: [
+        //                       SvgPicture.asset(
+        //                         'assets/svg/video6.svg',
+        //                         width: 17,
+        //                         height: 17,
+        //                       ),
+        //                       SizedBox(width: 6),
+        //                       Expanded(
+        //                           child:  Text(
+        //                             'Videographer(s): ${getSelectedCountByRole(1).toString().padLeft(2,'0')}/${getRequired(1).toString().padLeft(2,'0')}',
+        //
+        //                             style: TextStyle(
+        //                               fontFamily: 'InstrumentSans',
+        //                               fontSize: 10,
+        //                               fontWeight: FontWeight.w500,
+        //                             ),
+        //                           )
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //               SizedBox(width: 16,),
+        //               Expanded(
+        //                 child: Container(
+        //                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+        //                   margin: EdgeInsets.symmetric(vertical: 12,),
+        //                   decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(12),
+        //                     border: Border.all(
+        //                       color: Colors.white.withOpacity(0.5),
+        //                       width: 0.5,
+        //                     ),
+        //                   ),
+        //                   child: Row(
+        //                     children: [
+        //                     SvgPicture.asset(
+        //                         'assets/svg/Photo6.SVG',
+        //                         width: 17,
+        //                         height: 17,
+        //                       ),
+        //                       SizedBox(width: 6),
+        //                       Expanded(
+        //                           child: Text(
+        //                             'Photographer(s) : ${getSelectedCountByRole(2).toString().padLeft(2,'0')}/${getRequired(2).toString().padLeft(2,'0')}',
+        //                             style: TextStyle(
+        //                               fontFamily: 'InstrumentSans',
+        //                               fontSize: 10,
+        //                               fontWeight: FontWeight.w500,
+        //                             ),
+        //                           )
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //             ],
+        //           ),*/
+        //
+        //         /// 🔹 TEXT ABOVE BUTTON
+        //         if (showLocationCard)
+        //           Padding(
+        //             padding: EdgeInsets.only(bottom: 10),
+        //             child: InkWell(
+        //               onTap: () {
+        //                 Navigator.push(
+        //                   context,
+        //                   MaterialPageRoute(
+        //                     builder: (_) => ReviewConfirmScreen(
+        //                       bookingId: widget.bookingId,
+        //                     ),
+        //                   ),
+        //                 );
+        //               },
+        //               child: Text(
+        //                 "Complete your Shoot",
+        //                 style: TextStyle(
+        //                   fontSize: 14,
+        //                   fontFamily: "Outfit",
+        //                   fontWeight: FontWeight.w400,
+        //                   color: ColorCode.kWhiteOpacity70,
+        //                   decoration: TextDecoration.underline,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //
+        //         /// 🔹 BUTTON
+        //         SizedBox(
+        //           height: 55,
+        //           width: double.infinity,
+        //           child: ElevatedButton(
+        //
+        //             onPressed: () async {
+        //
+        //
+        //
+        //               /// CONTACT SALES FLOW
+        //               if (showLocationCard) {
+        //                 showSalesDialog(context);   // 🔥 Dialog open hoga
+        //                 return;
+        //               }
+        //
+        //               /// NORMAL FLOW
+        //               /*      if (addedCrewUserIds.isEmpty) {
+        //                 _showNoCrewPopup();
+        //                 return;
+        //               }*/
+        //
+        //               for (final userId in addedCrewUserIds) {
+        //
+        //                 final matches = crewMatches
+        //                     .where((e) => (e['crew_member_id'] ?? e['user']?['id']) == userId)
+        //                     .toList();
+        //
+        //                 if (matches.isEmpty) continue;
+        //
+        //                 /*  final roleId =
+        //                     int.tryParse(matches.first['role_id'].toString()) ?? 0;*/
+        //                 final roleId =
+        //                     int.tryParse(matches.first['role_id'].toString()) ?? 0;
+        //                 await _addHolds(
+        //                   creativeUserId: userId,
+        //                   roleId: roleId,
+        //                 );
+        //               }
+        //
+        //               Navigator.push(
+        //                 context,
+        //                 MaterialPageRoute(
+        //                   builder: (_) => ReviewConfirmScreen(
+        //                     bookingId: widget.bookingId,
+        //                   ),
+        //                 ),
+        //               );
+        //             },
+        //
+        //             style: ElevatedButton.styleFrom(
+        //               backgroundColor: ColorCode.kButtonColor,
+        //               elevation: 0,
+        //               shape: RoundedRectangleBorder(
+        //                 borderRadius: BorderRadius.circular(12),
+        //               ),
+        //             ),
+        //
+        //             child: Text(
+        //               showLocationCard
+        //                   ? "Contact With Sales"
+        //                   : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
+        //               style: const TextStyle(
+        //                 fontSize: 14,
+        //                 fontFamily: "Unbounded",
+        //                 fontWeight: FontWeight.w600,
+        //                 color: Colors.black,
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // )
+        bottomNavigationBar: ClipRect(
+          
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              color: Colors.transparent,
+              padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+            
+                  /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
+                  if (showLocationCard)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ReviewConfirmScreen(
+                                bookingId: widget.bookingId,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-
-                    if (getSelectedCountByRole(2) > 0 &&
-                        getSelectedCountByRole(1) > 0)
-                      const SizedBox(width: 10),
-
-                    /// PHOTOGRAPHER CHIP
-                    if (getSelectedCountByRole(1) > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        child: Row(
-                          children: [
-
-                            SvgPicture.asset(
-                              "assets/svg/CameraMinimalistic.svg",
-                              height: 16,
-                              color: Colors.white,
-                            ),
-
-                            const SizedBox(width: 6),
-
-                            Text(
-                              "Photographer(s): "
-                                  "${getSelectedCountByRole(1).toString().padLeft(2,'0')}/"
-                                  "${requiredCountByRole[1]?.toString().padLeft(2,'0') ?? '00'}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),*/
-              /// 🔹 TEXT ABOVE BUTTON
-              if (showLocationCard)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ReviewConfirmScreen(
-                            bookingId: widget.bookingId,
+                          );
+                        },
+                        child: const Text(
+                          "Complete your Shoot",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white70,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
-                      );
-                    },
-                    child: Text(
-                      "Complete your Shoot",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Outfit",
-                        fontWeight: FontWeight.w400,
-                        color: ColorCode.kWhiteOpacity70,
-                        decoration: TextDecoration.underline,
                       ),
                     ),
-                  ),
-                ),
-
-              /// 🔹 BUTTON
-              SizedBox(
-                height: 55,
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-
-                    /// CONTACT SALES FLOW
-                    if (showLocationCard) {
-                      showSalesDialog(context);   // 🔥 Dialog open hoga
-                      return;
-                    }
-
-                    /// NORMAL FLOW
-                    /*      if (addedCrewUserIds.isEmpty) {
-                      _showNoCrewPopup();
-                      return;
-                    }*/
-
-                    for (final userId in addedCrewUserIds) {
-
-                      final matches = crewMatches
-                          .where((e) => e['user']['id'] == userId)
-                          .toList();
-
-                      if (matches.isEmpty) continue;
-
-                    /*  final roleId =
-                          int.tryParse(matches.first['role_id'].toString()) ?? 0;*/
-                      final roleId =
-                          int.tryParse(matches.first['role_id'].toString()) ?? 0;
-                      await _addHolds(
-                        creativeUserId: userId,
-                        roleId: roleId,
-                      );
-                    }
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ReviewConfirmScreen(
-                          bookingId: widget.bookingId,
+            
+                  /// 🔥 MAIN BUTTON
+                  SizedBox(
+                    height: 55,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+            
+                        /// 🔴 IF NO DATA → SALES FLOW
+                        if (showLocationCard) {
+                          showSalesDialog(context);
+                          return;
+                        }
+            
+                        /// 🟢 NORMAL FLOW
+                        for (final userId in addedCrewUserIds) {
+            
+                          final matches = crewMatches
+                              .where((e) => (e['crew_member_id'] ?? e['user']?['id']) == userId)
+                              .toList();
+            
+                          if (matches.isEmpty) continue;
+            
+                          final roleId =
+                              int.tryParse(matches.first['role_id'].toString()) ?? 0;
+            
+                          await _addHolds(
+                            creativeUserId: userId,
+                            roleId: roleId,
+                          );
+                        }
+            
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ReviewConfirmScreen(
+                              bookingId: widget.bookingId,
+                            ),
+                          ),
+                        );
+                      },
+            
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorCode.kButtonColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    );
-                  },
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+            
+                      child: Text(
+                        showLocationCard
+                            ? "Contact With Sales"
+                            : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: "Unbounded",
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
                   ),
-
-                  child: Text(
-                    showLocationCard
-                        ? "Contact With Sales"
-                        : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        )
+        ),
 
     );
   }
@@ -2280,7 +2411,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
     overlayEntry = OverlayEntry(
       builder: (_) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
+        top: MediaQuery.of(context).padding.top + 100,
         left: 16,
         right: 16,
         child: Material(
@@ -2475,92 +2606,84 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: ColorCode.k282828,
+          backgroundColor: const Color(0xFF1E1E1E),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Stack(
-            children: [
 
-              /// MAIN CONTENT
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // 🔥 IMPORTANT
+              children: [
 
-                    /// SUCCESS ICON
-                    SizedBox(
-                      height: 100,
-                      child: Lottie.asset(
-                        "assets/lottie/Untitled file.json",
-                        repeat: false,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                /// 🔥 SMALL ICON / LOTTIE
+                SizedBox(
 
-                    const SizedBox(height: 18),
+                  child: Lottie.asset(
 
-                    /// TITLE
-                    const Text(
-                      "Request Received",
-                      style: TextStyle(
-                        color: Color(0xFFD6C29C),
-                        fontSize: 18,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    /// DESCRIPTION
-                    const Text(
-                      "Our Sales team will shortly reach out to you to finalize your creative requirements.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontFamily: "Outfit",
-                      ),
-                    ),
-
-                    const SizedBox(height: 22),
-
-                    /// BUTTON
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD6C29C),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          "Got it",
-                          style: TextStyle(
-                            color: Color(0xFF1D1D1B),
-                            fontSize: 14,
-                            fontFamily: "Unbounded",
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    "assets/lottie/Untitled file.json",
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
 
-              /// CLOSE BUTTON
+                const SizedBox(height: 12),
 
-            ],
+                /// 🔹 TITLE
+                const Text(
+                  "Request Received",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFD6C29C),
+                    fontSize: 16, // 🔽 reduce
+                    fontFamily: "Unbounded",
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// 🔹 DESCRIPTION
+                const Text(
+                  "Our Sales team will shortly reach out to you to finalize your creative requirements.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12, // 🔽 reduce
+                    fontFamily: "Outfit",
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// 🔹 BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 45, // 🔽 reduce
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD6C29C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "Got It",
+                      style: TextStyle(
+                        color: Color(0xFF1D1D1B),
+                        fontSize: 13,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

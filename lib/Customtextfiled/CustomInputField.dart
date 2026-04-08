@@ -88,11 +88,12 @@ class _CustomInputFieldState extends State<CustomInputField> {
         labelText: "${widget.title}",
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
+
         labelStyle: TextStyle(
           fontSize: 14,
           color: highlight
               ? ColorCode.kButtonColor
-              : ColorCode.kWhiteOpacity70,
+              : ColorCode.kWhiteOpacity_60,
           fontFamily: "Outfit",
         ),
 
@@ -100,17 +101,17 @@ class _CustomInputFieldState extends State<CustomInputField> {
         const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
             color: highlight
                 ? ColorCode.kGoldBorder50
-                : ColorCode.kWhiteOpacity70,
+                : ColorCode.kWhiteOpacity30,
             width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
             color: ColorCode.kGoldBorder50,
             width: 0.5,

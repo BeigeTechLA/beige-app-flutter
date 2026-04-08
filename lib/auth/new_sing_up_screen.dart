@@ -21,7 +21,6 @@ import '../service/google_config.dart';
 import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
-import 'login_screen.dart';
 
 
 class NewSingUpScreen extends StatefulWidget {
@@ -32,7 +31,8 @@ class NewSingUpScreen extends StatefulWidget {
 }
 
 class _NewSingUpScreenState extends State<NewSingUpScreen> {
-
+  bool isLocationSelected = false;
+  bool isProgrammaticChange = false;
   File? profileImage;
   final ImagePicker _picker = ImagePicker();
   final FocusNode _locationFocus = FocusNode();
@@ -81,6 +81,15 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   @override
   void initState() {
     super.initState();
+    locationController.addListener(() {
+      if (isProgrammaticChange) return; // 👈 skip
+
+      if (isLocationSelected) {
+        setState(() {
+          isLocationSelected = false;
+        });
+      }
+    });//
 
     nameController.addListener(() => setState(() {}));
     emailController.addListener(() => setState(() {}));
@@ -89,7 +98,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     confirmPasswordController.addListener(() => setState(() {}));
 
     _getCurrentLocation();
- /*   _getCurrentLocation();
+    /*   _getCurrentLocation();
     nameController.addListener(() {
       setState(() {});
     });
@@ -531,6 +540,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         selectedAddress = parts.join(', ');
 
         locationController.text = selectedAddress;
+        isProgrammaticChange = true;
+        locationController.text = selectedAddress;
+        isProgrammaticChange = false;
         locationController.selection = TextSelection.fromPosition(
           TextPosition(offset: locationController.text.length),
         );
@@ -660,7 +672,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
 
   void _showSnack(String message) {
-   TopMessage.show(context, message);
+    TopMessage.show(context, message);
   }
 
   @override
@@ -684,7 +696,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-      String _darkMapStyle = '''
+    String _darkMapStyle = '''
 [
   {
     "elementType": "geometry",
@@ -755,17 +767,17 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                       /// 🔙 BACK BUTTON
                       Positioned(
-                        top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                        left: 16,
-                        child:InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: SvgPicture.asset(
-                            "assets/svg/back.svg",
-                            height: 24,
-                          ),
-                        )
+                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                          left: 16,
+                          child:InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: SvgPicture.asset(
+                              "assets/svg/back.svg",
+                              height: 24,
+                            ),
+                          )
                       ),
 
                       /// 🏷️ TITLE + SUBTITLE (CENTER)
@@ -829,7 +841,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                             const SizedBox(height: 22),
 
-                        /*    _buildField("Name", nameController),
+                            /*    _buildField("Name", nameController),
                             const SizedBox(height: 16),
                             _buildField("Email ID", emailController),
                             const SizedBox(height: 16),*/
@@ -864,6 +876,10 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                   debounceTime: 600,
                                   isLatLngRequired: true,
 
+
+
+
+
                                   textStyle: const TextStyle(
                                     color: ColorCode.white,
                                     fontFamily: "Outfit",
@@ -871,6 +887,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                   ),
 
                                   inputDecoration: InputDecoration(
+
+
                                     hintText: "Location*",
                                     hintStyle: const TextStyle(
                                       color: ColorCode.kWhiteOpacity70,
@@ -884,13 +902,13 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                     ),
 
                                     /// 📍 LOCATION SVG
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(right: 16),
+                                    suffixIcon: Padding(//
+                                      padding: const EdgeInsets.all(13),
                                       child: SvgPicture.asset(
                                         "assets/svg/LocationPin.svg",
-                                        width: 10,
-                                        height: 10,
-                                        color: ColorCode.kWhiteOpacity70,
+                                        width: 24,
+                                        height: 24,
+                                        color: ColorCode.white,//
                                       ),
                                     ),
                                   ),
@@ -911,16 +929,22 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                       selectedLng = latLng.longitude;
                                       selectedAddress = prediction.description ?? "";
                                       showMap = true;
+                                      isLocationSelected = true;
                                     });
 
-                                    locationController.text = selectedAddress;
-                                  },
+                                    // 👇 YAHAA ADD KARO
+                                    isProgrammaticChange = true;
 
+                                    locationController.text = selectedAddress;
+
+                                    isProgrammaticChange = false;
+                                  },
                                   itemClick: (prediction) {
                                     locationController.text = prediction.description ?? "";
                                   },
 
-                                  isCrossBtnShown: true,
+                                  isCrossBtnShown: !isLocationSelected,
+
                                 ),
 
                               ],
@@ -980,7 +1004,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                             const SizedBox(height: 16),
 
-                       /*     _buildPasswordField(
+                            /*     _buildPasswordField(
                               "Create Password",
                               showPassword,
                                   () => setState(() => showPassword = !showPassword),
@@ -1537,19 +1561,20 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     if (name.isEmpty && email.isEmpty && profileImage == null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
+        margin: EdgeInsets.symmetric(horizontal: 22),//
         height: 60,
         decoration: BoxDecoration(
-          color: ColorCode.k282828,
-          border: Border.all(color: ColorCode.kHeadingColor),
+          color: Color(0xff1D1D1B),//
+          border: Border.all(color: Colors.white.withValues(alpha: 0.10),width: 0.50),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children:  [
             Container(
-              height: 32,
-              width: 32,
-              decoration: BoxDecoration(
+              height: 33,
+              width: 33,
+              decoration: BoxDecoration(//
                 shape: BoxShape.circle,
                 color: ColorCode.k1D1D1B_Opacity70,
                 border: Border.all(
@@ -1568,7 +1593,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
             const SizedBox(width: 10),
 
             Text(
-              "Tell Us About Yourself & Add Details",
+              "Tell Us About Yourself & Add Details",//
               style: TextStyle(
                 fontFamily: "Outfit",
                 fontSize: 12,
@@ -1582,7 +1607,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
     // 🔥 Dynamic Card (jab data fill ho)
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 22),//
+
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -1613,7 +1640,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                 : null,
           ),
 
-          const SizedBox(width: 14),
+          const SizedBox(width: 10),
 
           /// 📝 NAME + EMAIL
           Expanded(
@@ -1629,8 +1656,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       "Name: ",
                       style: TextStyle(
                         fontFamily: "Outfit",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
@@ -1638,7 +1665,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       name.isEmpty ? "Your Name" : name,
                       style: const TextStyle(
                         fontFamily: "Outfit",
-                        fontSize: 15,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
@@ -1652,12 +1679,11 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                 Row(
                   children: [
                     const Text(
-                      "Email: ",
+                      "Email ID: ",
                       style: TextStyle(
                         fontFamily: "Outfit",
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: Colors.black54,
                       ),
                     ),
                     Expanded(
@@ -1682,7 +1708,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   }
 
 
-  }
+}
 class CircleHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -1723,5 +1749,3 @@ class CircleHolePainter extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
-
-

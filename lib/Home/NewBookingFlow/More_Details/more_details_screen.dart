@@ -203,6 +203,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         return Icons.work_outline;
     }
   }*/
+
   String getContentTypeIcon(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -348,8 +349,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-     String _darkMapStyle = '''
+    String _darkMapStyle = '''
 [
   {
     "elementType": "geometry",
@@ -440,665 +440,670 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           ],
         ),
       ),
-      body: SafeArea(child:SingleChildScrollView(
-        child: Padding(padding:  EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-        
-        
-        
-        Row(
-        children: List.generate(3, (index) {
-          double fillWidth = 0;
-        
-          if (index < currentStep) {
-            // ✅ Completed step (FULL)
-            fillWidth = double.infinity;
-          } else if (index == currentStep) {
-            // 🟡 Current step (HALF)
-            fillWidth = 35.44;
-          } else {
-            // ⭕ Upcoming step (EMPTY)
-            fillWidth = 0;
-          }
-        
-          return Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              height: 5,
-              decoration: BoxDecoration(
-                color: ColorCode.kSubtextColor, // grey background
-                borderRadius: BorderRadius.circular(64),
+      body: SafeArea(child:Padding(padding:  EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+      
+      
+      
+      Row(
+      children: List.generate(3, (index) {
+        double fillWidth = 0;
+      
+        if (index < currentStep) {
+          // ✅ Completed step (FULL)
+          fillWidth = double.infinity;
+        } else if (index == currentStep) {
+          // 🟡 Current step (HALF)
+          fillWidth = 35.44;
+        } else {
+          // ⭕ Upcoming step (EMPTY)
+          fillWidth = 0;
+        }
+      
+        return Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(right: 8),
+            height: 5,
+            decoration: BoxDecoration(
+              color: ColorCode.kSubtextColor, // grey background
+              borderRadius: BorderRadius.circular(64),
+            ),
+            child: fillWidth > 0
+                ? Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                height: 5,
+                width: fillWidth == double.infinity ? null : fillWidth,
+                decoration: BoxDecoration(
+                  color: ColorCode.kButtonColor,
+                  borderRadius: BorderRadius.circular(64),
+                ),
               ),
-              child: fillWidth > 0
-                  ? Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  height: 5,
-                  width: fillWidth == double.infinity ? null : fillWidth,
-                  decoration: BoxDecoration(
-                    color: ColorCode.kButtonColor,
-                    borderRadius: BorderRadius.circular(64),
-                  ),
-                ),
-              )
-                  : const SizedBox(),
-            ),
-          );
-        }),
-        ),
-        
-        
-            SizedBox(
-              height: 20,
-            ),
-        
-            Row(
-              children: [
-                Text(
-                  "More Details",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            )
+                : const SizedBox(),
+          ),
+        );
+      }),
+      ),
+      
+      
+          SizedBox(
+            height: 20,
+          ),
+      
+          Row(
             children: [
-
-
-
-              const SizedBox(height: 12),
-
-              /// 🔹 INCLUDED CARD
-              const SizedBox(height: 12),
-
-              /// 🎥 VIDEOGRAPHY CARD
-              if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2B2B2B),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-
-                      /// ICON BOX
-                      Container(
-                        height: 40,
-                        width: 40,
-                       /* decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),*/
-                        child: Center(
-                          child: SvgPicture.asset(
-                            "assets/svg/video.svg",
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      /// TITLE
-                      Expanded(
-                        child: Text(
-                          "Videographer X${includedVideoQty + additionalVideoQty}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-
-                      /// INCLUDED BADGE
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: ColorCode.kButtonColor),
-                        ),
-                        child: const Text(
-                          "Included",
-                          style: TextStyle(
-                            color: ColorCode.kButtonColor,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              /// 📷 PHOTOGRAPHY CARD
-              if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2B2B2B),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-
-                      /// ICON BOX
-                      Container(
-                        height: 40,
-                        width: 40,
-                     /*   decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10),
-                        ),*/
-                        child: Center(
-                          child: SvgPicture.asset(
-                            "assets/svg/Photo.svg",
-                            // height: 20,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      /// TITLE
-                      Expanded(
-                        child: Text(
-                          "Photographer X${includedPhotoQty + additionalPhotoQty}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-
-                      /// INCLUDED BADGE
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: ColorCode.kButtonColor),
-                        ),
-                        child: const Text(
-                          "Included",
-                          style: TextStyle(
-                            color: ColorCode.kButtonColor,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-
-              const SizedBox(height: 24),
-
-
-
-              /// 🔹 QUESTION
               Text(
-                "Would you like to Add Additional creatives?",
+                "More Details",
                 style: TextStyle(
-                  color: Colors.white,
                   fontFamily: "Unbounded",
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-
-              const SizedBox(height: 12),
-
-
-              Row(
-                children: [
-                  _radioOption("Yes", true),
-                  const SizedBox(width: 24),
-                  _radioOption("No", false),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              /// 🔹 ADDITIONAL SHOOTER CARD
-              if (loding)
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2B2B2B),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      /// 📸 Photography (only if allowed)
-                      if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
-                        _buildQtyRow(
-                          title: "Photography",
-                          value: additionalPhotoQty,
-                          onAdd: () => setState(() => additionalPhotoQty++),
-                          onRemove: () {
-                            if (additionalPhotoQty > 0) {
-                              setState(() => additionalPhotoQty--);
-                            }
-                          },
-                        ),
-
-                      /// 🎥 Videography (only if allowed)
-                      if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
-                        _buildQtyRow(
-                          title: "Videography",
-                          value: additionalVideoQty,
-                          onAdd: () => setState(() => additionalVideoQty++),
-                          onRemove: () {
-                            if (additionalVideoQty > 0) {
-                              setState(() => additionalVideoQty--);
-                            }
-                          },
-                        ),
-                    ],
-                  ),
-                ),
+            ],
+          ),
+      
+      
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
 
 
 
-              SizedBox(height: 20),
-             /* TextField(
-                controller: searchController,
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    searchLocation(value);
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText:"Select Location*",
-                  suffixIcon:
-                   Icon(Icons.location_on_outlined, color: ColorCode.white),
+                const SizedBox(height: 12),
 
+                /// 🔹 INCLUDED CARD
+                const SizedBox(height: 12),
 
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  labelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  /// ⭐ 0.5px BORDER + OPACITY COLOR
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                       // 🔥 exact 0.5px
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                          // focus border thicker
-                    ),
-                  ),
-
-                  floatingLabelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-
-                  ),
-                ),
-              ),*/
-              // GooglePlaceAutoCompleteTextField(
-              //   textEditingController: searchController,
-              //   googleAPIKey: GoogleConfig.placesApiKey,
-              //   debounceTime: 600,
-              //   isLatLngRequired: true,
-              //
-              //   textStyle: const TextStyle(
-              //     color: ColorCode.white,
-              //     fontFamily: "Outfit",
-              //   ),
-              //
-              //   inputDecoration: InputDecoration(
-              //     // labelText: "Select Location*",
-              //     floatingLabelBehavior: FloatingLabelBehavior.always,
-              //
-              //     labelStyle: const TextStyle(
-              //       color: ColorCode.kWhiteOpacity70,
-              //       fontFamily: "Outfit",
-              //     ),
-              //
-              //     hintText: "Search or select location",
-              //     hintStyle: const TextStyle(
-              //       color: ColorCode.kWhiteOpacity70,
-              //     ),
-              //
-              //     suffixIcon: const Icon(
-              //       Icons.location_on_outlined,
-              //       color: ColorCode.kWhiteOpacity70,
-              //     ),
-              //
-              //     contentPadding: const EdgeInsets.symmetric(
-              //       horizontal: 20,
-              //       vertical: 18,
-              //     ),
-              //
-              //     enabledBorder: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(12),
-              //       borderSide: const BorderSide(
-              //         color: ColorCode.kWhiteOpacity70,
-              //         width: 0.5,
-              //       ),
-              //     ),
-              //
-              //     focusedBorder: OutlineInputBorder(
-              //       borderRadius: BorderRadius.circular(12),
-              //       borderSide: const BorderSide(
-              //         color: ColorCode.kButtonColor,
-              //         width: 1,
-              //       ),
-              //     ),
-              //   ),
-              //
-              //   getPlaceDetailWithLatLng: (prediction) async {
-              //     final latLng = LatLng(
-              //       double.parse(prediction.lat!),
-              //       double.parse(prediction.lng!),
-              //     );
-              //
-              //     setState(() {
-              //       currentLatLng = latLng;
-              //       selectedAddress = prediction.description ?? "";
-              //       searchController.text = selectedAddress;
-              //     });
-              //
-              //     mapController?.animateCamera(
-              //       CameraUpdate.newLatLngZoom(latLng, 14),
-              //     );
-              //   },
-              //
-              //   itemClick: (prediction) {
-              //     searchController.text = prediction.description ?? "";
-              //     searchController.selection = TextSelection.fromPosition(
-              //       TextPosition(offset: searchController.text.length),
-              //     );
-              //   },
-              //
-              //   isCrossBtnShown: true,
-              // ),
-
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// 🔹 LOCATION FIELD
+                /// 🎥 VIDEOGRAPHY CARD
+                if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
                   Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: const Color(0xFF2B2B2B),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+
+                        /// ICON BOX
+                        Container(
+                          height: 40,
+                          width: 40,
+                         /* decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(10),
+                          ),*/
+                          child: Center(
+                            child: SvgPicture.asset(
+                              "assets/svg/video.svg",
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// TITLE
+                        Expanded(
+                          child: Text(
+                            "Videographer X${includedVideoQty + additionalVideoQty}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+
+                        /// INCLUDED BADGE
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: ColorCode.kButtonColor),
+                          ),
+                          child: const Text(
+                            "Included",
+                            style: TextStyle(
+                              color: ColorCode.kButtonColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                /// 📷 PHOTOGRAPHY CARD
+                if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2B2B2B),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+
+                        /// ICON BOX
+                        Container(
+                          height: 40,
+                          width: 40,
+                       /*   decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(10),
+                          ),*/
+                          child: Center(
+                            child: SvgPicture.asset(
+                              "assets/svg/Photo.svg",
+                              // height: 20,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        /// TITLE
+                        Expanded(
+                          child: Text(
+                            "Photographer X${includedPhotoQty + additionalPhotoQty}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+
+                        /// INCLUDED BADGE
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: ColorCode.kButtonColor),
+                          ),
+                          child: const Text(
+                            "Included",
+                            style: TextStyle(
+                              color: ColorCode.kButtonColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                const SizedBox(height: 24),
+
+
+
+                /// 🔹 QUESTION
+                Text(
+                  "Would you like to Add Additional creatives?",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: "Unbounded",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+
+                Row(
+                  children: [
+                    _radioOption("Yes", true),
+                    const SizedBox(width: 24),
+                    _radioOption("No", false),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// 🔹 ADDITIONAL SHOOTER CARD
+                if (loding)
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2B2B2B),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        /// 📸 Photography (only if allowed)
+                        if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
+                          _buildQtyRow(
+                            title: "Photography",
+                            value: additionalPhotoQty,
+                            onAdd: () => setState(() => additionalPhotoQty++),
+                            onRemove: () {
+                              if (additionalPhotoQty > 0) {
+                                setState(() => additionalPhotoQty--);
+                              }
+                            },
+                          ),
+
+                        /// 🎥 Videography (only if allowed)
+                        if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
+                          _buildQtyRow(
+                            title: "Videography",
+                            value: additionalVideoQty,
+                            onAdd: () => setState(() => additionalVideoQty++),
+                            onRemove: () {
+                              if (additionalVideoQty > 0) {
+                                setState(() => additionalVideoQty--);
+                              }
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+
+
+
+                SizedBox(height: 20),
+               /* TextField(
+                  controller: searchController,
+                  onSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      searchLocation(value);
+                    }
+                  },
+                  decoration: InputDecoration(
+                    labelText:"Select Location*",
+                    suffixIcon:
+                     Icon(Icons.location_on_outlined, color: ColorCode.white),
+
+
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                    labelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                    ),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+
+                    /// ⭐ 0.5px BORDER + OPACITY COLOR
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: ColorCode.kGoldBorder50,
-                        width: 0.5,
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                       // 🔥 exact 0.5px
                       ),
+                    ),
+
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                          // focus border thicker
+                      ),
+                    ),
+
+                    floatingLabelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
 
                     ),
-                    child: GooglePlaceAutoCompleteTextField(
-                      textEditingController: searchController,
-                      focusNode: locationFocusNode,
-                      googleAPIKey: GoogleConfig.placesApiKey,
-                      debounceTime: 600,
-                      isLatLngRequired: true,
+                  ),
+                ),*/
+                // GooglePlaceAutoCompleteTextField(
+                //   textEditingController: searchController,
+                //   googleAPIKey: GoogleConfig.placesApiKey,
+                //   debounceTime: 600,
+                //   isLatLngRequired: true,
+                //
+                //   textStyle: const TextStyle(
+                //     color: ColorCode.white,
+                //     fontFamily: "Outfit",
+                //   ),
+                //
+                //   inputDecoration: InputDecoration(
+                //     // labelText: "Select Location*",
+                //     floatingLabelBehavior: FloatingLabelBehavior.always,
+                //
+                //     labelStyle: const TextStyle(
+                //       color: ColorCode.kWhiteOpacity70,
+                //       fontFamily: "Outfit",
+                //     ),
+                //
+                //     hintText: "Search or select location",
+                //     hintStyle: const TextStyle(
+                //       color: ColorCode.kWhiteOpacity70,
+                //     ),
+                //
+                //     suffixIcon: const Icon(
+                //       Icons.location_on_outlined,
+                //       color: ColorCode.kWhiteOpacity70,
+                //     ),
+                //
+                //     contentPadding: const EdgeInsets.symmetric(
+                //       horizontal: 20,
+                //       vertical: 18,
+                //     ),
+                //
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: const BorderSide(
+                //         color: ColorCode.kWhiteOpacity70,
+                //         width: 0.5,
+                //       ),
+                //     ),
+                //
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: const BorderSide(
+                //         color: ColorCode.kButtonColor,
+                //         width: 1,
+                //       ),
+                //     ),
+                //   ),
+                //
+                //   getPlaceDetailWithLatLng: (prediction) async {
+                //     final latLng = LatLng(
+                //       double.parse(prediction.lat!),
+                //       double.parse(prediction.lng!),
+                //     );
+                //
+                //     setState(() {
+                //       currentLatLng = latLng;
+                //       selectedAddress = prediction.description ?? "";
+                //       searchController.text = selectedAddress;
+                //     });
+                //
+                //     mapController?.animateCamera(
+                //       CameraUpdate.newLatLngZoom(latLng, 14),
+                //     );
+                //   },
+                //
+                //   itemClick: (prediction) {
+                //     searchController.text = prediction.description ?? "";
+                //     searchController.selection = TextSelection.fromPosition(
+                //       TextPosition(offset: searchController.text.length),
+                //     );
+                //   },
+                //
+                //   isCrossBtnShown: true,
+                // ),
 
-                      textStyle: const TextStyle(
-                        color: ColorCode.white,
-                        fontFamily: "Outfit",
-                        fontSize: 14,
+
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    /// 🔹 LOCATION FIELD
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: ColorCode.kGoldBorder50,
+                            width: 0.5,
+                          ),
+
+                        ),
+                        child: GooglePlaceAutoCompleteTextField(
+                          textEditingController: searchController,
+                          focusNode: locationFocusNode,
+                          googleAPIKey: GoogleConfig.placesApiKey,
+                          debounceTime: 600,
+                          isLatLngRequired: true,
+
+                          textStyle: const TextStyle(
+                            color: ColorCode.white,
+                            fontFamily: "Outfit",
+                            fontSize: 14,
+                          ),
+
+                          inputDecoration:  InputDecoration(
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            hintText: "Search or select location",
+                            hintStyle: TextStyle(
+                              color: ColorCode.kWhiteOpacity70,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.only(right: 12),
+                              child: SizedBox(
+                                width: 16,   // 👈 control size here
+                                height: 16,
+                                child: SvgPicture.asset(
+                                  "assets/svg/LocationPin.svg",
+                                  fit: BoxFit.none,
+                                ),
+                              ),
+                            ),),
+
+                          getPlaceDetailWithLatLng: (prediction) async {
+                            final latLng = LatLng(
+                              double.parse(prediction.lat!),
+                              double.parse(prediction.lng!),
+                            );
+
+                            locationFocusNode.unfocus();
+
+                            await _updateLocationFromLatLng(latLng);
+
+                            setState(() {
+                              currentLatLng = latLng;
+                              selectedAddress = prediction.description ?? "";
+                              locationError = null; // ✅ REMOVE ERROR HERE
+                            });
+
+                            searchController.text = selectedAddress;
+                            searchController.selection = TextSelection.fromPosition(
+                              TextPosition(offset: searchController.text.length),
+                            );
+
+                            mapController?.animateCamera(
+                              CameraUpdate.newLatLngZoom(latLng, 14),
+                            );
+                          },
+
+                          itemClick: (prediction) {
+                            searchController.text = prediction.description ?? "";
+                            searchController.selection = TextSelection.fromPosition(
+                              TextPosition(offset: searchController.text.length),
+                            );
+                          },
+
+                          isCrossBtnShown: true,
+                        ),
                       ),
 
-                      inputDecoration: const InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        hintText: "Search or select location",
-                        hintStyle: TextStyle(
-                          color: ColorCode.kWhiteOpacity70,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.only(right: 8),
-                          child: Icon(
-                            Icons.location_on_outlined,
-                            color: ColorCode.kWhiteOpacity70,
+                    /// 🔴 ERROR TEXT
+                    if (locationError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          locationError!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
                           ),
                         ),
                       ),
+                  ],
+                ),
 
-                      getPlaceDetailWithLatLng: (prediction) async {
-                        final latLng = LatLng(
-                          double.parse(prediction.lat!),
-                          double.parse(prediction.lng!),
-                        );
 
-                        locationFocusNode.unfocus();
 
-                        await _updateLocationFromLatLng(latLng);
 
-                        setState(() {
-                          currentLatLng = latLng;
-                          selectedAddress = prediction.description ?? "";
-                          locationError = null; // ✅ REMOVE ERROR HERE
-                        });
+                SizedBox(height: 10),
 
-                        searchController.text = selectedAddress;
-                        searchController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: searchController.text.length),
-                        );
-
-                        mapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(latLng, 14),
-                        );
-                      },
-
-                      itemClick: (prediction) {
-                        searchController.text = prediction.description ?? "";
-                        searchController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: searchController.text.length),
-                        );
-                      },
-
-                      isCrossBtnShown: true,
-                    ),
-                  ),
-
-                  /// 🔴 ERROR TEXT
-                  if (locationError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        locationError!,
-                        style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 12,
+                /// 🗺️ MAP WITH FIXED HEIGHT
+                if (showMap)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: SizedBox(
+                    height: 350,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: currentLatLng == null
+                          ? const Center(child: CircularProgressIndicator())
+                          :GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: currentLatLng!,
+                          zoom: 14,
                         ),
-                      ),
-                    ),
-                ],
-              ),
 
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        zoomControlsEnabled: true,
+                        compassEnabled: false,
 
+                        // 🔥 IMPORTANT FIX (touch enable)
+                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                          Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                          ),
+                        },
 
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          controller.setMapStyle(_darkMapStyle);
+                        },
 
-              SizedBox(height: 10),
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("selected"),
+                            position: currentLatLng!,
+                          ),
+                        },
 
-              /// 🗺️ MAP WITH FIXED HEIGHT
-              if (showMap)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: SizedBox(
-                  height: 280,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: currentLatLng == null
-                        ? const Center(child: CircularProgressIndicator())
-                        :GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: currentLatLng!,
-                        zoom: 14,
+                        onTap: (latLng) async {
+                          await _updateLocationFromLatLng(latLng);
+                        },
                       ),
 
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      zoomControlsEnabled: true,
-                      compassEnabled: false,
-
-                      // 🔥 IMPORTANT FIX (touch enable)
-                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                        Factory<OneSequenceGestureRecognizer>(
-                              () => EagerGestureRecognizer(),
-                        ),
-                      },
-
-                      onMapCreated: (controller) {
-                        mapController = controller;
-                        controller.setMapStyle(_darkMapStyle);
-                      },
-
-                      markers: {
-                        Marker(
-                          markerId: const MarkerId("selected"),
-                          position: currentLatLng!,
-                        ),
-                      },
-
-                      onTap: (latLng) async {
-                        await _updateLocationFromLatLng(latLng);
-                      },
                     ),
-
                   ),
                 ),
-              ),
 
 
-              SizedBox(height: 20),
-      /*        TextField(
-                controller: additionalDetailsController,
-        maxLines: 5,
+                SizedBox(height: 20),
+                /*        TextField(
+                  controller: additionalDetailsController,
+                  maxLines: 5,
 
-                decoration: InputDecoration(
-                  labelText:"Additional Details",
+                  decoration: InputDecoration(
+                    labelText:"Additional Details",
 
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
 
-                  labelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  /// ⭐ 0.5px BORDER + OPACITY COLOR
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                       // 🔥 exact 0.5px
+                    labelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
                     ),
-                  ),
 
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                          // focus border thicker
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
                     ),
-                  ),
 
-                  floatingLabelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
+                    /// ⭐ 0.5px BORDER + OPACITY COLOR
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                       // 🔥 exact 0.5px
+                      ),
+                    ),
 
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                          // focus border thicker
+                      ),
+                    ),
+
+                    floatingLabelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),*/
-              CustomInputField(
-                title: "Additional Details",
-                controller: additionalDetailsController,
-                keyboardType: TextInputType.multiline,
-                maxLines: 5,
+                SizedBox(height: 20),*/
+                CustomInputField(
+                  title: "Additional Details",
+                  controller: additionalDetailsController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 5,
 
-              ),
-              /*TextField(
-
-                controller: referenceLinksController,
-                decoration: InputDecoration(
-                  labelText:"Supporting Links",
-
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                  labelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
-                  ),
-
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 18,
-                  ),
-
-                  /// ⭐ 0.5px BORDER + OPACITY COLOR
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                       // 🔥 exact 0.5px
-                    ),
-                  ),
-
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
-                      width: 0.5,                          // focus border thicker
-                    ),
-                  ),
-
-                  floatingLabelStyle: const TextStyle(
-                    color: ColorCode.kWhiteOpacity70,
-
-                  ),
                 ),
-              ),*/
-              SizedBox(height: 20),
-              CustomInputField(
-                title: "Supporting Links",
-                controller: referenceLinksController,
-                keyboardType: TextInputType.url,
+                /*TextField(
 
-              ),
-            ],
+                  controller: referenceLinksController,
+                  decoration: InputDecoration(
+                    labelText:"Supporting Links",
+
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                    labelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                    ),
+
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+
+                    /// ⭐ 0.5px BORDER + OPACITY COLOR
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                       // 🔥 exact 0.5px
+                      ),
+                    ),
+
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        width: 0.5,                          // focus border thicker
+                      ),
+                    ),
+
+                    floatingLabelStyle: const TextStyle(
+                      color: ColorCode.kWhiteOpacity70,
+
+                    ),
+                  ),
+                ),*/
+                SizedBox(height: 20),
+                CustomInputField(
+                  title: "Supporting Links",
+                  controller: referenceLinksController,
+                  keyboardType: TextInputType.url,
+
+                ),
+              ],
+            ),
           ),
-            SizedBox(height: 20),
-        
-        
-          ],
         ),
-        
-        ),
+          SizedBox(height: 20),
+      
+      
+        ],
+      ),
+      
       )
       ) ,
 

@@ -40,13 +40,15 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
           children: [
 
             /// ✅ SUCCESS LOTTIE
-            Lottie.asset(
-              "assets/lottie/Untitled file.json",
-              height: 180,
-              repeat: false,
+            Transform.translate(
+              offset: Offset(0, 20),
+              child: Lottie.asset(
+                "assets/lottie/Untitled file.json",
+                height: 180,
+                repeat: false,
+              ),
             ),
 
-            const SizedBox(height: 24),
 
             const Text(
               "You're All Set",

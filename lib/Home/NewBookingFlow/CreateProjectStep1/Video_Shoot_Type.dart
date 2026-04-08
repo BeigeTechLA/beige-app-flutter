@@ -8,7 +8,7 @@ import 'package:lottie/lottie.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
-import 'Shoot_Date_Time_screen.dart';
+import 'ShootDateTime/Shoot_Date_Time_screen.dart';
 class VideoShootType extends StatefulWidget {
   final int bookingId;
   final int contentTypeId;
@@ -267,229 +267,233 @@ String getContentTypeTitle(int contentTypeId) {
       body: SafeArea(
         child: Padding(
           padding:  EdgeInsets.all(20.0),
-          child: Column(
-            children: [
+          child: Container(
 
-              Row(
-                children: List.generate(3, (index) {
-                  bool isActive = index == 0; // current step (1/3)
+            child: Column(
+              children: [
 
-                  return Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: ColorCode.kSubtextColor, // grey background
-                        borderRadius: BorderRadius.circular(64),
-                      ),
-                      child: isActive
-                          ? Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          height: 5,
-                          width: 70, // 🔥 colored portion only
-                          decoration: BoxDecoration(
-                            color: ColorCode.kButtonColor,
-                            borderRadius: BorderRadius.circular(64),
-                          ),
+                Row(
+                  children: List.generate(3, (index) {
+                    bool isActive = index == 0; // current step (1/3)
+
+                    return Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: ColorCode.kSubtextColor, // grey background
+                          borderRadius: BorderRadius.circular(64),
                         ),
-                      )
-                          : const SizedBox(),
-                    ),
-                  );
-                }),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Text(
-                    getContentTypeTitle(widget.contentTypeId),
-                    style:  TextStyle(
-                      fontFamily: "Unbounded",
-                      fontSize: 16,
-                      color: ColorCode.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-
-              Expanded(
-                child: ListView.builder(
-                  cacheExtent: 4000,
-                  itemCount: shootTypes.length,
-                  padding:  EdgeInsets.only(top: 12),
-                  itemBuilder: (context, index) {
-
-                    final item = shootTypes[index];
-                    final List tags = item['tags'] ?? [];
-                    final String tagsText = tags.join(" , ");
-
-                    final imagePath = item['image']?.toString() ?? '';
-                    final fullImageUrl = imagePath.isNotEmpty
-                        ? ApiService().getImageURL(imagePath)
-                        : '';
-
-
-                    debugPrint("🧾 RAW IMAGE PATH → $imagePath");
-                    debugPrint("🖼 FULL IMAGE URL → $fullImageUrl");
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        /// 🔹 IMAGE CARD
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            setState(() {
-                              selectedIndex = index;
-                              selectedShootTypeId = item['id'];
-                              selectedShootTypeName = item['name'];
-                            });
-
-                            debugPrint("✅ Selected ID → $selectedShootTypeId");
-                            debugPrint("✅ Selected Name → $selectedShootTypeName");
-                          },
+                        child: isActive
+                            ? Align(
+                          alignment: Alignment.centerLeft,
                           child: Container(
-                            padding: const EdgeInsets.all(10),
+                            height: 5,
+                            width: 70, // 🔥 colored portion only
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                          
-                          
+                              color: ColorCode.kButtonColor,
+                              borderRadius: BorderRadius.circular(64),
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                          
-                                /// 🔹 LEFT IMAGE
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: SizedBox(
-                                    height: 125,
-                                    width: 120,
-                                    child: CachedNetworkImage(
-                                      imageUrl: fullImageUrl,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(
-                                        child: Lottie.asset(
-                                          "assets/lottie/Untitled_file.json",
-                                          width: 60,
-                                          height: 60,
+                          ),
+                        )
+                            : const SizedBox(),
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      getContentTypeTitle(widget.contentTypeId),
+                      style:  TextStyle(
+                        fontFamily: "Unbounded",
+                        fontSize: 16,
+                        color: ColorCode.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                Expanded(
+                  child: ListView.builder(
+                    cacheExtent: 4000,
+                    itemCount: shootTypes.length,
+                    padding:  EdgeInsets.only(top: 12),
+                    itemBuilder: (context, index) {
+
+                      final item = shootTypes[index];
+                      final List tags = item['tags'] ?? [];
+                      final String tagsText = tags.join(" , ");
+
+                      final imagePath = item['image']?.toString() ?? '';
+                      final fullImageUrl = imagePath.isNotEmpty
+                          ? ApiService().getImageURL(imagePath)
+                          : '';
+
+
+                      debugPrint("🧾 RAW IMAGE PATH → $imagePath");
+                      debugPrint("🖼 FULL IMAGE URL → $fullImageUrl");
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          /// 🔹 IMAGE CARD
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = index;
+                                selectedShootTypeId = item['id'];
+                                selectedShootTypeName = item['name'];
+                              });
+
+                              debugPrint("✅ Selected ID → $selectedShootTypeId");
+                              debugPrint("✅ Selected Name → $selectedShootTypeName");
+                            },
+                            child: Container(
+
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+
+
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+
+                                  /// 🔹 LEFT IMAGE
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: SizedBox(
+                                      height: 125,
+                                      width: 120,
+                                      child: CachedNetworkImage(
+                                        imageUrl: fullImageUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => Center(
+                                          child: Lottie.asset(
+                                            "assets/lottie/Untitled_file.json",
+                                            width: 60,
+                                            height: 60,
+                                          ),
                                         ),
+                                        errorWidget: (context, url, error) =>
+                                        const Icon(Icons.broken_image, color: Colors.grey),
                                       ),
-                                      errorWidget: (context, url, error) =>
-                                      const Icon(Icons.broken_image, color: Colors.grey),
                                     ),
                                   ),
-                                ),
-                          
-                                const SizedBox(width: 16),
-                          
-                                /// 🔹 CENTER TEXT SECTION
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                          
-                                      /// Title
-                                      Text(
-                                        item['name'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          fontFamily: "Outfit",
+
+                                  const SizedBox(width: 16),
+
+                                  /// 🔹 CENTER TEXT SECTION
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+
+                                        /// Title
+                                        Text(
+                                          item['name'] ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                            fontFamily: "Outfit",
+                                          ),
                                         ),
-                                      ),
-                          
-                          
-                                      Text(
-                                        tagsText,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: ColorCode.kWhiteOpacity70,
-                                          fontFamily: "Outfit",
+
+
+                                        Text(
+                                          tagsText,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: ColorCode.kWhiteOpacity70,
+                                            fontFamily: "Outfit",
+                                          ),
                                         ),
-                                      ),
-                          
-                                    ],
+
+                                      ],
+                                    ),
                                   ),
-                                ),
-                          
-                                const SizedBox(width: 12),
-                          
-                                /// 🔹 RIGHT RADIO BUTTON
-                                InkWell(
-                             /*     splashColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
-                                  onTap: () {
-                                    setState(() {
-                                      selectedIndex = index;
-                                      selectedShootTypeId = item['id'];
-                                      selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
-                                    });
-                          
-                                    debugPrint("✅ Selected ID → $selectedShootTypeId");
-                                    debugPrint("✅ Selected Name → $selectedShootTypeName");
-                                  },*/
-                                  child: Container(
-                                    height: 25,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: selectedIndex == index
-                                          ? const LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Color(0xFFE8D1AB),
-                                          Color(0xFFD4A14D),
-                                        ],
+
+                                  const SizedBox(width: 12),
+
+                                  /// 🔹 RIGHT RADIO BUTTON
+                                  InkWell(
+                               /*     splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    onTap: () {
+                                      setState(() {
+                                        selectedIndex = index;
+                                        selectedShootTypeId = item['id'];
+                                        selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
+                                      });
+
+                                      debugPrint("✅ Selected ID → $selectedShootTypeId");
+                                      debugPrint("✅ Selected Name → $selectedShootTypeName");
+                                    },*/
+                                    child: Container(
+                                      height: 25,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: selectedIndex == index
+                                            ? const LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Color(0xFFE8D1AB),
+                                            Color(0xFFD4A14D),
+                                          ],
+                                        )
+                                            : null,
+                                        border: Border.all(
+                                          color: Colors.white54,
+                                        ),
+                                      ),
+                                      child: selectedIndex == index
+                                          ? const Center(
+                                        child: CircleAvatar(
+                                          radius: 3,
+                                          backgroundColor: Colors.black,
+                                        ),
                                       )
                                           : null,
-                                      border: Border.all(
-                                        color: Colors.white54,
-                                      ),
                                     ),
-                                    child: selectedIndex == index
-                                        ? const Center(
-                                      child: CircleAvatar(
-                                        radius: 3,
-                                        backgroundColor: Colors.black,
-                                      ),
-                                    )
-                                        : null,
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
 
 
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
 
 
 
-            ],
+              ],
+            ),
           ),
 
         ),
       ),
       /// ✅ BOTTOM BAR (FIXED)
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         child: Row(
           children: [
             Expanded(

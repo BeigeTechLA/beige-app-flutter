@@ -22,7 +22,7 @@ class CrewSizeMatchingScreen extends StatefulWidget {
 class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
   int currentStep = 1;
-bool isLoading =true;
+  bool isLoading =true;
 
   List<String> defaultOutput = [];
 
@@ -148,605 +148,626 @@ bool isLoading =true;
       ),
 
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(padding:  EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-          
-          
-                Row(
-                  children: List.generate(3, (index) {
-                    double fillWidth = 0;
-          
-                    if (index < currentStep) {
-                      // ✅ Completed step (FULL)
-                      fillWidth = double.infinity;
-                    } else if (index == currentStep) {
-                      // 🟡 Current step (HALF)
-                      fillWidth = 82.44;
-                    } else {
-          
-                      fillWidth = 0;
-                    }
-          
-                    return Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: ColorCode.kSubtextColor, // grey background
-                          borderRadius: BorderRadius.circular(64),
-                        ),
-                        child: fillWidth > 0
-                            ? Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            height: 5,
-                            width: fillWidth == double.infinity ? null : fillWidth,
-                            decoration: BoxDecoration(
-                              color: ColorCode.kButtonColor,
-                              borderRadius: BorderRadius.circular(64),
-                            ),
+        child: Padding(padding:  EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+
+
+              Row(
+                children: List.generate(3, (index) {
+                  double fillWidth = 0;
+
+                  if (index < currentStep) {
+                    // ✅ Completed step (FULL)
+                    fillWidth = double.infinity;
+                  } else if (index == currentStep) {
+                    // 🟡 Current step (HALF)
+                    fillWidth = 82.44;
+                  } else {
+
+                    fillWidth = 0;
+                  }
+
+                  return Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: ColorCode.kSubtextColor, // grey background
+                        borderRadius: BorderRadius.circular(64),
+                      ),
+                      child: fillWidth > 0
+                          ? Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          height: 5,
+                          width: fillWidth == double.infinity ? null : fillWidth,
+                          decoration: BoxDecoration(
+                            color: ColorCode.kButtonColor,
+                            borderRadius: BorderRadius.circular(64),
                           ),
-                        )
-                            : const SizedBox(),
-                      ),
-                    );
-                  }),
-                ),
-          
-                SizedBox(
-                  height: 20,
-                ),
-          
-                Row(
-                  children: [
-                    Text(
-                      "Crew Size & Matching",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-          
-                SizedBox(height: 20),
-          
-                Container(
-                  // padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    border: Border.all(color: ColorCode.kWhiteOpacity70,width: 0.5)
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding:  EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: ColorCode.kButtonColor,
-                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10),
+                      )
+                          : const SizedBox(),
+                    ),
+                  );
+                }),
+              ),
+
+              SizedBox(
+                height: 20,
+              ),
+
+              Row(
+                children: [
+                  Text(
+                    "Crew Size & Matching",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+              Container(
+
+                child: Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          // padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                              border: Border.all(color:Colors.white.withOpacity(0.30),width: 0.5)
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding:  EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.kButtonColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        "assets/svg/Group_2087329363.svg",
+
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "Recommended Crew Size for \nYour Project",
+                                        style: TextStyle(color: ColorCode.kHeadingColor, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: SvgPicture.asset(
-                                "assets/svg/Group_2087329363.svg",
+
+
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: SizedBox(
+                                    height: 280,
+                                    width: double.infinity,
+                                    child: CachedNetworkImage(
+                                      imageUrl: getShootImage(),
+                                      fit: BoxFit.cover,
+
+                                      // ⏳ loading
+                                      placeholder: (context, url) {
+                                        debugPrint("⏳ IMAGE LOADING → $url");
+                                        return Center(
+                                          child: Lottie.asset(
+                                            "assets/lottie/Untitled_file.json",
+                                            width: 120,
+                                            height: 120,
+                                          ),
+                                        );
+                                      },
+
+                                      // ✅ success
+                                      imageBuilder: (context, imageProvider) {
+                                        debugPrint("✅ IMAGE LOADED → ${getShootImage()}");
+                                        return Image(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+
+                                      // ❌ error
+                                      errorWidget: (context, url, error) {
+                                        debugPrint("❌ IMAGE FAILED → $url");
+                                        return Center(
+                                          child: Lottie.asset(
+                                            "assets/lottie/Untitled_file.json",
+                                            width: 120,
+                                            height: 120,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+
+
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child:Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "$shootName ($contentType)",
+                                        //  maxLines: 2,                    // ✅ allows wrapping
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: ColorCode.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: "Outfit",
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 8),
+
+                                    Text(
+                                      "$minCrew - $maxCrew People",
+                                      style: const TextStyle(
+                                        color: ColorCode.kButtonColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: "Outfit",
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                "Recommended Crew Size for \nYour Project",
-                                style: TextStyle(color: ColorCode.kHeadingColor, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                              SizedBox(height: 10),
+                              if (defaultOutput.isNotEmpty) ...[
+                                // const SizedBox(height: 10),
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Divider(color: ColorCode.white.withOpacity(0.30)),
+                                ),
+
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Typical output:",
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.70),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: "Outfit",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            getDefaultOutputText(),
+                                            style: const TextStyle(
+                                              color: ColorCode.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: "Outfit",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Text(
+                              "How would you like to proceed?",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
-                      ),
 
-
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                        SizedBox(height: 10),
+                        Container(
+                          padding: EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                            /*    border: Border.all(color: ColorCode.kButtonColor)*/
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: SizedBox(
-                            height: 280,
-                            width: double.infinity,
-                            child: CachedNetworkImage(
-                              imageUrl: getShootImage(),
-                              fit: BoxFit.cover,
-
-                              // ⏳ loading
-                              placeholder: (context, url) {
-                                debugPrint("⏳ IMAGE LOADING → $url");
-                                return Center(
-                                  child: Lottie.asset(
-                                    "assets/lottie/Untitled_file.json",
-                                    width: 120,
-                                    height: 120,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  // Image.asset(
+                                  //   "assets/newbookflow/ai_matchmaker.png",
+                                  //   fit: BoxFit.cover,
+                                  // ),
+                                  Container(
+                                    padding: EdgeInsets.all(11),
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color:Color(0xffE8D1AB)
+                                    ),
+                                    child: SvgPicture.asset(
+                                      'assets/svg/Stars.svg',
+                                      width: 22,
+                                      height: 22,
+                                      fit: BoxFit.cover,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xff1D1D1B),
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
                                   ),
-                                );
-                              },
-
-                              // ✅ success
-                              imageBuilder: (context, imageProvider) {
-                                debugPrint("✅ IMAGE LOADED → ${getShootImage()}");
-                                return Image(
-                                  image: imageProvider,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-
-                              // ❌ error
-                              errorWidget: (context, url, error) {
-                                debugPrint("❌ IMAGE FAILED → $url");
-                                return Center(
-                                  child: Lottie.asset(
-                                    "assets/lottie/Untitled_file.json",
-                                    width: 120,
-                                    height: 120,
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "AI Matchmaker",
+                                      style: TextStyle(color: ColorCode.kButtonColor, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
+                                    ),
                                   ),
-                                );
-                              },
-                            ),
+                                ],
+                              ),
+
+                              // Divider(color: ColorCode.kDividerWhite12,),
+                              //
+
+                              SizedBox(height: 10),
+
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Our AI will analyse your project and match you with the perfect crew size and specialists",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: ColorCode.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Outfit",
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: 10),
+
+                              Container(
+                                /*  decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(13)),
+                              color: ColorCode.k282828,
+                            ),*/
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildCheckRow("Optimal team composition"),
+                                    const SizedBox(height: 10),
+                                    _buildCheckRow("Matched based on your budget"),
+                                    const SizedBox(height: 10),
+                                    _buildCheckRow("Industry best practices"),
+                                  ],
+                                ),
+                              ),
+
+
+                            ],
                           ),
                         ),
-                      ),
+
+                        SizedBox(height: 20),
+                        Divider(color: ColorCode.kDividerWhite12,),
+                        SizedBox(height:15),
+                        Row(
+                          children: [
+                            Text(
+                              "How AI Matching Works",
+                              style: TextStyle(
+                                fontFamily: "Unbounded",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
 
 
-
-                      Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child:Row(
-                      children: [
-                        Expanded(
+                        SizedBox(height:20),
+                        Align(
+                          alignment: Alignment.centerLeft,
                           child: Text(
-                            "$shootName (${contentType.toUpperCase()})",
-                            maxLines: 2,                    // ✅ allows wrapping
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: ColorCode.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            "Our intelligent matching system considers multiple factors to build your ideal crew:",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              color: ColorCode.kWhiteOpacity70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
                               fontFamily: "Outfit",
                             ),
                           ),
                         ),
+                        SizedBox(height:15),
 
-                        const SizedBox(width: 8),
+                        Container(
+                          /*   decoration: BoxDecoration(
+                              color: ColorCode.k282828,
+                              borderRadius: BorderRadius.circular(14),
+                            ),*/
 
-                        Text(
-                          "$minCrew - $maxCrew People",
-                          style: const TextStyle(
-                            color: ColorCode.kButtonColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Outfit",
-                          ),
-                        ),
-                      ],
-                    ),
-
-                      ),
-                  SizedBox(height: 10),
-                      if (defaultOutput.isNotEmpty) ...[
-                        const SizedBox(height: 10),
-
-                        Divider(color: ColorCode.kDividerWhite12),
-
-                        const SizedBox(height: 10),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Typical output:",
-                                    style: TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "Outfit",
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "•",
+                                      style: TextStyle(
+                                        color: Color(0xFFE6C48F),
+                                        fontSize: 16,
+                                        height: 1.4,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: RichText(
+                                        text: const TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "Shoot Type & Complexity: ",
+                                              style: TextStyle(
+                                                color: Color(0xffE8D1AB),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text:
+                                              "Different shoots require different team sizes",
+                                              style: TextStyle(
+                                                color: ColorCode.kWhiteOpacity70,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Text(
-                                    getDefaultOutputText(),
-                                    style: const TextStyle(
-                                      color: ColorCode.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "Outfit",
+
+                              const SizedBox(height: 12),
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "•",
+                                      style: TextStyle(
+                                        color: Color(0xFFE6C48F),
+                                        fontSize: 16,
+                                        height: 1.4,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: RichText(
+                                        text: const TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "Budget Range: ",
+                                              style: TextStyle(
+                                                color: Color(0xffE8D1AB),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text:
+                                              "We match crews that fit your budget tier",
+                                              style: TextStyle(
+                                                color: ColorCode.kWhiteOpacity70,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "•",
+                                      style: TextStyle(
+                                        color: Color(0xFFE6C48F),
+                                        fontSize: 16,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: RichText(
+                                        text: const TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "Industry Standards: ",
+                                              style: TextStyle(
+                                                color: Color(0xffE8D1AB),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text:
+                                              "Based on thousands of successful projects",
+                                              style: TextStyle(
+                                                color: ColorCode.kWhiteOpacity70,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                        )
+
+
                       ],
-
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Text(
-                      "How would you like to proceed?",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-          
-                SizedBox(height: 10),
-                Container(
-                   padding: EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                  /*    border: Border.all(color: ColorCode.kButtonColor)*/
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          // Image.asset(
-                          //   "assets/newbookflow/ai_matchmaker.png",
-                          //   fit: BoxFit.cover,
-                          // ),
-                          Container(
-                            padding: EdgeInsets.all(9),
-                            decoration: BoxDecoration(
-                             shape: BoxShape.circle,
-                                color:Color(0xffE8D1AB)
-                            ),
-                            child: SvgPicture.asset(
-                              'assets/svg/Stars.svg',
-                              width: 21,
-                              height: 21,
-                              fit: BoxFit.cover,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xff1D1D1B),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                           SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "AI Matchmaker",
-                              style: TextStyle(color: ColorCode.kButtonColor, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Divider(color: ColorCode.kDividerWhite12,),
-                      //
-
-                      SizedBox(height: 10),
-
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Our AI will analyse your project and match you with the perfect crew size and specialists",
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: ColorCode.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: "Outfit",
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                    Container(
-          /*  decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(13)),
-              color: ColorCode.k282828,
-            ),*/
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCheckRow("Optimal team composition"),
-                const SizedBox(height: 10),
-                _buildCheckRow("Matched based on your budget"),
-                const SizedBox(height: 10),
-                _buildCheckRow("Industry best practices"),
-              ],
-            ),
-          ),
-
-
-          ],
-                  ),
-                ),
-
-                SizedBox(height: 20),
-                Divider(color: ColorCode.kDividerWhite12,),
-                SizedBox(height:15),
-                Row(
-                  children: [
-                    Text(
-                      "How AI Matching Works",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-
-
-                SizedBox(height:20),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Our intelligent matching system considers multiple factors to build your ideal crew:",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: "Outfit",
-                    ),
-                  ),
-                ),
-                SizedBox(height:15),
-
-          Container(
-         /*   decoration: BoxDecoration(
-              color: ColorCode.k282828,
-              borderRadius: BorderRadius.circular(14),
-            ),*/
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "•",
-                      style: TextStyle(
-                        color: Color(0xFFE6C48F),
-                        fontSize: 16,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Shoot Type & Complexity: ",
-                              style: TextStyle(
-                                color: Color(0xFFE6C48F),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                              "Different shoots require different team sizes",
-                              style: TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "•",
-                      style: TextStyle(
-                        color: Color(0xFFE6C48F),
-                        fontSize: 16,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Budget Range: ",
-                              style: TextStyle(
-                                color: Color(0xFFE6C48F),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                              "We match crews that fit your budget tier",
-                              style: TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "•",
-                      style: TextStyle(
-                        color: Color(0xFFE6C48F),
-                        fontSize: 16,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: RichText(
-                        text: const TextSpan(
-                          children: [
-                            TextSpan(
-                              text: "Industry Standards: ",
-                              style: TextStyle(
-                                color: Color(0xFFE6C48F),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                              "Based on thousands of successful projects",
-                              style: TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Outfit",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-
-
-
-          ],
-            ),
-          ),
-        ),
-      ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // 🔹 Back Button
-              Expanded(
-                child: SizedBox(
-                  height: 55,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: Colors.white.withOpacity(0.3),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      "Back",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              // 🔸 Continue Button
-              Expanded(
-                child: SizedBox(
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FindingThePerfectScreen(
-                            bookingId: widget.bookingId,
-                            contentTypeId: widget.contentTypeId,
-                            specialtyId: widget.specialtyId,
-                            ShootTypeId: widget.ShootTypeId,
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorCode.kButtonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child:  Text(
-                      "Continue",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Unbounded",
-                        fontWeight: FontWeight.w600,
-                        color: ColorCode.kHeadingColor,
-                      ),
                     ),
                   ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // 🔹 Back Button
+            Expanded(
+              child: SizedBox(
+                height: 55,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Back",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // 🔸 Continue Button
+            Expanded(
+              child: SizedBox(
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FindingThePerfectScreen(
+                          bookingId: widget.bookingId,
+                          contentTypeId: widget.contentTypeId,
+                          specialtyId: widget.specialtyId,
+                          ShootTypeId: widget.ShootTypeId,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorCode.kButtonColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child:  Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w600,
+                      color: ColorCode.kHeadingColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
 
 
-    ),
+      ),
     );
   }
 
@@ -754,8 +775,8 @@ bool isLoading =true;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Image.asset(
-          "assets/newbookflow/true.png", // ✔️ icon image
+        SvgPicture.asset(
+          "assets/svg/true.svg", // ✔️ icon image
           height: 24,
           width: 24,
         ),
