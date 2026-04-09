@@ -342,7 +342,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       body:  Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
 
@@ -584,8 +584,25 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Divider(color: ColorCode.kDividerWhite12,),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Container(
+                            height: 1,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.09), // left
+                                  Colors.white.withOpacity(0.09), // center
+                                  Colors.white.withOpacity(0.09), // right
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                          ),
+                        ),
                         SizedBox(height: 30),
 
 
@@ -611,7 +628,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ],
                               ),
 
-                              SizedBox(height: 14),
+                              SizedBox(height: 10),
 
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -753,8 +770,22 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               ),
 
                               Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Divider(color: ColorCode.kDividerWhite12),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                child: Container(
+                                  height: 1,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white.withOpacity(0.09), // left
+                                        Colors.white.withOpacity(0.09), // center
+                                        Colors.white.withOpacity(0.09), // right
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                             Column(

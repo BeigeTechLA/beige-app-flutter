@@ -863,7 +863,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       }
     });
   }
-  // Helper method to format time (Make sure this is inside your _ShootDateTimeScreenState class)
+
+
+
   void _updateTimeText(TextEditingController controller, TimeOfDay picked) {
     final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod.toString().padLeft(2, '0');
     final minute = picked.minute.toString().padLeft(2, '0');

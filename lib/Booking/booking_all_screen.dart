@@ -385,7 +385,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 eventDate: eventDate,
                 startTime: startTime,
                 endTime: endTime,
-                durationHours: shoot['duration_hours'] ?? '',
+                durationHours: (shoot['duration_hours'] ?? 0).toDouble(),
                 location: shoot['location'] ?? '',
                 imageUrl: finalImage,
                 shootTypeId: shootTypeId,

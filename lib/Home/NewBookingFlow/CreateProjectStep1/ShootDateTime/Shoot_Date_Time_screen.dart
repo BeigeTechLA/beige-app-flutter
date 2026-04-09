@@ -25,7 +25,8 @@
   }
   
   class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
-  
+    bool isToday = false;
+
     Map<DateTime, bool> expandedMap = {};
     Map<DateTime, TimeOfDay?> startTimes = {};
     Map<DateTime, TimeOfDay?> endTimes = {};
@@ -254,7 +255,12 @@
     bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
       final startMinutes = start.hour * 60 + start.minute;
       final endMinutes = end.hour * 60 + end.minute;
-      return endMinutes > startMinutes;
+
+      /// ✅ SAME DAY
+      if (endMinutes > startMinutes) return true;
+
+      /// ✅ NEXT DAY ALLOW
+      return true;
     }
     bool get isFormValid {
 
@@ -410,11 +416,11 @@
 
       setState(() => isSubmitting = true);
 
-      /// 🔥 EDIT RESET
+      /// 🔥 RESET
       if (!isEditNeeded) {
         selectedEditTypeIds.clear();
         selectedEditTypeNames.clear();
-        videoCounts.clear();   // ✅ ADD THIS
+        videoCounts.clear();
         photoCounts.clear();
       }
 
@@ -444,15 +450,31 @@
 
       /// ================= SINGLE DAY =================
       if (selectedIndex == 1) {
+
+        /// ✅ SAFETY CHECK
+        if (selectedDate == null || startTime == null || endTime == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please select date and time")),
+          );
+          setState(() => isSubmitting = false);
+          return;
+        }
+
+        /// ✅ END > START CHECK
+        if (!isEndTimeAfterStart(startTime!, endTime!)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("End time must be after Start time")),
+          );
+          setState(() => isSubmitting = false);
+          return;
+        }
+
         payload = {
           "booking_type": "single_day",
           "time_zone": "Asia/Calcutta",
           "event_date": _apiDateFormat(selectedDate!),
-
-          /// 🔥 FORMAT TIME (HH:mm:ss)
           "start_time": _formatTime(startTime!),
           "end_time": _formatTime(endTime!),
-
           "edits_needed": isEditNeeded ? 1 : 0,
           "video_edit_types": videoEditKeys,
           "photo_edit_types": photoEditKeys,
@@ -463,20 +485,73 @@
       if (selectedIndex == 2) {
         List<Map<String, dynamic>> bookingDays = [];
 
+        if (selectedDates.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please select dates")),
+          );
+          setState(() => isSubmitting = false);
+          return;
+        }
+
+        /// 🔹 SAME TIME FOR ALL
         if (istimingsame) {
+
+          if (startTime == null || endTime == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Please select time")),
+            );
+            setState(() => isSubmitting = false);
+            return;
+          }
+
+          if (!isEndTimeAfterStart(startTime!, endTime!)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("End time must be after Start time")),
+            );
+            setState(() => isSubmitting = false);
+            return;
+          }
+
           for (var date in selectedDates) {
             bookingDays.add({
               "date": _apiDateFormat(date),
-              "start_time": startTimeController.text,
-              "end_time": endTimeController.text,
+              "start_time": _formatTime(startTime!),
+              "end_time": _formatTime(endTime!),
             });
           }
-        } else {
+
+        }
+
+        /// 🔹 DIFFERENT TIME FOR EACH DATE
+        else {
+
           for (var date in selectedDates) {
+
+            final start = startTimes[date];
+            final end = endTimes[date];
+
+            /// ❌ NULL CHECK
+            if (start == null || end == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Select time for all dates")),
+              );
+              setState(() => isSubmitting = false);
+              return;
+            }
+
+            /// ❌ VALIDATION
+            if (!isEndTimeAfterStart(start, end)) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("End time must be after Start time")),
+              );
+              setState(() => isSubmitting = false);
+              return;
+            }
+
             bookingDays.add({
               "date": _apiDateFormat(date),
-              "start_time": startTimes[date]?.format(context),
-              "end_time": endTimes[date]?.format(context),
+              "start_time": _formatTime(start), // ✅ FIXED
+              "end_time": _formatTime(end),     // ✅ FIXED
             });
           }
         }
@@ -658,7 +733,7 @@
     Future<void> _selectDateMultiple(BuildContext context) async {
       List<DateTime> tempSelected = List.from(selectedDates);
 
-      await showDialog(
+      final result = await showDialog(
         context: context,
         builder: (context) {
           return Theme(
@@ -673,7 +748,8 @@
               ),
             ),
             child: Dialog(
-              insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+              insetPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -683,7 +759,7 @@
                     mainAxisSize: MainAxisSize.min,
                     children: [
 
-                      /// 🔥 HEADER (exact feel)
+                      /// HEADER
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -699,22 +775,17 @@
                         ),
                       ),
 
-                      /// 🔥 CALENDAR
+                      /// CALENDAR
                       SizedBox(
                         height: 350,
                         child: CalendarDatePicker2(
                           config: CalendarDatePicker2Config(
                             calendarType: CalendarDatePicker2Type.multi,
-
                             selectedDayHighlightColor: ColorCode.kButtonColor,
                             selectedDayTextStyle: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
-
-                            dayTextStyle: const TextStyle(color: Colors.white),
-                            weekdayLabelTextStyle:
-                            const TextStyle(color: Colors.white70),
                           ),
                           value: tempSelected,
                           onValueChanged: (dates) {
@@ -725,7 +796,7 @@
                         ),
                       ),
 
-                      /// 🔥 ACTIONS (same feel)
+                      /// ACTIONS
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -748,17 +819,18 @@
             ),
           );
         },
-      )..then((result) {
-        if (result != null && result is List<DateTime>) {
-          setState(() {
-            selectedDates = result;
+      );
 
-            /// 🔥 IMPORTANT RESET
-            startTimes.clear();
-            endTimes.clear();
-          });
-        }
-      });
+      /// 🔥 IMPORTANT FIX (THIS WAS MISSING)
+      if (result != null && result is List<DateTime>) {
+        setState(() {
+          selectedDates = result;
+
+          /// reset times
+          startTimes.clear();
+          endTimes.clear();
+        });
+      }
     }
     // Helper method to format time (Make sure this is inside your _ShootDateTimeScreenState class)
     void _updateTimeText(TextEditingController controller, TimeOfDay picked) {
@@ -767,100 +839,6 @@
       final period = picked.period == DayPeriod.am ? "AM" : "PM";
       controller.text = "$hour:$minute $period";
     }
-  
-   /* Future<void> _selectTime(
-        BuildContext context,
-        TextEditingController controller,
-        bool isStartTime,
-        ) async {
-  
-      TimeOfDay initial = isStartTime ? (startTime ?? TimeOfDay.now()) : (endTime ?? TimeOfDay.now());
-  
-      final picked = await showTimePicker(
-        context: context,
-        initialTime: initial,
-        initialTime: initial,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              dialogBackgroundColor: const Color(0xFF121212),
-  
-              colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor, // Selected circle/hand color
-                onPrimary: Colors.white,         // Text on primary
-                surface: Color(0xFF1E1E1E),      // Picker background
-                onSurface: Colors.white,         // Normal text color
-              ),
-  
-              timePickerTheme: const TimePickerThemeData(
-                backgroundColor: Color(0xFF121212),
-                dialBackgroundColor: Color(0xFF121212),
-                dialHandColor: Colors.white,
-                dialTextColor: Colors.grey,
-  
-                // 🔥 Hour / Minute box colors
-                hourMinuteColor: ColorCode.kButtonColor,
-                hourMinuteTextColor: Colors.black, // ✅ BLACK text inside selected time box
-  
-                // 🔥 AM / PM section
-                dayPeriodColor: ColorCode.kButtonColor,
-                dayPeriodTextColor: Colors.white, // ✅ WHITE text in AM / PM
-  
-                // 🔥 Action Buttons (OK / CANCEL)
-                confirmButtonStyle: ButtonStyle(
-                  foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
-                ),
-                cancelButtonStyle: ButtonStyle(
-                  foregroundColor: WidgetStatePropertyAll(ColorCode.kButtonColor),
-                ),
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-  
-      if (picked == null || !mounted) return;
-  
-      // 🔒 HARD BLOCK: 4-HOUR RULE FOR TODAY
-      if (isTodaySelected()) {
-        final now = DateTime.now();
-        final minAllowed = now.add(const Duration(hours: 4));
-  
-        // Create a DateTime from the picked time to compare easily
-        final pickedDT = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, picked.hour, picked.minute);
-  
-        if (pickedDT.isBefore(minAllowed)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("For today, please select a time at least 4 hours from now.")),
-          );
-          return;
-        }
-      }
-  
-      setState(() {
-        if (isStartTime) {
-          startTime = picked;
-          _updateTimeText(startTimeController, picked);
-  
-          // Validation: If Start is now after End, reset End to Start + 1 hour
-          if (endTime != null && !isEndTimeAfterStart(startTime!, endTime!)) {
-            endTime = TimeOfDay(hour: (startTime!.hour + 1) % 24, minute: startTime!.minute);
-            _updateTimeText(endTimeController, endTime!);
-          }
-        } else {
-          // Validation: Check if End is after Start
-          if (startTime != null && !isEndTimeAfterStart(startTime!, picked)) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("End time must be after Start time")),
-            );
-            return;
-          }
-          endTime = picked;
-          _updateTimeText(endTimeController, picked);
-        }
-      });
-    }*/
 
 
     Future<void> _selectTime(
@@ -869,30 +847,36 @@
         bool isStartTime,
         DateTime? date,
         ) async {
-
       final now = DateTime.now();
 
-      /// 🔥 CHECK TODAY
-      bool isToday = false;
-      if (date != null) {
-        isToday = date.year == now.year &&
-            date.month == now.month &&
-            date.day == now.day;
-      } else {
-        isToday = isTodaySelected();
-      }
+      /// 🔥 BASE DATE (MOST IMPORTANT FIX)
+      final baseDate = date ?? selectedDate;
+      if (baseDate == null) return;
 
-      /// 🔥 INITIAL TIME (NO FORCE)
+      /// 🔥 CHECK ONLY EXACT DATE IS TODAY
+      bool isToday = baseDate.year == now.year &&
+          baseDate.month == now.month &&
+          baseDate.day == now.day;
+
+      /// 🔥 INITIAL TIME
       TimeOfDay initial;
 
       if (date != null) {
+        /// MULTIPLE DATE
         initial = isStartTime
             ? (startTimes[date] ?? TimeOfDay.now())
             : (endTimes[date] ?? TimeOfDay.now());
       } else {
+        /// SINGLE DATE
         initial = isStartTime
             ? (startTime ?? TimeOfDay.now())
             : (endTime ?? TimeOfDay.now());
+      }
+
+      /// ✅ ONLY TODAY START TIME → AUTO +4 HOURS
+      if (isToday && isStartTime) {
+        final min = now.add(const Duration(hours: 4));
+        initial = TimeOfDay(hour: min.hour, minute: min.minute);
       }
 
       final picked = await showTimePicker(
@@ -901,11 +885,12 @@
         builder: (context, child) {
           return Theme(
             data: ThemeData.dark().copyWith(
+              useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
                 primary: ColorCode.kButtonColor,
-                onPrimary: Colors.white,
-                surface: Color(0xFF1E1E1E),
+                onPrimary: Colors.black,
+                surface: Color(0xFF121212),
                 onSurface: Colors.white,
               ),
               timePickerTheme: const TimePickerThemeData(
@@ -926,12 +911,9 @@
 
       if (picked == null || !mounted) return;
 
-      /// 🔥 4 HOUR VALIDATION (FINAL FIX)
-      if (isToday) {
-
+      /// ✅ VALIDATION ONLY IF THAT DATE IS TODAY
+      if (isToday && isStartTime) {
         final minAllowed = now.add(const Duration(hours: 4));
-
-        final baseDate = date ?? selectedDate!;
 
         DateTime pickedDT = DateTime(
           baseDate.year,
@@ -941,57 +923,37 @@
           picked.minute,
         );
 
-        /// 🔥 IMPORTANT FIX: next-day case handle
-        if (minAllowed.day != now.day) {
-          pickedDT = pickedDT.add(const Duration(days: 1));
-        }
-
         if (pickedDT.isBefore(minAllowed)) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                "You must select a start time at least 4 hours from now.",
-              ),
+              content: Text("Start time must be at least 4 hours from now"),
             ),
           );
           return;
         }
       }
 
+      /// 🔥 SAVE DATA
       setState(() {
-
         if (date != null) {
-          /// 🔥 MULTIPLE DAY
+          /// MULTIPLE DATE
           if (isStartTime) {
             startTimes[date] = picked;
           } else {
             endTimes[date] = picked;
           }
         } else {
-          /// 🔥 SINGLE DAY
+          /// SINGLE DATE
           if (isStartTime) {
             startTime = picked;
             _updateTimeText(startTimeController, picked);
           } else {
-
-            /// 🔥 END TIME VALIDATION
-            if (startTime != null &&
-                !isEndTimeAfterStart(startTime!, picked)) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("End time must be after Start time"),
-                ),
-              );
-              return;
-            }
-
             endTime = picked;
             _updateTimeText(endTimeController, picked);
           }
         }
       });
     }
-  
     @override
     Widget build(BuildContext context) {
       return Scaffold(
@@ -1886,7 +1848,7 @@
                               ),
   
                               SizedBox(height: 12,),
-                       /*       Container(
+                          /*    Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: const Color(0xffE8D1AB), // Beige/Cream color
@@ -2081,249 +2043,149 @@
       required Function(List<DateTime>) onChanged,
     }) {
       DateTime today = DateTime.now();
-      List<DateTime> allDates = List.generate(60, (index) => today.add(Duration(days: index)));
-  
+
+      /// ✅ Current month calculation (IMPORTANT FIX)
+      DateTime firstDay = DateTime(today.year, today.month, 1);
+      DateTime lastDay = DateTime(today.year, today.month + 1, 0);
+      int totalDays = lastDay.day;
+
+      /// ✅ Only current month dates
+      List<DateTime> allDates = List.generate(
+        totalDays - today.day + 1,
+            (index) => DateTime(
+          today.year,
+          today.month,
+          today.day + index,
+        ),
+      );
+
       bool isSameDate(DateTime a, DateTime b) {
-        return a.year == b.year && a.month == b.month && a.day == b.day;
+        return a.year == b.year &&
+            a.month == b.month &&
+            a.day == b.day;
       }
-  
+
       String getHeaderMonth() {
-        return selectedDates.isNotEmpty
-            ? DateFormat('MMM yyyy').format(selectedDates.first)
-            : DateFormat('MMM yyyy').format(today);
+        return DateFormat('MMM yyyy').format(today);
       }
-  
-  
-      // Show multi‑date picker with local state
-      Future<void> showMultiDatePicker() async {
-        List<DateTime> tempSelected = List.from(selectedDates);
-  
-        await showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: const Color(0xFF121212),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          builder: (context) {
-            return StatefulBuilder(
-              builder: (context, setSheetState) {
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.85,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 12),
-  
-                      /// 🔥 HEADER (like single date)
-                      const Text(
-                        "Select Dates",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-  
-                      const SizedBox(height: 16),
-  
-                      /// 🔥 CALENDAR (FULL)
-                      Expanded(
-                        child: CalendarDatePicker2(
-                          config: CalendarDatePicker2Config(
-                            calendarType: CalendarDatePicker2Type.multi,
-                            selectedDayHighlightColor: const Color(0xFFE8D1AB),
-                            selectedDayTextStyle: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            dayTextStyle: const TextStyle(color: Colors.white),
-                            weekdayLabelTextStyle:
-                            const TextStyle(color: Colors.grey),
-                          ),
-                          value: tempSelected,
-                          onValueChanged: (dates) {
-                            setSheetState(() {
-                              tempSelected = dates;
-                            });
-                          },
-                        ),
-                      ),
-  
-                      /// 🔥 BUTTONS
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("Cancel"),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE8D1AB),
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context, tempSelected);
-                                },
-                                child: const Text(
-                                  "Done",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ).then((result) {
-          if (result != null && result is List<DateTime>) {
-            onChanged(result);
-          }
-        });
-      }
-  
+
       return Container(
-        // padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color:  Color(0xff282828),
+          color: const Color(0xff282828),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// 🔥 Header
             Padding(
-              padding: EdgeInsetsGeometry.only(left: 12,right: 12,top: 12),
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     getHeaderMonth(),
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500,fontFamily: 'Outfit'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Outfit',
+                    ),
                   ),
                   GestureDetector(
                     onTap: () => _selectDateMultiple(context),
                     child: SvgPicture.asset(
                       'assets/svg/Calendar_Mark-2.svg',
-                      width: 24, // optional (Icon size jaisa)
+                      width: 24,
                       height: 24,
                     ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 16),
-  
-            Container(
-              //  color: Colors.red,
-              child: SizedBox(
-                height:58,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: allDates.length,
-                  itemBuilder: (context, index) {
-                    final date = allDates[index];
-                    final isSelected = selectedDates.any((d) => isSameDate(d, date));
-  
-                    return GestureDetector(
-                      onTap: () {
-                        List<DateTime> updated = List.from(selectedDates);
 
-                        if (isSelected) {
-                          updated.removeWhere((d) => isSameDate(d, date));
-                        } else {
-                          updated.add(date);
-                        }
+            /// 🔥 Horizontal Month Dates
+            SizedBox(
+              height: 58,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: allDates.length,
+                itemBuilder: (context, index) {
+                  final date = allDates[index];
 
-                        onChanged(updated);
+                  final isSelected =
+                  selectedDates.any((d) => isSameDate(d, date));
 
-                        /// ✅ ADD THIS (IMPORTANT)
-                        setState(() {});
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 9),
-                        padding: const EdgeInsets.symmetric(horizontal: 19, vertical:4),//
-                        decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFFE8D1AB) : Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(38),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "${date.day}",
-                              style: TextStyle(
-  
-                                fontFamily: 'Outfit',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: isSelected ? Color(0xff222222) : Color(0xff939393),
-                              ),
-                            ),
-                            Text(
-                              DateFormat('EEE').format(date),
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontFamily: 'Outfit',
-                                fontWeight: FontWeight.w700,
-  
-                                color: isSelected?
-                                Color(0xff1D1D1B)
-  
-                                    :Color(0xffffffff).withOpacity(0.6),
-                              ),
-                            ),
-                          ],
-                        ),
+                  /// ✅ Disable past dates (optional but good)
+                  final isPast = date.isBefore(
+                    DateTime(today.year, today.month, today.day),
+                  );
+
+                  return GestureDetector(
+                    onTap: isPast
+                        ? null
+                        : () {
+                      List<DateTime> updated =
+                      List.from(selectedDates);
+
+                      if (isSelected) {
+                        updated.removeWhere(
+                                (d) => isSameDate(d, date));
+                      } else {
+                        updated.add(date);
+                      }
+
+                      onChanged(updated);
+
+                      /// 🔥 UI refresh
+                      (context as Element).markNeedsBuild();
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 9),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 19, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFFE8D1AB)
+                            : Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(38),
                       ),
-                    );
-                  },
-                ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${date.day}",
+                            style: TextStyle(
+                              fontFamily: 'Outfit',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xff222222)
+                                  : const Color(0xff939393),
+                            ),
+                          ),
+                          Text(
+                            DateFormat('EEE').format(date),
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontFamily: 'Outfit',
+                              fontWeight: FontWeight.w700,
+                              color: isSelected
+                                  ? const Color(0xff1D1D1B)
+                                  : Colors.white.withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
+
             const SizedBox(height: 16),
-  
-            // Row(
-            //   children: [
-            //     Container(
-            //       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            //       decoration: BoxDecoration(
-            //         color: Colors.black.withOpacity(0.4),
-            //         borderRadius: BorderRadius.circular(20),
-            //       ),
-            //       child: Text(
-            //         "Total Days: ${selectedDates.length}",
-            //         style: const TextStyle(color: Colors.white, fontSize: 13),
-            //       ),
-            //     ),
-            //     const SizedBox(width: 12),
-            //     Expanded(
-            //       child: Container(
-            //         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            //         decoration: BoxDecoration(
-            //           color: const Color(0xFF2A2723),
-            //           borderRadius: BorderRadius.circular(20),
-            //         ),
-            //         child: Text(
-            //           selectedDates.isEmpty
-            //               ? "No dates selected"
-            //               : selectedDates.map((e) => DateFormat('d MMM').format(e)).join(', '),
-            //           style: const TextStyle(color: Color(0xFFE8D1AB), fontSize: 12),
-            //           overflow: TextOverflow.ellipsis,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-  
           ],
         ),
       );
@@ -2435,8 +2297,7 @@
                                     });
                                   },
                                   child: Center(
-                                    child: Icon(Icons.remove,
-                                        size: 16, color: Colors.black),
+                                    child: const Icon(Icons.remove, size: 16, color: Colors.black),
                                   ),
                                 ),
                               ),
@@ -2448,7 +2309,10 @@
                                     .padLeft(2, '0'),
                                 style: TextStyle(
                                   color: ColorCode.kHeadingColor,
-                                  fontSize: 12,
+                                  fontSize: 13,
+                                  fontFamily: "Helvetica Neue",
+                                  fontWeight: FontWeight.w600
+
                                 ),
                               ),
 
@@ -2490,40 +2354,41 @@
     }
     Widget PhotoEdits(String title, List<dynamic> data) {
       return Container(
-        margin: EdgeInsets.symmetric(vertical: 17),
+        margin: const EdgeInsets.symmetric(vertical: 17),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
+          border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
-            /// HEADER
+            /// 🔥 HEADER
             GestureDetector(
               onTap: () {
                 setState(() {
                   isPhotoOpen = !isPhotoOpen;
 
-                  /// ✅ CLOSE → CLEAR DATA
                   if (!isPhotoOpen) {
                     photoCounts.clear();
                   }
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                decoration: BoxDecoration(
-                  color: Color(0xff282828),
-                  borderRadius: BorderRadius.circular(12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: const BoxDecoration(
+                  color: Color(0xff2B2B2B),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(title,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
-
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     Icon(
                       isPhotoOpen
                           ? Icons.keyboard_arrow_up
@@ -2535,99 +2400,214 @@
               ),
             ),
 
-            /// BODY
+            /// 🔥 BODY
             if (isPhotoOpen)
               ...data.asMap().entries.map((entry) {
                 int id = entry.key;
                 var item = entry.value;
 
                 String name = item['value'] ?? "";
-
+                String note = item['note'] ?? "";
                 int count = photoCounts[id] ?? 0;
 
-                return Padding(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 15, vertical: 11),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(name,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Outfit")),
-                      ),
+                return Column(
+                  children: [
+                    Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                      child: Row(
+                        children: [
+                          /// TEXT
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.add,
+                                      size: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    const SizedBox(width: 1),
+                                    Expanded(
+                                      child: Text(
+                                        note,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
 
-                      /// COUNTER
+                          /// COUNTER
+                          Container(
+                            width: 95,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8D1AB),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                /// MINUS
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        int current = photoCounts[id] ?? 0;
+
+                                        if (current > 0) {
+                                          current--;
+
+                                          if (current == 0) {
+                                            photoCounts.remove(id);
+                                          } else {
+                                            photoCounts[id] = current;
+                                          }
+                                        }
+                                      });
+                                    },
+                                    child: const Icon(Icons.remove,
+                                        size: 16, color: Colors.black),
+                                  ),
+                                ),
+
+                                /// COUNT
+                                Text(
+                                  count.toString().padLeft(2, '0'),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                    fontFamily: "Helvetica Neue",
+
+
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+
+                                /// PLUS
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        int current = photoCounts[id] ?? 0;
+                                        current++;
+                                        photoCounts[id] = current;
+                                      });
+                                    },
+                                    child: const Icon(Icons.add,
+                                        size: 16, color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    /// DIVIDER
+                    Container(
+                      height: 0.5,
+                      color: Colors.white.withOpacity(0.15),
+                    ),
+                  ],
+                );
+              }).toList(),
+
+            /// 🔥 EXTRA SECTION (ONLY ONCE, NOT INSIDE LOOP)
+            /*  if (isPhotoOpen)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
                       Container(
-                        width: 90,
-                        height: 32,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Color(0xFFE8D1AB),
+                          color: const Color(0xff322F2A),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
                           children: [
-
-                            /// ➖ MINUS
+                            /// LEFT TEXT
                             Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    int current = photoCounts[id] ?? 0;
+                              child: Row(
+                                children: const [
+                                  Text(
+                                    "📸 ",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      "Includes 100 free photo edits",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
 
-                                    if (current > 0) {
-                                      current--;
-
-                                      if (current == 0) {
-                                        photoCounts.remove(id);
-                                      } else {
-                                        photoCounts[id] = current;
-                                      }
-                                    }
-                                  });
-                                },
-                                child: Center(
-                                  child: Icon(Icons.remove,
-                                      size: 16, color: Colors.black),
+                            /// RIGHT BOX (INSIDE SAME CONTAINER)
+                       *//*     Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: const Text(
+                                "4 Hour Duration",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
                                 ),
                               ),
-                            ),
-
-                            /// COUNT
-                            Text(
-                              (photoCounts[id] ?? 0)
-                                  .toString()
-                                  .padLeft(2, '0'),
-                              style: TextStyle(
-                                color: ColorCode.kHeadingColor,
-                                fontSize: 12,
-                              ),
-                            ),
-
-                            /// ➕ PLUS
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    int current = photoCounts[id] ?? 0;
-                                    current++;
-
-                                    photoCounts[id] = current;
-                                  });
-                                },
-                                child: Center(
-                                  child: Icon(Icons.add,
-                                      size: 16, color: Colors.black),
-                                ),
-                              ),
-                            ),
+                            ),*//*
                           ],
                         ),
                       ),
+                      const SizedBox(height: 12),
+
+                        Container(
+
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xff322F2A),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "+ 25 Added Extra",
+                              style:
+                              TextStyle(
+                                color: const Color(0xFFE8D1AB),
+                                fontSize: 12,
+                                fontFamily: 'Helvetica Neue',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                );
-              }).toList(),
+                ),*/
           ],
         ),
       );

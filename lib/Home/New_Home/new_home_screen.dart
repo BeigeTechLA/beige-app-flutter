@@ -34,7 +34,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   int _currentCard = 0;
 
   late AnimationController _controller;
-
+  late PageController _studioController;
+  int _activeStudioIndex = 0;
   final PageController _featuredController = PageController(
       initialPage: 1000,
       viewportFraction: 0.65);
@@ -279,9 +280,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         return Colors.red;
     }
   }
-  final PageController _studioController = PageController(
+  /*final PageController _studioController = PageController(
+
       viewportFraction: 0.75);
-  int _activeStudioIndex = 0;
+  int _activeStudioIndex = 0;*/
 
 
   final PageController _pageController = PageController(
@@ -332,6 +334,16 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   void initState() {
     super.initState();
     fetchData();
+
+
+    _studioController = PageController(
+      initialPage: studioList.length * 50, // 🔥 CENTER IMAGE FIRST
+      viewportFraction: 0.7, // 👈 3 images visible
+    );
+
+    _activeStudioIndex =
+        _studioController.initialPage % studioList.length;
+
     _controller = AnimationController(
       vsync: this,
 
@@ -351,7 +363,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       viewportFraction: 0.82, // 👈 right side card visible
     );
 
-    _cardController = PageController(viewportFraction: 0.88);
+    _cardController = PageController(
+        initialPage: cardData.length * 50,
+        viewportFraction: 0.88);
     _bookingSwipeController = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 400),
@@ -708,9 +722,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               ),
 
                             ),
-                            SvgPicture.asset(
+                           /* SvgPicture.asset(
                               "assets/svg/my_profile/layer1.svg",
-                            ),
+                            ),*/
                           ],
                         ),
                       ),
@@ -939,7 +953,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   double perspective = 0.0022;
 
                                   double rotation = difference *
-                                      0.8; // Is value ko 0.4 se 0.7 tak change karke dekhein
+                                      0.8; //
                                   rotation = rotation.clamp(-0.8, 0.9);
 
                                   // 3. Scale & Opacity
@@ -948,20 +962,17 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   double opacity = (1 - (difference.abs() * 0.10))
                                       .clamp(0.6, 2.0);
 
-                                  // 4. Translate (Cards ko center ke paas laane ke liye)
-                                  // Agar cards ke beech zyada gap hai to is -50 ko badha kar -70 kar dena
                                   double translateX = difference * -100;
 
                                   return Opacity(
                                     opacity: opacity,
                                     child: Transform(
-                                      // Alignment center se hi 3D look sabse acha aata hai
                                       alignment: Alignment.center,
                                       transform: Matrix4.identity()
                                         ..setEntry(3, 2, perspective) // 3D depth
                                         ..translate(translateX) // Paas lane ke liye
                                         ..rotateY(
-                                            rotation) // Aapke blue box jaisa fold karne ke liye
+                                            rotation) //
                                         ..scale(scale), // Chota karne ke liye
                                       child: teamCard(
                                         image: featuredImages[actualIndex],
@@ -1259,15 +1270,15 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 fontFamily: "Unbounded",
                               ),
                             ),
-                            SvgPicture.asset(
+                            /*SvgPicture.asset(
                               "assets/svg/my_profile/layer1.svg",
-                            ),
+                            ),*/
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      GestureDetector(
+          /*            GestureDetector(
                         onTap: () {
                           if (!_bookingSwipeController.isAnimating) {
                             _bookingSwipeController.forward().then((_) {
@@ -1345,9 +1356,122 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             },
                           ),
                         ),
+                      ),*/
+
+
+
+
+
+    Column(
+      children: [
+        bookingList.isEmpty
+            ? const SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              "No Bookings Available",
+              style:  TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        )
+            :
+        GestureDetector(
+          onTap: () {
+            if (!_bookingSwipeController.isAnimating && bookingList.isNotEmpty) {
+              _bookingSwipeController.forward().then((_) {
+                setState(() {
+                  _currentBookingIndex =
+                      (_currentBookingIndex + 1) % bookingList.length;
+                  _bookingSwipeController.reset();
+                });
+              });
+            }
+          },
+
+          onHorizontalDragEnd: (details) {
+            if (_bookingSwipeController.isAnimating || bookingList.isEmpty) return;
+
+            if (details.primaryVelocity != null && details.primaryVelocity! < 0) {
+              _bookingSwipeController.forward().then((_) {
+                setState(() {
+                  _currentBookingIndex =
+                      (_currentBookingIndex + 1) % bookingList.length;
+                  _bookingSwipeController.reset();
+                });
+              });
+            }
+          },
+
+          child: SizedBox(
+            height: 408,
+            child: AnimatedBuilder(
+              animation: _bookingSwipeController,
+              builder: (context, child) {
+
+                /// 🔥 SAFE VALUE (NaN avoid)
+                double val = _bookingSwipeController.value;
+                if (val.isNaN) val = 0.0;
+
+                // Front Card
+                double frontSlide = val * 300;
+                double frontOpacity = 1 - val;
+
+                // Back Card
+                double backOffsetX = 20 * (1 - val);
+                double backOffsetY = -20 * (1 - val);
+                double backScale = 0.96 + (0.04 * val);
+                double backRotate = 0.08 * (1 - val);
+
+                /// 🔥 SAFE INDEX
+                int currentIndex =
+                    _currentBookingIndex % bookingList.length;
+
+                int nextIndex =
+                    (_currentBookingIndex + 1) % bookingList.length;
+
+                return Stack(
+                  clipBehavior: Clip.antiAlias,
+                  alignment: Alignment.center,
+                  children: [
+
+                    /// 🔹 BACK CARD
+                    Transform.translate(
+                      offset: Offset(backOffsetX, backOffsetY),
+                      child: Transform.rotate(
+                        angle: backRotate,
+                        child: Transform.scale(
+                          scale: backScale,
+                          child: Opacity(
+                            opacity: 0.5 + (0.5 * val),
+                            child: _buildBookingCard(
+                              nextIndex,
+                              isBackCard: val < 0.5,
+                            ),
+                          ),
+                        ),
                       ),
+                    ),
 
-
+                    /// 🔥 FRONT CARD
+                    Transform.translate(
+                      offset: Offset(0, frontSlide),
+                      child: Opacity(
+                        opacity: frontOpacity,
+                        child: _buildBookingCard(
+                          currentIndex,
+                          isBackCard: false,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    ),
 
 
                       const SizedBox(height: 10),
@@ -1574,183 +1698,183 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Rebook Your Shoots",
-                              style: TextStyle(color: ColorCode.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
-                            child: Container(
-                              height: 280,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  )
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  // 1. MAIN BACKGROUND IMAGE
-                                  Positioned.fill(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(30),
-                                      child: Image.asset(
-                                        "assets/new_home/RebookYourShoots_img.jpg",
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                        /*  Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  "Rebook Your Shoots",
+                                  style: TextStyle(color: ColorCode.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "Unbounded",
+                                    height: 1.2,
                                   ),
-
-                                  // 2. BLACK GRADIENT (Bottom to Top)
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                          colors: [
-                                            Colors.black.withOpacity(0.9),
-                                            Colors.black.withOpacity(0.4),
-                                            Colors.transparent,
-                                          ],
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                child: Container(
+                                  height: 280,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      )
+                                    ],
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // 1. MAIN BACKGROUND IMAGE
+                                      Positioned.fill(
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(30),
+                                          child: Image.asset(
+                                            "assets/new_home/RebookYourShoots_img.jpg",
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
 
-                                  // 3. CONTENT (Icon, Text, Buttons)
-                                  Positioned(
-                                    bottom: 20,
-                                    left: 20,
-                                    right: 20,
-                                    child: Column(
-                                      children: [
-                                        // --- MUSIC INFO ROW ---
-                                        Row(
-                                          children: [
-                                            // Dark Circular Icon Background
-                                            Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                    0.12),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(Icons.music_note,
-                                                  color: Colors.white, size: 20),
+                                      // 2. BLACK GRADIENT (Bottom to Top)
+                                      Positioned.fill(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                              colors: [
+                                                Colors.black.withOpacity(0.9),
+                                                Colors.black.withOpacity(0.4),
+                                                Colors.transparent,
+                                              ],
                                             ),
-                                            const SizedBox(width: 12),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment
-                                                  .start,
-                                              children: const [
-                                                Text(
-                                                  "Music Video",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                      ),
+
+                                      // 3. CONTENT (Icon, Text, Buttons)
+                                      Positioned(
+                                        bottom: 20,
+                                        left: 20,
+                                        right: 20,
+                                        child: Column(
+                                          children: [
+                                            // --- MUSIC INFO ROW ---
+                                            Row(
+                                              children: [
+                                                // Dark Circular Icon Background
+                                                Container(
+                                                  padding: const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white.withOpacity(
+                                                        0.12),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Icon(Icons.music_note,
+                                                      color: Colors.white, size: 20),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment
+                                                      .start,
+                                                  children: const [
+                                                    Text(
+                                                      "Music Video",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: "Outfit",
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "March 18, 2026 • Las Vegas, USA",
+                                                      style: TextStyle(
+                                                        color: Colors.white60,
+                                                        fontSize: 12,
+                                                        fontFamily: "Outfit",
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+
+                                            const SizedBox(height: 20),
+
+                                            // --- ACTION BUTTONS ROW ---
+                                            Row(
+                                              children: [
+                                                // Book Again Button
+                                                Expanded(
+                                                  child: Container(
+                                                    height: 30,
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      color: ColorCode.kButtonColor,
+                                                      // Aapka beige color
+                                                      borderRadius: BorderRadius
+                                                          .circular(30),
+                                                    ),
+                                                    child: const Text(
+                                                      "Book Again",
+                                                      style: TextStyle(
+                                                        color: ColorCode.black,
+                                                        fontSize: 12,
+                                                        fontWeight: FontWeight.w700,
+                                                        fontFamily: "Helvetica Neue",
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                                Text(
-                                                  "March 18, 2026 • Las Vegas, USA",
-                                                  style: TextStyle(
-                                                    color: Colors.white60,
-                                                    fontSize: 12,
-                                                    fontFamily: "Outfit",
-                                                  ),
+                                                const SizedBox(width: 12),
+                                                // Circular Arrow Button
+                                                SvgPicture.asset(
+                                                  "assets/svg/home_view_profile.svg",
+
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-
-                                        const SizedBox(height: 20),
-
-                                        // --- ACTION BUTTONS ROW ---
-                                        Row(
-                                          children: [
-                                            // Book Again Button
-                                            Expanded(
-                                              child: Container(
-                                                height: 30,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color: ColorCode.kButtonColor,
-                                                  // Aapka beige color
-                                                  borderRadius: BorderRadius
-                                                      .circular(30),
-                                                ),
-                                                child: const Text(
-                                                  "Book Again",
-                                                  style: TextStyle(
-                                                    color: ColorCode.black,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    fontFamily: "Helvetica Neue",
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            // Circular Arrow Button
-                                            SvgPicture.asset(
-                                              "assets/svg/home_view_profile.svg",
-
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: Container(
+                              height: 1,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.09), // left
+                                    Colors.white.withOpacity(0.09), // center
+                                    Colors.white.withOpacity(0.09), // right
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
                               ),
                             ),
                           ),
-
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Container(
-                          height: 1,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                          const SizedBox(height: 10),*/
                       // --- RECENT PROJECT SECTION ---
-                      Padding(
+               /*       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Column(
@@ -1785,8 +1909,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
+                      const SizedBox(height: 20),*/
+                  /*    Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Container(
                           height: 1,
@@ -1804,7 +1928,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),*/
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Column(
@@ -1944,9 +2068,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   ),
                                 ),
 
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 30, // 👈 थोड़ा extra safe height
+                       /*         Expanded(
+                                  child: Container(
+                                    color: Colors.green,
                                     child: AnimatedBuilder(
                                       animation: _controller,
                                       builder: (context, child) {
@@ -1959,55 +2083,94 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                                         double transition = (value * words.length) % 1;
 
-                                        const double textHeight = 30; // 👈 SAME VALUE
+                                        const double textHeight = 36;
 
-                                        return ClipRect(
-                                          child: Transform.translate(
-                                            offset: Offset(0, -transition * textHeight),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: textHeight,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Text(
-                                                      words[currentIndex],
-                                                      overflow: TextOverflow.ellipsis,
-                                                      style: const TextStyle(
-                                                        color: ColorCode.white,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontFamily: "Unbounded",
-                                                        height: 1.0, // 👈 FORCE FIX
+                                        return SizedBox(
+                                          height: textHeight, // ✅ FIX
+                                          child: ClipRect(
+                                            child: Transform.translate(
+                                              offset: Offset(0, -transition * textHeight),
+                                              child: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: textHeight,
+                                                    child: Align(
+                                                      alignment: Alignment.centerLeft,
+                                                      child: Text(
+                                                        words[currentIndex],
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: const TextStyle(
+                                                          color: ColorCode.white,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w500,
+                                                          fontFamily: "Unbounded",
+                                                          height: 1.0,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  height: textHeight,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Text(
-                                                      words[nextIndex],
-                                                      overflow: TextOverflow.ellipsis,
-                                                      style: const TextStyle(
-                                                        color: ColorCode.white,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                        fontFamily: "Unbounded",
-                                                        height: 1.0,
+                                                  SizedBox(
+                                                    height: textHeight,
+                                                    child: Align(
+                                                      alignment: Alignment.centerLeft,
+                                                      child: Text(
+                                                        words[nextIndex],
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: const TextStyle(
+                                                          color: ColorCode.white,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.w500,
+                                                          fontFamily: "Unbounded",
+                                                          height: 1.0,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         );
                                       },
                                     ),
                                   ),
-                                ),
+                                )*/
+
+                                AnimatedBuilder(
+                                  animation: _controller,
+                                  builder: (context, child) {
+                                    double value = _controller.value; // ✅ FIX: value define kiya
+
+                                    int index = (value * words.length).floor() % words.length;
+
+                                    return AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 500), // thoda smooth
+                                      transitionBuilder: (child, animation) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: SlideTransition(
+                                            position: Tween<Offset>(
+                                              begin: const Offset(0, 0.3),
+                                              end: Offset.zero,
+                                            ).animate(animation),
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        words[index],
+                                        key: ValueKey<int>(index), // ✅ important for animation
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: ColorCode.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: "Unbounded",
+                                          height: 1.0,
+                                        ),),
+                                    );
+                                  },
+                                )
                               ],
                             ),
                             const SizedBox(height: 15),
@@ -2103,65 +2266,76 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                         children: [
 
                                                           /// INSTAGRAM
-                                                          GestureDetector(
-                                                            onTap: () => openLink(Topinstagram[realIndex]),
-                                                            child: Row(
-                                                              children: [
-                                                                const Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                                                                const SizedBox(width: 4),
-                                                                Text(
-                                                                  instaFollowers[realIndex],
-                                                                  style: const TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: 13,
-                                                                    fontWeight: FontWeight.w500,
+                                                          if (Topinstagram[realIndex].isNotEmpty &&
+                                                              instaFollowers[realIndex] != "-")
+                                                            GestureDetector(
+                                                              onTap: () => openLink(Topinstagram[realIndex]),
+                                                              child: Row(
+                                                                children: [
+                                                                  SvgPicture.asset("assets/svg/Instagram.svg"),
+                                                                  const SizedBox(width: 4),
+                                                                  Text(
+                                                                    instaFollowers[realIndex],
+                                                                    style: const TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: 13,
+                                                                      fontWeight: FontWeight.w500,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ),
 
-                                                          const SizedBox(width: 18),
+                                                          /// spacing only if visible
+                                                          if (Topinstagram[realIndex].isNotEmpty &&
+                                                              instaFollowers[realIndex] != "-")
+                                                            const SizedBox(width: 18),
 
                                                           /// YOUTUBE
-                                                          GestureDetector(
-                                                            onTap: () => openLink(Topyoutube[realIndex]),
-                                                            child: Row(
-                                                              children: [
-                                                                const Icon(Icons.play_arrow_outlined, color: Colors.red, size: 18),
-                                                                const SizedBox(width: 4),
-                                                                Text(
-                                                                  youtubeFollowers[realIndex],
-                                                                  style: const TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: 13,
-                                                                    fontWeight: FontWeight.w500,
+                                                          if (Topyoutube[realIndex].isNotEmpty &&
+                                                              youtubeFollowers[realIndex] != "-")
+                                                            GestureDetector(
+                                                              onTap: () => openLink(Topyoutube[realIndex]),
+                                                              child: Row(
+                                                                children: [
+                                                                  SvgPicture.asset("assets/svg/Youtube.svg"),
+                                                                  const SizedBox(width: 4),
+                                                                  Text(
+                                                                    youtubeFollowers[realIndex],
+                                                                    style: const TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: 13,
+                                                                      fontWeight: FontWeight.w500,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ),
 
-                                                          const SizedBox(width: 18),
+                                                          if (Topyoutube[realIndex].isNotEmpty &&
+                                                              youtubeFollowers[realIndex] != "-")
+                                                            const SizedBox(width: 18),
 
                                                           /// TIKTOK
-                                                          GestureDetector(
-                                                            onTap: () => openLink(Toptiktok[realIndex]),
-                                                            child: Row(
-                                                              children: [
-                                                                const Icon(Icons.tiktok, color: Colors.white, size: 16),
-                                                                const SizedBox(width: 4),
-                                                                Text(
-                                                                  tiktokFollowers[realIndex],
-                                                                  style: const TextStyle(
-                                                                    color: Colors.white,
-                                                                    fontSize: 13,
-                                                                    fontWeight: FontWeight.w500,
+                                                          if (Toptiktok[realIndex].isNotEmpty &&
+                                                              tiktokFollowers[realIndex] != "-")
+                                                            GestureDetector(
+                                                              onTap: () => openLink(Toptiktok[realIndex]),
+                                                              child: Row(
+                                                                children: [
+                                                                  SvgPicture.asset("assets/svg/Tiktok.svg"),
+                                                                  const SizedBox(width: 4),
+                                                                  Text(
+                                                                    tiktokFollowers[realIndex],
+                                                                    style: const TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: 13,
+                                                                      fontWeight: FontWeight.w500,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ),
                                                         ],
                                                       )
                                                     ],
@@ -2234,8 +2408,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
 
           ),
-          if (isLoading)
-            const AppLoader(),
+        /*  if (isLoading)
+            const AppLoader(),*/
         ],
       ),
     );

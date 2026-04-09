@@ -305,7 +305,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                   Text(
                     "Review & Cdonfirm",
                     style: TextStyle(
-                      fontFamily: "Unbounded ",
+                      fontFamily: "Unbounded",
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: ColorCode.white,
@@ -459,7 +459,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
               Divider(color: Colors.white24,),
               SizedBox(height: 28),
 
-              Column(
+       /*       Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
@@ -702,7 +702,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
                 ],
-              ),
+              ),*/
               /* Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -798,10 +798,9 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
-          borderRadius: const BorderRadius.vertical(
+        /*  borderRadius: const BorderRadius.vertical(
             top: Radius.circular(20),
-          ),
+          ),*/
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.4),
