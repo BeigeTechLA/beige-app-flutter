@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Model/HomeModel.dart';
@@ -10,8 +12,13 @@ import '../../service/api_service.dart';
 import '../../widgets/loding.dart';
 import '../HomeSekect/Home_view_profile.dart';
 import '../HomeSekect/change_location_screen.dart';
+import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
+import '../NewBookingFlow/CreateProjectStep1/ShootDateTime/Shoot_Date_Time_screen.dart';
 import '../NewBookingFlow/CreateProjectStep1/Video_Shoot_Type.dart';
+import '../NewBookingFlow/More_Details/crew_size_matching_screen.dart';
+import '../NewBookingFlow/More_Details/more_details_screen.dart';
+import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
 import 'home_controller .dart';
 
 class NewHomeScreen extends StatefulWidget {
@@ -27,7 +34,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   final GlobalKey featuredKey = GlobalKey();
   final GlobalKey topCreativeKey = GlobalKey();
   List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
-
+  int ? contentTypeId;
   HomeModel? homeData;
   bool isLoading = true;
   int? bookingId;
@@ -292,7 +299,188 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
   );
 
+  int getContentTypeId(String type) {
+    switch (type.toLowerCase()) {
+      case "photographer":
+        return 2;
+      case "videographer":
+        return 1;
+      case "Select All":
+        return 3;
+      default:
+        return 1;
+    }
+  }
+/*  Future<void> handleResume(ContinueBooking booking) async {
 
+
+    int contentTypeId = data['content_type'] ?? 1;
+    int shootTypeId = data['shoot_type_id'] ?? 0;
+
+    openResumeScreen(
+      booking.currentScreen ?? "",
+      booking.bookingId ?? 0,
+      contentTypeId,
+      shootTypeId,
+      data,
+    );
+  }*/
+  Future<void> handleResume(ContinueBooking booking) async {
+
+    /// 🔥 content_type direct backend se
+    String type = booking.contentType ?? "photographer";
+
+    int contentTypeId = getContentTypeId(type);
+
+    int shootTypeId = 0; // abhi pending hai
+
+    openResumeScreen(
+      booking.currentScreen,
+      booking.bookingId,
+      contentTypeId,
+      shootTypeId,
+      {},
+    );
+  }
+  void openResumeScreen(
+      String screen,
+      int bookingId,
+      int contentTypeId,
+      int shootTypeId,
+      Map<String, dynamic> data,
+      ) {
+
+    switch (screen) {
+
+      case "save_content_type":
+        Navigator.push(context,
+            MaterialPageRoute(builder: (_) => ContentTypeScreen()));
+        break;
+
+      case "save_shoot_type":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => VideoShootType(
+                bookingId: bookingId,
+                contentTypeId: contentTypeId,
+              ),
+            ));
+        break;
+
+      case "get_edit_types":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => VideoShootType(
+                bookingId: bookingId,
+                contentTypeId: contentTypeId,
+              ),
+            ));
+        break;
+
+      case "save_time": // 🔥 STEP 4
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => ShootDateTimeScreen(
+                bookingId: bookingId,
+                contentTypeId: contentTypeId,
+                ShootTypeId: shootTypeId,
+              ),
+            ));
+        break;
+
+      case "save_details":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => MoreDetailsScreen(
+                bookingId: bookingId,
+                contentTypeId: contentTypeId,
+                ShootTypeId: shootTypeId,
+                /*initialData: data,*/
+                specialtyId: 22,
+
+              ),
+            ));
+        break;
+
+      case "crew_recommendation":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => CrewSizeMatchingScreen(
+                bookingId: bookingId,
+                contentTypeId:contentTypeId,
+                specialtyId:22,
+                ShootTypeId: shootTypeId,
+              ),
+            ));
+        break;
+
+      case "creative_matches": // 🔥 STEP 7
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => SelectYourDreamTeam(
+                bookingId: bookingId,
+                contentTypeId:contentTypeId,
+                specialtyId:22,
+                ShootTypeId: shootTypeId,
+              ),
+            ));
+        break;
+
+      case "selected_creatives":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => SelectYourDreamTeam(
+                bookingId: bookingId,
+                contentTypeId:contentTypeId,
+                specialtyId:22,
+                ShootTypeId: shootTypeId,
+
+              ),
+            ));
+        break;
+
+      case "summary":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => ReviewConfirmScreen(
+                bookingId: bookingId,
+              ),
+            ));
+        break;
+
+      case "payment_method":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => ReviewConfirmScreen(
+                bookingId: bookingId,
+              ),
+            ));
+        break;
+
+      case "pay_now":
+        Navigator.push(context,
+            MaterialPageRoute(
+              builder: (_) => ReviewConfirmScreen(
+                bookingId: bookingId,
+              ),
+            ));
+        break;
+      default:
+        print("❌ Unknown screen: $screen");
+    }
+  }
+
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "";
+
+    final d = DateTime.parse(date);
+    return DateFormat('dd,MM,yyyy').format(d); // 👉 04 08, 2026
+  }
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "";
+    final parsed = DateFormat("HH:mm:ss").parse(time);
+    return DateFormat("hh:mm a").format(parsed); // 👉 09:00 AM
+  }
   final List<Color> _textColors = [
     Colors.white.withOpacity(0.5),
     const Color(0xFFE8D1AB),
@@ -745,7 +933,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Container(
@@ -764,31 +952,222 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding:  EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Continue Your Booking",
-                              style: TextStyle(color: ColorCode.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
-                                height: 1.2,
-                              ),
-
-
-                            ),
-
-                          ],
-                        ),
-                      ),
-
-
                       // Main Card
-                      Container(
+
+                      const SizedBox(height: 10),
+                      Column(
+                        children: [
+                      /// 🔥 CONTINUE BOOKING DYNAMIC (NO ERROR VERSION)
+                      homeData?.continueBooking != null &&
+                      homeData!.continueBooking!.show
+                      ? Column(
+                        children: [
+
+                          Padding(
+                            padding:  EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Continue Your Booking",
+                                  style: TextStyle(color: ColorCode.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "Unbounded",
+                                    height: 1.2,
+                                  ),
+
+
+                                ),
+
+                              ],
+                            ),
+                          ),
+
+                            // const SizedBox(height: 10),
+                          Container(
+                          padding: const EdgeInsets.all(20),
+                                margin: const EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE8D1AB),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Column(
+                                  children: [
+
+                                    /// TOP ROW
+                                    Row(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: (homeData?.continueBooking?.imageUrl != null &&
+                                              homeData!.continueBooking!.imageUrl!.trim().isNotEmpty)
+                                              ? Image.network(
+                                            ApiService.imageURL +
+                          homeData!.continueBooking!.imageUrl!,
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+
+                                            /// 🔥 Loading time pe loader
+                                            loadingBuilder: (context, child, loadingProgress) {
+                                              if (loadingProgress == null) return child;
+                                              return SizedBox(
+                          height: 80,
+                          width: 80,
+                          child: Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                                              );
+                                            },
+
+                                            /// ❌ Error aaye to placeholder
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return SvgPicture.asset(
+                          "assets/svg/imag_placeholder.svg",
+                          height: 80,
+                          width: 80,
+                          fit: BoxFit.cover,
+                                              );
+                                            },
+                                          )
+                                              : SvgPicture.asset(
+                                            "assets/svg/imag_placeholder.svg",
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+
+                                        const SizedBox(width: 15),
+
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                          homeData!.continueBooking!.title ?? "",
+                          style: const TextStyle(
+                            color: ColorCode.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                                              ),
+
+                                              const SizedBox(height: 4),
+
+                                              Text(
+                          "Step ${homeData!.continueBooking!.currentScreenOrder} of ${homeData!.continueBooking!.totalSteps}",
+                          style: const TextStyle(
+                            color: ColorCode.kBlackOpacity70,
+                            fontSize: 13,
+                          ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 20),
+
+                                    /*/// PROGRESS
+                                    LinearProgressIndicator(
+                                      value: homeData!.continueBooking!.progress ?? 0.0,
+                                    ),*/
+                                    Row(
+                                      children: List.generate(3, (index) {
+                                        double progress =
+                                            homeData?.continueBooking?.progress ?? 0.0; // 0 to 1
+
+                                        double segmentProgress = (progress * 3) - index;
+
+                                        /// clamp between 0 to 1
+                                        double value = segmentProgress.clamp(0.0, 1.0);
+
+                                        return Expanded(
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                                            height: 6,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0x33000000), // background (light)
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: FractionallySizedBox(
+                                              alignment: Alignment.centerLeft,
+                                              widthFactor: value, // 🔥 main logic
+                                              child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black, // filled part
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 20),
+
+                                    /// 🔥 RESUME BUTTON
+                                    GestureDetector(
+                                      onTap: () {
+                                        handleResume(homeData!.continueBooking!);
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          color: ColorCode.kHeadingColor, // Dark background
+                                          borderRadius: BorderRadius.circular(23),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                          Text(
+                                          "Resume",
+                                          style: TextStyle(
+                                            color: ColorCode.kButtonColor,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "Unbounded",
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        const Icon(
+                                          Icons.arrow_forward,
+                                          color: ColorCode.kButtonColor,
+                                          size: 24,
+                                        ),]),)
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: Container(
+                              height: 1,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.09), // left
+                                    Colors.white24,
+                                    Colors.white.withOpacity(0.09), // right
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+        : const SizedBox(),
+                        ],
+                      ),
+                      // const SizedBox(height: 10),
+                      /* Container(
                         padding: const EdgeInsets.all(20),
                         margin: EdgeInsets.all(18),
                         decoration: BoxDecoration(
@@ -885,26 +1264,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Container(
-                          height: 1,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white24,
-                                Colors.white.withOpacity(0.09), // right
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                        ),
-                      ),
+                      ),*/
+
                       const SizedBox(height: 10),
                       Padding(
                         key: featuredKey,
@@ -2414,6 +2775,17 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       ),
     );
   }
+  Widget _stepBar({required bool isActive}) {
+    return Expanded(
+      child: Container(
+        height: 6,
+        decoration: BoxDecoration(
+          color: isActive ? Colors.black : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
   Widget _buildCardbook(Map<String, String> data) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
@@ -2596,7 +2968,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      booking.eventDate ?? "-",
+                      formatDate(booking.eventDate),
+
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -2614,7 +2987,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      "${booking.startTime ?? ""} - ${booking.endTime ?? ""}",
+                      "${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}",
+
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -2674,11 +3048,11 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                 const SizedBox(width: 10),
 
                 /// 🔹 ICON BUTTON
-                SvgPicture.asset(
+          /*      SvgPicture.asset(
                   "assets/svg/home_view_profile.svg",
                   height: 36,
                   color: Colors.white,
-                ),
+                ),*/
               ],
             ),
         ],

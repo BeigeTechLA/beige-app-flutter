@@ -73,6 +73,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
       onSubmitted: widget.onFieldSubmitted,           // ✅
       cursorColor: ColorCode.kButtonColor,
       autofillHints: widget.autofillHints,
+      enableSuggestions: !widget.isPassword,
+      autocorrect: !widget.isPassword,
       onChanged: widget.onChanged,
       inputFormatters: widget.inputFormatters,
       maxLines: widget.maxLines,

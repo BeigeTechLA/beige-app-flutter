@@ -520,48 +520,45 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Weekly Availability",
-                        style: TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                      if (weeklyAvailability.isNotEmpty) ...[
+                        const Text(
+                          "Weekly Availability",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 14),
+                        const SizedBox(height: 14),
 
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2A2A2A),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: weeklyAvailability.isEmpty
-                            ? Center(
-                              child: const Text(
-                                                        "Not available",
-                              style:  TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
-                              )),
-                            )
-                            : Column(
-                          children: weekDaysOrder.map((day) {
-                            bool isActive = weeklyAvailability.contains(day);
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2A2A),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            children: weekDaysOrder.map((day) {
+                              bool isActive = weeklyAvailability.contains(day);
 
-                            return availabilityRow(
-                              day,
-                              isActive,
-                              "10:00 am - 10:00 pm",
-                            );
-                          }).toList(),
+                              return availabilityRow(
+                                day,
+                                isActive,
+                                "10:00 am - 10:00 pm",
+                              );
+                            }).toList(),
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Divider(color: Colors.white10,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Divider(color: Colors.white10,
+                          ),
                         ),
-                      ),
+                      ],
+
+
                    /*   Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

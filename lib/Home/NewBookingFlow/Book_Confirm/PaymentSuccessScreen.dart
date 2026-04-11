@@ -29,18 +29,17 @@ class PaymentSuccessScreen extends StatelessWidget {
         );
         return false; // ❌ prevent default back
       },
-      child: Scaffold(
+      child:Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
 
-              /// 🎉 LOTTIE SUCCESS
+              /// 🎉 LOTTIE
               Lottie.asset(
                 "assets/lottie/Untitled file.json",
                 height: 180,
-
               ),
 
               const SizedBox(height: 20),
@@ -64,44 +63,43 @@ class PaymentSuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: ColorCode.kWhiteOpacity70,
+                  fontFamily: "Outfit",
+                  fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
               ),
+            ],
+          ),
+        ),
 
-              const SizedBox(height: 30),
-
-              /// 🔘 BUTTON
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    /// 🔥 BUTTON → GO TO HOME
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const Mainscreen(),
-                      ),
-                          (route) => false,
-                    );
-                  },
-                  child: const Text(
-                    "View Summary",
-                    style: TextStyle(
-                      fontFamily: "Unbounded",
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+        /// 🔥 BUTTON AT BOTTOM
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(20),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const Mainscreen()),
+                    (route) => false,
+              );
+            },
+            child: Container(
+              height: 55,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE6C79C),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                "View Summary",
+                style: TextStyle(
+                  fontFamily: "Unbounded",
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

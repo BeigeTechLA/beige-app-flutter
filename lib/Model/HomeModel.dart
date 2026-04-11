@@ -11,6 +11,7 @@ class HomeModel {
   final List<Specialty> specialties;
   final List<Creative> mainCreatives;
   final List<Creative> featuredCreatives;
+  final ContinueBooking? continueBooking;
 
   HomeModel({
     required this.location,
@@ -21,6 +22,7 @@ class HomeModel {
     required this.mainCreatives,
     required this.featuredCreatives, required this.name,
     required this.yourBookings,
+    this.continueBooking,
   });
 
   factory HomeModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +47,9 @@ class HomeModel {
       yourBookings: (json['your_bookings'] as List? ?? [])
           .map((e) => Your_Booking.fromJson(e))
           .toList(),
+      continueBooking: json['continue_booking'] != null
+          ? ContinueBooking.fromJson(json['continue_booking'])
+          : null,
     );
   }
 }
@@ -126,6 +131,7 @@ class ContinueBooking {
   final double progress;
   final String resumeApi;
   final List<Flow> flow;
+  final String? contentType;
 
   ContinueBooking({
     required this.show,
@@ -139,6 +145,7 @@ class ContinueBooking {
     required this.progress,
     required this.resumeApi,
     required this.flow,
+    this.contentType,
   });
 
   factory ContinueBooking.fromJson(Map<String, dynamic> json) {
@@ -158,6 +165,7 @@ class ContinueBooking {
       flow: (json['flow'] as List? ?? [])
           .map((e) => Flow.fromJson(e))
           .toList(),
+      contentType: json['content_type'],
     );
   }
 }

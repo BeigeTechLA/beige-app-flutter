@@ -19,13 +19,14 @@ class ApiEndpoints {
 
   static const String booking_specialties = "bookings/specialties";
 
-  //
+  //Stripe
   static const String booking_creatives = "creatives";
 
   static const String payment = "payment";
 
   static const String payment_setup = "payment/setup-intent";
-  static const String payment_attach = "payment/attach";
+  static const String payment_attach = "stripe/confirm";
+  static const String payment_sheet = "paymentsheet";
 
   // static const String payment_now = "payment";
   ///------------------My profile-----------------------\\\

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
@@ -19,7 +20,7 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
   final String ?location;
   final String? contentType;
   final int shootTypeId;
-
+  final List<dynamic>? multiDays;
 
   final String ?imageUrl;
   const UpcomingEventSummaryManagebooking({super.key,
@@ -32,6 +33,7 @@ class UpcomingEventSummaryManagebooking extends StatefulWidget {
      this.location,
      this.imageUrl,
     this.contentType, required this.shootTypeId,
+    this.multiDays,
   });
 
   @override
@@ -53,7 +55,17 @@ class _UpcomingEventSummaryManagebookingState
 
     return ApiService().getImageURL(url);
   }
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "--";
+    final parsed = DateFormat("HH:mm:ss").parse(time);
+    return DateFormat("hh:mm a").format(parsed);
+  }
 
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "--";
+    final parsed = DateTime.parse(date);
+    return DateFormat("dd MMM yyyy").format(parsed);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -301,28 +313,59 @@ class _UpcomingEventSummaryManagebookingState
                               color: Colors.white.withOpacity(0.9),
                             ),
                           ),
-                          child: Column(
+                          child:Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              infoRowBlack(
-                                "assets/svg/Group 2087328870.svg",
-                                "${widget.startTime ?? '--'} to ${widget.endTime ?? '--'} "
-                                    "(${widget.durationHours ?? 0}h duration)",
-                              ),
 
-                              const SizedBox(height: 10),
-                              infoRowBlack(
-                                "assets/svg/Frame.svg",
-                                widget.eventDate ?? "Date not available",
-                              ),
+                              /// 🔵 MULTI DAY (comma detect)
+                              if (widget.multiDays != null && widget.multiDays!.isNotEmpty) ...[
 
-                              const SizedBox(height: 10),
+                                /// 🔵 REAL MULTI DAY
+                                ...widget.multiDays!.map((day) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      infoRowBlack(
+                                        "assets/svg/Frame.svg",
+                                        formatDate(day['date']),
+                                      ),
+
+                                      infoRowBlack(
+                                        "assets/svg/Group 2087328870.svg",
+                                        "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])} "
+                                            "(${day['duration_hours']}h)",
+                                      ),
+
+                                      const SizedBox(height: 8),
+                                    ],
+                                  );
+                                }).toList(),
+
+                              ] else ...[
+
+                                /// 🟢 SINGLE DAY
+                                infoRowBlack(
+                                  "assets/svg/Frame.svg",
+                                  formatDate(widget.eventDate),
+                                ),
+
+                                const SizedBox(height: 8),
+
+                                infoRowBlack(
+                                  "assets/svg/Group 2087328870.svg",
+                                  "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                      "(${widget.durationHours ?? 0}h)",
+                                ),
+                              ],
+                              const SizedBox(height: 8),
+                              /// 📍 LOCATION
                               infoRowBlack(
                                 "assets/svg/location.svg",
                                 widget.location ?? "Location not available",
                               ),
-
                             ],
-                          ),
+                          )
                         ),
 
                         const SizedBox(height: 20),

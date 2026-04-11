@@ -1,6 +1,7 @@
 import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
@@ -8,6 +9,7 @@ import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
+import '../../../widgets/loding.dart' show AppLoader;
 import '../../HomeSekect/payment_method.dart';
 import 'PaymentSuccessScreen.dart';
 
@@ -31,6 +33,11 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   String? nameError;
   String? emailError;
   String? phoneError;
+
+  bool loading = true;
+  Map<String, dynamic>? paymentData;
+  String? setupIntentClientSecret;
+
 
   Map<String, dynamic>? booking;
   List<dynamic> heldCreatives = [];
@@ -77,6 +84,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   void initState() {
     super.initState();
     _fetchHomeReview();
+    _createSetupIntent();
   }
   @override
   void dispose() {
@@ -175,7 +183,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       setState(() => isLoading = false);
     }
   }
-
+  bool isProcessing = false;
 /*void _snakbar(String message){
     TopMessage.show(context, message);
 
@@ -189,13 +197,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
     return grouped;
   }
-  Future<void> _fetchReview() async {
+  Future<bool> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill required fields")),
       );
-      // _snakbar('Please fill required fields');
-      return;
+      return false;
     }
 
     setState(() => isLoading = true);
@@ -212,8 +219,102 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       );
 
       if (response != null && response['error'] == false) {
-        debugPrint("✅ Payment Details Submitted");
+        debugPrint("✅ Details Saved");
+        return true; // 🔥 only return
+      } else {
+        debugPrint("❌ API Failed: $response");
+        return false;
+      }
+    } catch (e) {
+      debugPrint("❌ ERROR: $e");
+      return false;
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+  Future<Map<String, dynamic>> _createSetupIntent() async {
+    try {
+      debugPrint("🚀 CREATE PAYMENT SHEET API START");
 
+      final response = await ApiService().postData(
+        "${ApiEndpoints.booking}/${widget.bookingId}/paymentsheet",
+        {},
+      );
+
+      debugPrint("📥 FULL RESPONSE:");
+      debugPrint(response.toString());
+
+      if (response == null || response['error'] == true) {
+        throw response?['message'] ?? "PaymentSheet failed";
+      }
+
+      final data = response['data'];
+      final paymentSheet = data['payment_sheet'];
+
+      /// ✅ Correct client secret
+      setupIntentClientSecret =
+      paymentSheet['payment_intent_client_secret'];
+
+      debugPrint("✅ CLIENT SECRET:");
+      debugPrint(setupIntentClientSecret);
+
+      return paymentSheet; // 🔥 VERY IMPORTANT
+    } catch (e) {
+      debugPrint("❌ CREATE PAYMENT SHEET ERROR: $e");
+      rethrow;
+    } finally {
+      debugPrint("🛑 CREATE PAYMENT SHEET API END");
+    }
+  }
+  Future<void> _openStripeSheet() async {
+    if (isProcessing) return;
+
+    isProcessing = true;
+
+    try {
+      setState(() => loading = true);
+
+      /// 🔥 1️⃣ FIRST SAVE DETAILS
+      final isSaved = await _fetchReview();
+
+      if (!isSaved) return;
+
+      debugPrint("✅ Details saved, starting payment...");
+
+      /// 🔥 2️⃣ CREATE PAYMENT SHEET
+      final paymentSheet = await _createSetupIntent();
+
+      final clientSecret =
+      paymentSheet['payment_intent_client_secret'];
+
+      if (clientSecret == null || clientSecret.isEmpty) {
+        throw "Client secret missing";
+      }
+
+      /// 🔥 3️⃣ INIT STRIPE
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          customerId: paymentSheet['customer_id'],
+          customerEphemeralKeySecret:
+          paymentSheet['ephemeral_key_secret'],
+          merchantDisplayName: "BEIGE",
+        ),
+      );
+
+      /// 🔥 4️⃣ OPEN STRIPE
+      await Stripe.instance.presentPaymentSheet();
+
+      debugPrint("✅ Payment Success");
+
+      /// 🔥 5️⃣ GET PAYMENT INTENT ID
+      final paymentIntentId = clientSecret.split('_secret').first;
+
+      /// 🔥 6️⃣ BACKEND CONFIRM
+      await _attachPaymentMethodToBackend(paymentIntentId);
+
+      /// 🔥 7️⃣ NAVIGATE SUCCESS SCREEN
+      if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -226,13 +327,52 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
           ),
         );
       }
-      else {
-        debugPrint("❌ Payment API failed: $response");
-      }
+
+    } on StripeException catch (e) {
+      if (e.error.code == FailureCode.Canceled) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
+      );
     } catch (e) {
-      debugPrint("Review API Error: $e");
+      debugPrint("❌ ERROR: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     } finally {
-      setState(() => isLoading = false);
+      isProcessing = false;
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
+  Future<void> _attachPaymentMethodToBackend(
+      String paymentIntentId) async {
+    try {
+      debugPrint("🔗 BACKEND CONFIRM START");
+
+      final payload = {
+        "payment_intent_id": paymentIntentId,
+      };
+
+      debugPrint("📤 PAYLOAD: $payload");
+
+      final response = await ApiService().postData(
+        "${ApiEndpoints.payment}/${widget.bookingId}/stripe/confirm",
+        payload,
+      );
+
+      debugPrint("📥 BACKEND RESPONSE:");
+      debugPrint(response.toString());
+
+      if (response == null || response['error'] == true) {
+        throw response?['message'] ?? "Backend confirm failed";
+      }
+
+      debugPrint("✅ BACKEND CONFIRM SUCCESS");
+    } catch (e) {
+      debugPrint("❌ BACKEND ERROR: $e");
+      rethrow;
     }
   }
 
@@ -555,29 +695,56 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 decoration: BoxDecoration(
                                   color: ColorCode.white,
                                   borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.9),
-                                  ),
+                                  border: Border.all(color: Colors.white.withOpacity(0.9)),
                                 ),
                                 child: Column(
                                   children: [
 
-                                    infoRowBlack(
-                                      "assets/svg/Group 2087328870.svg",
+                                    /// 🔥 CHECK MULTI OR SINGLE
+                                    if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
+
+                                      /// ✅ MULTI DAY
+                                      ...List.generate(booking!['booking_days'].length, (index) {
+                                        var day = booking!['booking_days'][index];
+
+                                        return Column(
+                                          children: [
+                                            infoRowBlack(
+                                              "assets/svg/Group 2087328870.svg",
+                                              "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
+                                                  " (${day['duration_hours']}h)",
+                                            ),
+                                            const SizedBox(height: 6),
+                                            infoRowBlack(
+                                              "assets/svg/Frame.svg",
+                                              formatDate(day['date']),
+                                            ),
+                                            const SizedBox(height: 10),
+                                          ],
+                                        );
+                                      }),
+
+                                    ] else ...[
+
+                                      /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
+                                      infoRowBlack(
+                                        "assets/svg/Group 2087328870.svg",
                                         "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
-                                            " (${pricing?['duration_hours']}h duration)",
-                                    ),
-                                    const SizedBox(height: 8),
-                                    infoRowBlack(
-                                      "assets/svg/Frame.svg",
-                                      formatDate(booking?['event_date']),
-                                    ),
+                                            " (${booking?['duration_hours']}h)",
+                                      ),
+                                      const SizedBox(height: 8),
+                                      infoRowBlack(
+                                        "assets/svg/Frame.svg",
+                                        formatDate(booking?['event_date']),
+                                      ),
+                                    ],
+
+                                    /// 📍 LOCATION (COMMON)
                                     const SizedBox(height: 8),
                                     infoRowBlack(
                                       "assets/svg/location.svg",
                                       booking?['event_location'] ?? "",
                                     ),
-
                                   ],
                                 ),
                               )
@@ -788,7 +955,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ),
                               ),
                             ],
-                            Column(
+                        /*    Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
 
@@ -826,7 +993,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 SizedBox(height: 14),
 
                                 /// 🔹 PAY AT VENUE
-                                /*  paymentRadioTile(
+                                *//*  paymentRadioTile(
                           title: "Pay By Credit or Debit Card",
                           value: 0,
                         ),
@@ -834,7 +1001,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         paymentRadioTile(
                           title: "Pay Via Stripe",
                           value: 1,
-                        ),*/
+                        ),*//*
                                 paymentRadioTile(
                                   title: hasSavedCard
                                       ? "Pay Via Stripe"
@@ -846,11 +1013,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                               ],
                             ),
+*/
 
-                            Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Divider(color: ColorCode.kDividerWhite12,),
-                            ),
 
 
                             Row(
@@ -1050,6 +1214,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               ],
             ),
           ),
+          if (isLoading)
+            const AppLoader()
         ],
 
       ),
@@ -1063,7 +1229,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               child: SizedBox(
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _fetchReview,
+                  onPressed: isLoading ? null : _openStripeSheet,
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorCode.kButtonColor,

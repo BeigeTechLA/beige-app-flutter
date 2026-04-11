@@ -765,7 +765,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   Future<void> _selectDateMultiple(BuildContext context) async {
     List<DateTime> tempSelected = List.from(selectedDates);
 
-    await showDialog(
+    final result = await showDialog(
       context: context,
       builder: (context) {
         return Theme(
@@ -780,7 +780,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             ),
           ),
           child: Dialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+            insetPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -790,7 +791,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
 
-                    /// 🔥 HEADER (exact feel)
+                    /// HEADER
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
@@ -806,22 +807,17 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                       ),
                     ),
 
-                    /// 🔥 CALENDAR
+                    /// CALENDAR
                     SizedBox(
                       height: 350,
                       child: CalendarDatePicker2(
                         config: CalendarDatePicker2Config(
                           calendarType: CalendarDatePicker2Type.multi,
-
                           selectedDayHighlightColor: ColorCode.kButtonColor,
                           selectedDayTextStyle: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
-
-                          dayTextStyle: const TextStyle(color: Colors.white),
-                          weekdayLabelTextStyle:
-                          const TextStyle(color: Colors.white70),
                         ),
                         value: tempSelected,
                         onValueChanged: (dates) {
@@ -832,7 +828,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                       ),
                     ),
 
-                    /// 🔥 ACTIONS (same feel)
+                    /// ACTIONS
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -855,13 +851,18 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           ),
         );
       },
-    ).then((result) {
-      if (result != null) {
-        setState(() {
-          selectedDates = result;
-        });
-      }
-    });
+    );
+
+    /// 🔥 IMPORTANT FIX (THIS WAS MISSING)
+    if (result != null && result is List<DateTime>) {
+      setState(() {
+        selectedDates = result;
+
+        /// reset times
+        startTimes.clear();
+        endTimes.clear();
+      });
+    }
   }
 
 
@@ -1075,7 +1076,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               /// ================= SINGLE =================
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () {
+                                 /* onTap: () {
                                     if (isSingleLocked) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(content: Text("Single Day not allowed")),
@@ -1097,7 +1098,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                       startTimeController.clear();
                                       endTimeController.clear();
                                     });
-                                  },
+                                  },*/
+                                  onTap: null,
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
                                     decoration: BoxDecoration(
@@ -1366,6 +1368,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                           istimingsame = true;
                                         });
                                       },
+
                                     ),
                                     const SizedBox(width: 24),
                                     _buildOption(
@@ -1453,9 +1456,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         text: startTimes[date]?.format(context) ?? "",
                                                       ),
                                                       readOnly: true,
-                                                      onTap: () {
+                                                   /*   onTap: () {
                                                         _selectTime(context, null, true, date); // ✅ FIX
-                                                      },
+                                                      },*/
+                                                      onTap: null,
                                                       suffixIcon: Padding(
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
@@ -1471,9 +1475,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         text: endTimes[date]?.format(context) ?? "",
                                                       ),
                                                       readOnly: true,
-                                                      onTap: () {
+                                                    /*  onTap: () {
                                                         _selectTime(context, null, false, date); // ✅ FIX
-                                                      },
+                                                      },*/
+                                                      onTap: null,
                                                       suffixIcon: Padding(
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
@@ -1522,7 +1527,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                     title: "Start Time",
                                     controller: startTimeController,
                                     readOnly: true,
-                                    onTap: () {
+                                   /* onTap: () {
                                       if (selectedDates.isEmpty) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text("Please select date first")),
@@ -1531,7 +1536,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                       }
 
                                       _selectTime(context, startTimeController, true, null); // ✅ FIX
-                                    },
+                                    },*/
+                                    onTap: null,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
@@ -1550,7 +1556,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                     title: "End Time",
                                     controller: endTimeController,
                                     readOnly: true,
-                                    onTap: () {
+                                   /* onTap: () {
                                       if (selectedDates.isEmpty) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text("Please select date first")),
@@ -1559,7 +1565,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                       }
 
                                       _selectTime(context, endTimeController, false, null); // ✅ FIX
-                                    },
+                                    },*/
+                                    onTap: null,
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
@@ -1620,7 +1627,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               title: "Select Date",
                               controller: dateController,
                               readOnly: true,
-                              onTap: () => _selectDate(context),
+                              onTap: null,
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
@@ -1653,7 +1660,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               title: "Start Time",
                               controller: startTimeController,
                               readOnly: true,
-                              onTap: () {
+                           /*   onTap: () {
                                 if (!isDateSelected()) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Please select date first")),
@@ -1661,8 +1668,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                   return;
                                 }
 
-                                _selectTime(context, startTimeController, true, null); // ✅ FIX
-                              },
+                                // _selectTime(context, startTimeController, true, null); // ✅ FIX
+                              },*/
+                              onTap: null,
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
@@ -1680,7 +1688,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               title: "End Time",
                               controller: endTimeController,
                               readOnly: true,
-                              onTap: () {
+                             /* onTap: () {
                                 if (!isDateSelected()) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Please select date first")),
@@ -1689,7 +1697,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                 }
 
                                 _selectTime(context, endTimeController, false, null); // ✅ FIX
-                              },
+                              },*/
+                              onTap: null,
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
@@ -1705,267 +1714,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
 
                           SizedBox(height: 30,),
-                       /*   Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-
-                              /// 🔹 TITLE
-                              Text(
-                                "Edits Needed?",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              const SizedBox(height: 12),
-
-                              /// 🔹 YES / NO
-                              Row(
-                                children: [
-                                  _buildOption(
-                                    title: "Yes",
-                                    isSelected: isEditNeeded == true,
-                                    onTap: () {
-                                      setState(() {
-                                        isEditNeeded = true;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(width: 24),
-                                  _buildOption(
-
-                                    title: "No",
-                                    isSelected: isEditNeeded == false,
-                                    onTap: () {
-                                      setState(() {
-                                        isEditNeeded = false;
-
-                                        // 🔥 CLEAR OLD DATA
-                                        resetEditTypes();
-
-                                      });
-                                    },
-
-                                  ),
-                                ],
-                              ),
-
-                              /// 🔥 ONLY SHOW WHEN YES SELECTED
-                              if (isEditNeeded == true) ...[
-                                const SizedBox(height: 30),
-
-                                /// 🔹 INFO CONTAINER
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                  decoration: BoxDecoration(
-                                    color: ColorCode.k282828,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children:  [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.info_outline,
-                                            size: 18,
-                                            color: Colors.white,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            "Editing includes",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: "Outfit",
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.check,
-                                            size: 16,
-                                            color: Color(0xFFBDBDBD),
-                                          ),
-                                          SizedBox(width: 8),
-                                         *//* Expanded(
-                                            child: Text(
-                                              getEditingDescription(),
-                                              style: const TextStyle(
-                                                color: ColorCode.kWhiteOpacity70,
-                                                fontSize: 13,
-                                                fontFamily: "Outfit",
-                                              ),
-                                              softWrap: true,
-                                            ),
-                                          ),*//*
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                SizedBox(height: 30),
 
 
-                                *//*    GestureDetector(
-                                onTap: _showEditTypeBottomSheet,
-                                child: AbsorbPointer(
-                                  child: TextField(
-                                    controller: TextEditingController(
-                                      text: getEditTypeDisplayText(),
-                                    ),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "Outfit",
-                                      fontSize: 14,
-                                    ),
-                                    decoration: InputDecoration(
-                                      labelText: getContentTypeTitle(widget.contentTypeId),
-                                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                                      suffixIcon: const Icon(
-                                        Icons.keyboard_arrow_down,
-
-                                        color: ColorCode.kWhiteOpacity70,
-                                      ),
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),*//*
-                                Column(
-                                  children: [
-
-                                    /// ✅ VIDEO ONLY IF DATA AVAILABLE
-                                    if (editTypes.isNotEmpty)
-                                      VideoEdits('Video Edits', editTypes),
-
-                                    /// ✅ PHOTO ONLY IF DATA AVAILABLE
-                                    if (photoEditTypes.isNotEmpty)
-                                      PhotoEdits('Photo Edits', photoEditTypes),
-
-                                  ],
-                                ),
-
-                                SizedBox(height: 12,),
-                                *//*       Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xffE8D1AB), // Beige/Cream color
-                                  borderRadius: BorderRadius.circular(8), // Fully rounded like the image
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Sparkle Icon Container
-                                    Container(
-                                      width: 34,
-                                      height: 34,
-                                      padding: EdgeInsets.all(8),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child:  Center(
-                                        child: Image.asset('assets/images/star.png'),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width: 5),
-
-                                    // Text
-                                    const Expanded(
-                                      child: Text(
-                                        "You’ll Receive 125 Photos + 2 Videos",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff101010),
-
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),*//*
-
-                                if (selectedEditTypeNames.isNotEmpty) ...[
-                                  const SizedBox(height: 14),
-
-                                  *//* Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: List.generate(selectedEditTypeNames.length, (index) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: ColorCode.k282828,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: ColorCode.kWhiteOpacity70,
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          selectedEditTypeNames[index],
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                            fontFamily: "Outfit",
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-
-                                        /// ❌ REMOVE ICON
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedEditTypeIds.removeAt(index);
-                                              selectedEditTypeNames.removeAt(index);
-                                            });
-                                          },
-                                          child: const Icon(
-                                            Icons.close,
-                                            size: 16,
-                                            color: Colors.white70,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-                              ),*//*
-                                ]
-                              ],
-                            ],
-                          ),
-*/
 
 
                         ],
@@ -2014,13 +1764,24 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: isFormValid && !isSubmitting
+               /* onPressed: isFormValid && !isSubmitting
                     ? () {
                   debugPrint("✅ Continue clicked");
                   _ShootDate_Time(); // 🔥 API CALL
                 }
                     : null, // ❌ disabled when false
-
+*/
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BookinReviewConfirm(
+                        // contentTypeId: widget.contentTypeId,
+                        bookingId: widget.bookingId,
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFormValid
                       ? ColorCode.kButtonColor   // ✅ active
@@ -2058,246 +1819,152 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     required BuildContext context,
     required List<DateTime> selectedDates,
     required Function(List<DateTime>) onChanged,
-  }) {
+  })
+  {
     DateTime today = DateTime.now();
-    List<DateTime> allDates = List.generate(60, (index) => today.add(Duration(days: index)));
+
+    /// ✅ Current month calculation (IMPORTANT FIX)
+    DateTime firstDay = DateTime(today.year, today.month, 1);
+    DateTime lastDay = DateTime(today.year, today.month + 1, 0);
+    int totalDays = lastDay.day;
+
+    /// ✅ Only current month dates
+    List<DateTime> allDates = List.generate(
+      totalDays - today.day + 1,
+          (index) => DateTime(
+        today.year,
+        today.month,
+        today.day + index,
+      ),
+    );
 
     bool isSameDate(DateTime a, DateTime b) {
-      return a.year == b.year && a.month == b.month && a.day == b.day;
+      return a.year == b.year &&
+          a.month == b.month &&
+          a.day == b.day;
     }
 
     String getHeaderMonth() {
-      return selectedDates.isNotEmpty
-          ? DateFormat('MMM yyyy').format(selectedDates.first)
-          : DateFormat('MMM yyyy').format(today);
-    }
-
-
-    // Show multi‑date picker with local state
-    Future<void> showMultiDatePicker() async {
-      List<DateTime> tempSelected = List.from(selectedDates);
-
-      await showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: const Color(0xFF121212),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setSheetState) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height * 0.85,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-
-                    /// 🔥 HEADER (like single date)
-                    const Text(
-                      "Select Dates",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    /// 🔥 CALENDAR (FULL)
-                    Expanded(
-                      child: CalendarDatePicker2(
-                        config: CalendarDatePicker2Config(
-                          calendarType: CalendarDatePicker2Type.multi,
-                          selectedDayHighlightColor: const Color(0xFFE8D1AB),
-                          selectedDayTextStyle: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          dayTextStyle: const TextStyle(color: Colors.white),
-                          weekdayLabelTextStyle:
-                          const TextStyle(color: Colors.grey),
-                        ),
-                        value: tempSelected,
-                        onValueChanged: (dates) {
-                          setSheetState(() {
-                            tempSelected = dates;
-                          });
-                        },
-                      ),
-                    ),
-
-                    /// 🔥 BUTTONS
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("Cancel"),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFE8D1AB),
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context, tempSelected);
-                              },
-                              child: const Text(
-                                "Done",
-                                style: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ).then((result) {
-        if (result != null && result is List<DateTime>) {
-          onChanged(result);
-        }
-      });
+      return DateFormat('MMM yyyy').format(today);
     }
 
     return Container(
-      // padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color:  Color(0xff282828),
+        color: const Color(0xff282828),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// 🔥 Header
           Padding(
-            padding: EdgeInsetsGeometry.only(left: 12,right: 12,top: 12),
+            padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   getHeaderMonth(),
-                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500,fontFamily: 'Outfit'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Outfit',
+                  ),
                 ),
                 GestureDetector(
                   onTap: () => _selectDateMultiple(context),
                   child: SvgPicture.asset(
                     'assets/svg/Calendar_Mark-2.svg',
-                    width: 24, // optional (Icon size jaisa)
+                    width: 24,
                     height: 24,
                   ),
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 16),
 
-          Container(
-            //  color: Colors.red,
-            child: SizedBox(
-              height:58,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: allDates.length,
-                itemBuilder: (context, index) {
-                  final date = allDates[index];
-                  final isSelected = selectedDates.any((d) => isSameDate(d, date));
+          /// 🔥 Horizontal Month Dates
+          SizedBox(
+            height: 58,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: allDates.length,
+              itemBuilder: (context, index) {
+                final date = allDates[index];
 
-                  return GestureDetector(
-                    onTap: () {
-                      List<DateTime> updated = List.from(selectedDates);
-                      if (isSelected) {
-                        updated.removeWhere((d) => isSameDate(d, date));
-                      } else {
-                        updated.add(date);
-                      }
-                      onChanged(updated);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 9),
-                      padding: const EdgeInsets.symmetric(horizontal: 19, vertical:4),//
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFE8D1AB) : Colors.black.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(38),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${date.day}",
-                            style: TextStyle(
+                final isSelected =
+                selectedDates.any((d) => isSameDate(d, date));
 
-                              fontFamily: 'Outfit',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected ? Color(0xff222222) : Color(0xff939393),
-                            ),
-                          ),
-                          Text(
-                            DateFormat('EEE').format(date),
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontFamily: 'Outfit',
-                              fontWeight: FontWeight.w700,
+                /// ✅ Disable past dates (optional but good)
+                final isPast = date.isBefore(
+                  DateTime(today.year, today.month, today.day),
+                );
 
-                              color: isSelected?
-                              Color(0xff1D1D1B)
+                return GestureDetector(
+                  onTap: isPast
+                      ? null
+                      : () {
+                    List<DateTime> updated =
+                    List.from(selectedDates);
 
-                                  :Color(0xffffffff).withOpacity(0.6),
-                            ),
-                          ),
-                        ],
-                      ),
+                    if (isSelected) {
+                      updated.removeWhere(
+                              (d) => isSameDate(d, date));
+                    } else {
+                      updated.add(date);
+                    }
+
+                    onChanged(updated);
+
+                    /// 🔥 UI refresh
+                    (context as Element).markNeedsBuild();
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 9),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 19, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFFE8D1AB)
+                          : Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(38),
                     ),
-                  );
-                },
-              ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${date.day}",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? const Color(0xff222222)
+                                : const Color(0xff939393),
+                          ),
+                        ),
+                        Text(
+                          DateFormat('EEE').format(date),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w700,
+                            color: isSelected
+                                ? const Color(0xff1D1D1B)
+                                : Colors.white.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
+
           const SizedBox(height: 16),
-
-          // Row(
-          //   children: [
-          //     Container(
-          //       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          //       decoration: BoxDecoration(
-          //         color: Colors.black.withOpacity(0.4),
-          //         borderRadius: BorderRadius.circular(20),
-          //       ),
-          //       child: Text(
-          //         "Total Days: ${selectedDates.length}",
-          //         style: const TextStyle(color: Colors.white, fontSize: 13),
-          //       ),
-          //     ),
-          //     const SizedBox(width: 12),
-          //     Expanded(
-          //       child: Container(
-          //         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          //         decoration: BoxDecoration(
-          //           color: const Color(0xFF2A2723),
-          //           borderRadius: BorderRadius.circular(20),
-          //         ),
-          //         child: Text(
-          //           selectedDates.isEmpty
-          //               ? "No dates selected"
-          //               : selectedDates.map((e) => DateFormat('d MMM').format(e)).join(', '),
-          //           style: const TextStyle(color: Color(0xFFE8D1AB), fontSize: 12),
-          //           overflow: TextOverflow.ellipsis,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-
         ],
       ),
     );
@@ -2627,7 +2294,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     required VoidCallback onTap,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: null,
       borderRadius: BorderRadius.circular(30),
       child: Row(
         children: [

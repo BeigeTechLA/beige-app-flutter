@@ -231,27 +231,43 @@
     }
     String formatSelectedDates(List<DateTime> dates) {
       if (dates.isEmpty) return "";
-  
-      dates.sort(); // important for correct order
-  
-      final days = dates.map((e) => DateFormat('d').format(e)).toList();
-      final lastDate = dates.last;
-  
-      String daysText = "";
-  
-      if (days.length == 1) {
-        daysText = days.first;
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-        "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
+
+      dates.sort();
+
+      Map<String, List<int>> monthMap = {};
+
+      for (var date in dates) {
+        String key = DateFormat('MMM yyyy').format(date);
+
+        if (!monthMap.containsKey(key)) {
+          monthMap[key] = [];
+        }
+
+        monthMap[key]!.add(date.day);
       }
-  
-      final monthYear = DateFormat('MMM yyyy').format(lastDate);
-  
-      return "Selected Days: $daysText $monthYear";
+
+      List<String> result = [];
+
+      monthMap.forEach((month, days) {
+        days.sort();
+
+        String daysText = "";
+
+        if (days.length == 1) {
+          daysText = "${days.first}";
+        } else if (days.length == 2) {
+          daysText = "${days[0]} & ${days[1]}";
+        } else {
+          daysText =
+          "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
+        }
+
+        result.add("$daysText $month");
+      });
+
+      return "Selected Days: ${result.join(', ')}";
     }
+
     bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
       final startMinutes = start.hour * 60 + start.minute;
       final endMinutes = end.hour * 60 + end.minute;
@@ -781,16 +797,96 @@
                         child: CalendarDatePicker2(
                           config: CalendarDatePicker2Config(
                             calendarType: CalendarDatePicker2Type.multi,
-                            selectedDayHighlightColor: ColorCode.kButtonColor,
+
+                            /// ❌ REMOVE DEFAULT CIRCLE
+                            selectedDayHighlightColor: Colors.transparent,
+
+                            /// ❌ PAST DATES DISABLE
+                            firstDate: DateTime.now(),
+
+                            /// TEXT STYLE
                             selectedDayTextStyle: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
+
+                            /// 🔥 CUSTOM UI (MAIN PART)
+                            dayBuilder: ({
+                              required DateTime date,
+                              TextStyle? textStyle,
+                              BoxDecoration? decoration,
+                              bool? isSelected,
+                              bool? isDisabled,
+                              bool? isToday,
+                            }) {
+                              final today = DateTime.now();
+
+                              bool isPast = date.isBefore(
+                                DateTime(today.year, today.month, today.day),
+                              );
+
+                              /// ❌ PAST DATE (VISIBLE BUT DISABLED)
+                              if (isPast) {
+                                return Container(
+                                  margin: const EdgeInsets.all(4),
+                                  child: Center(
+                                    child: Text(
+                                      "${date.day}",
+                                      style: const TextStyle(
+                                        color: Colors.grey, // 👈 grey = disabled look
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              /// ✅ SELECTED (BOX STYLE)
+                              if (isSelected == true) {
+                                return Container(
+                                  margin: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE8D1AB),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${date.day}",
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              /// ✅ NORMAL DATE
+                              return Container(
+                                margin: const EdgeInsets.all(4),
+                                child: Center(
+                                  child: Text(
+                                    "${date.day}",
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
+
                           value: tempSelected,
+
                           onValueChanged: (dates) {
                             setStateDialog(() {
-                              tempSelected = dates;
+                              /// 🔥 SAFETY FILTER
+                              tempSelected = dates.where((date) {
+                                return !date.isBefore(
+                                  DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day,
+                                  ),
+                                );
+                              }).toList();
                             });
                           },
                         ),
@@ -821,12 +917,9 @@
         },
       );
 
-      /// 🔥 IMPORTANT FIX (THIS WAS MISSING)
       if (result != null && result is List<DateTime>) {
         setState(() {
           selectedDates = result;
-
-          /// reset times
           startTimes.clear();
           endTimes.clear();
         });
@@ -850,8 +943,18 @@
       final now = DateTime.now();
 
       /// 🔥 BASE DATE (MOST IMPORTANT FIX)
-      final baseDate = date ?? selectedDate;
+      DateTime? baseDate;
+
+      if (date != null) {
+        baseDate = date;
+      } else if (selectedDate != null) {
+        baseDate = selectedDate;
+      } else if (selectedDates.isNotEmpty) {
+        baseDate = selectedDates.first; // ✅ FIX
+      }
+
       if (baseDate == null) return;
+      // if (baseDate == null) return;
 
       /// 🔥 CHECK ONLY EXACT DATE IS TODAY
       bool isToday = baseDate.year == now.year &&
@@ -927,15 +1030,34 @@
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Start time must be at least 4 hours from now"),
+              duration: Duration(seconds: 1), // ✅ 2 second show
             ),
           );
           return;
         }
       }
-
-      /// 🔥 SAVE DATA
       setState(() {
         if (date != null) {
+          /// 🔥 MULTIPLE DATE FIX
+          if (isStartTime) {
+            startTimes[date] = picked;
+          } else {
+            endTimes[date] = picked;
+          }
+        } else {
+          /// 🔥 SINGLE DATE
+          if (isStartTime) {
+            startTime = picked;
+            _updateTimeText(startTimeController, picked);
+          } else {
+            endTime = picked;
+            _updateTimeText(endTimeController, picked);
+          }
+        }
+      });
+      /// 🔥 SAVE DATA
+     /* setState(() {
+       *//* if (date != null) {
           /// MULTIPLE DATE
           if (isStartTime) {
             startTimes[date] = picked;
@@ -951,8 +1073,8 @@
             endTime = picked;
             _updateTimeText(endTimeController, picked);
           }
-        }
-      });
+        }*//*
+      });*/
     }
     @override
     Widget build(BuildContext context) {
@@ -1329,7 +1451,7 @@
                                 ],
                               ),
   
-                              SizedBox(height: 12,),
+                              SizedBox(height: 18,),
                               Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
                                 color: Colors.white,
                                 fontFamily:'Unbounded',
@@ -1429,7 +1551,7 @@
                                                 children: [
   
                                                   /// Start Time
-  
+
                                                       CustomInputField(
                                     title: "Start Time",
                                     controller: TextEditingController(
@@ -1553,7 +1675,7 @@
                                     ),
                                   ),
                                 ),
-  
+
                                 SizedBox(height: 12),
   
                                 Row(
@@ -2041,7 +2163,8 @@
       required BuildContext context,
       required List<DateTime> selectedDates,
       required Function(List<DateTime>) onChanged,
-    }) {
+    })
+    {
       DateTime today = DateTime.now();
 
       /// ✅ Current month calculation (IMPORTANT FIX)
@@ -2207,10 +2330,10 @@
                   isVideoOpen = !isVideoOpen;
 
                   /// ✅ CLOSE → CLEAR DATA
-                  if (!isVideoOpen) {
+                 /* if (!isVideoOpen) {
                     videoCounts.clear();
                     selectedEditTypeIds.clear();
-                  }
+                  }*/
                 });
               },
               child: Container(
@@ -2367,9 +2490,9 @@
                 setState(() {
                   isPhotoOpen = !isPhotoOpen;
 
-                  if (!isPhotoOpen) {
+                  /*if (!isPhotoOpen) {
                     photoCounts.clear();
-                  }
+                  }*/
                 });
               },
               child: Container(
@@ -2622,9 +2745,9 @@
       required bool isSelected,
       required VoidCallback onTap,
     }) {
-      return InkWell(
+      return GestureDetector(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
+
         child: Row(
           children: [
             Container(

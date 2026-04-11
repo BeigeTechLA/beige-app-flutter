@@ -330,14 +330,62 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
   // ================= UPCOMING CARD =================
 // ================= UPCOMING CARD =================
+  Map<String, dynamic> getBookingDisplayData(Map shoot) {
+    String eventDate = '';
+    String startTime = '';
+    String endTime = '';
+    double duration = 0;
+
+    /// 🔵 MULTI DAY
+    if (shoot['booking_type'] == 'multi_day') {
+      final days = shoot['multi_day']?['days'] ?? [];
+
+      if (days.isNotEmpty) {
+        /// 👉 all dates join
+        eventDate = days.map((d) => d['date']).join(", ");
+
+        /// 👉 first day time (ya tu change kar sakta hai)
+        startTime = days.first['start_time'] ?? '';
+        endTime = days.first['end_time'] ?? '';
+
+        duration = (shoot['duration_hours'] ?? 0).toDouble();
+      }
+    }
+
+    /// 🟢 SINGLE DAY
+    else {
+      final singleDay = shoot['single_day'];
+
+      eventDate = singleDay?['event_date'] ?? shoot['event_date'] ?? '';
+      startTime = singleDay?['start_time'] ?? shoot['start_time'] ?? '';
+      endTime = singleDay?['end_time'] ?? shoot['end_time'] ?? '';
+      duration = (shoot['duration_hours'] ?? 0).toDouble();
+    }
+
+    return {
+      "eventDate": eventDate,
+      "startTime": startTime,
+      "endTime": endTime,
+      "duration": duration,
+    };
+  }
+
+
+
 
   Widget upcomingBookingCard(Map shoot) {
     final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
-    final String imageUrl = ApiService().getImageURL(
-      shoot['creative']?['profile_image_url'] ?? '',
-    );
+    final String imageUrlRaw = shoot['image_url'] ?? '';
+    final String imageUrl = imageUrlRaw.isNotEmpty
+        ? ApiService().getImageURL(imageUrlRaw)
+        : '';
+    final display = getBookingDisplayData(shoot);
 
+    final String eventDate = display['eventDate'] ?? '';
+    final String startTime = display['startTime'] ?? '';
+    final String endTime = display['endTime'] ?? '';
+    final double duration = display['duration'] ?? 0;
     /// ✅ SAFE DATA
     final int bookingId = shoot['booking_id'] ?? 0;
     final int shootTypeId = shoot['shoot_type_id'] ?? 0;
@@ -345,9 +393,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
 
-    final String eventDate = shoot['event_date'] ?? '';
-    final String startTime = shoot['start_time'] ?? '';
-    final String endTime = shoot['end_time'] ?? '';
 
     /// ✅ FINAL IMAGE
     final String finalImage =
@@ -385,7 +430,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 eventDate: eventDate,
                 startTime: startTime,
                 endTime: endTime,
-                durationHours: (shoot['duration_hours'] ?? 0).toDouble(),
+                multiDays: shoot['multi_day']?['days'] ?? [],
+                durationHours: shoot['duration_hours'] ?? 0,
                 location: shoot['location'] ?? '',
                 imageUrl: finalImage,
                 shootTypeId: shootTypeId,
@@ -402,9 +448,10 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget completedBookingCard(Map shoot) {
     final String fallbackImage = "assets/images/home1.png";
 
-    final String imageUrl = ApiService().getImageURL(
-      shoot['creative']?['profile_image_url'] ?? '',
-    );
+    final String imageUrlRaw = shoot['image_url'] ?? '';
+    final String imageUrl = imageUrlRaw.isNotEmpty
+        ? ApiService().getImageURL(imageUrlRaw)
+        : '';
 
     /// ✅ SAFE DATA
     final int bookingId = shoot['booking_id'] ?? 0;
@@ -518,15 +565,15 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     fontWeight: FontWeight.w600,
     ),
     ),
-    const SizedBox(height: 4),
-    Text(
+    const SizedBox(height: 14),
+  /*  Text(
     "$date | $time",
     style: const TextStyle(
     color: Colors.white70,
     fontSize: 10,
     ),
     ),
-    const SizedBox(height: 10),
+    const SizedBox(height: 10),*/
 
     Row(
     children: [

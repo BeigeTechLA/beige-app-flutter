@@ -14,7 +14,6 @@ import 'HomeSekect/home_booking_summary_details.dart';
 import 'HomeSekect/recommended_detils_screen.dart';
 import 'HomeSekect/select_location.dart';
 import 'SelectLocationMapScreen.dart';
-import 'Specialities/specialities.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

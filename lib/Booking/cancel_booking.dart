@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -70,7 +71,17 @@ class _CancelBookingState extends State<CancelBooking> {
 
     return ApiService().getImageURL(url);
   }
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "--";
+    final parsed = DateFormat("HH:mm:ss").parse(time);
+    return DateFormat("hh:mm a").format(parsed);
+  }
 
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "--";
+    final parsed = DateTime.parse(date);
+    return DateFormat("dd MMM yyyy").format(parsed);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -309,24 +320,60 @@ class _CancelBookingState extends State<CancelBooking> {
                               color: Colors.white.withOpacity(0.9),
                             ),
                           ),
-                          child: Column(
-                            children: [
-                              infoRowBlack(
-                                "assets/svg/Group 2087328870.svg",
-                                "01:30 AM to 03:30 AM (1h duration)",
-                              ),
-                              const SizedBox(height: 10),
-                              infoRowBlack(
-                                "assets/svg/Frame.svg",
-                                "Apr 01, 2025 - Apr 04, 2025",
-                              ),
-                              const SizedBox(height: 10),
-                              infoRowBlack(
-                                "assets/svg/location.svg",
-                                "2458 Sunset Boulevard, Los Angeles, CA 90026",
-                              ),
-                            ],
-                          ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                /// 🔵 MULTI DAY
+                                if (widget.eventDate != null && widget.eventDate!.contains(",")) ...[
+
+                                  ...widget.eventDate!.split(",").map((date) {
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+
+                                        infoRowBlack(
+                                          "assets/svg/Frame.svg",
+                                          formatDate(date.trim()),
+                                        ),
+
+                                        infoRowBlack(
+                                          "assets/svg/Group 2087328870.svg",
+                                          "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                              "(${widget.durationHours ?? 0}h)",
+                                        ),
+
+                                        const SizedBox(height: 10),
+                                      ],
+                                    );
+                                  }).toList(),
+
+                                ] else ...[
+
+                                  /// 🟢 SINGLE DAY
+                                  infoRowBlack(
+                                    "assets/svg/Frame.svg",
+                                    formatDate(widget.eventDate),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  infoRowBlack(
+                                    "assets/svg/Group 2087328870.svg",
+                                    "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                        "(${widget.durationHours ?? 0}h)",
+                                  ),
+                                ],
+
+                                const SizedBox(height: 8),
+
+                                /// 📍 LOCATION
+                                infoRowBlack(
+                                  "assets/svg/location.svg",
+                                  widget.location ?? "",
+                                ),
+                              ],
+                            )
                         ),
 
                         const SizedBox(height: 20),

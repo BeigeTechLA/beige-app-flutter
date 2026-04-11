@@ -145,12 +145,18 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
           otherCreators.clear();
 
           for (var item in crewMatches) {
-            double distance = (item['distance_km'] ?? 9999).toDouble();
 
-            if (distance <= 50) {
-              nearbyCreators.add(item); // near creators
+            double distance = 0;
+
+            if (item['distance_km'] != null) {
+              distance = (item['distance_km'] as num).toDouble();
+            }
+
+            /// 🔥 CONDITION FIX
+            if (distance > 0 && distance <= 50) {
+              nearbyCreators.add(item);
             } else {
-              otherCreators.add(item); // other creators
+              otherCreators.add(item);
             }
           }
 
@@ -929,7 +935,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 const SizedBox(height: 10),
 
                                 const Text(
-                                  "No user found in this location",
+                                  "Our creators around \nyour location are booked ",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: "Unbounded",

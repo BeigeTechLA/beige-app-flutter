@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/loding.dart';
 
 class UpcomingBookingEventSummary extends StatefulWidget {
   final int bookingId;
@@ -69,13 +70,24 @@ class _UpcomingBookingEventSummaryState
   }
 
 
+  String formatDate(String? date) {
+    if (date == null || date.isEmpty) return "";
 
+    final d = DateTime.parse(date);
+    return DateFormat('dd,MM,yyyy').format(d); // 👉 04 08, 2026
+  }
+  String formatTime(String? time) {
+    if (time == null || time.isEmpty) return "";
+
+    final parsedTime = DateFormat("HH:mm:ss").parse(time);
+    return DateFormat("hh:mm a").format(parsedTime); // 👉 03:27 PM
+  }
   String formatTimelineTime(String isoTime) {
     final date = DateTime.parse(isoTime).toLocal();
     return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
   String getCreativeImage() {
-    final image = bookingData?['creative']?['profile_image_url'];
+    final image = bookingData?['creative']?['image_url'];
     if (image == null || image.isEmpty) {
       return "";
     }
@@ -100,6 +112,10 @@ class _UpcomingBookingEventSummaryState
 
   @override
   Widget build(BuildContext context) {
+    final event = bookingData?['event'];
+    final multiDay = event?['multi_day'];
+    final days = multiDay?['days'] ?? [];
+    final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
     return Scaffold(
 
       body: Stack(
@@ -240,214 +256,169 @@ class _UpcomingBookingEventSummaryState
 
                 /// 🟢 MAIN CARD
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                        /// 🔥 MULTI / SINGLE HANDLE
+                        if (isMulti) ...[
+
+                    /// ✅ MULTI DAY LOOP
+                    ...List.generate(days.length, (index) {
+                  final day = days[index];
+
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      // Divider(color: Colors.white12),
-
-
+                      infoRow(
+                        "assets/svg/Frame.svg",
+                        formatDate(day['date']),
+                      ),
 
                       infoRow(
                         "assets/svg/Group 2087328870.svg",
-                        "${bookingData?['event']?['start_time']} - "
-                            "${bookingData?['event']?['end_time']} "
-                            "(${bookingData?['event']?['duration_hours']}h)",
+                        "${formatTime(day['start_time'])} - ${formatTime(day['end_time'])} "
+                            "(${day['duration_hours']}h)",
                       ),
 
-
-
-                      infoRow(
-                        "assets/svg/Frame.svg",
-
-                        bookingData?['event']?['event_date'] ?? "",
-                      ),
-
-                      infoRow(
-                        "assets/svg/location.svg",
-                        bookingData?['event']?['location'] ?? "",
-                      ),
-
-
-                      const SizedBox(height: 12),
-
-                      /// 📄 DESCRIPTION
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-
-                            Text(
-                              bookingData?['event']?['name'] ?? "",
-                              style: const TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
-
-                            const SizedBox(height: 6),
-
-                            Text(
-                              bookingData?['event']?['type'] ?? "",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            const Text(
-                              "Description",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
-                            ),
-
-                            const SizedBox(height: 6),
-
-                            Text(
-                              bookingData?['event']?['description'] ?? "No description available",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20,),
-
-                      Column(
-                        children: [
-
-                          /// 🔹 TOP INFO CARD
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: ColorCode.k282828,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final isSmallWidth = constraints.maxWidth < 320;
-
-                                return isSmallWidth
-                                    ? Column(
-                                  children: [
-                                    infoItem(
-                                      icon: Icons.attach_money,
-                                      title: "Event Budget",
-                                      value: "₹${bookingData?['event']?['budget']}",
-                                    ),
-                                    const SizedBox(height: 12),
-                                    infoItem(
-                                      icon: Icons.group,
-                                      title: "Crew Size Needed",
-                                      value:
-                                      "${bookingData?['event']?['crew_size_needed']} members",
-                                    ),
-                                  ],
-                                )
-                                    : Row(
-                                  children: [
-                                    Expanded(
-                                      child: infoItem(
-                                        icon: Icons.attach_money,
-                                        title: "Event Budget",
-                                        value: formatBudget(),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: infoItem(
-                                        icon: Icons.group,
-                                        title: "Crew Size Needed",
-                                        value: bookingData?['event']?['crew_size_needed'] != null
-                                            ? "${bookingData?['event']?['crew_size_needed']} members"
-                                            : "-",
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          /// 🔹 VIEW PROJECT TIMELINE (PIXEL PERFECT)
-                          /*      InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: () {
-                          showProjectTimelineDialog(context);
-
-                        },
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "View Project Timeline",
-                              textScaleFactor: 1.0, // 👈 prevents pixel/text overflow
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: ColorCode.white,
-                                height: 1.2,
-                              ),
-                            ),
-                             SizedBox(height: 2),
-                            Container(
-                              height: 1,
-                              width: 110,
-                              color: ColorCode.kButtonColor,
-                            ),
-                          ],
-                        ),
-                      ),*/
-
-                        ],
-                      ),
-
+                      const SizedBox(height: 10),
                     ],
-                  ),
-                ),
+                  );
+                }),
 
+              ] else ...[
+
+            /// ✅ SINGLE DAY
+            if (event?['event_date'] != null)
+            infoRow(
+            "assets/svg/Frame.svg",
+            formatDate(event?['event_date']),
+          ),
+
+          if (event?['start_time'] != null && event?['end_time'] != null)
+            infoRow(
+              "assets/svg/Group 2087328870.svg",
+              "${formatTime(event?['start_time'])} - ${formatTime(event?['end_time'])} "
+                  "(${event?['duration_hours']}h)",
+            ),
+        ],
+
+          /// 📍 LOCATION
+          if ((event?['location'] ?? "").isNotEmpty)
+    infoRow(
+      "assets/svg/location.svg",
+      event?['location'],
+    ),
+
+    const SizedBox(height: 12),
+
+    /// 📄 DESCRIPTION CARD
+    Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+    color: Colors.white.withOpacity(0.05),
+    borderRadius: BorderRadius.circular(20),
+    border: Border.all(
+    color: Colors.white.withOpacity(0.1),
+    ),
+    ),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+
+    Text(
+    event?['name'] ?? "",
+    style: const TextStyle(
+    fontFamily: "Outfit",
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    ),
+    ),
+
+    const SizedBox(height: 6),
+
+    Text(
+    event?['type'] ?? "",
+    style: const TextStyle(
+    fontSize: 12,
+    color: Colors.white70,
+    ),
+    ),
+
+    const SizedBox(height: 12),
+
+    const Text(
+    "Description",
+    style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Colors.white,
+    ),
+    ),
+
+    const SizedBox(height: 6),
+
+    Text(
+    event?['description'] ?? "No description available",
+    style: const TextStyle(
+    fontSize: 12,
+    color: Colors.white70,
+    ),
+    ),
+    ],
+    ),
+    ),
+
+    const SizedBox(height: 20),
+
+    /// 🔹 BUDGET + CREW
+    Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+    color: ColorCode.k282828,
+    borderRadius: BorderRadius.circular(20),
+    ),
+    child: Row(
+    children: [
+    Expanded(
+    child: infoItem(
+    icon: Icons.attach_money,
+    title: "Event Budget",
+    value: formatBudget(),
+    ),
+    ),
+    const SizedBox(width: 16),
+    Expanded(
+    child: infoItem(
+    icon: Icons.group,
+    title: "Crew Size Needed",
+    value: event?['crew_size_needed'] != null
+    ? "${event?['crew_size_needed']} members"
+        : "-",
+    ),
+    ),
+    ],
+    ),
+    ),
+    ],
+    ),
+    ),
               ],
             ),
           ),
           if (loading)
-            Container(
-              color: Colors.black, // ya transparent bhi rakh sakte ho
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: ColorCode.kGold40,
-                ),
-              ),
-            ),
+            const AppLoader()
         ],
 
       ),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(20),
-        child:    SizedBox(
+        padding: const EdgeInsets.all(18.0),
+        child: SizedBox(
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
@@ -457,11 +428,22 @@ class _UpcomingBookingEventSummaryState
                 MaterialPageRoute(
                   builder: (context) => UpcomingEventSummaryManagebooking(
                     projectName: bookingData?['event']?['name'] ?? '',
-                    eventDate: bookingData?['event']?['event_date'] ?? '',
-                    startTime: bookingData?['event']?['start_time'] ?? '',
-                    endTime: bookingData?['event']?['end_time'] ?? '',
-                    durationHours:
-                    bookingData?['event']?['duration_hours'] ?? 0,
+                    /// 🔥 FIXED DATA PASS
+                    eventDate: isMulti
+                        ? days.map((d) => d['date']).join(", ")
+                        : event?['event_date'] ?? '',
+
+                    startTime: isMulti
+                        ? (days.isNotEmpty ? days.first['start_time'] : '')
+                        : event?['start_time'] ?? '',
+
+                    endTime: isMulti
+                        ? (days.isNotEmpty ? days.first['end_time'] : '')
+                        : event?['end_time'] ?? '',
+
+                    durationHours: event?['duration_hours'] ?? 0,
+                    multiDays: days,
+
                     location: bookingData?['event']?['location'] ?? '',
                     imageUrl: getCreativeImage().isNotEmpty
                         ? getCreativeImage()
