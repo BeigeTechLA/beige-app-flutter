@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../widgets/loding.dart';
 
 class FavouriteScreen extends StatefulWidget {
   const FavouriteScreen({super.key});
@@ -69,92 +70,124 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// 🔙 BACK BUTTON
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: InkWell(
-                onTap: () => Navigator.pop(context),
-                child: SvgPicture.asset(
-                  "assets/svg/back.svg",
-                  height: 24,
-                  color: ColorCode.white,
-                ),
-              ),
-            ),
-                SizedBox(height: 10,),
-            /// 🏷 TITLE
-             Padding(
-               padding: EdgeInsets.symmetric(horizontal: 16),
-               child: Text(
-                " Favourites",
-                style: TextStyle(
-                  fontFamily: "Unbounded",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: ColorCode.white,
-                ),
-                           ),
-             ),
-
-
-
-            Expanded(
-              child: favourites.isEmpty
-                  ? Center(
-                child: Text(
-                  "No Favourite Data",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Outfit",
-                    color: Colors.grey,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 🔙 BACK BUTTON
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: SvgPicture.asset(
+                      "assets/svg/back.svg",
+                      height: 24,
+                      color: ColorCode.white,
+                    ),
                   ),
                 ),
-              )
-                  : ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                itemCount: favourites.length,
-                itemBuilder: (context, index) {
-                  final item = favourites[index];
-                  final int creatorId = item['creator_id'];
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: SizedBox(
-                        height: 220,
-                        child: Stack(
-                          children: [
-                            /// IMAGE
-                            item['profile_image_url'] != null
-                                ? Image.network(
-                              ApiService().getImageURL(item['profile_image_url']),
-                              width: double.infinity,
-                              height: 220,
-                              fit: BoxFit.cover,
-                            )
-                                : SvgPicture.asset(
-                              "assets/svg/imag_placeholder.svg",
-                              width: double.infinity,
-                              height: 220,
-                              fit: BoxFit.cover,
-                            ),
-
-                            /// बाकी tera same code...
-                          ],
-                        ),
-                      ),
+                SizedBox(height: 10,),
+                /// 🏷 TITLE
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    " Favourites",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: ColorCode.white,
                     ),
-                  );
-                },
-              ),
-            )
-          ],
-        ),
+                  ),
+                ),
+
+
+
+                Expanded(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : favourites.isEmpty
+                      ? const Center(
+                    child: Text(
+                      "No Favourite Data",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                      : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    itemCount: favourites.length,
+                    itemBuilder: (context, index) {
+                      final item = favourites[index];
+
+                      /// ✅ SAFE NULL HANDLING
+                      final int? creatorId = item['crew_member_id'];
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: SizedBox(
+                            height: 220,
+                            child: Stack(
+                              children: [
+                                /// ✅ IMAGE SAFE
+                                (item['profile_image_url'] != null &&
+                                    item['profile_image_url']
+                                        .toString()
+                                        .isNotEmpty)
+                                    ? Image.network(
+                                  ApiService().getImageURL(
+                                      item['profile_image_url']),
+                                  width: double.infinity,
+                                  height: 220,
+                                  fit: BoxFit.cover,
+                                )
+                                    : SvgPicture.asset(
+                                  "assets/svg/imag_placeholder.svg",
+                                  width: double.infinity,
+                                  height: 220,
+                                  fit: BoxFit.cover,
+                                ),
+
+                                /// ❤️ REMOVE BUTTON
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (creatorId != null) {
+                                        _removeFavourite(
+                                          creatorId: creatorId,
+                                          index: index,
+                                        );
+                                      } else {
+                                        debugPrint("creator_id is NULL ❌");
+                                      }
+                                    },
+                                    child: SvgPicture.asset(
+                                      "assets/svg/Heart_COLOR.svg",
+                                      height: 22,
+                                      width: 22,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          if (isLoading)
+            const AppLoader()
+        ],
+
       ),
     );
   }

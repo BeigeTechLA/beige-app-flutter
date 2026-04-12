@@ -2,28 +2,28 @@
   import 'package:flutter/material.dart';
   import 'package:flutter_svg/svg.dart';
   import 'package:intl/intl.dart';
-  
+
   import '../../../../Customtextfiled/CustomInputField.dart';
   import '../../../../main.dart';
   import '../../../../service/api_endpoints.dart';
   import '../../../../service/api_service.dart';
   import '../../../../utility/ColorCode.dart';
   import '../../More_Details/more_details_screen.dart';
-  
+
   class ShootDateTimeScreen extends StatefulWidget {
-  
+
     // final int specialtyId;
     final int ShootTypeId;
     final int bookingId;
     final int contentTypeId;
-  
+
     const ShootDateTimeScreen({super.key,
       required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
-  
+
     @override
     State<ShootDateTimeScreen> createState() => _ShootDateTimeScreenState();
   }
-  
+
   class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     bool isToday = false;
 
@@ -39,28 +39,28 @@
     bool isShootDateSelected() {
       return selectedDates.isNotEmpty;
     }
-  
+
     String getDurationText(DateTime date) {
       final start = startTimes[date];
       final end = endTimes[date];
-  
+
       if (start == null || end == null) return "Duration:00";
-  
+
       final startMin = start.hour * 60 + start.minute;
       final endMin = end.hour * 60 + end.minute;
-  
+
       int diff;
-  
+
       if (endMin >= startMin) {
         diff = endMin - startMin;
       } else {
         /// 🔥 NEXT DAY SUPPORT
         diff = (24 * 60 - startMin) + endMin;
       }
-  
+
       final hours = diff ~/ 60;
       final minutes = diff % 60;
-  
+
       /// 🔥 FORMAT LOGIC
       if (hours > 0 && minutes > 0) {
         return "Duration: ${hours}h ${minutes}m";
@@ -75,7 +75,7 @@
         context: context,
         initialTime: TimeOfDay.now(),
       );
-  
+
       if (picked != null) {
         setState(() {
           if (isStart) {
@@ -86,17 +86,17 @@
         });
       }
     }
-  
+
     Future<void> selectShootTime(
         BuildContext context,
         TextEditingController controller,
         bool isStartTime,
         ) async {
-  
+
       TimeOfDay initial = isStartTime
           ? (shootStartTime ?? TimeOfDay.now())
           : (shootEndTime ?? TimeOfDay.now());
-  
+
       final picked = await showTimePicker(
         context: context,
         initialTime: initial,
@@ -125,7 +125,7 @@
           );
         },
       );
-  
+
       if (picked != null) {
         setState(() {
           if (isStartTime) {
@@ -133,88 +133,88 @@
           } else {
             shootEndTime = picked;
           }
-  
+
           controller.text = picked.format(context);
         });
       }
     }
-  
+
     DateTime startDate = DateTime.now();
     DateTime endDate = DateTime(
       DateTime.now().year,
       DateTime.now().month + 1,
       DateTime.now().day,
     );
-  
+
     void generateDates() {
       DateTime current = startDate;
-  
+
       while (current.isBefore(endDate) || current == endDate) {
         allDates.add(current);
         current = current.add(Duration(days: 1));
       }
     }
-  
+
     List<DateTime> allDates = [];
     List<DateTime> selectedDates = [];
     List<dynamic> photoEditTypes = [];
     List<dynamic> editTypes = [];
-  
-  
-  
-  
+
+
+
+
     int selectedIndex=1;
     bool istimingsame=true;
     bool isPhotoOpen = true; //      // API data
     bool isVideoOpen = true; //      // API data
-  
+
     List<int> selectedEditTypeIds = [];        // selected ids
     List<String> selectedEditTypeNames = [];
-  
-  
+
+
     final TextEditingController dateController = TextEditingController();
     final TextEditingController startTimeController = TextEditingController();
     final TextEditingController endTimeController = TextEditingController();
-  
-  
-  
-  
+
+
+
+
     TimeOfDay? startTime;
     TimeOfDay? endTime;
-  
+
     DateTime? selectedDate;
-  
+
     bool isEditNeeded = false;  // ✅ Default = No selected
-  
+
     bool isSubmitting = false;
     bool isDateSelected() {
       return selectedDate != null;
     }
-  
+
     bool isLoading =true;
     @override
     void initState() {
       super.initState();
-  
+
       _edittype();
     }
-  
+
     String _apiDateFormat(DateTime date) {
-  
+
       return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  
+
     }
-  
+
     String formatDatesAlt(List<DateTime> dates) {
       if (dates.isEmpty) return "";
-  
+
       dates.sort();
-  
+
       final days = dates.map((e) => DateFormat('d').format(e)).toList();
       final lastDate = dates.last;
-  
+
       String daysText = "";
-  
+
       if (days.length == 1) {
         daysText = days.first;
       } else if (days.length == 2) {
@@ -223,10 +223,10 @@
         daysText =
         "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
       }
-  
+
       final month = DateFormat('MMM').format(lastDate);
       final year = DateFormat('yyyy').format(lastDate);
-  
+
       return "$month $daysText, $year";
     }
     String formatSelectedDates(List<DateTime> dates) {
@@ -325,25 +325,25 @@
       return true;
     }
     String getEditingDescription() {
-  
+
       // 🎬 Video Content
       if (widget.contentTypeId == 1) {
         return "Professional editing includes color grading,sound mixing, and basic revisions.";
       }
-  
+
       // 📸 Photo Content (Special Case 16 & 9)
       if ((widget.ShootTypeId == 16 || widget.ShootTypeId == 9) &&
           (widget.contentTypeId == 2 || widget.contentTypeId == 3)) {
         // return "50 edited photos per hour for weddings";
         return "Professional editing includes color grading,sound mixing, and basic revisions.";
       }
-  
+
       // 📷 Default Photo
       return "Professional editing includes color grading,sound mixing, and basic revisions.";
       // return "25 edited photos per hour";
     }
-  
-  
+
+
     @override
     void dispose() {
       startTimeController.dispose();
@@ -351,13 +351,13 @@
       dateController.dispose();
       super.dispose();
     }
-  
+
     void resetEditTypes() {
       selectedEditTypeIds.clear();
       selectedEditTypeNames.clear();
     }
-  
-  
+
+
     String getContentTypeTitle(int contentTypeId) {
       switch (contentTypeId) {
         case 1:
@@ -370,50 +370,50 @@
           return "Shoot Type";
       }
     }
-  
-  
+
+
     String getEditTypeDisplayText() {
-  
+
       /// 🔥 When nothing selected
       if (selectedEditTypeNames.isEmpty) {
-  
+
         switch (widget.contentTypeId) {
           case 1:
             return "Select Video Edit Type";
-  
+
           case 2:
             return "Select Photo Edit Type";
-  
+
           case 3:
             return "Select Photo & Video Edit Type";
-  
+
           default:
             return "Select Edit Type";
         }
       }
-  
+
       /// 🔥 Single selection
       if (selectedEditTypeNames.length == 1) {
         return selectedEditTypeNames.first;
       }
-  
+
       /// 🔥 Multiple selection
       return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
     }
-  
+
     Future<void> _edittype() async {
       setState(() => isLoading = true);
-  
+
       try {
         final response = await ApiService().fetchData(
           "${ApiEndpoints.booking_shoot_types}${widget.ShootTypeId}/edit-types",
         );
-  
+
         debugPrint("API Response → $response");
-  
+
         if (response != null && response['error'] == false) {
           final data = response['data'];
-  
+
           setState(() {
             editTypes = data['video_edit_types'] ?? [];
             photoEditTypes = data['photo_edit_types'] ?? [];
@@ -618,7 +618,7 @@
       final now = DateTime.now().add(const Duration(hours: 4));
       return TimeOfDay(hour: now.hour, minute: now.minute);
     }
-  
+
     bool isTodaySelected() {
       if (selectedDate == null) return false;
       final now = DateTime.now();
@@ -626,20 +626,20 @@
           selectedDate!.month == now.month &&
           selectedDate!.day == now.day;
     }
-  
-  
+
+
     DateTime minDateTimeForToday() {
       return DateTime.now().add(const Duration(hours: 4));
     }
-  
+
     bool isMinTimeNextDay() {
       final min = minDateTimeForToday();
       final now = DateTime.now();
       return min.day != now.day;
     }
-  
-  
-  
+
+
+
     Future<void> _selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
@@ -698,7 +698,7 @@
           );
         },
       );
-  
+
       if (picked != null && mounted) {
         setState(() {
           /// 🔥 SINGLE DAY MODE
@@ -707,14 +707,14 @@
             dateController.text =
             "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
           }
-  
+
           /// 🔥 MULTIPLE DAY MODE
           else {
             bool exists = selectedDates.any((d) =>
             d.year == picked.year &&
                 d.month == picked.month &&
                 d.day == picked.day);
-  
+
             if (exists) {
               selectedDates.removeWhere((d) =>
               d.year == picked.year &&
@@ -724,7 +724,7 @@
               selectedDates.add(picked);
             }
           }
-  
+
           /// 🔥 AUTO TIME LOGIC (ONLY SINGLE)
           if (selectedIndex == 1) {
             if (isTodaySelected()) {
@@ -738,7 +738,7 @@
               startTime = const TimeOfDay(hour: 9, minute: 0);
               endTime = const TimeOfDay(hour: 17, minute: 0);
             }
-  
+
             _updateTimeText(startTimeController, startTime!);
             _updateTimeText(endTimeController, endTime!);
           }
@@ -942,46 +942,45 @@
         ) async {
       final now = DateTime.now();
 
-      /// 🔥 BASE DATE (MOST IMPORTANT FIX)
+      /// 🔥 BASE DATE (ALL CASE COVER)
       DateTime? baseDate;
 
       if (date != null) {
-        baseDate = date;
+        baseDate = date; // Multiple NO
       } else if (selectedDate != null) {
-        baseDate = selectedDate;
+        baseDate = selectedDate; // Single Day
       } else if (selectedDates.isNotEmpty) {
-        baseDate = selectedDates.first; // ✅ FIX
+        baseDate = selectedDates.first; // Multiple YES
       }
 
       if (baseDate == null) return;
-      // if (baseDate == null) return;
 
-      /// 🔥 CHECK ONLY EXACT DATE IS TODAY
-      bool isToday = baseDate.year == now.year &&
-          baseDate.month == now.month &&
-          baseDate.day == now.day;
+      /// 🔥 CHECK TODAY
+      bool isSameDay =
+          baseDate.year == now.year &&
+              baseDate.month == now.month &&
+              baseDate.day == now.day;
 
       /// 🔥 INITIAL TIME
       TimeOfDay initial;
 
       if (date != null) {
-        /// MULTIPLE DATE
         initial = isStartTime
             ? (startTimes[date] ?? TimeOfDay.now())
             : (endTimes[date] ?? TimeOfDay.now());
       } else {
-        /// SINGLE DATE
         initial = isStartTime
             ? (startTime ?? TimeOfDay.now())
             : (endTime ?? TimeOfDay.now());
       }
 
-      /// ✅ ONLY TODAY START TIME → AUTO +4 HOURS
-      if (isToday && isStartTime) {
+      /// 🔥 TODAY START TIME → AUTO +4 HOURS
+      /*if (isSameDay && isStartTime) {
         final min = now.add(const Duration(hours: 4));
         initial = TimeOfDay(hour: min.hour, minute: min.minute);
-      }
+      }*/
 
+      /// 🔥 TIME PICKER WITH THEME
       final picked = await showTimePicker(
         context: context,
         initialTime: initial,
@@ -1014,11 +1013,11 @@
 
       if (picked == null || !mounted) return;
 
-      /// ✅ VALIDATION ONLY IF THAT DATE IS TODAY
-      if (isToday && isStartTime) {
+      /// 🔥 VALIDATION (4 HOUR RULE)
+      if (isStartTime) {
         final minAllowed = now.add(const Duration(hours: 4));
 
-        DateTime pickedDT = DateTime(
+        final pickedDT = DateTime(
           baseDate.year,
           baseDate.month,
           baseDate.day,
@@ -1026,55 +1025,46 @@
           picked.minute,
         );
 
+        /// 🔥 FINAL CORRECT CHECK (DATE + TIME)
         if (pickedDT.isBefore(minAllowed)) {
+          final min = TimeOfDay.fromDateTime(minAllowed);
+
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Start time must be at least 4 hours from now"),
-              duration: Duration(seconds: 1), // ✅ 2 second show
+            SnackBar(
+              content: Text("Select time after 4 hours from now"),
+              duration: Duration(seconds: 1),
             ),
           );
           return;
         }
       }
+
+      /// 🔥 SAVE DATA
       setState(() {
         if (date != null) {
-          /// 🔥 MULTIPLE DATE FIX
+          /// MULTIPLE (NO)
           if (isStartTime) {
             startTimes[date] = picked;
           } else {
             endTimes[date] = picked;
           }
         } else {
-          /// 🔥 SINGLE DATE
+          /// SINGLE / MULTIPLE YES
           if (isStartTime) {
             startTime = picked;
-            _updateTimeText(startTimeController, picked);
+            if (controller != null) {
+              _updateTimeText(controller, picked);
+            }
+
           } else {
             endTime = picked;
-            _updateTimeText(endTimeController, picked);
+            if (controller != null) {
+              _updateTimeText(controller, picked);
+            }
           }
+
         }
       });
-      /// 🔥 SAVE DATA
-     /* setState(() {
-       *//* if (date != null) {
-          /// MULTIPLE DATE
-          if (isStartTime) {
-            startTimes[date] = picked;
-          } else {
-            endTimes[date] = picked;
-          }
-        } else {
-          /// SINGLE DATE
-          if (isStartTime) {
-            startTime = picked;
-            _updateTimeText(startTimeController, picked);
-          } else {
-            endTime = picked;
-            _updateTimeText(endTimeController, picked);
-          }
-        }*//*
-      });*/
     }
     @override
     Widget build(BuildContext context) {
@@ -1085,7 +1075,7 @@
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-  
+
               Align(
                 alignment: Alignment.centerLeft,
                 child: InkWell(
@@ -1121,20 +1111,20 @@
             ],
           ),
         ),
-  
+
         body: SafeArea(
-  
+
           child: Stack(
             children: [
               Padding(
                 padding:  EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-  
+
                     Row(
                       children: List.generate(3, (index) {
                         bool isActive = index == 0; // current step (1/3)
-  
+
                         return Expanded(
                           child: Container(
                             margin: const EdgeInsets.only(right: 8),
@@ -1163,11 +1153,11 @@
                     SizedBox(
                       height: 20,
                     ),
-  
+
                     Row(
                       children: [
                         Text(
-  
+
                           textAlign: TextAlign.start,
                           "Select Booking Type",
                           style: TextStyle(
@@ -1180,7 +1170,7 @@
                     ),
                     SizedBox(height: 12,),
                     //////////////////////////////////////////////////////////////////////////
-  
+
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -1192,7 +1182,7 @@
                                     onTap: () {
                                       setState(() {
                                         selectedIndex = 1;
-  
+
                                         selectedDates.clear();   // 🔥 ADD THIS
                                         startTimes.clear();
                                         endTimes.clear();
@@ -1266,7 +1256,7 @@
                                               shape: BoxShape.circle,
                                               border: Border.all(
                                                 color: Colors.white.withOpacity(0.3),
-  
+
                                               ),
                                             ),
                                           ),
@@ -1275,9 +1265,9 @@
                                     ),
                                   ),
                                 ),
-  
+
                                 SizedBox(width: 12),
-  
+
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
@@ -1286,7 +1276,7 @@
                                         selectedDates.clear();   // 🔥 ADD THIS
                                         startTimes.clear();      // 🔥 ADD THIS
                                         endTimes.clear();
-  
+
                                         startTimeController.clear();
                                         endTimeController.clear();
                                         startTime = null;
@@ -1303,7 +1293,7 @@
                                         border: selectedIndex == 2
                                             ? null
                                             :Border.all(color: Colors.white.withOpacity(0.3)),
-  
+
                                       ),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1319,7 +1309,7 @@
                                                   : Colors.grey,
                                             ),
                                           ),
-  
+
                                           selectedIndex==2?
                                           Container(
                                             width: 22,
@@ -1339,7 +1329,7 @@
                                                 end: Alignment.bottomRight,
                                               )
                                                   : null,
-  
+
                                               border: selectedIndex == 2
                                                   ? Border.all(color: Colors.grey)
                                                   : null,
@@ -1373,12 +1363,12 @@
                                 ),
                               ],
                             ),
-  
-  
+
+
                         SizedBox(
                           height: 50,
                         ),
-  
+
                         if (selectedIndex==2) ...[
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1393,7 +1383,7 @@
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-  
+
                                 ],
                               ),
                               SizedBox(height: 12,),
@@ -1406,10 +1396,10 @@
                                   });
                                 },
                               ),
-  
-  
+
+
                               SizedBox(height: 12,),
-  
+
                               Row(
                                 children: [
                                   Container(
@@ -1450,16 +1440,16 @@
                                   ),
                                 ],
                               ),
-  
+
                               SizedBox(height: 18,),
                               Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
                                 color: Colors.white,
                                 fontFamily:'Unbounded',
                                 fontSize: 14,
                               ),),
-  
+
                               const SizedBox(height: 12),
-  
+
                               /// 🔹 YES / NO
                               Row(
                                 children: [
@@ -1474,42 +1464,42 @@
                                   ),
                                   const SizedBox(width: 24),
                                   _buildOption(
-  
+
                                     title: "No",
                                     isSelected: istimingsame == false,
                                     onTap: () {
                                       setState(() {
                                         istimingsame = false;
-  
+
                                         // 🔥 CLEAR OLD DATA
                                         resetEditTypes();
-  
+
                                       });
                                     },
-  
+
                                   ),
                                 ],
                               ),
                               if (istimingsame == false) ...[
                                 const SizedBox(height: 20),
-  
+
                                 Column(
                                   children: selectedDates.map((date) {
                                     final isOpen = expandedMap[date] ?? false;
-  
+
                                     return Container(
                                       margin: const EdgeInsets.only(bottom: 12),
                                       decoration: BoxDecoration(
-  
+
                                         border: isOpen?
                                         Border.all(color: Colors.white.withOpacity(0.2)):
-  
+
                                         Border.all(color:  Colors.transparent),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Column(
                                         children: [
-  
+
                                           /// 🔥 HEADER (Dropdown)
                                           GestureDetector(
                                             onTap: () {
@@ -1540,16 +1530,16 @@
                                               ),
                                             ),
                                           ),
-  
+
                                           /// 🔥 BODY
                                           if (isOpen) ...[
                                             Padding(
                                               padding: const EdgeInsets.all(16),
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
-  
+
                                                 children: [
-  
+
                                                   /// Start Time
 
                                                       CustomInputField(
@@ -1587,9 +1577,9 @@
                                                       ),
                                                     ),
                                                   ),
-  
+
                                                   const SizedBox(height: 16),
-  
+
                                                   /// Duration
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(
@@ -1616,12 +1606,12 @@
                                   }).toList(),
                                 )
                               ],
-  
-  
-  
+
+
+
                               if (istimingsame == true) ...[
                                 SizedBox(height: 22),
-  
+
                                 /// ✅ START TIME
                                 CustomInputField(
                                   title: "Start Time",
@@ -1647,9 +1637,9 @@
                                     ),
                                   ),
                                 ),
-  
+
                                 SizedBox(height: 30),
-  
+
                                 /// ✅ END TIME
                                 CustomInputField(
                                   title: "End Time",
@@ -1662,7 +1652,7 @@
                                       );
                                       return;
                                     }
-  
+
                                     _selectTime(context, endTimeController, false, null); // ✅ FIX
                                   },
                                   suffixIcon: Padding(
@@ -1677,7 +1667,7 @@
                                 ),
 
                                 SizedBox(height: 12),
-  
+
                                 Row(
                                   children: [
                                     SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
@@ -1694,15 +1684,89 @@
                                     ),
                                   ],
                                 ),
-                              ]
-  
-  
-  
+                                SizedBox(height: 20),
+                                Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2A2A2A),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.08),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      /// 📅 ICON
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.3),
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Icon(
+                                          Icons.calendar_today_rounded,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 12),
+
+                                      /// 📅 DATE + TIME (DYNAMIC)
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            /// 🔥 DYNAMIC DATE
+                                            Text(
+                                              formatDatesAlt(selectedDates), // ✅ already in your code
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 4),
+
+                                            /// 🔥 DYNAMIC TIME
+                                            Text(
+                                              startTime != null && endTime != null
+                                                  ? "${startTime!.format(context)} – ${endTime!.format(context)}"
+                                                  : "Select Time",
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(0.6),
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      /// ⏱ DYNAMIC HOURS
+                                      Text(
+                                        getTotalDuration(), // 👇 function below
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.7),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),)
+,                              ],
+
+                              SizedBox(height: 12),
+
+
+
+
+
                             ],
                           ),
                         ],
-  
-  
+
+
                         if (selectedIndex==1) ...[
                           Row(
                             children: [
@@ -1716,11 +1780,11 @@
                               ),
                             ],
                           ),
-  
+
                           SizedBox(height: 30,),
-  
-  
-  
+
+
+
                           CustomInputField(
                             title: "Select Date",
                             controller: dateController,
@@ -1765,7 +1829,7 @@
                                 );
                                 return;
                               }
-  
+
                               _selectTime(context, startTimeController, true, null); // ✅ FIX
                             },
                             suffixIcon: Padding(
@@ -1778,9 +1842,9 @@
                               ),
                             ),
                           ),
-  
+
                           SizedBox(height: 30),
-  
+
                           CustomInputField(
                             title: "End Time",
                             controller: endTimeController,
@@ -1792,7 +1856,7 @@
                                 );
                                 return;
                               }
-  
+
                               _selectTime(context, endTimeController, false, null); // ✅ FIX
                             },
                             suffixIcon: Padding(
@@ -1806,14 +1870,14 @@
                             ),
                           ),
                         ],
-  
-  
-  
+
+
+
                         SizedBox(height: 30,),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-  
+
                             /// 🔹 TITLE
                             Text(
                               "Edits Needed?",
@@ -1823,9 +1887,9 @@
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-  
+
                             const SizedBox(height: 12),
-  
+
                             /// 🔹 YES / NO
                             Row(
                               children: [
@@ -1840,27 +1904,27 @@
                                 ),
                                 const SizedBox(width: 24),
                                 _buildOption(
-  
+
                                   title: "No",
                                   isSelected: isEditNeeded == false,
                                   onTap: () {
                                     setState(() {
                                       isEditNeeded = false;
-  
+
                                       // 🔥 CLEAR OLD DATA
                                       resetEditTypes();
-  
+
                                     });
                                   },
-  
+
                                 ),
                               ],
                             ),
-  
+
                             /// 🔥 ONLY SHOW WHEN YES SELECTED
                             if (isEditNeeded == true) ...[
                               const SizedBox(height: 30),
-  
+
                               /// 🔹 INFO CONTAINER
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1915,10 +1979,10 @@
                                   ],
                                 ),
                               ),
-  
+
                               SizedBox(height: 30),
-  
-  
+
+
                           /*    GestureDetector(
                                 onTap: _showEditTypeBottomSheet,
                                 child: AbsorbPointer(
@@ -1936,7 +2000,7 @@
                                       floatingLabelBehavior: FloatingLabelBehavior.always,
                                       suffixIcon: const Icon(
                                         Icons.keyboard_arrow_down,
-  
+
                                         color: ColorCode.kWhiteOpacity70,
                                       ),
                                       contentPadding:
@@ -1968,7 +2032,7 @@
 
                                 ],
                               ),
-  
+
                               SizedBox(height: 12,),
                           /*    Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1998,9 +2062,9 @@
                                         child: Image.asset('assets/images/star.png'),
                                       ),
                                     ),
-  
+
                                     const SizedBox(width: 5),
-  
+
                                     // Text
                                     const Expanded(
                                       child: Text(
@@ -2009,17 +2073,17 @@
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
                                           color: Color(0xff101010),
-  
+
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),*/
-  
+
                               if (selectedEditTypeNames.isNotEmpty) ...[
                                 const SizedBox(height: 14),
-  
+
                                 /* Wrap(
                                 spacing: 10,
                                 runSpacing: 10,
@@ -2046,7 +2110,7 @@
                                           ),
                                         ),
                                         const SizedBox(width: 6),
-  
+
                                         /// ❌ REMOVE ICON
                                         GestureDetector(
                                           onTap: () {
@@ -2070,16 +2134,16 @@
                             ],
                           ],
                         ),
-  
-  
-  
+
+
+
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-  
+
               ),
               /*  if (isSubmitting)
               Positioned.fill(
@@ -2094,10 +2158,10 @@
                 ),
               ),*/
             ],
-  
+
           ),
         ),
-  
+
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -2125,7 +2189,7 @@
                     _ShootDate_Time(); // 🔥 API CALL
                   }
                       : null, // ❌ disabled when false
-  
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFormValid
                         ? ColorCode.kButtonColor   // ✅ active
@@ -2139,7 +2203,7 @@
                     ),
                     elevation: isFormValid ? 2 : 0,
                   ),
-  
+
                   child: const Text(
                     "Continue",
                     style: TextStyle(
@@ -2149,10 +2213,10 @@
                     ),
                   ),
                 ),
-  
+
               ),
-  
-  
+
+
             ],
           ),
         ),
@@ -2735,11 +2799,28 @@
         ),
       );
     }
-  
-  
 
-  
-  
+
+
+    String getTotalDuration() {
+      if (startTime == null || endTime == null) return "0 Hour";
+
+      final startMin = startTime!.hour * 60 + startTime!.minute;
+      final endMin = endTime!.hour * 60 + endTime!.minute;
+
+      int diff;
+
+      if (endMin >= startMin) {
+        diff = endMin - startMin;
+      } else {
+        diff = (24 * 60 - startMin) + endMin;
+      }
+
+      final hours = diff ~/ 60;
+
+      return "$hours Hour / Day";
+    }
+
     Widget _buildOption({
       required String title,
       required bool isSelected,
@@ -2797,5 +2878,5 @@
         ),
       );
     }
-  
+
   }

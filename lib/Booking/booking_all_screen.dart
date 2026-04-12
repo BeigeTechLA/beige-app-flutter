@@ -114,6 +114,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       body: Stack(
         children: [
           Padding(
+
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,84 +152,94 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
 
                 /// TOGGLE
-                Container(
-                  height: 55,
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: ColorCode.k282828,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // 🔥 blur power
+                    child: Container(
+                      height: 55,
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05), // 🔥 glass effect
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
 
-                      /// 🔹 UPCOMING TAB
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isUpcomingSelected = true;
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeInOut,
-                            decoration: BoxDecoration(
-                              color: isUpcomingSelected
-                                  ? const Color(0xFFE8D8BD) // selected bg
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Upcoming",
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isUpcomingSelected
-                                    ? Colors.black
-                                    : Colors.white70,
+                          /// 🔹 UPCOMING TAB
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isUpcomingSelected = true;
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut,
+                                decoration: BoxDecoration(
+                                  color: isUpcomingSelected
+                                      ? const Color(0xFFE8D8BD)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Upcoming",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: isUpcomingSelected
+                                        ? Colors.black
+                                        : Colors.white70,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
 
-                      /// 🔹 COMPLETED TAB
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isUpcomingSelected = false;
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeInOut,
-                            decoration: BoxDecoration(
-                              color: !isUpcomingSelected
-                                  ? const Color(0xFFE8D8BD)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              "Completed",
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: !isUpcomingSelected
-                                    ? Colors.black
-                                    : Colors.white70,
+                          /// 🔹 COMPLETED TAB
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isUpcomingSelected = false;
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut,
+                                decoration: BoxDecoration(
+                                  color: !isUpcomingSelected
+                                      ? const Color(0xFFE8D8BD)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Completed",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: !isUpcomingSelected
+                                        ? Colors.black
+                                        : Colors.white70,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+
 
 
 

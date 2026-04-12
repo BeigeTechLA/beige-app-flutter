@@ -266,7 +266,7 @@ String getContentTypeTitle(int contentTypeId) {
 
       body: SafeArea(
         child: Padding(
-          padding:  EdgeInsets.all(20.0),
+          padding:  EdgeInsets.all(18.0),
           child: Container(
 
             child: Column(

@@ -3148,19 +3148,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   }
 
 
-  Widget _buildProgressBar({required bool isActive}) {
-    return Expanded(
-      child: Container(
-        height: 5,
-        decoration: BoxDecoration(
-          color: isActive
-              ? Colors.black
-              : Colors.black.withOpacity(0.15), // Faded for inactive
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
   Widget _buildServiceCard(
       int index, String title, String imagePath) {
     bool isSelected = selectedIndex == index;
@@ -3170,6 +3157,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         setState(() {
           selectedIndex = index;
         });
+
         playBorderAnimationOnce();
 
         if (title == "Photo") {
@@ -3178,7 +3166,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
           _continueBooking(1);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("$title Coming Soon")),
+            SnackBar(
+              content: Text("$title Coming Soon"),
+              duration: const Duration(seconds: 1), // ✅ 1 sec
+            ),
           );
         }
       },
@@ -3190,15 +3181,17 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
             return Transform.scale(
               scale: isSelected ? 1.05 : 1.0,
               child: Container(
-                width: 90, // 🔥 thoda wide kiya text ke liye
+                width: 90,
                 padding: const EdgeInsets.all(1.5),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
 
+                  /// ✅ ONE TIME ROTATION FIXED
                   gradient: isSelected
                       ? SweepGradient(
-                    transform:
-                    GradientRotation(_controller.value * 5.0),
+                    transform: GradientRotation(
+                      _controller.value * 2 * 3.1416, // 🔥 FIXED
+                    ),
                     colors: [
                       Colors.transparent,
                       const Color(0xFFE8D1AB).withOpacity(0.4),
@@ -3223,7 +3216,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                     borderRadius: BorderRadius.circular(16),
                   ),
 
-                  /// 🔥 ICON + TEXT INSIDE
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -3261,9 +3253,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     );
   }
   void playBorderAnimationOnce() {
-    _controller.forward(from: 0).then((_) {
-      _controller.stop(); // 🔥 stop after one round
-    });
+    _controller.reset();
+    _controller.forward(); // only once
   }
   Widget _buildStudioCard(Map<String, String> data) {
     return Align(

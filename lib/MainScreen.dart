@@ -133,9 +133,9 @@ class _MainscreenState extends State<Mainscreen> {
   Widget _buildIcon(String path) {
     return SvgPicture.asset(
       path,
-      height: 28,
-      width: 28,
-      fit: BoxFit.none,
+      height: 26,
+      width: 26,
+      fit: BoxFit.cover,
     );
   }
 }

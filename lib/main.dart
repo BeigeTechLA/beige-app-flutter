@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
       ),*/
 
 
-      theme: ThemeData(
+     /* theme: ThemeData(
         // useMaterial3: true, // 🔥 latest UI behavior control
 
         scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
@@ -99,12 +99,57 @@ class _MyAppState extends State<MyApp> {
         hoverColor: Colors.transparent,
 
         // 🔥 smooth page transitions (optional but pro)
-      /*  pageTransitionsTheme: const PageTransitionsTheme(
+      *//*  pageTransitionsTheme: const PageTransitionsTheme(
           builders: {
             TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           },
-        ),*/
+        ),*//*
+      ),*/
+      theme: ThemeData(
+        scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: ColorCode.bcakgroundcolor,
+          iconTheme: IconThemeData(color: Colors.white),
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+        ),
+
+        colorScheme: ColorScheme.dark(
+          background: ColorCode.bcakgroundcolor,
+          primary: Colors.white,
+        ),
+
+        // ✅ REMOVE ALL CLICK EFFECTS
+        splashFactory: NoSplash.splashFactory, // 🔥 MOST IMPORTANT
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+
+        // ✅ Remove Ink ripple globally
+        useMaterial3: false, // sometimes M3 adds effects
+
+        // ✅ Remove button overlay effect
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            splashFactory: NoSplash.splashFactory,
+          ),
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            splashFactory: NoSplash.splashFactory,
+          ),
+        ),
+
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            splashFactory: NoSplash.splashFactory,
+          ),
+        ),
       ),
       // ✅ Correct navigation logic
       home: widget.isLoggedIn

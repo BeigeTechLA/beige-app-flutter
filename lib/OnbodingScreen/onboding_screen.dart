@@ -1,8 +1,9 @@
+import 'package:beige/auth/new_login_screen.dart';
+import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
-import '../auth/new_login_screen.dart';
-import '../auth/new_sing_up_screen.dart';
-import '../utility/ColorCode.dart';
 
+
+import '../utility/ColorCode.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,15 +20,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "image": "assets/Onboding/img_1.png",
       "title": "Book Your Dream\nShoot",
-      "description": "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
+      "description":
+      "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
       "image": "assets/Onboding/img.png",
       "title": "Find Video & Photo\nWork",
-      "description": "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
+      "description":
+      "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
     },
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -47,22 +49,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   itemBuilder: (context, index) {
                     return Column(
                       children: [
-                        /// ---------------- IMAGE ----------------
                         Expanded(
-                          flex: 1,
-                          child: Align(
-                            alignment: Alignment(0, 3),
-                            child: Container(
-                              color: ColorCode.green,
-                              child: Image.asset(
-                                pages[index]['image']!,
-                                fit: BoxFit.fill, // 👈 no crop ever
-                              ),
-                            ),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  top: constraints.maxHeight * 0.05, // 👈 responsive top space
+                                  left: 12,
+                                  right: 12,
+                                ),
+                                child: Image.asset(
+                                  pages[index]['image']!,
+                                  width: double.infinity,
+                                  height: constraints.maxHeight * 0.6, // 👈 responsive height
+                                  fit: BoxFit.contain, // 👈 NO CUT guaranteed
+                                ),
+                              );
+                            },
                           ),
                         ),
 
-                        /// ---------------- TITLE ----------------
+
+
                         Text(
                           pages[index]['title']!,
                           textAlign: TextAlign.center,
@@ -76,7 +84,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         const SizedBox(height: 10),
 
-                        /// ---------------- DESCRIPTION ----------------
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Text(
@@ -104,13 +111,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   pages.length,
                       (index) => Container(
                     margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width:_currentPage==index ?30:19,
+                    width: 40,
                     height: 4,
                     decoration: BoxDecoration(
                       color: _currentPage == index
                           ? ColorCode.white
                           : ColorCode.kWhiteOpacity60,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
@@ -160,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const NewSingUpScreen(),
+                      builder: (_) =>  NewSingUpScreen(),
                     ),
                   );
                 },
@@ -168,7 +175,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding: EdgeInsets.only(bottom: 20),
                   child: Text.rich(
                     TextSpan(
-                      text: "Don't have an account? ",
+                      text: "Don’t have an account? ",
                       style: TextStyle(
                         fontFamily: "Outfit",
                         color: ColorCode.kWhiteOpacity60,
@@ -192,33 +199,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
 
           /// ---------------- SKIP BUTTON ----------------
-          if (_currentPage != pages.length - 1)
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40, right: 20),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NewLoginScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      "Skip",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        color: ColorCode.white,
-                        fontSize: 14,
+          _currentPage != pages.length - 1
+              ? SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, right: 20),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NewLoginScreen(),
                       ),
+                    );
+                  },
+                  child: const Text(
+                    "Skip",
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      color: ColorCode.white,
+                      fontSize: 14,
                     ),
                   ),
                 ),
               ),
             ),
+          )
+              : const SizedBox(),
         ],
       ),
     );
