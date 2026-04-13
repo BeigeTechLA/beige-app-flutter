@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 
+import '../Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import '../service/api_service.dart';
 
 import '../service/api_endpoints.dart';
@@ -148,7 +149,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                   ],
                 ),
 
-                SizedBox(height: 20),
+                SizedBox(height: 12),
 
 
                 /// TOGGLE
@@ -256,7 +257,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                       children: [
                         /// 🔹 IMAGE
                         Image.asset(
-                          "assets/Icons/booking_serch.png",
+                          "assets/new_home/upcoming_nodata_imge.png",
+                          height: 150,
                           fit: BoxFit.contain,
                         ),
                         Text("No Booking Found",
@@ -387,7 +389,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget upcomingBookingCard(Map shoot) {
     final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
-    final String imageUrlRaw = shoot['image_url'] ?? '';
+    final String imageUrlRaw = shoot['creative']?['profile_image_url'] ?? '';
     final String imageUrl = imageUrlRaw.isNotEmpty
         ? ApiService().getImageURL(imageUrlRaw)
         : '';
@@ -457,9 +459,8 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 // ================= COMPLETED CARD =================
 
   Widget completedBookingCard(Map shoot) {
-    final String fallbackImage = "assets/images/home1.png";
+    final String imageUrlRaw = shoot['creative']?['profile_image_url'] ?? '';
 
-    final String imageUrlRaw = shoot['image_url'] ?? '';
     final String imageUrl = imageUrlRaw.isNotEmpty
         ? ApiService().getImageURL(imageUrlRaw)
         : '';
@@ -472,20 +473,24 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     final String startTime = shoot['start_time'] ?? '';
     final String endTime = shoot['end_time'] ?? '';
 
-    /// ✅ FINAL IMAGE
-    final String finalImage =
-    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
 
     return bookingCard(
-      imagePath: finalImage,
+      imagePath: imageUrlRaw,
       title: projectName,
       date: eventDate,
       time: "$startTime - $endTime",
       buttonText: "Book Again",
       showEditIcon: false,
       onButtonTap: () {
-        // 👉 Add navigation if needed
-        // Navigator.push(...)
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ContentTypeScreen(
+              fromHome: true,
+            ),
+          ),
+
+        );
       },
     );
   }
@@ -513,18 +518,29 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
           child: Stack(
             children: [
           // ✅ IMAGE (NO BLUR)
-          Positioned.fill(
-          child: isNetwork
-          ? Image.network(
-            imagePath,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-              "assets/svg/imag_placeholder.svg",
-              fit: BoxFit.cover,
-            ),
-        )
-            : Image.asset(imagePath, fit: BoxFit.cover),
-    ),
+              Positioned.fill(
+                child: (imagePath.isEmpty)
+                    ? SvgPicture.asset(
+                  "assets/svg/imag_placeholder.svg",
+                  fit: BoxFit.cover,
+                )
+                    : Image.network(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return SvgPicture.asset(
+                      "assets/svg/imag_placeholder.svg",
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
 
     // ❌ TOP BLUR REMOVED COMPLETELY
 

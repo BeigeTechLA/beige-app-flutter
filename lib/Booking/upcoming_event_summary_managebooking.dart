@@ -6,8 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../utility/date_time_utils.dart';
 import 'MY_SelectBookingType.dart';
-import 'booking_select_date_time_slots.dart';
 import 'cancel_booking.dart';
 
 class UpcomingEventSummaryManagebooking extends StatefulWidget {
@@ -55,17 +55,7 @@ class _UpcomingEventSummaryManagebookingState
 
     return ApiService().getImageURL(url);
   }
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "--";
-    final parsed = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsed);
-  }
 
-  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "--";
-    final parsed = DateTime.parse(date);
-    return DateFormat("dd MMM yyyy").format(parsed);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -328,12 +318,12 @@ class _UpcomingEventSummaryManagebookingState
 
                                       infoRowBlack(
                                         "assets/svg/Frame.svg",
-                                        formatDate(day['date']),
+                                        DateTimeUtils.formatDate(day['date']),
                                       ),
 
                                       infoRowBlack(
                                         "assets/svg/Group 2087328870.svg",
-                                        "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])} "
+                                        "${DateTimeUtils.formatTime(day['start_time'])} to ${DateTimeUtils.formatTime(day['end_time'])} "
                                             "(${day['duration_hours']}h)",
                                       ),
 
@@ -347,14 +337,14 @@ class _UpcomingEventSummaryManagebookingState
                                 /// 🟢 SINGLE DAY
                                 infoRowBlack(
                                   "assets/svg/Frame.svg",
-                                  formatDate(widget.eventDate),
+                                    DateTimeUtils.formatDate(widget.eventDate)
                                 ),
 
                                 const SizedBox(height: 8),
 
                                 infoRowBlack(
                                   "assets/svg/Group 2087328870.svg",
-                                  "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
                                       "(${widget.durationHours ?? 0}h)",
                                 ),
                               ],
@@ -374,7 +364,7 @@ class _UpcomingEventSummaryManagebookingState
                         Row(
                           children: [
                             // ✅ Back Button
-                            Expanded(
+                           /* Expanded(
                                 child: SizedBox(
                                   height: 55,
                                   child: OutlinedButton(
@@ -416,9 +406,9 @@ class _UpcomingEventSummaryManagebookingState
                                   ),
                                 )
 
-                            ),
+                            ),*/
 
-                            const SizedBox(width: 12),
+                            // const SizedBox(width: 12),
 
                             // ✅ Next Button
                             Expanded(

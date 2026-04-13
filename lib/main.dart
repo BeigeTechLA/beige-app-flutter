@@ -17,9 +17,9 @@ void main() async {
   // ✅ Set environment
   const environment = String.fromEnvironment('ENV', defaultValue: 'dev');
   AppConfig.setEnvironment(environment);
- /* Stripe.publishableKey =
+  Stripe.publishableKey =
   "pk_test_51S5czd54hnPNgHXUq7sunp8uvTDW4ln6aw8Y3bP249JZmx4xuvoIED4mZTuNIkAFcOoCApICfgv9dM4VbbleJo7L00GqNEkj3I";
-  // ✅ Read login state*/
+  // ✅ Read login state
   // ✅ Read login state
   final prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
@@ -130,7 +130,7 @@ class _MyAppState extends State<MyApp> {
         hoverColor: Colors.transparent,
 
         // ✅ Remove Ink ripple globally
-        useMaterial3: false, // sometimes M3 adds effects
+        // useMaterial3: false, // sometimes M3 adds effects
 
         // ✅ Remove button overlay effect
         elevatedButtonTheme: ElevatedButtonThemeData(

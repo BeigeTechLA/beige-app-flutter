@@ -1,4 +1,3 @@
-import 'package:beige/Home/HomeSekect/recommended_for_you.dart';
 import 'package:flutter/material.dart';
 import 'package:beige/utility/ColorCode.dart';
 

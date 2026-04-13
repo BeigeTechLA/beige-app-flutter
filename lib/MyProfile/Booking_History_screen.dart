@@ -130,29 +130,33 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                             child: Stack(
                               children: [
                                 /// 🖼 IMAGE
-                                image.isNotEmpty
-                                    ? Image.network(
-                                  ApiService().getImageURL(image),
-                                  width: double.infinity,
-                                  height: 220,
-                                  fit: BoxFit.cover,
-                          
-                                  /// ✅ ERROR HANDLE (IMPORTANT)
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return SvgPicture.asset(
-                                      "assets/svg/imag_placeholder.svg",
-                                      width: double.infinity,
-                                      height: 220,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                )
-                                    : SvgPicture.asset(
+                            image.isNotEmpty
+                            ? Image.network(
+                            ApiService().getImageURL(image),
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center( // 🔥 ADD THIS
+                                child: SvgPicture.asset(
                                   "assets/svg/imag_placeholder.svg",
-                                  width: double.infinity,
-                                  height: 220,
-                                  fit: BoxFit.cover,
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.contain,
                                 ),
+                              );
+                            },
+                          )
+:
+                            Center( // 🔥 ADD THIS
+                              child: SvgPicture.asset(
+                                "assets/svg/imag_placeholder.svg",
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
                                 /// 🌑 GRADIENT
                                 Positioned(
                                   bottom: 0,
@@ -172,7 +176,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                     ),
                                   ),
                                 ),
-                          
+
                                 /// 🟢 STATUS
                             /*    Positioned(
                                   top: 12,
@@ -223,9 +227,9 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                           ),
                                         ],
                                       ),*/
-                          
+
                                       const SizedBox(height: 6),
-                          
+
                                       /// NAME
                                       Text(
                                         name,
@@ -236,7 +240,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                          
+
                                       /// ROLE
                                       Text(
                                         role,
@@ -250,7 +254,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                     ],
                                   ),
                                 ),
-                          
+
                                 /// 💰 PRICE
                             /*    Positioned(
                                   bottom: 16,

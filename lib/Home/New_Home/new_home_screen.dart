@@ -12,6 +12,7 @@ import '../../service/api_service.dart';
 import '../../widgets/loding.dart';
 import '../HomeSekect/Home_view_profile.dart';
 import '../HomeSekect/change_location_screen.dart';
+import '../HomeSekect/recommended_detils_screen.dart';
 import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import '../NewBookingFlow/CreateProjectStep1/ShootDateTime/Shoot_Date_Time_screen.dart';
@@ -113,6 +114,15 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       "image": "assets/new_home/home_book3.png",
       "title": "Instant Pricing &\nIntelligent Matchmaking.",
       "button": "Find Your Creative",
+    },
+  ];
+
+  final List<Map<String, String>> Your_Bookings = [
+    {
+      "bg": "assets/new_home/Group 2087329746.png",
+      "image": "assets/new_home/home_book1.png",
+      "title": "Find Your Perfect Creator\nAnywhere, Anytime.",
+      "button": "Book a Shoot",
     },
   ];
   final List<String> featuredNames = [
@@ -474,7 +484,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     if (date == null || date.isEmpty) return "";
 
     final d = DateTime.parse(date);
-    return DateFormat('dd,MM,yyyy').format(d); // 👉 04 08, 2026
+    return DateFormat('dd-MM-yyyy').format(d); // 👉 04 08, 2026
   }
   String formatTime(String? time) {
     if (time == null || time.isEmpty) return "";
@@ -624,7 +634,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                     children: [
                                       Text(
                                         "Hello ${homeData?.name ?? "User"} 👋",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
+
                                           color: Colors.white,
                                           fontSize: 22,
                                           fontFamily: "Outfit",
@@ -654,6 +667,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                 child:
                                                 Text(
                                                     homeData?.location ?? "Loading...",
+
                                                     overflow: TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                         color: Colors.white.withOpacity(0.6),
@@ -1046,7 +1060,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                          homeData!.continueBooking!.title ?? "",
+                          homeData!.continueBooking!.currentScreenLabel ?? "",
                           style: const TextStyle(
                             color: ColorCode.black,
                             fontSize: 14,
@@ -1468,7 +1482,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   style: TextStyle(
                                     color: Color(0x29000000),
                                     fontSize: 35,
-                                    fontWeight: FontWeight.w900, // Extra Bold look
+                                    fontWeight: FontWeight.w500, // Extra Bold look
                                     fontFamily: "Unbounded",
                                   ),),
                               ),
@@ -1478,7 +1492,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               Align(
                                 alignment: Alignment.topCenter,
                                 child: SizedBox(
-                                  height: 350,
+                                  height: 330,
                                   child: PageView.builder(
                                     controller: _studioController, //
                                     clipBehavior: Clip.none,
@@ -1720,22 +1734,15 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       ),*/
 
 
-
-
-
     Column(
       children: [
         bookingList.isEmpty
-            ? const SizedBox(
-          height: 200,
-          child: Center(
-            child: Text(
-              "No Bookings Available",
-              style:  TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        )
+
+            ?
+        SizedBox(
+      height: 160,
+      child: _buildEmptyBookingCard(),
+    )
             :
         GestureDetector(
           onTap: () {
@@ -1988,7 +1995,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                     Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
-                                                        builder: (context) => HomeViewProfile(id: data.id),
+                                                        builder: (context) => RecommendedDetilsScreen(
+                                                          id: data.id, // ✅ correct
+                                                          bookingId: 121,
+                                                        ),
                                                       ),
                                                     );
                                                   },
@@ -2775,14 +2785,123 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       ),
     );
   }
-  Widget _stepBar({required bool isActive}) {
-    return Expanded(
-      child: Container(
-        height: 6,
-        decoration: BoxDecoration(
-          color: isActive ? Colors.black : Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(10),
-        ),
+  Widget _buildEmptyBookingCard() {
+    return Container(
+      height: 180,
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+         border: Border.all(color: Colors.white.withOpacity(0.1)),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+
+          /// 🔥 BACKGROUND IMAGE
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Image.asset(
+                "assets/new_home/Group 2087329746.png", // 👈 BG IMAGE
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          /// 🔥 DARK OVERLAY (for text visibility)
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.black.withOpacity(0.2),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// 🔹 TEXT CONTENT
+          Positioned(
+            left: 16,
+            top: 20,
+            bottom: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                Text(
+                  "No Shoots Yet",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontFamily: "Helvetica Neue",
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  "Book Your First Shoot To\nGet Started.",
+                  style: TextStyle(
+                    fontFamily: "Helvetica Neue",
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
+                ),
+
+SizedBox(height: 10,),
+                /// 🔥 BUTTON
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContentTypeScreen(fromHome: true),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 9),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFE8D1AB),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      "Book a Shoot",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        color: ColorCode.black,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// 🔥 RIGHT IMAGE (FLOATING 🔥)
+          Positioned(
+            right: 8,   // 👈 thoda bahar nikle
+            bottom: 6,
+            // 👈 niche se thoda cut
+            child: Image.asset(
+              "assets/new_home/Your-Bookings.png",
+              height: 170, // 👈 bigger = premium look
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -3396,74 +3515,76 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         child: AnimatedBuilder(
           animation: _swipeController,
           builder: (context, child) {
-            double slide = _swipeController.value * 700;
-            double rotate = _swipeController.value * 0.4;
+            double slide = _swipeController.value * MediaQuery.of(context).size.width;
+            double rotate = _swipeController.value * 0.15;
             double opacity = 1 - _swipeController.value;
 
-            return Stack(
-              alignment: Alignment.center,
-              children: [
+            return ClipRect(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
 
-                /// 🔹 BACK CARD
-                Transform.translate(
-                  offset: const Offset(0, -45),
-                  child: Transform.rotate(
-                    angle: 0.06,
-                    child: Transform.scale(
-                      scale: 0.88,
-                      child: Opacity(
-                        opacity: 0.3,
-                        child: IgnorePointer(
-                          child: _buildCreativeCard(
-                            list.isEmpty
-                                ? 0
-                                : (_currentCreativeIndex + 2) % list.length,
-                            isBackground: true,
+                  /// 🔹 BACK CARD
+                  Transform.translate(
+                    offset: const Offset(0, -45),
+                    child: Transform.rotate(
+                      angle: 0.06,
+                      child: Transform.scale(
+                        scale: 0.88,
+                        child: Opacity(
+                          opacity: 0.3,
+                          child: IgnorePointer(
+                            child: _buildCreativeCard(
+                              list.isEmpty
+                                  ? 0
+                                  : (_currentCreativeIndex + 2) % list.length,
+                              isBackground: true,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                /// 🔹 MIDDLE CARD
-                Transform.translate(
-                  offset: const Offset(0, -25),
-                  child: Transform.rotate(
-                    angle: -0.04,
-                    child: Transform.scale(
-                      scale: 0.94,
-                      child: Opacity(
-                        opacity: 0.6,
-                        child: IgnorePointer(
-                          child: _buildCreativeCard(
-                            list.isEmpty
-                                ? 0
-                                : (_currentCreativeIndex + 1) % list.length,
-                            isBackground: true,
+                  /// 🔹 MIDDLE CARD
+                  Transform.translate(
+                    offset: const Offset(0, -25),
+                    child: Transform.rotate(
+                      angle: -0.04,
+                      child: Transform.scale(
+                        scale: 0.94,
+                        child: Opacity(
+                          opacity: 0.6,
+                          child: IgnorePointer(
+                            child: _buildCreativeCard(
+                              list.isEmpty
+                                  ? 0
+                                  : (_currentCreativeIndex + 1) % list.length,
+                              isBackground: true,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                /// 🔹 FRONT CARD
-                Transform.translate(
-                  offset: Offset(0, slide),
-                  child: Transform.rotate(
-                    angle: rotate,
-                    child: Opacity(
-                      opacity: opacity,
-                      child: _buildCreativeCard(
-                        list.isEmpty
-                            ? 0
-                            : _currentCreativeIndex % list.length,
+                  /// 🔹 FRONT CARD
+                  Transform.translate(
+                    offset: Offset(0, slide),
+                    child: Transform.rotate(
+                      angle: rotate,
+                      child: Opacity(
+                        opacity: opacity,
+                        child: _buildCreativeCard(
+                          list.isEmpty
+                              ? 0
+                              : _currentCreativeIndex % list.length,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           },
         ),
@@ -3550,8 +3671,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                HomeViewProfile(id: item.id),
+                            builder: (context) => RecommendedDetilsScreen(
+                          id: item.id, // ✅ correct
+                          bookingId: 121,
+                        ),
                           ),
                         );
                       },

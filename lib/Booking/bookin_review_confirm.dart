@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
+import '../utility/images.dart';
 import '../widgets/loding.dart';
 import 'Shoot_updated_screen.dart';
 import 'booking_summary_view_summary.dart';
@@ -263,424 +264,243 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
     return Scaffold(
       backgroundColor: ColorCode.bcakgroundcolor,
 
-
       appBar: AppBar(
-
-
         elevation: 0,
+        leadingWidth: 40, // 🔥 important
         leading: InkWell(
           onTap: () => Navigator.pop(context),
-          child: Image.asset(
-            "assets/Icons/Reply.png",
-            height: 22,
-            color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(7),
+            child: SvgPicture.asset(
+              images.back,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text("2/2", style: TextStyle(color: Colors.white)),
-            ),
-          )
-        ],
+        actions: const [ Padding( padding: EdgeInsets.only(right: 16), child: Center( child: Text("2/2", style: TextStyle(color: Colors.white)), ), ) ],
       ),
+
 
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding:  EdgeInsets.all(16),
-              child: Column(
-                children: [
-
-                  /// STEP INDICATOR
-                  Row(
-                    children: List.generate(
-                      2,
-                          (index) => Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 6),
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: index < 2
-                                ? ColorCode.kButtonColor
-                                : ColorCode.kSubtextColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+          Padding(
+            padding:  EdgeInsets.all(16),
+            child: Column(
+              children: [
+          
+                /// STEP INDICATOR
+                Row(
+                  children: List.generate(
+                    2,
+                        (index) => Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 6),
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: index < 2
+                              ? ColorCode.kButtonColor
+                              : ColorCode.kSubtextColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Text(
-                        "Review & Cdonfirm",
-                        style: TextStyle(
-                          fontFamily: "Unbounded",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: ColorCode.white,
-                        ),
+                ),
+          
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Text(
+                      "Review & Cdonfirm",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: ColorCode.white,
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 24),
-
-                  /// 📸 CREATOR CARD
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: ColorCode.k282828,
-                      borderRadius: BorderRadius.circular(18),
                     ),
+                  ],
+                ),
+                SizedBox(height: 24),
+          
+                /// 📸 CREATOR CARD
+                Expanded(
+                  child: SingleChildScrollView(
+
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
-                        /// 🔹 TOP PROFILE ROW
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: getShootTypeImage().isNotEmpty
-                                  ? Image.network(
-                                getShootTypeImage(),
-                                height: 144,
-                                width: 126,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) {
-                                  return SvgPicture.asset(
-                                    "assets/svg/imag_placeholder.svg",
-                                    height: 144,
-                                    width: 126,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
-                                  : SvgPicture.asset(
-                                "assets/svg/imag_placeholder.svg",
-                                height: 144,
-                                width: 126,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-
-                            const SizedBox(width: 14),
-
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:  [
-
-                                  SizedBox(height: 6),
-                                  Text(
-                                    booking?['project_name'] ?? '',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      fontFamily: "Outfit",
-                                    ),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    booking?['shoot_type_name'] ?? '',
-                                    style: TextStyle(
-                                      fontSize: 12, color: ColorCode.kWhiteOpacity70,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(
-
-                                    getContentTypeTitle(getSafeContentType()),
-
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: ColorCode.kButtonColor,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        SizedBox(
-                          height: 1,
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: List.generate(
-                                  (constraints.maxWidth / 14).floor(),
-                                      (index) => Container(
-                                    width: 6,
-                                    height: 1,
-                                    color: Colors.white30,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-
-                        const SizedBox(height: 12),
-
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: ColorCode.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Colors.white.withOpacity(0.9)),
-                          ),
-                          child: Column(
-                            children: [
-
-                              /// 🔥 CHECK MULTI OR SINGLE
-                              if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
-
-                                /// ✅ MULTI DAY
-                                ...List.generate(booking!['booking_days'].length, (index) {
-                                  var day = booking!['booking_days'][index];
-
-                                  return Column(
-                                    children: [
-                                      infoRowBlack(
-                                        "assets/svg/Group 2087328870.svg",
-                                        "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
-                                            " (${day['duration_hours']}h)",
-                                      ),
-                                      const SizedBox(height: 8),
-                                      infoRowBlack(
-                                        "assets/svg/Frame.svg",
-                                        formatDate(day['date']),
-                                      ),
-                                      const SizedBox(height: 8),
-                                    ],
-                                  );
-                                }),
-
-                              ] else ...[
-
-                                /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
-                                infoRowBlack(
-                                  "assets/svg/Group 2087328870.svg",
-                                  "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
-                                      " (${booking?['duration_hours']}h)",
-                                ),
-                                const SizedBox(height: 8),
-                                infoRowBlack(
-                                  "assets/svg/Frame.svg",
-                                  formatDate(booking?['event_date']),
-                                ),
-                              ],
-
-                              /// 📍 LOCATION (COMMON)
-                              const SizedBox(height: 8),
-                              infoRowBlack(
-                                "assets/svg/location.svg",
-                                booking?['event_location'] ?? "",
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Container(
-                      height: 1,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.white.withOpacity(0.09), // left
-                            Colors.white.withOpacity(0.09), // center
-                            Colors.white.withOpacity(0.09), // right
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 28),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      if ((booking?['video_edit_types'] ?? []).isNotEmpty ||
-                          (booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Editing Services",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: ColorCode.white,
-                                fontFamily: "Unbounded",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(height: 10),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF282828),
-                            borderRadius: BorderRadius.circular(14),
+                            color: ColorCode.k282828,
+                            borderRadius: BorderRadius.circular(18),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
 
-                              /// ================= VIDEO EDITS =================
-                              if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
-
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 8),
-                                  child: Text(
-                                    "Video Edits:",
-                                    style: TextStyle(
-                                      color: ColorCode.white,
-                                      fontSize: 12,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400,
+                              /// 🔹 TOP PROFILE ROW
+                              Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: getShootTypeImage().isNotEmpty
+                                        ? Image.network(
+                                      getShootTypeImage(),
+                                      height: 144,
+                                      width: 126,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) {
+                                        return SvgPicture.asset(
+                                          "assets/svg/imag_placeholder.svg",
+                                          height: 144,
+                                          width: 126,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                        : SvgPicture.asset(
+                                      "assets/svg/imag_placeholder.svg",
+                                      height: 144,
+                                      width: 126,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                ),
 
-                                Builder(
-                                  builder: (context) {
-                                    final rawList =
-                                    List<String>.from(booking?['video_edit_types'] ?? []);
+                                  const SizedBox(width: 14),
 
-                                    final Map<String, int> countMap = {};
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children:  [
 
-                                    for (var item in rawList) {
-                                      countMap[item] = (countMap[item] ?? 0) + 1;
-                                    }
-
-                                    final uniqueList = countMap.keys.toList();
-
-                                    return Column(
-                                      children: uniqueList.map((edit) {
-                                        final count = countMap[edit];
-
-                                        return Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            // width: double.infinity,
-                                            margin: const EdgeInsets.only(bottom: 8),
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kGoldLight20,
-                                              borderRadius: BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              "${(edit)} x$count",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: ColorCode.kButtonColor,
-                                                fontSize: 12,
-                                                fontFamily: "Outfit",
-                                                fontWeight: FontWeight.w500, // 🔥 better look
-                                                letterSpacing: 0.5,
-                                              ),
-                                            ),
+                                        SizedBox(height: 6),
+                                        Text(
+                                          booking?['project_name'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                            fontFamily: "Outfit",
                                           ),
-                                        );
-                                      }).toList(),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          booking?['shoot_type_name'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 12, color: ColorCode.kWhiteOpacity70,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+
+                                          getContentTypeTitle(getSafeContentType()),
+
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: ColorCode.kButtonColor,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+
+                              const SizedBox(height: 14),
+
+                              SizedBox(
+                                height: 1,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: List.generate(
+                                        (constraints.maxWidth / 14).floor(),
+                                            (index) => Container(
+                                          width: 6,
+                                          height: 1,
+                                          color: Colors.white30,
+                                        ),
+                                      ),
                                     );
                                   },
                                 ),
+                              ),
 
-                                SizedBox(height: 12),
-                              ],
 
-                              /// ================= PHOTO EDITS =================
-                              if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+                              const SizedBox(height: 12),
 
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 8),
-                                  child: Text(
-                                    "Photo Edits:",
-                                    style: TextStyle(
-                                      color: ColorCode.white,
-                                      fontSize: 12,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: ColorCode.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white.withOpacity(0.9)),
                                 ),
+                                child: Column(
+                                  children: [
 
-                                Builder(
-                                  builder: (context) {
-                                    final rawList =
-                                    List<String>.from(booking?['photo_edit_types'] ?? []);
+                                    /// 🔥 CHECK MULTI OR SINGLE
+                                    if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
 
-                                    final Map<String, int> countMap = {};
+                                      /// ✅ MULTI DAY
+                                      ...List.generate(booking!['booking_days'].length, (index) {
+                                        var day = booking!['booking_days'][index];
 
-                                    for (var item in rawList) {
-                                      countMap[item] = (countMap[item] ?? 0) + 1;
-                                    }
-
-                                    final uniqueList = countMap.keys.toList();
-
-                                    return Column(
-                                      children: uniqueList.map((edit) {
-                                        final count = countMap[edit];
-
-                                        return Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            // width: double.infinity,
-                                            margin: const EdgeInsets.only(bottom: 8),
-                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                            decoration: BoxDecoration(
-                                              color: ColorCode.kGoldLight20,
-                                              borderRadius: BorderRadius.circular(4),
+                                        return Column(
+                                          children: [
+                                            infoRowBlack(
+                                              "assets/svg/Group 2087328870.svg",
+                                              "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
+                                                  " (${day['duration_hours']}h)",
                                             ),
-                                            child: Text(
-                                              "${(edit)} x$count",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: ColorCode.kButtonColor,
-                                                fontSize: 12,
-                                                fontFamily: "Outfit",
-                                                fontWeight: FontWeight.w500, // 🔥 better look
-                                                letterSpacing: 0.5,
-                                              ),
+                                            const SizedBox(height: 8),
+                                            infoRowBlack(
+                                              "assets/svg/Frame.svg",
+                                              formatDate(day['date']),
                                             ),
-                                          ),
+                                            const SizedBox(height: 8),
+                                          ],
                                         );
-                                      }).toList(),
-                                    );
-                                  },
+                                      }),
+
+                                    ] else ...[
+
+                                      /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
+                                      infoRowBlack(
+                                        "assets/svg/Group 2087328870.svg",
+                                        "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
+                                            " (${booking?['duration_hours']}h)",
+                                      ),
+                                      const SizedBox(height: 8),
+                                      infoRowBlack(
+                                        "assets/svg/Frame.svg",
+                                        formatDate(booking?['event_date']),
+                                      ),
+                                    ],
+
+                                    /// 📍 LOCATION (COMMON)
+                                    const SizedBox(height: 8),
+                                    infoRowBlack(
+                                      "assets/svg/location.svg",
+                                      booking?['event_location'] ?? "",
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              )
                             ],
                           ),
                         ),
-
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                           child: Container(
                             height: 1,
                             width: double.infinity,
@@ -697,404 +517,263 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                             ),
                           ),
                         ),
-                      ],
-                      /*    Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        SizedBox(height: 28),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+                            if ((booking?['video_edit_types'] ?? []).isNotEmpty ||
+                                (booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Payment Method",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: ColorCode.white,
-                                            fontFamily: "Unbounded",
-                                            fontWeight: FontWeight.w500
-                                        ),),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PaymentMethodScreen(
-                                                    bookingId: widget.bookingId,),
-                                            ),
-                                          );
-                                        },
-                                        child: Image.asset(
-                                          "assets/Icons/rightside.png",
-                                          height: 40, // bigger height
-                                          width: 40,
-                                          color: ColorCode.white,
-                                        ),
-                                      )
-                                    ],
+                                  Text(
+                                    "Editing Services",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: ColorCode.white,
+                                      fontFamily: "Unbounded",
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  SizedBox(height: 14),
-
-                                  /// 🔹 PAY AT VENUE
-                                  *//*  paymentRadioTile(
-                            title: "Pay By Credit or Debit Card",
-                            value: 0,
-                          ),
-
-                          paymentRadioTile(
-                            title: "Pay Via Stripe",
-                            value: 1,
-                          ),*//*
-                                  paymentRadioTile(
-                                    title: hasSavedCard
-                                        ? "Pay Via Stripe"
-                                        : "Pay Via Stripe (Add Card First)",
-                                    value: 1,
-                                    isDisabled: !hasSavedCard,
-                                  ),
-
-
                                 ],
                               ),
-        */
 
-                    ],
-                  ),
+                              SizedBox(height: 10),
 
-                  /*       Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Editing Services",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: ColorCode.white,
-                              fontFamily: "Unbounded",
-                              fontWeight: FontWeight.w500
-                          ),),
-                      ],
-                    ),
-                    SizedBox(height: 14),
-
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF282828),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          /// 🔹 Title
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Text(
-                              "$creativeRole:",
-                              style: const TextStyle(
-                                color: ColorCode.white,
-                                fontSize: 12,
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-
-                          /// 🔹 Grid
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: (booking?['edit_types'] ?? []).length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 2.3, // thoda slim card
-                            ),
-                            itemBuilder: (context, index) {
-
-                              final edit = booking!['edit_types'][index];
-
-                              final parts = edit.split('(');
-                              final title = parts[0].trim();
-                              final duration = parts.length > 1 ? "(${parts[1]}" : "";
-
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kGoldLight20,   // ✅ background change
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: const Color(0xFF282828),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
 
-                                    /// 🔹 Title
-                                    Text(
-                                      title,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: ColorCode.kButtonColor, // ✅ text color change
-                                        fontFamily: "Outfit",
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
+                                    /// ================= VIDEO EDITS =================
+                                    if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
 
-                                    /// 🔹 Duration
-                                    if (duration.isNotEmpty)
-                                      Text(
-                                        duration,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: ColorCode.kButtonColor, // ✅ text color change
-                                          fontFamily: "Outfit",
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400,
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          "Video Edits:",
+                                          style: TextStyle(
+                                            color: ColorCode.white,
+                                            fontSize: 12,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                         ),
                                       ),
+
+                                      Builder(
+                                        builder: (context) {
+                                          final rawList =
+                                          List<String>.from(booking?['video_edit_types'] ?? []);
+
+                                          final Map<String, int> countMap = {};
+
+                                          for (var item in rawList) {
+                                            countMap[item] = (countMap[item] ?? 0) + 1;
+                                          }
+
+                                          final uniqueList = countMap.keys.toList();
+
+                                          return Column(
+                                            children: uniqueList.map((edit) {
+                                              final count = countMap[edit];
+
+                                              return Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                  // width: double.infinity,
+                                                  margin: const EdgeInsets.only(bottom: 8),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: ColorCode.kGoldLight20,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    "${(edit)} x$count",
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: ColorCode.kButtonColor,
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w500, // 🔥 better look
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          );
+                                        },
+                                      ),
+
+                                      SizedBox(height: 12),
+                                    ],
+
+                                    /// ================= PHOTO EDITS =================
+                                    if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+
+                                      const Padding(
+                                        padding: EdgeInsets.only(bottom: 8),
+                                        child: Text(
+                                          "Photo Edits:",
+                                          style: TextStyle(
+                                            color: ColorCode.white,
+                                            fontSize: 12,
+                                            fontFamily: "Outfit",
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Builder(
+                                        builder: (context) {
+                                          final rawList =
+                                          List<String>.from(booking?['photo_edit_types'] ?? []);
+
+                                          final Map<String, int> countMap = {};
+
+                                          for (var item in rawList) {
+                                            countMap[item] = (countMap[item] ?? 0) + 1;
+                                          }
+
+                                          final uniqueList = countMap.keys.toList();
+
+                                          return Column(
+                                            children: uniqueList.map((edit) {
+                                              final count = countMap[edit];
+
+                                              return Align(
+                                                alignment: Alignment.centerLeft,
+                                                child: Container(
+                                                  // width: double.infinity,
+                                                  margin: const EdgeInsets.only(bottom: 8),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    color: ColorCode.kGoldLight20,
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    "${(edit)} x$count",
+                                                    textAlign: TextAlign.center,
+                                                    style: const TextStyle(
+                                                      color: ColorCode.kButtonColor,
+                                                      fontSize: 12,
+                                                      fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.w500, // 🔥 better look
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ],
                                 ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                              ),
 
-
-                    SizedBox(height: 14),
-                    // _buildField("Full Name*", nameController),
-                    //
-                    // const SizedBox(height: 15),
-                    //
-                    // _buildField("Email ID", emailController),
-                    //
-                    // const SizedBox(height: 15),
-                    //
-                    // _buildField("Phone Number*", phoneController, isPhone: true),
-
-
-
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Pricing Summary",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: ColorCode.white,
-                              fontFamily: "Unbounded",
-                              fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 14),
-                        Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            color: ColorCode.kGoldGradientLight,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Package Offer",
-                                style: TextStyle(
-                                  color: ColorCode.kHeadingColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Outfit",
+                   /*           Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                child: Container(
+                                  height: 1,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.white.withOpacity(0.09), // left
+                                        Colors.white.withOpacity(0.09), // center
+                                        Colors.white.withOpacity(0.09), // right
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const Divider(color: ColorCode.black),
-
-                              _buildCheckRow(
-                                text: "Unlimited Usage Rights",
-                                iconPath: "assets/newbookflow/security-wifi (1).png",
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCheckRow(
-                                text: "All Raw Content",
-                                iconPath: "assets/newbookflow/File Image.png",
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCheckRow(
-                                text: "Include Edited Deliverable",
-                                iconPath: "assets/newbookflow/Box.png",
-                              ),
-                              const SizedBox(height: 12),
-                              _buildCheckRow(
-                                text: "Up to 2 Sets of Revisions",
-                                iconPath: "assets/newbookflow/Refresh.png",
-                              ),
+                              ),*/
                             ],
-                          ),
-                        ),
+                            /*    Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
 
-                        const SizedBox(height: 14),
-                        Divider(color: ColorCode.kDividerWhite12),
-                        // --- SHOOT COST CARD ---
-                        builderPricingCard(
-                          title: "Shoot Cost",
-                          amount: calculateShootCost()['total'],
-                          subtitles: [
-                            if (calculateShootCost()['hasPreProd']) "",
-                            if (calculateShootCost()['hasRush']) "• Rush Fee",
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Payment Method",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: ColorCode.white,
+                                              fontFamily: "Unbounded",
+                                              fontWeight: FontWeight.w500
+                                          ),),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PaymentMethodScreen(
+                                                      bookingId: widget.bookingId,),
+                                              ),
+                                            );
+                                          },
+                                          child: Image.asset(
+                                            "assets/Icons/rightside.png",
+                                            height: 40, // bigger height
+                                            width: 40,
+                                            color: ColorCode.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(height: 14),
+
+                                    /// 🔹 PAY AT VENUE
+                                    *//*  paymentRadioTile(
+                              title: "Pay By Credit or Debit Card",
+                              value: 0,
+                            ),
+
+                            paymentRadioTile(
+                              title: "Pay Via Stripe",
+                              value: 1,
+                            ),*//*
+                                    paymentRadioTile(
+                                      title: hasSavedCard
+                                          ? "Pay Via Stripe"
+                                          : "Pay Via Stripe (Add Card First)",
+                                      value: 1,
+                                      isDisabled: !hasSavedCard,
+                                    ),
+
+
+                                  ],
+                                ),
+                      */
 
                           ],
                         ),
 
-                        // --- EDITING SERVICES CARD ---
-                        builderPricingCard(
-                          title: "Editing Services",
-                          amount: (pricing?['editing_amount'] ?? 0).toDouble(),
-                          subtitles: (pricing?['editing_breakdown'] as List? ?? [])
-                              .map((e) => "• ${e['label']}")
-                              .toList(),
-                        ),
-
-                        // --- ADDITIONAL CREW CARD ---
-                        if (calculateAdditionalCrew()['total'] > 0)
-                          builderPricingCard(
-                            title: "Additional Crew",
-                            amount: calculateAdditionalCrew()['total'],
-                            subtitles: (calculateAdditionalCrew()['counts'] as Map<int, int>)
-                                .entries
-                                .map((e) => "• ${e.value}x ${e.key == 1 ? 'Videographer' : 'Photographer'}")
-                                .toList(),
-                          ),
-
-                        const SizedBox(height: 10),
-                        const Divider(color: ColorCode.kDividerWhite12),
-
-                        /// 🔹 TOTAL
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Total Amount",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: ColorCode.white,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                "\$${pricing?['total_amount']?.toStringAsFixed(2) ?? "0.00"}",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: ColorCode.kButtonColor, // Making total stand out
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
 
 
-                  ],
-                ),*/
-                  /* Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Payment Method",
-                          style:    TextStyle(
-                              fontSize: 14,
-                              color: ColorCode.white,
-                              fontFamily: "Unbounded",
-                              fontWeight: FontWeight.w500
-                          ),),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentMethodScreen(bookingId:widget.bookingId),
-                              ),
-                            );
-                          },
-                          child: Image.asset(
-                            "assets/Icons/rightside.png",
-                            height: 40,   // bigger height
-                            width: 40,
-                            color: ColorCode.white,
-                          ),
-                        )
+                        const SizedBox(height: 32),
                       ],
                     ),
-                    SizedBox(height: 14),
+                  ),
+                ),
 
-                    /// 🔹 PAY AT VENUE
-                    paymentRadioTile(
-                      title: "Pay Via Stripe",
-                      value: 0,
-                    ),
-
-                    paymentRadioTile(
-                      title: "Pay By Credit or Debit Card",
-                      value: 1,
-                    ),
-                 *//*   Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF282828),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Pay Full Payment in Advance",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-
-                          /// 🔥 IMAGE-LIKE SWITCH
-                          gradientSwitch(
-                            value: payFullAdvance,
-                            onChanged: (val) {
-                              setState(() {
-                                payFullAdvance = val;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),*//*
-
-
-                  ],
-                ),*/
-
-
-
-
-
-                  const SizedBox(height: 32),
-
-                ],
-              ),
+          
+              ],
             ),
           ),
 

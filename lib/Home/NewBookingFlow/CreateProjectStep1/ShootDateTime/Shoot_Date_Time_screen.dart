@@ -210,24 +210,38 @@
 
       dates.sort();
 
-      final days = dates.map((e) => DateFormat('d').format(e)).toList();
-      final lastDate = dates.last;
+      Map<String, List<int>> monthMap = {};
 
-      String daysText = "";
+      for (var date in dates) {
+        String key = DateFormat('MMM yyyy').format(date);
 
-      if (days.length == 1) {
-        daysText = days.first;
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-        "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
+        if (!monthMap.containsKey(key)) {
+          monthMap[key] = [];
+        }
+
+        monthMap[key]!.add(date.day);
       }
 
-      final month = DateFormat('MMM').format(lastDate);
-      final year = DateFormat('yyyy').format(lastDate);
+      List<String> result = [];
 
-      return "$month $daysText, $year";
+      monthMap.forEach((month, days) {
+        days.sort();
+
+        String daysText = "";
+
+        if (days.length == 1) {
+          daysText = "${days.first}";
+        } else if (days.length == 2) {
+          daysText = "${days[0]} & ${days[1]}";
+        } else {
+          daysText =
+          "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
+        }
+
+        result.add("$month $daysText");
+      });
+
+      return result.join(", ");
     }
     String formatSelectedDates(List<DateTime> dates) {
       if (dates.isEmpty) return "";
@@ -949,8 +963,8 @@
         baseDate = date; // Multiple NO
       } else if (selectedDate != null) {
         baseDate = selectedDate; // Single Day
-      } else if (selectedDates.isNotEmpty) {
-        baseDate = selectedDates.first; // Multiple YES
+      }else if (selectedDates.isNotEmpty && date == null) {
+        baseDate = selectedDates.first; // or remove this block completely
       }
 
       if (baseDate == null) return;
@@ -1016,6 +1030,14 @@
       /// 🔥 VALIDATION (4 HOUR RULE)
       if (isStartTime) {
         final minAllowed = now.add(const Duration(hours: 4));
+/*
+        final pickedDT = DateTime(
+          baseDate.year,
+          baseDate.month,
+          baseDate.day,
+          picked.hour,
+          picked.minute,
+        );*/
 
         final pickedDT = DateTime(
           baseDate.year,
@@ -1024,6 +1046,23 @@
           picked.hour,
           picked.minute,
         );
+
+        /// 🔥 APPLY ONLY IF TODAY
+        bool isToday =
+            baseDate.year == now.year &&
+                baseDate.month == now.month &&
+                baseDate.day == now.day;
+
+        /// 🔥 ONLY APPLY FOR TODAY
+        if (isToday && pickedDT.isBefore(minAllowed)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Select time after 4 hours from now"),
+              duration: Duration(seconds: 1),
+            ),
+          );
+          return;
+        }
 
         /// 🔥 FINAL CORRECT CHECK (DATE + TIME)
         if (pickedDT.isBefore(minAllowed)) {
@@ -1697,20 +1736,9 @@
                                   child: Row(
                                     children: [
                                       /// 📅 ICON
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.3),
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(
-                                          Icons.calendar_today_rounded,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                      ),
+                                      SvgPicture.asset("assets/svg/calendar-03.svg"),
 
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 13),
 
                                       /// 📅 DATE + TIME (DYNAMIC)
                                       Expanded(
@@ -1722,8 +1750,9 @@
                                               formatDatesAlt(selectedDates), // ✅ already in your code
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 13,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w500,
+                                                fontFamily: "Helvetica Neue"
                                               ),
                                             ),
 
@@ -1735,7 +1764,10 @@
                                                   ? "${startTime!.format(context)} – ${endTime!.format(context)}"
                                                   : "Select Time",
                                               style: TextStyle(
-                                                color: Colors.white.withOpacity(0.6),
+                                                fontFamily: "Helvetica Neue",
+
+
+                                                color: ColorCode.kWhiteOpacity70,
                                                 fontSize: 11,
                                               ),
                                             ),
@@ -1747,8 +1779,11 @@
                                       Text(
                                         getTotalDuration(), // 👇 function below
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.7),
-                                          fontSize: 12,
+                                          color: ColorCode.kButtonColor,
+                                          fontSize: 14,
+                                          fontFamily: "Helvetica Neue",
+
+
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -2801,9 +2836,10 @@
     }
 
 
-
     String getTotalDuration() {
-      if (startTime == null || endTime == null) return "0 Hour";
+      if (startTime == null || endTime == null || selectedDates.isEmpty) {
+        return "0 Hour";
+      }
 
       final startMin = startTime!.hour * 60 + startTime!.minute;
       final endMin = endTime!.hour * 60 + endTime!.minute;
@@ -2816,9 +2852,12 @@
         diff = (24 * 60 - startMin) + endMin;
       }
 
-      final hours = diff ~/ 60;
+      final hoursPerDay = diff ~/ 60;
 
-      return "$hours Hour / Day";
+      final totalDays = selectedDates.length;
+      final totalHours = hoursPerDay * totalDays;
+      return "$totalDays Hours / $totalHours Days";
+
     }
 
     Widget _buildOption({

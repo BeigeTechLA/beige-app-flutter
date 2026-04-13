@@ -99,11 +99,11 @@ flutter:
     - assets/Onboding/
     - assets/Icons/
     - assets/lottie/
-    - assets/newbookflow/
-    - assets/Book_shoot/
-    - assets/Book_shoot_svg/
+#    - assets/newbookflow/
+#    - assets/Book_shoot/
+#    - assets/Book_shoot_svg/
     - assets/svg/
-    - assets/svg/Bottom_svg/
+#    - assets/svg/Bottom_svg/
     - assets/svg/my_profile/
     - assets/new_home/
     - assets/svg/new_bottom_image/

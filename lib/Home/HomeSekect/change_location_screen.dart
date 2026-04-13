@@ -306,7 +306,18 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                     _mapController.complete(controller);
                     controller.setMapStyle(_darkMapStyle);
                   },
+                  zoomControlsEnabled: false,   // ❗ ANDROID zoom +/- remove
+              // Android zoom buttons
+                  mapToolbarEnabled: false,       // 🔥 IMPORTANT (iOS fix)
+                  myLocationButtonEnabled: false,
+                  compassEnabled: false,
+                  indoorViewEnabled: false,
 
+                  /// gestures (keep ON)
+                  zoomGesturesEnabled: true,
+                  scrollGesturesEnabled: true,
+                  tiltGesturesEnabled: true,
+                  rotateGesturesEnabled: true,
               /*    myLocationEnabled: true,
                   myLocationButtonEnabled: true,
                   compassEnabled: true,*/
@@ -321,7 +332,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                     ),
                   },
 
-                  zoomGesturesEnabled: false,
+
                   // scrollGesturesEnabled: true,
                 ),
 

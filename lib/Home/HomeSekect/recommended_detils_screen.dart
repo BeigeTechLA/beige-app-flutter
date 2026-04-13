@@ -8,7 +8,6 @@ import '../../service/api_service.dart';
 import '../../utility/ColorCode.dart';
 import '../../widgets/loding.dart';
 import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
-import 'add_on_services.dart';
 
 class RecommendedDetilsScreen extends StatefulWidget {
 
@@ -148,6 +147,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
       setState(() => isLoading = false);
     }
   }
+/*
 
   Future<void> _Booking() async {
     setState(() => isLoading = true);
@@ -184,7 +184,9 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message,style: TextStyle(color: ColorCode.red),),
-       /*     backgroundColor: Colors.transparent,*/
+       */
+/*     backgroundColor: Colors.transparent,*//*
+
           ),
         );
       }
@@ -203,6 +205,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
     }
   }
 
+*/
 
 
   @override

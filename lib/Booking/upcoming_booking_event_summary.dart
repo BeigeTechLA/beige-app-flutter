@@ -1,4 +1,5 @@
 import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
+import 'package:beige/utility/date_time_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +47,7 @@ class _UpcomingBookingEventSummaryState
 
       if (response != null && response['error'] == false) {
         bookingData = response['data'];
-
+        debugPrint("response Error: $response");
       }
     } catch (e) {
       debugPrint("Upcoming Error: $e");
@@ -70,7 +71,7 @@ class _UpcomingBookingEventSummaryState
   }
 
 
-  String formatDate(String? date) {
+/*  String formatDate(String? date) {
     if (date == null || date.isEmpty) return "";
 
     final d = DateTime.parse(date);
@@ -81,19 +82,19 @@ class _UpcomingBookingEventSummaryState
 
     final parsedTime = DateFormat("HH:mm:ss").parse(time);
     return DateFormat("hh:mm a").format(parsedTime); // 👉 03:27 PM
-  }
+  }*/
+
   String formatTimelineTime(String isoTime) {
     final date = DateTime.parse(isoTime).toLocal();
     return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
   String getCreativeImage() {
-    final image = bookingData?['creative']?['image_url'];
-    if (image == null || image.isEmpty) {
-      return "";
-    }
+    final String image = bookingData?['creative']?['profile_image_url'] ?? '';
+
+    if (image.isEmpty) return "";
+
     return ApiService().getImageURL(image);
   }
-
   String formatBudget() {
     final budgetString = bookingData?['event']?['budget'];
 
@@ -274,12 +275,12 @@ class _UpcomingBookingEventSummaryState
 
                       infoRow(
                         "assets/svg/Frame.svg",
-                        formatDate(day['date']),
+                      DateTimeUtils.formatDate(day['date']),
                       ),
 
                       infoRow(
                         "assets/svg/Group 2087328870.svg",
-                        "${formatTime(day['start_time'])} - ${formatTime(day['end_time'])} "
+                        "${DateTimeUtils.formatTime(day['start_time'])} - ${DateTimeUtils.formatTime(day['end_time'])} "
                             "(${day['duration_hours']}h)",
                       ),
 
@@ -294,13 +295,13 @@ class _UpcomingBookingEventSummaryState
             if (event?['event_date'] != null)
             infoRow(
             "assets/svg/Frame.svg",
-            formatDate(event?['event_date']),
+              DateTimeUtils.formatDate(event?['event_date']),
           ),
 
           if (event?['start_time'] != null && event?['end_time'] != null)
             infoRow(
               "assets/svg/Group 2087328870.svg",
-              "${formatTime(event?['start_time'])} - ${formatTime(event?['end_time'])} "
+              "${DateTimeUtils.formatTime(event?['start_time'])} - ${DateTimeUtils.formatTime(event?['end_time'])} "
                   "(${event?['duration_hours']}h)",
             ),
         ],

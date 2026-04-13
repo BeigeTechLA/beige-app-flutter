@@ -125,7 +125,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       final int? creatorId = item['crew_member_id'];
 
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: SizedBox(

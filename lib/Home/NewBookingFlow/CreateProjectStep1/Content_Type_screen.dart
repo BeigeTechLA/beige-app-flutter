@@ -383,7 +383,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage:"assets/newbookflow/Select_all.png",
+                          activeImage:"assets/new_home/selectall.png",
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -391,7 +391,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// VIDEOGRAPHY
                         _buildOption(
                           title: "Videography",
-                          activeImage:"assets/new_home/video2.png",
+                          activeImage:"assets/new_home/Videography.png",
                           // inactiveImage: images.videography,
                           value: selectedContentTypeIds.contains(1),
                           onTap: () => _handleSelection(1),
@@ -400,7 +400,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage:"assets/newbookflow/Photography1.png",
+                          activeImage:"assets/new_home/photography.png",
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
                         ),

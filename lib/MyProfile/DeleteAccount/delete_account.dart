@@ -172,53 +172,32 @@ class _DeleteAccountState extends State<DeleteAccount> {
          ),
        )
    ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: SizedBox(
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _requestDeleteAccount,
+      bottomNavigationBar:
+      Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: SizedBox(
+          height: 52,
+          child: ElevatedButton(
+            onPressed: isLoading ? null : _requestDeleteAccount,
 
 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontFamily: "Unbounded",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: ColorCode.kHeadingColor,
-                    ),
-                  ),
-                ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorCode.kButtonColor,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
-          ],
+            child: const Text(
+              "Continue",
+              style: TextStyle(
+                fontFamily: "Unbounded",
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: ColorCode.kHeadingColor,
+              ),
+            ),
+          ),
         ),
       ),
     );

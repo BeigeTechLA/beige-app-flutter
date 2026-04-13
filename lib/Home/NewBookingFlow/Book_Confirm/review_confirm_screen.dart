@@ -381,7 +381,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     if (date == null || date.isEmpty) return "";
 
     final d = DateTime.parse(date);
-    return DateFormat('MM,dd,yyyy').format(d); // 👉 04 08, 2026
+    return DateFormat('MM-dd-yyyy').format(d); // 👉 04 08, 2026
   }
   String formatTime(String? time) {
     if (time == null || time.isEmpty) return "";
@@ -714,12 +714,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                               "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
                                                   " (${day['duration_hours']}h)",
                                             ),
-                                            const SizedBox(height: 6),
+                                            const SizedBox(height: 8),
                                             infoRowBlack(
                                               "assets/svg/Frame.svg",
                                               formatDate(day['date']),
                                             ),
-                                            const SizedBox(height: 10),
+                                            const SizedBox(height: 8)
                                           ],
                                         );
                                       }),
@@ -1086,7 +1086,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ),
                                 const SizedBox(height: 14),
                                 Container(
-                                  padding: const EdgeInsets.all(15),
+                                  // padding: const EdgeInsets.all(15),
                                   decoration: BoxDecoration(
                                     color: ColorCode.kCreamSoft,
                                     borderRadius: BorderRadius.circular(12),
@@ -1094,35 +1094,38 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        "Package Offer",
-                                        style: TextStyle(
-                                          color: ColorCode.kHeadingColor,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          fontFamily: "Outfit",
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 10,bottom: 10,top: 10),
+                                        child: const Text(
+                                          "Package Offer",
+                                          style: TextStyle(
+                                            color: ColorCode.kHeadingColor,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: "Outfit",
+                                          ),
                                         ),
                                       ),
                                       const Divider(color: ColorCode.black),
 
                                       _buildCheckRow(
                                         text: "Unlimited Usage Rights",
-                                        iconPath: "assets/newbookflow/security-wifi (1).png",
+                                        iconPath: "assets/svg/Unlimited_Usage_Rights.svg",
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "All Raw Content",
-                                        iconPath: "assets/newbookflow/File Image.png",
+                                        iconPath: "assets/svg/All_Raw_Content.svg",
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "Include Edited Deliverable",
-                                        iconPath: "assets/newbookflow/Box.png",
+                                        iconPath: "assets/svg/Include_Edited_Deliverable .svg",
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "Up to 2 Sets of Revisions",
-                                        iconPath: "assets/newbookflow/Refresh.png",
+                                        iconPath: "assets/svg/Up_to _Sets _Revisions.svg",
                                       ),
                                     ],
                                   ),
@@ -1180,7 +1183,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         "Total Amount",
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: ColorCode.white,
+                                          color: ColorCode.kButtonColor,
                                           fontFamily: "Outfit",
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -1189,7 +1192,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
                                         style: const TextStyle(
                                           fontSize: 18,
-                                          color: ColorCode.kButtonColor,
+                                          color: ColorCode.white,
                                           fontFamily: "Outfit",
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -1232,11 +1235,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                   onPressed: isLoading ? null : _openStripeSheet,
 
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
+                    backgroundColor: isProcessing
+                        ? ColorCode.k282828 // 👈 disabled look
+                        : ColorCode.kButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 0,
                   ),
                   child: Text(
                     "Pay \$${NumberFormat('#,##0.00').format(
@@ -1494,38 +1498,35 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
     required String text,
     required String iconPath,
   }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 28,
-          width: 28,
-          decoration: const BoxDecoration(
-            color: Colors.black,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Image.asset(
+    return Padding(
+      padding: const EdgeInsets.only(left: 10,bottom: 4,),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: SvgPicture.asset(
               iconPath,
-              height: 14,
-              width: 14,
-              color: Colors.white,
+              height:32,
+              width: 32,
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: ColorCode.black,
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              fontFamily: "Outfit",
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              textAlign: TextAlign.start,
+              style:
+              const TextStyle(
+
+                color: ColorCode.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                fontFamily: "Outfit",
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
