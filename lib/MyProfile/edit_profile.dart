@@ -609,66 +609,6 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 
-  /* Future<void> _uploadImage() async {
-    if (_profileImage == null) {
-      debugPrint("❌ NO IMAGE FOUND");
-      return;
-    }
-
-    try {
-      setState(() => isLoading = true);
-
-      final fileName = _profileImage!.path.split('/').last;
-
-      debugPrint("🟡 START UPLOAD");
-      debugPrint("📁 FILE: $fileName");
-      debugPrint("🌐 API: ${ApiService().baseUrl}auth/profile-photo");
-
-      FormData formData = FormData.fromMap({
-        "profile_photo": await MultipartFile.fromFile(
-          _profileImage!.path,
-          filename: fileName,
-        ),
-      });
-
-      final dio = Dio();
-      final headers = await ApiService().createAuthorizationHeader();
-
-      debugPrint("🧾 HEADERS: $headers");
-
-      final response = await dio.post(
-        "${ApiService().baseUrl}auth/profile-photo",
-        data: formData,
-        options: Options(
-          headers: {
-            ...headers,
-            "Accept": "application/json",
-          },
-        ),
-      );
-
-      debugPrint("✅ API HIT");
-      debugPrint("📊 STATUS: ${response.statusCode}");
-      debugPrint("📦 RESPONSE: ${response.data}");
-
-      await _fetchMyProfile(); // 👈 GET again
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Profile image uploaded")),
-        );
-        await _fetchMyProfile();
-
-      }
-    } catch (e) {
-      debugPrint("❌ UPLOAD ERROR: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Upload failed")),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }*/
   Future<void> _uploadImage() async {
     if (_profileImage == null) return;
 

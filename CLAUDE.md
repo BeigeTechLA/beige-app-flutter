@@ -9,14 +9,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 flutter pub get
 
 # Run in development
-flutter run --dart-define=ENV=dev
+flutter run --flavor dev -t lib/main_dev.dart
 
 # Run in production
-flutter run --dart-define=ENV=prod
+flutter run --flavor prod -t lib/main_prod.dart
 
-# Build
-flutter build apk --dart-define=ENV=prod
-flutter build ios --dart-define=ENV=prod
+# Build APK (release)
+flutter build apk --flavor prod -t lib/main_prod.dart --release
+
+# Build iOS (release)
+flutter build ios --flavor prod -t lib/main_prod.dart --release
 
 # Analyze / lint
 flutter analyze
@@ -39,9 +41,11 @@ No state management library — uses `StatefulWidget` + `setState()` throughout.
 Standard `Navigator.push()/pop()` — no routing library. `MainScreen` manages a 4-tab bottom nav (Home, Book Shoot, Bookings, Messages) using `TabBar` + `setState`. Global `navigatorKey` and `scaffoldMessengerKey` are defined in `main.dart`.
 
 ### Environment / Config
-`lib/service/config.dart` — `AppConfig.setEnvironment(env)` reads `--dart-define=ENV=dev|prod` at startup (called from `main()`):
-- **dev**: `https://mobile.beige.app/api/`
-- **prod**: `https://api.naturecuretech.com/api/`
+`lib/config/env.dart` — `Env.init(environment)` sets API URLs and Stripe key per environment. Separate entry points select the environment:
+- `lib/main_dev.dart` → dev (`https://mobile.beige.app/api/`)
+- `lib/main_prod.dart` → prod (`https://api.naturecuretech.com/api/`)
+
+Run with: `flutter run --flavor dev -t lib/main_dev.dart`
 
 ### API Layer
 `lib/service/api_service.dart` — wraps `dio` + `http` with `fetchData()`, `postData()`, `putData()`. Auto-injects Bearer token from SharedPreferences. Endpoints are centralized in `lib/service/api_endpoints.dart`.

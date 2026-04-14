@@ -4,17 +4,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as _dio;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'config.dart';
- // Make sure AppConfig.apiUrl is correctly set
+import '../config/env.dart';
 
 class ApiService {
-  final String _baseUrl = AppConfig.apiUrl;
+  final String _baseUrl = Env.apiUrl;
   String get baseUrl => _baseUrl;
 
-  static String imageURL = AppConfig.imageUrl; // Using image URL from AppConfig
+  static String imageURL = Env.imageUrl;
 
 
 
@@ -133,21 +131,6 @@ class ApiService {
     return prefs.getString('folder');  // folder stored while login
   }
 
- /* static Future<String> getImageURL(String image) async {
-    String folder = await getFolder() ?? ''; // Now calling the static getFolder
-    return imageURL + folder + image; // Combine URL with folder and image
-  }
-*/
-
- /* static Future<String> getImageURL(String image) async {
-    String folder = await getFolder() ?? '';
-    return imageURL + folder + image;
-  }
-
-  static String getImageURLSync(String folder, String image) {
-    return imageURL + folder + image;
-  }*/
-
   Future<dynamic> postMultipartData(
       String url,
       Map<String, String> fields,
@@ -193,98 +176,7 @@ class ApiService {
   }
 
 
-  Future<dynamic> postMultipartStep3(
-      String url, {
-        required Map<String, String> fields,
-        File? resume,
-        File? portfolio,
-        List<File>? certificates,
-        List<File>? recentWorks,
-        List<int>? recentWorkIndexes,
-      }) async {
-    final dio = Dio();
-
-    FormData formData = FormData.fromMap(fields);
-
-    /// 📄 Resume
-    if (resume != null) {
-      formData.files.add(
-        MapEntry(
-          "resume",
-          await MultipartFile.fromFile(
-            resume.path,
-            filename: resume.path.split('/').last,
-          ),
-        ),
-      );
-    }
-
-    /// 📁 Portfolio
-    if (portfolio != null) {
-      formData.files.add(
-        MapEntry(
-          "portfolio",
-          await MultipartFile.fromFile(
-            portfolio.path,
-            filename: portfolio.path.split('/').last,
-          ),
-        ),
-      );
-    }
-
-    /// 📜 Certification files (MULTIPLE)
-    if (certificates != null) {
-      for (final file in certificates) {
-        formData.files.add(
-          MapEntry(
-            "certifications",
-            await MultipartFile.fromFile(
-              file.path,
-              filename: file.path.split('/').last,
-            ),
-          ),
-        );
-      }
-    }
-
-    /// 🎬 Recent Work Media + Index
-    if (recentWorks != null && recentWorkIndexes != null) {
-      for (int i = 0; i < recentWorks.length; i++) {
-        formData.files.add(
-          MapEntry(
-            "recent_work_media",
-            await MultipartFile.fromFile(
-              recentWorks[i].path,
-              filename: recentWorks[i].path.split('/').last,
-            ),
-          ),
-        );
-
-        formData.fields.add(
-          MapEntry(
-            "recent_work_media_index",
-            recentWorkIndexes[i].toString(),
-          ),
-        );
-      }
-    }
-
-    final response = await dio.post(
-      url,
-      data: formData,
-      options: Options(
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      ),
-    );
-
-    return response.data;
-  }
-
-
-
-  String  getImageURL(String imagePath) {
+  String getImageURL(String imagePath) {
     return imageURL + imagePath;
   }
 
