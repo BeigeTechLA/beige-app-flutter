@@ -135,17 +135,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    /*     InkWell(
-                    onTap: () {
-                      openFilterBottomSheet(context);
-                    },
-                    child: Image.asset(
-                      "assets/Icons/Filter.png",
-                      height: 40,
-                      width: 40,
-                      color: ColorCode.white,
-                    ),
-                  ),*/
                   ],
                 ),
 
