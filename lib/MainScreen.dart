@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import 'Home/New_Home/new_home_screen.dart';
-import 'Home/home_screen.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});

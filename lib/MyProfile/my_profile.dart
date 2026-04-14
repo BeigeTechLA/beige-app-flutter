@@ -1,4 +1,3 @@
-import 'package:beige/Home/home_screen.dart';
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

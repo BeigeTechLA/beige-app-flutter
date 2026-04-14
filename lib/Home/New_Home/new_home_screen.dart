@@ -321,20 +321,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         return 1;
     }
   }
-/*  Future<void> handleResume(ContinueBooking booking) async {
 
-
-    int contentTypeId = data['content_type'] ?? 1;
-    int shootTypeId = data['shoot_type_id'] ?? 0;
-
-    openResumeScreen(
-      booking.currentScreen ?? "",
-      booking.bookingId ?? 0,
-      contentTypeId,
-      shootTypeId,
-      data,
-    );
-  }*/
   Future<void> handleResume(ContinueBooking booking) async {
 
     /// 🔥 content_type direct backend se
@@ -528,6 +515,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
       setState(() => isLoading = false);
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -535,8 +523,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
 
     _studioController = PageController(
-      initialPage: studioList.length * 50, // 🔥 CENTER IMAGE FIRST
-      viewportFraction: 0.7, // 👈 3 images visible
+      initialPage: studioList.length * 50, //
+      viewportFraction: 0.7, //
     );
 
     _activeStudioIndex =
@@ -820,21 +808,21 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         height: 160,
                         child: PageView.builder(
                           controller: _cardController,
-                          itemCount: 1000, // 🔥 infinite feel
+                          itemCount: 1000, //
                           onPageChanged: (index) {
                             setState(() {
-                              _currentCard = index % cardData.length; // 👈 loop indicator
+                              _currentCard = index % cardData.length;
                             });
                           },
                           itemBuilder: (context, index) {
-                            final data = cardData[index % cardData.length]; // 👈 loop data
+                            final data = cardData[index % cardData.length]; //
                             return _buildCardbook(data);
                           },
                         ),
                       ),
                       // Banner Dots Indicator
                       Transform.translate(
-                        offset: const Offset(0, -7), // 🔥 thoda aur upar (perfect alignment)
+                        offset: const Offset(0, -7), //
                         child: Center(
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -1132,7 +1120,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         width: double.infinity,
                                         height: 48,
                                         decoration: BoxDecoration(
-                                          color: ColorCode.kHeadingColor, // Dark background
+                                          color: ColorCode.kHeadingColor, //
                                           borderRadius: BorderRadius.circular(23),
                                         ),
                                         child: Row(
@@ -1181,104 +1169,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         ],
                       ),
                       // const SizedBox(height: 10),
-                      /* Container(
-                        padding: const EdgeInsets.all(20),
-                        margin: EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8D1AB), // Tan/Beige background
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Column(
-                          children: [
-                            // Top Row: Image and Text Info
-                            Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Image.asset(
-                                    "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png",
-                                    // Replace with your image
-                                    height: 80,
-                                    width: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Wedding Photography",
-                                        style: TextStyle(
-                                          color: ColorCode.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: "HelveticaNeue",
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "Step 2 of 3: Select Creative",
-                                        style: TextStyle(
-                                          color: ColorCode.kBlackOpacity70,
-                                          fontSize: 15,
-                                          fontFamily: "Outfit",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 25),
-
-                            // Progress Indicators
-                            Row(
-                              children: [
-                                _buildProgressBar(isActive: true),
-                                const SizedBox(width: 8),
-                                _buildProgressBar(isActive: false),
-                                const SizedBox(width: 8),
-                                _buildProgressBar(isActive: false),
-                              ],
-                            ),
-
-                            const SizedBox(height: 25),
-
-                            // Resume Button
-                            Container(
-                              width: double.infinity,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: ColorCode.kHeadingColor, // Dark background
-                                borderRadius: BorderRadius.circular(23),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Resume",
-                                    style: TextStyle(
-                                      color: ColorCode.kButtonColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "Unbounded",
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Icon(
-                                    Icons.arrow_forward,
-                                    color: ColorCode.kButtonColor,
-                                    size: 24,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),*/
 
                       const SizedBox(height: 10),
                       Padding(
