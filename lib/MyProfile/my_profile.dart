@@ -1,5 +1,6 @@
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart' show Lottie;
 import '../service/api_endpoints.dart';
@@ -341,11 +342,6 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                   );
                 }),
-                _divider(),
-                _menuRow(
-                  "assets/svg/my_profile/Payment methods.svg",
-                  "Payment methods",
-                ),
               ],
             ),
           ),
@@ -377,11 +373,15 @@ class _MyProfileState extends State<MyProfile> {
             ),
             child: Column(
               children: [
-                _menuRow("assets/svg/my_profile/Terms & Condition.svg", "Terms & Condition"),
+                _menuRow("assets/svg/my_profile/Terms & Condition.svg", "Terms & Condition", onTap: () async {
+                  final uri = Uri.parse("https://beige.app/terms-and-conditions");
+                  if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                }),
                 _divider(),
-                _menuRow("assets/svg/my_profile/Help & Support.svg", "Help & Support"),
-                _divider(),
-                _menuRow("assets/svg/my_profile/Privacy Policy.svg", "Privacy Policy"),
+                _menuRow("assets/svg/my_profile/Privacy Policy.svg", "Privacy Policy", onTap: () async {
+                  final uri = Uri.parse("https://beige.app/privacy-policy");
+                  if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                }),
               ],
             ),
           ),
@@ -422,8 +422,6 @@ class _MyProfileState extends State<MyProfile> {
           ),
           );
           }),
-                _divider(),
-                _menuRow("assets/svg/my_profile/Notifications Settings.svg" ,"Notifications Settings"),
                 _divider(),
                 _menuRow(
                   "assets/svg/my_profile/Logout.svg",

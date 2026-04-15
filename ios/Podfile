@@ -8,6 +8,12 @@ project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,
   'Release' => :release,
+  'Debug-dev' => :debug,
+  'Profile-dev' => :release,
+  'Release-dev' => :release,
+  'Debug-prod' => :debug,
+  'Profile-prod' => :release,
+  'Release-prod' => :release,
 }
 
 def flutter_root
@@ -43,5 +49,17 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
     end
+  end
+
+  # Ensure Generated.xcconfig is included in Pods xcconfig files for flavor configurations.
+  # Flutter needs Generated.xcconfig (containing FLUTTER_ROOT, etc.) for the build to work.
+  flavor_suffixes = ['debug-dev', 'release-dev', 'profile-dev', 'debug-prod', 'release-prod', 'profile-prod']
+  flavor_suffixes.each do |suffix|
+    xcconfig_path = "#{installer.sandbox.root}/Target Support Files/Pods-Runner/Pods-Runner.#{suffix}.xcconfig"
+    next unless File.exist?(xcconfig_path)
+    content = File.read(xcconfig_path)
+    generated_include = '#include "../../../Flutter/Generated.xcconfig"'
+    next if content.include?(generated_include)
+    File.open(xcconfig_path, 'a') { |f| f.puts "\n#{generated_include}" }
   end
 end
