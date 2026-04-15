@@ -24,7 +24,7 @@ class _ShootUpdatedScreenState extends State<ShootUpdatedScreen> {
               children: [
                 /// 🎉 LOTTIE SUCCESS
                 Lottie.asset(
-                  "assets/lottie/Untitled file.json",
+                  "assets/lottie/success_animation.json",
                   height: 180,
                   repeat: false,
                 ),

@@ -22,13 +22,6 @@ class images {
   static const String include="assets/svg/include.svg";
   static const String up="assets/svg/up.svg";
 
-  //For Book A Shoot
-  static const String editing="assets/Book_shoot/editing.png";
-  static const String livestreaming="assets/Book_shoot/livestreaming.png";
-  static const String photography="assets/Book_shoot/photography.png";
-  static const String selectall="assets/Book_shoot/selectall.png";
-  static const String studios="assets/Book_shoot/studios.png";
-  static const String videography="assets/Book_shoot/videography.png";
 
 
 

@@ -280,7 +280,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                         debugPrint("⏳ IMAGE LOADING → $url");
                                         return Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/Untitled_file.json",
+                                            "assets/lottie/loading_spinner.json",
                                             width: 120,
                                             height: 120,
                                           ),
@@ -301,7 +301,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                         debugPrint("❌ IMAGE FAILED → $url");
                                         return Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/Untitled_file.json",
+                                            "assets/lottie/loading_spinner.json",
                                             width: 120,
                                             height: 120,
                                           ),
@@ -423,10 +423,6 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                             children: [
                               Row(
                                 children: [
-                                  // Image.asset(
-                                  //   "assets/newbookflow/ai_matchmaker.png",
-                                  //   fit: BoxFit.cover,
-                                  // ),
                                   Container(
                                     padding: EdgeInsets.all(11),
                                     decoration: BoxDecoration(

@@ -403,7 +403,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
 
                       // ✅ LOTTIE SUCCESS ANIMATION
                       Lottie.asset(
-                        'assets/lottie/Untitled file.json',
+                        'assets/lottie/success_animation.json',
 
                         repeat: false,
                       ),

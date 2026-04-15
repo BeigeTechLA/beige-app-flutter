@@ -267,15 +267,6 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                               height: 24,
                             ),
                           ),
-                          /*   Row(
-                children: [
-                  Image.asset("assets/Icons/Share 2.png",
-                      height: 24, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Image.asset("assets/images/Heart Angle.png",
-                      height: 24, color: Colors.white),
-                ],
-              ),*/
                         ],
                       ),
                     ),

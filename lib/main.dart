@@ -1,4 +1,3 @@
-import 'package:beige/service/stripe_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,20 +5,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'MainScreen.dart';
 import 'No_internet/internet_helper.dart';
 import 'SplashScreen/splash_screen.dart';
-import 'service/config.dart';
+import 'config/env.dart';
 import 'utility/ColorCode.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-GlobalKey<ScaffoldMessengerState>();
-void main() async {
+    GlobalKey<ScaffoldMessengerState>();
+
+Future<void> startApp(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Set environment
-  const environment = String.fromEnvironment('ENV', defaultValue: 'dev');
-  AppConfig.setEnvironment(environment);
-/*  Stripe.publishableKey = StripeConfig.publishableKey;*/
-  // ✅ Read login state
+  Env.init(environment);
+  Stripe.publishableKey = Env.stripePublishableKey;
+
   final prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 

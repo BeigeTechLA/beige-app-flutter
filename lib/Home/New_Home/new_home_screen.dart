@@ -21,7 +21,7 @@ import '../NewBookingFlow/CreateProjectStep1/Video_Shoot_Type.dart';
 import '../NewBookingFlow/More_Details/crew_size_matching_screen.dart';
 import '../NewBookingFlow/More_Details/more_details_screen.dart';
 import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
-import 'home_controller .dart';
+import 'home_controller.dart';
 
 class NewHomeScreen extends StatefulWidget {
   const NewHomeScreen({super.key});
@@ -202,14 +202,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   final List<String> words = ["Influencers", "Streamers", "Actors", "Models", "Personalities"];
 
   final List<String> Topwords = [
-    "assets/new_home/Topwrods/Justin Beiber.png",
+    "assets/new_home/Topwrods/Justin Beiber.webp",
     "assets/new_home/Topwrods/Cedric The Entertainer.webp",
-    "assets/new_home/Topwrods/Wiz Khalifa.png",
-    "assets/new_home/Topwrods/Pressa.jpg",
-    "assets/new_home/Topwrods/Tyga.png",
-    "assets/new_home/Topwrods/CentralCee.png",
+    "assets/new_home/Topwrods/Wiz Khalifa.webp",
+    "assets/new_home/Topwrods/Pressa.webp",
+    "assets/new_home/Topwrods/Tyga.webp",
+    "assets/new_home/Topwrods/CentralCee.webp",
     "assets/new_home/Topwrods/Chief Keef.webp",
-    "assets/new_home/Topwrods/Swae Lee.png",
+    "assets/new_home/Topwrods/Swae Lee.webp",
     "assets/new_home/Topwrods/Natasha Graziano.jpg"
   ];
 
@@ -1994,7 +1994,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(30),
                                           child: Image.asset(
-                                            "assets/new_home/RebookYourShoots_img.jpg",
+                                            "assets/new_home/RebookYourShoots_img.webp",
                                             fit: BoxFit.cover,
                                           ),
                                         ),

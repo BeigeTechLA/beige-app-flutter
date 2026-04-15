@@ -43,7 +43,7 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
             Transform.translate(
               offset: Offset(0, 20),
               child: Lottie.asset(
-                "assets/lottie/Untitled file.json",
+                "assets/lottie/success_animation.json",
                 height: 180,
                 repeat: false,
               ),

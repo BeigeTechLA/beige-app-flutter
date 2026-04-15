@@ -38,7 +38,7 @@ class PaymentSuccessScreen extends StatelessWidget {
 
               /// 🎉 LOTTIE
               Lottie.asset(
-                "assets/lottie/Untitled file.json",
+                "assets/lottie/success_animation.json",
                 height: 180,
               ),
 
