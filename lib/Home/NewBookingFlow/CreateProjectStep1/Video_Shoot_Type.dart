@@ -378,7 +378,7 @@ String getContentTypeTitle(int contentTypeId) {
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) => Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/Untitled_file.json",
+                                            "assets/lottie/loading_spinner.json",
                                             width: 60,
                                             height: 60,
                                           ),

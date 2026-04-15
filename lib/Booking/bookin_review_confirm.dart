@@ -12,7 +12,6 @@ import '../utility/ColorCode.dart';
 import '../utility/images.dart';
 import '../widgets/loding.dart';
 import 'Shoot_updated_screen.dart';
-import 'booking_summary_view_summary.dart';
 
 class BookinReviewConfirm extends StatefulWidget {
   final int bookingId;
@@ -700,65 +699,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                 ),
                               ),*/
                             ],
-                            /*    Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Payment Method",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: ColorCode.white,
-                                              fontFamily: "Unbounded",
-                                              fontWeight: FontWeight.w500
-                                          ),),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    PaymentMethodScreen(
-                                                      bookingId: widget.bookingId,),
-                                              ),
-                                            );
-                                          },
-                                          child: Image.asset(
-                                            "assets/Icons/rightside.png",
-                                            height: 40, // bigger height
-                                            width: 40,
-                                            color: ColorCode.white,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(height: 14),
-
-                                    /// 🔹 PAY AT VENUE
-                                    *//*  paymentRadioTile(
-                              title: "Pay By Credit or Debit Card",
-                              value: 0,
-                            ),
-
-                            paymentRadioTile(
-                              title: "Pay Via Stripe",
-                              value: 1,
-                            ),*//*
-                                    paymentRadioTile(
-                                      title: hasSavedCard
-                                          ? "Pay Via Stripe"
-                                          : "Pay Via Stripe (Add Card First)",
-                                      value: 1,
-                                      isDisabled: !hasSavedCard,
-                                    ),
-
-
-                                  ],
-                                ),
-                      */
 
                           ],
                         ),

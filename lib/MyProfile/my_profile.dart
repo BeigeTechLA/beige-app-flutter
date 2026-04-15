@@ -184,7 +184,7 @@ class _MyProfileState extends State<MyProfile> {
                                       width: 96,
                                       height: 96,
                                       child: Lottie.asset(
-                                        "assets/lottie/Untitled_file.json",
+                                        "assets/lottie/loading_spinner.json",
                                         fit: BoxFit.contain,
                                       ),
                                     ),

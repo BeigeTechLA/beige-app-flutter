@@ -196,17 +196,6 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      /*  InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Image.asset(
-                          "assets/Icons/back_icon/Reply.png",
-                          height: 24,
-                          width: 24,
-                        ),
-                      ),*/
-
                       InkWell(
                         onTap: () => Navigator.pop(context),
                         child: SvgPicture.asset(
