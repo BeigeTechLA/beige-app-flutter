@@ -219,7 +219,7 @@ class _MyProfileState extends State<MyProfile> {
 
             /// 🔹 USER INFO
              Text(
-              myProfile?['name'] ?? '',
+              myProfile?['name'] ?? 'USER',
               style: TextStyle(
                 fontFamily: "Outfit",
                 color: Colors.white,

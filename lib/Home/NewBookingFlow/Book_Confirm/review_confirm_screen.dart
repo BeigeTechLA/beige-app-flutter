@@ -809,7 +809,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                                     /// ================= VIDEO EDITS =================
                                     if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
-
                                       const Padding(
                                         padding: EdgeInsets.only(bottom: 8),
                                         child: Text(
@@ -823,49 +822,34 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         ),
                                       ),
 
-                                      Builder(
-                                        builder: (context) {
-                                          final rawList =
-                                          List<String>.from(booking?['video_edit_types'] ?? []);
+                                      Column(
+                                        children: List.generate(
+                                          booking?['video_edit_types'].length ?? 0,
+                                              (index) {
+                                            final item = booking?['video_edit_types'][index];
 
-                                          final Map<String, int> countMap = {};
-
-                                          for (var item in rawList) {
-                                            countMap[item] = (countMap[item] ?? 0) + 1;
-                                          }
-
-                                          final uniqueList = countMap.keys.toList();
-
-                                          return Column(
-                                            children: uniqueList.map((edit) {
-                                              final count = countMap[edit];
-
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                   // width: double.infinity,
-                                                  margin: const EdgeInsets.only(bottom: 8),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    "${(edit)} x$count",
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w500, // 🔥 better look
-                                                      letterSpacing: 0.5,
-                                                    ),
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: ColorCode.kGoldLight20,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  "${item['value']} x${item['count']}",
+                                                  style: const TextStyle(
+                                                    color: ColorCode.kButtonColor,
+                                                    fontSize: 12,
+                                                    fontFamily: "Outfit",
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                          );
-                                        },
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
 
                                       SizedBox(height: 12),
@@ -873,7 +857,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                                     /// ================= PHOTO EDITS =================
                                     if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-
                                       const Padding(
                                         padding: EdgeInsets.only(bottom: 8),
                                         child: Text(
@@ -887,51 +870,37 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         ),
                                       ),
 
-                                      Builder(
-                                        builder: (context) {
-                                          final rawList =
-                                          List<String>.from(booking?['photo_edit_types'] ?? []);
+                                      Column(
+                                        children: List.generate(
+                                          booking?['photo_edit_types'].length ?? 0,
+                                              (index) {
+                                            final item = booking?['photo_edit_types'][index];
 
-                                          final Map<String, int> countMap = {};
-
-                                          for (var item in rawList) {
-                                            countMap[item] = (countMap[item] ?? 0) + 1;
-                                          }
-
-                                          final uniqueList = countMap.keys.toList();
-
-                                          return Column(
-                                            children: uniqueList.map((edit) {
-                                              final count = countMap[edit];
-
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                   // width: double.infinity,
-                                                  margin: const EdgeInsets.only(bottom: 8),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    "${(edit)} x$count",
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w500, // 🔥 better look
-                                                      letterSpacing: 0.5,
-                                                    ),
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: ColorCode.kGoldLight20,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  "${item['value']} x${item['count']}"
+                                                      "${item['note'] != null ? ' (${item['note']})' : ''}",
+                                                  style: const TextStyle(
+                                                    color: ColorCode.kButtonColor,
+                                                    fontSize: 12,
+                                                    fontFamily: "Outfit",
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                          );
-                                        },
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ],
+                                    ]
                                   ],
                                 ),
                               ),
@@ -1446,51 +1415,6 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   }
 
 
-  /// Text Field (Email)
-  Widget _buildField(
-      String label,
-      TextEditingController controller, {
-        bool isPhone = false,
-      }) {
-    return TextField(
-      controller: controller,
-      cursorColor: ColorCode.white,
-      style: const TextStyle(color: ColorCode.white),
-
-      /// ✅ PHONE FIELD KE LIYE NUMBER KEYPAD
-      keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
-
-      /// ✅ SIRF DIGITS (PHONE)
-      inputFormatters: isPhone
-          ? [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(10),
-      ]
-          : null,
-
-      decoration: InputDecoration(
-        labelText: label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
-            width: 0.5,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
-            width: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
 
 
 

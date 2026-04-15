@@ -30,8 +30,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   int currentStep = 1;
   bool loding   = false;
 
- // checkbox
-  // quantity = totalQuantity;
 
   String? locationError;
 
@@ -204,6 +202,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     }
   }*/
 
+/*
   String getContentTypeIcon(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -216,6 +215,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
         return "assets/svg/default.svg";
     }
   }
+*/
 
 
   @override

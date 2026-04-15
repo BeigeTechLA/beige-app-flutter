@@ -153,7 +153,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             }
 
             /// 🔥 CONDITION FIX
-            if (distance > 0 && distance <= 50) {
+            if (distance > 0 && distance <= 100) {
               nearbyCreators.add(item);
             } else {
               otherCreators.add(item);

@@ -863,7 +863,7 @@ class _EditProfileState extends State<EditProfile> {
                                 /// ✅ SVG fallback
                                 child: getProfileImage() == null
                                     ? SvgPicture.asset(
-                                  "assets/svg/profile.svg",
+                                  "assets/svg/persone.svg",
                                   fit: BoxFit.cover,
                                 )
                                     : null,
