@@ -68,17 +68,34 @@
       return (24 * 60 - startMin) + endMin;
     }
 
+    TimeOfDay? convertStringToTime(String? timeStr) {
+      if (timeStr == null) return null;
+
+      final now = DateTime.now();
+      final dt = parseTime(timeStr, now);
+
+      return TimeOfDay(hour: dt.hour, minute: dt.minute);
+    }
+
     int getTotalSelectedDurationInMinutes() {
       if (selectedIndex == 1) {
-        if (startTime == null || endTime == null) return 0;
-        return _calculateDurationInMinutes(startTime!, endTime!);
+        final start = convertStringToTime(startTimeStr);
+        final end = convertStringToTime(endTimeStr);
+
+        if (start == null || end == null) return 0;
+
+        return _calculateDurationInMinutes(start, end);
       }
 
       if (selectedDates.isEmpty) return 0;
 
       if (istimingsame) {
-        if (startTime == null || endTime == null) return 0;
-        return _calculateDurationInMinutes(startTime!, endTime!) * selectedDates.length;
+        final start = convertStringToTime(startTimeStr);
+        final end = convertStringToTime(endTimeStr);
+
+        if (start == null || end == null) return 0;
+
+        return _calculateDurationInMinutes(start, end) * selectedDates.length;
       }
 
       int totalMinutes = 0;
@@ -88,6 +105,7 @@
         final end = endTimes[date];
 
         if (start == null || end == null) continue;
+
         totalMinutes += _calculateDurationInMinutes(start, end);
       }
 
@@ -179,8 +197,10 @@
     }
 
     String getDurationText(DateTime date) {
-      final start = startTimes[date];
-      final end = endTimes[date];
+      final key = normalizeDate(date);
+
+      final start = startTimes[key];
+      final end = endTimes[key];
 
       if (start == null || end == null) return "Duration:00";
 
@@ -192,14 +212,12 @@
       if (endMin >= startMin) {
         diff = endMin - startMin;
       } else {
-        /// 🔥 NEXT DAY SUPPORT
         diff = (24 * 60 - startMin) + endMin;
       }
 
       final hours = diff ~/ 60;
       final minutes = diff % 60;
 
-      /// 🔥 FORMAT LOGIC
       if (hours > 0 && minutes > 0) {
         return "Duration: ${hours}h ${minutes}m";
       } else if (hours > 0) {
@@ -372,7 +390,15 @@
       return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
     }
+    String getTotalDuration() {
+      final totalMinutes = getTotalSelectedDurationInMinutes();
 
+      if (totalMinutes <= 0) return "0 Hour";
+
+      final hours = (totalMinutes / 60).ceil();
+
+      return "$hours ${hours == 1 ? "Hour" : "Hours"}";
+    }
     String formatDatesAlt(List<DateTime> dates) {
       if (dates.isEmpty) return "";
 
@@ -410,6 +436,17 @@
       });
 
       return result.join(", ");
+    }
+    String getDaysAndHours() {
+      final totalMinutes = getTotalSelectedDurationInMinutes();
+
+      if (totalMinutes <= 0) return "0 Day • 0 Hour";
+
+      final hours = (totalMinutes / 60).ceil();
+      final days = selectedDates.length;
+
+      return "$days ${days == 1 ? "Day" : "Days"} • "
+          "$hours ${hours == 1 ? "Hour" : "Hours"}";
     }
     String formatSelectedDates(List<DateTime> dates) {
       if (dates.isEmpty) return "";
@@ -449,7 +486,9 @@
 
       return "Selected Days: ${result.join(', ')}";
     }
-
+    DateTime normalizeDate(DateTime d) {
+      return DateTime(d.year, d.month, d.day);
+    }
     bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
       final startMinutes = start.hour * 60 + start.minute;
       final endMinutes = end.hour * 60 + end.minute;
@@ -1812,19 +1851,21 @@
                                                   ),*/
 
                                                   buildTimeDropdown(
-                                                    title: "Start Time",
-                                                    selectedTime: startTimeMap[date],
+                                                    key: ValueKey("${date.toString()}_start"),
+                                                    title: "Start Timsssssssse",
+                                                    selectedTime: startTimeMap[normalizeDate(date)],
                                                     isStart: true,
-                                    date: date,
+                                                    date: date,
                                                     onSelect: (val) {
+                                                      final key = normalizeDate(date);
+
                                                       setState(() {
-                                                        startTimeMap[date] = val;
-                                                        endTimeMap[date] = null;
+                                                        startTimeMap[key] = val;
+                                                        endTimeMap[key] = null;
 
-                                                        /// 🔥 STRING → TimeOfDay convert
-                                                        final dt = parseTime(val, date);
+                                                        final dt = parseTime(val, key);
 
-                                                        startTimes[date] = TimeOfDay(
+                                                        startTimes[key] = TimeOfDay(
                                                           hour: dt.hour,
                                                           minute: dt.minute,
                                                         );
@@ -1833,18 +1874,20 @@
                                                   ),
                                                   SizedBox(height: 10,),
                                                   buildTimeDropdown(
+                                                    key: ValueKey("${date.toString()}_end"),
                                                     title: "End Time",
-                                                    selectedTime: endTimeMap[date],
+                                                    selectedTime: endTimeMap[normalizeDate(date)],
                                                     isStart: false,
                                                     date: date,
                                                     onSelect: (val) {
+                                                      final key = normalizeDate(date);
+
                                                       setState(() {
-                                                        endTimeMap[date] = val;
+                                                        endTimeMap[key] = val;
 
-                                                        /// 🔥 STRING → TimeOfDay convert
-                                                        final dt = parseTime(val, date);
+                                                        final dt = parseTime(val, key);
 
-                                                        endTimes[date] = TimeOfDay(
+                                                        endTimes[key] = TimeOfDay(
                                                           hour: dt.hour,
                                                           minute: dt.minute,
                                                         );
@@ -2017,9 +2060,9 @@
 
                                             /// 🔥 DYNAMIC TIME
                                             Text(
-                                              startTime != null && endTime != null
-                                                  ? "${startTime!.format(context)} – ${endTime!.format(context)}"
-                                                  : "Select Time",
+      startTimeStr != null && endTimeStr != null
+      ? "$startTimeStr – $endTimeStr"
+          : "Select Time",
                                               style: TextStyle(
                                                 fontFamily: "Helvetica Neue",
 
@@ -2034,7 +2077,7 @@
 
                                       /// ⏱ DYNAMIC HOURS
                                       Text(
-                                        getTotalDuration(), // 👇 function below
+                                        getDaysAndHours(), // 👇 function below
                                         style: TextStyle(
                                           color: ColorCode.kButtonColor,
                                           fontSize: 14,
@@ -2281,7 +2324,7 @@
                                         SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            getEditingDescription(),
+                                            "Professional editing includes color grading, sound mixing, and basic revisions",
                                             style: const TextStyle(
                                               color: ColorCode.kWhiteOpacity70,
                                               fontSize: 13,
@@ -2349,7 +2392,7 @@
                                 ],
                               ),
 
-                    /*          if (photoEditTypes.isNotEmpty) ...[
+                              if (photoEditTypes.isNotEmpty) ...[
                                 SizedBox(height: 12,),
                                 Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -2397,7 +2440,7 @@
                                   ],
                                 ),
                               ),
-                              ],*/
+                              ],
 
                               if (selectedEditTypeNames.isNotEmpty) ...[
                                 const SizedBox(height: 14),
@@ -2600,9 +2643,10 @@
                   GestureDetector(
                     onTap: () => _selectDateMultiple(context),
                     child: SvgPicture.asset(
-                      'assets/svg/Calendar_Mark-2.svg',
+                      'assets/svg/calendar-03.svg',
                       width: 24,
                       height: 24,
+
                     ),
                   ),
                 ],
@@ -3119,7 +3163,7 @@
     }
 
 
-    String getTotalDuration() {
+ /*   String getTotalDuration() {
       if (startTime == null || endTime == null || selectedDates.isEmpty) {
         return "0 Hour";
       }
@@ -3141,7 +3185,7 @@
       final totalHours = hoursPerDay * totalDays;
       return "$totalDays Hours / $totalHours Days";
 
-    }
+    }*/
 
     Widget _buildOption({
       required String title,
@@ -3202,6 +3246,7 @@
     }
 
     Widget buildTimeDropdown({
+        Key? key, // ✅ FIX ADD THIS
       required String title,
       required String? selectedTime,
       required Function(String) onSelect,

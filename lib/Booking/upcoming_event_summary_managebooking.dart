@@ -428,8 +428,8 @@ class _UpcomingEventSummaryManagebookingState
                                       MaterialPageRoute(
                                         builder: (_) => MySelectbookingtype(
                                           bookingId: widget.bookingId,
-                                      /*    contentType: widget.contentType ?? '',
-                                          shootTypeId: widget.shootTypeId,*/
+                                           contentType: widget.contentType ?? '',
+                                          shootTypeId: widget.shootTypeId,
                                         ),
                                       ),
                                     );
