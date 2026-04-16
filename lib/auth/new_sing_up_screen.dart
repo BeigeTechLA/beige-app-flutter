@@ -21,6 +21,7 @@ import '../service/google_config.dart';
 import '../service/shared_service.dart';
 import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
+import '../widgets/loding.dart';
 
 
 class NewSingUpScreen extends StatefulWidget {
@@ -1299,14 +1300,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
             ),
           ),
           if (isLoggingIn)
-            Container(
-              color: Colors.black.withOpacity(0.6),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: ColorCode.kButtonColor,
-                ),
-              ),
-            ),
+            const AppLoader(),
         ],
 
       ),

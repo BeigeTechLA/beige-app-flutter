@@ -128,34 +128,34 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   ];
   final List<String> featuredNames = [
     "Alec H",
-    "Benson F",
+   /* "Benson F",*/
     "Christopher R",
     "Corey B",
     "Cornelius M",
     "Daniel A",
     "Daniel C",
     "Gary Ahmed",
-    "Jesse S.",
+   /* "Jesse S.",*/
     "Mikey D",
     "Nathan Grant"
   ];
 
   final List<String> featuredImages = [
     "assets/images/Alec+H.png",
-    "assets/images/Benson+F.png",
+    // "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
     "assets/images/Cornelius+M. (1).png",
     "assets/images/Daniel+A.png",
     "assets/images/Daniel+C.png",
     "assets/images/Gary+Ahmed.png",
-    "assets/images/Jesse+S.png",
+  /*  "assets/images/Jesse+S.png",*/
     "assets/images/Mikey+D (1).jpg",
     "assets/images/Nathan+Grant.png"
   ];
   final List<String> images = [
     "assets/images/Alec+H.png",
-    "assets/images/Benson+F.png",
+    // "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
     "assets/images/Cornelius+M. (1).png",

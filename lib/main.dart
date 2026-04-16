@@ -16,7 +16,7 @@ Future<void> startApp(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   Env.init(environment);
-  // Stripe.publishableKey = Env.stripePublishableKey;
+    Stripe.publishableKey = Env.stripePublishableKey;
 
   final prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

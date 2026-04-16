@@ -1,8 +1,6 @@
-
-
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:intl/intl.dart';
 
 import '../Customtextfiled/CustomInputField.dart';
@@ -10,25 +8,19 @@ import '../Home/NewBookingFlow/More_Details/more_details_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../utility/ColorCode.dart';
-
+import '../utility/images.dart';
+import 'bookin_review_confirm.dart';
 
 class MySelectbookingtype extends StatefulWidget {
-  final int shootTypeId;
   final int bookingId;
-  final String? contentType;
 
-  const MySelectbookingtype({super.key, required this.bookingId, required this.shootTypeId, required this.contentType});
+  const MySelectbookingtype({super.key, required this.bookingId});
 
   @override
   State<MySelectbookingtype> createState() => _MySelectbookingtypeState();
 }
 
 class _MySelectbookingtypeState extends State<MySelectbookingtype> {
-
-  bool isToday = false;
-  bool isStartOpen = false;
-  bool isEndOpen = false;
-  static const Set<int> _weddingShootTypeIds = {9, 16};
 
   Map<DateTime, bool> expandedMap = {};
   Map<DateTime, TimeOfDay?> startTimes = {};
@@ -39,150 +31,14 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
   TimeOfDay? shootStartTime;
   TimeOfDay? shootEndTime;
+  bool isSingleLocked = true;
   bool isShootDateSelected() {
     return selectedDates.isNotEmpty;
   }
 
-  String? startTimeStr;
-  String? endTimeStr;
-
-  /// MULTIPLE NO (PER DATE)
-  Map<DateTime, String?> startTimeMap = {};
-  Map<DateTime, String?> endTimeMap = {};
-
-
-  bool get isWeddingShoot => _weddingShootTypeIds.contains(widget.shootTypeId);
-
-  int get includedPhotosPerHour => isWeddingShoot ? 50 : 25;
-
-  int get extraPhotosPerAddOn => 25;
-
-  int _calculateDurationInMinutes(TimeOfDay start, TimeOfDay end) {
-    final startMin = start.hour * 60 + start.minute;
-    final endMin = end.hour * 60 + end.minute;
-
-    if (endMin >= startMin) {
-      return endMin - startMin;
-    }
-
-    return (24 * 60 - startMin) + endMin;
-  }
-
-  int getTotalSelectedDurationInMinutes() {
-    if (selectedIndex == 1) {
-      if (startTime == null || endTime == null) return 0;
-      return _calculateDurationInMinutes(startTime!, endTime!);
-    }
-
-    if (selectedDates.isEmpty) return 0;
-
-    if (istimingsame) {
-      if (startTime == null || endTime == null) return 0;
-      return _calculateDurationInMinutes(startTime!, endTime!) * selectedDates.length;
-    }
-
-    int totalMinutes = 0;
-
-    for (final date in selectedDates) {
-      final start = startTimes[date];
-      final end = endTimes[date];
-
-      if (start == null || end == null) continue;
-      totalMinutes += _calculateDurationInMinutes(start, end);
-    }
-
-    return totalMinutes;
-  }
-  List<String> generateTimeList({
-    required bool isStart,
-    DateTime? date,
-  }) {
-    List<String> times = [];
-
-    DateTime now = DateTime.now();
-    DateTime baseDate = date ?? selectedDate ?? now;
-
-    /// 🔥 4 HOUR RULE
-    DateTime minTime = now.add(Duration(hours: 4));
-
-    /// 🔥 LOOP SAME AS SINGLE DAY (IMPORTANT)
-    DateTime startOfDay = DateTime(baseDate.year, baseDate.month, baseDate.day, 0, 0);
-    DateTime endOfDay = startOfDay.add(Duration(days: 1));
-
-    DateTime current = startOfDay;
-
-    while (current.isBefore(endOfDay)) {
-
-      /// 🔥 CHECK TODAY
-      bool isToday =
-          baseDate.year == now.year &&
-              baseDate.month == now.month &&
-              baseDate.day == now.day;
-
-      /// ✅ APPLY SAME RULE AS SINGLE DAY
-      if (isToday && current.isBefore(minTime)) {
-        current = current.add(Duration(minutes: 15));
-        continue;
-      }
-
-      /// 🔥 END TIME FILTER
-      if (!isStart) {
-        String? startStr;
-
-        if (date != null) {
-          startStr = startTimeMap[date];
-        } else {
-          startStr = startTimeStr;
-        }
-
-        if (startStr != null) {
-          DateTime startDT = parseTime(startStr, baseDate);
-
-          if (!current.isAfter(startDT)) {
-            current = current.add(Duration(minutes: 15));
-            continue;
-          }
-        }
-      }
-
-      /// ✅ FINAL FORMAT (12 HOUR SAME AS SINGLE)
-      final time = TimeOfDay.fromDateTime(current);
-      times.add(time.format(context));
-
-      current = current.add(Duration(minutes: 15));
-    }
-
-    return times;
-  }
-
-
-  int getRoundedBookedHours() {
-    final totalMinutes = getTotalSelectedDurationInMinutes();
-    if (totalMinutes <= 0) return 0;
-    return (totalMinutes / 60).ceil();
-  }
-
-  int getIncludedPhotoCount() {
-    final bookedHours = getRoundedBookedHours();
-    if (bookedHours == 0) return 0;
-    return bookedHours * includedPhotosPerHour;
-  }
-
-  String getDurationSummaryLabel() {
-    final bookedHours = getRoundedBookedHours();
-
-    if (bookedHours > 0) {
-      return "$bookedHours ${bookedHours == 1 ? "Hour" : "Hours"} Duration";
-    }
-
-    return "Select Duration";
-  }
-
   String getDurationText(DateTime date) {
-    final key = normalizeDate(date);
-
-    final start = startTimes[key];
-    final end = endTimes[key];
+    final start = startTimes[date];
+    final end = endTimes[date];
 
     if (start == null || end == null) return "Duration:00";
 
@@ -194,12 +50,14 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     if (endMin >= startMin) {
       diff = endMin - startMin;
     } else {
+      /// 🔥 NEXT DAY SUPPORT
       diff = (24 * 60 - startMin) + endMin;
     }
 
     final hours = diff ~/ 60;
     final minutes = diff % 60;
 
+    /// 🔥 FORMAT LOGIC
     if (hours > 0 && minutes > 0) {
       return "Duration: ${hours}h ${minutes}m";
     } else if (hours > 0) {
@@ -222,36 +80,6 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           endTimes[date] = picked;
         }
       });
-    }
-  }
-
-
-  DateTime parseTime(String time, DateTime date) {
-    try {
-      final parts = time.split(' ');
-      final timePart = parts[0]; // 12:45
-      final period = parts[1];   // AM / PM
-
-      final t = timePart.split(':');
-      int hour = int.parse(t[0]);
-      int minute = int.parse(t[1]);
-
-      if (period == "PM" && hour != 12) {
-        hour += 12;
-      } else if (period == "AM" && hour == 12) {
-        hour = 0;
-      }
-
-      return DateTime(
-        date.year,
-        date.month,
-        date.day,
-        hour,
-        minute,
-      );
-    } catch (e) {
-      print("PARSE ERROR: $e");
-      return date; // fallback
     }
   }
 
@@ -353,8 +181,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   DateTime? selectedDate;
 
   bool isEditNeeded = false;  // ✅ Default = No selected
-  bool isSingleLocked = true;
-  bool isMultiLocked = true;
+
   bool isSubmitting = false;
   bool isDateSelected() {
     return selectedDate != null;
@@ -365,7 +192,6 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   void initState() {
     super.initState();
 
-    _edittype();
     time();
   }
 
@@ -380,89 +206,52 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
     dates.sort();
 
-    Map<String, List<int>> monthMap = {};
+    final days = dates.map((e) => DateFormat('d').format(e)).toList();
+    final lastDate = dates.last;
 
-    for (var date in dates) {
-      String key = DateFormat('MMM yyyy').format(date);
+    String daysText = "";
 
-      if (!monthMap.containsKey(key)) {
-        monthMap[key] = [];
-      }
-
-      monthMap[key]!.add(date.day);
+    if (days.length == 1) {
+      daysText = days.first;
+    } else if (days.length == 2) {
+      daysText = "${days[0]} & ${days[1]}";
+    } else {
+      daysText =
+      "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
     }
 
-    List<String> result = [];
+    final month = DateFormat('MMM').format(lastDate);
+    final year = DateFormat('yyyy').format(lastDate);
 
-    monthMap.forEach((month, days) {
-      days.sort();
-
-      String daysText = "";
-
-      if (days.length == 1) {
-        daysText = "${days.first}";
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-        "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-      }
-
-      result.add("$month $daysText");
-    });
-
-    return result.join(", ");
+    return "$month $daysText, $year";
   }
   String formatSelectedDates(List<DateTime> dates) {
     if (dates.isEmpty) return "";
 
-    dates.sort();
+    dates.sort(); // important for correct order
 
-    Map<String, List<int>> monthMap = {};
+    final days = dates.map((e) => DateFormat('d').format(e)).toList();
+    final lastDate = dates.last;
 
-    for (var date in dates) {
-      String key = DateFormat('MMM yyyy').format(date);
+    String daysText = "";
 
-      if (!monthMap.containsKey(key)) {
-        monthMap[key] = [];
-      }
-
-      monthMap[key]!.add(date.day);
+    if (days.length == 1) {
+      daysText = days.first;
+    } else if (days.length == 2) {
+      daysText = "${days[0]} & ${days[1]}";
+    } else {
+      daysText =
+      "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
     }
 
-    List<String> result = [];
+    final monthYear = DateFormat('MMM yyyy').format(lastDate);
 
-    monthMap.forEach((month, days) {
-      days.sort();
-
-      String daysText = "";
-
-      if (days.length == 1) {
-        daysText = "${days.first}";
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-        "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-      }
-
-      result.add("$daysText $month");
-    });
-
-    return "Selected Days: ${result.join(', ')}";
-  }
-  DateTime normalizeDate(DateTime d) {
-    return DateTime(d.year, d.month, d.day);
+    return "Selected Days: $daysText $monthYear";
   }
   bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
-
-    /// ✅ SAME DAY
-    if (endMinutes > startMinutes) return true;
-
-    /// ✅ NEXT DAY ALLOW
-    return true;
+    return endMinutes > startMinutes;
   }
   bool get isFormValid {
 
@@ -485,64 +274,36 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       if (istimingsame == false) {
         for (var date in selectedDates) {
           if (startTimes[date] == null || endTimes[date] == null) {
-            return false;
+            return false; // ❌ any date missing time
           }
         }
       }
     }
 
-    /// 🔥 EDIT VALIDATION (FIXED)
-    if (isEditNeeded) {
-      bool hasEdits = false;
-
-      // check video edits
-      videoCounts.forEach((key, value) {
-        if (value > 0) hasEdits = true;
-      });
-
-      // check photo edits
-      photoCounts.forEach((key, value) {
-        if (value > 0) hasEdits = true;
-      });
-
-      if (!hasEdits) return false;
-    }
+    /// 🔥 EDIT VALIDATION
+    if (isEditNeeded && selectedEditTypeIds.isEmpty) return false;
 
     return true;
   }
-  String getEditingDescription() {
+  /*String getEditingDescription() {
 
     // 🎬 Video Content
-    if (widget.contentType == 1) {
-      return "Professional editing includes color grading, sound mixing, and basic revisions.";
+    if (widget.contentTypeId == 1) {
+      return "Professional editing includes color grading,sound mixing, and basic revisions.";
     }
 
     // 📸 Photo Content (Special Case 16 & 9)
-    if (isWeddingShoot &&
-        (widget.contentType == 2 || widget.contentType == 3)) {
-      return "Wedding shoots include 50 edited photos per hour, with extra add-ons available in sets of 25 photos.";
+    if ((widget.ShootTypeId == 16 || widget.ShootTypeId == 9) &&
+        (widget.contentTypeId == 2 || widget.contentTypeId == 3)) {
+      return "50 edited photos per hour for weddings";
     }
 
     // 📷 Default Photo
-    return "This shoot includes 25 edited photos per hour, with extra add-ons available in sets of 25 photos.";
-  }
+    return "25 edited photos per hour";
+  }*/
 
-  String getPhotoInclusionMessage() {
-    final includedPhotos = getIncludedPhotoCount();
-    final bookedHours = getRoundedBookedHours();
 
-    if (includedPhotos == 0 || bookedHours == 0) {
-      return isWeddingShoot
-          ? "Wedding shoots include 50 edited photos per hour. You can add 25 extra photos anytime."
-          : "This shoot includes 25 edited photos per hour. You can add 25 extra photos anytime.";
-    }
-
-    final photoLabel = includedPhotos == 1 ? "photo" : "photos";
-    final hourLabel = bookedHours == 1 ? "hour" : "hours";
-
-    return "You’ll receive $includedPhotos edited $photoLabel for $bookedHours $hourLabel. Need more? Add 25 extra photos.";
-  }
-
+  bool isMultiLocked = false;
 
   @override
   void dispose() {
@@ -572,12 +333,12 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   }
 
 
-  String getEditTypeDisplayText() {
+/*  String getEditTypeDisplayText() {
 
     /// 🔥 When nothing selected
     if (selectedEditTypeNames.isEmpty) {
 
-      switch (widget.contentType) {
+      switch (widget.contentTypeId) {
         case 1:
           return "Select Video Edit Type";
 
@@ -599,32 +360,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
     /// 🔥 Multiple selection
     return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
-  }
+  }*/
 
-  Future<void> _edittype() async {
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking_shoot_types}${widget.shootTypeId}/edit-types",
-      );
-
-      debugPrint("API Response → $response");
-
-      if (response != null && response['error'] == false) {
-        final data = response['data'];
-
-        setState(() {
-          editTypes = data['video_edit_types'] ?? [];
-          photoEditTypes = data['photo_edit_types'] ?? [];
-        });
-      }
-    } catch (e) {
-      debugPrint("API Error → $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
 
   Future<void> time() async {
     setState(() => isLoading = true);
@@ -644,12 +381,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           editTypes = data['video_edit_types'] ?? [];
           photoEditTypes = data['photo_edit_types'] ?? [];
 
-          /// 🔥 RESET ALL (VERY IMPORTANT)
+          /// RESET COMMON
           selectedDates.clear();
           startTimes.clear();
           endTimes.clear();
-          startTimeMap.clear();
-          endTimeMap.clear();
 
           /// =========================
           /// 🔥 SINGLE DAY
@@ -657,12 +392,13 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           if (data['booking_type'] == "single_day") {
             selectedIndex = 1;
 
-            isSingleLocked = false;
-            isMultiLocked = true;
+            /// ✅ LOCK FIX
+            isSingleLocked = false; // allow
+            isMultiLocked = true;   // block
 
             /// DATE
             if (data['event_date'] != null) {
-              selectedDate = normalizeDate(DateTime.parse(data['event_date']));
+              selectedDate = DateTime.parse(data['event_date']);
 
               dateController.text =
               "${selectedDate!.day.toString().padLeft(2, '0')}-"
@@ -673,28 +409,27 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             /// START TIME
             if (data['start_time'] != null) {
               final s = data['start_time'].split(":");
-
               startTime = TimeOfDay(
                 hour: int.parse(s[0]),
                 minute: int.parse(s[1]),
               );
-
-              startTimeStr = _formatTo12Hour(startTime!); // 🔥 FIX
               _updateTimeText(startTimeController, startTime!);
             }
 
             /// END TIME
             if (data['end_time'] != null) {
               final e = data['end_time'].split(":");
-
               endTime = TimeOfDay(
                 hour: int.parse(e[0]),
                 minute: int.parse(e[1]),
               );
-
-              endTimeStr = _formatTo12Hour(endTime!); // 🔥 FIX
               _updateTimeText(endTimeController, endTime!);
             }
+
+            /// CLEAR MULTI UI
+            selectedDates.clear();
+            startTimes.clear();
+            endTimes.clear();
           }
 
           /// =========================
@@ -703,8 +438,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           else if (data['booking_type'] == "multi_day") {
             selectedIndex = 2;
 
-            isSingleLocked = true;
-            isMultiLocked = false;
+            /// ✅ LOCK FIX
+            isSingleLocked = true;  // block
+            isMultiLocked = false;  // allow
 
             final multiDay = data['multi_day'];
 
@@ -712,11 +448,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             selectedDate = null;
             dateController.clear();
 
-            /// ✅ SELECTED DATES (FIXED)
-            if (multiDay?['selected_dates'] != null) {
+            /// ✅ SELECTED DATES
+            if (multiDay != null && multiDay['selected_dates'] != null) {
               selectedDates = (multiDay['selected_dates'] as List)
-                  .map((d) => normalizeDate(DateTime.parse(d)))
-                  .toSet()
+                  .map((d) => DateTime.parse(d))
                   .toList();
             }
 
@@ -724,71 +459,49 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             istimingsame =
                 multiDay?['same_timings_for_all_selected_dates'] ?? true;
 
-            /// =========================
-            /// 🔥 SAME TIME FOR ALL
-            /// =========================
+            /// ✅ SHARED TIME
             if (istimingsame == true &&
                 multiDay?['shared_time'] != null) {
-
               final shared = multiDay['shared_time'];
 
               if (shared['start_time'] != null) {
                 final s = shared['start_time'].split(":");
-
                 startTime = TimeOfDay(
                   hour: int.parse(s[0]),
                   minute: int.parse(s[1]),
                 );
-
-                startTimeStr = _formatTo12Hour(startTime!); // 🔥 FIX
                 _updateTimeText(startTimeController, startTime!);
               }
 
               if (shared['end_time'] != null) {
                 final e = shared['end_time'].split(":");
-
                 endTime = TimeOfDay(
                   hour: int.parse(e[0]),
                   minute: int.parse(e[1]),
                 );
-
-                endTimeStr = _formatTo12Hour(endTime!); // 🔥 FIX
                 _updateTimeText(endTimeController, endTime!);
               }
             }
 
-            /// =========================
-            /// 🔥 DIFFERENT TIME PER DAY
-            /// =========================
+            /// ✅ PER DAY TIME
             if (multiDay?['days'] != null) {
               for (var day in multiDay['days']) {
+                final date = DateTime.parse(day['date']);
 
-                final date = normalizeDate(DateTime.parse(day['date'])); // 🔥 FIX
-
-                /// START TIME
                 if (day['start_time'] != null) {
                   final s = day['start_time'].split(":");
-
-                  final start = TimeOfDay(
+                  startTimes[date] = TimeOfDay(
                     hour: int.parse(s[0]),
                     minute: int.parse(s[1]),
                   );
-
-                  startTimes[date] = start;
-                  startTimeMap[date] = _formatTo12Hour(start); // 🔥 IMPORTANT
                 }
 
-                /// END TIME
                 if (day['end_time'] != null) {
                   final e = day['end_time'].split(":");
-
-                  final end = TimeOfDay(
+                  endTimes[date] = TimeOfDay(
                     hour: int.parse(e[0]),
                     minute: int.parse(e[1]),
                   );
-
-                  endTimes[date] = end;
-                  endTimeMap[date] = _formatTo12Hour(end); // 🔥 IMPORTANT
                 }
               }
             }
@@ -802,24 +515,16 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     }
   }
 
-  String _formatTo12Hour(TimeOfDay time) {
-    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? "AM" : "PM";
 
-    return "$hour:$minute $period";
-  }
   Future<void> _ShootDate_Time() async {
     if (!isFormValid) return;
 
     setState(() => isSubmitting = true);
 
-    /// 🔥 RESET
+    /// 🔥 EDIT RESET
     if (!isEditNeeded) {
       selectedEditTypeIds.clear();
       selectedEditTypeNames.clear();
-      videoCounts.clear();
-      photoCounts.clear();
     }
 
     /// 🔥 BUILD EDIT ARRAYS
@@ -848,32 +553,16 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
     /// ================= SINGLE DAY =================
     if (selectedIndex == 1) {
-
-      /// ✅ SAFETY CHECK
-      if (selectedDate == null || startTime == null || endTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select date and time")),
-        );
-        setState(() => isSubmitting = false);
-        return;
-      }
-
-      /// ✅ END > START CHECK
-      if (!isEndTimeAfterStart(startTime!, endTime!)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("End time must be after Start time")),
-        );
-        setState(() => isSubmitting = false);
-        return;
-      }
-
       payload = {
         "booking_type": "single_day",
         "time_zone": "Asia/Calcutta",
         "event_date": _apiDateFormat(selectedDate!),
+
+        /// 🔥 FORMAT TIME (HH:mm:ss)
         "start_time": _formatTime(startTime!),
         "end_time": _formatTime(endTime!),
-        "edits_needed": isEditNeeded ? 1 : 0,
+
+        "edits_needed": isEditNeeded,
         "video_edit_types": videoEditKeys,
         "photo_edit_types": photoEditKeys,
       };
@@ -883,73 +572,20 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     if (selectedIndex == 2) {
       List<Map<String, dynamic>> bookingDays = [];
 
-      if (selectedDates.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select dates")),
-        );
-        setState(() => isSubmitting = false);
-        return;
-      }
-
-      /// 🔹 SAME TIME FOR ALL
       if (istimingsame) {
-
-        if (startTime == null || endTime == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please select time")),
-          );
-          setState(() => isSubmitting = false);
-          return;
-        }
-
-        if (!isEndTimeAfterStart(startTime!, endTime!)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("End time must be after Start time")),
-          );
-          setState(() => isSubmitting = false);
-          return;
-        }
-
         for (var date in selectedDates) {
           bookingDays.add({
             "date": _apiDateFormat(date),
-            "start_time": _formatTime(startTime!),
-            "end_time": _formatTime(endTime!),
+            "start_time": startTimeController.text,
+            "end_time": endTimeController.text,
           });
         }
-
-      }
-
-      /// 🔹 DIFFERENT TIME FOR EACH DATE
-      else {
-
+      } else {
         for (var date in selectedDates) {
-
-          final start = startTimes[date];
-          final end = endTimes[date];
-
-          /// ❌ NULL CHECK
-          if (start == null || end == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Select time for all dates")),
-            );
-            setState(() => isSubmitting = false);
-            return;
-          }
-
-          /// ❌ VALIDATION
-          if (!isEndTimeAfterStart(start, end)) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("End time must be after Start time")),
-            );
-            setState(() => isSubmitting = false);
-            return;
-          }
-
           bookingDays.add({
             "date": _apiDateFormat(date),
-            "start_time": _formatTime(start), // ✅ FIXED
-            "end_time": _formatTime(end),     // ✅ FIXED
+            "start_time": startTimes[date]?.format(context),
+            "end_time": endTimes[date]?.format(context),
           });
         }
       }
@@ -973,17 +609,15 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       );
 
       if (response != null && response['error'] == false) {
-/*  Navigator.push(
-  context,
-  MaterialPageRoute(
-  builder: (_) => MoreDetailsScreen(
-  contentTypeId: widget.contentTypeId,
-  specialtyId: 22,
-  ShootTypeId: widget.ShootTypeId,
-  bookingId: widget.bookingId,
-  ),
-  ),
-  );*/
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BookinReviewConfirm(
+              // contentTypeId: widget.contentTypeId,
+              bookingId: widget.bookingId,
+            ),
+          ),
+        );
       }
     } catch (e) {
       debugPrint("❌ API Error → $e");
@@ -1179,96 +813,16 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                       child: CalendarDatePicker2(
                         config: CalendarDatePicker2Config(
                           calendarType: CalendarDatePicker2Type.multi,
-
-                          /// ❌ REMOVE DEFAULT CIRCLE
-                          selectedDayHighlightColor: Colors.transparent,
-
-                          /// ❌ PAST DATES DISABLE
-                          firstDate: DateTime.now(),
-
-                          /// TEXT STYLE
+                          selectedDayHighlightColor: ColorCode.kButtonColor,
                           selectedDayTextStyle: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
-
-                          /// 🔥 CUSTOM UI (MAIN PART)
-                          dayBuilder: ({
-                            required DateTime date,
-                            TextStyle? textStyle,
-                            BoxDecoration? decoration,
-                            bool? isSelected,
-                            bool? isDisabled,
-                            bool? isToday,
-                          }) {
-                            final today = DateTime.now();
-
-                            bool isPast = date.isBefore(
-                              DateTime(today.year, today.month, today.day),
-                            );
-
-                            /// ❌ PAST DATE (VISIBLE BUT DISABLED)
-                            if (isPast) {
-                              return Container(
-                                margin: const EdgeInsets.all(4),
-                                child: Center(
-                                  child: Text(
-                                    "${date.day}",
-                                    style: const TextStyle(
-                                      color: Colors.grey, // 👈 grey = disabled look
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            /// ✅ SELECTED (BOX STYLE)
-                            if (isSelected == true) {
-                              return Container(
-                                margin: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE8D1AB),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "${date.day}",
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-
-                            /// ✅ NORMAL DATE
-                            return Container(
-                              margin: const EdgeInsets.all(4),
-                              child: Center(
-                                child: Text(
-                                  "${date.day}",
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            );
-                          },
                         ),
-
                         value: tempSelected,
-
                         onValueChanged: (dates) {
                           setStateDialog(() {
-                            /// 🔥 SAFETY FILTER
-                            tempSelected = dates.where((date) {
-                              return !date.isBefore(
-                                DateTime(
-                                  DateTime.now().year,
-                                  DateTime.now().month,
-                                  DateTime.now().day,
-                                ),
-                              );
-                            }).toList();
+                            tempSelected = dates;
                           });
                         },
                       ),
@@ -1299,41 +853,20 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       },
     );
 
+    /// 🔥 IMPORTANT FIX (THIS WAS MISSING)
     if (result != null && result is List<DateTime>) {
       setState(() {
-        /// ✅ ONLY UNIQUE DATES
-        selectedDates = result
-            .map((d) => normalizeDate(d))
-            .toSet()
-            .toList();
+        selectedDates = result;
 
-        /// ❌ REMOVE EXTRA OLD DATA
-        startTimes.removeWhere((k, v) => !selectedDates.contains(k));
-        endTimes.removeWhere((k, v) => !selectedDates.contains(k));
-        startTimeMap.removeWhere((k, v) => !selectedDates.contains(k));
-        endTimeMap.removeWhere((k, v) => !selectedDates.contains(k));
-
-        /// ✅ AUTO APPLY SAME TIME
-        for (var date in selectedDates) {
-          if (!startTimeMap.containsKey(date)) {
-            startTimeMap[date] = startTimeStr;
-            endTimeMap[date] = endTimeStr;
-
-            if (startTimeStr != null) {
-              final dt = parseTime(startTimeStr!, date);
-              startTimes[date] = TimeOfDay(hour: dt.hour, minute: dt.minute);
-            }
-
-            if (endTimeStr != null) {
-              final dt = parseTime(endTimeStr!, date);
-              endTimes[date] = TimeOfDay(hour: dt.hour, minute: dt.minute);
-            }
-          }
-        }
+        /// reset times
+        startTimes.clear();
+        endTimes.clear();
       });
     }
   }
-  // Helper method to format time (Make sure this is inside your _ShootDateTimeScreenState class)
+
+
+
   void _updateTimeText(TextEditingController controller, TimeOfDay picked) {
     final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod.toString().padLeft(2, '0');
     final minute = picked.minute.toString().padLeft(2, '0');
@@ -1342,65 +875,56 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   }
 
 
+
   Future<void> _selectTime(
       BuildContext context,
       TextEditingController? controller,
       bool isStartTime,
       DateTime? date,
       ) async {
+
     final now = DateTime.now();
 
-    /// 🔥 BASE DATE (ALL CASE COVER)
-    DateTime? baseDate;
-
-    if (date != null) {
-      baseDate = date; // Multiple NO
-    } else if (selectedDate != null) {
-      baseDate = selectedDate; // Single Day
-    }else if (selectedDates.isNotEmpty && date == null) {
-      baseDate = selectedDates.first; // or remove this block completely
-    }
-
-    if (baseDate == null) return;
-
     /// 🔥 CHECK TODAY
-    bool isSameDay =
-        baseDate.year == now.year &&
-            baseDate.month == now.month &&
-            baseDate.day == now.day;
+    bool isToday = false;
+    if (date != null) {
+      isToday = date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
+    } else {
+      isToday = isTodaySelected();
+    }
 
     /// 🔥 INITIAL TIME
     TimeOfDay initial;
 
-    if (date != null) {
-      initial = isStartTime
-          ? (startTimes[date] ?? TimeOfDay.now())
-          : (endTimes[date] ?? TimeOfDay.now());
+    if (isToday && isStartTime) {
+      final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
+      final minAllowed = roundedNow.add(const Duration(hours: 4));
+      initial = TimeOfDay.fromDateTime(minAllowed);
     } else {
-      initial = isStartTime
-          ? (startTime ?? TimeOfDay.now())
-          : (endTime ?? TimeOfDay.now());
+      if (date != null) {
+        initial = isStartTime
+            ? (startTimes[date] ?? TimeOfDay.now())
+            : (endTimes[date] ?? TimeOfDay.now());
+      } else {
+        initial = isStartTime
+            ? (startTime ?? TimeOfDay.now())
+            : (endTime ?? TimeOfDay.now());
+      }
     }
 
-    /// 🔥 TODAY START TIME → AUTO +4 HOURS
-    /*if (isSameDay && isStartTime) {
-        final min = now.add(const Duration(hours: 4));
-        initial = TimeOfDay(hour: min.hour, minute: min.minute);
-      }*/
-
-    /// 🔥 TIME PICKER WITH THEME
     final picked = await showTimePicker(
       context: context,
       initialTime: initial,
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            useMaterial3: true,
             dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
               primary: ColorCode.kButtonColor,
-              onPrimary: Colors.black,
-              surface: Color(0xFF121212),
+              onPrimary: Colors.white,
+              surface: Color(0xFF1E1E1E),
               onSurface: Colors.white,
             ),
             timePickerTheme: const TimePickerThemeData(
@@ -1421,18 +945,12 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
     if (picked == null || !mounted) return;
 
-    /// 🔥 VALIDATION (4 HOUR RULE)
-    if (isStartTime) {
-      final minAllowed = now.add(const Duration(hours: 4));
-/*
-        final pickedDT = DateTime(
-          baseDate.year,
-          baseDate.month,
-          baseDate.day,
-          picked.hour,
-          picked.minute,
-        );*/
+    /// 🔥 4 HOUR VALIDATION (MAIN FIX)
+    if (isToday) {
+      final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
+      final minAllowed = roundedNow.add(const Duration(hours: 4));
 
+      final baseDate = date ?? selectedDate!;
       final pickedDT = DateTime(
         baseDate.year,
         baseDate.month,
@@ -1441,1252 +959,774 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
         picked.minute,
       );
 
-      /// 🔥 APPLY ONLY IF TODAY
-      bool isToday =
-          baseDate.year == now.year &&
-              baseDate.month == now.month &&
-              baseDate.day == now.day;
-
-      /// 🔥 ONLY APPLY FOR TODAY
-      if (isToday && pickedDT.isBefore(minAllowed)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Select time after 4 hours from now"),
-            duration: Duration(seconds: 1),
-          ),
-        );
-        return;
-      }
-
-      /// 🔥 FINAL CORRECT CHECK (DATE + TIME)
       if (pickedDT.isBefore(minAllowed)) {
-        final min = TimeOfDay.fromDateTime(minAllowed);
-
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Select time after 4 hours from now"),
-            duration: Duration(seconds: 1),
-          ),
+          const SnackBar(content: Text("Select time after 4 hours")),
         );
         return;
       }
     }
 
-    /// 🔥 SAVE DATA
     setState(() {
       if (date != null) {
-        /// MULTIPLE (NO)
+        /// 🔥 MULTIPLE
         if (isStartTime) {
           startTimes[date] = picked;
         } else {
           endTimes[date] = picked;
         }
       } else {
-        /// SINGLE / MULTIPLE YES
+        /// 🔥 SINGLE
         if (isStartTime) {
           startTime = picked;
-          if (controller != null) {
-            _updateTimeText(controller, picked);
-          }
-
+          _updateTimeText(startTimeController, picked);
         } else {
-          endTime = picked;
-          if (controller != null) {
-            _updateTimeText(controller, picked);
+          if (startTime != null &&
+              !isEndTimeAfterStart(startTime!, picked)) {
+            /* ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("End time must be after Start time"),
+                ),
+              );*/
+            return;
           }
-        }
 
+          endTime = picked;
+          _updateTimeText(endTimeController, picked);
+        }
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-
-            Align(
-              alignment: Alignment.centerLeft,
-              child: InkWell(
-                onTap: () => Navigator.pop(context,true),
-                child: SvgPicture.asset(
-                  "assets/svg/back.svg",
-                  height: 24,
-                ),
+        leadingWidth: 40, // 🔥 important
+        leading: InkWell(
+          onTap: () => Navigator.pop(context),
+          child: Padding(
+            padding: const EdgeInsets.all(7),
+            child: SvgPicture.asset(
+              images.back,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
               ),
             ),
-            Text(
-              "Create Project",
-              style: TextStyle(
-                color: ColorCode.white,
-                fontSize: 14,
-                fontFamily: "Outfit",
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            // 🔹 Step Text (Right)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "1/3",
-                style: TextStyle(
-                  color: ColorCode.white,
-                  fontSize: 14,
-                  fontFamily: "Outfit",
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
+        actions: const [ Padding( padding: EdgeInsets.only(right: 16), child: Center( child: Text("1/2", style: TextStyle(color: Colors.white)), ), ) ],
       ),
 
       body: SafeArea(
 
         child: Stack(
-            children: [
-        Padding(
-        padding:  EdgeInsets.all(20.0),
-        child: Column(
-            children: [
-
-        Row(
-        children: List.generate(3, (index) {
-          bool isActive = index == 0; // current step (1/3)
-
-          return Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              height: 5,
-              decoration: BoxDecoration(
-                color: ColorCode.kSubtextColor, // grey background
-                borderRadius: BorderRadius.circular(64),
-              ),
-              child: isActive
-                  ? Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  height: 5,
-                  width: 120, // 🔥 colored portion only
-                  decoration: BoxDecoration(
-                    color: ColorCode.kButtonColor,
-                    borderRadius: BorderRadius.circular(64),
-                  ),
-                ),
-              )
-                  : const SizedBox(),
-            ),
-          );
-        }),
-      ),
-      SizedBox(
-        height: 20,
-      ),
-
-      Row(
-        children: [
-          Text(
-
-            textAlign: TextAlign.start,
-            "Select Booking Type",
-            style: TextStyle(
-              fontFamily: "Unbounded",
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-      SizedBox(height: 12,),
-      //////////////////////////////////////////////////////////////////////////
-
-      Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-              children: [
-          Row(
           children: [
-          /// ================= SINGLE =================
-          Expanded(
-            child: GestureDetector(
-
-                onTap: () {
-                    if (isSingleLocked) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Single Day not allowed")),
-                    );
-                    return;
-                    }
-
-                    setState(() {
-                    selectedIndex = 1;
-
-                    /// reset multi
-                    selectedDates.clear();
-                    startTimes.clear();
-                    endTimes.clear();
-
-                    /// reset time
-                    startTime = null;
-                    endTime = null;
-                    startTimeController.clear();
-                    endTimeController.clear();
-                    });
-                    },
-
-                    child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
-                    decoration: BoxDecoration(
-                      /// 🔥 COLOR FIX
-                      color: isSingleLocked
-              ? Colors.grey.withOpacity(0.3)
-              : (selectedIndex == 1
-              ? const Color(0xFFE6D5B8)
-              : Colors.transparent),
-
-                      borderRadius: BorderRadius.circular(12),
-
-                      border: selectedIndex == 1
-              ? null
-              : Border.all(color: Colors.white.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-            Text(
-              "Single Day",
-              style: TextStyle(
-                fontFamily: 'Outfit',
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: isSingleLocked
-                    ? Colors.grey
-                    : (selectedIndex == 1
-                    ? Colors.black
-                    : Colors.grey),
-              ),
-            ),
-
-            /// RADIO
-            selectedIndex == 1
-                ? Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF000000),
-                    Color(0xFF363131),
-                  ],
-                ),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: const Center(
-                child: CircleAvatar(
-                  radius: 3,
-                  backgroundColor: Color(0xFFE6D5B8),
-                ),
-              ),
-            )
-                : Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
-                ),
-              ),
-            ),
-                      ],
-                    ),
-                  ),
-                ),
-          ),
-          
-              const SizedBox(width: 12),
-          
-              /// ================= MULTI =================
-              Expanded(
-                child: GestureDetector(
-                onTap: () {
-                if (isMultiLocked) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Multiple Day not allowed")),
-                );
-                return;
-                }
-
-                setState(() {
-                selectedIndex = 2;
-
-                /// reset single
-                selectedDate = null;
-                dateController.clear();
-
-                /// reset time
-                startTime = null;
-                endTime = null;
-                startTimeController.clear();
-                endTimeController.clear();
-                });
-                },
-                child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
-                decoration: BoxDecoration(
-                /// 🔥 COLOR FIX
-                color: isMultiLocked
-                ? Colors.grey.withOpacity(0.3)
-                    : (selectedIndex == 2
-                ? const Color(0xFFE6D5B8)
-                    : Colors.transparent),
-
-                borderRadius: BorderRadius.circular(12),
-
-                border: selectedIndex == 2
-                ? null
-                    : Border.all(color: Colors.white.withOpacity(0.3)),
-                ),
-                child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Padding(
+              padding:  EdgeInsets.all(15),
+              child: Column(
                 children: [
-                Text(
-                "Multiple Days",
-                style: TextStyle(
-                fontFamily: 'Outfit',
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: isMultiLocked
-                ? Colors.grey
-                    : (selectedIndex == 2
-                ? Colors.black
-                    : Colors.grey),
-                ),
-                ),
 
-                /// RADIO
-                selectedIndex == 2
-                ? Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                colors: [
-                Color(0xFF000000),
-                Color(0xFF363131),
-                ],
-                ),
-                border: Border.all(color: Colors.grey),
-                ),
-                child: const Center(
-                child: CircleAvatar(
-                radius: 3,
-                backgroundColor: Color(0xFFE6D5B8),
-                ),
-                ),
-                )
-                    : Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                ),
-                ),
-                ),
-                ],
-                ),
-                ),
-                ),
-              ),
-              ],
-              ),
-          
-          
-          
-              //////////////////////////////////////////////////////////////////////////
-          
-              SizedBox(
-              height: 50,
-              ),
-          
-              if (selectedIndex==2) ...[
-              Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Row(
-              children: [
-              Text(
-              "Select Date",
-              style: TextStyle(
-              fontFamily: "Unbounded",
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              ),
-              ),
-          
-              ],
-              ),
-              SizedBox(height: 12,),
-              buildDateSelector(
-              context: context,
-              selectedDates: selectedDates,
-              onChanged: (dates) {
-              setState(() {
-              selectedDates = dates;
-              });
-              },
-              ),
-          
-          
-              SizedBox(height: 12,),
-          
-              Row(
-              children: [
-              Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-              color: Color(0xff322F2A),
-              borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-              "Total Days: ${selectedDates.length}",
-              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
-              ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-              child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-              color: Color(0xff322F2A),
-              borderRadius: BorderRadius.circular(12),
-              ),
-              child: selectedDates.isEmpty
-              ? const Text(
-              "No dates selected",
-              style: TextStyle(
-              color: Color(0xFFE8D1AB),
-              fontSize: 12,
-              ),
-              )
-                  : SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // 👈 scroll enable
-              child: Text(
-              formatSelectedDates(selectedDates),
-              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
-              ),
-              ),
-              ),
-              ),
-              ],
-              ),
-          
-              SizedBox(height: 18,),
-              Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
-              color: Colors.white,
-              fontFamily:'Unbounded',
-              fontSize: 14,
-              ),),
-          
-              const SizedBox(height: 12),
-          
-              /// 🔹 YES / NO
-              Row(
-              children: [
-              _buildOption(
-              title: "Yes",
-              isSelected: istimingsame == true,
-              onTap: () {
-              setState(() {
-              istimingsame = true;
-          
-              /// 🔥 RESET ADD HERE
-              startTimeStr = null;
-              endTimeStr = null;
-              startTimeMap.clear();
-              endTimeMap.clear();
-              isStartOpen = false;
-              isEndOpen = false;
-              });
-              }
-              ),
-              const SizedBox(width: 24),
-              _buildOption(
-          
-              title: "No",
-              isSelected: istimingsame == false,
-              onTap: () {
-              setState(() {
-              istimingsame = false;
-          
-              /// 🔥 RESET ADD HERE
-              startTimeStr = null;
-              endTimeStr = null;
-              startTimeMap.clear();
-              endTimeMap.clear();
-              isStartOpen = false;
-              isEndOpen = false;
-              });
-              }
-          
-              ),
-              ],
-              ),
-              if (istimingsame == false) ...[
-              const SizedBox(height: 20),
-          
-              Column(
-              children: selectedDates.map((date) {
-              final isOpen = expandedMap[date] ?? false;
-          
-              return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-          
-              border: isOpen?
-              Border.all(color: Colors.white.withOpacity(0.2)):
-          
-              Border.all(color:  Colors.transparent),
-              borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-              children: [
-          
-              /// 🔥 HEADER (Dropdown)
-              GestureDetector(
-              onTap: () {
-              setState(() {
-              expandedMap[date] = !isOpen;
-              });
-              },
-              child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-              color: const Color(0xff282828),
-              borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-              Text(
-              DateFormat('MMMM dd, yyyy').format(date),
-              style: const TextStyle(color: Colors.white),
-              ),
-              Icon(
-              isOpen
-              ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down,
-              color: Colors.white,
-              )
-              ],
-              ),
-              ),
-              ),
-          
-              /// 🔥 BODY
-              if (isOpen) ...[
-              Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-          
-              children: [
-          
-              /// Start Time
-          
-              /*  CustomInputField(
-                                  title: "Start Time",
-                                  controller: TextEditingController(
-                                  text: startTimes[date]?.format(context) ?? "",
-                                  ),
-                                  readOnly: true,
-                                  onTap: () {
-                                  _selectTime(context, null, true, date); // ✅ FIX
-                                  },
-                                  suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: SvgPicture.asset(
-                                  "assets/svg/Group 2087328870.svg",
-                                    color: ColorCode.white,
-                                  ),
-                                  ),
-                                  ),
-                                                SizedBox(height: 30,),
-                                                CustomInputField(
-                                                  title: "End Time",
-                                                  controller: TextEditingController(
-                                                    text: endTimes[date]?.format(context) ?? "",
-                                                  ),
-                                                  readOnly: true,
-                                                  onTap: () {
-                                                    _selectTime(context, null, false, date); // ✅ FIX
-                                                  },
-                                                  suffixIcon: Padding(
-                                                    padding: const EdgeInsets.all(12),
-                                                    child: SvgPicture.asset(
-                                                      "assets/svg/Group 2087328870.svg",
-                                                      color: ColorCode.white,
-                                                    ),
-                                                  ),
-                                                ),*/
-          
-              buildTimeDropdown(
-              key: ValueKey("${date.toString()}_start"),
-              title: "Start Time",
-              selectedTime: startTimeMap[normalizeDate(date)],
-              isStart: true,
-              date: date,
-              onSelect: (val) {
-              final key = normalizeDate(date);
-          
-              setState(() {
-              startTimeMap[key] = val;
-              endTimeMap[key] = null;
-          
-              final dt = parseTime(val, key);
-          
-              startTimes[key] = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-              );
-              });
-              },
-              ),
-              SizedBox(height: 10,),
-              buildTimeDropdown(
-              key: ValueKey("${date.toString()}_end"),
-              title: "End Time",
-              selectedTime: endTimeMap[normalizeDate(date)],
-              isStart: false,
-              date: date,
-              onSelect: (val) {
-              final key = normalizeDate(date);
-          
-              setState(() {
-              endTimeMap[key] = val;
-          
-              final dt = parseTime(val, key);
-          
-              endTimes[key] = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-              );
-              });
-              },
-              ),
-              const SizedBox(height: 16),
-          
-              /// Duration
-              Container(
-              padding: const EdgeInsets.symmetric(
-              horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-              color: const Color(0xffE8D1AB),
-              borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-              getDurationText(date),
-              style: const TextStyle(
-              color: Colors.black,
-              fontSize: 12,
-              ),
-              ),
-              ),
-              ],
-              ),
-              )
-              ]
-              ],
-              ),
-              );
-              }).toList(),
-              )
-              ],
-          
-          
-          
-              if (istimingsame == true) ...[
-              SizedBox(height: 22),
-          
-              /*      /// ✅ START TIME
-                              CustomInputField(
-                                title: "Start Time",
-                                controller: startTimeController,
-                                readOnly: true,
-                                onTap: () {
-                                  if (selectedDates.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please select date first")),
-                                    );
-                                    return;
-                                  }
-          
-                                  _selectTime(context, startTimeController, true, null); // ✅ FIX
-                                },
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: SvgPicture.asset(
-                                    "assets/svg/Group 2087328870.svg",
-                                    color: ColorCode.white,
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                              ),
-          
-                              SizedBox(height: 30),
-          
-                              /// ✅ END TIME
-                              CustomInputField(
-                                title: "End Time",
-                                controller: endTimeController,
-                                readOnly: true,
-                                onTap: () {
-                                  if (selectedDates.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Please select date first")),
-                                    );
-                                    return;
-                                  }
-          
-                                  _selectTime(context, endTimeController, false, null); // ✅ FIX
-                                },
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: SvgPicture.asset(
-                                    "assets/svg/Group 2087328870.svg",
-                                    color: ColorCode.white,
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                              ),*/
-              buildTimeDropdown(
-              title: "Start Time",
-              selectedTime: startTimeStr,
-              isStart: true,
-              onSelect: (val) {
-              setState(() {
-              startTimeStr = val;
-              endTimeStr = null; // reset end
-              });
-              },
-              ),
-              SizedBox(height: 10,),
-              buildTimeDropdown(
-              title: "End Time",
-              selectedTime: endTimeStr,
-              isStart: false,
-              onSelect: (val) {
-              setState(() {
-              endTimeStr = val;
-              });
-              },
-          
-              ),
-              const SizedBox(height: 16),
-              SizedBox(height: 12),
-          
-              Row(
-              children: [
-              SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
-              SizedBox(width: 6),
-              Text(
-              'Applied to ${selectedDates.length} selected dates',
-              style: TextStyle(
-              color: const Color(0xFFA9A9A9),
-              fontSize: 14,
-              fontFamily: 'Outfit',
-              fontWeight: FontWeight.w400,
-              height: 1.36,
-              ),
-              ),
-              ],
-              ),
-              SizedBox(height: 20),
-              Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-              color: Colors.white.withOpacity(0.08),
-              ),
-              ),
-              child: Row(
-              children: [
-              /// 📅 ICON
-              SvgPicture.asset("assets/svg/calendar-03.svg"),
-          
-              const SizedBox(width: 13),
-          
-              /// 📅 DATE + TIME (DYNAMIC)
-              Expanded(
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              /// 🔥 DYNAMIC DATE
-              Text(
-              formatDatesAlt(selectedDates), // ✅ already in your code
-              style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              fontFamily: "Helvetica Neue"
-              ),
-              ),
-          
-              const SizedBox(height: 4),
-          
-              /// 🔥 DYNAMIC TIME
-              Text(
-              startTime != null && endTime != null
-              ? "${startTime!.format(context)} – ${endTime!.format(context)}"
-                  : "Select Time",
-              style: TextStyle(
-              fontFamily: "Helvetica Neue",
-          
-          
-              color: ColorCode.kWhiteOpacity70,
-              fontSize: 11,
-              ),
-              ),
-              ],
-              ),
-              ),
-          
-              /// ⏱ DYNAMIC HOURS
-              Text(
-              getTotalDuration(), // 👇 function below
-              style: TextStyle(
-              color: ColorCode.kButtonColor,
-              fontSize: 14,
-              fontFamily: "Helvetica Neue",
-          
-          
-              fontWeight: FontWeight.w500,
-              ),
-              ),
-              ],
-              ),)
-              ,                              ],
-          
-              SizedBox(height: 12),
-          
-          
-          
-          
-          
-              ],
-              ),
-              ],
-          
-          
-              if (selectedIndex==1) ...[
-              Row(
-              children: [
-              Text(
-              "Shoot Date & Time",
-              style: TextStyle(
-              fontFamily: "Unbounded",
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              ),
-              ),
-              ],
-              ),
-          
-              SizedBox(height: 30,),
-          
-          
-          
-              CustomInputField(
-              title: "Select Date",
-              controller: dateController,
-              readOnly: true,
-              onTap: () => _selectDate(context),
-              suffixIcon: Padding(
-              padding: const EdgeInsets.all(12),
-              child: SvgPicture.asset(
-              "assets/svg/calendar-03.svg",
-              width: 20,
-              height: 20,
-              colorFilter: const ColorFilter.mode(
-              ColorCode.kWhiteOpacity70,
-              BlendMode.srcIn,
-              ),
-              ),
-              ),
-              ),
-              SizedBox(height: 30,),
-              /*   timeField(
-                      controller: startTimeController,
-                      label: "Start Time*",
-                      onTap: () {
-                        if (!isDateSelected()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Please select date first")),
-                          );
-                          return;
-                        }
-                        // Updated call: 3 arguments (context, controller, isStartTime)
-                        _selectTime(context, startTimeController, true);
-                      },
-                                      ),*/
-              /*  CustomInputField(
-                          title: "Start Time",
-                          controller: startTimeController,
-                          readOnly: true,
-                          onTap: () {
-                            if (!isDateSelected()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Please select date first")),
-                              );
-                              return;
-                            }
-          
-                            _selectTime(context, startTimeController, true, null); // ✅ FIX
-                          },
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: SvgPicture.asset(
-                              "assets/svg/Group 2087328870.svg",
-                              width: 20,
-                              height: 20,
-                              color: ColorCode.white,
-                            ),
+                  Row(
+                    children: List.generate(
+                      2,
+                          (index) => Expanded(
+                        child: Container(
+                          margin:  EdgeInsets.only(right: 6),
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: index < 1
+                                ? ColorCode.kButtonColor
+                                : ColorCode.kSubtextColor,
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-          
-                        SizedBox(height: 30),
-          
-                        CustomInputField(
-                          title: "End Time",
-                          controller: endTimeController,
-                          readOnly: true,
-                          onTap: () {
-                            if (!isDateSelected()) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Please select date first")),
-                              );
-                              return;
-                            }
-          
-                            _selectTime(context, endTimeController, false, null); // ✅ FIX
-                          },
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: SvgPicture.asset(
-                              "assets/svg/Group 2087328870.svg",
-                              width: 20,
-                              height: 20,
-                              color: ColorCode.white,
-                            ),
-                          ),
-                        ),*/
-          
-              buildTimeDropdown(
-              title: "Start Timeddddddd",
-              selectedTime: startTimeStr,
-              isStart: true,
-              onSelect: (val) {
-              setState(() {
-              startTimeStr = val;
-              endTimeStr = null; // reset end
-              });
-              },
-              ),
-              SizedBox(height: 10,),
-              buildTimeDropdown(
-              title: "End Time",
-              selectedTime: endTimeStr,
-              isStart: false,
-              onSelect: (val) {
-              setState(() {
-              endTimeStr = val;
-              });
-              },
-              ),
-              const SizedBox(height: 16),
-              ],
-          
-          
-          
-              SizedBox(height: 30,),
-              Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-          
-              /// 🔹 TITLE
-              Text(
-              "Edits Needed?",
-              style: TextStyle(
-              fontFamily: "Unbounded",
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              ),
-              ),
-          
-              const SizedBox(height: 12),
-          
-              /// 🔹 YES / NO
-              Row(
-              children: [
-              _buildOption(
-              title: "Yes",
-              isSelected: isEditNeeded == true,
-              onTap: () {
-              setState(() {
-              isEditNeeded = true;
-              });
-              },
-              ),
-              const SizedBox(width: 24),
-              _buildOption(
-          
-              title: "No",
-              isSelected: isEditNeeded == false,
-              onTap: () {
-              setState(() {
-              isEditNeeded = false;
-          
-              // 🔥 CLEAR OLD DATA
-              resetEditTypes();
-          
-              });
-              },
-          
-              ),
-              ],
-              ),
-          
-              /// 🔥 ONLY SHOW WHEN YES SELECTED
-              if (isEditNeeded == true) ...[
-              const SizedBox(height: 30),
-          
-              /// 🔹 INFO CONTAINER
-              Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-              color: ColorCode.k282828,
-              borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:  [
-              Row(
-              children: [
-              Icon(
-              Icons.info_outline,
-              size: 18,
-              color: Colors.white,
-              ),
-              SizedBox(width: 8),
-              Text(
-              "Editing includes",
-              style: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              fontFamily: "Outfit",
-              ),
-              ),
-              ],
-              ),
-              SizedBox(height: 10),
-              Row(
-              children: [
-              Icon(
-              Icons.check,
-              size: 16,
-              color: Color(0xFFBDBDBD),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-              child: Text(
-              getEditingDescription(),
-              style: const TextStyle(
-              color: ColorCode.kWhiteOpacity70,
-              fontSize: 13,
-              fontFamily: "Outfit",
-              ),
-              softWrap: true,
-              ),
-              ),
-              ],
-              ),
-              ],
-              ),
-              ),
-          
-              SizedBox(height: 30),
-          
-          
-              /*    GestureDetector(
-                              onTap: _showEditTypeBottomSheet,
-                              child: AbsorbPointer(
-                                child: TextField(
-                                  controller: TextEditingController(
-                                    text: getEditTypeDisplayText(),
-                                  ),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: "Outfit",
-                                    fontSize: 14,
-                                  ),
-                                  decoration: InputDecoration(
-                                    labelText: getContentTypeTitle(widget.contentTypeId),
-                                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                                    suffixIcon: const Icon(
-                                      Icons.keyboard_arrow_down,
-          
-                                      color: ColorCode.kWhiteOpacity70,
-                                    ),
-                                    contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                                    enabledBorder: OutlineInputBorder(
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  Row(
+                    children: [
+                      Text(
+
+                        textAlign: TextAlign.start,
+                        "Select Booking Type",
+                        style: TextStyle(
+                          fontFamily: "Unbounded",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12,),
+                  //////////////////////////////////////////////////////////////////////////
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              /// ================= SINGLE =================
+                              Expanded(
+                                child: GestureDetector(
+                                  /* onTap: () {
+                                    if (isSingleLocked) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Single Day not allowed")),
+                                      );
+                                      return;
+                                    }
+
+                                    setState(() {
+                                      selectedIndex = 1;
+
+                                      /// reset multi
+                                      selectedDates.clear();
+                                      startTimes.clear();
+                                      endTimes.clear();
+
+                                      /// reset time
+                                      startTime = null;
+                                      endTime = null;
+                                      startTimeController.clear();
+                                      endTimeController.clear();
+                                    });
+                                  },*/
+                                  onTap: null,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                    decoration: BoxDecoration(
+                                      /// 🔥 COLOR FIX
+                                      color: isSingleLocked
+                                          ? Colors.grey.withOpacity(0.3)
+                                          : (selectedIndex == 1
+                                          ? const Color(0xFFE6D5B8)
+                                          : Colors.transparent),
+
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide:
-                                      const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+
+                                      border: selectedIndex == 1
+                                          ? null
+                                          : Border.all(color: Colors.white.withOpacity(0.3)),
                                     ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide:
-                                      const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Single Day",
+                                          style: TextStyle(
+                                            fontFamily: 'Outfit',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: isSingleLocked
+                                                ? Colors.grey
+                                                : (selectedIndex == 1
+                                                ? Colors.black
+                                                : Colors.grey),
+                                          ),
+                                        ),
+
+                                        /// RADIO
+                                        selectedIndex == 1
+                                            ? Container(
+                                          width: 22,
+                                          height: 22,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF000000),
+                                                Color(0xFF363131),
+                                              ],
+                                            ),
+                                            border: Border.all(color: Colors.grey),
+                                          ),
+                                          child: const Center(
+                                            child: CircleAvatar(
+                                              radius: 3,
+                                              backgroundColor: Color(0xFFE6D5B8),
+                                            ),
+                                          ),
+                                        )
+                                            : Container(
+                                          width: 22,
+                                          height: 22,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.3),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ),*/
-              Column(
-              children: [
-          
-              /// ✅ VIDEO ONLY IF DATA AVAILABLE
-              if (editTypes.isNotEmpty)
-              VideoEdits('Video Edits', editTypes),
-          
-              /// ✅ PHOTO ONLY IF DATA AVAILABLE
-              if (photoEditTypes.isNotEmpty)
-              PhotoEdits('Photo Edits', photoEditTypes),
-          
-              ],
-              ),
-          
-              /*          if (photoEditTypes.isNotEmpty) ...[
-                              SizedBox(height: 12,),
-                              Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xffE8D1AB), // Beige/Cream color
-                                borderRadius: BorderRadius.circular(8), // Fully rounded like the image
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
+
+                              const SizedBox(width: 12),
+
+                              /// ================= MULTI =================
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (isMultiLocked) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Multiple Day not allowed")),
+                                      );
+                                      return;
+                                    }
+
+                                    setState(() {
+                                      selectedIndex = 2;
+
+                                      /// reset single
+                                      selectedDate = null;
+                                      dateController.clear();
+
+                                      /// reset time
+                                      startTime = null;
+                                      endTime = null;
+                                      startTimeController.clear();
+                                      endTimeController.clear();
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                    decoration: BoxDecoration(
+                                      /// 🔥 COLOR FIX
+                                      color: isMultiLocked
+                                          ? Colors.grey.withOpacity(0.3)
+                                          : (selectedIndex == 2
+                                          ? const Color(0xFFE6D5B8)
+                                          : Colors.transparent),
+
+                                      borderRadius: BorderRadius.circular(12),
+
+                                      border: selectedIndex == 2
+                                          ? null
+                                          : Border.all(color: Colors.white.withOpacity(0.3)),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Multiple Days",
+                                          style: TextStyle(
+                                            fontFamily: 'Outfit',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: isMultiLocked
+                                                ? Colors.grey
+                                                : (selectedIndex == 2
+                                                ? Colors.black
+                                                : Colors.grey),
+                                          ),
+                                        ),
+
+                                        /// RADIO
+                                        selectedIndex == 2
+                                            ? Container(
+                                          width: 22,
+                                          height: 22,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF000000),
+                                                Color(0xFF363131),
+                                              ],
+                                            ),
+                                            border: Border.all(color: Colors.grey),
+                                          ),
+                                          child: const Center(
+                                            child: CircleAvatar(
+                                              radius: 3,
+                                              backgroundColor: Color(0xFFE6D5B8),
+                                            ),
+                                          ),
+                                        )
+                                            : Container(
+                                          width: 22,
+                                          height: 22,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white.withOpacity(0.3),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ],
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  // Sparkle Icon Container
-                                  Container(
-                                    width: 34,
-                                    height: 34,
-                                    padding: EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child:  Center(
-                                      child: Image.asset('assets/images/star.png'),
-                                    ),
-                                  ),
-          
-                                  const SizedBox(width: 5),
-          
-                                  // Text
-                                  Expanded(
-                                    child: Text(
-                                      "You’ll Receive 125 Photos + 2 Videos",
+                            ],
+                          ),
+
+
+                          SizedBox(
+                            height: 50,
+                          ),
+
+                          if (selectedIndex==2) ...[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Select Date",
                                       style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xff101010),
-          
+                                        fontFamily: "Unbounded",
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            ],*/
-          
-              if (selectedEditTypeNames.isNotEmpty) ...[
-              const SizedBox(height: 14),
-          
-              /* Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: List.generate(selectedEditTypeNames.length, (index) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: ColorCode.k282828,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: ColorCode.kWhiteOpacity70,
-                                      width: 0.5,
+
+                                  ],
+                                ),
+                                SizedBox(height: 12,),
+                                buildDateSelector(
+                                  context: context,
+                                  selectedDates: selectedDates,
+                                  onChanged: (dates) {
+                                    setState(() {
+                                      selectedDates = dates;
+                                    });
+                                  },
+                                ),
+
+
+                                SizedBox(height: 12,),
+
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xff322F2A),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        "Total Days: ${selectedDates.length}",
+                                        style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
+                                      ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        selectedEditTypeNames[index],
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 13,
-                                          fontFamily: "Outfit",
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Color(0xff322F2A),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: selectedDates.isEmpty
+                                            ? const Text(
+                                          "No dates selected",
+                                          style: TextStyle(
+                                            color: Color(0xFFE8D1AB),
+                                            fontSize: 12,
+                                          ),
+                                        )
+                                            : SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal, // 👈 scroll enable
+                                          child: Text(
+                                              formatSelectedDates(selectedDates),
+                                              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(width: 6),
-          
-                                      /// ❌ REMOVE ICON
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedEditTypeIds.removeAt(index);
-                                            selectedEditTypeNames.removeAt(index);
-                                          });
-                                        },
-                                        child: const Icon(
-                                          Icons.close,
-                                          size: 16,
-                                          color: Colors.white70,
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(height: 12,),
+                                Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily:'Unbounded',
+                                  fontSize: 14,
+                                ),),
+
+                                const SizedBox(height: 12),
+
+                                /// 🔹 YES / NO
+                                Row(
+                                  children: [
+                                    _buildOption(
+                                      title: "Yes",
+                                      isSelected: istimingsame == true,
+                                      onTap: () {
+                                        setState(() {
+                                          istimingsame = true;
+                                        });
+                                      },
+
+                                    ),
+                                    const SizedBox(width: 24),
+                                    _buildOption(
+
+                                      title: "No",
+                                      isSelected: istimingsame == false,
+                                      onTap: () {
+                                        setState(() {
+                                          istimingsame = false;
+
+                                          // 🔥 CLEAR OLD DATA
+                                          resetEditTypes();
+
+                                        });
+                                      },
+
+                                    ),
+                                  ],
+                                ),
+                                if (istimingsame == false) ...[
+                                  const SizedBox(height: 20),
+
+                                  Column(
+                                    children: selectedDates.map((date) {
+                                      final isOpen = expandedMap[date] ?? false;
+
+                                      return Container(
+                                        margin: const EdgeInsets.only(bottom: 12),
+                                        decoration: BoxDecoration(
+
+                                          border: isOpen?
+                                          Border.all(color: Colors.white.withOpacity(0.2)):
+
+                                          Border.all(color:  Colors.transparent),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Column(
+                                          children: [
+
+                                            /// 🔥 HEADER (Dropdown)
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  expandedMap[date] = !isOpen;
+                                                });
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xff282828),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      DateFormat('MMMM dd, yyyy').format(date),
+                                                      style: const TextStyle(color: Colors.white),
+                                                    ),
+                                                    Icon(
+                                                      isOpen
+                                                          ? Icons.keyboard_arrow_up
+                                                          : Icons.keyboard_arrow_down,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+
+                                            /// 🔥 BODY
+                                            if (isOpen) ...[
+                                              Padding(
+                                                padding: const EdgeInsets.all(16),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                  children: [
+
+                                                    /// Start Time
+
+                                                    CustomInputField(
+                                                      title: "Start Time",
+                                                      controller: TextEditingController(
+                                                        text: startTimes[date]?.format(context) ?? "",
+                                                      ),
+                                                      readOnly: true,
+                                                      /*   onTap: () {
+                                                        _selectTime(context, null, true, date); // ✅ FIX
+                                                      },*/
+                                                      onTap: null,
+                                                      suffixIcon: Padding(
+                                                        padding: const EdgeInsets.all(12),
+                                                        child: SvgPicture.asset(
+                                                          "assets/svg/Group 2087328870.svg",
+                                                          color: ColorCode.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 30,),
+                                                    CustomInputField(
+                                                      title: "End Time",
+                                                      controller: TextEditingController(
+                                                        text: endTimes[date]?.format(context) ?? "",
+                                                      ),
+                                                      readOnly: true,
+                                                      /*  onTap: () {
+                                                        _selectTime(context, null, false, date); // ✅ FIX
+                                                      },*/
+                                                      onTap: null,
+                                                      suffixIcon: Padding(
+                                                        padding: const EdgeInsets.all(12),
+                                                        child: SvgPicture.asset(
+                                                          "assets/svg/Group 2087328870.svg",
+                                                          color: ColorCode.white,
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    const SizedBox(height: 16),
+
+                                                    /// Duration
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                          horizontal: 14, vertical: 8),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xffE8D1AB),
+                                                        borderRadius: BorderRadius.circular(8),
+                                                      ),
+                                                      child: Text(
+                                                        getDurationText(date),
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ]
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  )
+                                ],
+
+
+
+                                if (istimingsame == true) ...[
+                                  SizedBox(height: 22),
+
+                                  /// ✅ START TIME
+                                  CustomInputField(
+                                    title: "Start Time",
+                                    controller: startTimeController,
+                                    readOnly: true,
+                                    /* onTap: () {
+                                      if (selectedDates.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please select date first")),
+                                        );
+                                        return;
+                                      }
+
+                                      _selectTime(context, startTimeController, true, null); // ✅ FIX
+                                    },*/
+                                    onTap: null,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: SvgPicture.asset(
+                                        "assets/svg/Group 2087328870.svg",
+                                        color: ColorCode.white,
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 30),
+
+                                  /// ✅ END TIME
+                                  CustomInputField(
+                                    title: "End Time",
+                                    controller: endTimeController,
+                                    readOnly: true,
+                                    /* onTap: () {
+                                      if (selectedDates.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please select date first")),
+                                        );
+                                        return;
+                                      }
+
+                                      _selectTime(context, endTimeController, false, null); // ✅ FIX
+                                    },*/
+                                    onTap: null,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: SvgPicture.asset(
+                                        "assets/svg/Group 2087328870.svg",
+                                        color: ColorCode.white,
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 12),
+
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Applied to ${selectedDates.length} selected dates',
+                                        style: TextStyle(
+                                          color: const Color(0xFFA9A9A9),
+                                          fontSize: 14,
+                                          fontFamily: 'Outfit',
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.36,
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-                              }),
-                            ),*/
-              ]
-              ],
-              ],
+                                ]
+
+
+
+                              ],
+                            ),
+                          ],
+
+
+                          if (selectedIndex==1) ...[
+                            Row(
+                              children: [
+                                Text(
+                                  "Shoot Date & Time",
+                                  style: TextStyle(
+                                    fontFamily: "Unbounded",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 30,),
+
+
+
+                            CustomInputField(
+                              title: "Select Date",
+                              controller: dateController,
+                              readOnly: true,
+                              onTap: null,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: SvgPicture.asset(
+                                  "assets/svg/calendar-03.svg",
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: const ColorFilter.mode(
+                                    ColorCode.kWhiteOpacity70,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 30,),
+                            /*   timeField(
+                        controller: startTimeController,
+                        label: "Start Time*",
+                        onTap: () {
+                          if (!isDateSelected()) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please select date first")),
+                            );
+                            return;
+                          }
+                          // Updated call: 3 arguments (context, controller, isStartTime)
+                          _selectTime(context, startTimeController, true);
+                        },
+                                        ),*/
+                            CustomInputField(
+                              title: "Start Time",
+                              controller: startTimeController,
+                              readOnly: true,
+                              /*   onTap: () {
+                                if (!isDateSelected()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Please select date first")),
+                                  );
+                                  return;
+                                }
+
+                                // _selectTime(context, startTimeController, true, null); // ✅ FIX
+                              },*/
+                              onTap: null,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: SvgPicture.asset(
+                                  "assets/svg/Group 2087328870.svg",
+                                  width: 20,
+                                  height: 20,
+                                  color: ColorCode.white,
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 30),
+
+                            CustomInputField(
+                              title: "End Time",
+                              controller: endTimeController,
+                              readOnly: true,
+                              /* onTap: () {
+                                if (!isDateSelected()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Please select date first")),
+                                  );
+                                  return;
+                                }
+
+                                _selectTime(context, endTimeController, false, null); // ✅ FIX
+                              },*/
+                              onTap: null,
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: SvgPicture.asset(
+                                  "assets/svg/Group 2087328870.svg",
+                                  width: 20,
+                                  height: 20,
+                                  color: ColorCode.white,
+                                ),
+                              ),
+                            ),
+                          ],
+
+
+
+                          SizedBox(height: 30,),
+
+
+
+
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              ],
-              ),
-        ),
-    /*  if (isSubmitting)
+
+            ),
+            /*  if (isSubmitting)
               Positioned.fill(
                 child: Container(
                   color: Colors.black.withOpacity(0.15), // optional dim
@@ -2698,72 +1738,80 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                   ),
                 ),
               ),*/
-      )
-            ],
+          ],
 
-    ),
-    ),
-    ]),
+        ),
+      ),
 
-    ),
-    bottomNavigationBar: Padding(
-    padding: const EdgeInsets.all(16),
-    child: Row(
-    children: [
-    Expanded(
-    child:  OutlinedButton(
-    onPressed: () => Navigator.pop(context),
-    style: OutlinedButton.styleFrom(
-    foregroundColor: Colors.white,
-    side: const BorderSide(color: Colors.grey),
-    padding: const EdgeInsets.symmetric(vertical: 14),
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12),
-    ),
-    ),
-    child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
-    ),
-    ),
-    const SizedBox(width: 12),
-    Expanded(
-    child: ElevatedButton(
-    onPressed: isFormValid && !isSubmitting
-    ? () {
-    debugPrint("✅ Continue clicked");
-    _ShootDate_Time(); // 🔥 API CALL
-    }
-        : null, // ❌ disabled when false
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(5, 10, 16, 15),
+        child: Row(
+          children: [
+            /*   Expanded(
+              child:  OutlinedButton(
+                onPressed: () => Navigator.pop(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.grey),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+              ),
+            ),*/
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                /* onPressed: isFormValid && !isSubmitting
+                    ? () {
+                  debugPrint("✅ Continue clicked");
+                  _ShootDate_Time(); // 🔥 API CALL
+                }
+                    : null, // ❌ disabled when false
+*/
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BookinReviewConfirm(
+                        // contentTypeId: widget.contentTypeId,
+                        bookingId: widget.bookingId,
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isFormValid
+                      ? ColorCode.kButtonColor   // ✅ active
+                      : ColorCode.k282828,       // ❌ disabled
+                  foregroundColor: isFormValid
+                      ? Colors.black
+                      : Colors.grey.shade500,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: isFormValid ? 2 : 0,
+                ),
 
-    style: ElevatedButton.styleFrom(
-    backgroundColor: isFormValid
-    ? ColorCode.kButtonColor   // ✅ active
-        : ColorCode.k282828,       // ❌ disabled
-    foregroundColor: isFormValid
-    ? Colors.black
-        : Colors.grey.shade500,
-    padding: const EdgeInsets.symmetric(vertical: 14),
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12),
-    ),
-    elevation: isFormValid ? 2 : 0,
-    ),
+                child: const Text(
+                  "Next",
+                  style: TextStyle(
+                    fontFamily: "Unbounded",
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
 
-    child: const Text(
-    "Continue",
-    style: TextStyle(
-    fontFamily: "Unbounded",
-    fontWeight: FontWeight.w500,
-    fontSize: 14,
-    ),
-    ),
-    ),
-
-    ),
+            ),
 
 
-    ],
-    ),
-    ),
+          ],
+        ),
+      ),
     );
   }
   /////////////////////////////////////////////////////////////////////////////////////
@@ -2826,10 +1874,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 GestureDetector(
                   onTap: () => _selectDateMultiple(context),
                   child: SvgPicture.asset(
-                    'assets/svg/calendar-03.svg',
+                    'assets/svg/Calendar_Mark-2.svg',
                     width: 24,
                     height: 24,
-
                   ),
                 ),
               ],
@@ -2856,7 +1903,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 );
 
                 return GestureDetector(
-                  onTap: isPast
+                /*  onTap: isPast
                       ? null
                       : () {
                     List<DateTime> updated =
@@ -2873,6 +1920,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
                     /// 🔥 UI refresh
                     (context as Element).markNeedsBuild();
+                  },*/
+                  onTap: () {
+
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 9),
@@ -2937,12 +1987,6 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             onTap: () {
               setState(() {
                 isVideoOpen = !isVideoOpen;
-
-                /// ✅ CLOSE → CLEAR DATA
-                /* if (!isVideoOpen) {
-                    videoCounts.clear();
-                    selectedEditTypeIds.clear();
-                  }*/
               });
             },
             child: Container(
@@ -2956,10 +2000,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 children: [
                   Text(title,
                       style: TextStyle(
-                        color: ColorCode.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      )),
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600)),
 
                   AnimatedRotation(
                     turns: isVideoOpen ? 0.5 : 0,
@@ -2981,16 +2024,16 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
             firstChild: Column(
               children: data.asMap().entries.map((entry) {
-                int id = entry.key;
+                int id = entry.key; // ✅ FIX
                 var item = entry.value;
 
-                String name = item['value'] ?? "";
+                String name = item['value'] ?? ""; // ✅ FIX
 
                 int count = videoCounts[id] ?? 0;
 
                 return Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 15, vertical: 11),
                   child: Row(
                     children: [
                       Expanded(
@@ -3000,73 +2043,57 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
                       /// COUNTER
                       Container(
-                        width: 90,
-                        height: 35,
+                        width: 75,
+                        height: 28,
                         decoration: BoxDecoration(
                           color: Color(0xffE8D1AB),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
                           children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (count > 0) {
+                                    videoCounts[id] = count - 1;
 
-                            /// ➖ MINUS
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    int current = videoCounts[id] ?? 0;
-
-                                    if (current > 0) {
-                                      current--;
-
-                                      if (current == 0) {
-                                        videoCounts.remove(id);
-                                        selectedEditTypeIds.remove(id);
-                                      } else {
-                                        videoCounts[id] = current;
-                                      }
+                                    if (videoCounts[id] == 0) {
+                                      selectedEditTypeIds.remove(id);
                                     }
-                                  });
-                                },
-                                child: Center(
-                                  child: const Icon(Icons.remove, size: 16, color: Colors.black),
-                                ),
+                                  }
+                                });
+                              },
+                              child: Padding(
+                                padding:
+                                EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.remove, size: 10,color: ColorCode.black,),
                               ),
                             ),
 
-                            /// COUNT
-                            Text(
-                              (videoCounts[id] ?? 0)
-                                  .toString()
-                                  .padLeft(2, '0'),
-                              style: TextStyle(
-                                  color: ColorCode.kHeadingColor,
-                                  fontSize: 13,
-                                  fontFamily: "Helvetica Neue",
-                                  fontWeight: FontWeight.w600
+                            Text(count.toString().padLeft(2, '0'),style: TextStyle(
+                              color: ColorCode.kHeadingColor,
+                              fontSize: 11.17,
+                              fontFamily: 'Helvetica Neue',
+                              fontWeight: FontWeight.w500,
+                            ),),
 
-                              ),
-                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  videoCounts[id] = count + 1;
 
-                            /// ➕ PLUS
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    int current = videoCounts[id] ?? 0;
-                                    current++;
-
-                                    videoCounts[id] = current;
-
-                                    if (!selectedEditTypeIds.contains(id)) {
-                                      selectedEditTypeIds.add(id);
-                                    }
-                                  });
-                                },
-                                child: Center(
-                                  child: Icon(Icons.add,
-                                      size: 16, color: Colors.black),
-                                ),
+                                  if (!selectedEditTypeIds
+                                      .contains(id)) {
+                                    selectedEditTypeIds.add(id);
+                                  }
+                                });
+                              },
+                              child: Padding(
+                                padding:
+                                EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.add, size: 10,color: ColorCode.black,),
                               ),
                             ),
                           ],
@@ -3086,41 +2113,35 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
   }
   Widget PhotoEdits(String title, List<dynamic> data) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 17),
+      margin: EdgeInsets.symmetric(vertical: 17),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+        border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
-          /// 🔥 HEADER
+          /// HEADER
           GestureDetector(
             onTap: () {
               setState(() {
                 isPhotoOpen = !isPhotoOpen;
-
-                /*if (!isPhotoOpen) {
-                    photoCounts.clear();
-                  }*/
               });
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xff2B2B2B),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              decoration: BoxDecoration(
+                color: Color(0xff282828),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  Text(title,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
+
                   Icon(
                     isPhotoOpen
                         ? Icons.keyboard_arrow_up
@@ -3132,252 +2153,152 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             ),
           ),
 
-          /// 🔥 BODY
+          /// BODY
           if (isPhotoOpen)
             ...data.asMap().entries.map((entry) {
-              int id = entry.key;
+              int id = entry.key; // ✅ FIX
               var item = entry.value;
 
-              String name = item['value'] ?? "";
-              String note = item['note'] ?? "";
+              String name = item['value'] ?? ""; // ✅ FIX
+
               int count = photoCounts[id] ?? 0;
 
-              return Column(
-                children: [
-                  Padding(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                    child: Row(
-                      children: [
-                        /// TEXT
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.add,
-                                    size: 14,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(width: 1),
-                                  Expanded(
-                                    child: Text(
-                                      note,
-                                      style: const TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-
-                        /// COUNTER
-                        Container(
-                          width: 95,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE8D1AB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              /// MINUS
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      int current = photoCounts[id] ?? 0;
-
-                                      if (current > 0) {
-                                        current--;
-
-                                        if (current == 0) {
-                                          photoCounts.remove(id);
-                                        } else {
-                                          photoCounts[id] = current;
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: const Icon(Icons.remove,
-                                      size: 16, color: Colors.black),
-                                ),
-                              ),
-
-                              /// COUNT
-                              Text(
-                                count.toString().padLeft(2, '0'),
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 13,
-                                  fontFamily: "Helvetica Neue",
-
-
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-
-                              /// PLUS
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      int current = photoCounts[id] ?? 0;
-                                      current++;
-                                      photoCounts[id] = current;
-                                    });
-                                  },
-                                  child: const Icon(Icons.add,
-                                      size: 16, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+              return Padding(
+                padding:
+                EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(name,
+                          style: TextStyle(color: Colors.white)),
                     ),
-                  ),
 
-                  /// DIVIDER
-                  Container(
-                    height: 0.5,
-                    color: Colors.white.withOpacity(0.15),
-                  ),
-                ],
+                    Container(
+                      width: 80,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFE8D1AB),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (count > 0) {
+                                  photoCounts[id] = count - 1;
+                                }
+                              });
+                            },
+                            child: Padding(
+                              padding:
+                              EdgeInsets.symmetric(horizontal: 8),
+                              child: Icon(Icons.remove, size: 10,color: ColorCode.black,),
+                            ),
+                          ),
+
+                          Text(count.toString().padLeft(2, '0'),style: TextStyle(  color: ColorCode.kHeadingColor,
+                            fontSize: 11.17,
+                            fontFamily: 'Helvetica Neue',
+                            fontWeight: FontWeight.w500,
+                          ),),
+
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                photoCounts[id] = count + 1;
+                              });
+                            },
+                            child: Padding(
+                                padding:
+                                EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.add, size: 10,color: ColorCode.black,)
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               );
             }).toList(),
-
-          /// 🔥 EXTRA SECTION (ONLY ONCE, NOT INSIDE LOOP)
-          /*       if (isPhotoOpen)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xff322F2A),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            /// LEFT TEXT
-                            Expanded(
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    "📸 ",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Includes 100 free photo edits",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            /// RIGHT BOX (INSIDE SAME CONTAINER)
-                           Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              child: const Text(
-                                "4 Hour Duration",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                        Container(
-
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xff322F2A),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "+ 25 Added Extra",
-                              style:
-                              TextStyle(
-                                color: const Color(0xFFE8D1AB),
-                                fontSize: 12,
-                                fontFamily: 'Helvetica Neue',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),*/
         ],
       ),
     );
   }
 
 
-  String getTotalDuration() {
-    if (startTime == null || endTime == null || selectedDates.isEmpty) {
-      return "0 Hour";
-    }
+  Widget timeField({
+    required TextEditingController controller,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AbsorbPointer( // 🔥 TextField touch disable
+        child: TextField(
+          controller: controller,
+          readOnly: true,
+          cursorColor: ColorCode.white,
 
-    final startMin = startTime!.hour * 60 + startTime!.minute;
-    final endMin = endTime!.hour * 60 + endTime!.minute;
+          style: const TextStyle(color: ColorCode.white),
 
-    int diff;
+          decoration: InputDecoration(
+            labelText: label,
+            floatingLabelBehavior: FloatingLabelBehavior.always,
 
-    if (endMin >= startMin) {
-      diff = endMin - startMin;
-    } else {
-      diff = (24 * 60 - startMin) + endMin;
-    }
+            labelStyle: TextStyle(
+              color: ColorCode.kWhiteOpacity70,
+              fontSize: 12,
+              fontFamily: "Outfit",
+            ),
 
-    final hoursPerDay = diff ~/ 60;
+            suffixIcon:  Padding(
+              padding: const EdgeInsets.all(12),
+              child: SvgPicture.asset(
+                "assets/svg/Group 2087328870.svg",
+                width: 20,
+                height: 20,
+                colorFilter: const ColorFilter.mode(
+                  ColorCode.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
 
-    final totalDays = selectedDates.length;
-    final totalHours = hoursPerDay * totalDays;
-    return "$totalDays Hours / $totalHours Days";
+            contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
 
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+              const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+            ),
+
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+              const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+            ),
+          ),
+        ),
+      ),
+    );
   }
+
+
 
   Widget _buildOption({
     required String title,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-
+    return InkWell(
+      onTap: null,
+      borderRadius: BorderRadius.circular(30),
       child: Row(
         children: [
           Container(
@@ -3428,196 +2349,4 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
     );
   }
 
-  Widget buildTimeDropdown({
-    Key? key, // ✅ FIX ADD THIS
-    required String title,
-    required String? selectedTime,
-    required Function(String) onSelect,
-    required bool isStart,
-    DateTime? date,
-  }) {
-    bool isOpen = isStart ? isStartOpen : isEndOpen;
-
-    final list = generateTimeList(isStart: isStart, date: date);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        /// 🔹 TITLE
-        Text(title, style: TextStyle(color: ColorCode.white,fontFamily: "Outfit",fontSize: 12)),
-
-
-        /// 🔹 SELECT BOX
-        GestureDetector(
-          onTap: () {
-
-            if (selectedIndex == 1 && selectedDate == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select date first")),
-              );
-              return;
-            }
-
-            if (selectedIndex == 2 && selectedDates.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select date first")),
-              );
-              return;
-            }
-
-            if (isStart) {
-              setState(() {
-                isStartOpen = !isStartOpen;
-                isEndOpen = false;
-              });
-            } else {
-              if (selectedTime == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Please select start time first")),
-                );
-                return;
-              }
-
-              setState(() {
-                isEndOpen = !isEndOpen;
-                isStartOpen = false;
-              });
-            }
-          },
-
-          child: Container(
-            padding: EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white24),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  selectedTime ?? "Select Time",
-                  style: TextStyle(color: Colors.white),
-                ),
-                Icon(
-                  isOpen
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        SizedBox(height: 10),
-
-        /// 🔥 DROPDOWN LIST
-        if (isOpen)
-          Container(
-            height: 220,
-            decoration: BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              border: Border.all(color: ColorCode.kWhiteOpacity70,width: 0.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListView.builder(
-              itemCount: list.length,
-              itemBuilder: (context, index) {
-                final time = list[index];
-                final isSelected = time == selectedTime;
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      onSelect(time);
-
-                      /// 🔥 AUTO NEXT TIME
-                      if (isStart) {
-                        int i = list.indexOf(time);
-                        if (i != -1 && i + 1 < list.length) {
-                          if (date != null) {
-                            endTimeMap[date] = list[i + 1];
-                          } else {
-                            endTimeStr = list[i + 1];
-                          }
-                        }
-
-                        isStartOpen = false;
-                        isEndOpen = true;
-                      } else {
-                        isEndOpen = false;
-                      }
-                    });
-                  },
-
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Color(0xFFE8D1AB)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isSelected
-                            ? Color(0xFFE8D1AB)
-                            : Colors.transparent,
-                      ),
-                    ),
-
-                    child: Row(
-                      children: [
-
-                        /// 🔘 RADIO
-                        Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.black
-                                  : Colors.white54,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: isSelected
-                              ? Center(
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          )
-                              : null,
-                        ),
-
-                        SizedBox(width: 12),
-
-                        /// ⏰ TIME TEXT
-                        Text(
-                          time,
-                          style: TextStyle(
-                            color: isSelected
-                                ? Colors.black
-                                : Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-      ],
-    );
-  }
 }
-

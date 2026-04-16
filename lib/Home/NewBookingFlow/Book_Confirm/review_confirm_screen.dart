@@ -9,6 +9,7 @@ import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../utility/ColorCode.dart';
+import '../../../utility/date_time_utils.dart';
 import '../../../widgets/loding.dart' show AppLoader;
 import '../../HomeSekect/payment_method.dart';
 import 'PaymentSuccessScreen.dart';
@@ -700,47 +701,51 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 child: Column(
                                   children: [
 
-                                    /// 🔥 CHECK MULTI OR SINGLE
+                                    /// 🔥 MULTI DAY
                                     if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
-
-                                      /// ✅ MULTI DAY
                                       ...List.generate(booking!['booking_days'].length, (index) {
                                         var day = booking!['booking_days'][index];
 
                                         return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             infoRowBlack(
                                               "assets/svg/Group 2087328870.svg",
-                                              "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
-                                                  " (${day['duration_hours']}h)",
+                                              "${DateTimeUtils.formatTime(day['start_time'])} to "
+                                                  "${DateTimeUtils.formatTime(day['end_time'])} "
+                                                  "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
                                             ),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 6),
+
                                             infoRowBlack(
                                               "assets/svg/Frame.svg",
-                                              formatDate(day['date']),
+                                              DateTimeUtils.formatDate(day['date']),
                                             ),
-                                            const SizedBox(height: 8)
+
+                                            const SizedBox(height: 10),
                                           ],
                                         );
                                       }),
+                                    ]
 
-                                    ] else ...[
-
-                                      /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
+                                    /// 🔥 SINGLE DAY
+                                    else ...[
                                       infoRowBlack(
                                         "assets/svg/Group 2087328870.svg",
-                                        "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
-                                            " (${booking?['duration_hours']}h)",
+                                        "${DateTimeUtils.formatTime(booking?['start_time'])} to "
+                                            "${DateTimeUtils.formatTime(booking?['end_time'])} "
+                                            "(${DateTimeUtils.formatDuration((booking?['duration_hours'] ?? 0).toDouble())})",
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: 6),
+
                                       infoRowBlack(
                                         "assets/svg/Frame.svg",
-                                        formatDate(booking?['event_date']),
+                                        DateTimeUtils.formatDate(booking?['event_date']),
                                       ),
                                     ],
 
-                                    /// 📍 LOCATION (COMMON)
-                                    const SizedBox(height: 8),
+                                    /// 📍 LOCATION
+                                    const SizedBox(height: 10),
                                     infoRowBlack(
                                       "assets/svg/location.svg",
                                       booking?['event_location'] ?? "",

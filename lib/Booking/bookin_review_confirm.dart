@@ -553,7 +553,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
                                     /// ================= VIDEO EDITS =================
                                     if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
-
                                       const Padding(
                                         padding: EdgeInsets.only(bottom: 8),
                                         child: Text(
@@ -567,49 +566,34 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                         ),
                                       ),
 
-                                      Builder(
-                                        builder: (context) {
-                                          final rawList =
-                                          List<String>.from(booking?['video_edit_types'] ?? []);
+                                      Column(
+                                        children: List.generate(
+                                          booking?['video_edit_types'].length ?? 0,
+                                              (index) {
+                                            final item = booking?['video_edit_types'][index];
 
-                                          final Map<String, int> countMap = {};
-
-                                          for (var item in rawList) {
-                                            countMap[item] = (countMap[item] ?? 0) + 1;
-                                          }
-
-                                          final uniqueList = countMap.keys.toList();
-
-                                          return Column(
-                                            children: uniqueList.map((edit) {
-                                              final count = countMap[edit];
-
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                  // width: double.infinity,
-                                                  margin: const EdgeInsets.only(bottom: 8),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    "${(edit)} x$count",
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w500, // 🔥 better look
-                                                      letterSpacing: 0.5,
-                                                    ),
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: ColorCode.kGoldLight20,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  "${item['value']} x${item['count']}",
+                                                  style: const TextStyle(
+                                                    color: ColorCode.kButtonColor,
+                                                    fontSize: 12,
+                                                    fontFamily: "Outfit",
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                          );
-                                        },
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
 
                                       SizedBox(height: 12),
@@ -617,7 +601,6 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
                                     /// ================= PHOTO EDITS =================
                                     if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-
                                       const Padding(
                                         padding: EdgeInsets.only(bottom: 8),
                                         child: Text(
@@ -631,55 +614,40 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                         ),
                                       ),
 
-                                      Builder(
-                                        builder: (context) {
-                                          final rawList =
-                                          List<String>.from(booking?['photo_edit_types'] ?? []);
+                                      Column(
+                                        children: List.generate(
+                                          booking?['photo_edit_types'].length ?? 0,
+                                              (index) {
+                                            final item = booking?['photo_edit_types'][index];
 
-                                          final Map<String, int> countMap = {};
-
-                                          for (var item in rawList) {
-                                            countMap[item] = (countMap[item] ?? 0) + 1;
-                                          }
-
-                                          final uniqueList = countMap.keys.toList();
-
-                                          return Column(
-                                            children: uniqueList.map((edit) {
-                                              final count = countMap[edit];
-
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                  // width: double.infinity,
-                                                  margin: const EdgeInsets.only(bottom: 8),
-                                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                  child: Text(
-                                                    "${(edit)} x$count",
-                                                    textAlign: TextAlign.center,
-                                                    style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
-                                                      fontSize: 12,
-                                                      fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.w500, // 🔥 better look
-                                                      letterSpacing: 0.5,
-                                                    ),
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(bottom: 8),
+                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  color: ColorCode.kGoldLight20,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                                child: Text(
+                                                  "${item['value']} x${item['count']}"
+                                                      "${item['note'] != null ? ' (${item['note']})' : ''}",
+                                                  style: const TextStyle(
+                                                    color: ColorCode.kButtonColor,
+                                                    fontSize: 12,
+                                                    fontFamily: "Outfit",
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
-                                              );
-                                            }).toList(),
-                                          );
-                                        },
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
-                                    ],
+                                    ]
                                   ],
                                 ),
                               ),
-
                    /*           Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                                 child: Container(

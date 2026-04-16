@@ -61,7 +61,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                 children: [
 
                   /// 🌙 DARK MODE
-                  Container(
+             /*     Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
                     ),
@@ -106,7 +106,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
 
 
 

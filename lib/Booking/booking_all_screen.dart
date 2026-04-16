@@ -330,7 +330,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     );
   }
 
-  // ================= UPCOMING CARD =================
+
 // ================= UPCOMING CARD =================
   Map<String, dynamic> getBookingDisplayData(Map shoot) {
     String eventDate = '';
@@ -378,27 +378,34 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
   Widget upcomingBookingCard(Map shoot) {
     final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
-    final String imageUrlRaw = shoot['creative']?['profile_image_url'] ?? '';
-    final String imageUrl = imageUrlRaw.isNotEmpty
-        ? ApiService().getImageURL(imageUrlRaw)
-        : '';
+    // 1. profile image
+    final String profileImageRaw = shoot['creative']?['profile_image_url'] ?? '';
+
+    // 2. shoot image
+    final String shootImageRaw = shoot['image_url'] ?? '';
+
+    // FINAL IMAGE
+    String finalImage;
+
+    if (profileImageRaw.isNotEmpty) {
+      finalImage = ApiService().getImageURL(profileImageRaw);
+    } else if (shootImageRaw.isNotEmpty) {
+      finalImage = ApiService().getImageURL(shootImageRaw);
+    } else {
+      finalImage = fallbackImage;
+    }
+
     final display = getBookingDisplayData(shoot);
 
     final String eventDate = display['eventDate'] ?? '';
     final String startTime = display['startTime'] ?? '';
     final String endTime = display['endTime'] ?? '';
-    final double duration = display['duration'] ?? 0;
-    /// ✅ SAFE DATA
+
     final int bookingId = shoot['booking_id'] ?? 0;
     final int shootTypeId = shoot['shoot_type_id'] ?? 0;
 
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
-
-
-    /// ✅ FINAL IMAGE
-    final String finalImage =
-    imageUrl.isNotEmpty ? imageUrl : fallbackImage;
 
     return GestureDetector(
       onTap: () {
@@ -409,6 +416,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               bookingId: bookingId,
               contentType: contentType,
               shootTypeId: shootTypeId,
+
             ),
           ),
         );
@@ -422,6 +430,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         showEditIcon: true,
         buttonText: "Manage Shoot",
         onButtonTap: () {
+          print("Manage Shoot button clicked"); // ✅ print
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -433,7 +442,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                 startTime: startTime,
                 endTime: endTime,
                 multiDays: shoot['multi_day']?['days'] ?? [],
-                durationHours: shoot['duration_hours'] ?? 0,
+                durationHours: (shoot['duration_hours'] ?? 0).toDouble(), // ✅ FIX
                 location: shoot['location'] ?? '',
                 imageUrl: finalImage,
                 shootTypeId: shootTypeId,
@@ -444,27 +453,36 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       ),
     );
   }
-
 // ================= COMPLETED CARD =================
-
   Widget completedBookingCard(Map shoot) {
-    final String imageUrlRaw = shoot['creative']?['profile_image_url'] ?? '';
+    final String fallbackImage = "assets/svg/imag_placeholder.svg";
 
-    final String imageUrl = imageUrlRaw.isNotEmpty
-        ? ApiService().getImageURL(imageUrlRaw)
-        : '';
+    // 1. profile image
+    final String profileImageRaw = shoot['creative']?['profile_image_url'] ?? '';
 
-    /// ✅ SAFE DATA
+    // 2. shoot image
+    final String shootImageRaw = shoot['image_url'] ?? '';
+
+    // FINAL IMAGE LOGIC
+    String finalImage;
+
+    if (profileImageRaw.isNotEmpty) {
+      finalImage = ApiService().getImageURL(profileImageRaw);
+    } else if (shootImageRaw.isNotEmpty) {
+      finalImage = ApiService().getImageURL(shootImageRaw);
+    } else {
+      finalImage = fallbackImage;
+    }
+
+    /// SAFE DATA
     final int bookingId = shoot['booking_id'] ?? 0;
-
     final String projectName = shoot['project_name'] ?? '';
     final String eventDate = shoot['event_date'] ?? '';
     final String startTime = shoot['start_time'] ?? '';
     final String endTime = shoot['end_time'] ?? '';
 
-
     return bookingCard(
-      imagePath: imageUrlRaw,
+      imagePath: finalImage, // ✅ IMPORTANT FIX
       title: projectName,
       date: eventDate,
       time: "$startTime - $endTime",
@@ -478,7 +496,6 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               fromHome: true,
             ),
           ),
-
         );
       },
     );
@@ -516,12 +533,10 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                     : Image.network(
                   imagePath,
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
+                /*  loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    );
-                  },
+                    return CircularProgressIndicator(strokeWidth: 2);
+                  },*/
                   errorBuilder: (context, error, stackTrace) {
                     return SvgPicture.asset(
                       "assets/svg/imag_placeholder.svg",

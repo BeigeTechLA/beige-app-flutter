@@ -149,6 +149,7 @@ Future<void> select_shoottype() async {
             ShootTypeId: selectedShootTypeId!,
             bookingId: bookingId,
             contentTypeId: widget.contentTypeId,
+            shootTypeName: selectedShootTypeName,
           ),
         ),
       );
