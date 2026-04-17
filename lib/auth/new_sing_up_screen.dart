@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
@@ -1134,14 +1135,44 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                             fontFamily: "Outfit",
                                           ),
                                         ),
-                                        const TextSpan(
-                                          text: "Terms & Conditions and Privacy Policy",
-                                          style: TextStyle(
+                                        TextSpan(
+                                          text: "Terms & Conditions",
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.w600,
                                             color: ColorCode.white,
                                             fontSize: 13,
                                             fontFamily: "Outfit",
+                                            decoration: TextDecoration.underline,
                                           ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () async {
+                                              final uri = Uri.parse("https://beige.app/terms-and-conditions");
+                                              if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                                            },
+                                        ),
+                                        const TextSpan(
+                                          text: " and ",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: ColorCode.kWhiteOpacity70,
+                                            fontSize: 13,
+                                            fontFamily: "Outfit",
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: "Privacy Policy",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: ColorCode.white,
+                                            fontSize: 13,
+                                            fontFamily: "Outfit",
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () async {
+                                              final uri = Uri.parse("https://beige.app/privacy-policy");
+                                              if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                                            },
                                         ),
                                         const TextSpan(
                                           text: " set out of this site",
