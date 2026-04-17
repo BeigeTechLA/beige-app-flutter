@@ -324,7 +324,7 @@ class _UpcomingEventSummaryManagebookingState
                                       infoRowBlack(
                                         "assets/svg/Group 2087328870.svg",
                                         "${DateTimeUtils.formatTime(day['start_time'])} to ${DateTimeUtils.formatTime(day['end_time'])} "
-                                            "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())}))",
+                                            "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
                                       ),
 
                                       const SizedBox(height: 8),

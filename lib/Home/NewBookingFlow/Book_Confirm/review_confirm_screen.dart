@@ -201,7 +201,16 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
   Future<bool> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill required fields")),
+
+           SnackBar(content: Text("Please fill required fields",
+
+          ),
+        duration: Duration(seconds: 1), // ✅ 1 sec
+        behavior: SnackBarBehavior.floating, //k
+        // margin: EdgeInsets.all(5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),),
       );
       return false;
     }
@@ -574,7 +583,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                       child: creativeImage.isNotEmpty
                                           ? Image.network(
                                         "${ApiService.imageURL}$creativeImage",
-                                        fit: BoxFit.cover, // 🔥 proper crop
+                                        fit: BoxFit.cover, //
                                         alignment: Alignment.center, // 🔥 center focus
                                         errorBuilder: (_, __, ___) {
                                           return SvgPicture.asset(
@@ -722,7 +731,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                               DateTimeUtils.formatDate(day['date']),
                                             ),
 
-                                            const SizedBox(height: 10),
+                                            const SizedBox(height: 6),
                                           ],
                                         );
                                       }),
@@ -745,7 +754,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                     ],
 
                                     /// 📍 LOCATION
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 6),
                                     infoRowBlack(
                                       "assets/svg/location.svg",
                                       booking?['event_location'] ?? "",

@@ -116,74 +116,6 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   }
 
 
-
-
-/*  Future<void> _handleSelection(int contentTypeId) async {
-
-    setState(() {
-      selectedContentTypeIds = contentTypeId == 3 ? [1,2] : [contentTypeId];
-    });
-
-    /// Select All → API nahi
-    if (contentTypeId != 3) {
-      await _callBookingApi(contentTypeId);
-    } else {
-      setState(() {
-        isShootTypeLoaded = true;
-      });
-    }
-
-    if (!isShootTypeLoaded) return;
-
-    int contentTypeToSend = contentTypeId == 3 ? 3 : contentTypeId;
-
-    final body = {
-      "specialty_id": widget.specialtyId,
-      "content_type": contentTypeToSend,
-      if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
-        "shoot_type_id": shootTypeIds.first,
-    };
-
-    try {
-      final response =
-      await ApiService().postData(ApiEndpoints.booking, body);
-
-      final bookingId = response['data']?['booking_id'];
-
-      if (response != null && response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => VideoShootType(
-              contentTypeId: contentTypeToSend,
-              bookingId: bookingId,
-            ),
-          ),
-        );
-      }
-
-    } catch (e) {
-      debugPrint("❌ Error → $e");
-    }
-  }*/
-
-  // void _handleSelection(int contentTypeId) {
-  //   setState(() {
-  //
-  //     /// SELECT ALL
-  //     if (contentTypeId == 3) {
-  //       selectedContentTypeIds = [1, 2];
-  //       return;
-  //     }
-  //
-  //     /// NORMAL MULTI SELECT
-  //     if (selectedContentTypeIds.contains(contentTypeId)) {
-  //       selectedContentTypeIds.remove(contentTypeId);
-  //     } else {
-  //       selectedContentTypeIds.add(contentTypeId);
-  //     }
-  //   });
-  // }
   void _handleSelection(int contentTypeId) {
     setState(() {
       if (contentTypeId == 3) {
@@ -433,27 +365,47 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
                         const Spacer(),
 
-                        SizedBox(
+                        Center(
+                          child: SizedBox(
+                            height: 56,
+                            child: GestureDetector(
+                              onTap: isContinueEnabled ? _continueBooking : null,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 120),
+                                // padding: const EdgeInsets.symmetric(horizontal: 40), // 🔥 width control
 
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: isContinueEnabled ? _continueBooking : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isContinueEnabled
-                                  ? ColorCode.kButtonColor
-                                  : Colors.grey.shade700,
-
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              "Continue",
-                              style: TextStyle(
-                                color: ColorCode.k1D1D1B_Opacity70,
-                                fontSize: 12,
-                                fontFamily: 'Outfit',
-                                fontWeight: FontWeight.bold,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  gradient: isContinueEnabled
+                                      ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFFE8D1AB), // light gold
+                                      Color(0xFFFDEFD9), // cream
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                      : LinearGradient(
+                                    colors: [
+                                      Colors.grey.shade700,
+                                      Colors.grey.shade700,
+                                    ],
+                                  ),
+                                 /* border: Border.all(
+                                    color: const Color(0x80DDDDDD), // 50% border
+                                    width: 0.5,
+                                  ),*/
+                                ),
+                                child: const Text(
+                                  "Continue",
+                                  style: TextStyle(
+                                    color: ColorCode.k1D1D1B_Opacity70,
+                                    fontSize: 12,
+                                    fontFamily: 'Outfit',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -482,7 +434,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     bool isDisabled = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 4),
       child: GestureDetector(
         onTap: isDisabled ? null : onTap,
         child: Row(
@@ -552,9 +504,17 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                       : ColorCode.kBorderLight,
                   width: 0.5,
                 ),
-                color: value
-                    ? ColorCode.kButtonColor
-                    : Colors.transparent,
+                gradient: value
+                    ? const LinearGradient(
+                  colors: [
+                    Color(0xFFE8D1AB), // light gold
+                    Color(0xFFFDEFD9), // cream
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+                    : null, // 🔥 important
+                color: value ? null : Colors.transparent, // 🔥 fallback
               ),
               child: value
                   ? const Icon(
@@ -571,3 +531,4 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
     );
   }
 }
+

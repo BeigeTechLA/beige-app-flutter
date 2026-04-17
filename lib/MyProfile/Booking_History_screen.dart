@@ -27,7 +27,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
     try {
       final response =
       await ApiService().fetchData(ApiEndpoints.my_bookings);
-
+      print("response check => $response");
       if (response != null && response['error'] == false) {
         setState(() {
           bookings = response['data'] ?? [];
@@ -106,11 +106,11 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                       final booking = bookings[index];
 
                       final String image =
-                          booking['profile_image_url'] ?? "";
+                          booking['image_url'] ?? "";
                       final String name =
-                          booking['creator_name'] ?? "-";
+                          booking['project_name'] ?? "-";
                       final String role =
-                          booking['primary_title'] ?? "";
+                          booking['content_type'] ?? "";
                       final String status =
                           booking['status'] ?? "Completed";
                       final String rating =
@@ -143,7 +143,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                   "assets/svg/imag_placeholder.svg",
                                   width: 120,
                                   height: 120,
-                                  fit: BoxFit.contain,
+                                  fit: BoxFit.cover,
                                 ),
                               );
                             },

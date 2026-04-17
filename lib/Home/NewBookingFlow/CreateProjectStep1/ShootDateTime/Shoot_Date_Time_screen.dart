@@ -38,11 +38,6 @@
     Map<int, int> videoCounts = {};
     Map<int, int> photoCounts = {};
 
-    TimeOfDay? shootStartTime;
-    TimeOfDay? shootEndTime;
-    bool isShootDateSelected() {
-      return selectedDates.isNotEmpty;
-    }
 
     String? startTimeStr;
     String? endTimeStr;
@@ -51,6 +46,37 @@
     Map<DateTime, String?> startTimeMap = {};
     Map<DateTime, String?> endTimeMap = {};
 
+
+
+
+    List<DateTime> allDates = [];
+    List<DateTime> selectedDates = [];
+    List<dynamic> photoEditTypes = [];
+    List<dynamic> editTypes = [];
+
+    int selectedIndex=1;
+    bool istimingsame=true;
+    bool isPhotoOpen = true; //      // API data
+    bool isVideoOpen = true; //      // API data
+
+    List<int> selectedEditTypeIds = [];        // selected ids
+    List<String> selectedEditTypeNames = [];
+    final TextEditingController dateController = TextEditingController();
+    final TextEditingController startTimeController = TextEditingController();
+    final TextEditingController endTimeController = TextEditingController();
+    TimeOfDay? startTime;
+    TimeOfDay? endTime;
+
+    DateTime? selectedDate;
+
+    bool isEditNeeded = false;  // ✅ Default = No selected
+
+    bool isSubmitting = false;
+    bool isDateSelected() {
+      return selectedDate != null;
+    }
+
+    bool isLoading =true;
 
     bool get isWeddingShoot => _weddingShootTypeIds.contains(widget.ShootTypeId);
 
@@ -112,6 +138,7 @@
 
       return totalMinutes;
     }
+
     List<String> generateTimeList({
       required bool isStart,
       DateTime? date,
@@ -121,7 +148,6 @@
       DateTime now = DateTime.now();
       DateTime baseDate = date ?? selectedDate ?? now;
 
-      /// 🔥 4 HOUR RULE
       DateTime minTime = now.add(Duration(hours: 4));
 
       /// 🔥 LOOP SAME AS SINGLE DAY (IMPORTANT)
@@ -224,6 +250,7 @@
 
       return total;
     }
+
     String getDurationSummaryLabel() {
       final bookedHours = getRoundedBookedHours();
 
@@ -295,45 +322,6 @@
       }
     }
 
-
-
-    List<DateTime> allDates = [];
-    List<DateTime> selectedDates = [];
-    List<dynamic> photoEditTypes = [];
-    List<dynamic> editTypes = [];
-
-
-
-
-    int selectedIndex=1;
-    bool istimingsame=true;
-    bool isPhotoOpen = true; //      // API data
-    bool isVideoOpen = true; //      // API data
-
-    List<int> selectedEditTypeIds = [];        // selected ids
-    List<String> selectedEditTypeNames = [];
-
-
-    final TextEditingController dateController = TextEditingController();
-    final TextEditingController startTimeController = TextEditingController();
-    final TextEditingController endTimeController = TextEditingController();
-
-
-
-
-    TimeOfDay? startTime;
-    TimeOfDay? endTime;
-
-    DateTime? selectedDate;
-
-    bool isEditNeeded = false;  // ✅ Default = No selected
-
-    bool isSubmitting = false;
-    bool isDateSelected() {
-      return selectedDate != null;
-    }
-
-    bool isLoading =true;
     @override
     void initState() {
       super.initState();
@@ -1443,564 +1431,472 @@
 
 
                         SizedBox(
-                          height: 50,
+                          height: 30,
                         ),
 
-                        if (selectedIndex==2) ...[
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            if (selectedIndex==1) ...[
                               Row(
                                 children: [
                                   Text(
-                                    "Select Date",
+                                    "Shoot Date & Time",
                                     style: TextStyle(
                                       fontFamily: "Unbounded",
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-
                                 ],
                               ),
-                              SizedBox(height: 12,),
-                              buildDateSelector(
-                                context: context,
-                                selectedDates: selectedDates,
-                                onChanged: (dates) {
+
+                              SizedBox(height: 30,),
+
+
+
+                              CustomInputField(
+                                title: "Select Date",
+                                controller: dateController,
+                                readOnly: true,
+                                onTap: () => _selectDate(context),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: SvgPicture.asset(
+                                    "assets/svg/calendar-03.svg",
+                                    width: 20,
+                                    height: 20,
+                                    colorFilter: const ColorFilter.mode(
+                                      ColorCode.kWhiteOpacity70,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20,),
+
+
+                              buildTimeDropdown(
+                                title: "Start Time",
+                                selectedTime: startTimeStr,
+                                isStart: true,
+                                onSelect: (val) {
                                   setState(() {
-                                    selectedDates = dates;
+                                    startTimeStr = val;
+                                    endTimeStr = null; // reset end
                                   });
                                 },
                               ),
-
-
-                              SizedBox(height: 12,),
-
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Color(0xff322F2A),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      "Total Days: ${selectedDates.length}",
-                                      style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xff322F2A),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: selectedDates.isEmpty
-                                          ? const Text(
-                                        "No dates selected",
-                                        style: TextStyle(
-                                          color: Color(0xFFE8D1AB),
-                                          fontSize: 12,
-                                        ),
-                                      )
-                                          : SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal, // 👈 scroll enable
-                                        child: Text(
-                                            formatSelectedDates(selectedDates),
-                                            style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              SizedBox(height: 20,),
+                              buildTimeDropdown(
+                                title: "End Time",
+                                selectedTime: endTimeStr,
+                                isStart: false,
+                                onSelect: (val) {
+                                  setState(() {
+                                    endTimeStr = val;
+                                  });
+                                },
                               ),
-
-                              SizedBox(height: 18,),
-                              Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
-                                color: Colors.white,
-                                fontFamily:'Unbounded',
-                                fontSize: 14,
-                              ),),
-
-                              const SizedBox(height: 12),
-
-                              /// 🔹 YES / NO
-                              Row(
-                                children: [
-                                  _buildOption(
-                                    title: "Yes",
-                                    isSelected: istimingsame == true,
-                                      onTap: () {
-                                        setState(() {
-                                          istimingsame = true;
-
-                                          /// 🔥 RESET ADD HERE
-                                          startTimeStr = null;
-                                          endTimeStr = null;
-                                          startTimeMap.clear();
-                                          endTimeMap.clear();
-                                          isStartOpen = false;
-                                          isEndOpen = false;
-                                        });
-                                      }
-                                  ),
-                                  const SizedBox(width: 24),
-                                  _buildOption(
-
-                                    title: "No",
-                                    isSelected: istimingsame == false,
-                                      onTap: () {
-                                        setState(() {
-                                          istimingsame = false;
-
-                                          /// 🔥 RESET ADD HERE
-                                          startTimeStr = null;
-                                          endTimeStr = null;
-                                          startTimeMap.clear();
-                                          endTimeMap.clear();
-                                          isStartOpen = false;
-                                          isEndOpen = false;
-                                        });
-                                      }
-
-                                  ),
-                                ],
-                              ),
-                              if (istimingsame == false) ...[
-                                const SizedBox(height: 20),
-
-                                Column(
-                                  children: selectedDates.map((date) {
-                                    final isOpen = expandedMap[date] ?? false;
-
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 12),
-                                      decoration: BoxDecoration(
-
-                                        border: isOpen?
-                                        Border.all(color: Colors.white.withOpacity(0.2)):
-
-                                        Border.all(color:  Colors.transparent),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        children: [
-
-                                          /// 🔥 HEADER (Dropdown)
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-
-                                                /// 🔥 sab close karo
-                                                expandedMap.updateAll((key, value) => false);
-
-                                                /// 🔥 sirf current open karo
-                                                expandedMap[date] = !isOpen;
-                                              });
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xff282828),
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    DateFormat('MMMM dd, yyyy').format(date),
-                                                    style: const TextStyle(color: Colors.white),
-                                                  ),
-                                                  Icon(
-                                                    isOpen
-                                                        ? Icons.keyboard_arrow_up
-                                                        : Icons.keyboard_arrow_down,
-                                                    color: Colors.white,
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-
-                                          /// 🔥 BODY
-                                          if (isOpen) ...[
-                                            Padding(
-                                              padding: const EdgeInsets.all(16),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                children: [
-
-                                                  /// Start Time
-
-                                                    /*  CustomInputField(
-                                    title: "Start Time",
-                                    controller: TextEditingController(
-                                    text: startTimes[date]?.format(context) ?? "",
-                                    ),
-                                    readOnly: true,
-                                    onTap: () {
-                                    _selectTime(context, null, true, date); // ✅ FIX
-                                    },
-                                    suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: SvgPicture.asset(
-                                    "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
-                                    ),
-                                    ),
-                                    ),
-                                                  SizedBox(height: 30,),
-                                                  CustomInputField(
-                                                    title: "End Time",
-                                                    controller: TextEditingController(
-                                                      text: endTimes[date]?.format(context) ?? "",
-                                                    ),
-                                                    readOnly: true,
-                                                    onTap: () {
-                                                      _selectTime(context, null, false, date); // ✅ FIX
-                                                    },
-                                                    suffixIcon: Padding(
-                                                      padding: const EdgeInsets.all(12),
-                                                      child: SvgPicture.asset(
-                                                        "assets/svg/Group 2087328870.svg",
-                                                        color: ColorCode.white,
-                                                      ),
-                                                    ),
-                                                  ),*/
-
-                                                  buildTimeDropdown(
-                                                    key: ValueKey("${date.toString()}_start"),
-                                                    title: "Start Time",
-                                                    selectedTime: startTimeMap[normalizeDate(date)],
-                                                    isStart: true,
-                                                    date: date,
-                                                    onSelect: (val) {
-                                                      final key = normalizeDate(date);
-
-                                                      setState(() {
-                                                        startTimeMap[key] = val;
-                                                        endTimeMap[key] = null;
-
-                                                        final dt = parseTime(val, key);
-
-                                                        startTimes[key] = TimeOfDay(
-                                                          hour: dt.hour,
-                                                          minute: dt.minute,
-                                                        );
-                                                      });
-                                                    },
-                                                  ),
-                                                  SizedBox(height: 10,),
-                                                  buildTimeDropdown(
-                                                    key: ValueKey("${date.toString()}_end"),
-                                                    title: "End Time",
-                                                    selectedTime: endTimeMap[normalizeDate(date)],
-                                                    isStart: false,
-                                                    date: date,
-                                                    onSelect: (val) {
-                                                      final key = normalizeDate(date);
-
-                                                      setState(() {
-                                                        endTimeMap[key] = val;
-
-                                                        final dt = parseTime(val, key);
-
-                                                        endTimes[key] = TimeOfDay(
-                                                          hour: dt.hour,
-                                                          minute: dt.minute,
-                                                        );
-                                                      });
-                                                    },
-                                                  ),
-                                                  const SizedBox(height: 16),
-
-                                                  /// Duration
-                                                  Container(
-                                                    padding: const EdgeInsets.symmetric(
-                                                        horizontal: 14, vertical: 8),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(0xffE8D1AB),
-                                                      borderRadius: BorderRadius.circular(8),
-                                                    ),
-                                                    child: Text(
-                                                      getDurationText(date),
-                                                      style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ]
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                )
-                              ],
-
-
-
-                              if (istimingsame == true) ...[
-                                SizedBox(height: 22),
-
-                          /*      /// ✅ START TIME
-                                CustomInputField(
-                                  title: "Start Time",
-                                  controller: startTimeController,
-                                  readOnly: true,
-                                  onTap: () {
-                                    if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select date first")),
-                                      );
-                                      return;
-                                    }
-
-                                    _selectTime(context, startTimeController, true, null); // ✅ FIX
-                                  },
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),
-
-                                SizedBox(height: 30),
-
-                                /// ✅ END TIME
-                                CustomInputField(
-                                  title: "End Time",
-                                  controller: endTimeController,
-                                  readOnly: true,
-                                  onTap: () {
-                                    if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select date first")),
-                                      );
-                                      return;
-                                    }
-
-                                    _selectTime(context, endTimeController, false, null); // ✅ FIX
-                                  },
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),*/
-      buildTimeDropdown(
-      title: "Start Time",
-      selectedTime: startTimeStr,
-      isStart: true,
-        onSelect: (val) {
-          setState(() {
-            startTimeStr = val;
-            endTimeStr = null;
-
-            final dt = parseTime(val, selectedDate ?? DateTime.now());
-
-            startTime = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-            );
-          });
-        },
-      ),
-                                SizedBox(height: 10,),
-      buildTimeDropdown(
-      title: "End Time",
-      selectedTime: endTimeStr,
-      isStart: false,
-        onSelect: (val) {
-          setState(() {
-            endTimeStr = val;
-
-            final dt = parseTime(val, selectedDate ?? DateTime.now());
-
-            endTime = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-            );
-          });
-        },
-
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(height: 12),
-
-                                Row(
-                                  children: [
-                                    SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Applied to ${selectedDates.length} selected dates',
-                                      style: TextStyle(
-                                        color: const Color(0xFFA9A9A9),
-                                        fontSize: 14,
-                                        fontFamily: 'Outfit',
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.36,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 20),
-                                Container(
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF2A2A2A),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.08),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      /// 📅 ICON
-                                      SvgPicture.asset("assets/svg/calendar-03.svg"),
-
-                                      const SizedBox(width: 13),
-
-                                      /// 📅 DATE + TIME (DYNAMIC)
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            /// 🔥 DYNAMIC DATE
-                                            Text(
-                                              formatDatesAlt(selectedDates), // ✅ already in your code
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: "Helvetica Neue"
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 4),
-
-                                            /// 🔥 DYNAMIC TIME
-                                            Text(
-      startTimeStr != null && endTimeStr != null
-      ? "$startTimeStr – $endTimeStr"
-          : "Select Time",
-                                              style: TextStyle(
-                                                fontFamily: "Helvetica Neue",
-
-
-                                                color: ColorCode.kWhiteOpacity70,
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      /// ⏱ DYNAMIC HOURS
-                                      Text(
-                                        getDaysAndHours(), // 👇 function below
-                                        style: TextStyle(
-                                          color: ColorCode.kButtonColor,
-                                          fontSize: 14,
-                                          fontFamily: "Helvetica Neue",
-
-
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),)
-,                              ],
-
-                              SizedBox(height: 12),
-
-
-
-
-
+                              const SizedBox(height: 16),
                             ],
-                          ),
-                        ],
+                           if (selectedIndex==2) ...[Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Row(
+                                 children: [
+                                   Text(
+                                     "Select Date",
+                                     style: TextStyle(
+                                       fontFamily: "Unbounded",
+                                       fontSize: 16,
+                                       fontWeight: FontWeight.w500,
+                                     ),
+                                   ),
+
+                                 ],
+                               ),
+                               SizedBox(height: 12,),
+                               buildDateSelector(
+                                 context: context,
+                                 selectedDates: selectedDates,
+                                 onChanged: (dates) {
+                                   setState(() {
+                                     selectedDates = dates;
+                                   });
+                                 },
+                               ),
 
 
-                        if (selectedIndex==1) ...[
-                          Row(
-                            children: [
-                              Text(
-                                "Shoot Date & Time",
-                                style: TextStyle(
-                                  fontFamily: "Unbounded",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                               SizedBox(height: 12,),
 
-                          SizedBox(height: 30,),
+                               Row(
+                                 children: [
+                                   Container(
+                                     padding: const EdgeInsets.all(12),
+                                     decoration: BoxDecoration(
+                                       color: Color(0xff322F2A),
+                                       borderRadius: BorderRadius.circular(12),
+                                     ),
+                                     child: Text(
+                                       "Total Days: ${selectedDates.length}",
+                                       style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
+                                     ),
+                                   ),
+                                   const SizedBox(width: 12),
+                                   Expanded(
+                                     child: Container(
+                                       padding: const EdgeInsets.all(12),
+                                       decoration: BoxDecoration(
+                                         color: Color(0xff322F2A),
+                                         borderRadius: BorderRadius.circular(12),
+                                       ),
+                                       child: selectedDates.isEmpty
+                                           ? const Text(
+                                         "No dates selected",
+                                         style: TextStyle(
+                                           color: Color(0xFFE8D1AB),
+                                           fontSize: 12,
+                                         ),
+                                       )
+                                           : SingleChildScrollView(
+                                         scrollDirection: Axis.horizontal, // 👈 scroll enable
+                                         child: Text(
+                                             formatSelectedDates(selectedDates),
+                                             style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
+                                         ),
+                                       ),
+                                     ),
+                                   ),
+                                 ],
+                               ),
+
+                               SizedBox(height: 18,),
+                               Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
+                                 color: Colors.white,
+                                 fontFamily:'Unbounded',
+                                 fontSize: 14,
+                               ),),
+
+                               const SizedBox(height: 12),
+
+                               /// 🔹 YES / NO
+                               Row(
+                                 children: [
+                                   _buildOption(
+                                       title: "Yes",
+                                       isSelected: istimingsame == true,
+                                       onTap: () {
+                                         setState(() {
+                                           istimingsame = true;
+
+                                           /// 🔥 RESET ADD HERE
+                                           startTimeStr = null;
+                                           endTimeStr = null;
+                                           startTimeMap.clear();
+                                           endTimeMap.clear();
+                                           isStartOpen = false;
+                                           isEndOpen = false;
+                                         });
+                                       }
+                                   ),
+                                   const SizedBox(width: 24),
+                                   _buildOption(
+
+                                       title: "No",
+                                       isSelected: istimingsame == false,
+                                       onTap: () {
+                                         setState(() {
+                                           istimingsame = false;
+
+                                           /// 🔥 RESET ADD HERE
+                                           startTimeStr = null;
+                                           endTimeStr = null;
+                                           startTimeMap.clear();
+                                           endTimeMap.clear();
+                                           isStartOpen = false;
+                                           isEndOpen = false;
+                                         });
+                                       }
+
+                                   ),
+                                 ],
+                               ),
+                               if (istimingsame == false) ...[
+                                 const SizedBox(height: 20),
+
+                                 Column(
+                                   children: selectedDates.map((date) {
+                                     final isOpen = expandedMap[date] ?? false;
+
+                                     return Container(
+                                       margin: const EdgeInsets.only(bottom: 12),
+                                       decoration: BoxDecoration(
+
+                                         border: isOpen?
+                                         Border.all(color: Colors.white.withOpacity(0.2)):
+
+                                         Border.all(color:  Colors.transparent),
+                                         borderRadius: BorderRadius.circular(12),
+                                       ),
+                                       child: Column(
+                                         children: [
+
+                                           /// 🔥 HEADER (Dropdown)
+                                           GestureDetector(
+                                             onTap: () {
+                                               setState(() {
+
+                                                 /// 🔥 sab close karo
+                                                 expandedMap.updateAll((key, value) => false);
+
+
+                                                 expandedMap[date] = !isOpen;
+                                               });
+                                             },
+                                             child: Container(
+                                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                               decoration: BoxDecoration(
+                                                 color: const Color(0xff282828),
+                                                 borderRadius: BorderRadius.circular(12),
+                                               ),
+                                               child: Row(
+                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                 children: [
+                                                   Text(
+                                                     DateFormat('MMMM dd, yyyy').format(date),
+                                                     style: const TextStyle(color: Colors.white),
+                                                   ),
+                                                   Icon(
+                                                     isOpen
+                                                         ? Icons.keyboard_arrow_up
+                                                         : Icons.keyboard_arrow_down,
+                                                     color: Colors.white,
+                                                   )
+                                                 ],
+                                               ),
+                                             ),
+                                           ),
+
+                                           /// 🔥 BODY
+                                           if (isOpen) ...[
+                                             Padding(
+                                               padding: const EdgeInsets.all(16),
+                                               child: Column(
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+
+                                                 children: [
+
+                                                   /// Start Time
+
+
+                                                   buildTimeDropdown(
+                                                     key: ValueKey("${date.toString()}_start"),
+                                                     title: "Start Time",
+                                                     selectedTime: startTimeMap[normalizeDate(date)],
+                                                     isStart: true,
+                                                     date: date,
+                                                     onSelect: (val) {
+                                                       final key = normalizeDate(date);
+
+                                                       setState(() {
+                                                         startTimeMap[key] = val;
+                                                         endTimeMap[key] = null;
+
+                                                         final dt = parseTime(val, key);
+
+                                                         startTimes[key] = TimeOfDay(
+                                                           hour: dt.hour,
+                                                           minute: dt.minute,
+                                                         );
+                                                       });
+                                                     },
+                                                   ),
+                                                   SizedBox(height: 10,),
+                                                   buildTimeDropdown(
+                                                     key: ValueKey("${date.toString()}_end"),
+                                                     title: "End Time",
+                                                     selectedTime: endTimeMap[normalizeDate(date)],
+                                                     isStart: false,
+                                                     date: date,
+                                                     onSelect: (val) {
+                                                       final key = normalizeDate(date);
+
+                                                       setState(() {
+                                                         endTimeMap[key] = val;
+
+                                                         final dt = parseTime(val, key);
+
+                                                         endTimes[key] = TimeOfDay(
+                                                           hour: dt.hour,
+                                                           minute: dt.minute,
+                                                         );
+                                                       });
+                                                     },
+                                                   ),
+                                                   const SizedBox(height: 16),
+
+                                                   /// Duration
+                                                   Container(
+                                                     padding: const EdgeInsets.symmetric(
+                                                         horizontal: 14, vertical: 8),
+                                                     decoration: BoxDecoration(
+                                                       color: const Color(0xffE8D1AB),
+                                                       borderRadius: BorderRadius.circular(8),
+                                                     ),
+                                                     child: Text(
+                                                       getDurationText(date),
+                                                       style: const TextStyle(
+                                                         color: Colors.black,
+                                                         fontSize: 12,
+                                                       ),
+                                                     ),
+                                                   ),
+                                                 ],
+                                               ),
+                                             )
+                                           ]
+                                         ],
+                                       ),
+                                     );
+                                   }).toList(),
+                                 )
+                               ],
+                               if (istimingsame == true) ...[
+                                 SizedBox(height: 22),
+
+
+                                 buildTimeDropdown(
+                                   title: "Start Time",
+                                   selectedTime: startTimeStr,
+                                   isStart: true,
+                                   onSelect: (val) {
+                                     setState(() {
+                                       startTimeStr = val;
+                                       endTimeStr = null;
+
+                                       final dt = parseTime(val, selectedDate ?? DateTime.now());
+
+                                       startTime = TimeOfDay(
+                                         hour: dt.hour,
+                                         minute: dt.minute,
+                                       );
+                                     });
+                                   },
+                                 ),
+                                 SizedBox(height: 10,),
+                                 buildTimeDropdown(
+                                   title: "End Time",
+                                   selectedTime: endTimeStr,
+                                   isStart: false,
+                                   onSelect: (val) {
+                                     setState(() {
+                                       endTimeStr = val;
+
+                                       final dt = parseTime(val, selectedDate ?? DateTime.now());
+
+                                       endTime = TimeOfDay(
+                                         hour: dt.hour,
+                                         minute: dt.minute,
+                                       );
+                                     });
+                                   },
+
+                                 ),
+                                 const SizedBox(height: 16),
+                                 SizedBox(height: 12),
+
+                                 Row(
+                                   children: [
+                                     SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
+                                     SizedBox(width: 6),
+                                     Text(
+                                       'Applied to ${selectedDates.length} selected dates',
+                                       style: TextStyle(
+                                         color: const Color(0xFFA9A9A9),
+                                         fontSize: 14,
+                                         fontFamily: 'Outfit',
+                                         fontWeight: FontWeight.w400,
+                                         height: 1.36,
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                                 SizedBox(height: 20),
+                                 Container(
+                                   padding: const EdgeInsets.all(14),
+                                   decoration: BoxDecoration(
+                                     color: const Color(0xFF2A2A2A),
+                                     borderRadius: BorderRadius.circular(14),
+                                     border: Border.all(
+                                       color: Colors.white.withOpacity(0.08),
+                                     ),
+                                   ),
+                                   child: Row(
+                                     children: [
+                                       /// 📅 ICON
+                                       SvgPicture.asset("assets/svg/calendar-03.svg"),
+
+                                       const SizedBox(width: 13),
+
+                                       /// 📅 DATE + TIME (DYNAMIC)
+                                       Expanded(
+                                         child: Column(
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           children: [
+                                             /// 🔥 DYNAMIC DATE
+                                             Text(
+                                               formatDatesAlt(selectedDates), // ✅ already in your code
+                                               style: const TextStyle(
+                                                   color: Colors.white,
+                                                   fontSize: 14,
+                                                   fontWeight: FontWeight.w500,
+                                                   fontFamily: "Helvetica Neue"
+                                               ),
+                                             ),
+
+                                             const SizedBox(height: 4),
+
+                                             /// 🔥 DYNAMIC TIME
+                                             Text(
+                                               startTimeStr != null && endTimeStr != null
+                                                   ? "$startTimeStr – $endTimeStr"
+                                                   : "Select Time",
+                                               style: TextStyle(
+                                                 fontFamily: "Helvetica Neue",
+
+
+                                                 color: ColorCode.kWhiteOpacity70,
+                                                 fontSize: 11,
+                                               ),
+                                             ),
+                                           ],
+                                         ),
+                                       ),
+
+                                       /// ⏱ DYNAMIC HOURS
+                                       Text(
+                                         getDaysAndHours(), // 👇 function below
+                                         style: TextStyle(
+                                           color: ColorCode.kButtonColor,
+                                           fontSize: 14,
+                                           fontFamily: "Helvetica Neue",
+
+
+                                           fontWeight: FontWeight.w500,
+                                         ),
+                                       ),
+                                     ],
+                                   ),)
+                                 ,                              ],
+
+                               SizedBox(height: 12),
+
+
+                             ],
+                           ),],
 
 
 
-                          CustomInputField(
-                            title: "Select Date",
-                            controller: dateController,
-                            readOnly: true,
-                            onTap: () => _selectDate(context),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: SvgPicture.asset(
-                                "assets/svg/calendar-03.svg",
-                                width: 20,
-                                height: 20,
-                                colorFilter: const ColorFilter.mode(
-                                  ColorCode.kWhiteOpacity70,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 30,),
 
 
-                          buildTimeDropdown(
-                            title: "Start Time",
-                            selectedTime: startTimeStr,
-                            isStart: true,
-                            onSelect: (val) {
-                              setState(() {
-                                startTimeStr = val;
-                                endTimeStr = null; // reset end
-                              });
-                            },
-                          ),
-                          SizedBox(height: 10,),
-                          buildTimeDropdown(
-                            title: "End Time",
-                            selectedTime: endTimeStr,
-                            isStart: false,
-                            onSelect: (val) {
-                              setState(() {
-                                endTimeStr = val;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                        ],
 
 
 
@@ -2881,7 +2777,7 @@
                   end: Alignment.bottomCenter,
                   colors: [
                     Color(0xFFE8D1AB), // light gold
-                    Color(0xFFD4A14D), // dark gold
+                    Color(0xFFFDEFD9), // dark gold
                   ],
                 )
                     : null,

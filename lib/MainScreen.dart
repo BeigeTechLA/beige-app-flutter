@@ -59,7 +59,7 @@ class _MainscreenState extends State<Mainscreen> {
         child: BackdropFilter(
           filter: ImageFilter.blur(
             sigmaX: 80,
-            sigmaY: 70,
+            sigmaY: 10,
           ),
           child: BottomNavigationBar(
 

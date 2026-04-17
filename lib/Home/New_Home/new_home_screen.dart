@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../Model/HomeModel.dart';
 import '../../MyProfile/my_profile.dart';
 import '../../service/api_service.dart';
+import '../../utility/date_time_utils.dart';
 import '../../widgets/loding.dart';
 import '../HomeSekect/Home_view_profile.dart';
 import '../HomeSekect/change_location_screen.dart';
@@ -153,20 +154,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     "assets/images/Mikey+D (1).jpg",
     "assets/images/Nathan+Grant.png"
   ];
-  final List<String> images = [
-    "assets/images/Alec+H.png",
-    // "assets/images/Benson+F.png",
-    "assets/images/Christopher+R.png",
-    "assets/images/Corey+B.png",
-    "assets/images/Cornelius+M. (1).png",
-    "assets/images/Daniel+A.png",
-    "assets/images/Daniel+C.png",
 
-  ];
   final List<Map<String, String>> studioList = [
     {
       "image": "assets/new_home/4ce6dbc682ece0f18c3f89046020d5e78a3fcf13.png",
-      // Apni studio images dalein
       "name": "Beige Media",
       "desc": "(Modern Resort Villa with Jacuzzi)",
       "location": "Woodland Hills, Los Angeles,",
@@ -192,12 +183,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     },
   ];
 
-  Future<void> openLink(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Could not launch $url';
-    }
-  }
+
 
   final List<String> words = ["Influencers", "Streamers", "Actors", "Models", "Personalities"];
 
@@ -274,18 +260,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     "29.5M","-","7.7M","557K","11.3M","19.2M","703K","3.8M","4.8M"
   ];
 
-  Color getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return Colors.green;   // ✅ Completed → GREEN
-      case "pending":
-      case "draft":
-      case "matching":
-        return Colors.red;     // 🔴 Sab pending type → RED
-      default:
-        return Colors.red;     // Default bhi pending maan lo
+  Future<void> openLink(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
     }
   }
+
 
 
   Color getStatusColorFromLabel(String label) {
@@ -298,10 +279,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         return Colors.red;
     }
   }
-  /*final PageController _studioController = PageController(
-
-      viewportFraction: 0.75);
-  int _activeStudioIndex = 0;*/
 
 
   final PageController _pageController = PageController(
@@ -325,7 +302,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
   Future<void> handleResume(ContinueBooking booking) async {
 
-    /// 🔥 content_type direct backend se
     String type = booking.contentType ?? "photographer";
 
     int contentTypeId = getContentTypeId(type);
@@ -468,22 +444,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     }
   }
 
-  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "";
 
-    final d = DateTime.parse(date);
-    return DateFormat('dd-MM-yyyy').format(d); // 👉 04 08, 2026
-  }
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "";
-    final parsed = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsed); // 👉 09:00 AM
-  }
   final List<Color> _textColors = [
     Colors.white.withOpacity(0.5),
     const Color(0xFFE8D1AB),
     ColorCode.kWhiteOpacity70
   ];
+
   Future<void> _continueBooking(int contentType) async {
 
     setState(() => isLoading = true);
@@ -606,7 +573,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           // ✅ IMAGE ADDED HERE
                           image: DecorationImage(
                             image: AssetImage("assets/images/mappp.png"),
-                            // opacity: 0.2, // Subtle look ke liye opacity kam rakhi hai
+                            // opacity: 0.2, //
                             fit: BoxFit.contain,
                             alignment: Alignment(0, 0.7),
                           ),
@@ -764,7 +731,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               child: Text(
                                 _searchTexts[index],
                                 key: ValueKey<int>(index),
-                                // Key badalne par hi animation hoga
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: _textColors[index], // DYNAMIC COLOR
@@ -860,7 +826,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                                     margin: const EdgeInsets.symmetric(horizontal: 5),
 
-                                    height: 2, // 🔥 thoda better thickness
+                                    height: 2, //
                                     width: isActive ? 26 : 14, // 🔥 smooth pill effect
 
                                     decoration: BoxDecoration(
@@ -1540,88 +1506,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       ),
                       const SizedBox(height: 20),
 
-          /*            GestureDetector(
-                        onTap: () {
-                          if (!_bookingSwipeController.isAnimating) {
-                            _bookingSwipeController.forward().then((_) {
-                              setState(() {
-                                _currentBookingIndex = (_currentBookingIndex + 1) % bookingList.length;
-                                _bookingSwipeController.reset();
-                              });
-                            });
-                          }
-                        },
-                        onHorizontalDragEnd: (details) {
-                          if (_bookingSwipeController.isAnimating) return;
-                          if (details.primaryVelocity! < 0) { // Left Swipe
-                            _bookingSwipeController.forward().then((_) {
-                              setState(() {
-                                _currentBookingIndex = (_currentBookingIndex + 1) % bookingList.length;
-                                _bookingSwipeController.reset();
-                              });
-                            });
-                          }
-                        },
-                        child: SizedBox(
-                          height: 408,
-                          child: AnimatedBuilder(
-                            animation: _bookingSwipeController,
-                            builder: (context, child) {
-                              double val = _bookingSwipeController.value;
-
-                              // Front Card Animations
-                              double frontSlide = val * 300; // Niche ki taraf jayega
-                              double frontOpacity = 1 - val;
-
-                              // Back Card Animations (Ye piche se aage aayega)
-                              double backOffsetX = 20 * (1 - val);  // 20 se 0 tak
-                              double backOffsetY = -20 * (1 - val); // -20 se 0 tak
-                              double backScale = 0.96 + (0.04 * val); // 0.96 se 1.0 tak
-                              double backRotate = 0.08 * (1 - val); // 0.08 se 0 tak
-
-                              return Stack(
-                                clipBehavior:  Clip.antiAlias,
-                                alignment: Alignment.center,
-                                children: [
-                                  /// 🔹 BACK CARD (Jo ab aage aa raha hai)
-                                  Transform.translate(
-                                    offset: Offset(backOffsetX, backOffsetY),
-                                    child: Transform.rotate(
-                                      angle: backRotate,
-                                      child: Transform.scale(
-                                        scale: backScale,
-                                        child: Opacity(
-                                          // Back card ki opacity transition ke waqt badh jayegi
-                                          opacity: 0.5 + (0.5 * val),
-                                          child: _buildBookingCard(
-                                            (_currentBookingIndex + 1) % bookingList.length,
-                                            isBackCard: val < 0.5, // Jab tak aadha transition na ho, details chhupao
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                  /// 🔥 MAIN CARD (Jo slide hokar ja raha hai)
-                                  Transform.translate(
-                                    offset: Offset(0, frontSlide),
-                                    child: Opacity(
-                                      opacity: frontOpacity,
-                                      child: _buildBookingCard(
-                                        _currentBookingIndex % bookingList.length,
-                                        isBackCard: false,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),*/
 
 
-    Column(
+
+                   Column(
       children: [
         bookingList.isEmpty
 
@@ -1727,7 +1615,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         ),
       ],
     ),
-
 
                       const SizedBox(height: 10),
                       Padding(
@@ -1911,7 +1798,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                                               const SizedBox(width: 10),
 
-                                              /// 🔥 ICON BUTTON (PERFECT CIRCLE)
                                               Container(
                                                 height: 38,
                                                 width: 38,
@@ -1956,237 +1842,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         ),
                       ),
                       const SizedBox(height: 10),
-                        /*  Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: Text(
-                                  "Rebook Your Shoots",
-                                  style: TextStyle(color: ColorCode.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: "Unbounded",
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
-                                child: Container(
-                                  height: 280,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
-                                      )
-                                    ],
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      // 1. MAIN BACKGROUND IMAGE
-                                      Positioned.fill(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(30),
-                                          child: Image.asset(
-                                            "assets/new_home/RebookYourShoots_img.webp",
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
 
-                                      // 2. BLACK GRADIENT (Bottom to Top)
-                                      Positioned.fill(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(30),
-                                            gradient: LinearGradient(
-                                              begin: Alignment.bottomCenter,
-                                              end: Alignment.topCenter,
-                                              colors: [
-                                                Colors.black.withOpacity(0.9),
-                                                Colors.black.withOpacity(0.4),
-                                                Colors.transparent,
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                      // 3. CONTENT (Icon, Text, Buttons)
-                                      Positioned(
-                                        bottom: 20,
-                                        left: 20,
-                                        right: 20,
-                                        child: Column(
-                                          children: [
-                                            // --- MUSIC INFO ROW ---
-                                            Row(
-                                              children: [
-                                                // Dark Circular Icon Background
-                                                Container(
-                                                  padding: const EdgeInsets.all(10),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(
-                                                        0.12),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(Icons.music_note,
-                                                      color: Colors.white, size: 20),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment
-                                                      .start,
-                                                  children: const [
-                                                    Text(
-                                                      "Music Video",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.bold,
-                                                        fontFamily: "Outfit",
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "March 18, 2026 • Las Vegas, USA",
-                                                      style: TextStyle(
-                                                        color: Colors.white60,
-                                                        fontSize: 12,
-                                                        fontFamily: "Outfit",
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-
-                                            const SizedBox(height: 20),
-
-                                            // --- ACTION BUTTONS ROW ---
-                                            Row(
-                                              children: [
-                                                // Book Again Button
-                                                Expanded(
-                                                  child: Container(
-                                                    height: 30,
-                                                    alignment: Alignment.center,
-                                                    decoration: BoxDecoration(
-                                                      color: ColorCode.kButtonColor,
-                                                      // Aapka beige color
-                                                      borderRadius: BorderRadius
-                                                          .circular(30),
-                                                    ),
-                                                    child: const Text(
-                                                      "Book Again",
-                                                      style: TextStyle(
-                                                        color: ColorCode.black,
-                                                        fontSize: 12,
-                                                        fontWeight: FontWeight.w700,
-                                                        fontFamily: "Helvetica Neue",
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                // Circular Arrow Button
-                                                SvgPicture.asset(
-                                                  "assets/svg/home_view_profile.svg",
-
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Container(
-                              height: 1,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.09), // left
-                                    Colors.white.withOpacity(0.09), // center
-                                    Colors.white.withOpacity(0.09), // right
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),*/
-                      // --- RECENT PROJECT SECTION ---
-               /*       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Recent Project",
-                              style: TextStyle(color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Unbounded"),
-                            ),
-                            const SizedBox(height: 15),
-
-                            // Card 1 with "D" Badge
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                _buildProjectCard(
-                                    "Private Event", "Mar 10, 2025", "136 Files",
-                                    "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
-
-                              ],
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // Card 2
-                            _buildProjectCard(
-                                "Wedding Photography", "Feb 15, 2025", "150 Files",
-                                "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),*/
-                  /*    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        child: Container(
-                          height: 1,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),*/
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Column(
@@ -2547,7 +2203,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                           /// spacing only if visible
                                                           if (Topinstagram[realIndex].isNotEmpty &&
                                                               instaFollowers[realIndex] != "-")
-                                                            const SizedBox(width: 18),
+                                                            const SizedBox(width: 13),
 
                                                           /// YOUTUBE
                                                           if (Topyoutube[realIndex].isNotEmpty &&
@@ -2572,7 +2228,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
                                                           if (Topyoutube[realIndex].isNotEmpty &&
                                                               youtubeFollowers[realIndex] != "-")
-                                                            const SizedBox(width: 18),
+                                                            const SizedBox(width: 13),
 
                                                           /// TIKTOK
                                                           if (Toptiktok[realIndex].isNotEmpty &&
@@ -2582,12 +2238,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                               child: Row(
                                                                 children: [
                                                                   SvgPicture.asset("assets/svg/Tiktok.svg"),
-                                                                  const SizedBox(width: 4),
+                                                                  const SizedBox(width: 2),
                                                                   Text(
                                                                     tiktokFollowers[realIndex],
                                                                     style: const TextStyle(
                                                                       color: Colors.white,
-                                                                      fontSize: 13,
+                                                                      fontSize: 10,
                                                                       fontWeight: FontWeight.w500,
                                                                     ),
                                                                   ),
@@ -2652,7 +2308,6 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               ),
                             ),
                             const SizedBox(height: 10),
-                            // AB YE CALL KAREIN:
                             _buildTopCreativesStack(context),
 
                           ],
@@ -2974,7 +2629,7 @@ SizedBox(height: 10,),
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      formatDate(booking.eventDate),
+                      DateTimeUtils.formatDate(booking.eventDate),
 
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
@@ -2993,7 +2648,7 @@ SizedBox(height: 10,),
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      "${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}",
+                      "${  DateTimeUtils.formatTime(booking.startTime)} - ${  DateTimeUtils.formatTime(booking.endTime)}",
 
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
@@ -3065,94 +2720,6 @@ SizedBox(height: 10,),
       ),
     );
   }
-  Widget _buildProjectCard(String title, String date, String files,
-      String img) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF222222), // 👈 Figma background
-        borderRadius: BorderRadius.circular(22),
-
-        // 👇 Gradient Border Trick
-        border: Border.all(
-          width: 0.5,
-          color: Colors.white.withOpacity(0.10), // fallback
-        ),
-
-        // 👇 Shadow for premium look (optional)
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-
-      // 👇 Gradient Border Overlay
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Image.asset(
-              img,
-              height: 80,
-              width: 80,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 15),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold)),
-                Text(date,
-                    style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 12)),
-                const SizedBox(height: 8),
-                Text(files,
-                    style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12)),
-              ],
-            ),
-          ),
-
-          Column(
-            children: [
-              _buildSmallCircleBtn("assets/svg/eyes1.svg"),
-              const SizedBox(height: 8),
-              _buildSmallCircleBtn("assets/svg/install.svg"),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmallCircleBtn(String svgPath) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        shape: BoxShape.circle,
-      ),
-      child: SvgPicture.asset(
-        svgPath,
-        height: 18,
-        width: 18,
-        color: Colors.white, // optional (remove if original color chahiye)
-      ),
-    );
-  }
-
 
   Widget _buildServiceCard(
       int index, String title, String imagePath) {
@@ -3258,6 +2825,7 @@ SizedBox(height: 10,),
       ),
     );
   }
+
   void playBorderAnimationOnce() {
     _controller.reset();
     _controller.forward(); // only once
@@ -3670,9 +3238,9 @@ class BeveledTrayPainter extends CustomPainter {
     double w = size.width;
     double h = size.height;
 
-    // Dimensions (Aap inhe adjust kar sakte hain)
-    double bevelHeight = 12; // Kitna neeche jayega
-    double slopeWidth = 15;  // Tirchi line ki width
+
+    double bevelHeight = 12; //
+    double slopeWidth = 15;  //
     double shoulderWidth = w * 0.18; // Side ki strips ki width
 
     // Main Path define karna

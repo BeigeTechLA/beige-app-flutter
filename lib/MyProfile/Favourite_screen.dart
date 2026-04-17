@@ -31,6 +31,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     try {
       final response = await ApiService().fetchData(ApiEndpoints.my_favourites);
 
+      print("Response: $response");
       if (response != null && response['error'] == false) {
         setState(() {
           favourites = response['data'] ?? [];
@@ -120,7 +121,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     itemCount: favourites.length,
                     itemBuilder: (context, index) {
                       final item = favourites[index];
-
+                      print("Image URL: ${item['profile_image_url']}");
                       /// ✅ SAFE NULL HANDLING
                       final int? creatorId = item['crew_member_id'];
 
@@ -130,51 +131,71 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                           borderRadius: BorderRadius.circular(20),
                           child: SizedBox(
                             height: 220,
-                            child: Stack(
-                              children: [
-                                /// ✅ IMAGE SAFE
-                                (item['profile_image_url'] != null &&
-                                    item['profile_image_url']
-                                        .toString()
-                                        .isNotEmpty)
-                                    ? Image.network(
-                                  ApiService().getImageURL(
-                                      item['profile_image_url']),
-                                  width: double.infinity,
-                                  height: 220,
-                                  fit: BoxFit.fill,
-                                )
-                                    : SvgPicture.asset(
-                                  "assets/svg/imag_placeholder.svg",
-                                  width: double.infinity,
-                                  height: 220,
-                                  fit: BoxFit.cover,
-                                ),
+                              child: Stack(
+                                children: [
+                                  /// ✅ DIRECT IMAGE
+                                  Image.network(
+                                    ApiService().getImageURL(item['profile_image_url'] ?? ""),
+                                    width: double.infinity,
 
-                                /// ❤️ REMOVE BUTTON
-                                Positioned(
-                                  top: 10,
-                                  right: 10,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (creatorId != null) {
-                                        _removeFavourite(
-                                          creatorId: creatorId,
-                                          index: index,
-                                        );
-                                      } else {
-                                        debugPrint("creator_id is NULL ❌");
-                                      }
+                                    fit: BoxFit.cover,
+
+                                    /// 🔥 ERROR HANDLE (IMPORTANT)
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: SvgPicture.asset(
+                                          "assets/svg/imag_placeholder.svg",
+                                          width: double.infinity,
+                                          height: 220,
+                                          fit: BoxFit.cover,
+
+                                        ),
+                                      );
                                     },
-                                    child: SvgPicture.asset(
-                                      "assets/svg/Heart_COLOR.svg",
-                                      height: 22,
-                                      width: 22,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black.withOpacity(0.85),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+
+                                  /// ❤️ REMOVE BUTTON
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (creatorId != null) {
+                                          _removeFavourite(
+                                            creatorId: creatorId,
+                                            index: index,
+                                          );
+                                        } else {
+                                          debugPrint("creator_id is NULL ❌");
+                                        }
+                                      },
+                                      child: SvgPicture.asset(
+                                        "assets/svg/Heart_COLOR.svg",
+                                        height: 22,
+                                        width: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
                           ),
                         ),
                       );

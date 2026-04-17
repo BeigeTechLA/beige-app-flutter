@@ -370,7 +370,7 @@ class _EditProfileState extends State<EditProfile> {
                                       imageFile,
                                       width: 340,
                                       height: 340,
-                                      fit: BoxFit.fill,
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),

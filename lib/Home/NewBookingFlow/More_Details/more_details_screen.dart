@@ -649,7 +649,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: "Unbounded",
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -1187,7 +1187,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   ? const LinearGradient(
                 colors: [
                   Color(0xFFE8D1AB),
-                  Color(0xFFD4A14D),
+                  Color(0xFFFDEFD9),
                 ],
               )
                   : null,

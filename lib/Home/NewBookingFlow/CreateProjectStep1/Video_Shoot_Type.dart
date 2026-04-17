@@ -453,8 +453,8 @@ String getContentTypeTitle(int contentTypeId) {
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
                                           colors: [
-                                            Color(0xFFE8D1AB),
-                                            Color(0xFFD4A14D),
+                                            Color(0xFFE8D1AB), // light gold
+                                            Color(0xFFFDEFD9),
                                           ],
                                         )
                                             : null,
@@ -494,7 +494,7 @@ String getContentTypeTitle(int contentTypeId) {
       ),
       /// ✅ BOTTOM BAR (FIXED)
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
             Expanded(
