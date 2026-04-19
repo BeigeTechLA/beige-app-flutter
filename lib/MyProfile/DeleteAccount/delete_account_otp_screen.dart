@@ -6,7 +6,9 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
-import '../../utility/ColorCode.dart';
+import '../../app/colors.dart';
+import '../../app/text_styles.dart';
+import '../../app/radii.dart';
 import '../../widgets/TopMessage.dart';
 
 class DeleteAccountOtpScreen extends StatefulWidget {
@@ -99,7 +101,7 @@ void resetTimer() {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Server error, please try again"),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     } finally {
@@ -162,7 +164,7 @@ void resetTimer() {
               child:  SvgPicture.asset(
                 "assets/svg/back.svg",
                 height: 24,
-                color: ColorCode.white,
+                color: AppColors.white,
               )
             ),
 
@@ -172,10 +174,10 @@ void resetTimer() {
             Text(
               "Delete Account",
               style: TextStyle(
-                fontFamily: "Unbounded",
+                fontFamily: AppTextStyles.fontFamilyDisplay,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: ColorCode.white,
+                color: AppColors.white,
               ),
             ),
 
@@ -187,10 +189,10 @@ void resetTimer() {
 
               style: TextStyle(
                   fontSize: 14,
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   height: 1.5,
                   fontWeight: FontWeight.w400,
-                  fontFamily: "Outfit"
+                  fontFamily: AppTextStyles.fontFamilyBody
               ),
             ),
             const SizedBox(height: 20),
@@ -209,8 +211,8 @@ void resetTimer() {
                         border: Border.all(
                           color: (focusNodes[index].hasFocus ||
                               controllers[index].text.isNotEmpty)
-                              ? ColorCode.kButtonColor
-                              : ColorCode.kWhiteOpacity60,
+                              ? AppColors.primary
+                              : AppColors.white60,
                           width: 1.5,
                         ),
                       ),
@@ -258,7 +260,7 @@ void resetTimer() {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: ColorCode.kWhiteOpacity60,
+                    color: AppColors.white60,
                   ),
                 ),
               ],
@@ -277,7 +279,7 @@ void resetTimer() {
                   child: Text(
                     "Resend OTP",
                     style: TextStyle(
-                      color: ColorCode.kWhiteOpacity60,
+                      color: AppColors.white60,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       decoration: TextDecoration.underline,
@@ -300,10 +302,10 @@ void resetTimer() {
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isOtpFilled
-                      ? ColorCode.kButtonColor
-                      : ColorCode.kGold40,
+                      ? AppColors.primary
+                      : AppColors.goldOpacity40,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: AppRadii.xlAll,
                   ),
                 ),
                 child:Text(
@@ -312,7 +314,7 @@ void resetTimer() {
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: isOtpFilled
-                        ? ColorCode.kHeadingColor
+                        ? AppColors.textHeading
                         : Colors.black38,
                   ),
                 ),

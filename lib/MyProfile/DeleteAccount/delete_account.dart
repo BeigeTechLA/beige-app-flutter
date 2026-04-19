@@ -3,7 +3,9 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
-import '../../utility/ColorCode.dart';
+import '../../app/colors.dart';
+import '../../app/text_styles.dart';
+import '../../app/radii.dart';
 import 'delete_account_otp_screen.dart';
 class DeleteAccount extends StatefulWidget {
   const DeleteAccount({super.key});
@@ -29,7 +31,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
      ScaffoldMessenger.of(context).showSnackBar(
        const SnackBar(
          content: Text("Please select a reason"),
-         backgroundColor: Colors.red,
+         backgroundColor: AppColors.error,
        ),
      );
      return;
@@ -63,7 +65,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
        ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
            content: Text(response['message'] ?? "Something went wrong"),
-           backgroundColor: Colors.red,
+           backgroundColor: AppColors.error,
          ),
        );
      }
@@ -72,7 +74,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
      ScaffoldMessenger.of(context).showSnackBar(
        const SnackBar(
          content: Text("Server error, please try again"),
-         backgroundColor: Colors.red,
+         backgroundColor: AppColors.error,
        ),
      );
    } finally {
@@ -98,7 +100,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
                child:  SvgPicture.asset(
                  "assets/svg/back.svg",
                  height: 24,
-                 color: ColorCode.white,
+                 color: AppColors.white,
                )
              ),
 
@@ -108,10 +110,10 @@ class _DeleteAccountState extends State<DeleteAccount> {
              Text(
                "Delete Account",
                style: TextStyle(
-                 fontFamily: "Unbounded",
+                 fontFamily: AppTextStyles.fontFamilyDisplay,
                  fontSize: 16,
                  fontWeight: FontWeight.w600,
-                 color: ColorCode.white,
+                 color: AppColors.white,
                ),
              ),
 
@@ -122,10 +124,10 @@ class _DeleteAccountState extends State<DeleteAccount> {
                "This action will permanently delete your account and all associated data. If you need help or have questions, please contact us at support@beige.com",
                style: TextStyle(
                  fontSize: 14,
-                 color: ColorCode.kWhiteOpacity70,
+                 color: AppColors.white70,
                  height: 1.5,
                  fontWeight: FontWeight.w400,
-                 fontFamily: "Outfit"
+                 fontFamily: AppTextStyles.fontFamilyBody
                ),
              ),
 
@@ -133,7 +135,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
              Container(
                padding: EdgeInsets.all(20),
 
-               decoration: BoxDecoration(color: ColorCode.k282828),
+               decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.lgAll),
 
                child: Column(
                  children: [
@@ -142,9 +144,9 @@ class _DeleteAccountState extends State<DeleteAccount> {
                        Text("Why do you wish to leave Beige?",
                          style: TextStyle(
                              fontSize: 14,
-                             color: ColorCode.white,
+                             color: AppColors.white,
                              fontWeight: FontWeight.w500,
-                             fontFamily: "Outfit"
+                             fontFamily: AppTextStyles.fontFamilyBody
                          ),),
                      ],
                    ),
@@ -154,8 +156,8 @@ class _DeleteAccountState extends State<DeleteAccount> {
                      "Please let us know the reason for deleting your account.",
                      style: TextStyle(
                        fontSize: 12,
-                       color: ColorCode.kWhiteOpacity70,
-                       fontFamily: "Outfit",
+                       color: AppColors.white70,
+                       fontFamily: AppTextStyles.fontFamilyBody,
                        fontWeight: FontWeight.w400
 
                      ),
@@ -182,19 +184,19 @@ class _DeleteAccountState extends State<DeleteAccount> {
 
 
             style: ElevatedButton.styleFrom(
-              backgroundColor: ColorCode.kButtonColor,
+              backgroundColor: AppColors.primary,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: AppRadii.xlAll,
               ),
             ),
             child: const Text(
               "Continue",
               style: TextStyle(
-                fontFamily: "Unbounded",
+                fontFamily: AppTextStyles.fontFamilyDisplay,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kHeadingColor,
+                color: AppColors.textHeading,
               ),
             ),
           ),
@@ -227,8 +229,8 @@ class _DeleteAccountState extends State<DeleteAccount> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isSelected
-                      ? ColorCode.kButtonColor
-                      : ColorCode.kWhiteOpacity70,
+                      ? AppColors.primary
+                      : AppColors.white70,
 
                 ),
               ),
@@ -239,7 +241,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
                   height: 10,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: ColorCode.kButtonColor,
+                    color: AppColors.primary,
                   ),
                 ),
               )
@@ -254,9 +256,9 @@ class _DeleteAccountState extends State<DeleteAccount> {
                 reason,
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppTextStyles.fontFamilyBody,
                   fontWeight: FontWeight.w400,
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                 ),
               ),
             ),

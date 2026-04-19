@@ -1,5 +1,7 @@
 import 'dart:ui';
-import 'package:beige/utility/ColorCode.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
@@ -481,7 +483,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   final List<Color> _textColors = [
     Colors.white.withOpacity(0.5),
     const Color(0xFFE8D1AB),
-    ColorCode.kWhiteOpacity70
+    AppColors.white70
   ];
   Future<void> _continueBooking(int contentType) async {
 
@@ -904,7 +906,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             Text(
                               "Explore Services",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(color: AppColors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
@@ -972,7 +974,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               children: [
                                 Text(
                                   "Continue Your Booking",
-                                  style: TextStyle(color: ColorCode.white,
+                                  style: TextStyle(color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Unbounded",
@@ -1050,7 +1052,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                               Text(
                           homeData!.continueBooking!.currentScreenLabel ?? "",
                           style: const TextStyle(
-                            color: ColorCode.black,
+                            color: AppColors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -1061,7 +1063,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                               Text(
                           "Step ${homeData!.continueBooking!.currentScreenOrder} of ${homeData!.continueBooking!.totalSteps}",
                           style: const TextStyle(
-                            color: ColorCode.kBlackOpacity70,
+                            color: AppColors.black70,
                             fontSize: 13,
                           ),
                                               ),
@@ -1120,7 +1122,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         width: double.infinity,
                                         height: 48,
                                         decoration: BoxDecoration(
-                                          color: ColorCode.kHeadingColor, //
+                                          color: AppColors.textHeading, //
                                           borderRadius: BorderRadius.circular(23),
                                         ),
                                         child: Row(
@@ -1129,7 +1131,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                           Text(
                                           "Resume",
                                           style: TextStyle(
-                                            color: ColorCode.kButtonColor,
+                                            color: AppColors.primary,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
                                             fontFamily: "Unbounded",
@@ -1138,7 +1140,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         const SizedBox(width: 10),
                                         const Icon(
                                           Icons.arrow_forward,
-                                          color: ColorCode.kButtonColor,
+                                          color: AppColors.primary,
                                           size: 24,
                                         ),]),)
                                     ),
@@ -1179,7 +1181,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             const Text(
                               "Featured Creatives",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(color: AppColors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
@@ -1193,7 +1195,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       ),
                       const SizedBox(height: 20),
                       Container(
-                        // color: ColorCode.red,
+                        // color: AppColors.error,
                         child: SizedBox(
                           height: 280,
                           child: AnimatedBuilder(
@@ -1759,7 +1761,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             Text(
                               "We Think You’ll Love These ",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
@@ -1779,7 +1781,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           child: Text(
                             "No Data Found",
                               style:
-                              TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                              TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
                               )
                           ),
                         ),
@@ -1858,7 +1860,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                           Text(
                                             data.name,
                                             style: const TextStyle(
-                                              color: ColorCode.white,
+                                              color: AppColors.white,
                                               fontSize: 12,
                                               fontFamily: "Helvetica Neue",
                                               fontWeight: FontWeight.w500,
@@ -1896,13 +1898,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                     height: 35,
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       borderRadius: BorderRadius.circular(40),
                                                     ),
                                                     child: const Text(
                                                       "View Profile",
                                                       style: TextStyle(
-                                                        color: ColorCode.black,
+                                                        color: AppColors.black,
                                                         fontFamily: 'Helvetica Neue',
                                                         fontSize: 12,
                                                         fontWeight: FontWeight.w700,
@@ -1966,7 +1968,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 padding: const EdgeInsets.symmetric(horizontal: 20),
                                 child: Text(
                                   "Rebook Your Shoots",
-                                  style: TextStyle(color: ColorCode.white,
+                                  style: TextStyle(color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Unbounded",
@@ -2080,7 +2082,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                     height: 30,
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       // Aapka beige color
                                                       borderRadius: BorderRadius
                                                           .circular(30),
@@ -2088,7 +2090,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                     child: const Text(
                                                       "Book Again",
                                                       style: TextStyle(
-                                                        color: ColorCode.black,
+                                                        color: AppColors.black,
                                                         fontSize: 12,
                                                         fontWeight: FontWeight.w700,
                                                         fontFamily: "Helvetica Neue",
@@ -2197,7 +2199,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             const Text(
                               "How It Works",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
@@ -2322,7 +2324,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 const Text(
                                   "Top ",
                                   style: TextStyle(
-                                    color: ColorCode.white,
+                                    color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "Unbounded",
@@ -2361,7 +2363,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                         words[currentIndex],
                                                         overflow: TextOverflow.ellipsis,
                                                         style: const TextStyle(
-                                                          color: ColorCode.white,
+                                                          color: AppColors.white,
                                                           fontSize: 16,
                                                           fontWeight: FontWeight.w500,
                                                           fontFamily: "Unbounded",
@@ -2378,7 +2380,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                                         words[nextIndex],
                                                         overflow: TextOverflow.ellipsis,
                                                         style: const TextStyle(
-                                                          color: ColorCode.white,
+                                                          color: AppColors.white,
                                                           fontSize: 16,
                                                           fontWeight: FontWeight.w500,
                                                           fontFamily: "Unbounded",
@@ -2423,7 +2425,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         key: ValueKey<int>(index), // ✅ important for animation
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: ColorCode.white,
+                                          color: AppColors.white,
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                           fontFamily: "Unbounded",
@@ -2647,7 +2649,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             const Text(
                               "Top Creatives Near you",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
@@ -2769,7 +2771,7 @@ SizedBox(height: 10,),
                       "Book a Shoot",
                       style: TextStyle(
                         fontFamily: "Unbounded",
-                        color: ColorCode.black,
+                        color: AppColors.black,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                       ),
@@ -2847,7 +2849,7 @@ SizedBox(height: 10,),
                   Text(
                     data["title"]!,
                     style: TextStyle(
-                      color: ColorCode.white,
+                      color: AppColors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       fontFamily: "Helvetica Neue",
@@ -2880,7 +2882,7 @@ SizedBox(height: 10,),
                       child: Text(
                         data["button"]!,
                         style: TextStyle(
-                          color: ColorCode.kHeadingColor,
+                          color: AppColors.textHeading,
                           fontFamily: "Unbounded",
                           fontWeight: FontWeight.w600,
                           fontSize: 11,
@@ -2942,7 +2944,7 @@ SizedBox(height: 10,),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontFamily: "Helvetica Neue",
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -2973,7 +2975,7 @@ SizedBox(height: 10,),
                   children: [
                     SvgPicture.asset(
                       "assets/svg/Frame.svg",
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -2991,7 +2993,7 @@ SizedBox(height: 10,),
                   children: [
                     SvgPicture.asset(
                       "assets/svg/Group 2087328870.svg",
-                      color: ColorCode.white,
+                      color: AppColors.white,
 
                     ),
                     const SizedBox(width: 6),
@@ -3269,7 +3271,7 @@ SizedBox(height: 10,),
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
-        // color: ColorCode.orange,
+        // color: AppColors.warning,
         // margin: const EdgeInsets.symmetric(horizontal: 10),
 
         child: Stack(
@@ -3325,7 +3327,7 @@ SizedBox(height: 10,),
             name,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              color: ColorCode.white,
+              color: AppColors.white,
               fontFamily: "Outfit",
               fontSize: 15,
               fontWeight: FontWeight.w600,
@@ -3350,7 +3352,7 @@ SizedBox(height: 10,),
             Text(
               "No Creatives Found",
                 style:
-                TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
                 )
             ),
           ],
@@ -3489,7 +3491,7 @@ SizedBox(height: 10,),
       height: 400,
       width: double.infinity,
       decoration: BoxDecoration(
-        border: Border.all(color: ColorCode.kWhiteOpacity36, width: 0.5),
+        border: Border.all(color: AppColors.white36, width: 0.5),
         borderRadius: BorderRadius.circular(40),
         image: (imageUrl != null && imageUrl.isNotEmpty)
             ? DecorationImage(
@@ -3540,7 +3542,7 @@ SizedBox(height: 10,),
                     Text(
                       item.name,
                       style: const TextStyle(
-                        color: ColorCode.white,
+                        color: AppColors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         fontFamily: "Unbounded",
@@ -3550,7 +3552,7 @@ SizedBox(height: 10,),
                     Text(
                       item.title ?? "Creative Professional",
                       style: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                         fontSize: 14,
                       ),
                     ),
@@ -3572,13 +3574,13 @@ SizedBox(height: 10,),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 26, vertical: 8),
                         decoration: BoxDecoration(
-                          color: ColorCode.kButtonColor,
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(50),
                         ),
                         child: const Text(
                           "View Profile",
                           style: TextStyle(
-                            color: ColorCode.black,
+                            color: AppColors.black,
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),
@@ -3634,7 +3636,7 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: ColorCode.black,
+                  color: AppColors.black,
                   fontFamily: "Helvetica Neue",
                 ),
               ),
@@ -3645,7 +3647,7 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   fontFamily: "Helvetica Neue",
-                  color: ColorCode.k1D1D1B_Opacity70,
+                  color: AppColors.backgroundOpacity70,
                 ),
               ),
             ],
@@ -3660,7 +3662,7 @@ Widget _sideDot() {
     width: 20,
     height: 20,
     decoration: BoxDecoration(
-      color: ColorCode.bcakgroundcolor,
+      color: AppColors.background,
       borderRadius: BorderRadius.circular(50),
     ),
   );
