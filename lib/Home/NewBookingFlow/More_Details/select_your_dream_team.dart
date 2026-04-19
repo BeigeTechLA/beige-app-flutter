@@ -6,7 +6,7 @@ import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import '../../../widgets/loding.dart' show AppLoader;
 import '../../HomeSekect/recommended_detils_screen.dart';
 import '../Book_Confirm/review_confirm_screen.dart';
@@ -474,7 +474,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
               Text(
                 "More Details",
                 style: TextStyle(
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w400,
@@ -486,7 +486,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 child: Text(
                   "2/3",
                   style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontSize: 14,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w400,
@@ -525,7 +525,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           margin: const EdgeInsets.only(right: 8),
                           height: 5,
                           decoration: BoxDecoration(
-                            color: ColorCode.kSubtextColor, // grey background
+                            color: AppColors.textSecondary, // grey background
                             borderRadius: BorderRadius.circular(64),
                           ),
                           child: fillWidth > 0
@@ -535,7 +535,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               height: 5,
                               width: fillWidth == double.infinity ? null : fillWidth,
                               decoration: BoxDecoration(
-                                color: ColorCode.kButtonColor,
+                                color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(64),
                               ),
                             ),
@@ -559,7 +559,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           fontFamily: "Unbounded",
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: ColorCode.white,
+                          color: AppColors.white,
                         ),
                       ),
                       InkWell(
@@ -852,7 +852,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                           decoration: BoxDecoration(
-                                            color: isAdded ? ColorCode.kLightRed : ColorCode.kButtonColor,
+                                            color: isAdded ? AppColors.errorLight : AppColors.primary,
                                             borderRadius: BorderRadius.circular(30),
                                             border: isAdded ? Border.all(color: Colors.red) : null,
                                           ),
@@ -963,7 +963,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   child: SizedBox(
                                     width: MediaQuery.of(context).size.width * 0.85,
                                     child: Divider(
-                                      color: ColorCode.kDividerWhite12,
+                                      color: AppColors.dividerDark,
                                       thickness: 1,
                                     ),
                                   ),
@@ -983,7 +983,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 fontFamily: "Unbounded",
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: ColorCode.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -1234,8 +1234,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                                       horizontal: 14, vertical: 8),
                                                   decoration: BoxDecoration(
                                                     color: isAdded
-                                                        ? ColorCode.kLightRed
-                                                        : ColorCode.kButtonColor,
+                                                        ? AppColors.errorLight
+                                                        : AppColors.primary,
                                                     borderRadius: BorderRadius.circular(30),
                                                     border: isAdded
                                                         ? Border.all(color: Colors.red)
@@ -1350,8 +1350,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isRoleWiseSelectionComplete
-                        ? ColorCode.kButtonColor
-                        : ColorCode.kButtonColor,
+                        ? AppColors.primary
+                        : AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1366,8 +1366,8 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       fontFamily: "Unbounded",
                       fontWeight: FontWeight.w600,
                       color: isRoleWiseSelectionComplete
-                          ? ColorCode.kHeadingColor
-                          : ColorCode.kHeadingColor,
+                          ? AppColors.textHeading
+                          : AppColors.textHeading,
                     ),
                   ),
 
@@ -1568,7 +1568,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         //                   fontSize: 14,
         //                   fontFamily: "Outfit",
         //                   fontWeight: FontWeight.w400,
-        //                   color: ColorCode.kWhiteOpacity70,
+        //                   color: AppColors.white70,
         //                   decoration: TextDecoration.underline,
         //                 ),
         //               ),
@@ -1626,7 +1626,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
         //             },
         //
         //             style: ElevatedButton.styleFrom(
-        //               backgroundColor: ColorCode.kButtonColor,
+        //               backgroundColor: AppColors.primary,
         //               elevation: 0,
         //               shape: RoundedRectangleBorder(
         //                 borderRadius: BorderRadius.circular(12),
@@ -1731,7 +1731,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       },
             
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorCode.kButtonColor,
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -1782,7 +1782,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: ColorCode.k282828,
+                    color: AppColors.surfaceVariant,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(28),
                       topRight: Radius.circular(28),
@@ -1802,7 +1802,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                             height: 5,
                             margin: const EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              color: ColorCode.kWhiteOpacity70,
+                              color: AppColors.white70,
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
@@ -1871,7 +1871,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             fontFamily: "Outfit",
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
-                                            color: ColorCode.kWhiteOpacity70,
+                                            color: AppColors.white70,
                                           ),
                                         ),
 
@@ -1936,14 +1936,14 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   fontFamily: "Outfit",
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                               RangeSlider(
                                 values: priceRange,
                                 min: 100,
                                 max: 15000,
-                                activeColor: ColorCode.kButtonColor,
+                                activeColor: AppColors.primary,
                                 inactiveColor: Colors.white24,
                                 onChanged: (values) {
                                   setState(() => priceRange = values);
@@ -1956,7 +1956,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   Text(
                                     "Minimum\n\$${priceRange.start.toInt()}",
                                     style: const TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: AppColors.white70,
                                       fontSize: 11,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w400,
@@ -1966,7 +1966,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                     "Maximum\n\$${priceRange.end.toInt()}",
                                     textAlign: TextAlign.end,
                                     style: const TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: AppColors.white70,
                                       fontSize: 11,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w400,
@@ -1989,7 +1989,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
                                   border:
-                                  Border.all(color: ColorCode.kWhiteOpacity60
+                                  Border.all(color: AppColors.white60
                                   ),
                                 ),
                                 child: TextButton(
@@ -2006,7 +2006,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                       fontFamily: "Unbounded",
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                     ),
                                   ),
                                 ),
@@ -2017,7 +2017,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               child: Container(
                                 height: 55,
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: TextButton(
@@ -2034,7 +2034,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                         fontFamily: "Unbounded",
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        color: ColorCode.black,
+                                        color: AppColors.black,
                                       )
                                   ),
                                 ),
@@ -2072,7 +2072,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
+                const Icon(Icons.favorite, color: AppColors.primary, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -2132,7 +2132,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     ),
                     child: const Icon(
                       Icons.error_outline,
-                      color: ColorCode.kButtonColor,
+                      color: AppColors.primary,
                       size: 28,
                     ),
                   ),
@@ -2168,7 +2168,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     "Beige's team will create the best talent for you based on your needs.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: ColorCode.kButtonColor,
+                      color: AppColors.primary,
                       fontSize: 14,
                       fontFamily: "Outfit",
                       fontWeight: FontWeight.w600,
@@ -2211,7 +2211,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            color: ColorCode.kButtonColor,
+                            color: AppColors.primary,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: TextButton(

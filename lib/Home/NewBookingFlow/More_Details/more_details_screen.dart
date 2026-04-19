@@ -11,7 +11,7 @@ import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../service/google_config.dart';
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import 'crew_size_matching_screen.dart';
 
 class MoreDetailsScreen extends StatefulWidget {
@@ -418,7 +418,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             Text(
               "More Details",
               style: TextStyle(
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
@@ -430,7 +430,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               child: Text(
                 "2/3",
                 style: TextStyle(
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w400,
@@ -466,7 +466,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             margin: const EdgeInsets.only(right: 8),
             height: 5,
             decoration: BoxDecoration(
-              color: ColorCode.kSubtextColor, // grey background
+              color: AppColors.textSecondary, // grey background
               borderRadius: BorderRadius.circular(64),
             ),
             child: fillWidth > 0
@@ -476,7 +476,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 height: 5,
                 width: fillWidth == double.infinity ? null : fillWidth,
                 decoration: BoxDecoration(
-                  color: ColorCode.kButtonColor,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(64),
                 ),
               ),
@@ -564,12 +564,12 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: ColorCode.kButtonColor),
+                            border: Border.all(color: AppColors.primary),
                           ),
                           child: const Text(
                             "Included",
                             style: TextStyle(
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                               fontSize: 12,
                             ),
                           ),
@@ -624,12 +624,12 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: ColorCode.kButtonColor),
+                            border: Border.all(color: AppColors.primary),
                           ),
                           child: const Text(
                             "Included",
                             style: TextStyle(
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                               fontSize: 12,
                             ),
                           ),
@@ -721,13 +721,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   decoration: InputDecoration(
                     labelText:"Select Location*",
                     suffixIcon:
-                     Icon(Icons.location_on_outlined, color: ColorCode.white),
+                     Icon(Icons.location_on_outlined, color: AppColors.white),
 
 
                     floatingLabelBehavior: FloatingLabelBehavior.always,
 
                     labelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                      color: AppColors.white70, // #1D1D1B 60% opacity
                     ),
 
                     contentPadding: const EdgeInsets.symmetric(
@@ -739,7 +739,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
@@ -747,13 +747,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
                       ),
                     ),
 
                     floatingLabelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                      color: AppColors.white70,
 
                     ),
                   ),
@@ -765,7 +765,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 //   isLatLngRequired: true,
                 //
                 //   textStyle: const TextStyle(
-                //     color: ColorCode.white,
+                //     color: AppColors.white,
                 //     fontFamily: "Outfit",
                 //   ),
                 //
@@ -774,18 +774,18 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 //     floatingLabelBehavior: FloatingLabelBehavior.always,
                 //
                 //     labelStyle: const TextStyle(
-                //       color: ColorCode.kWhiteOpacity70,
+                //       color: AppColors.white70,
                 //       fontFamily: "Outfit",
                 //     ),
                 //
                 //     hintText: "Search or select location",
                 //     hintStyle: const TextStyle(
-                //       color: ColorCode.kWhiteOpacity70,
+                //       color: AppColors.white70,
                 //     ),
                 //
                 //     suffixIcon: const Icon(
                 //       Icons.location_on_outlined,
-                //       color: ColorCode.kWhiteOpacity70,
+                //       color: AppColors.white70,
                 //     ),
                 //
                 //     contentPadding: const EdgeInsets.symmetric(
@@ -796,7 +796,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 //     enabledBorder: OutlineInputBorder(
                 //       borderRadius: BorderRadius.circular(12),
                 //       borderSide: const BorderSide(
-                //         color: ColorCode.kWhiteOpacity70,
+                //         color: AppColors.white70,
                 //         width: 0.5,
                 //       ),
                 //     ),
@@ -804,7 +804,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 //     focusedBorder: OutlineInputBorder(
                 //       borderRadius: BorderRadius.circular(12),
                 //       borderSide: const BorderSide(
-                //         color: ColorCode.kButtonColor,
+                //         color: AppColors.primary,
                 //         width: 1,
                 //       ),
                 //     ),
@@ -848,7 +848,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           color: Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: ColorCode.kGoldBorder50,
+                            color: AppColors.borderGold,
                             width: 0.5,
                           ),
 
@@ -861,7 +861,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                           isLatLngRequired: true,
 
                           textStyle: const TextStyle(
-                            color: ColorCode.white,
+                            color: AppColors.white,
                             fontFamily: "Outfit",
                             fontSize: 14,
                           ),
@@ -872,7 +872,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                             focusedBorder: InputBorder.none,
                             hintText: "Search or select location",
                             hintStyle: TextStyle(
-                              color: ColorCode.kWhiteOpacity70,
+                              color: AppColors.white70,
                             ),
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 16,
@@ -1008,7 +1008,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     floatingLabelBehavior: FloatingLabelBehavior.always,
 
                     labelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                      color: AppColors.white70, // #1D1D1B 60% opacity
                     ),
 
                     contentPadding: const EdgeInsets.symmetric(
@@ -1020,7 +1020,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
@@ -1028,13 +1028,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
                       ),
                     ),
 
                     floatingLabelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                      color: AppColors.white70,
 
                     ),
                   ),
@@ -1056,7 +1056,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     floatingLabelBehavior: FloatingLabelBehavior.always,
 
                     labelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                      color: AppColors.white70, // #1D1D1B 60% opacity
                     ),
 
                     contentPadding: const EdgeInsets.symmetric(
@@ -1068,7 +1068,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
@@ -1076,13 +1076,13 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
                       ),
                     ),
 
                     floatingLabelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                      color: AppColors.white70,
 
                     ),
                   ),
@@ -1131,10 +1131,10 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                 onPressed: isSubmitting ? null : _More_Details,
 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorCode.kButtonColor,
+                  backgroundColor: AppColors.primary,
                   /* backgroundColor: selectedIndex == -1
-                      ? ColorCode.kGoldGradientLight // disabled
-                      : ColorCode.kButtonColor, // enabled
+                      ? AppColors.goldGradientLight // disabled
+                      : AppColors.primary, // enabled
                   foregroundColor: selectedIndex == -1
                       ? Colors.grey.shade400
                       : Colors.black,*/
@@ -1147,7 +1147,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
                   "Continue",
                   style: TextStyle(
                     fontFamily: "Unbounded",
-                    color: ColorCode.kHeadingColor,
+                    color: AppColors.textHeading,
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
@@ -1192,7 +1192,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
               )
                   : null,
               border: Border.all(
-                color: ColorCode.kWhiteOpacity70,
+                color: AppColors.white70,
                 width: 1,
               ),
             ),
@@ -1239,7 +1239,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
-              color: ColorCode.kButtonColor,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(

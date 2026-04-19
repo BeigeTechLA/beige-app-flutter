@@ -5,7 +5,7 @@ import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import '../../HomeSekect/finding_the_perfect_screen.dart';
 
 class CrewSizeMatchingScreen extends StatefulWidget {
@@ -124,7 +124,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
             Text(
               "More Details",
               style: TextStyle(
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 fontFamily: "Outfit",
@@ -137,7 +137,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                 "2/3",
                 style: TextStyle(
                   fontFamily: "Outfit",
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
@@ -173,7 +173,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                       margin: const EdgeInsets.only(right: 8),
                       height: 5,
                       decoration: BoxDecoration(
-                        color: ColorCode.kSubtextColor, // grey background
+                        color: AppColors.textSecondary, // grey background
                         borderRadius: BorderRadius.circular(64),
                       ),
                       child: fillWidth > 0
@@ -183,7 +183,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                           height: 5,
                           width: fillWidth == double.infinity ? null : fillWidth,
                           decoration: BoxDecoration(
-                            color: ColorCode.kButtonColor,
+                            color: AppColors.primary,
                             borderRadius: BorderRadius.circular(64),
                           ),
                         ),
@@ -231,7 +231,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                               Container(
                                 padding:  EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -252,7 +252,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                     Expanded(
                                       child: Text(
                                         "Recommended Crew Size for \nYour Project",
-                                        style: TextStyle(color: ColorCode.kHeadingColor, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                                        style: TextStyle(color: AppColors.textHeading, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
                                       ),
                                     ),
                                   ],
@@ -324,7 +324,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                         //  maxLines: 2,                    // ✅ allows wrapping
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          color: ColorCode.white,
+                                          color: AppColors.white,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                           fontFamily: "Outfit",
@@ -337,7 +337,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                     Text(
                                       "$minCrew - $maxCrew People",
                                       style: const TextStyle(
-                                        color: ColorCode.kButtonColor,
+                                        color: AppColors.primary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         fontFamily: "Outfit",
@@ -353,7 +353,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  child: Divider(color: ColorCode.white.withOpacity(0.30)),
+                                  child: Divider(color: AppColors.white.withOpacity(0.30)),
                                 ),
 
 
@@ -381,7 +381,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                           Text(
                                             getDefaultOutputText(),
                                             style: const TextStyle(
-                                              color: ColorCode.white,
+                                              color: AppColors.white,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
                                               fontFamily: "Outfit",
@@ -417,7 +417,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                           padding: EdgeInsets.all(9),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
-                            /*    border: Border.all(color: ColorCode.kButtonColor)*/
+                            /*    border: Border.all(color: AppColors.primary)*/
                           ),
                           child: Column(
                             children: [
@@ -444,13 +444,13 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                   Expanded(
                                     child: Text(
                                       "AI Matchmaker",
-                                      style: TextStyle(color: ColorCode.kButtonColor, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
+                                      style: TextStyle(color: AppColors.primary, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
                                     ),
                                   ),
                                 ],
                               ),
 
-                              // Divider(color: ColorCode.kDividerWhite12,),
+                              // Divider(color: AppColors.dividerDark,),
                               //
 
                               SizedBox(height: 10),
@@ -461,7 +461,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                   "Our AI will analyse your project and match you with the perfect crew size and specialists",
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
-                                    color: ColorCode.white,
+                                    color: AppColors.white,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: "Outfit",
@@ -474,7 +474,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                               Container(
                                 /*  decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(13)),
-                              color: ColorCode.k282828,
+                              color: AppColors.surfaceVariant,
                             ),*/
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -494,7 +494,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                         ),
 
                         SizedBox(height: 20),
-                        Divider(color: ColorCode.kDividerWhite12,),
+                        Divider(color: AppColors.dividerDark,),
                         SizedBox(height:15),
                         Row(
                           children: [
@@ -517,7 +517,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                             "Our intelligent matching system considers multiple factors to build your ideal crew:",
                             textAlign: TextAlign.left,
                             style: TextStyle(
-                              color: ColorCode.kWhiteOpacity70,
+                              color: AppColors.white70,
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
                               fontFamily: "Outfit",
@@ -528,7 +528,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
                         Container(
                           /*   decoration: BoxDecoration(
-                              color: ColorCode.k282828,
+                              color: AppColors.surfaceVariant,
                               borderRadius: BorderRadius.circular(14),
                             ),*/
 
@@ -566,7 +566,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                               text:
                                               "Different shoots require different team sizes",
                                               style: TextStyle(
-                                                color: ColorCode.kWhiteOpacity70,
+                                                color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
                                                 fontFamily: "Outfit",
@@ -613,7 +613,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                               text:
                                               "We match crews that fit your budget tier",
                                               style: TextStyle(
-                                                color: ColorCode.kWhiteOpacity70,
+                                                color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
                                                 fontFamily: "Outfit",
@@ -660,7 +660,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                               text:
                                               "Based on thousands of successful projects",
                                               style: TextStyle(
-                                                color: ColorCode.kWhiteOpacity70,
+                                                color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
                                                 fontFamily: "Outfit",
@@ -741,7 +741,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
+                    backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -753,7 +753,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                       fontSize: 14,
                       fontFamily: "Unbounded",
                       fontWeight: FontWeight.w600,
-                      color: ColorCode.kHeadingColor,
+                      color: AppColors.textHeading,
                     ),
                   ),
                 ),
@@ -781,7 +781,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
           child: Text(
             text,
             style: const TextStyle(
-              color: ColorCode.kWhiteOpacity70,
+              color: AppColors.white70,
               fontSize: 12,
               fontWeight: FontWeight.w400,
               fontFamily: "Outfit",
