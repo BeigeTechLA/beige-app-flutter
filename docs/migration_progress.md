@@ -51,11 +51,11 @@ The remaining screens must be migrated to the new design tokens following the sa
 - `lib/MyProfile/Favourite_screen.dart` ✅ (4 ColorCode refs replaced)
 - `lib/MyProfile/edit_profile.dart` ✅ (~25 ColorCode refs replaced)
 
-**Batch 6: Profile Settings (4 files)**
-- `lib/Profile/app_preferences.dart`
-- `lib/Profile/change_password_screen.dart`
-- `lib/Profile/my_profile_enter_otp_screen.dart`
-- `lib/Profile/my_profile_new_password_screen.dart`
+**Batch 6: Profile Settings (4 files) ✅ Done**
+- `lib/MyProfile/app_preferences.dart` ✅
+- `lib/MyProfile/Change_Password_screen.dart` ✅
+- `lib/MyProfile/myprofile_enter_otp_screen.dart` ✅
+- `lib/MyProfile/myprofile_new_password_screen.dart` ✅
 
 **Batch 7: Delete Account & Home Feed Initial (4 files)**
 - `lib/Profile/delete_account.dart`

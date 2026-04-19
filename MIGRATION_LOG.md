@@ -5,6 +5,13 @@
 
 ---
 
+### 2026-04-19: Phase 3.1 Design Token Migration — Batch 6 (Profile Settings)
+- **Changes**: Migrated `app_preferences.dart`, `Change_Password_screen.dart`, `myprofile_enter_otp_screen.dart`, and `myprofile_new_password_screen.dart` within `lib/MyProfile/`.
+- **Decisions**: 
+  - Standardized hardcoded colors (`ColorCode.k282828` mapping to `AppColors.surfaceVariant`, inline Opacity combinations to tokenized AppColors) to eliminate design drift.
+  - Removed remaining 2 `ColorCode` strings hidden locally within `Booking_History_screen.dart` comment blocks.
+- **Constraints Maintained**: Used batching 5-file limits. `flutter analyze` completed securely. Zero functional or design regressions.
+
 ### 2026-04-19: Phase 3 Auth Design Token Migration Completed
 - **Changes**: Migrated `new_sing_up_screen.dart`, `new_forgot_otp_screen.dart`, `new_new_passwrod_screen.dart`, `new_login_screen.dart`, `new_forgot_passwrod_screen.dart`.
 - **Decisions**: 
