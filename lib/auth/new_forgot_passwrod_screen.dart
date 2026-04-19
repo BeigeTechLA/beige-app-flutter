@@ -133,7 +133,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: ColorCode.white,
+      // backgroundColor: AppColors.white,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -193,7 +193,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                               style: TextStyle(
                                 fontFamily: AppTextStyles.fontFamilyDisplay,
                                 fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.white,
                               ),
                             ),
@@ -316,7 +316,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           height: 50,
                           decoration: BoxDecoration(
-                            color: ColorCode.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.12),
@@ -392,7 +392,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
               color: Colors.black.withOpacity(0.5),
               child: const Center(
                 child: CircularProgressIndicator(
-                  color: ColorCode.kGoldGradientLight,
+                  color: AppColors.goldGradientLight,
                 ),
               ),
             ),*/

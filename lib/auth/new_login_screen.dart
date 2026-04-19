@@ -190,7 +190,7 @@
     @override
     Widget build(BuildContext context) {
       return Scaffold(
-        // backgroundColor: ColorCode.white,
+        // backgroundColor: AppColors.white,
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -348,27 +348,27 @@
                                     width: 20,
                                     decoration: BoxDecoration(
                                       color: savePassword
-                                          ? ColorCode.black
-                                          : Colors.transparent,
+                                          ? AppColors.black
+                                          : AppColors.transparent,
                                       borderRadius: BorderRadius.circular(5),
                                       border: Border.all(
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color: AppColors.white70,
                                       ),
                                     ),
                                     child: savePassword
                                         ? const Icon(Icons.check,
-                                        size: 14, color: ColorCode.kButtonColor)
+                                        size: 14, color: AppColors.primary)
                                         : null,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(
-                                  "Save Password",
+                                  "Keep me logged in",
                                   style: TextStyle(
                                     fontFamily: "Outfit",
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
-                                    color: ColorCode.kWhiteOpacity60,
+                                    color: AppColors.white60,
                                   ),
                                 ),
                                 const Spacer(),*/
@@ -446,7 +446,7 @@
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           height: 50,
                           decoration: BoxDecoration(
-                            color: ColorCode.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.12),

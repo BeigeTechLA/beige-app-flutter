@@ -175,7 +175,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: ColorCode.white,
+      // backgroundColor: AppColors.white,
       body: Stack(
         children:[
           SingleChildScrollView(
@@ -435,7 +435,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           height: 50,
                           decoration: BoxDecoration(
-                            color: ColorCode.white,
+                            color: AppColors.white,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.12),
@@ -515,7 +515,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                   width: 40,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    color: ColorCode.kButtonColor,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -533,7 +533,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
             const Text(
               "I Remember my Password. ",
               style: TextStyle(
-                color: ColorCode.kWhiteOpacity60,
+                color: AppColors.white60,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),

@@ -115,7 +115,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: ColorCode.white,
+      // backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -352,7 +352,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         height: 50,
                         decoration: BoxDecoration(
-                          color: ColorCode.white,
+                          color: AppColors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: Colors.white.withOpacity(0.12),

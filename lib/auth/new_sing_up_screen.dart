@@ -15,12 +15,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
 import '../service/shared_service.dart';
-import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
 
 
@@ -136,14 +139,14 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.85,
               decoration: const BoxDecoration(
-                color: Color(0xFF1C1C1C),
+                color: AppColors.surface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               padding: const EdgeInsets.all(16),
@@ -156,7 +159,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:ColorCode.kWhiteOpacity70,
+                        color:AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -168,9 +171,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       Text(
                         "Crop your Profile",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 18,
-                          fontFamily: "Outfit",
+                          fontFamily: AppTextStyles.fontFamilyBody,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -182,7 +185,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                           padding: EdgeInsets.all(6),
                           child: Icon(
                             Icons.close,
-                            color: Colors.white,
+                            color: AppColors.white,
                             size: 22,
                           ),
                         ),
@@ -193,7 +196,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                   SizedBox(height: 20),
 
-                  Divider(color: ColorCode.kDividerWhite12,),
+                  Divider(color: AppColors.dividerDark,),
 
                   /// 🔥 CIRCULAR PREVIEW AREA
                   Expanded(
@@ -285,9 +288,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                               overlayShape: const RoundSliderOverlayShape(
                                 overlayRadius: 14,
                               ),
-                              activeTrackColor: ColorCode.kButtonColor,
-                              inactiveTrackColor: Colors.white.withOpacity(0.3),
-                              thumbColor: ColorCode.kButtonColor,
+                              activeTrackColor: AppColors.primary,
+                              inactiveTrackColor: AppColors.white30,
+                              thumbColor: AppColors.primary,
                             ),
                             child: Slider(
                               min: 1,
@@ -325,9 +328,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorCode.kButtonColor,
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadii.lgAll,
                         ),
                         elevation: 0,
                       ),
@@ -349,9 +352,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       child:  Text(
                         "Save",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.textHeading,
                           fontSize: 14,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -744,7 +747,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 ''';
 
     return Scaffold(
-      // backgroundColor: ColorCode.white,
+      // backgroundColor: AppColors.white,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -791,10 +794,10 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                             Text(
                               "Sign Up Now",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppTextStyles.fontFamilyDisplay,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: ColorCode.white,
+                                color: AppColors.white,
                               ),
                             ),
 
@@ -804,9 +807,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                               "Join Beige to book talented photographers\nand videographers for your projects.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontFamily: "Outfit",
+                                fontFamily: AppTextStyles.fontFamilyBody,
                                 fontSize: 14,
-                                color: ColorCode.kWhiteOpacity70,
+                                color: AppColors.white70,
                               ),
                             ),
 
@@ -828,12 +831,12 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        margin: AppSpacing.authCardMargin,
                         decoration: BoxDecoration(
-                          color: ColorCode.bcakgroundcolor,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.06),
+                            color: AppColors.white.withValues(alpha: 0.06),
                             width: 1,
                           ),
                         ),
@@ -882,8 +885,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
 
                                   textStyle: const TextStyle(
-                                    color: ColorCode.white,
-                                    fontFamily: "Outfit",
+                                    color: AppColors.white,
+                                    fontFamily: AppTextStyles.fontFamilyBody,
                                     fontSize: 14,
                                   ),
 
@@ -892,7 +895,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                                     hintText: "Location*",
                                     hintStyle: const TextStyle(
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: AppColors.white70,
                                     ),
                                     floatingLabelBehavior: FloatingLabelBehavior.always,
                                     border: InputBorder.none,
@@ -909,7 +912,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                         "assets/svg/LocationPin.svg",
                                         width: 24,
                                         height: 24,
-                                        color: ColorCode.white,//
+                                        color: AppColors.white,//
                                       ),
                                     ),
                                   ),
@@ -1101,18 +1104,18 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                       width: 20,
                                       decoration: BoxDecoration(
                                         color: savePassword
-                                            ? ColorCode.kButtonColor
-                                            : Colors.transparent,
+                                            ? AppColors.primary
+                                            : AppColors.transparent,
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
-                                          color: ColorCode.kWhiteOpacity70,
+                                          color: AppColors.white70,
                                         ),
                                       ),
                                       child: savePassword
                                           ? const Icon(
                                         Icons.check,
                                         size: 14,
-                                        color: ColorCode.black,
+                                        color: AppColors.black,
                                       )
                                           : null,
                                     ),
@@ -1130,18 +1133,18 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                           text: "I agree to the ",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
-                                            color: ColorCode.kWhiteOpacity70,
+                                            color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                         TextSpan(
                                           text: "Terms & Conditions",
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w600,
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 13,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppTextStyles.fontFamilyBody,
                                             decoration: TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
@@ -1154,18 +1157,18 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                           text: " and ",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
-                                            color: ColorCode.kWhiteOpacity70,
+                                            color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                         TextSpan(
                                           text: "Privacy Policy",
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w600,
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 13,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppTextStyles.fontFamilyBody,
                                             decoration: TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
@@ -1178,9 +1181,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                           text: " set out of this site",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w400,
-                                            color: ColorCode.kWhiteOpacity70,
+                                            color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                       ],
@@ -1200,23 +1203,23 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
 
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isFormValid
-                                      ? ColorCode.kButtonColor
-                                      : ColorCode.kGoldGradientLight,
+                                      ? AppColors.primary
+                                      : AppColors.goldGradientLight,
 
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                   ),
                                 ),
 
                                 child: Text(
                                   "Create Account",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppTextStyles.fontFamilyDisplay,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: isFormValid
-                                        ? ColorCode.kHeadingColor
-                                        : ColorCode.k282828,
+                                        ? AppColors.textHeading
+                                        : AppColors.surfaceVariant,
                                   ),
                                 ),
                               ),
@@ -1237,7 +1240,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           height: 50,
                           decoration: BoxDecoration(
-                            color: ColorCode.k282828,
+                            color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.12),
@@ -1264,7 +1267,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                 child: const Icon(
                                   Icons.person_outline,
                                   size: 16,
-                                  color: ColorCode.kWhiteOpacity70,
+                                  color: AppColors.white70,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -1274,7 +1277,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                                   fontFamily: "Outfit",
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
-                                  color: ColorCode.kWhiteOpacity70,
+                                  color: AppColors.white70,
                                   letterSpacing: 0.2,
                                 ),
                               ),
@@ -1299,7 +1302,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                     const Text(
                       "Already have an account? ",
                       style: TextStyle(
-                        color: ColorCode.kWhiteOpacity60,
+                        color: AppColors.white60,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1334,7 +1337,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
               color: Colors.black.withOpacity(0.6),
               child: const Center(
                 child: CircularProgressIndicator(
-                  color: ColorCode.kButtonColor,
+                  color: AppColors.primary,
                 ),
               ),
             ),
@@ -1350,10 +1353,10 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
   Widget _buildField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      cursorColor: ColorCode.white,
+      cursorColor: AppColors.white,
       style: const TextStyle(
-        color: ColorCode.white,
-        fontFamily: "Outfit",
+        color: AppColors.white,
+        fontFamily: AppTextStyles.fontFamilyBody,
         fontSize: 15,
         fontWeight: FontWeight.w400,
       ),
@@ -1362,21 +1365,21 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppTextStyles.fontFamilyBody,
           fontWeight: FontWeight.w400,
           fontSize: 15,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),
 
         floatingLabelStyle: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppTextStyles.fontFamilyBody,
           fontWeight: FontWeight.w400,
           fontSize: 15,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),
 
         contentPadding: const EdgeInsets.symmetric(
@@ -1385,17 +1388,17 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         ),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
@@ -1411,34 +1414,34 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
     return TextField(
       controller: controller,
       obscureText: !isVisible,
-      cursorColor: ColorCode.kWhiteOpacity70,
+      cursorColor: AppColors.white70,
       style:const TextStyle(
-        fontFamily: "Outfit",
+        fontFamily: AppTextStyles.fontFamilyBody,
         fontWeight: FontWeight.w400,
         fontSize: 12,
 
-        color: ColorCode.kWhiteOpacity70,
+        color: AppColors.white70,
       ),
       decoration: InputDecoration(
         labelText: "$title*",
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppTextStyles.fontFamilyBody,
           fontWeight: FontWeight.w400,
           fontSize: 15,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),
 
         floatingLabelStyle: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppTextStyles.fontFamilyBody,
           fontWeight: FontWeight.w400,
           fontSize: 15,
           height: 1.0,
           letterSpacing: 0,
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),
 
         contentPadding: const EdgeInsets.symmetric(
@@ -1451,7 +1454,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
           onPressed: onToggle,
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.white,
+            color: AppColors.white,
             size: 20,
           ),
         ),
@@ -1459,7 +1462,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
@@ -1467,7 +1470,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
@@ -1484,7 +1487,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
         color: const Color(0xFF1C1C1C),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: ColorCode.kBorderLight
+            color: AppColors.borderLight
         ),
       ),
       child: Column(
@@ -1495,9 +1498,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
             "Profile Picture",
             style: TextStyle(
               fontSize: 16,
-              fontFamily: "Outfit",
+              fontFamily: AppTextStyles.fontFamilyBody,
               fontWeight: FontWeight.w500,
-              color: ColorCode.white,
+              color: AppColors.white,
             ),
           ),
 
@@ -1508,8 +1511,8 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
             "Add photo to build connection and trust",
             style: TextStyle(
                 fontSize: 12,
-                fontFamily: "Outfit",
-                color: ColorCode.kWhiteOpacity70
+                fontFamily: AppTextStyles.fontFamilyBody,
+                color: AppColors.white70
             ),
           ),
 
@@ -1542,7 +1545,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 10),
                     decoration: BoxDecoration(
-                      color: ColorCode.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Row(
@@ -1607,7 +1610,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
               width: 33,
               decoration: BoxDecoration(//
                 shape: BoxShape.circle,
-                color: ColorCode.k1D1D1B_Opacity70,
+                color: AppColors.backgroundOpacity70,
                 border: Border.all(
                   color: Colors.white.withOpacity(0.06),
                   width: 1,
@@ -1626,9 +1629,9 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
             Text(
               "Tell Us About Yourself & Add Details",//
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppTextStyles.fontFamilyBody,
                 fontSize: 12,
-                color: ColorCode.k5D5D5D,
+                color: AppColors.disabled,
               ),
             ),
           ],
