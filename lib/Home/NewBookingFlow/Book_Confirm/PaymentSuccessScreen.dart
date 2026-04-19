@@ -1,5 +1,5 @@
 import 'package:beige/MainScreen.dart';
-import 'package:beige/utility/ColorCode.dart';
+import 'package:biegeapp/app/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -48,7 +48,7 @@ class PaymentSuccessScreen extends StatelessWidget {
               const Text(
                 "Paid Successfully",
                 style: TextStyle(
-                  color: ColorCode.kButtonColor,
+                  color: AppColors.primary,
                   fontFamily: "Unbounded",
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -62,7 +62,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                 "Your payment was successful & your booking is now confirmed.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w500,
                   fontSize: 14,

@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import '../../../widgets/loding.dart' show AppLoader;
 import '../../HomeSekect/payment_method.dart';
 import 'PaymentSuccessScreen.dart';
@@ -457,7 +457,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               "Book & Confirm",
               style: TextStyle(
                 fontFamily: "Outfit",
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
@@ -469,7 +469,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                 "3/3",
                 style: TextStyle(
                   fontFamily: "Outfit",
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
 
                 ),
@@ -505,7 +505,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         margin: const EdgeInsets.only(right: 8),
                         height: 5,
                         decoration: BoxDecoration(
-                          color: ColorCode.kSubtextColor, // grey background
+                          color: AppColors.textSecondary, // grey background
                           borderRadius: BorderRadius.circular(64),
                         ),
                         child: fillWidth > 0
@@ -517,7 +517,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ? null
                                 : fillWidth,
                             decoration: BoxDecoration(
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(64),
                             ),
                           ),
@@ -538,7 +538,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         fontFamily: "Unbounded",
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: ColorCode.white,
+                        color: AppColors.white,
                       ),
                     ),
 
@@ -554,7 +554,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: ColorCode.k282828,
+                            color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Column(
@@ -608,7 +608,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                             creativeRatingText,
                                             style: const TextStyle(
                                               fontSize: 14,
-                                              color: ColorCode.kWhiteOpacity70,
+                                              color: AppColors.white70,
                                               fontWeight: FontWeight.w500,
                                               fontFamily: "Outfit",
                                             ),
@@ -622,7 +622,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                           "Content Type: $creativeRole",
                                           style: const TextStyle(
                                             fontSize: 12,
-                                            color: ColorCode.kButtonColor,
+                                            color: AppColors.primary,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -650,7 +650,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         "From \$$creativeRate/Hr",
                                         style: const TextStyle(
                                           fontSize: 14,
-                                          color: ColorCode.kButtonColor,
+                                          color: AppColors.primary,
                                           fontFamily: "Outfit",
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -693,7 +693,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(color: Colors.white.withOpacity(0.9)),
                                 ),
@@ -787,7 +787,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                     "Editing Services",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -815,7 +815,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         child: Text(
                                           "Video Edits:",
                                           style: TextStyle(
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 12,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w400,
@@ -847,14 +847,14 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                                   margin: const EdgeInsets.only(bottom: 8),
                                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                   decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
+                                                    color: AppColors.goldLight20,
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
                                                     "${(edit)} x$count",
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       fontSize: 12,
                                                       fontFamily: "Outfit",
                                                       fontWeight: FontWeight.w500, // 🔥 better look
@@ -879,7 +879,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         child: Text(
                                           "Photo Edits:",
                                           style: TextStyle(
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 12,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w400,
@@ -911,14 +911,14 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                                   margin: const EdgeInsets.only(bottom: 8),
                                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                   decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
+                                                    color: AppColors.goldLight20,
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
                                                     "${(edit)} x$count",
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       fontSize: 12,
                                                       fontFamily: "Outfit",
                                                       fontWeight: FontWeight.w500, // 🔥 better look
@@ -966,7 +966,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                                   style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w500
                                   ),),
@@ -1011,7 +1011,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                             Padding(
                               padding: EdgeInsets.all(12.0),
-                              child: Divider(color: ColorCode.kDividerWhite12,),
+                              child: Divider(color: AppColors.dividerDark,),
                             ),
 
                             Column(
@@ -1021,7 +1021,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                   "Pricing Summary",
                                   style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w500),
                                 ),
@@ -1029,7 +1029,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 Container(
                                   // padding: const EdgeInsets.all(15),
                                   decoration: BoxDecoration(
-                                    color: ColorCode.kCreamSoft,
+                                    color: AppColors.accent,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -1040,14 +1040,14 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         child: const Text(
                                           "Package Offer",
                                           style: TextStyle(
-                                            color: ColorCode.kHeadingColor,
+                                            color: AppColors.textHeading,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                             fontFamily: "Outfit",
                                           ),
                                         ),
                                       ),
-                                      const Divider(color: ColorCode.black),
+                                      const Divider(color: AppColors.black),
 
                                       _buildCheckRow(
                                         text: "Unlimited Usage Rights",
@@ -1073,7 +1073,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                 ),
 
                                 const SizedBox(height: 14),
-                                Divider(color: ColorCode.kDividerWhite12),
+                                Divider(color: AppColors.dividerDark),
                                 // --- SHOOT COST CARD ---
                                 // --- SHOOT COST CARD ---
                                 builderPricingCard(
@@ -1112,7 +1112,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                           ),*/
 
                                 const SizedBox(height: 10),
-                                const Divider(color: ColorCode.kDividerWhite12),
+                                const Divider(color: AppColors.dividerDark),
 
                                 /// 🔹 TOTAL
                                 Padding(
@@ -1124,7 +1124,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         "Total Amount",
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: ColorCode.kButtonColor,
+                                          color: AppColors.primary,
                                           fontFamily: "Outfit",
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -1133,7 +1133,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                                         "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
                                         style: const TextStyle(
                                           fontSize: 18,
-                                          color: ColorCode.white,
+                                          color: AppColors.white,
                                           fontFamily: "Outfit",
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -1177,8 +1177,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isProcessing
-                        ? ColorCode.k282828 // 👈 disabled look
-                        : ColorCode.kButtonColor,
+                        ? AppColors.surfaceVariant // 👈 disabled look
+                        : AppColors.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1192,7 +1192,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                       fontSize: 14,
                       fontFamily: "Unbounded",
                       fontWeight: FontWeight.w600,
-                      color: ColorCode.kHeadingColor,
+                      color: AppColors.textHeading,
                     ),
                   ),
                 ),
@@ -1235,7 +1235,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
             text,
             style: const TextStyle(
               fontSize: 12,
-              color: ColorCode.black,
+              color: AppColors.black,
               fontFamily: "Outfit",
               fontWeight: FontWeight.w400,
             ),
@@ -1316,7 +1316,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
                 )
                     : null,
                 border: Border.all(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   width: 1,
                 ),
               ),
@@ -1395,8 +1395,8 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       }) {
     return TextField(
       controller: controller,
-      cursorColor: ColorCode.white,
-      style: const TextStyle(color: ColorCode.white),
+      cursorColor: AppColors.white,
+      style: const TextStyle(color: AppColors.white),
 
       /// ✅ PHONE FIELD KE LIYE NUMBER KEYPAD
       keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
@@ -1412,20 +1412,20 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
       decoration: InputDecoration(
         labelText: label,
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+        labelStyle: const TextStyle(color: AppColors.white70),
         contentPadding:
         const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
             width: 0.5,
           ),
         ),
@@ -1459,7 +1459,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
               style:
               const TextStyle(
 
-                color: ColorCode.black,
+                color: AppColors.black,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 fontFamily: "Outfit",

@@ -1,4 +1,4 @@
-import 'package:beige/utility/ColorCode.dart';
+import 'package:biegeapp/app/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -250,7 +250,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: ColorCode.bcakgroundcolor,
+    return Scaffold(backgroundColor: AppColors.background,
 
       body: SafeArea(
         child: Padding(
@@ -275,7 +275,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
 
-                  color: ColorCode.white,
+                  color: AppColors.white,
                 ),
               ),
 
@@ -286,7 +286,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     fontFamily: "Outfit",
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: ColorCode.kWhiteOpacity70
+                    color: AppColors.white70
                 ),
               ),
 
@@ -300,7 +300,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     fontFamily: "Unbounded",
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: ColorCode.white,
+                    color: AppColors.white,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -355,7 +355,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     fontFamily: "Unbounded",
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: ColorCode.white
+                    color: AppColors.white
                 ),
               ),
               const SizedBox(height: 12),
