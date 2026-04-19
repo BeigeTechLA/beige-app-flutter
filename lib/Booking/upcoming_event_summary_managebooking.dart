@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import '../utility/date_time_utils.dart';
 import 'MY_SelectBookingType.dart';
 import 'cancel_booking.dart';
@@ -108,7 +108,7 @@ class _UpcomingEventSummaryManagebookingState
               padding: EdgeInsets.all(10),
               // padding: EdgeInsets.only(right: 20,left: 20,top: 10,),
               decoration: const BoxDecoration(
-                color: ColorCode.k282828,
+                color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(32),
                 ),
@@ -123,7 +123,7 @@ class _UpcomingEventSummaryManagebookingState
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:ColorCode.kWhiteOpacity70,
+                        color:AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -140,7 +140,7 @@ class _UpcomingEventSummaryManagebookingState
                           Text(
                             "Manage Shoots",
                             style:  TextStyle(
-                                color: ColorCode.white,
+                                color: AppColors.white,
                                 fontSize: 16,
                                 fontFamily: "Unbounded",
                                 fontWeight: FontWeight.w500
@@ -150,7 +150,7 @@ class _UpcomingEventSummaryManagebookingState
                           Text(
                             "View, reschedule, or cancel your upcoming \nappointments.",
                             style:  TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
+                                color: AppColors.white70,
                                 fontSize: 14,
                                 fontFamily: "Outfit",
                                 fontWeight: FontWeight.w400
@@ -168,12 +168,12 @@ class _UpcomingEventSummaryManagebookingState
                     ],
                   ),
 
-                  Divider(color: ColorCode.kDividerWhite12),
+                  Divider(color: AppColors.dividerDark),
                   SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: ColorCode.kHeadingColor,
+                      color: AppColors.textHeading,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
@@ -235,7 +235,7 @@ class _UpcomingEventSummaryManagebookingState
                                       SizedBox(width: 4),
                                       Text(
                                         "4.5 (120)",
-                                        style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
+                                        style: TextStyle(fontSize: 14, color: AppColors.white70,  fontWeight: FontWeight.w500,
                                           fontFamily: "Outfit",
                                         ),
                                       ),
@@ -255,7 +255,7 @@ class _UpcomingEventSummaryManagebookingState
                                   Text(
                                     widget.contentType ?? '',
                                     style: TextStyle(
-                                      fontSize: 12, color: ColorCode.kWhiteOpacity70,
+                                      fontSize: 12, color: AppColors.white70,
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w400,
                                     ),
@@ -369,9 +369,9 @@ class _UpcomingEventSummaryManagebookingState
                                   height: 55,
                                   child: OutlinedButton(
                                     style: OutlinedButton.styleFrom(
-                                      foregroundColor: ColorCode.kHeadingColor,
+                                      foregroundColor: AppColors.textHeading,
                                       side: const BorderSide(
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color: AppColors.white70,
                                         width: 0.5,        // ⭐ BORDER WIDTH 0.5
                                       ),
                                       shape: RoundedRectangleBorder(
@@ -397,7 +397,7 @@ class _UpcomingEventSummaryManagebookingState
                                     child: const Text(
                                       "Cancel",
                                       style: TextStyle(
-                                        color: ColorCode.white,
+                                        color: AppColors.white,
                                         fontFamily: 'Unbounded',
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -437,7 +437,7 @@ class _UpcomingEventSummaryManagebookingState
                                   child: const Text(
                                     "Reschedule",//
                                     style: TextStyle(
-                                      color: ColorCode.kHeadingColor,
+                                      color: AppColors.textHeading,
                                       fontFamily: 'Unbounded',   // ← Add this
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -477,7 +477,7 @@ class _UpcomingEventSummaryManagebookingState
             text,
             style: const TextStyle(
                 fontSize: 12,
-                color: ColorCode.black,
+                color: AppColors.black,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400
 

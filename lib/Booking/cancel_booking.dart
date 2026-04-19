@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import '../widgets/TopMessage.dart';
 
 
@@ -132,7 +132,7 @@ class _CancelBookingState extends State<CancelBooking> {
               padding: EdgeInsets.all(10),
               // padding: EdgeInsets.only(right: 20,left: 20,top: 10,),
               decoration: const BoxDecoration(
-                color: ColorCode.k282828,
+                color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(32),
                 ),
@@ -147,7 +147,7 @@ class _CancelBookingState extends State<CancelBooking> {
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:ColorCode.kWhiteOpacity70,
+                        color:AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -164,7 +164,7 @@ class _CancelBookingState extends State<CancelBooking> {
                           Text(
                             "Cancel Booking",
                             style:  TextStyle(
-                                color: ColorCode.white,
+                                color: AppColors.white,
                                 fontSize: 16,
                                 fontFamily: "Unbounded",
                                 fontWeight: FontWeight.w500
@@ -174,7 +174,7 @@ class _CancelBookingState extends State<CancelBooking> {
                           Text(
                             "Are you sure you’d like to cancel \nthis appointment?.",
                             style:  TextStyle(
-                                color: ColorCode.kWhiteOpacity70,
+                                color: AppColors.white70,
                                 fontSize: 14,
                                 fontFamily: "Outfit",
                                 fontWeight: FontWeight.w400
@@ -192,12 +192,12 @@ class _CancelBookingState extends State<CancelBooking> {
                     ],
                   ),
 
-                  Divider(color: ColorCode.kDividerWhite12),
+                  Divider(color: AppColors.dividerDark),
                   SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: ColorCode.kHeadingColor,
+                      color: AppColors.textHeading,
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Column(
@@ -244,7 +244,7 @@ class _CancelBookingState extends State<CancelBooking> {
                                       SizedBox(width: 4),
                                  /*     Text(
                                         "4.5 (120)",
-                                        style: TextStyle(fontSize: 14, color: ColorCode.kWhiteOpacity70,  fontWeight: FontWeight.w500,
+                                        style: TextStyle(fontSize: 14, color: AppColors.white70,  fontWeight: FontWeight.w500,
                                           fontFamily: "Outfit",
                                         ),
                                       ),*/
@@ -265,7 +265,7 @@ class _CancelBookingState extends State<CancelBooking> {
                                     widget.contentType ?? "",
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: AppColors.white70,
                                       fontFamily: "Outfit",
                                     ),
                                   ),
@@ -275,7 +275,7 @@ class _CancelBookingState extends State<CancelBooking> {
                                     "From \$450/Hr",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.kButtonColor,
+                                      color: AppColors.primary,
                                       fontFamily: "Outfit",
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -396,13 +396,13 @@ class _CancelBookingState extends State<CancelBooking> {
 
                                   child: isCancelling
                                       ?  CircularProgressIndicator(
-                                    color: ColorCode.kHeadingColor,
+                                    color: AppColors.textHeading,
                                     strokeWidth: 2,
                                   )
                                       : const Text(
                                     "Yes, Cancel",
                                     style: TextStyle(
-                                      color: ColorCode.kHeadingColor,
+                                      color: AppColors.textHeading,
                                       fontFamily: 'Unbounded',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
@@ -442,7 +442,7 @@ class _CancelBookingState extends State<CancelBooking> {
             text,
             style:  TextStyle(
                 fontSize: 12,
-                color: ColorCode.black,
+                color: AppColors.black,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400
 
@@ -470,7 +470,7 @@ class _CancelBookingState extends State<CancelBooking> {
                 // margin: const EdgeInsets.symmetric(horizontal: 24),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: ColorCode.k282828,
+                  color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -496,7 +496,7 @@ class _CancelBookingState extends State<CancelBooking> {
                         fontFamily: "Unbounded",
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
-                        color: ColorCode.kButtonColor,
+                        color: AppColors.primary,
                       ),
                     ),
 
@@ -510,7 +510,7 @@ class _CancelBookingState extends State<CancelBooking> {
                         fontFamily: "Outfit",
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                       ),
                     ),
 
@@ -530,7 +530,7 @@ class _CancelBookingState extends State<CancelBooking> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                   side:  BorderSide(
-                                    color: ColorCode.kWhiteOpacity70,width: 0.5 // 👈 border color
+                                    color: AppColors.white70,width: 0.5 // 👈 border color
                                   ),
                                 ),
 
@@ -544,7 +544,7 @@ class _CancelBookingState extends State<CancelBooking> {
                               child: const Text(
                                 "Explore",
                                 style: TextStyle(
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                   fontFamily: 'Unbounded',   // ← Add this
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,

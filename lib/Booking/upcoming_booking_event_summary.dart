@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import '../widgets/loding.dart';
 
 class UpcomingBookingEventSummary extends StatefulWidget {
@@ -380,7 +380,7 @@ class _UpcomingBookingEventSummaryState
     Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-    color: ColorCode.k282828,
+    color: AppColors.surfaceVariant,
     borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -456,7 +456,7 @@ class _UpcomingBookingEventSummaryState
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor:  ColorCode.kButtonColor,
+              backgroundColor:  AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -467,7 +467,7 @@ class _UpcomingBookingEventSummaryState
               style: TextStyle(
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kHeadingColor,
+                color: AppColors.textHeading,
                 fontSize: 14,
               ),
             ),
@@ -487,7 +487,7 @@ class _UpcomingBookingEventSummaryState
             iconPath,
            /* height: 16,
             width: 16,*/
-            color: ColorCode.white,
+            color: AppColors.white,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -497,7 +497,7 @@ class _UpcomingBookingEventSummaryState
 
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kWhiteOpacity70,                fontSize: 12,
+                color: AppColors.white70,                fontSize: 12,
               ),
             ),
           ),
@@ -537,8 +537,8 @@ class _UpcomingBookingEventSummaryState
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                ColorCode.kButtonColor.withOpacity(0.9),
-                ColorCode.kButtonColor.withOpacity(0.6),
+                AppColors.primary.withOpacity(0.9),
+                AppColors.primary.withOpacity(0.6),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
@@ -593,7 +593,7 @@ class _UpcomingBookingEventSummaryState
               height: MediaQuery.of(context).size.height * 0.95,
               padding: const EdgeInsets.all(10),
               decoration: const BoxDecoration(
-                color: ColorCode.k282828,
+                color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(32),
                 ),
@@ -606,7 +606,7 @@ class _UpcomingBookingEventSummaryState
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -752,8 +752,8 @@ class _UpcomingBookingEventSummaryState
                           fontFamily: "Outfit",
                           fontWeight: FontWeight.w500,
                           color: isActive
-                              ? ColorCode.kButtonColor
-                              : ColorCode.kWhiteOpacity70,
+                              ? AppColors.primary
+                              : AppColors.white70,
                         ),
                       ),
                     ),
@@ -773,7 +773,7 @@ class _UpcomingBookingEventSummaryState
                   style: const TextStyle(
                     fontSize: 9,
                     fontFamily: "Outfit",
-                    color: ColorCode.kWhiteOpacity70,
+                    color: AppColors.white70,
                   ),
                 ),
                 const SizedBox(height: 20),

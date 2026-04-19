@@ -8,8 +8,8 @@ import 'package:intl/intl.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
-import '../utility/images.dart';
+import '../app/colors.dart';
+import '../app/assets.dart';
 import '../widgets/loding.dart';
 import 'Shoot_updated_screen.dart';
 
@@ -261,7 +261,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorCode.bcakgroundcolor,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
         elevation: 0,
@@ -271,7 +271,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
           child: Padding(
             padding: const EdgeInsets.all(7),
             child: SvgPicture.asset(
-              images.back,
+              AppAssets.back,
               colorFilter: const ColorFilter.mode(
                 Colors.white,
                 BlendMode.srcIn,
@@ -300,8 +300,8 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                         height: 5,
                         decoration: BoxDecoration(
                           color: index < 2
-                              ? ColorCode.kButtonColor
-                              : ColorCode.kSubtextColor,
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -318,7 +318,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                         fontFamily: "Unbounded",
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: ColorCode.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ],
@@ -334,7 +334,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: ColorCode.k282828,
+                            color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Column(
@@ -390,7 +390,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                         Text(
                                           booking?['shoot_type_name'] ?? '',
                                           style: TextStyle(
-                                            fontSize: 12, color: ColorCode.kWhiteOpacity70,
+                                            fontSize: 12, color: AppColors.white70,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w400,
                                           ),
@@ -402,7 +402,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: ColorCode.kButtonColor,
+                                            color: AppColors.primary,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -440,7 +440,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(color: Colors.white.withOpacity(0.9)),
                                 ),
@@ -531,7 +531,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                     "Editing Services",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       fontFamily: "Unbounded",
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -559,7 +559,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                         child: Text(
                                           "Video Edits:",
                                           style: TextStyle(
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 12,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w400,
@@ -591,14 +591,14 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                                   margin: const EdgeInsets.only(bottom: 8),
                                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                   decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
+                                                    color: AppColors.goldLight20,
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
                                                     "${(edit)} x$count",
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       fontSize: 12,
                                                       fontFamily: "Outfit",
                                                       fontWeight: FontWeight.w500, // 🔥 better look
@@ -623,7 +623,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                         child: Text(
                                           "Photo Edits:",
                                           style: TextStyle(
-                                            color: ColorCode.white,
+                                            color: AppColors.white,
                                             fontSize: 12,
                                             fontFamily: "Outfit",
                                             fontWeight: FontWeight.w400,
@@ -655,14 +655,14 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                                                   margin: const EdgeInsets.only(bottom: 8),
                                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                   decoration: BoxDecoration(
-                                                    color: ColorCode.kGoldLight20,
+                                                    color: AppColors.goldLight20,
                                                     borderRadius: BorderRadius.circular(4),
                                                   ),
                                                   child: Text(
                                                     "${(edit)} x$count",
                                                     textAlign: TextAlign.center,
                                                     style: const TextStyle(
-                                                      color: ColorCode.kButtonColor,
+                                                      color: AppColors.primary,
                                                       fontSize: 12,
                                                       fontFamily: "Outfit",
                                                       fontWeight: FontWeight.w500, // 🔥 better look
@@ -788,7 +788,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
 
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorCode.kButtonColor,
+                    backgroundColor: AppColors.primary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -800,7 +800,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                       fontFamily: "Unbounded",
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: ColorCode.kHeadingColor,
+                      color: AppColors.textHeading,
                     ),
                   ),
                 ),
@@ -846,7 +846,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
             text,
             style: const TextStyle(
               fontSize: 12,
-              color: ColorCode.black,
+              color: AppColors.black,
               fontFamily: "Outfit",
               fontWeight: FontWeight.w400,
             ),
@@ -946,7 +946,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
 
                 /// Border
                 border: Border.all(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   width: 1,
                 ),
               ),
@@ -1045,7 +1045,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
           child: Text(
             text,
             style: const TextStyle(
-              color: ColorCode.black,
+              color: AppColors.black,
               fontSize: 13,
               fontWeight: FontWeight.w400,
               fontFamily: "Outfit",

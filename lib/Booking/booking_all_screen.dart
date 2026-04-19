@@ -9,7 +9,7 @@ import '../Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import '../service/api_service.dart';
 
 import '../service/api_endpoints.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import '../widgets/loding.dart';
 import 'upcoming_event_summary_managebooking.dart';
 import 'upcoming_booking_event_summary.dart';
@@ -129,7 +129,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                     Text(
                       "My Shoots",
                       style: TextStyle(
-                        color: ColorCode.white,
+                        color: AppColors.white,
                         fontFamily: 'Unbounded',
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -252,14 +252,14 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                         ),
                         Text("No Booking Found",
                             style:
-                            TextStyle(color: ColorCode.kButtonColor,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
+                            TextStyle(color: AppColors.primary,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
                         ),
 
                         Text(
                           "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: ColorCode.kWhiteOpacity70,
+                            color: AppColors.white70,
                             fontFamily: "Outfit",
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -282,7 +282,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                       ? const Center(
                     child: Text("No Completed Shoots",
                         style:
-                        TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                        TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
                         )),
                   )
                       : ListView.builder(
@@ -607,7 +607,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
     child: Text(
     buttonText,
     style: const TextStyle(
-    color:ColorCode.kHeadingColor,
+    color:AppColors.textHeading,
     fontSize: 14,
       fontFamily: "Outfit"
       ,
@@ -653,7 +653,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: ColorCode.k282828,
+                color: AppColors.surfaceVariant,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(28),
                   topRight: Radius.circular(28),
@@ -674,7 +674,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                         height: 5,
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
@@ -753,7 +753,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
                               border:
-                              Border.all(color: ColorCode.kWhiteOpacity60
+                              Border.all(color: AppColors.white60
                               ),
                             ),
                             child: TextButton(
@@ -770,7 +770,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                                   fontFamily: "Unbounded",
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -781,7 +781,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                           child: Container(
                             height: 55,
                             decoration: BoxDecoration(
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: TextButton(
@@ -794,7 +794,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                                     fontFamily: "Unbounded",
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: ColorCode.black,
+                                    color: AppColors.black,
                                   )
                               ),
                             ),
@@ -852,7 +852,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
             selectedPayment = val;
           });
         },
-        activeColor: ColorCode.kButtonColor,
+        activeColor: AppColors.primary,
         title: Text(
           title,
           style: const TextStyle(color: Colors.white),
