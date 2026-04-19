@@ -1,13 +1,15 @@
 import 'dart:async';
 
-import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
 import 'new_login_screen.dart';
 import 'new_new_passwrod_screen.dart';
@@ -217,7 +219,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                           child: SvgPicture.asset(
                             "assets/svg/back.svg",
                             height: 24,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -232,24 +234,24 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                             Text(
                               "Enter OTP code",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppTextStyles.fontFamilyDisplay,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color:
-                                ColorCode.white,
+                                AppColors.white,
                               ),
                             ),
 
-                            SizedBox(height: 8),
+                            SizedBox(height: AppSpacing.sm),
 
                             Text(
                               "Enter 6 digit OTP sent to your\nregistered email ID.",
 
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontFamily: "Outfit",
+                                fontFamily: AppTextStyles.fontFamilyBody,
                                 fontSize: 14,
-                                color: ColorCode.kWhiteOpacity70,
+                                color: AppColors.white70,
                               ),
                             ),
                           ],
@@ -269,14 +271,14 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
+                        padding: AppSpacing.authCardPadding,
                         // 👈 top extra
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        margin: AppSpacing.authCardMargin,
                         decoration: BoxDecoration(
-                          color: ColorCode.bcakgroundcolor,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.06),
+                            color: AppColors.white.withValues(alpha: 0.06),
                             width: 1,
                           ),
                         ),
@@ -295,14 +297,14 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                     child: Container(
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
 
                                         // ⭐ Border color logic
                                         border: Border.all(
                                           color: (focusNodes[index].hasFocus ||
                                               controllers[index].text.isNotEmpty)
-                                              ? ColorCode.kGoldBorder50
-                                              : ColorCode.kWhiteOpacity60,
+                                              ? AppColors.borderGold
+                                              : AppColors.white60,
                                           width: 0.5,
                                         ),
                                       ),
@@ -353,7 +355,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: ColorCode.kButtonColor,
+                                    color: AppColors.primary,
                                   ),
                                 )
                               ],
@@ -367,7 +369,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                   style: TextStyle(
                                     color: const Color(0xFFD5D5D5),
                                     fontSize: 14,
-                                    fontFamily: 'Outfit',
+                                    fontFamily: AppTextStyles.fontFamilyBody,
                                     fontWeight: FontWeight.w400,
                                     height: 1.60,
                                   ),
@@ -378,10 +380,10 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                     " Resend the Code",
                                     style: TextStyle(
                                       color: seconds == 0
-                                          ? ColorCode.kButtonColor
-                                          : ColorCode.kButtonColor,
+                                          ? AppColors.primary
+                                          : AppColors.primary,
                                       fontSize: 15,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppTextStyles.fontFamilyBody,
                                       fontWeight: FontWeight.bold,
                                       decoration: TextDecoration.underline,
                                     ),
@@ -397,21 +399,21 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                                 onPressed: isOtpFilled ? _verifyOtp : null,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isOtpFilled
-                                      ? ColorCode.kButtonColor
-                                      : ColorCode.kGoldGradientLight,
+                                      ? AppColors.primary
+                                      : AppColors.goldGradientLight,
 
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                   ),
                                 ),
                                 child: Text(
                                   isOtpFilled ? "Submit" : "Continue",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppTextStyles.fontFamilyDisplay,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: isOtpFilled
-                                        ? ColorCode.kHeadingColor
+                                        ? AppColors.textHeading
                                         : Colors.black38,
                                   ),
                                 ),
@@ -564,10 +566,10 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
   Widget _buildField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      cursorColor: ColorCode.white,
+      cursorColor: AppColors.white,
 
       style: const TextStyle(
-        color: ColorCode.white, // typed text color
+        color: AppColors.white, // typed text color
       ),
 
       decoration: InputDecoration(
@@ -575,33 +577,33 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+          color: AppColors.white70, // #1D1D1B 60% opacity
         ),
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.lg,
         ),
 
         /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            color: AppColors.white70, // #1D1D1B99 (60% opacity)
             width: 0.5, // 🔥 exact 0.5px
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            color: AppColors.white70, // #1D1D1B99 (60% opacity)
             width: 0.5, // focus border thicker
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),)
       ,);
   }

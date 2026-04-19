@@ -1,12 +1,13 @@
-import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
-import '../utility/images.dart';
 import '../widgets/TopMessage.dart';
 import 'Password_successfull.dart';
 import 'new_forgot_otp_screen.dart';
@@ -154,7 +155,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                       child: SvgPicture.asset(
                         "assets/svg/back.svg",
                         height: 24,
-                        color: Colors.white, // agar white chahiye ho
+                        color: AppColors.white, // agar white chahiye ho
                       ),
                     ),
                   ),
@@ -171,22 +172,22 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                           'Secure your Account',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 16,
-                            fontFamily: 'Unbounded',
+                            fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
 
-                        SizedBox(height: 8),
+                        SizedBox(height: AppSpacing.sm),
 
                         Text(
                           'You\'re almost done! Set a new password\nto secure your account.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.60),
+                            color: AppColors.white.withValues(alpha: 0.60),
                             fontSize: 14,
-                            fontFamily: 'Outfit',
+                            fontFamily: AppTextStyles.fontFamilyBody,
                             fontWeight: FontWeight.w400,
                             height: 1.29,
                           ),
@@ -210,12 +211,12 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.fromLTRB(20, 25 , 20, 20),
                     // 👈 top extra
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    margin: AppSpacing.authCardMargin,
                     decoration: BoxDecoration(
-                      color: ColorCode.bcakgroundcolor,
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
+                        color: AppColors.white.withValues(alpha: 0.10),
                         width: 0.50,
                       ),
                     ),
@@ -269,7 +270,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                                   : "assets/svg/eyes2.svg",
                               height: 22,
                               colorFilter: const ColorFilter.mode(
-                                Colors.white,
+                                AppColors.white,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -316,21 +317,21 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isPasswordFilled
-                                  ? ColorCode.kButtonColor
-                                  : ColorCode.kGoldGradientLight,
+                                  ? AppColors.primary
+                                  : AppColors.goldGradientLight,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                                borderRadius: AppRadii.xlAll,
                               ),
                             ),
                             child:  Text(
                               "Save New Password",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppTextStyles.fontFamilyDisplay,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: isPasswordFilled
-                                    ? ColorCode.kHeadingColor
-                                    : ColorCode.k282828,
+                                    ? AppColors.textHeading
+                                    : AppColors.surfaceVariant,
                               ),
                             ),
                           ),
