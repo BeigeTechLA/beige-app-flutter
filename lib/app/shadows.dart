@@ -67,7 +67,7 @@ class AppShadows {
         ),
       ];
 
-  /// Soft drop shadow — matches existing ColorCode.softShadow usage
+  /// Soft drop shadow
   static List<BoxShadow> get soft => [
         const BoxShadow(
           color: Color(0x11000000),

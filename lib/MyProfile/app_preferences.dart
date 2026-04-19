@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import '../app/colors.dart';
 import '../app/text_styles.dart';
 import '../app/radii.dart';
-import '../utility/images.dart';
+import '../app/assets.dart';
 import 'DeleteAccount/delete_account.dart';
 import 'DeleteAccount/delete_account_otp_screen.dart';
 
@@ -30,7 +30,7 @@ class _AppPreferencesState extends State<AppPreferences> {
               InkWell(
                 onTap: () => Navigator.pop(context),
                 child: SvgPicture.asset(
-                  images.back,
+                  AppAssets.back,
                   height: 24,
                   width: 24,
                   colorFilter: const ColorFilter.mode(
@@ -79,7 +79,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                           Row(
                             children: [
                               SvgPicture.asset(
-                                images.delete2,
+                                AppAssets.delete2,
                                 height: 24,
                                 width: 24,
                                 colorFilter: const ColorFilter.mode(
@@ -119,7 +119,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                     child: Row(
                       children: [
                         SvgPicture.asset(
-                          images.appversion3,
+                          AppAssets.appVersion3,
                           height: 24,
                           width: 24,
                           colorFilter: const ColorFilter.mode(

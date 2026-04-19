@@ -11,7 +11,7 @@ import '../app/colors.dart';
 import '../app/text_styles.dart';
 import '../app/spacing.dart';
 import '../app/radii.dart';
-import '../utility/images.dart';
+import '../app/assets.dart';
 import 'bookin_review_confirm.dart';
 
 class MySelectbookingtype extends StatefulWidget {
@@ -1012,7 +1012,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           child: Padding(
             padding: const EdgeInsets.all(7),
             child: SvgPicture.asset(
-              images.back,
+              AppAssets.back,
               colorFilter: const ColorFilter.mode(
                 Colors.white,
                 BlendMode.srcIn,
