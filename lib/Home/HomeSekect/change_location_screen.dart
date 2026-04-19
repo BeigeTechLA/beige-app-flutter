@@ -6,7 +6,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:beige/utility/ColorCode.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
@@ -172,7 +174,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               right: 16,
             ),
             decoration:  BoxDecoration(
-              color: ColorCode.k282828,
+              color: AppColors.surfaceVariant,
               border: Border.all(color: Colors.transparent),
 
               /// ❌ REMOVE SHADOW
@@ -193,20 +195,20 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
 
               /// ✅ MAIN FIX HERE
               boxDecoration: BoxDecoration(
-                color: ColorCode.kHeadingColor,
+                color: AppColors.textHeading,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.transparent),
               ),
 
               textStyle: const TextStyle(
-                color: ColorCode.kWhiteOpacity70,
+                color: AppColors.white70,
                 fontFamily: "Outfit",
                 fontSize: 14,
               ),
 
               inputDecoration: InputDecoration(
                 hintText: "Search location",
-                hintStyle: TextStyle(color: ColorCode.kWhiteOpacity70,),
+                hintStyle: TextStyle(color: AppColors.white70,),
 
                 filled: true,
                 fillColor: Colors.transparent, // ⚠️ important
@@ -235,7 +237,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Icon(
                       Icons.close,
-                      color: ColorCode.kWhiteOpacity70,
+                      color: AppColors.white70,
                       size: 20,
                     ),
                   ),
@@ -482,7 +484,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD6C29C),
+                        backgroundColor: AppColors.primary,
                         minimumSize: const Size(double.infinity, 52),
                         elevation: 10,
                         shadowColor: Colors.black.withOpacity(0.6),

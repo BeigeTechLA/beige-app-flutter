@@ -5,7 +5,9 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
-import '../../utility/ColorCode.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
 import '../../widgets/loding.dart';
 import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 
@@ -183,7 +185,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message,style: TextStyle(color: ColorCode.red),),
+            content: Text(message,style: TextStyle(color: AppColors.error),),
        */
 /*     backgroundColor: Colors.transparent,*//*
 
@@ -296,7 +298,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                                 style: const TextStyle(
                                   fontFamily: "Outfit",
                                   fontSize: 14,
-                                  color: ColorCode.kWhiteOpacity70,
+                                  color: AppColors.white70,
                                 ),
                               ),
                             ],
@@ -309,7 +311,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                               fontFamily: "Outfit",
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                             ),
                           ),*/
                         ],
@@ -351,7 +353,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(
-                      color: ColorCode.kDividerWhite12,
+                      color: AppColors.dividerDark,
                       thickness: 1,
                     ),
                   ),
@@ -366,7 +368,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(
-                      color: ColorCode.kDividerWhite12,
+                      color: AppColors.dividerDark,
                       thickness: 1,
                     ),
                   ),
@@ -450,7 +452,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(
-                      color: ColorCode.kDividerWhite12,
+                      color: AppColors.dividerDark,
                       thickness: 1,
                     ),
                   ),
@@ -504,7 +506,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(
-                      color: ColorCode.kDividerWhite12,
+                      color: AppColors.dividerDark,
                       thickness: 1,
                     ),
                   ),
@@ -702,7 +704,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _Booking,
             style: ElevatedButton.styleFrom(
-              backgroundColor:  ColorCode.kButtonColor,
+              backgroundColor:  AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -710,7 +712,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
             child:   Text(
               "Add to Crew",
               style: TextStyle(
-                color: ColorCode.kHeadingColor,
+                color: AppColors.textHeading,
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
@@ -821,7 +823,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           fontFamily: "Unbounded",
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: ColorCode.white,
+          color: AppColors.white,
         ),
       ),
     );
@@ -836,7 +838,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
           fontFamily: "Outfit",
           fontSize: 13,
           fontWeight: FontWeight.w400,
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),
       ),
     );
@@ -973,7 +975,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
   }) {
     return Card(
       margin: const EdgeInsets.only(right: 12),
-      color: ColorCode.k282828,
+      color: AppColors.surfaceVariant,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:beige/utility/ColorCode.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
 
 import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
 
@@ -56,7 +58,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorCode.bcakgroundcolor,
+      backgroundColor: AppColors.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -73,7 +75,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        ColorCode.white
+                        AppColors.white
                             .withOpacity(0.35 * _controller.value),
                         Colors.transparent,
                       ],
@@ -90,7 +92,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
                             child: const Icon(
                               Icons.auto_awesome,
                               size: 34,
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                             ),
                           ),
                         );
@@ -113,7 +115,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
                 fontFamily: "Unbounded",
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kButtonColor,
+                color: AppColors.primary,
               ),
             ),
           ],
@@ -134,7 +136,7 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
         child: Icon(
           Icons.auto_awesome,
           size: size,
-          color: ColorCode.kButtonColor,
+          color: AppColors.primary,
         ),
       ),
     );

@@ -5,7 +5,9 @@
 
   import '../../service/api_endpoints.dart';
   import '../../service/api_service.dart';
-  import '../../utility/ColorCode.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
   import '../../widgets/loding.dart';
 
   class HomeViewProfile extends StatefulWidget {
@@ -181,7 +183,7 @@
 
     ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-    content: Text(message,style: TextStyle(color: ColorCode.red),),
+    content: Text(message,style: TextStyle(color: AppColors.error),),
     *//*     backgroundColor: Colors.transparent,*//*
     ),
     );
@@ -291,7 +293,7 @@
                                     style: const TextStyle(
                                       fontFamily: "Outfit",
                                       fontSize: 14,
-                                      color: ColorCode.kWhiteOpacity70,
+                                      color: AppColors.white70,
                                     ),
                                   ),
                                 ],
@@ -304,7 +306,7 @@
                                 fontFamily: "Outfit",
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: ColorCode.kButtonColor,
+                                color: AppColors.primary,
                               ),
                             ),*/
                             ],
@@ -543,7 +545,7 @@
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
                         child: Divider(
-                          color: ColorCode.kDividerWhite12,
+                          color: AppColors.dividerDark,
                           thickness: 1,
                         ),
                       ),
@@ -740,7 +742,7 @@
               child: ElevatedButton(
                 onPressed: isLoading ? null : _Booking,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:  ColorCode.kButtonColor,
+                  backgroundColor:  AppColors.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -757,7 +759,7 @@
                     : const Text(
                   "Add to Crew",
                   style: TextStyle(
-                    color: ColorCode.kHeadingColor,
+                    color: AppColors.textHeading,
                     fontFamily: "Unbounded",
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -868,7 +870,7 @@
             fontFamily: "Unbounded",
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: ColorCode.white,
+            color: AppColors.white,
           ),
         ),
       );
@@ -883,7 +885,7 @@
             fontFamily: "Outfit",
             fontSize: 13,
             fontWeight: FontWeight.w400,
-            color: ColorCode.kWhiteOpacity70,
+            color: AppColors.white70,
           ),
         ),
       );
@@ -1020,7 +1022,7 @@
     }) {
       return Card(
         margin: const EdgeInsets.only(right: 12),
-        color: ColorCode.k282828,
+        color: AppColors.surfaceVariant,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
         ),
