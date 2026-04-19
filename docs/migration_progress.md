@@ -57,11 +57,11 @@ The remaining screens must be migrated to the new design tokens following the sa
 - `lib/MyProfile/myprofile_enter_otp_screen.dart` ✅
 - `lib/MyProfile/myprofile_new_password_screen.dart` ✅
 
-**Batch 7: Delete Account & Home Feed Initial (4 files)**
-- `lib/Profile/delete_account.dart`
-- `lib/Profile/delete_account_otp_screen.dart`
-- `lib/Home/new_home_screen.dart`
-- `lib/Home/home_controller.dart`
+**Batch 7: Delete Account & Home Feed Initial (4 files) ✅ Done**
+- `lib/MyProfile/DeleteAccount/delete_account.dart` ✅
+- `lib/MyProfile/DeleteAccount/delete_account_otp_screen.dart` ✅
+- `lib/Home/New_Home/new_home_screen.dart` ✅ (~42 ColorCode refs globally substituted)
+- `lib/Home/New_Home/home_controller.dart` ✅ (no visual configurations needing sync)
 
 **Batch 8: Profiles & Location (4 files)**
 - `lib/Home/home_view_profile.dart`

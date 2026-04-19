@@ -5,6 +5,13 @@
 
 ---
 
+### 2026-04-19: Phase 3.1 Design Token Migration — Batch 7 (Delete Account & Home Feed Initial)
+- **Changes**: Migrated `delete_account.dart`, `delete_account_otp_screen.dart`, `new_home_screen.dart`, and `home_controller.dart`.
+- **Decisions**: 
+  - Standardized hardcoded colors across the DeleteAccount UI utilizing the `error` variant instead of `Colors.red`.
+  - Refactored `new_home_screen.dart` (the largest home feed God Widget at 3800+ lines) globally replacing ~42 `ColorCode` strings to semantic `AppColors` mappings like `backgroundOpacity70`.
+- **Constraints Maintained**: Used batching 5-file limits. Clean `flutter analyze` ensuring zero visual functional changes.
+
 ### 2026-04-19: Phase 3.1 Design Token Migration — Batch 6 (Profile Settings)
 - **Changes**: Migrated `app_preferences.dart`, `Change_Password_screen.dart`, `myprofile_enter_otp_screen.dart`, and `myprofile_new_password_screen.dart` within `lib/MyProfile/`.
 - **Decisions**: 
