@@ -1,8 +1,10 @@
 import 'dart:ui';
 
-import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
+import 'app/colors.dart';
+import 'app/text_styles.dart';
 
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
@@ -65,22 +67,14 @@ class _MainscreenState extends State<Mainscreen> {
 
             currentIndex: _selectedIndex,
             elevation: 0,
-            backgroundColor: Colors.transparent,
+            backgroundColor: AppColors.transparent,
             type: BottomNavigationBarType.fixed,
 
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
+            selectedItemColor: AppColors.white,
+            unselectedItemColor: AppColors.white70,
 
-            selectedLabelStyle: const TextStyle(
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: "Outfit",
-              fontWeight: FontWeight.w500,
-              fontSize: 12,
-            ),
+            selectedLabelStyle: AppTextStyles.labelMedium,
+            unselectedLabelStyle: AppTextStyles.labelMedium,
 
             onTap: (index) {
               setState(() {

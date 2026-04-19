@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../utility/ColorCode.dart';
+
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 
 class CustomInputField extends StatefulWidget {
   final String title;
@@ -71,7 +75,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,        // ✅
       onSubmitted: widget.onFieldSubmitted,           // ✅
-      cursorColor: ColorCode.kButtonColor,
+      cursorColor: AppColors.primary,
       autofillHints: widget.autofillHints,
       enableSuggestions: !widget.isPassword,
       autocorrect: !widget.isPassword,
@@ -81,8 +85,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
 
       style: const TextStyle(
-        color: ColorCode.white,
-        fontFamily: "Outfit",
+        color: AppColors.white,
+        fontFamily: AppTextStyles.fontFamilyBody,
         fontSize: 15,
       ),
 
@@ -94,28 +98,28 @@ class _CustomInputFieldState extends State<CustomInputField> {
         labelStyle: TextStyle(
           fontSize: 14,
           color: highlight
-              ? ColorCode.kButtonColor
-              : ColorCode.kWhiteOpacity_60,
-          fontFamily: "Outfit",
+              ? AppColors.primary
+              : AppColors.white60,
+          fontFamily: AppTextStyles.fontFamilyBody,
         ),
 
         contentPadding:
-        const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: BorderSide(
             color: highlight
-                ? ColorCode.kGoldBorder50
-                : ColorCode.kWhiteOpacity30,
+                ? AppColors.borderGold
+                : AppColors.white30,
             width: 0.5,
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kGoldBorder50,
+            color: AppColors.borderGold,
             width: 0.5,
           ),
         ),

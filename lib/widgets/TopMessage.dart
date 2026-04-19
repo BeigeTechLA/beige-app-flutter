@@ -1,6 +1,10 @@
 import 'dart:ui';
-import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
+
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 
 class TopMessage {
   static void show(BuildContext context, String message) {
@@ -21,7 +25,7 @@ class TopMessage {
 
               ),
               child: Container(
-                color: Colors.black.withOpacity(0.8),
+                color: AppColors.black.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -35,14 +39,14 @@ class TopMessage {
               color: Colors.transparent,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
+                  horizontal: AppSpacing.base,
+                  vertical: AppSpacing.mld,
                 ),
                 decoration: BoxDecoration(
 
                   color: const Color(0xff100B03),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color:Color(0xffF66E6E)),
+                  borderRadius: AppRadii.xlAll,
+                  border: Border.all(color: const Color(0xffF66E6E)),
                 ),
                 child: Row(
                   children: [
@@ -57,10 +61,8 @@ class TopMessage {
                     Expanded(
                       child: Text(
                         message,
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          color: Color(0xffF66E6E),
-                          fontSize: 11,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: const Color(0xffF66E6E),
                         ),
                       ),
                     ),
@@ -71,7 +73,7 @@ class TopMessage {
                       },
                       child: const Icon(
                         Icons.close,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ],

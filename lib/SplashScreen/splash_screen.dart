@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:beige/OnbodingScreen/onboding_screen.dart';
-import '../utility/ColorCode.dart';
+
+import '../app/colors.dart';
+import '../app/text_styles.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           /// 🔹 SOLID BACKGROUND
           Container(
-            color: ColorCode.kHeadingColor,
+            color: AppColors.textHeading,
           ),
 
           /// 🔹 CENTER IMAGE (ONLY THIS CHANGES)
@@ -110,10 +112,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Text(
                   "— Streamline your crew, equipment, & projects  —",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: ColorCode.white,
-                    fontSize: 16,
-                    fontFamily: "Unbounded",
+                  style: AppTextStyles.titleSmall.copyWith(
+                    color: AppColors.white,
                   ),
                 ),
               ),
