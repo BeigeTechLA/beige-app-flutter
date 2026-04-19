@@ -19,8 +19,6 @@ abstract class ExceptionHandler {
       return Left(mapDioError(e));
     } on SocketException {
       return const Left(NoInternetException());
-    } on TimeoutException {
-      return const Left(TimeoutException());
     } catch (e) {
       return Left(UnknownException(originalError: e));
     }
@@ -72,7 +70,7 @@ abstract class ExceptionHandler {
       case 422:
         return ValidationException(
           message: message ?? 'Validation failed',
-          fieldErrors: data is Map<String, dynamic> ? data['errors'] as Map<String, dynamic>? : null,
+          fieldErrors: _extractFieldErrors(data),
           originalError: error,
         );
       case 429:
@@ -83,5 +81,17 @@ abstract class ExceptionHandler {
         }
         return UnknownException(message: message ?? 'Bad response', originalError: error);
     }
+  }
+
+  static Map<String, List<String>>? _extractFieldErrors(dynamic data) {
+    if (data is Map<String, dynamic> && data['errors'] is Map) {
+      return (data['errors'] as Map).map(
+        (key, value) => MapEntry(
+          key.toString(),
+          (value is List) ? value.map((e) => e.toString()).toList() : [value.toString()],
+        ),
+      );
+    }
+    return null;
   }
 }

@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
-
 sealed class AppException implements Exception {
   final String message;
   final String? code;
@@ -52,7 +49,7 @@ class NotFoundException extends AppException {
 }
 
 class ValidationException extends AppException {
-  final Map<String, dynamic>? fieldErrors;
+  final Map<String, List<String>>? fieldErrors;
   const ValidationException({super.message = 'Validation failed', this.fieldErrors, super.originalError, super.code = '422'});
 }
 
