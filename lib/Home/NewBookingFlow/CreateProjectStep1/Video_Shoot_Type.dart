@@ -7,7 +7,7 @@ import 'package:lottie/lottie.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import 'ShootDateTime/Shoot_Date_Time_screen.dart';
 class VideoShootType extends StatefulWidget {
   final int bookingId;
@@ -240,7 +240,7 @@ String getContentTypeTitle(int contentTypeId) {
             Text(
               "Create Project",
               style: TextStyle(
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
@@ -254,7 +254,7 @@ String getContentTypeTitle(int contentTypeId) {
                 style: TextStyle(
                   fontSize: 14,
                   fontFamily: "Outfit",
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontWeight: FontWeight.w400,
 
                 ),
@@ -281,7 +281,7 @@ String getContentTypeTitle(int contentTypeId) {
                         margin: const EdgeInsets.only(right: 8),
                         height: 5,
                         decoration: BoxDecoration(
-                          color: ColorCode.kSubtextColor, // grey background
+                          color: AppColors.textSecondary, // grey background
                           borderRadius: BorderRadius.circular(64),
                         ),
                         child: isActive
@@ -291,7 +291,7 @@ String getContentTypeTitle(int contentTypeId) {
                             height: 5,
                             width: 70, // 🔥 colored portion only
                             decoration: BoxDecoration(
-                              color: ColorCode.kButtonColor,
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(64),
                             ),
                           ),
@@ -311,7 +311,7 @@ String getContentTypeTitle(int contentTypeId) {
                       style:  TextStyle(
                         fontFamily: "Unbounded",
                         fontSize: 16,
-                        color: ColorCode.white,
+                        color: AppColors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -416,7 +416,7 @@ String getContentTypeTitle(int contentTypeId) {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: ColorCode.kWhiteOpacity70,
+                                            color: AppColors.white70,
                                             fontFamily: "Outfit",
                                           ),
                                         ),
@@ -520,8 +520,8 @@ String getContentTypeTitle(int contentTypeId) {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedIndex == -1
-                      ? ColorCode.kGoldGradientLight // disabled
-                      : ColorCode.kButtonColor, // enabled
+                      ? AppColors.goldGradientLight // disabled
+                      : AppColors.primary, // enabled
                   foregroundColor: selectedIndex == -1
                       ? Colors.grey.shade400
                       : Colors.black,

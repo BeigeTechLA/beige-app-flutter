@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart' show ApiService;
-import '../../../utility/ColorCode.dart';
+import '../../../app/colors.dart';
 import 'Video_Shoot_Type.dart';
 
 class ContentTypeScreen extends StatefulWidget {
@@ -292,7 +292,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 child: Text(
                   "Create Project",
                   style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontSize: 16,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w500,
@@ -306,7 +306,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 child: Text(
                   "1/3",
                   style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontSize: 16,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w500,
@@ -341,7 +341,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                                 margin: const EdgeInsets.only(right: 8),
                                 height: 5,
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kSubtextColor,
+                                  color: AppColors.textSecondary,
                                   borderRadius: BorderRadius.circular(64),
                                 ),
                                 child: isActive
@@ -351,7 +351,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                                     height: 5,
                                     width: 35.44,
                                     decoration: BoxDecoration(
-                                      color: ColorCode.kButtonColor,
+                                      color: AppColors.primary,
                                       borderRadius: BorderRadius.circular(64),
                                     ),
                                   ),
@@ -440,7 +440,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                             onPressed: isContinueEnabled ? _continueBooking : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isContinueEnabled
-                                  ? ColorCode.kButtonColor
+                                  ? AppColors.primary
                                   : Colors.grey.shade700,
 
                               shape: RoundedRectangleBorder(
@@ -450,7 +450,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                             child: const Text(
                               "Continue",
                               style: TextStyle(
-                                color: ColorCode.k1D1D1B_Opacity70,
+                                color: AppColors.backgroundOpacity70,
                                 fontSize: 12,
                                 fontFamily: 'Outfit',
                                 fontWeight: FontWeight.bold,
@@ -496,8 +496,8 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isDisabled?
-                ColorCode.circular:
-                ColorCode.circular,
+                0.0:
+                0.0,
               ),
               // child: Center(
               //   child: SvgPicture.asset(
@@ -532,9 +532,9 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: isDisabled
-                      ? ColorCode.kWhiteOpacity60
+                      ? AppColors.white60
                       : value
-                      ? ColorCode.kButtonColor
+                      ? AppColors.primary
                       : Colors.white,
                 ),
               ),
@@ -548,12 +548,12 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: value
-                      ? ColorCode.kButtonColor
-                      : ColorCode.kBorderLight,
+                      ? AppColors.primary
+                      : AppColors.borderLight,
                   width: 0.5,
                 ),
                 color: value
-                    ? ColorCode.kButtonColor
+                    ? AppColors.primary
                     : Colors.transparent,
               ),
               child: value

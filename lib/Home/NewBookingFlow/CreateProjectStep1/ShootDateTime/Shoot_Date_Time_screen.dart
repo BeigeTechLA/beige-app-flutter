@@ -7,7 +7,7 @@
   import '../../../../main.dart';
   import '../../../../service/api_endpoints.dart';
   import '../../../../service/api_service.dart';
-  import '../../../../utility/ColorCode.dart';
+  import '../../../../app/colors.dart';
   import '../../More_Details/more_details_screen.dart';
 
   class ShootDateTimeScreen extends StatefulWidget {
@@ -105,7 +105,7 @@
             data: ThemeData.dark().copyWith(
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
+                primary: AppColors.primary,
                 onPrimary: Colors.white,
                 surface: Color(0xFF1E1E1E),
                 onSurface: Colors.white,
@@ -115,9 +115,9 @@
                 dialBackgroundColor: Color(0xFF121212),
                 dialHandColor: Colors.white,
                 dialTextColor: Colors.grey,
-                hourMinuteColor: ColorCode.kButtonColor,
+                hourMinuteColor: AppColors.primary,
                 hourMinuteTextColor: Colors.black,
-                dayPeriodColor: ColorCode.kButtonColor,
+                dayPeriodColor: AppColors.primary,
                 dayPeriodTextColor: Colors.white,
               ),
             ),
@@ -668,7 +668,7 @@
               useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
+                primary: AppColors.primary,
                 onPrimary: Colors.black,
                 surface: Color(0xFF121212),
                 onSurface: Colors.white,
@@ -700,7 +700,7 @@
               ),
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: ColorCode.kButtonColor,
+                  foregroundColor: AppColors.primary,
                   textStyle: const TextStyle(
                     fontFamily: "Unbounded",
                     fontWeight: FontWeight.w600,
@@ -771,7 +771,7 @@
               useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
+                primary: AppColors.primary,
                 onPrimary: Colors.black,
                 surface: Color(0xFF121212),
                 onSurface: Colors.white,
@@ -1004,7 +1004,7 @@
               useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
+                primary: AppColors.primary,
                 onPrimary: Colors.black,
                 surface: Color(0xFF121212),
                 onSurface: Colors.white,
@@ -1014,9 +1014,9 @@
                 dialBackgroundColor: Color(0xFF121212),
                 dialHandColor: Colors.white,
                 dialTextColor: Colors.grey,
-                hourMinuteColor: ColorCode.kButtonColor,
+                hourMinuteColor: AppColors.primary,
                 hourMinuteTextColor: Colors.black,
-                dayPeriodColor: ColorCode.kButtonColor,
+                dayPeriodColor: AppColors.primary,
                 dayPeriodTextColor: Colors.white,
               ),
             ),
@@ -1128,7 +1128,7 @@
               Text(
                 "Create Project",
                 style: TextStyle(
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w400,
@@ -1140,7 +1140,7 @@
                 child: Text(
                   "1/3",
                   style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontSize: 14,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w400,
@@ -1169,7 +1169,7 @@
                             margin: const EdgeInsets.only(right: 8),
                             height: 5,
                             decoration: BoxDecoration(
-                              color: ColorCode.kSubtextColor, // grey background
+                              color: AppColors.textSecondary, // grey background
                               borderRadius: BorderRadius.circular(64),
                             ),
                             child: isActive
@@ -1179,7 +1179,7 @@
                                 height: 5,
                                 width: 120, // 🔥 colored portion only
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(64),
                                 ),
                               ),
@@ -1594,7 +1594,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                     "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                     ),
                                     ),
                                     ),
@@ -1612,7 +1612,7 @@
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
                                                         "assets/svg/Group 2087328870.svg",
-                                                        color: ColorCode.white,
+                                                        color: AppColors.white,
                                                       ),
                                                     ),
                                                   ),
@@ -1670,7 +1670,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1698,7 +1698,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1767,7 +1767,7 @@
                                                 fontFamily: "Helvetica Neue",
 
 
-                                                color: ColorCode.kWhiteOpacity70,
+                                                color: AppColors.white70,
                                                 fontSize: 11,
                                               ),
                                             ),
@@ -1779,7 +1779,7 @@
                                       Text(
                                         getTotalDuration(), // 👇 function below
                                         style: TextStyle(
-                                          color: ColorCode.kButtonColor,
+                                          color: AppColors.primary,
                                           fontSize: 14,
                                           fontFamily: "Helvetica Neue",
 
@@ -1832,7 +1832,7 @@
                                 width: 20,
                                 height: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  ColorCode.kWhiteOpacity70,
+                                  AppColors.white70,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -1873,7 +1873,7 @@
                                 "assets/svg/Group 2087328870.svg",
                                 width: 20,
                                 height: 20,
-                                color: ColorCode.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -1900,7 +1900,7 @@
                                 "assets/svg/Group 2087328870.svg",
                                 width: 20,
                                 height: 20,
-                                color: ColorCode.white,
+                                color: AppColors.white,
                               ),
                             ),
                           ),
@@ -1964,7 +1964,7 @@
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.k282828,
+                                  color: AppColors.surfaceVariant,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
@@ -2002,7 +2002,7 @@
                                           child: Text(
                                             getEditingDescription(),
                                             style: const TextStyle(
-                                              color: ColorCode.kWhiteOpacity70,
+                                              color: AppColors.white70,
                                               fontSize: 13,
                                               fontFamily: "Outfit",
                                             ),
@@ -2036,19 +2036,19 @@
                                       suffixIcon: const Icon(
                                         Icons.keyboard_arrow_down,
 
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color: AppColors.white70,
                                       ),
                                       contentPadding:
                                       const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                        const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                        const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
                                     ),
                                   ),
@@ -2126,10 +2126,10 @@
                                   return Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: ColorCode.k282828,
+                                      color: AppColors.surfaceVariant,
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color: AppColors.white70,
                                         width: 0.5,
                                       ),
                                     ),
@@ -2227,8 +2227,8 @@
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFormValid
-                        ? ColorCode.kButtonColor   // ✅ active
-                        : ColorCode.k282828,       // ❌ disabled
+                        ? AppColors.primary   // ✅ active
+                        : AppColors.surfaceVariant,       // ❌ disabled
                     foregroundColor: isFormValid
                         ? Colors.black
                         : Colors.grey.shade500,
@@ -2446,7 +2446,7 @@
                   children: [
                     Text(title,
                         style: TextStyle(
-                          color: ColorCode.white,
+                          color: AppColors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         )),
@@ -2530,7 +2530,7 @@
                                     .toString()
                                     .padLeft(2, '0'),
                                 style: TextStyle(
-                                  color: ColorCode.kHeadingColor,
+                                  color: AppColors.textHeading,
                                   fontSize: 13,
                                   fontFamily: "Helvetica Neue",
                                   fontWeight: FontWeight.w600
@@ -2886,7 +2886,7 @@
                 )
                     : null,
                 border: Border.all(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   width: 1,
                 ),
               ),
@@ -2907,7 +2907,7 @@
             Text(
               title,
               style: const TextStyle(
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
