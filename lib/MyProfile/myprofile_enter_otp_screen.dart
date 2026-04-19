@@ -6,7 +6,9 @@ import 'package:flutter_svg/svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/text_styles.dart';
+import '../app/radii.dart';
 import '../widgets/TopMessage.dart';
 import 'myprofile_new_password_screen.dart';
 
@@ -209,15 +211,16 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                         "Enter OTP code",
                         style: TextStyle(
                             fontSize: 20,
+                            fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.bold,
-                            color: ColorCode.white),
+                            color: AppColors.white),
                       ),
 
                       const SizedBox(height: 6),
 
                       const Text(
                         "Enter 6 digit OTP sent to your registered email ID\nreset your password.",
-                        style: TextStyle(fontSize: 12, color: ColorCode.kWhiteOpacity60),
+                        style: TextStyle(fontSize: 12, fontFamily: AppTextStyles.fontFamilyBody, color: AppColors.white60),
                       ),
 
                       const SizedBox(height: 20),
@@ -238,8 +241,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                                   border: Border.all(
                                     color: (focusNodes[index].hasFocus ||
                                         controllers[index].text.isNotEmpty)
-                                        ? ColorCode.kGoldBorder50
-                                        : ColorCode.kWhiteOpacity60,
+                                        ? AppColors.borderGold
+                                        : AppColors.white60,
                                     width: 0.5,
                                   ),
                                 ),
@@ -289,8 +292,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              fontFamily: "Outfit",
-                              color: ColorCode.kWhiteOpacity60,
+                              fontFamily: AppTextStyles.fontFamilyBody,
+                              color: AppColors.white60,
                             ),
                           ),
                         ],
@@ -311,8 +314,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       "Resend OTP",
                       style:  TextStyle(
                         color: seconds == 0
-                            ? ColorCode.white
-                            : ColorCode.white,
+                            ? AppColors.white
+                            : AppColors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
@@ -332,8 +335,8 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                   onPressed: isOtpFilled ? _verifyOtp : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOtpFilled
-                        ? ColorCode.kButtonColor
-                        : ColorCode.kGold40,
+                        ? AppColors.primary
+                        : AppColors.goldOpacity40,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -344,7 +347,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: isOtpFilled
-                          ? ColorCode.kHeadingColor
+                          ? AppColors.textHeading
                           : Colors.black38,
                     ),
                   ),

@@ -220,8 +220,8 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                             "$rating ($reviews)",
                                             style: const TextStyle(
                                               fontSize: 12,
-                                              color: ColorCode
-                                                  .kWhiteOpacity70,
+                                              color: AppColors
+                                                  .white70,
                                               fontFamily: "Outfit",
                                             ),
                                           ),
@@ -273,8 +273,8 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                         fontSize: 12,
                                         fontFamily: "Outfit",
                                         fontWeight: FontWeight.w600,
-                                        color: ColorCode
-                                            .kCircleGradientTop,
+                                        color: AppColors
+                                            .textHeading,
                                       ),
                                     ),
                                   ),

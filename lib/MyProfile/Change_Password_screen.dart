@@ -3,7 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/text_styles.dart';
+import '../app/radii.dart';
 import '../widgets/TopMessage.dart';
 import 'myprofile_enter_otp_screen.dart';
 
@@ -186,9 +188,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         "Change your Password",//
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontWeight: FontWeight.w500,
-                          color: ColorCode.white,
+                          color: AppColors.white,
                         ),
                       ),
 
@@ -203,9 +205,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             maxLines: 3,
                             style: TextStyle(
                               fontSize: 13,
-                              fontFamily: "Outfit",
+                              fontFamily: AppTextStyles.fontFamilyBody,
                               fontWeight: FontWeight.w400,
-                              color: ColorCode.kWhiteOpacity60,
+                              color: AppColors.white60,
                             ),
                           );
                         },
@@ -241,20 +243,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   onPressed: _fetchForgotPassword,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isEmailFilled
-                        ? ColorCode.kButtonColor
-                        : ColorCode.kGoldGradientLight,
+                        ? AppColors.primary
+                        : AppColors.goldGradientLight,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.xlAll,
                     ),
                   ),
                   child: Text(
                     "Send OTP",
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: "Unbounded",
+                      fontFamily: AppTextStyles.fontFamilyDisplay,
                       color: isEmailFilled
-                          ? ColorCode.kHeadingColor
-                          : ColorCode.k282828,
+                          ? AppColors.textHeading
+                          : AppColors.surfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -283,7 +285,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           floatingLabelBehavior: FloatingLabelBehavior.always,
 
           labelStyle: const TextStyle(
-            color: ColorCode.white, // #1D1D1B 60% opacity
+            color: AppColors.white, // #1D1D1B 60% opacity
           ),
 
           contentPadding: const EdgeInsets.symmetric(
@@ -295,7 +297,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide:  BorderSide(
-              color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+              color: AppColors.white60, // #1D1D1B99 (60% opacity)
               width: 0.5,                       // 🔥 exact 0.5px
             ),
           ),
@@ -303,13 +305,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(
-              color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+              color: AppColors.white60, // #1D1D1B99 (60% opacity)
               width: 0.5,                          // focus border thicker
             ),
           ),
 
           floatingLabelStyle: const TextStyle(
-            color: ColorCode.kWhiteOpacity60,
+            color: AppColors.white60,
           ),)
 
     );

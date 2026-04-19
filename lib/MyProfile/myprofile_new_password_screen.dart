@@ -8,7 +8,9 @@ import 'package:lottie/lottie.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/text_styles.dart';
+import '../app/radii.dart';
 import '../widgets/TopMessage.dart';
 import 'my_profile.dart';
 
@@ -141,10 +143,10 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       Text(
                         "Set your new Password",
                         style: TextStyle(
-                          fontFamily: "Unbounded",
+                          fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: ColorCode.white,
+                          color: AppColors.white,
                         ),),
 
                       SizedBox(height: 6),
@@ -152,10 +154,10 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       const Text(
                         "You're almost done! Set a new password to secure your account. Make sure it's strong and unique.",
                         style: TextStyle(
-                          fontFamily: "Outfit",
+                          fontFamily: AppTextStyles.fontFamilyBody,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: ColorCode.kWhiteOpacity60,
+                          color: AppColors.white60,
                         ),),
 
                       SizedBox(height: 25),
@@ -266,11 +268,11 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isButtonEnabled
-                        ? ColorCode.kButtonColor
-                        : ColorCode.kCreamSoft,      // Inactive
+                        ? AppColors.primary
+                        : AppColors.surfaceVariant,      // Inactive
 
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.xlAll,
                     ),
                   ),
                   child:  Text(
@@ -279,7 +281,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: isButtonEnabled
-                          ? ColorCode.kHeadingColor
+                          ? AppColors.textHeading
                           : Colors.black38,    // ⭐ HERE I CHANGED THIS
                     ),
                   ),
@@ -304,10 +306,10 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
     return TextField(
       controller: controller,
       obscureText: !isVisible,
-      cursorColor: ColorCode.white,
+      cursorColor: AppColors.white,
 
       style: const TextStyle(
-        color: ColorCode.white,
+        color: AppColors.white,
       ),
 
       onChanged: (value) {
@@ -323,13 +325,13 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity60,
+          color: AppColors.white60,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: IconButton(
           icon: Icon(
             isVisible ? Icons.visibility : Icons.visibility_off,
-            color: ColorCode.kWhiteOpacity60,
+            color: AppColors.white60,
           ),
           onPressed: onToggle,
         ),
@@ -341,7 +343,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide:  BorderSide(
-            color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+            color: AppColors.white60, // #1D1D1B99 (60% opacity)
             width: 0.5,                       // 🔥 exact 0.5px
           ),
         ),
@@ -349,13 +351,13 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity60, // #1D1D1B99 (60% opacity)
+            color: AppColors.white60, // #1D1D1B99 (60% opacity)
             width: 0.5,                          // focus border thicker
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity60,
+          color: AppColors.white60,
         ),
       ),
     );
@@ -413,9 +415,9 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                        Text(
                         "You're All Set",
                         style: TextStyle(
-                          color: ColorCode.kButtonColor,
+                          color: AppColors.primary,
                           fontSize: 18,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -426,9 +428,9 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
                         "Congratulations! Your password has\nbeen changed successfully",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontFamily: "Outfit",
+                          fontFamily: AppTextStyles.fontFamilyBody,
                           fontWeight: FontWeight.w400,
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           fontSize: 14,
                         ),
                       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/text_styles.dart';
+import '../app/radii.dart';
 import '../utility/images.dart';
 import 'DeleteAccount/delete_account.dart';
 import 'DeleteAccount/delete_account_otp_screen.dart';
@@ -32,7 +34,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                   height: 24,
                   width: 24,
                   colorFilter: const ColorFilter.mode(
-                    ColorCode.white,
+                    AppColors.white,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -44,10 +46,10 @@ class _AppPreferencesState extends State<AppPreferences> {
               Text(
                 "App Preferences",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppTextStyles.fontFamilyDisplay,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: ColorCode.white,
+                  color: AppColors.white,
                 ),
               ),
 
@@ -68,9 +70,8 @@ class _AppPreferencesState extends State<AppPreferences> {
                     },
                     child: Container(
                       padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
-                      ),
-                        color: ColorCode.k282828,
+                      decoration: BoxDecoration(borderRadius: AppRadii.mdAll,
+                        color: AppColors.surfaceVariant,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,7 +83,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                                 height: 24,
                                 width: 24,
                                 colorFilter: const ColorFilter.mode(
-                                  ColorCode.white,
+                                  AppColors.white,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -90,8 +91,9 @@ class _AppPreferencesState extends State<AppPreferences> {
                               Text(
                                 "Delete Account",
                                 style: TextStyle(
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                   fontSize: 14,
+                                  fontFamily: AppTextStyles.fontFamilyBody,
                                 ),
                               ),
                             ],
@@ -111,9 +113,8 @@ class _AppPreferencesState extends State<AppPreferences> {
                   /// ℹ APP VERSION
                   Container(
                     padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
-                    ),
-                      color: ColorCode.k282828,
+                    decoration: BoxDecoration(borderRadius: AppRadii.mdAll,
+                      color: AppColors.surfaceVariant,
                     ),
                     child: Row(
                       children: [
@@ -122,7 +123,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                           height: 24,
                           width: 24,
                           colorFilter: const ColorFilter.mode(
-                            ColorCode.white,
+                            AppColors.white,
                             BlendMode.srcIn,
                           ),
                         ),
