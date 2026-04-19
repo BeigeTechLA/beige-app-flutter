@@ -2,8 +2,10 @@ import 'package:beige/auth/new_login_screen.dart';
 import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
 
-
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -54,45 +56,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             builder: (context, constraints) {
                               return Padding(
                                 padding: EdgeInsets.only(
-                                  top: constraints.maxHeight * 0.05, // 👈 responsive top space
-                                  left: 12,
-                                  right: 12,
+                                  top: constraints.maxHeight * 0.05,
+                                  left: AppSpacing.md,
+                                  right: AppSpacing.md,
                                 ),
                                 child: Image.asset(
                                   pages[index]['image']!,
                                   width: double.infinity,
-                                  height: constraints.maxHeight * 0.6, // 👈 responsive height
-                                  fit: BoxFit.contain, // 👈 NO CUT guaranteed
+                                  height: constraints.maxHeight * 0.6,
+                                  fit: BoxFit.contain,
                                 ),
                               );
                             },
                           ),
                         ),
 
-
-
                         Text(
                           pages[index]['title']!,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: "Unbounded",
-                            color: ColorCode.white,
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
                           ),
                         ),
 
-                        const SizedBox(height: 10),
+                        const SizedBox(height: AppSpacing.sm),
 
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                           child: Text(
                             pages[index]['description']!,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontFamily: "Outfit",
-                              color: ColorCode.kWhiteOpacity60,
-                              fontSize: 12,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.white60,
                             ),
                           ),
                         ),
@@ -102,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSpacing.xxxl),
 
               /// ---------------- DOT INDICATOR ----------------
               Row(
@@ -110,24 +106,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: List.generate(
                   pages.length,
                       (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
                       color: _currentPage == index
-                          ? ColorCode.white
-                          : ColorCode.kWhiteOpacity60,
-                      borderRadius: BorderRadius.circular(4),
+                          ? AppColors.white
+                          : AppColors.white60,
+                      borderRadius: BorderRadius.circular(AppRadii.xs),
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSpacing.xxxl),
 
               /// ---------------- LOGIN BUTTON ----------------
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -141,25 +137,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorCode.kButtonColor,
+                      backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadii.lg),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       "Login",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 14,
-                        color: ColorCode.kHeadingColor,
+                      style: AppTextStyles.labelLarge.copyWith(
+                        fontFamily: AppTextStyles.fontFamilyDisplay,
+                        color: AppColors.textHeading,
                       ),
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
 
               /// ---------------- SIGN UP TEXT ----------------
               GestureDetector(
@@ -171,22 +166,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   );
                 },
-                child: const Padding(
-                  padding: EdgeInsets.only(bottom: 20),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
                   child: Text.rich(
                     TextSpan(
-                      text: "Don’t have an account? ",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        color: ColorCode.kWhiteOpacity60,
-                        fontSize: 14,
+                      text: "Don't have an account? ",
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.white60,
                       ),
                       children: [
                         TextSpan(
                           text: "Sign Up",
-                          style: TextStyle(
-                            fontFamily: "Outfit",
-                            color: ColorCode.white,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.white,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -204,7 +196,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.only(top: 20, right: 20),
+                padding: const EdgeInsets.only(top: AppSpacing.lg, right: AppSpacing.lg),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pushReplacement(
@@ -214,12 +206,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     "Skip",
-                    style: TextStyle(
-                      fontFamily: "Outfit",
-                      color: ColorCode.white,
-                      fontSize: 14,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.white,
                     ),
                   ),
                 ),

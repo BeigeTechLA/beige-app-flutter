@@ -7,7 +7,10 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../Home/NewBookingFlow/More_Details/more_details_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
+import '../app/text_styles.dart';
+import '../app/spacing.dart';
+import '../app/radii.dart';
 import '../utility/images.dart';
 import 'bookin_review_confirm.dart';
 
@@ -101,7 +104,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           data: ThemeData.dark().copyWith(
             dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor,
+              primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: Color(0xFF1E1E1E),
               onSurface: Colors.white,
@@ -111,9 +114,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
               dialBackgroundColor: Color(0xFF121212),
               dialHandColor: Colors.white,
               dialTextColor: Colors.grey,
-              hourMinuteColor: ColorCode.kButtonColor,
+              hourMinuteColor: AppColors.primary,
               hourMinuteTextColor: Colors.black,
-              dayPeriodColor: ColorCode.kButtonColor,
+              dayPeriodColor: AppColors.primary,
               dayPeriodTextColor: Colors.white,
             ),
           ),
@@ -670,7 +673,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             useMaterial3: true,
             dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor,
+              primary: AppColors.primary,
               onPrimary: Colors.black,
               surface: Color(0xFF121212),
               onSurface: Colors.white,
@@ -702,7 +705,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: ColorCode.kButtonColor,
+                foregroundColor: AppColors.primary,
                 textStyle: const TextStyle(
                   fontFamily: "Unbounded",
                   fontWeight: FontWeight.w600,
@@ -773,7 +776,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             useMaterial3: true,
             dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor,
+              primary: AppColors.primary,
               onPrimary: Colors.black,
               surface: Color(0xFF121212),
               onSurface: Colors.white,
@@ -813,7 +816,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                       child: CalendarDatePicker2(
                         config: CalendarDatePicker2Config(
                           calendarType: CalendarDatePicker2Type.multi,
-                          selectedDayHighlightColor: ColorCode.kButtonColor,
+                          selectedDayHighlightColor: AppColors.primary,
                           selectedDayTextStyle: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -922,7 +925,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           data: ThemeData.dark().copyWith(
             dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
-              primary: ColorCode.kButtonColor,
+              primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: Color(0xFF1E1E1E),
               onSurface: Colors.white,
@@ -932,9 +935,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
               dialBackgroundColor: Color(0xFF121212),
               dialHandColor: Colors.white,
               dialTextColor: Colors.grey,
-              hourMinuteColor: ColorCode.kButtonColor,
+              hourMinuteColor: AppColors.primary,
               hourMinuteTextColor: Colors.black,
-              dayPeriodColor: ColorCode.kButtonColor,
+              dayPeriodColor: AppColors.primary,
               dayPeriodTextColor: Colors.white,
             ),
           ),
@@ -1038,8 +1041,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                           height: 5,
                           decoration: BoxDecoration(
                             color: index < 1
-                                ? ColorCode.kButtonColor
-                                : ColorCode.kSubtextColor,
+                                ? AppColors.primary
+                                : AppColors.textSubtle,
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -1464,7 +1467,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
                                                           "assets/svg/Group 2087328870.svg",
-                                                          color: ColorCode.white,
+                                                          color: AppColors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -1483,7 +1486,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
                                                           "assets/svg/Group 2087328870.svg",
-                                                          color: ColorCode.white,
+                                                          color: AppColors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -1542,7 +1545,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
                                         "assets/svg/Group 2087328870.svg",
-                                        color: ColorCode.white,
+                                        color: AppColors.white,
                                         width: 20,
                                         height: 20,
                                       ),
@@ -1571,7 +1574,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
                                         "assets/svg/Group 2087328870.svg",
-                                        color: ColorCode.white,
+                                        color: AppColors.white,
                                         width: 20,
                                         height: 20,
                                       ),
@@ -1635,7 +1638,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                   width: 20,
                                   height: 20,
                                   colorFilter: const ColorFilter.mode(
-                                    ColorCode.kWhiteOpacity70,
+                                    AppColors.white70,
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -1677,7 +1680,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                   "assets/svg/Group 2087328870.svg",
                                   width: 20,
                                   height: 20,
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -1705,7 +1708,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                   "assets/svg/Group 2087328870.svg",
                                   width: 20,
                                   height: 20,
-                                  color: ColorCode.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                             ),
@@ -1784,8 +1787,8 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFormValid
-                      ? ColorCode.kButtonColor   // ✅ active
-                      : ColorCode.k282828,       // ❌ disabled
+                      ? AppColors.primary   // ✅ active
+                      : AppColors.surfaceVariant,       // ❌ disabled
                   foregroundColor: isFormValid
                       ? Colors.black
                       : Colors.grey.shade500,
@@ -2065,12 +2068,12 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               child: Padding(
                                 padding:
                                 EdgeInsets.symmetric(horizontal: 8),
-                                child: Icon(Icons.remove, size: 10,color: ColorCode.black,),
+                                child: Icon(Icons.remove, size: 10,color: AppColors.black,),
                               ),
                             ),
 
                             Text(count.toString().padLeft(2, '0'),style: TextStyle(
-                              color: ColorCode.kHeadingColor,
+                              color: AppColors.textHeading,
                               fontSize: 11.17,
                               fontFamily: 'Helvetica Neue',
                               fontWeight: FontWeight.w500,
@@ -2090,7 +2093,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               child: Padding(
                                 padding:
                                 EdgeInsets.symmetric(horizontal: 8),
-                                child: Icon(Icons.add, size: 10,color: ColorCode.black,),
+                                child: Icon(Icons.add, size: 10,color: AppColors.black,),
                               ),
                             ),
                           ],
@@ -2192,11 +2195,11 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                             child: Padding(
                               padding:
                               EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(Icons.remove, size: 10,color: ColorCode.black,),
+                              child: Icon(Icons.remove, size: 10,color: AppColors.black,),
                             ),
                           ),
 
-                          Text(count.toString().padLeft(2, '0'),style: TextStyle(  color: ColorCode.kHeadingColor,
+                          Text(count.toString().padLeft(2, '0'),style: TextStyle(  color: AppColors.textHeading,
                             fontSize: 11.17,
                             fontFamily: 'Helvetica Neue',
                             fontWeight: FontWeight.w500,
@@ -2211,7 +2214,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                             child: Padding(
                                 padding:
                                 EdgeInsets.symmetric(horizontal: 8),
-                                child: Icon(Icons.add, size: 10,color: ColorCode.black,)
+                                child: Icon(Icons.add, size: 10,color: AppColors.black,)
                             ),
                           ),
                         ],
@@ -2239,16 +2242,16 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
         child: TextField(
           controller: controller,
           readOnly: true,
-          cursorColor: ColorCode.white,
+          cursorColor: AppColors.white,
 
-          style: const TextStyle(color: ColorCode.white),
+          style: const TextStyle(color: AppColors.white),
 
           decoration: InputDecoration(
             labelText: label,
             floatingLabelBehavior: FloatingLabelBehavior.always,
 
             labelStyle: TextStyle(
-              color: ColorCode.kWhiteOpacity70,
+              color: AppColors.white70,
               fontSize: 12,
               fontFamily: "Outfit",
             ),
@@ -2260,7 +2263,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 width: 20,
                 height: 20,
                 colorFilter: const ColorFilter.mode(
-                  ColorCode.white,
+                  AppColors.white,
                   BlendMode.srcIn,
                 ),
               ),
@@ -2272,13 +2275,13 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+              const BorderSide(color: AppColors.white70, width: 0.5),
             ),
 
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide:
-              const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+              const BorderSide(color: AppColors.white70, width: 0.5),
             ),
           ),
         ),
@@ -2314,7 +2317,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
               )
                   : null,
               border: Border.all(
-                color: ColorCode.kWhiteOpacity70,
+                color: AppColors.white70,
                 width: 1,
               ),
             ),
@@ -2335,7 +2338,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
           Text(
             title,
             style: const TextStyle(
-              color: ColorCode.white,
+              color: AppColors.white,
               fontSize: 14,
               fontFamily: "Outfit",
               fontWeight: FontWeight.w400,

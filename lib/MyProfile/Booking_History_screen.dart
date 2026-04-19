@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
   const BookingHistoryScreen({super.key});
@@ -61,7 +61,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                     child: SvgPicture.asset(
                       "assets/svg/back.svg",
                       height: 24,
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -75,7 +75,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                       fontFamily: "Unbounded",
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -86,7 +86,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                   child: isLoading
                       ? const Center(
                     child: CircularProgressIndicator(
-                      color: ColorCode.kButtonColor,
+                      color: AppColors.primary,
                     ),
                   )
                       : bookings.isEmpty
@@ -246,8 +246,8 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                         role,
                                         style: const TextStyle(
                                           fontSize: 11,
-                                          color: ColorCode
-                                              .kWhiteOpacity70,
+                                          color: AppColors
+                                              .white70,
                                           fontFamily: "Outfit",
                                         ),
                                       ),
@@ -263,7 +263,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 14, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: ColorCode.kButtonColor,
+                                      color: AppColors.primary,
                                       borderRadius:
                                       BorderRadius.circular(22),
                                     ),

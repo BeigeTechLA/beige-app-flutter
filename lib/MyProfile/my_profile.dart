@@ -6,7 +6,7 @@ import 'package:lottie/lottie.dart' show Lottie;
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import 'Booking_History_screen.dart';
 import 'Favourite_screen.dart';
 import 'app_preferences.dart';
@@ -115,7 +115,7 @@ class _MyProfileState extends State<MyProfile> {
                     },
                     child:SvgPicture.asset(
                       "assets/svg/back.svg",
-                      color: ColorCode.black,
+                      color: AppColors.black,
                       height: 24,
                     ),
                   ),
@@ -130,7 +130,7 @@ class _MyProfileState extends State<MyProfile> {
                     child: Text(
                       "My Profile",
                       style: TextStyle(
-                        color: ColorCode.kHeadingColor,
+                        color: AppColors.textHeading,
                         fontSize: 16,
                         fontFamily: "Unbounded",
                         fontWeight: FontWeight.w500,
@@ -232,7 +232,7 @@ class _MyProfileState extends State<MyProfile> {
              Text(
               "${myProfile?['email'] ?? ''}",
               style: TextStyle(
-                color: ColorCode.kWhiteOpacity60,
+                color: AppColors.white60,
                 fontFamily: "Outfit",
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -260,7 +260,7 @@ class _MyProfileState extends State<MyProfile> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                 decoration: BoxDecoration(
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: const Text(
@@ -268,7 +268,7 @@ class _MyProfileState extends State<MyProfile> {
                   style: TextStyle(
                     fontSize: 10,
                     fontFamily: "Outfit",
-                    color: ColorCode.kHeadingColor,
+                    color: AppColors.textHeading,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -278,7 +278,7 @@ class _MyProfileState extends State<MyProfile> {
 
             Padding(
               padding:  EdgeInsets.all(12),
-              child: Divider(color: ColorCode.kDividerWhite12,),
+              child: Divider(color: AppColors.dividerDark,),
             ),
 
 
@@ -305,7 +305,7 @@ class _MyProfileState extends State<MyProfile> {
             child: Row(
               children: [
                 Text("My Account",style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontFamily: "Unbounded",
                     fontSize: 14,
                     fontWeight: FontWeight.w500
@@ -349,14 +349,14 @@ class _MyProfileState extends State<MyProfile> {
           SizedBox(height: 10,),
           Padding(
             padding:  EdgeInsets.all(12),
-            child: Divider(color: ColorCode.kDividerWhite12,),
+            child: Divider(color: AppColors.dividerDark,),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Text("Legal",style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontFamily: "Unbounded",
                     fontSize: 14,
                     fontWeight: FontWeight.w500
@@ -388,7 +388,7 @@ class _MyProfileState extends State<MyProfile> {
 
           Padding(
             padding:  EdgeInsets.all(12),
-            child: Divider(color: ColorCode.kDividerWhite12,),
+            child: Divider(color: AppColors.dividerDark,),
           ),
 
           Padding(
@@ -396,7 +396,7 @@ class _MyProfileState extends State<MyProfile> {
             child: Row(
               children: [
                 Text("Settings",style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontFamily: "Unbounded",
                     fontSize: 14,
                     fontWeight: FontWeight.w500
@@ -459,7 +459,7 @@ class _MyProfileState extends State<MyProfile> {
                   iconPath,
                   height: 22,
                   width: 22,
-                  color: ColorCode.white,
+                  color: AppColors.white,
                 ),
               ),
             ),
@@ -469,7 +469,7 @@ class _MyProfileState extends State<MyProfile> {
                 title,
                 style: const TextStyle(
                   fontFamily: "Outfit",
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                 ),
               ),
@@ -478,7 +478,7 @@ class _MyProfileState extends State<MyProfile> {
               "assets/svg/my_profile/layer1.svg",
               height: 15,
               width: 20,
-              color: ColorCode.white,
+              color: AppColors.white,
             ),
           ],
         ),
@@ -518,7 +518,7 @@ class _MyProfileState extends State<MyProfile> {
                 width: 30,
                 margin:  EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -549,7 +549,7 @@ class _MyProfileState extends State<MyProfile> {
 
               Divider(
                 height: 1,
-                color: ColorCode.kDividerWhite12,
+                color: AppColors.dividerDark,
               ),
 
                SizedBox(height: 10),
@@ -566,7 +566,7 @@ class _MyProfileState extends State<MyProfile> {
                         Navigator.pop(context);
                       },
                       style: OutlinedButton.styleFrom(
-                        side:  BorderSide(color: ColorCode.kWhiteOpacity60),
+                        side:  BorderSide(color: AppColors.white60),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -600,7 +600,7 @@ class _MyProfileState extends State<MyProfile> {
                       },
 
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  ColorCode.kButtonColor,
+                        backgroundColor:  AppColors.primary,
                         padding:  EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -611,7 +611,7 @@ class _MyProfileState extends State<MyProfile> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: ColorCode.kHeadingColor,
+                          color: AppColors.textHeading,
                           fontFamily: "Unbounded",
                         ),
                       ),

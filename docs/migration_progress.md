@@ -38,18 +38,18 @@ Successfully implemented the foundational centralized design system for the Beig
 
 The remaining screens must be migrated to the new design tokens following the same strict maximum 5 files per batch rule.
 
-**Batch 4: Trivial/Independent Screens (5 files)**
-- `lib/SplashScreen/splash_screen.dart`
-- `lib/OnbodingScreen/onboding_screen.dart`
-- `lib/auth/Password_successfull.dart`
-- `lib/Booking/shoot_updated_screen.dart`
-- `lib/Booking/my_select_booking_type.dart`
+**Batch 4: Trivial/Independent Screens (5 files) ✅ Done**
+- `lib/SplashScreen/splash_screen.dart` ✅
+- `lib/OnbodingScreen/onboding_screen.dart` ✅
+- `lib/auth/Password_successfull.dart` ✅
+- `lib/Booking/Shoot_updated_screen.dart` ✅
+- `lib/Booking/MY_SelectBookingType.dart` ✅
 
-**Batch 5: Profile View & Edit (4 files)**
-- `lib/Profile/my_profile.dart`
-- `lib/Profile/booking_history_screen.dart`
-- `lib/Profile/favourite_screen.dart`
-- `lib/Profile/edit_profile.dart`
+**Batch 5: Profile View & Edit (4 files) ✅ Done**
+- `lib/MyProfile/my_profile.dart` ✅ (20 ColorCode refs replaced)
+- `lib/MyProfile/Booking_History_screen.dart` ✅ (4 ColorCode refs replaced)
+- `lib/MyProfile/Favourite_screen.dart` ✅ (4 ColorCode refs replaced)
+- `lib/MyProfile/edit_profile.dart` ✅ (~25 ColorCode refs replaced)
 
 **Batch 6: Profile Settings (4 files)**
 - `lib/Profile/app_preferences.dart`
@@ -97,4 +97,4 @@ The remaining screens must be migrated to the new design tokens following the sa
 - Final `flutter analyze` verification across the full project.
 
 ---
-**Next Step Recommendation:** Proceed immediately with **Batch 4** to eliminate hardcoded colors in the application's top-level shells and independent screens.
+**Next Step Recommendation:** Proceed with **Batch 6** — Profile Settings (4 files: app_preferences, change_password, my_profile_enter_otp, my_profile_new_password).

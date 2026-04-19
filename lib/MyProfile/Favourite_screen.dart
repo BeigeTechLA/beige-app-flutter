@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import '../widgets/loding.dart';
 
 class FavouriteScreen extends StatefulWidget {
@@ -84,7 +84,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     child: SvgPicture.asset(
                       "assets/svg/back.svg",
                       height: 24,
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -98,7 +98,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                       fontFamily: "Unbounded",
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -210,7 +210,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.favorite, color: ColorCode.kButtonColor, size: 18),
+                const Icon(Icons.favorite, color: AppColors.primary, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(

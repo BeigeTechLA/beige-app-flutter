@@ -19,7 +19,7 @@ import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
-import '../utility/ColorCode.dart';
+import '../app/colors.dart';
 import 'Change_Password_screen.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
@@ -297,7 +297,7 @@ class _EditProfileState extends State<EditProfile> {
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:ColorCode.kWhiteOpacity70,
+                        color:AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -334,7 +334,7 @@ class _EditProfileState extends State<EditProfile> {
 
                   SizedBox(height: 20),
 
-                  Divider(color: ColorCode.kDividerWhite12,),
+                  Divider(color: AppColors.dividerDark,),
 
                   /// 🔥 CIRCULAR PREVIEW AREA
                   Expanded(
@@ -426,9 +426,9 @@ class _EditProfileState extends State<EditProfile> {
                               overlayShape: const RoundSliderOverlayShape(
                                 overlayRadius: 14,
                               ),
-                              activeTrackColor: ColorCode.kButtonColor,
+                              activeTrackColor: AppColors.primary,
                               inactiveTrackColor: Colors.white.withOpacity(0.3),
-                              thumbColor: ColorCode.kButtonColor,
+                              thumbColor: AppColors.primary,
                             ),
                             child: Slider(
                               min: 1,
@@ -466,7 +466,7 @@ class _EditProfileState extends State<EditProfile> {
                     height: 55,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorCode.kButtonColor,
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -756,7 +756,7 @@ class _EditProfileState extends State<EditProfile> {
                         },
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
-                          color: ColorCode.black,
+                          color: AppColors.black,
                           height: 24,
                         ),
                       ),
@@ -771,7 +771,7 @@ class _EditProfileState extends State<EditProfile> {
                         child: Text(
                           "Edit Profile",
                           style: TextStyle(
-                            color: ColorCode.kHeadingColor,
+                            color: AppColors.textHeading,
                             fontSize: 16,
                             fontFamily: "Unbounded",
                             fontWeight: FontWeight.w500,
@@ -856,7 +856,7 @@ class _EditProfileState extends State<EditProfile> {
                 Text(
                   "${myProfile?['email'] ?? ''}",
                   style: TextStyle(
-                    color: ColorCode.kWhiteOpacity60,
+                    color: AppColors.white60,
                     fontFamily: "Outfit",
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -882,9 +882,9 @@ class _EditProfileState extends State<EditProfile> {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      ColorCode.kDividerStart,
-                      ColorCode.kDividerCenter,
-                      ColorCode.kDividerEnd,
+                      AppColors.dividerGradientEdge,
+                      AppColors.dividerGradientCenter,
+                      AppColors.dividerGradientEdge,
                     ],
                     stops: [0.0, 0.49, 1.0],
                   ),
@@ -899,10 +899,10 @@ class _EditProfileState extends State<EditProfile> {
 
                  /* TextField(
                       controller: nameController,
-                      cursorColor: ColorCode.white,
+                      cursorColor: AppColors.white,
 
                   style: const TextStyle(
-                    color: ColorCode.white, // typed text color
+                    color: AppColors.white, // typed text color
                   ),
 
                   decoration: InputDecoration(
@@ -910,7 +910,7 @@ class _EditProfileState extends State<EditProfile> {
                     floatingLabelBehavior: FloatingLabelBehavior.always,
 
                     labelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+                      color: AppColors.white70, // #1D1D1B 60% opacity
                     ),
 
                     contentPadding: const EdgeInsets.symmetric(
@@ -922,7 +922,7 @@ class _EditProfileState extends State<EditProfile> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
                       ),
                     ),
@@ -930,13 +930,13 @@ class _EditProfileState extends State<EditProfile> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+                        color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
                       ),
                     ),
 
                     floatingLabelStyle: const TextStyle(
-                      color: ColorCode.kWhiteOpacity70,
+                      color: AppColors.white70,
                     ),)
 
               ),
@@ -950,9 +950,9 @@ class _EditProfileState extends State<EditProfile> {
                /*   TextField(
                     controller: emailController,
 
-                    cursorColor: ColorCode.white,
+                    cursorColor: AppColors.white,
                     style: const TextStyle(
-                      color: ColorCode.white,
+                      color: AppColors.white,
                     ),
                     decoration: InputDecoration(
                       labelText: "Email ID*",
@@ -970,13 +970,13 @@ class _EditProfileState extends State<EditProfile> {
                         },
                         child: const Icon(
                           Icons.edit,
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           size: 20,
                         ),
                       ),*//*
 
                       labelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                       ),
 
                       contentPadding: const EdgeInsets.symmetric(
@@ -987,7 +987,7 @@ class _EditProfileState extends State<EditProfile> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           width: 0.5,
                         ),
                       ),
@@ -995,7 +995,7 @@ class _EditProfileState extends State<EditProfile> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           width: 0.5,
                         ),
                       ),
@@ -1025,23 +1025,23 @@ class _EditProfileState extends State<EditProfile> {
                   //       },
                   //       child: const Icon(
                   //         Icons.location_on_outlined,
-                  //         color: ColorCode.white,
+                  //         color: AppColors.white,
                   //       ),
                   //     ),
                   //     floatingLabelBehavior: FloatingLabelBehavior.always,
-                  //     labelStyle: const TextStyle(color: ColorCode.kWhiteOpacity70),
+                  //     labelStyle: const TextStyle(color: AppColors.white70),
                   //     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   //     enabledBorder: OutlineInputBorder(
                   //       borderRadius: BorderRadius.circular(12),
                   //       borderSide: const BorderSide(
-                  //         color: ColorCode.kWhiteOpacity70,
+                  //         color: AppColors.white70,
                   //         width: 0.5,
                   //       ),
                   //     ),
                   //     focusedBorder: OutlineInputBorder(
                   //       borderRadius: BorderRadius.circular(12),
                   //       borderSide: const BorderSide(
-                  //         color: ColorCode.kWhiteOpacity70,
+                  //         color: AppColors.white70,
                   //         width: 0.5,
                   //       ),
                   //     ),
@@ -1052,7 +1052,7 @@ class _EditProfileState extends State<EditProfile> {
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                         width: 0.8,
                       ),
                     ),
@@ -1064,7 +1064,7 @@ class _EditProfileState extends State<EditProfile> {
                       isLatLngRequired: true,
 
                       textStyle: const TextStyle(
-                        color: ColorCode.white,
+                        color: AppColors.white,
                         fontFamily: "Outfit",
                         fontSize: 14,
                       ),
@@ -1075,7 +1075,7 @@ class _EditProfileState extends State<EditProfile> {
                         focusedBorder: InputBorder.none,
                         hintText: "location*",
                         hintStyle: TextStyle(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                         ),
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
@@ -1085,7 +1085,7 @@ class _EditProfileState extends State<EditProfile> {
                           padding: EdgeInsets.only(right: 8),
                           child: Icon(
                             Icons.location_on_outlined,
-                            color: ColorCode.kWhiteOpacity70,
+                            color: AppColors.white70,
                           ),
                         ),
                       ),
@@ -1192,7 +1192,7 @@ class _EditProfileState extends State<EditProfile> {
                     readOnly: true,
                     obscureText: true,
                     obscuringCharacter: ".",
-                    cursorColor: ColorCode.white,
+                    cursorColor: AppColors.white,
 
                     decoration: InputDecoration(
                       labelText: "Change Password*",
@@ -1200,7 +1200,7 @@ class _EditProfileState extends State<EditProfile> {
 
                       hintText: "********",
                       hintStyle: const TextStyle(
-                      color: ColorCode.white,
+                      color: AppColors.white,
                       fontFamily: "Outfit",
                       fontSize: 14,
                         letterSpacing: 4,
@@ -1208,7 +1208,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
 
                       labelStyle: const TextStyle(
-                        color: ColorCode.kWhiteOpacity70,
+                        color: AppColors.white70,
                       ),
 
                       suffixIcon: GestureDetector(
@@ -1222,7 +1222,7 @@ class _EditProfileState extends State<EditProfile> {
                         },
                         child: const Icon(
                           Icons.edit,
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           size: 20,
                         ),
                       ),
@@ -1235,7 +1235,7 @@ class _EditProfileState extends State<EditProfile> {
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           width: 0.5,
                         ),
                       ),
@@ -1243,7 +1243,7 @@ class _EditProfileState extends State<EditProfile> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
-                          color: ColorCode.kWhiteOpacity70,
+                          color: AppColors.white70,
                           width: 0.5,
                         ),
                       ),
@@ -1294,7 +1294,7 @@ class _EditProfileState extends State<EditProfile> {
           child: ElevatedButton(
             onPressed: isLoading ? null : _edit_profile,
             style: ElevatedButton.styleFrom(
-              backgroundColor: ColorCode.kButtonColor,
+              backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -1305,7 +1305,7 @@ class _EditProfileState extends State<EditProfile> {
               style: TextStyle(
                 fontFamily: "Unbounded",
                 fontWeight: FontWeight.w500,
-                color: ColorCode.kHeadingColor,
+                color: AppColors.textHeading,
                 fontSize: 14,
               ),
             ),

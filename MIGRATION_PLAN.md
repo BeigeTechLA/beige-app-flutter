@@ -19,14 +19,14 @@ Every item below must be in place before any feature screen is migrated. Nothing
 
 | # | Item | Path | Exists? |
 |---|---|---|---|
-| 1 | AppColors | `lib/app/colors.dart` | ❌ No — `lib/app/` does not exist |
-| 2 | AppTextStyles | `lib/app/text_styles.dart` | ❌ No |
-| 3 | AppSpacing | `lib/app/spacing.dart` | ❌ No |
-| 4 | AppRadii | `lib/app/radii.dart` | ❌ No |
-| 5 | AppShadows | `lib/app/shadows.dart` | ❌ No |
-| 6 | AppDurations | `lib/app/durations.dart` | ❌ No |
-| 7 | AppTheme.light() + AppTheme.dark() | `lib/app/theme.dart` | ❌ No — minimal inline `ThemeData` in `main.dart` |
-| 8 | AppAssets | `lib/app/assets.dart` | ❌ No — `images.dart` covers 14 SVGs only |
+| 1 | AppColors | `lib/app/colors.dart` | ✅ Done — commit `48eb9ee` |
+| 2 | AppTextStyles | `lib/app/text_styles.dart` | ✅ Done — commit `48eb9ee` |
+| 3 | AppSpacing | `lib/app/spacing.dart` | ✅ Done — commit `48eb9ee` |
+| 4 | AppRadii | `lib/app/radii.dart` | ✅ Done — commit `48eb9ee` |
+| 5 | AppShadows | `lib/app/shadows.dart` | ✅ Done — commit `48eb9ee` |
+| 6 | AppDurations | `lib/app/durations.dart` | ✅ Done — commit `48eb9ee` |
+| 7 | AppTheme.light() + AppTheme.dark() | `lib/app/theme.dart` | ✅ Done — commit `48eb9ee` |
+| 8 | AppAssets | `lib/app/assets.dart` | ✅ Done — commit `48eb9ee` |
 
 ### Infrastructure
 
@@ -60,7 +60,7 @@ Every item below must be in place before any feature screen is migrated. Nothing
 | 24 | `lib/shared/` folder structure | `lib/shared/` | ❌ No |
 | 25 | `core_providers.dart` | `lib/core/providers/core_providers.dart` | ❌ No |
 
-**Checklist score: 0 / 25 items exist.**
+**Checklist score: 8 / 25 items exist.** (Design tokens complete, infrastructure pending)
 
 ---
 
@@ -203,9 +203,9 @@ Features are ordered by: isolation (no dependencies first), complexity (simplest
 |---|---|
 | Add all target packages to `pubspec.yaml` (`flutter_riverpod`, `go_router`, `freezed`, `json_annotation`, `build_runner`, `mocktail`, `firebase_core`, `firebase_crashlytics`, `firebase_analytics`) | 0.5 |
 | Create directory skeleton (`lib/app/`, `lib/core/`, `lib/features/`, `lib/shared/`) | 0.25 |
-| Create design tokens: `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadii`, `AppShadows`, `AppDurations` | 2 |
-| Create `AppTheme.light()` + `AppTheme.dark()` with full component themes | 1.5 |
-| Create `AppAssets` covering all asset paths | 0.5 |
+| Create design tokens: `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadii`, `AppShadows`, `AppDurations` | ✅ Done (0.5 day) |
+| Create `AppTheme.light()` + `AppTheme.dark()` with full component themes | ✅ Done (included above) |
+| Create `AppAssets` covering all asset paths | ✅ Done (included above) |
 | Build `DioClient` with `AuthInterceptor`, `ErrorInterceptor`, `RetryInterceptor`, `LoggingInterceptor` | 2 |
 | Create sealed `AppException` hierarchy + `ExceptionHandler.guardAsync()` | 1 |
 | Configure `GoRouter` with `StatefulShellRoute.indexedStack`, auth redirect, all route definitions | 2 |
