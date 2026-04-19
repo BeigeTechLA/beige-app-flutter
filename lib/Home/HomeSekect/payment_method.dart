@@ -1,8 +1,9 @@
-import 'package:biegeapp/app/colors.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../app/colors.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';

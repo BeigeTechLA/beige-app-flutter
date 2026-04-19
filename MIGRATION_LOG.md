@@ -5,6 +5,22 @@
 
 ---
 
+### 2026-04-19: Phase 3 Foundations — Network Layer (Dio + Interceptors + Sealed Exceptions)
+- **Changes**: 
+  - Created `AppException` sealed hierarchy.
+  - Implemented `ExceptionHandler.guardAsync()` returning `Either<AppException, T>`.
+  - Built `DioClient` with Auth → Retry → Error → Logging interceptor chain.
+  - Refactored `ApiEndpoints` from `lib/service/` to `lib/core/network/` with semantic organization.
+  - Added `sharedPreferencesProvider` and `dioClientProvider` in `lib/core/providers/core_providers.dart`.
+- **Decisions**: 
+  - Used `QueuedInterceptor` for `AuthInterceptor` to ensure ordered token handling.
+  - Implemented exponential backoff in `RetryInterceptor` (limited to 5xx errors).
+  - Used `dartz` for functional error handling in `guardAsync` as per `MIGRATION_RULES.md`.
+  - Migrated `ApiEndpoints` variable names to `camelCase` to match project standards.
+- **Constraints Maintained**: Zero visual impact (infrastructure only). Preserved environment configuration via `Env` class.
+
+---
+
 ### 2026-04-19: Phase 3.1 Design Token Migration — Batch 7 (Delete Account & Home Feed Initial)
 - **Changes**: Migrated `delete_account.dart`, `delete_account_otp_screen.dart`, `new_home_screen.dart`, and `home_controller.dart`.
 - **Decisions**: 

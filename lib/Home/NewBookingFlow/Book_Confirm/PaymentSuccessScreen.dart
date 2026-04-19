@@ -1,7 +1,8 @@
 import 'package:beige/MainScreen.dart';
-import 'package:biegeapp/app/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import '../../../app/colors.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   final int bookingId;

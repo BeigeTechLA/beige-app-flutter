@@ -1,6 +1,7 @@
-import 'package:biegeapp/app/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import '../app/colors.dart';
 
 class AppLoader extends StatelessWidget {
   const AppLoader({super.key});

@@ -495,9 +495,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDisabled?
-                0.0:
-                0.0,
+                color: isDisabled? AppColors.iconBackground: AppColors.iconBackground,
               ),
               // child: Center(
               //   child: SvgPicture.asset(
