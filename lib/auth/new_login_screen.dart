@@ -4,11 +4,14 @@
   import 'package:flutter_svg/svg.dart';
   import 'package:shared_preferences/shared_preferences.dart';
 
+  import '../app/colors.dart';
+  import '../app/radii.dart';
+  import '../app/spacing.dart';
+  import '../app/text_styles.dart';
   import '../Customtextfiled/CustomInputField.dart';
   import '../service/api_endpoints.dart';
   import '../service/api_service.dart';
   import '../service/shared_service.dart';
-  import '../utility/ColorCode.dart';
   import '../widgets/TopMessage.dart';
   import 'new_forgot_passwrod_screen.dart';
   import 'new_sing_up_screen.dart';
@@ -219,22 +222,22 @@
                           const Text(
                             "Welcome Back",
                             style: TextStyle(
-                              fontFamily: "Unbounded",
+                              fontFamily: AppTextStyles.fontFamilyDisplay,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: ColorCode.white,
+                              color: AppColors.white,
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
 
                           Text(
                             'Enter your details to access your account. Continue\nmanaging your bookings and profile.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.60),
+                              color: AppColors.white.withValues(alpha: 0.60),
                               fontSize: 14,
-                              fontFamily: 'Outfit',
+                              fontFamily: AppTextStyles.fontFamilyBody,
                               fontWeight: FontWeight.w400,
                               height: 1.29,
                             ),
@@ -256,13 +259,13 @@
 
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(20, 32,20, 20),
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: AppSpacing.authCardPadding,
+                      margin: AppSpacing.authCardMargin,
                       decoration: BoxDecoration(
-                        color: ColorCode.bcakgroundcolor,
+                        color: AppColors.background,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
+                          color: AppColors.white.withValues(alpha: 0.06),
                           width: 1,
                         ),
                       ),
@@ -284,7 +287,7 @@
 
 
 
-                            SizedBox(height: 20),
+                            SizedBox(height: AppSpacing.xl),
 
 
 
@@ -317,7 +320,7 @@
                                       : "assets/svg/eyes2.svg",
                                   height: 22,
                                   colorFilter: const ColorFilter.mode(
-                                    Colors.white,
+                                    AppColors.white,
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -377,19 +380,19 @@
                                   child: const Text(
                                     "Forgot Password?",
                                     style: TextStyle(
-                                        fontFamily: "Outfit",
-                                        color: ColorCode.kButtonColor,
+                                        fontFamily: AppTextStyles.fontFamilyBody,
+                                        color: AppColors.primary,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                         decoration: TextDecoration.underline,
                                         decorationThickness: 1.8,
-                                        decorationColor: ColorCode.kButtonColor
+                                        decorationColor: AppColors.primary
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: AppSpacing.smd),
                             SizedBox(
                               width: double.infinity,
                               height: 50,
@@ -405,22 +408,22 @@
 
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isFormValid
-                                      ? ColorCode.kButtonColor
-                                      : ColorCode.kGoldGradientLight,
+                                      ? AppColors.primary
+                                      : AppColors.goldGradientLight,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                   ),
                                 ),
 
                                 child: Text(
                                   "Login",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppTextStyles.fontFamilyDisplay,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: isFormValid
-                                        ? ColorCode.kHeadingColor
-                                        : ColorCode.k282828,
+                                        ? AppColors.textHeading
+                                        : AppColors.surfaceVariant,
                                   ),
                                 ),
                               ),
@@ -522,7 +525,7 @@
               const Text(
                 "Don’t have an account? ",
                 style: TextStyle(
-                  color: ColorCode.kWhiteOpacity60,
+                  color: AppColors.white60,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -539,7 +542,7 @@
                 child: const Text(
                   "Sign Up",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     decoration: TextDecoration.underline,

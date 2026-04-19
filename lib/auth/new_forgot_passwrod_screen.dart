@@ -2,10 +2,13 @@ import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../app/colors.dart';
+import '../app/radii.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
-import '../utility/ColorCode.dart';
 import '../widgets/TopMessage.dart';
 import 'new_forgot_otp_screen.dart';
 
@@ -188,23 +191,23 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                             Text(
                               "Forgot Password",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppTextStyles.fontFamilyDisplay,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: ColorCode.white,
+                                color: AppColors.white,
                               ),
                             ),
 
-                            SizedBox(height: 8),
+                            SizedBox(height: AppSpacing.sm),
 
                             Text(
-                              "Enter your registered email to receive a reset link.\n We’ll help you get back into your account quickly.",
+                              "Enter your registered email to receive a reset link.\n We'll help you get back into your account quickly.",
 
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontFamily: "Outfit",
+                                fontFamily: AppTextStyles.fontFamilyBody,
                                 fontSize: 14,
-                                color: ColorCode.kWhiteOpacity70,
+                                color: AppColors.white70,
                               ),
                             )
                           ],
@@ -224,14 +227,14 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 32,20, 20),
+                        padding: AppSpacing.authCardPadding,
                         // 👈 top extra
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        margin: AppSpacing.authCardMargin,
                         decoration: BoxDecoration(
-                          color: ColorCode.bcakgroundcolor,
+                          color: AppColors.background,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.06),
+                            color: AppColors.white.withValues(alpha: 0.06),
                             width: 1,
                           ),
                         ),
@@ -278,21 +281,21 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: isFormValid
-                                      ? ColorCode.kButtonColor
-                                      : ColorCode.kGoldGradientLight,
+                                      ? AppColors.primary
+                                      : AppColors.goldGradientLight,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                   ),
                                 ),
                                 child:  Text(
                                   "Send OTP",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppTextStyles.fontFamilyDisplay,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                     color: isFormValid
-                                        ? ColorCode.kHeadingColor
-                                        : ColorCode.k282828,
+                                        ? AppColors.textHeading
+                                        : AppColors.surfaceVariant,
                                   ),
                                 ),
                               ),
@@ -406,7 +409,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
               const Text(
                 "I Remember my Password. ",
                 style: TextStyle(
-                  color: ColorCode.kWhiteOpacity60,
+                  color: AppColors.white60,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -423,7 +426,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                 child: const Text(
                   "Login",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     decoration: TextDecoration.underline,
@@ -440,13 +443,13 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
   Widget _buildField(String title, TextEditingController controller) {
     return TextField(
       controller: controller,
-      cursorColor: ColorCode.white,
+      cursorColor: AppColors.white,
 
       onChanged: (value) {
         setState(() {}); // 🔥 UI refresh karega
       },
       style: const TextStyle(
-        color: ColorCode.white, // typed text color
+        color: AppColors.white, // typed text color
       ),
 
       decoration: InputDecoration(
@@ -454,33 +457,33 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
         labelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70, // #1D1D1B 60% opacity
+          color: AppColors.white70, // #1D1D1B 60% opacity
         ),
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.lg,
         ),
 
         /// ⭐ 0.5px BORDER + OPACITY COLOR
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            color: AppColors.white70, // #1D1D1B99 (60% opacity)
             width: 0.5, // 🔥 exact 0.5px
           ),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(
-            color: ColorCode.kWhiteOpacity70, // #1D1D1B99 (60% opacity)
+            color: AppColors.white70, // #1D1D1B99 (60% opacity)
             width: 0.5, // focus border thicker
           ),
         ),
 
         floatingLabelStyle: const TextStyle(
-          color: ColorCode.kWhiteOpacity70,
+          color: AppColors.white70,
         ),)
       ,);
   }

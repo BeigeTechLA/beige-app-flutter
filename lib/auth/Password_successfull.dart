@@ -2,8 +2,11 @@ import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../app/assets.dart';
+import '../app/colors.dart';
+import '../app/spacing.dart';
+import '../app/text_styles.dart';
 import '../MainScreen.dart';
-import '../utility/ColorCode.dart';
 
 class PasswordSuccessfull extends StatefulWidget {
   const PasswordSuccessfull({super.key});
@@ -33,7 +36,7 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C1C1C),
+      backgroundColor: AppColors.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -43,7 +46,7 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
             Transform.translate(
               offset: Offset(0, 20),
               child: Lottie.asset(
-                "assets/lottie/success_animation.json",
+                AppAssets.lottieSuccess,
                 height: 180,
                 repeat: false,
               ),
@@ -53,22 +56,22 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
             const Text(
               "You're All Set",
               style: TextStyle(
-                color: ColorCode.kButtonColor,
+                color: AppColors.primary,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                fontFamily: "Unbounded",
+                fontFamily: AppTextStyles.fontFamilyDisplay,
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
 
             const Text(
               "Congratulations! Your password has been\nchanged successfully",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: ColorCode.kWhiteOpacity70,
+                color: AppColors.white70,
                 fontSize: 14,
-                fontFamily: "Outfit",
+                fontFamily: AppTextStyles.fontFamilyBody,
               ),
             ),
           ],
