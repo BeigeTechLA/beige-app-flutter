@@ -5,6 +5,22 @@
 
 ---
 
+### 2026-04-19: Phase 2 — Critical Bug Fixes
+- **Changes**:
+  - Removed auth token `print()` from `api_service.dart:24` — was logging Bearer token on every API call in production.
+  - Added try/catch with `SocketException` and `TimeoutException` handling to `putData()` and `deleteData()` in `api_service.dart`.
+  - Fixed wrong S3 bucket URL in `shared_service.dart` — changed from `nextgengurukul` S3 to correct CloudFront URL (`d2jhn32fsulyac.cloudfront.net`).
+  - Replaced all remaining `print()` calls in `api_service.dart` and `shared_service.dart` with `debugPrint()` (stripped in release builds).
+  - Removed commented-out code blocks from `shared_service.dart` (per MIGRATION_RULES §10).
+  - Removed sensitive data logging (token, environment_id, folder) from `SharedService.setLoginDetails()`.
+- **Decisions**:
+  - Trailing space in `my_profile_photo` endpoint — already fixed in new `lib/core/network/api_endpoints.dart` (Phase 3 commit).
+  - `InstrumentSans` font — only referenced in commented-out code, no active runtime bug. Skipped.
+  - Internet connectivity bug (`internet_service.dart`) — confirmed still present (comparing `List<ConnectivityResult>` to `ConnectivityResult`). Left for dedicated fix as it requires API change understanding.
+- **Constraints Maintained**: Zero visual impact. All fixes are behavioral/security only.
+
+---
+
 ### 2026-04-19: Phase 3 Foundations — Network Layer (Dio + Interceptors + Sealed Exceptions)
 - **Changes**: 
   - Created `AppException` sealed hierarchy.

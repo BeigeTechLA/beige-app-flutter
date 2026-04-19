@@ -1,59 +1,9 @@
-    // import 'package:shared_preferences/shared_preferences.dart';
-    //
-    // class SharedService {
-    //   static String imageURL = "https://development-shambhavi.s3.amazonaws.com/nextgengurukul/";
-    //
-    //   static Future<bool> isLoggedIn() async {
-    //     final prefs = await SharedPreferences.getInstance();
-    //     String? token = prefs.getString('token');
-    //     return token != null && token.isNotEmpty;
-    //   }
-    //
-    //   static Future<void> setLoginDetails(Map<String, dynamic> loginData) async {
-    //     final prefs = await SharedPreferences.getInstance();
-    //     await prefs.setString('token', loginData['token']);
-    //
-    //     final userData = loginData['userData'] as Map<String, dynamic>;
-    //
-    //     await prefs.setString('name', userData['name'] ?? '');
-    //     await prefs.setString('email', userData['email'] ?? '');
-    //     await prefs.setInt('id', userData['id'] ?? -1);
-    //   }
-    //
-    //   static Future<Map<String, dynamic>> getUserData() async {
-    //     final prefs = await SharedPreferences.getInstance();
-    //     String name = prefs.getString('name') ?? '';
-    //     String email = prefs.getString('email') ?? '';
-    //     String token = prefs.getString('token') ?? '';
-    //     int id = prefs.getInt('id') ?? -1;
-    //
-    //     return {
-    //       'name': name,
-    //       'email': email,
-    //       'token': token,
-    //       'id': id,
-    //     };
-    //   }
-    //
-    //   static Future<void> clearUserData() async {
-    //     final prefs = await SharedPreferences.getInstance();
-    //     await prefs.remove('name');
-    //     await prefs.remove('email');
-    //     await prefs.remove('token');
-    //     await prefs.remove('id');
-    //   }
-    //
-    //   static String getImageURL(String image) {
-    //     return imageURL + image;
-    //   }
-    // }
-
-
+    import 'package:flutter/foundation.dart';
     import 'package:shared_preferences/shared_preferences.dart';
 
     class SharedService {
       static String imageURL =
-          "https://development-shambhavi.s3.amazonaws.com/nextgengurukul/";
+          "https://d2jhn32fsulyac.cloudfront.net/";
 
       /// Save user login details from API response
       static Future<void> setLoginDetails(Map<String, dynamic> response) async {
@@ -81,15 +31,7 @@
         await prefs.setString('department_id', departmentId);
         await prefs.setBool('isLoggedIn', true);
 
-        // Optional: print for debugging
-        print("🔐 token: $token");
-        print("🌍 environment_id: $environmentId");
-        print("📂 folder: $folder");
-        print("👤 name: $name");
-        print("🏢 department: $department");
-        print("🆔 department_id: $departmentId");
-        print("✅ isLoggedIn: true");
-        print("🎉 All login details saved to SharedPreferences");
+        debugPrint("✅ Login details saved to SharedPreferences");
       }
 
       /// Retrieve user data
@@ -121,23 +63,8 @@
       static Future<void> logout() async {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
-        print("🗑️ User data cleared from SharedPreferences");
+        debugPrint("🗑️ User data cleared from SharedPreferences");
       }
-
-      // static Future<void> logout() async {
-      //   final prefs = await SharedPreferences.getInstance();
-      //
-      //   await prefs.remove('token');
-      //   await prefs.remove('environment_id');
-      //   await prefs.remove('folder');
-      //   await prefs.remove('name');
-      //   await prefs.remove('designation');
-      //   await prefs.remove('department');
-      //   await prefs.remove('department_id');
-      //   await prefs.remove('isLoggedIn');
-      //
-      //   print("User session cleared but password kept");
-      // }
 
       /// Get stored token
       static Future<String?> getToken() async {
