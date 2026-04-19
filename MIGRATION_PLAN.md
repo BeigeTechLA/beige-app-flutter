@@ -1,0 +1,302 @@
+# Migration Readiness Report — Beige App
+
+> Generated: 2026-04-19
+> Based on: PROJECT_AUDIT.md, STATE_MANAGEMENT_AUDIT.md, NAVIGATION_AUDIT.md, STYLING_AUDIT.md, NETWORKING_AUDIT.md, FIREBASE_AUDIT.md, CODE_QUALITY_AND_TESTING_AUDIT.md
+
+---
+
+## 1. EXECUTIVE SUMMARY
+
+**Overall project health: 2 / 10.** The Beige app is a functional 27-screen Flutter application with working flavors, Stripe integration, and Google Maps, but it has zero architectural foundation for scale. Every screen is a monolithic `StatefulWidget` making direct `ApiService()` calls (83 instances), with 100% `setState`, zero tests (0% coverage), zero state management library, zero named routes, zero design tokens, zero Firebase integration, and 613 static analysis issues including a broken internet-connectivity check and auth token logging in production. The biggest risks are: (1) the 11 god widgets exceeding 1,000 lines that must be decomposed before migration, (2) the complete absence of a repository/domain layer requiring every screen to be rewired, and (3) zero test coverage meaning regressions will be invisible during migration. Estimated total effort to reach target architecture: **28–42 working days** for a single developer, or **14–21 days** with two developers working in parallel on independent feature tracks.
+
+---
+
+## 2. FOUNDATIONS CHECKLIST
+
+Every item below must be in place before any feature screen is migrated. Nothing exists today.
+
+### Design Tokens
+
+| # | Item | Path | Exists? |
+|---|---|---|---|
+| 1 | AppColors | `lib/app/colors.dart` | ❌ No — `lib/app/` does not exist |
+| 2 | AppTextStyles | `lib/app/text_styles.dart` | ❌ No |
+| 3 | AppSpacing | `lib/app/spacing.dart` | ❌ No |
+| 4 | AppRadii | `lib/app/radii.dart` | ❌ No |
+| 5 | AppShadows | `lib/app/shadows.dart` | ❌ No |
+| 6 | AppDurations | `lib/app/durations.dart` | ❌ No |
+| 7 | AppTheme.light() + AppTheme.dark() | `lib/app/theme.dart` | ❌ No — minimal inline `ThemeData` in `main.dart` |
+| 8 | AppAssets | `lib/app/assets.dart` | ❌ No — `images.dart` covers 14 SVGs only |
+
+### Infrastructure
+
+| # | Item | Path | Exists? |
+|---|---|---|---|
+| 9 | `ProviderScope` wrapping `MaterialApp` | `lib/main.dart` | ❌ No — `flutter_riverpod` not in pubspec |
+| 10 | GoRouter configuration | `lib/app/router.dart` | ❌ No — `go_router` not in pubspec |
+| 11 | Route name constants | `lib/app/route_names.dart` | ❌ No — zero named routes |
+| 12 | DioClient with interceptors | `lib/core/network/dio_client.dart` | ❌ No — `http` package is primary; Dio used raw in 1 method |
+| 13 | Sealed AppException hierarchy | `lib/core/network/exceptions/` | ❌ No — `Exception('string')` thrown everywhere |
+| 14 | ExceptionHandler.guardAsync() | `lib/core/network/exception_handler.dart` | ❌ No — raw try/catch in every widget |
+| 15 | FirebaseService.initialize() | `lib/core/firebase/firebase_service.dart` | ❌ No — zero Firebase packages |
+| 16 | AnalyticsService + AnalyticsEvents | `lib/core/firebase/analytics_service.dart` | ❌ No |
+| 17 | CrashlyticsService + CrashlyticsKeys | `lib/core/firebase/crashlytics_service.dart` | ❌ No |
+| 18 | AppAnalyticsObserver on router | `lib/core/firebase/app_analytics_observer.dart` | ❌ No |
+
+### Testing
+
+| # | Item | Path | Exists? |
+|---|---|---|---|
+| 19 | `pump_app.dart` with `pumpProviderApp` | `test/helpers/pump_app.dart` | ❌ No — `test/helpers/` does not exist |
+| 20 | `mocks.dart` | `test/helpers/mocks.dart` | ❌ No |
+| 21 | `test_data.dart` | `test/helpers/test_data.dart` | ❌ No |
+
+### Base Structure
+
+| # | Item | Path | Exists? |
+|---|---|---|---|
+| 22 | `lib/core/` folder structure | `lib/core/` | ❌ No |
+| 23 | `lib/features/` folder structure | `lib/features/` | ❌ No |
+| 24 | `lib/shared/` folder structure | `lib/shared/` | ❌ No |
+| 25 | `core_providers.dart` | `lib/core/providers/core_providers.dart` | ❌ No |
+
+**Checklist score: 0 / 25 items exist.**
+
+---
+
+## 3. FEATURE MIGRATION ORDER
+
+Features are ordered by: isolation (no dependencies first), complexity (simplest first), and dependency direction (if B needs A's providers, A migrates first).
+
+| Order | Feature | Screens | Files | Current State | API Calls | Complexity | Dependencies | Est. Days |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **Splash** | SplashScreen | 1 | setState + Timer | 0 | Trivial | None — standalone entry point | 0.5 |
+| 2 | **Onboarding** | OnboardingScreen | 1 | setState + PageController | 0 | Low | None | 0.5 |
+| 3 | **App Shell** | MainScreen | 1 | setState (tab index) | 0 | Low | GoRouter `ShellRoute` + `IndexedStack` | 1 |
+| 4 | **Password Success** | PasswordSuccessfull | 1 | setState + Future.delayed | 0 | Trivial | Auth route only | 0.25 |
+| 5 | **Shoot Updated** | ShootUpdatedScreen | 1 | setState | 0 | Trivial | Nav route only | 0.25 |
+| 6 | **Booking Type Selection** | MySelectBookingType | 1 | setState | 0 | Low | Date/time UI only, no API | 1 |
+| 7 | **Profile — View** | MyProfile, BookingHistoryScreen, FavouriteScreen | 3 | setState | ~8 | Medium | Auth provider (token), API repository | 2 |
+| 8 | **Profile — Edit** | EditProfile | 1 | setState | ~6 | High | Image upload, map, location, auth provider | 2 |
+| 9 | **Profile — Settings** | AppPreferences, ChangePasswordScreen, MyProfileEnterOtpScreen, MyProfileNewPasswordScreen | 4 | setState + Timer | ~6 | Medium | Auth provider, OTP timer | 2 |
+| 10 | **Profile — Delete Account** | DeleteAccount, DeleteAccountOtpScreen | 2 | setState + Timer | ~3 | Medium | Auth provider, OTP timer | 1 |
+| 11 | **Home Feed** | NewHomeScreen, HomeController | 2 | setState + AnimationController | ~6 | High | Auth provider, home repository, location provider | 3 |
+| 12 | **Creative Profiles** | HomeViewProfile, RecommendedDetilsScreen | 2 | setState | ~12 | Medium | Home provider, favourites provider | 2 |
+| 13 | **Location** | ChangeLocationScreen, FindingThePerfectScreen | 2 | setState | ~3 | Medium | Map, geolocation, profile provider | 1.5 |
+| 14 | **New Booking — Step 1** | ContentTypeScreen, VideoShootType | 2 | setState | ~6 | Medium | Booking repository | 2 |
+| 15 | **New Booking — Step 2** | ShootDateTimeScreen | 1 | setState | ~3 | High | 2,920 lines — must decompose first | 3 |
+| 16 | **New Booking — Step 3** | MoreDetailsScreen, CrewSizeMatchingScreen, SelectYourDreamTeam | 3 | setState | ~12 | High | Booking state from steps 1–2, file upload | 3 |
+| 17 | **New Booking — Review & Pay** | ReviewConfirmScreen, PaymentMethodScreen, PaymentSuccessScreen | 3 | setState | ~10 | High | Stripe, booking state from all prior steps | 3 |
+| 18 | **Booking Management** | BookingAllScreen, UpcomingBookingEventSummary, UpcomingEventSummaryManagebooking, BookinReviewConfirm, CancelBooking | 5 | setState | ~16 | High | Booking repository, auth provider | 3 |
+| 19 | **Auth — Login** | NewLoginScreen | 1 | setState | ~3 | High | Auth repository, token storage, navigation redirect | 2 |
+| 20 | **Auth — Signup** | NewSingUpScreen | 1 | setState | ~6 | Critical | 1,781 lines god widget — **must decompose into 3–4 screens first** (registration form, OTP verification, location/map, image upload) | 4 |
+| 21 | **Auth — Forgot Password** | NewForgotPasswrodScreen, NewForgotOtpScreen, NewNewPasswrodScreen | 3 | setState + Timer | ~6 | High | Auth repository, OTP timer, navigation chain | 2 |
+| 22 | **Internet Connectivity** | InternetHelper, InternetService | 2 | Static streams + global flags | 0 | Medium | Global connectivity provider | 1 |
+
+**Total feature migration: ~39 screens across 22 migration units.**
+
+---
+
+## 4. RISK REGISTER
+
+| # | Risk | Impact | Likelihood | Mitigation |
+|---|---|---|---|---|
+| 1 | **God widget decomposition breaks existing behavior** — splitting 3,838-line `new_home_screen.dart` or 1,781-line `new_sing_up_screen.dart` into sub-screens introduces navigation/state bugs | H | H | Decompose god widgets in a dedicated pre-migration phase; write integration tests for current behavior BEFORE splitting; test each split independently |
+| 2 | **Zero test coverage means silent regressions** — no way to detect if a migrated screen behaves differently from the original | H | H | Write "characterization tests" for each screen's API calls and navigation before migrating; add widget tests after migration |
+| 3 | **Broken internet service** — `internet_service.dart` compares `List<ConnectivityResult>` to `ConnectivityResult` (always false); offline detection is non-functional | H | H | Fix immediately as a pre-migration bug fix — 2 lines |
+| 4 | **Auth token logged to console in production** — `api_service.dart:30` prints Bearer token on every API call | H | H | Remove `print()` immediately — 1 line |
+| 5 | **SharedService.imageURL points to wrong S3 bucket** — hardcoded to `nextgengurukul` project; any screen using it shows broken images | M | M | Replace with correct CloudFront URL from `ApiService.imageURL`; consolidate to single source |
+| 6 | **`putData()` and `deleteData()` have no try/catch** — any network error during profile update or booking cancellation crashes the app | H | M | Wrap in `ExceptionHandler.guardAsync()` as part of network layer migration |
+| 7 | **57 `use_build_context_synchronously` violations** — using `BuildContext` after `await` causes framework assertion errors when widget is unmounted during async call | M | H | Fix as part of each screen's migration to Riverpod (async logic moves to Notifier, widget only reads state) |
+| 8 | **233 deprecated API calls** (`.withOpacity()`) — future Flutter SDK update will turn these into compile errors | M | M | Batch-replace `.withOpacity(x)` → `.withValues(alpha: x)` across all files in one sweep |
+| 9 | **`InstrumentSans` font referenced but not in pubspec** — text silently renders in system font | L | H | Add to `pubspec.yaml` fonts section, or replace with `Outfit` |
+| 10 | **Trailing space in `my_profile_photo` endpoint** — `"auth/profile-photo "` causes 404 on profile photo upload | M | H | Trim the string — 1 character fix |
+| 11 | **Both `http` and `Dio` in pubspec** — dual HTTP clients cause confusion; `http` is primary despite Dio being the target | L | L | Remove `http` package entirely after DioClient migration |
+| 12 | **Navigation stack corruption** — 4 screens navigate inside API callbacks without `mounted` check; fast double-taps or slow network can push duplicate screens | M | M | GoRouter migration eliminates this class of bugs (declarative routing) |
+| 13 | **No 401 handling** — expired tokens leave users on broken screens with no redirect to login | H | M | AuthInterceptor with redirect-on-401 built into DioClient |
+| 14 | **76 outdated packages** — `flutter pub outdated` reports 76 packages with newer versions outside constraints | M | L | Update incrementally after migration stabilizes; avoid mid-migration upgrades |
+
+---
+
+## 5. BLOCKERS
+
+### Hard Blockers (must resolve before migration starts)
+
+| # | Blocker | Why It Blocks | Resolution |
+|---|---|---|---|
+| 1 | **Firebase project does not exist** | Cannot create `FirebaseService.initialize()`, `CrashlyticsService`, or `AnalyticsService` without Firebase project credentials (`google-services.json`, `GoogleService-Info.plist`) | Create Firebase projects (dev + prod) in Firebase Console; run `flutterfire configure` to generate config files |
+| 2 | **No target packages in pubspec** | `flutter_riverpod`, `go_router`, `freezed`, `json_annotation`, `build_runner`, `mocktail` — none are declared | Add all target packages to `pubspec.yaml` in a single foundation PR |
+| 3 | **`lib/app/`, `lib/core/`, `lib/features/`, `lib/shared/` do not exist** | No target folder structure to migrate into | Create complete directory skeleton in foundation PR |
+
+### Architectural Decisions Needed Before Starting
+
+| # | Decision | Options | Recommendation |
+|---|---|---|---|
+| 1 | **Riverpod generation or manual?** | (a) `@riverpod` annotation + `riverpod_generator` + `build_runner` (b) Manual `Notifier`/`AsyncNotifier` | (b) Manual — avoids `build_runner` dependency, simpler for team unfamiliar with codegen |
+| 2 | **GoRouter: `StatefulShellRoute` or `ShellRoute`?** | (a) `StatefulShellRoute.indexedStack` for tab preservation (b) Plain `ShellRoute` | (a) `StatefulShellRoute.indexedStack` — matches target requirement for tab state preservation and fixes the current "every tab switch rebuilds" bug |
+| 3 | **Auth token storage** | (a) Keep `SharedPreferences` (current) (b) Migrate to `flutter_secure_storage` | (a) Keep `SharedPreferences` for now — lower risk; migrate to secure storage in a later sprint |
+| 4 | **Model generation** | (a) `freezed` + `json_serializable` (b) Manual `fromJson`/`toJson` | (a) `freezed` — eliminates boilerplate, gives `copyWith`, `==` , `toString` for free; worth the `build_runner` cost for models even if Riverpod stays manual |
+| 5 | **Migration strategy: big-bang or strangler fig?** | (a) Rewrite all screens at once (b) Migrate one feature at a time, old and new coexist | (b) Strangler fig — migrate one feature at a time; old screens continue to work via imperative nav until their turn |
+| 6 | **God widget strategy** | (a) Decompose before migration (b) Decompose during migration | (a) Before — decompose the 5 worst god widgets (>1,500 lines) in a pre-migration phase while tests are added |
+
+### Package Conflicts Requiring Replacement
+
+| Current Package | Version | Conflict | Replace With |
+|---|---|---|---|
+| `http` | `^1.4.0` | Redundant alongside Dio; must be removed after DioClient is built | Remove after all `ApiService` methods migrated to Dio |
+| *(none others)* | — | No packages actively conflict with target stack | — |
+
+---
+
+## 6. RECOMMENDED FIRST FEATURE (PILOT MIGRATION)
+
+### Feature: **Splash + Onboarding** (Migration units 1–2)
+
+**Why this feature:**
+- **Zero API calls** — isolates the migration to infrastructure wiring only (Riverpod, GoRouter, design tokens)
+- **2 screens, ~276 lines total** — smallest blast radius for mistakes
+- **No dependencies** on auth, booking, or profile state
+- **Exercises every foundation layer:** `ProviderScope`, `GoRouter` initial route, `AppTheme`, `AppColors`, `AppTextStyles`, `AppSpacing` — proving the foundation works before any complex screen touches it
+- **Self-contained navigation:** Splash → Onboarding → Login is a linear flow with no tab shell, no deep linking, no return-value pops
+- **Reversible** — if the migration approach doesn't work, these screens can be reverted without affecting the rest of the app
+
+**Expected learnings:**
+1. Does the `ProviderScope` → `GoRouter` → `MaterialApp.router` wiring work correctly with existing flavors?
+2. Do `AppColors` and `AppTextStyles` produce the correct visual output matching the current dark theme?
+3. Is the `GoRouter` redirect from splash → onboarding → login working correctly with the auth state check?
+4. How long does a "simple" 2-screen migration actually take? (calibrates all subsequent estimates)
+5. Does the test helper (`pumpProviderApp`) work for widget tests on these screens?
+
+**Estimated time: 1–1.5 days** (including writing widget tests for both screens).
+
+---
+
+## 7. TIMELINE ESTIMATE
+
+### Phase 1 — Audit (COMPLETE)
+
+| Task | Status | Days |
+|---|---|---|
+| Project audit | ✅ Done | — |
+| State management audit | ✅ Done | — |
+| Navigation audit | ✅ Done | — |
+| Styling audit | ✅ Done | — |
+| Networking audit | ✅ Done | — |
+| Firebase audit | ✅ Done | — |
+| Code quality & testing audit | ✅ Done | — |
+| Migration readiness report | ✅ This document | — |
+
+### Phase 2 — Critical Bug Fixes (before anything else)
+
+| Task | Est. Days |
+|---|---|
+| Fix broken internet connectivity check (`internet_service.dart`) | 0.25 |
+| Remove auth token `print()` from `api_service.dart` | 0.1 |
+| Fix `SharedService.imageURL` wrong S3 bucket | 0.1 |
+| Fix trailing space in `my_profile_photo` endpoint | 0.1 |
+| Add `InstrumentSans` to pubspec or remove from code | 0.1 |
+| **Subtotal** | **~0.5 days** |
+
+### Phase 3 — Foundations
+
+| Task | Est. Days |
+|---|---|
+| Add all target packages to `pubspec.yaml` (`flutter_riverpod`, `go_router`, `freezed`, `json_annotation`, `build_runner`, `mocktail`, `firebase_core`, `firebase_crashlytics`, `firebase_analytics`) | 0.5 |
+| Create directory skeleton (`lib/app/`, `lib/core/`, `lib/features/`, `lib/shared/`) | 0.25 |
+| Create design tokens: `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadii`, `AppShadows`, `AppDurations` | 2 |
+| Create `AppTheme.light()` + `AppTheme.dark()` with full component themes | 1.5 |
+| Create `AppAssets` covering all asset paths | 0.5 |
+| Build `DioClient` with `AuthInterceptor`, `ErrorInterceptor`, `RetryInterceptor`, `LoggingInterceptor` | 2 |
+| Create sealed `AppException` hierarchy + `ExceptionHandler.guardAsync()` | 1 |
+| Configure `GoRouter` with `StatefulShellRoute.indexedStack`, auth redirect, all route definitions | 2 |
+| Create `ProviderScope` → `MaterialApp.router` wiring in `main.dart` | 0.5 |
+| Create `core_providers.dart` (Dio, SharedPreferences, connectivity) | 0.5 |
+| Create Firebase projects (dev + prod), download config files, wire Gradle + Xcode | 1 |
+| Build `FirebaseService`, `CrashlyticsService`, `AnalyticsService`, `AnalyticsEvents`, `CrashlyticsKeys` | 1.5 |
+| Update `startApp()` with `runZonedGuarded` + `FlutterError.onError` + `PlatformDispatcher.instance.onError` | 0.5 |
+| Create `test/helpers/` (`pump_app.dart`, `mocks.dart`, `test_data.dart`) | 0.5 |
+| **Subtotal** | **~14 days** |
+
+### Phase 4 — Feature Migration
+
+| Migration Unit | Screens | Est. Days |
+|---|---|---|
+| 1. Splash | 1 | 0.5 |
+| 2. Onboarding | 1 | 0.5 |
+| 3. App Shell (MainScreen → ShellRoute) | 1 | 1 |
+| 4–6. Simple standalone screens | 3 | 1 |
+| 7. Profile — View | 3 | 2 |
+| 8. Profile — Edit | 1 | 2 |
+| 9. Profile — Settings | 4 | 2 |
+| 10. Profile — Delete Account | 2 | 1 |
+| 11. Home Feed | 2 | 3 |
+| 12. Creative Profiles | 2 | 2 |
+| 13. Location | 2 | 1.5 |
+| 14. New Booking — Step 1 | 2 | 2 |
+| 15. New Booking — Step 2 (decompose first) | 1 | 3 |
+| 16. New Booking — Step 3 | 3 | 3 |
+| 17. New Booking — Review & Pay | 3 | 3 |
+| 18. Booking Management | 5 | 3 |
+| 19. Auth — Login | 1 | 2 |
+| 20. Auth — Signup (decompose first) | 1→3 | 4 |
+| 21. Auth — Forgot Password | 3 | 2 |
+| 22. Internet Connectivity | 2 | 1 |
+| **Subtotal** | **~39 screens** | **~39 days** |
+
+### Phase 5 — Cleanup
+
+| Task | Est. Days |
+|---|---|
+| Remove old `ApiService` + `http` package | 0.5 |
+| Remove `ColorCode.dart`, `images.dart` (replaced by `AppColors`, `AppAssets`) | 0.5 |
+| Delete all old screen files (now in `lib/features/`) | 0.5 |
+| Remove old directory structure (`Booking/`, `Home/`, `MyProfile/`, etc.) | 0.25 |
+| Replace all remaining `print()` with Crashlytics or remove | 1 |
+| Replace 233 `.withOpacity()` calls with `.withValues()` | 0.5 |
+| Fix all remaining lint warnings | 1 |
+| Rename files/directories to `snake_case` (any remaining) | 0.5 |
+| Fix class name typos (`NewSingUpScreen`, `NewForgotPasswrodScreen`, etc.) | 0.25 |
+| **Subtotal** | **~5 days** |
+
+### Phase 6 — Testing
+
+| Task | Est. Days |
+|---|---|
+| Unit tests for all repositories (~8 repos) | 3 |
+| Unit tests for all Notifiers/AsyncNotifiers (~20 notifiers) | 4 |
+| Widget tests for critical screens (auth, booking, payment) | 3 |
+| Integration test for booking flow (end-to-end) | 2 |
+| Integration test for auth flow (end-to-end) | 1 |
+| **Subtotal** | **~13 days** |
+
+---
+
+### TOTAL
+
+| Phase | Days |
+|---|---|
+| Phase 1 — Audit | ✅ Complete |
+| Phase 2 — Critical bug fixes | 0.5 |
+| Phase 3 — Foundations | 14 |
+| Phase 4 — Feature migration | 39 |
+| Phase 5 — Cleanup | 5 |
+| Phase 6 — Testing | 13 |
+| **TOTAL** | **~71.5 working days** |
+
+### Realistic calendar estimate
+
+- **Solo developer:** ~14–16 weeks (3.5–4 months)
+- **Two developers (parallel tracks):** ~8–10 weeks (2–2.5 months) — one on foundations + infrastructure features, one on business features starting after foundations are done
+- **Three developers:** ~6–7 weeks — but coordination overhead increases; not recommended unless all three are familiar with Riverpod + GoRouter
+
+### Recommended phased delivery
+
+| Milestone | Includes | Target |
+|---|---|---|
+| **M1 — Foundations** | Bug fixes + all infrastructure (Phase 2–3) | Week 3 |
+| **M2 — Pilot** | Splash + Onboarding + Shell migrated | Week 4 |
+| **M3 — Profile** | All profile screens migrated (units 7–10) | Week 7 |
+| **M4 — Home + Booking** | Home feed, creative profiles, full booking flow (units 11–18) | Week 12 |
+| **M5 — Auth** | Login, signup (decomposed), forgot password (units 19–21) | Week 14 |
+| **M6 — Cleanup + Testing** | Phase 5 + Phase 6 | Week 16 |
+| **M7 — Release candidate** | Full regression pass, Firebase dashboards verified | Week 17 |
