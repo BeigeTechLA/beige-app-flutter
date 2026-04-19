@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+
+/// Centralized border radius tokens for the Beige app.
+///
+/// Values extracted from actual BorderRadius.circular() usage across codebase.
+/// Most common values: 12, 14, 20 (cards/containers), 8 (buttons), 4 (badges).
+///
+/// Never use magic number border radius in widgets — always use AppRadii.
+class AppRadii {
+  AppRadii._(); // Prevent instantiation
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // RAW VALUES
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// 0 — No rounding
+  static const double none = 0;
+
+  /// 4 — Subtle rounding (badges, progress bars)
+  static const double xs = 4;
+
+  /// 6 — Small elements (checkboxes, tags)
+  static const double sm = 6;
+
+  /// 8 — Buttons, small cards
+  static const double md = 8;
+
+  /// 10 — Medium containers
+  static const double mld = 10;
+
+  /// 12 — Cards, inputs, standard containers (most common)
+  static const double lg = 12;
+
+  /// 14 — Larger cards, buttons, dialogs
+  static const double xl = 14;
+
+  /// 16 — Large modals
+  static const double xxl = 16;
+
+  /// 18 — Image containers, profile sections
+  static const double xxxl = 18;
+
+  /// 20 — Floating cards, bottom sheets
+  static const double huge = 20;
+
+  /// 24 — Extra large floating elements
+  static const double massive = 24;
+
+  /// 30 — Rounded containers
+  static const double round = 30;
+
+  /// 38 — Large rounded (avatar-adjacent)
+  static const double roundLg = 38;
+
+  /// 999 — Pill / capsule shape
+  static const double full = 999;
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // CONVENIENCE BORDER RADIUS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static final BorderRadius xsAll = BorderRadius.circular(xs);
+  static final BorderRadius smAll = BorderRadius.circular(sm);
+  static final BorderRadius mdAll = BorderRadius.circular(md);
+  static final BorderRadius lgAll = BorderRadius.circular(lg);
+  static final BorderRadius xlAll = BorderRadius.circular(xl);
+  static final BorderRadius hugeAll = BorderRadius.circular(huge);
+  static final BorderRadius roundAll = BorderRadius.circular(round);
+  static final BorderRadius fullAll = BorderRadius.circular(full);
+
+  /// Top-only rounding for bottom sheets — 20px
+  static const BorderRadius topHuge = BorderRadius.only(
+    topLeft: Radius.circular(20),
+    topRight: Radius.circular(20),
+  );
+
+  /// Top-only rounding — 14px
+  static const BorderRadius topXl = BorderRadius.only(
+    topLeft: Radius.circular(14),
+    topRight: Radius.circular(14),
+  );
+}
