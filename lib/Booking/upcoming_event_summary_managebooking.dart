@@ -2,13 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../app/route_names.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
 import '../utility/date_time_utils.dart';
-import 'MY_SelectBookingType.dart';
-import 'cancel_booking.dart';
 
 class UpcomingEventSummaryManagebooking extends StatefulWidget {
   final int bookingId;
@@ -161,7 +161,7 @@ class _UpcomingEventSummaryManagebookingState
                       IconButton(
                         icon:  Icon(Icons.close, color: Colors.white),
                         onPressed: () {
-                          Navigator.pop(context);
+                          context.pop();
                         },
                       )
 
@@ -422,16 +422,9 @@ class _UpcomingEventSummaryManagebookingState
                                     ),
                                   ),
                                   onPressed: () {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => MySelectbookingtype(
-                                          bookingId: widget.bookingId,
-                                         /*  contentType: widget.contentType ?? '',
-                                          shootTypeId: widget.shootTypeId,*/
-                                        ),
-                                      ),
-                                    );
+                                    context.goNamed(RouteNames.selectBookingType, extra: {
+                                      'bookingId': widget.bookingId,
+                                    });
                                   },
                                   child: const Text(
                                     "Reschedule",//

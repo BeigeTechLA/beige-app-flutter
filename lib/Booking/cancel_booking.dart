@@ -1,10 +1,11 @@
 import 'dart:ui';
 
-import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../app/route_names.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
@@ -185,7 +186,7 @@ class _CancelBookingState extends State<CancelBooking> {
                       IconButton(
                         icon: const Icon(Icons.close, color: Colors.white),
                         onPressed: () {
-                          Navigator.pop(context);
+                          context.pop();
                         },
                       ),
 
@@ -536,10 +537,7 @@ class _CancelBookingState extends State<CancelBooking> {
 
                               ),
                               onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (_) =>Mainscreen()),
-                                );
+                                context.goNamed(RouteNames.home);
                               },
                               child: const Text(
                                 "Explore",

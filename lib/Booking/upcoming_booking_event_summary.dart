@@ -1,9 +1,10 @@
-import 'package:beige/Booking/upcoming_event_summary_managebooking.dart';
 import 'package:beige/utility/date_time_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../app/route_names.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
@@ -205,7 +206,7 @@ class _UpcomingBookingEventSummaryState
                       top: 45,
                       left: 16,
                       child: InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => context.pop(),
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
                           height: 24,
@@ -437,34 +438,25 @@ class _UpcomingBookingEventSummaryState
             onPressed: () {
 
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UpcomingEventSummaryManagebooking(
-                    projectName: bookingData?['event']?['name'] ?? '',
-                    /// 🔥 FIXED DATA PASS
-                    eventDate: isMulti
-                        ? days.map((d) => d['date']).join(", ")
-                        : event?['event_date'] ?? '',
-
-                    startTime: isMulti
-                        ? (days.isNotEmpty ? days.first['start_time'] : '')
-                        : event?['start_time'] ?? '',
-
-                    endTime: isMulti
-                        ? (days.isNotEmpty ? days.first['end_time'] : '')
-                        : event?['end_time'] ?? '',
-
-                    durationHours: (event?['duration_hours'] ?? 0).toDouble(),
-                    multiDays: days,
-
-                    location: bookingData?['event']?['location'] ?? '',
-                    imageUrl: getFinalImage(),
-                    bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
-                    contentType: widget.contentType,
-                  ),
-                ),
-              );
+              context.pushNamed(RouteNames.manageBooking, extra: {
+                'projectName': bookingData?['event']?['name'] ?? '',
+                'eventDate': isMulti
+                    ? days.map((d) => d['date']).join(", ")
+                    : event?['event_date'] ?? '',
+                'startTime': isMulti
+                    ? (days.isNotEmpty ? days.first['start_time'] : '')
+                    : event?['start_time'] ?? '',
+                'endTime': isMulti
+                    ? (days.isNotEmpty ? days.first['end_time'] : '')
+                    : event?['end_time'] ?? '',
+                'durationHours': (event?['duration_hours'] ?? 0).toDouble(),
+                'multiDays': days,
+                'location': bookingData?['event']?['location'] ?? '',
+                'imageUrl': getFinalImage(),
+                'bookingId': widget.bookingId,
+                'shootTypeId': widget.shootTypeId,
+                'contentType': widget.contentType,
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor:  AppColors.primary,
@@ -639,7 +631,7 @@ class _UpcomingBookingEventSummaryState
                           ),
                         ),
                         InkWell(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => context.pop(),
                           child:
                           const Icon(Icons.close, color: Colors.white),
                         ),

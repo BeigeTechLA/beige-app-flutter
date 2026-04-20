@@ -3,16 +3,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
-
-import '../Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
+import '../app/route_names.dart';
 import '../service/api_service.dart';
-
 import '../service/api_endpoints.dart';
 import '../app/colors.dart';
 import '../widgets/loding.dart';
-import 'upcoming_event_summary_managebooking.dart';
-import 'upcoming_booking_event_summary.dart';
 
 class BookingAllScreen extends StatefulWidget {
   const BookingAllScreen({super.key});
@@ -409,17 +406,11 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => UpcomingBookingEventSummary(
-              bookingId: bookingId,
-              contentType: contentType,
-              shootTypeId: shootTypeId,
-
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.bookingEventSummary, extra: {
+          'bookingId': bookingId,
+          'contentType': contentType,
+          'shootTypeId': shootTypeId,
+        });
       },
       child: bookingCard(
         imagePath: finalImage,
@@ -431,24 +422,19 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         buttonText: "Manage Shoot",
         onButtonTap: () {
           print("Manage Shoot button clicked"); // ✅ print
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => UpcomingEventSummaryManagebooking(
-                bookingId: bookingId,
-                projectName: projectName,
-                contentType: contentType,
-                eventDate: eventDate,
-                startTime: startTime,
-                endTime: endTime,
-                multiDays: shoot['multi_day']?['days'] ?? [],
-                durationHours: (shoot['duration_hours'] ?? 0).toDouble(), // ✅ FIX
-                location: shoot['location'] ?? '',
-                imageUrl: finalImage,
-                shootTypeId: shootTypeId,
-              ),
-            ),
-          );
+          context.pushNamed(RouteNames.manageBooking, extra: {
+            'bookingId': bookingId,
+            'projectName': projectName,
+            'contentType': contentType,
+            'eventDate': eventDate,
+            'startTime': startTime,
+            'endTime': endTime,
+            'multiDays': shoot['multi_day']?['days'] ?? [],
+            'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
+            'location': shoot['location'] ?? '',
+            'imageUrl': finalImage,
+            'shootTypeId': shootTypeId,
+          });
         },
       ),
     );
@@ -489,14 +475,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
       buttonText: "Book Again",
       showEditIcon: false,
       onButtonTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ContentTypeScreen(
-              fromHome: true,
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
       },
     );
   }
@@ -708,7 +687,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                           ),
                         ),
                         InkWell(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => context.pop(),
                           child: const Icon(Icons.close, color: Colors.white),
                         ),
                       ],
@@ -801,7 +780,7 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
                             ),
                             child: TextButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                context.pop();
                               },
                               child: const Text(
                                   "Apply",

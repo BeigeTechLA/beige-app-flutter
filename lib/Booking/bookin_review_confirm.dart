@@ -1,17 +1,16 @@
 import 'dart:ui';
 
-import 'package:beige/Home/HomeSekect/payment_method.dart';
-import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../app/route_names.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
 import '../app/assets.dart';
 import '../widgets/loding.dart';
-import 'Shoot_updated_screen.dart';
 
 class BookinReviewConfirm extends StatefulWidget {
   final int bookingId;
@@ -267,7 +266,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
         elevation: 0,
         leadingWidth: 40, // 🔥 important
         leading: InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: () => context.pop(),
           child: Padding(
             padding: const EdgeInsets.all(7),
             child: SvgPicture.asset(
@@ -744,14 +743,7 @@ class _BookinReviewConfirmState extends State<BookinReviewConfirm> {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ShootUpdatedScreen(
-
-                        ),
-                      ),
-                    );
+                    context.pushNamed(RouteNames.shootUpdated);
                   },
 
 
