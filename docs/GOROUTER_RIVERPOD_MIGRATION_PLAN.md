@@ -37,9 +37,9 @@
 | Batch | Description | Files Changed | New Files | Commit Type | Status | Commit |
 |-------|-------------|--------------|-----------|-------------|--------|--------|
 | **1** | Route names + GoRouter config | 0 modified | 2 created | `refactor(navigation)` | ✅ Done | `1e2a8b8` |
-| **2** | App widget + ProviderScope + wire router | 2 modified | 1 created | `refactor(navigation)` | ⬜ Pending | — |
-| **3** | StatefulShellRoute for bottom nav | 1 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
-| **4** | Auth redirect guard in GoRouter | 1 modified | 1 created | `refactor(auth)` | ⬜ Pending | — |
+| **2** | App widget + ProviderScope + wire router | 2 modified | 1 created | `refactor(navigation)` | ✅ Done | (pre-existing) |
+| **3** | StatefulShellRoute for bottom nav | 1 modified | 0 | `refactor(navigation)` | ✅ Done | (pre-existing) |
+| **4** | Auth redirect guard in GoRouter | 2 modified | 1 created | `refactor(auth)` | ✅ Done | — |
 | **5** | Migrate auth screen Navigator calls (6 files) | 6 modified | 0 | `refactor(auth)` | ⬜ Pending | — |
 | **6** | Migrate splash + onboarding Navigator calls | 2 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
 | **7** | Migrate home screen Navigator calls (part 1) | 3 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |

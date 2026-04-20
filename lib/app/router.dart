@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../Booking/MY_SelectBookingType.dart';
@@ -40,16 +41,56 @@ import '../auth/new_forgot_passwrod_screen.dart';
 import '../auth/new_login_screen.dart';
 import '../auth/new_new_passwrod_screen.dart';
 import '../auth/new_sing_up_screen.dart';
+import '../core/providers/auth_state_provider.dart';
 import 'route_names.dart';
 
 /// Global navigator key — kept temporarily for ScaffoldMessenger compatibility.
 /// Will be removed in Batch 14 cleanup.
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
-final GoRouter router = GoRouter(
-  navigatorKey: rootNavigatorKey,
-  initialLocation: '/splash',
-  routes: [
+/// Routes that do not require authentication.
+const _publicRoutes = {
+  '/splash',
+  '/onboarding',
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/forgot-otp',
+  '/reset-password',
+  '/password-success',
+};
+
+/// GoRouter provider — uses [authStateProvider] for redirect logic.
+/// Rebuild is triggered when auth state changes (login/logout).
+final routerProvider = Provider<GoRouter>((ref) {
+  final isLoggedIn = ref.watch(authStateProvider);
+
+  return GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: '/splash',
+    redirect: (context, state) {
+      final location = state.matchedLocation;
+
+      // Splash and onboarding always accessible
+      if (location == '/splash' || location == '/onboarding') {
+        return null;
+      }
+
+      final isPublicRoute = _publicRoutes.contains(location);
+
+      // Not logged in and trying to access protected route → login
+      if (!isLoggedIn && !isPublicRoute) {
+        return '/login';
+      }
+
+      // Logged in and trying to access auth route → home
+      if (isLoggedIn && isPublicRoute && location != '/splash' && location != '/onboarding') {
+        return '/';
+      }
+
+      return null;
+    },
+    routes: [
     // ── Auth & Onboarding (outside shell) ──────────────────────────
     GoRoute(
       path: '/splash',
@@ -434,7 +475,8 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const DeleteAccountOtpScreen(),
     ),
   ],
-);
+  );
+});
 
 /// Shell widget for bottom navigation with IndexedStack.
 /// Replaces the destructive switch(_selectedIndex) in old MainScreen.
