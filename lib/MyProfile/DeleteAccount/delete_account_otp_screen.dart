@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/route_names.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../app/colors.dart';
@@ -88,11 +89,7 @@ void resetTimer() {
         debugPrint("✅ ACCOUNT DELETED SUCCESSFULLY");
 
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) =>  NewLoginScreen()),
-              (route) => false,
-        );
+        context.goNamed(RouteNames.login);
       } else {
         TopMessage.show(context, response['message'] ?? "Invalid OTP");
       }
@@ -151,7 +148,7 @@ void resetTimer() {
 
             /// 🔙 BACK BUTTON
             InkWell(
-              onTap: () => Navigator.pop(context),
+              onTap: () => context.pop(),
               child:  SvgPicture.asset(
                 "assets/svg/back.svg",
                 height: 24,

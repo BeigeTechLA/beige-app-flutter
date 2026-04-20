@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/route_names.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../app/colors.dart';
 import '../../app/text_styles.dart';
 import '../../app/radii.dart';
-import 'delete_account_otp_screen.dart';
 class DeleteAccount extends StatefulWidget {
   const DeleteAccount({super.key});
 
@@ -55,12 +56,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
        debugPrint("✅ DELETE REQUEST SUCCESS");
 
        /// 👉 OTP SCREEN
-       Navigator.push(
-         context,
-         MaterialPageRoute(
-           builder: (_) => const DeleteAccountOtpScreen(),
-         ),
-       );
+       context.pushNamed(RouteNames.deleteAccountOtp);
      } else {
        ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(
@@ -96,7 +92,7 @@ class _DeleteAccountState extends State<DeleteAccount> {
 
              /// 🔙 BACK BUTTON
              InkWell(
-               onTap: () => Navigator.pop(context),
+               onTap: () => context.pop(),
                child:  SvgPicture.asset(
                  "assets/svg/back.svg",
                  height: 24,

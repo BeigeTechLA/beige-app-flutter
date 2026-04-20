@@ -49,6 +49,7 @@
 | **11** | Migrate booking management screens | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 | **12** | Migrate remaining booking + profile (part 1) | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 | **13** | Migrate remaining profile screens | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
+| **14** | Delete account + remove global navigatorKey | 4 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 
 ---
 

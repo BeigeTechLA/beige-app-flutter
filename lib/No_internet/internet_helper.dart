@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../app/router.dart';
 
 class InternetHelper {
   static StreamSubscription? _subscription;
@@ -15,7 +15,7 @@ class InternetHelper {
   static Future<void> _checkInternet() async {
     bool hasInternet = await _hasRealInternet();
 
-    final context = navigatorKey.currentState?.overlay?.context;
+    final context = rootNavigatorKey.currentState?.overlay?.context;
 
     if (!hasInternet) {
       if (!_isDialogShowing && context != null) {
