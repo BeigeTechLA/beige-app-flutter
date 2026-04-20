@@ -1,8 +1,9 @@
-import 'package:beige/MainScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../app/colors.dart';
+import '../../../app/route_names.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   final int bookingId;
@@ -23,11 +24,7 @@ class PaymentSuccessScreen extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         /// 🔥 BACK PRESS → GO TO HOME
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const Mainscreen()),
-              (route) => false,
-        );
+        context.goNamed(RouteNames.home);
         return false; // ❌ prevent default back
       },
       child:Scaffold(
@@ -78,11 +75,7 @@ class PaymentSuccessScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: GestureDetector(
             onTap: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const Mainscreen()),
-                    (route) => false,
-              );
+              context.goNamed(RouteNames.home);
             },
             child: Container(
               height: 55,

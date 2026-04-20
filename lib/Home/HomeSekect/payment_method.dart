@@ -2,11 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/colors.dart';
+import '../../app/route_names.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
-import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
   final int bookingId;
@@ -262,7 +263,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  context.pop();
                 },
 
                 child: SvgPicture.asset("assets/svg/back.svg", height: 24),
@@ -310,12 +311,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ...savedCards.map((card) {
                   return InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ReviewConfirmScreen(bookingId: widget.bookingId,),
-                        ),
-                      );
+                      context.pushNamed(RouteNames.reviewConfirm, extra: {
+                        'bookingId': widget.bookingId,
+                      });
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),

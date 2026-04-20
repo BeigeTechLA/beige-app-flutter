@@ -2,14 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../app/route_names.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../app/colors.dart';
 import '../../../widgets/loding.dart' show AppLoader;
-import '../../HomeSekect/recommended_detils_screen.dart';
-import '../Book_Confirm/review_confirm_screen.dart';
 
 class SelectYourDreamTeam extends StatefulWidget {
   final int specialtyId;
@@ -463,7 +463,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    context.pop();
                   },
                   child:SvgPicture.asset(
                     "assets/svg/back.svg",
@@ -874,15 +874,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                       /// DETAILS BUTTON
                                       InkWell(
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => RecommendedDetilsScreen(
-                                                id: item['id'],
-                                                bookingId: widget.bookingId,
-                                              ),
-                                            ),
-                                          );
+                                          context.pushNamed(RouteNames.recommendedDetails, extra: {
+                                            'id': item['id'],
+                                            'bookingId': widget.bookingId,
+                                          });
                                         },
                                         child: Image.asset(
                                           "assets/images/Group 2087328980.png",
@@ -1261,15 +1256,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                             /// 🔹 DETAILS BUTTON
                                             InkWell(
                                               onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => RecommendedDetilsScreen(
-                                                      id: item['crew_member_id'],
-                                                      bookingId: widget.bookingId,
-                                                    ),
-                                                  ),
-                                                );
+                                                context.pushNamed(RouteNames.recommendedDetails, extra: {
+                                                  'id': item['crew_member_id'],
+                                                  'bookingId': widget.bookingId,
+                                                });
                                               },
                                               child: SvgPicture.asset(
                                                 "assets/svg/home_view_profile.svg",
@@ -1336,14 +1326,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     }
 
                     // 🚀 GO NEXT SCREEN
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ReviewConfirmScreen(
-                          bookingId: widget.bookingId,
-                        ),
-                      ),
-                    );
+                    context.goNamed(RouteNames.reviewConfirm, extra: {
+                      'bookingId': widget.bookingId,
+                    });
                   },
 
 
@@ -1667,14 +1652,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ReviewConfirmScreen(
-                                bookingId: widget.bookingId,
-                              ),
-                            ),
-                          );
+                          context.pushNamed(RouteNames.reviewConfirm, extra: {
+                            'bookingId': widget.bookingId,
+                          });
                         },
                         child: const Text(
                           "Complete your Shoot",
@@ -1720,14 +1700,9 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           );
                         }
             
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ReviewConfirmScreen(
-                              bookingId: widget.bookingId,
-                            ),
-                          ),
-                        );
+                        context.pushNamed(RouteNames.reviewConfirm, extra: {
+                          'bookingId': widget.bookingId,
+                        });
                       },
             
                       style: ElevatedButton.styleFrom(
@@ -1822,7 +1797,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                               ),
                             ),
                             InkWell(
-                              onTap: () => Navigator.pop(context),
+                              onTap: () => context.pop(),
                               child: const Icon(Icons.close, color: Colors.white),
                             ),
                           ],
@@ -2024,7 +1999,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                                   onPressed: () {
                                     final sortKey = _getSortKey(selectedIndex);
 
-                                    Navigator.pop(context);
+                                    context.pop();
 
                                     onApply(sortKey); // 🔥 YAHI MAIN LINE HAI
                                   },
@@ -2190,7 +2165,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              context.pop();
                             },
                             child: const Text(
                               "Go Back & Select",
@@ -2216,16 +2191,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ReviewConfirmScreen(
-                                    bookingId: widget.bookingId,
-                                  ),
-                                ),
-                              );
+                              context.pop();
+                              context.pushNamed(RouteNames.reviewConfirm, extra: {
+                                'bookingId': widget.bookingId,
+                              });
                             },
                             child: const Text(
                               "Yes, Continue",
@@ -2317,7 +2286,7 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pop(context);
+                      context.pop();
                     },
                     child: const Text(
                       "Got It",

@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../app/route_names.dart';
 import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../app/colors.dart';
 import '../../../utility/date_time_utils.dart';
 import '../../../widgets/loding.dart' show AppLoader;
-import '../../HomeSekect/payment_method.dart';
-import 'PaymentSuccessScreen.dart';
 
 class ReviewConfirmScreen extends StatefulWidget {
   // final int id;
@@ -316,17 +316,12 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
       /// 🔥 7️⃣ NAVIGATE SUCCESS SCREEN
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PaymentSuccessScreen(
-              bookingId: widget.bookingId,
-              fullName: nameController.text.trim(),
-              phone: phoneController.text.trim(),
-              paymentMethod: getPaymentMethod(),
-            ),
-          ),
-        );
+        context.goNamed(RouteNames.paymentSuccess, extra: {
+          'bookingId': widget.bookingId,
+          'fullName': nameController.text.trim(),
+          'phone': phoneController.text.trim(),
+          'paymentMethod': getPaymentMethod(),
+        });
       }
 
     } on StripeException catch (e) {
@@ -446,7 +441,7 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,
@@ -1240,13 +1235,9 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
         // );
         TopMessage.show(context,'Please add a card first');
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                PaymentMethodScreen(bookingId: widget.bookingId),
-          ),
-        );
+        context.pushNamed(RouteNames.paymentMethod, extra: {
+          'bookingId': widget.bookingId,
+        });
       }
           : () {
         setState(() {
