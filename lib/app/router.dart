@@ -320,7 +320,8 @@ final GoRouter router = GoRouter(
           eventDate: data['eventDate'] as String?,
           startTime: data['startTime'] as String?,
           endTime: data['endTime'] as String?,
-          durationHours: data['durationHours'] as int?,
+          // This safely handles nulls, ints, and doubles
+          durationHours:(data['durationHours'] as num?)?.toDouble(),
           location: data['location'] as String?,
           imageUrl: data['imageUrl'] as String?,
           contentType: data['contentType'] as String?,

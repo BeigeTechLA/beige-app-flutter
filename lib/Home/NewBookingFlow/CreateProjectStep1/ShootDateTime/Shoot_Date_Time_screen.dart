@@ -7,7 +7,7 @@
   import '../../../../main.dart';
   import '../../../../service/api_endpoints.dart';
   import '../../../../service/api_service.dart';
-  import '../../../../utility/ColorCode.dart';
+  import '../../../../app/colors.dart';
   import '../../More_Details/more_details_screen.dart';
 
   class ShootDateTimeScreen extends StatefulWidget {
@@ -862,41 +862,41 @@
           return Theme(
             data: ThemeData.dark().copyWith(
               useMaterial3: true,
-              dialogBackgroundColor: const Color(0xFF121212),
+              dialogBackgroundColor: AppColors.surfaceDark,
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
-                onPrimary: Colors.black,
-                surface: Color(0xFF121212),
-                onSurface: Colors.white,
+                primary: AppColors.primary,
+                onPrimary: AppColors.black,
+                surface: AppColors.surfaceDark,
+                onSurface: AppColors.white,
               ),
               datePickerTheme: DatePickerThemeData(
-                backgroundColor: const Color(0xFF121212),
-                dividerColor: Colors.white12,
+                backgroundColor: AppColors.surfaceDark,
+                dividerColor: AppColors.dividerDark,
                 headerHeadlineStyle: const TextStyle(
                   fontFamily: "Unbounded",
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
                 headerHelpStyle: const TextStyle(fontSize: 0, height: 0),
-                headerBackgroundColor: Color(0xFF0E0E0E),
+                headerBackgroundColor: AppColors.surfaceDeep,
                 dayShape: WidgetStateProperty.all(
                   RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
                 weekdayStyle: const TextStyle(
                   fontFamily: "Outfit",
                   fontSize: 13,
-                  color: Colors.white70,
+                  color: AppColors.white70,
                 ),
                 dayStyle: const TextStyle(
                   fontFamily: "Outfit",
                   fontSize: 14,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: ColorCode.kButtonColor,
+                  foregroundColor: AppColors.primary,
                   textStyle: const TextStyle(
                     fontFamily: "Unbounded",
                     fontWeight: FontWeight.w600,
@@ -965,12 +965,12 @@
           return Theme(
             data: ThemeData.dark().copyWith(
               useMaterial3: true,
-              dialogBackgroundColor: const Color(0xFF121212),
+              dialogBackgroundColor: AppColors.surfaceDark,
               colorScheme: const ColorScheme.dark(
-                primary: ColorCode.kButtonColor,
-                onPrimary: Colors.black,
-                surface: Color(0xFF121212),
-                onSurface: Colors.white,
+                primary: AppColors.primary,
+                onPrimary: AppColors.black,
+                surface: AppColors.surfaceDark,
+                onSurface: AppColors.white,
               ),
             ),
             child: Dialog(
@@ -989,14 +989,14 @@
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
-                        color: const Color(0xFF0E0E0E),
+                        color: AppColors.surfaceDeep,
                         child: const Text(
                           "Select Date",
                           style: TextStyle(
                             fontFamily: "Unbounded",
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
                       ),
@@ -1009,14 +1009,14 @@
                             calendarType: CalendarDatePicker2Type.multi,
 
                             /// ❌ REMOVE DEFAULT CIRCLE
-                            selectedDayHighlightColor: Colors.transparent,
+                            selectedDayHighlightColor: AppColors.transparent,
 
                             /// ❌ PAST DATES DISABLE
                             firstDate: DateTime.now(),
 
                             /// TEXT STYLE
                             selectedDayTextStyle: const TextStyle(
-                              color: Colors.black,
+                              color: AppColors.black,
                               fontWeight: FontWeight.bold,
                             ),
 
@@ -1043,7 +1043,7 @@
                                     child: Text(
                                       "${date.day}",
                                       style: const TextStyle(
-                                        color: Colors.grey, // 👈 grey = disabled look
+                                        color: AppColors.disabled, // 👈 grey = disabled look
                                       ),
                                     ),
                                   ),
@@ -1055,14 +1055,14 @@
                                 return Container(
                                   margin: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFE8D1AB),
+                                    color: AppColors.primary,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Center(
                                     child: Text(
                                       "${date.day}",
                                       style: const TextStyle(
-                                        color: Colors.black,
+                                        color: AppColors.black,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -1076,7 +1076,7 @@
                                 child: Center(
                                   child: Text(
                                     "${date.day}",
-                                    style: const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: AppColors.white),
                                   ),
                                 ),
                               );
@@ -1166,7 +1166,7 @@
               Text(
                 "Create Project",
                 style: TextStyle(
-                  color: ColorCode.white,
+                  color: AppColors.white,
                   fontSize: 14,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w400,
@@ -1178,7 +1178,7 @@
                 child: Text(
                   "1/3",
                   style: TextStyle(
-                    color: ColorCode.white,
+                    color: AppColors.white,
                     fontSize: 14,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w400,
@@ -1207,7 +1207,7 @@
                             margin: const EdgeInsets.only(right: 8),
                             height: 5,
                             decoration: BoxDecoration(
-                              color: ColorCode.kSubtextColor, // grey background
+                              color: AppColors.textSubtle, // grey background
                               borderRadius: BorderRadius.circular(64),
                             ),
                             child: isActive
@@ -1217,7 +1217,7 @@
                                 height: 5,
                                 width: 120, // 🔥 colored portion only
                                 decoration: BoxDecoration(
-                                  color: ColorCode.kButtonColor,
+                                  color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(64),
                                 ),
                               ),
@@ -1273,12 +1273,12 @@
                                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
                                       decoration: BoxDecoration(
                                         color: selectedIndex == 1
-                                            ? Color(0xFFE6D5B8)
-                                            : Colors.transparent,
+                                            ? AppColors.primary
+                                            : AppColors.transparent,
                                         borderRadius: BorderRadius.circular(12),
                                         border: selectedIndex == 1
                                             ? null
-                                            :Border.all(color: Colors.white.withOpacity(0.3)),
+                                            :Border.all(color: AppColors.white30),
                                       ),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1290,8 +1290,8 @@
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14,
                                               color: selectedIndex == 1
-                                                  ? Colors.black
-                                                  : Colors.grey,
+                                                  ? AppColors.black
+                                                  : AppColors.disabled,
                                             ),
                                           ),
                                           selectedIndex==1?
@@ -1303,15 +1303,15 @@
                                               gradient: selectedIndex == 1
                                                   ? LinearGradient(
                                                 colors: [
-                                                  Color(0xFF000000),
-                                                  Color(0xFF363131),
+                                                  AppColors.black,
+                                                  AppColors.surfaceVariant,
                                                 ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               )
                                                   : null,
                                               border: selectedIndex == 1
-                                                  ? Border.all(color: Colors.grey)
+                                                  ? Border.all(color: AppColors.disabled)
                                                   : null,
                                             ),
                                             child: selectedIndex == 1
@@ -1321,7 +1321,7 @@
                                                 height: 6,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Color(0xFFE6D5B8),
+                                                  color: AppColors.primary,
                                                 ),
                                               ),
                                             )
@@ -1332,7 +1332,7 @@
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                color: Colors.white.withOpacity(0.3),
+                                                color: AppColors.white30,
 
                                               ),
                                             ),
@@ -1364,12 +1364,12 @@
                                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
                                       decoration: BoxDecoration(
                                         color: selectedIndex == 2
-                                            ? Color(0xFFE6D5B8)
-                                            : Colors.transparent,
+                                            ? AppColors.primary
+                                            : AppColors.transparent,
                                         borderRadius: BorderRadius.circular(12),
                                         border: selectedIndex == 2
                                             ? null
-                                            :Border.all(color: Colors.white.withOpacity(0.3)),
+                                            :Border.all(color: AppColors.white30),
 
                                       ),
                                       child: Row(
@@ -1382,8 +1382,8 @@
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14,
                                               color: selectedIndex == 2
-                                                  ? Colors.black
-                                                  : Colors.grey,
+                                                  ? AppColors.black
+                                                  : AppColors.disabled,
                                             ),
                                           ),
 
@@ -1394,13 +1394,13 @@
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               // color: selectedIndex == 1
-                                              //     ? Colors.black
-                                              //     : Colors.transparent,
+                                              //     ? AppColors.black
+                                              //     : AppColors.transparent,
                                               gradient: selectedIndex == 2
                                                   ? LinearGradient(
                                                 colors: [
-                                                  Color(0xFF000000),
-                                                  Color(0xFF363131),
+                                                  AppColors.black,
+                                                  AppColors.surfaceVariant,
                                                 ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
@@ -1408,7 +1408,7 @@
                                                   : null,
 
                                               border: selectedIndex == 2
-                                                  ? Border.all(color: Colors.grey)
+                                                  ? Border.all(color: AppColors.disabled)
                                                   : null,
                                             ),
                                             child: selectedIndex == 2
@@ -1418,7 +1418,7 @@
                                                 height: 6,
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Color(0xFFE6D5B8),
+                                                  color: AppColors.primary,
                                                 ),
                                               ),
                                             )
@@ -1429,7 +1429,7 @@
                                               decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: Colors.white.withOpacity(0.3),
+                                                    color: AppColors.white30,
                                                   )
                                               )
                                           )
@@ -1482,12 +1482,12 @@
                                   Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Color(0xff322F2A),
+                                      color: AppColors.surfaceVariant,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
                                       "Total Days: ${selectedDates.length}",
-                                      style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
+                                      style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -1495,14 +1495,14 @@
                                     child: Container(
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: Color(0xff322F2A),
+                                        color: AppColors.surfaceVariant,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: selectedDates.isEmpty
                                           ? const Text(
                                         "No dates selected",
                                         style: TextStyle(
-                                          color: Color(0xFFE8D1AB),
+                                          color: AppColors.primary,
                                           fontSize: 12,
                                         ),
                                       )
@@ -1510,7 +1510,7 @@
                                         scrollDirection: Axis.horizontal, // 👈 scroll enable
                                         child: Text(
                                             formatSelectedDates(selectedDates),
-                                            style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
+                                            style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
                                         ),
                                       ),
                                     ),
@@ -1520,7 +1520,7 @@
 
                               SizedBox(height: 18,),
                               Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontFamily:'Unbounded',
                                 fontSize: 14,
                               ),),
@@ -1581,9 +1581,9 @@
                                       decoration: BoxDecoration(
 
                                         border: isOpen?
-                                        Border.all(color: Colors.white.withOpacity(0.2)):
+                                        Border.all(color: AppColors.dividerDark):
 
-                                        Border.all(color:  Colors.transparent),
+                                        Border.all(color:  AppColors.transparent),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Column(
@@ -1604,7 +1604,7 @@
                                             child: Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                                               decoration: BoxDecoration(
-                                                color: const Color(0xff282828),
+                                                color: AppColors.surface,
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
                                               child: Row(
@@ -1612,13 +1612,13 @@
                                                 children: [
                                                   Text(
                                                     DateFormat('MMMM dd, yyyy').format(date),
-                                                    style: const TextStyle(color: Colors.white),
+                                                    style: const TextStyle(color: AppColors.white),
                                                   ),
                                                   Icon(
                                                     isOpen
                                                         ? Icons.keyboard_arrow_up
                                                         : Icons.keyboard_arrow_down,
-                                                    color: Colors.white,
+                                                    color: AppColors.white,
                                                   )
                                                 ],
                                               ),
@@ -1649,7 +1649,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                     "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                     ),
                                     ),
                                     ),
@@ -1667,7 +1667,7 @@
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
                                                         "assets/svg/Group 2087328870.svg",
-                                                        color: ColorCode.white,
+                                                        color: AppColors.white,
                                                       ),
                                                     ),
                                                   ),*/
@@ -1723,13 +1723,13 @@
                                                     padding: const EdgeInsets.symmetric(
                                                         horizontal: 14, vertical: 8),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xffE8D1AB),
+                                                      color: AppColors.primary,
                                                       borderRadius: BorderRadius.circular(8),
                                                     ),
                                                     child: Text(
                                                       getDurationText(date),
                                                       style: const TextStyle(
-                                                        color: Colors.black,
+                                                        color: AppColors.black,
                                                         fontSize: 12,
                                                       ),
                                                     ),
@@ -1769,7 +1769,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1797,7 +1797,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: ColorCode.white,
+                                      color: AppColors.white,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1850,7 +1850,7 @@
                                     Text(
                                       'Applied to ${selectedDates.length} selected dates',
                                       style: TextStyle(
-                                        color: const Color(0xFFA9A9A9),
+                                        color: AppColors.textSecondary,
                                         fontSize: 14,
                                         fontFamily: 'Outfit',
                                         fontWeight: FontWeight.w400,
@@ -1863,10 +1863,10 @@
                                 Container(
                                   padding: const EdgeInsets.all(14),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF2A2A2A),
+                                    color: AppColors.surfaceVariant,
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.08),
+                                      color: AppColors.dividerDark,
                                     ),
                                   ),
                                   child: Row(
@@ -1885,7 +1885,7 @@
                                             Text(
                                               formatDatesAlt(selectedDates), // ✅ already in your code
                                               style: const TextStyle(
-                                                color: Colors.white,
+                                                color: AppColors.white,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
                                                 fontFamily: "Helvetica Neue"
@@ -1903,7 +1903,7 @@
                                                 fontFamily: "Helvetica Neue",
 
 
-                                                color: ColorCode.kWhiteOpacity70,
+                                                color: AppColors.white70,
                                                 fontSize: 11,
                                               ),
                                             ),
@@ -1915,7 +1915,7 @@
                                       Text(
                                         getDaysAndHours(), // 👇 function below
                                         style: TextStyle(
-                                          color: ColorCode.kButtonColor,
+                                          color: AppColors.primary,
                                           fontSize: 14,
                                           fontFamily: "Helvetica Neue",
 
@@ -1968,7 +1968,7 @@
                                 width: 20,
                                 height: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  ColorCode.kWhiteOpacity70,
+                                  AppColors.white70,
                                   BlendMode.srcIn,
                                 ),
                               ),
@@ -2060,7 +2060,7 @@
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: ColorCode.k282828,
+                                  color: AppColors.surface,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
@@ -2071,13 +2071,13 @@
                                         Icon(
                                           Icons.info_outline,
                                           size: 18,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         ),
                                         SizedBox(width: 8),
                                         Text(
                                           "Editing includes",
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
                                             fontFamily: "Outfit",
@@ -2091,14 +2091,14 @@
                                         Icon(
                                           Icons.check,
                                           size: 16,
-                                          color: Color(0xFFBDBDBD),
+                                          color: AppColors.textSecondary,
                                         ),
                                         SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
                                             "Professional editing includes color grading, sound mixing, and basic revisions",
                                             style: const TextStyle(
-                                              color: ColorCode.kWhiteOpacity70,
+                                              color: AppColors.white70,
                                               fontSize: 13,
                                               fontFamily: "Outfit",
                                             ),
@@ -2122,7 +2122,7 @@
                                       text: getEditTypeDisplayText(),
                                     ),
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.white,
                                       fontFamily: "Outfit",
                                       fontSize: 14,
                                     ),
@@ -2132,19 +2132,19 @@
                                       suffixIcon: const Icon(
                                         Icons.keyboard_arrow_down,
 
-                                        color: ColorCode.kWhiteOpacity70,
+                                        color: AppColors.white70,
                                       ),
                                       contentPadding:
                                       const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                        const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
+                                        const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
                                     ),
                                   ),
@@ -2167,11 +2167,11 @@
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xffE8D1AB), // Beige/Cream color
+                                      color: AppColors.primary, // Beige/Cream color
                                       borderRadius: BorderRadius.circular(12), // Fully rounded like the image
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
+                                          color: AppColors.black10,
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -2185,7 +2185,7 @@
                                           height: 34,
                                           padding: EdgeInsets.all(8),
                                           decoration: const BoxDecoration(
-                                            color: Colors.black,
+                                            color: AppColors.black,
                                             shape: BoxShape.circle,
                                           ),
                                           child:  Center(
@@ -2203,7 +2203,7 @@
                                               fontSize: 12,
                                               fontFamily: "Outfit",
                                               fontWeight: FontWeight.w600,
-                                              color: Color(0xff101010),
+                                              color: AppColors.surfaceDeep,
 
                                             ),
                                           ),
@@ -2231,11 +2231,11 @@
               /*  if (isSubmitting)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.15), // optional dim
+                  color: AppColors.black.withOpacity(0.15), // optional dim
                   child: const Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -2253,8 +2253,8 @@
                 child:  OutlinedButton(
                   onPressed: () => Navigator.pop(context),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.grey),
+                    foregroundColor: AppColors.white,
+                    side: const BorderSide(color: AppColors.disabled),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -2275,11 +2275,11 @@
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFormValid
-                        ? ColorCode.kButtonColor   // ✅ active
-                        : ColorCode.k282828,       // ❌ disabled
+                        ? AppColors.primary   // ✅ active
+                        : AppColors.surface,       // ❌ disabled
                     foregroundColor: isFormValid
-                        ? Colors.black
-                        : Colors.grey.shade500,
+                        ? AppColors.black
+                        : AppColors.disabled,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -2341,7 +2341,7 @@
 
       return Container(
         decoration: BoxDecoration(
-          color: const Color(0xff282828),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -2356,7 +2356,7 @@
                   Text(
                     getHeaderMonth(),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       fontFamily: 'Outfit',
@@ -2419,8 +2419,8 @@
                           horizontal: 19, vertical: 4),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFFE8D1AB)
-                            : Colors.black.withOpacity(0.5),
+                            ? AppColors.primary
+                            : AppColors.overlay,
                         borderRadius: BorderRadius.circular(38),
                       ),
                       child: Column(
@@ -2433,8 +2433,8 @@
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: isSelected
-                                  ? const Color(0xff222222)
-                                  : const Color(0xff939393),
+                                  ? AppColors.surface
+                                  : AppColors.textSecondary,
                             ),
                           ),
                           Text(
@@ -2444,8 +2444,8 @@
                               fontFamily: 'Outfit',
                               fontWeight: FontWeight.w700,
                               color: isSelected
-                                  ? const Color(0xff1D1D1B)
-                                  : Colors.white.withOpacity(0.6),
+                                  ? AppColors.background
+                                  : AppColors.white60,
                             ),
                           ),
                         ],
@@ -2466,7 +2466,7 @@
       return Container(
         margin: EdgeInsets.symmetric(vertical: 17),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
+          border: Border.all(color: AppColors.white30, width: 0.5),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -2487,7 +2487,7 @@
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 decoration: BoxDecoration(
-                  color: Color(0xff282828),
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
@@ -2495,7 +2495,7 @@
                   children: [
                     Text(title,
                         style: TextStyle(
-                          color: ColorCode.white,
+                          color: AppColors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         )),
@@ -2504,7 +2504,7 @@
                       turns: isVideoOpen ? 0.5 : 0,
                       duration: Duration(milliseconds: 300),
                       child: Icon(Icons.keyboard_arrow_down,
-                          color: Colors.white),
+                          color: AppColors.white),
                     ),
                   ],
                 ),
@@ -2534,7 +2534,7 @@
                       children: [
                         Expanded(
                           child: Text(name,
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: AppColors.white)),
                         ),
 
                         /// COUNTER
@@ -2542,7 +2542,7 @@
                           width: 90,
                           height: 35,
                           decoration: BoxDecoration(
-                            color: Color(0xffE8D1AB),
+                            color: AppColors.primary,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Row(
@@ -2568,7 +2568,7 @@
                                     });
                                   },
                                   child: Center(
-                                    child: const Icon(Icons.remove, size: 16, color: Colors.black),
+                                    child: const Icon(Icons.remove, size: 16, color: AppColors.black),
                                   ),
                                 ),
                               ),
@@ -2579,7 +2579,7 @@
                                     .toString()
                                     .padLeft(2, '0'),
                                 style: TextStyle(
-                                  color: ColorCode.kHeadingColor,
+                                  color: AppColors.textHeading,
                                   fontSize: 13,
                                   fontFamily: "Helvetica Neue",
                                   fontWeight: FontWeight.w600
@@ -2604,7 +2604,7 @@
                                   },
                                   child: Center(
                                     child: Icon(Icons.add,
-                                        size: 16, color: Colors.black),
+                                        size: 16, color: AppColors.black),
                                   ),
                                 ),
                               ),
@@ -2627,7 +2627,7 @@
       return Container(
         margin: const EdgeInsets.symmetric(vertical: 17),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.5),
+          border: Border.all(color: AppColors.white30, width: 0.5),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -2642,7 +2642,7 @@
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: const BoxDecoration(
-                  color: Color(0xff2B2B2B),
+                  color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
                 ),
                 child: Row(
@@ -2650,14 +2650,14 @@
                   children: [
                     Text(title,
                         style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w600)),
                     Icon(
                       isPhotoOpen
                           ? Icons.keyboard_arrow_up
                           : Icons.keyboard_arrow_down,
-                      color: Colors.white,
+                      color: AppColors.white,
                     )
                   ],
                 ),
@@ -2688,13 +2688,13 @@
                               children: [
                                 Text(name,
                                     style: const TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.white,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 3),
                                 Text(note,
                                     style: const TextStyle(
-                                        color: Colors.grey, fontSize: 11)),
+                                        color: AppColors.disabled, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -2704,7 +2704,7 @@
                             width: 95,
                             height: 34,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE8D1AB),
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -2728,7 +2728,7 @@
                                       });
                                     },
                                     child: const Icon(Icons.remove,
-                                        size: 16, color: Colors.black),
+                                        size: 16, color: AppColors.black),
                                   ),
                                 ),
 
@@ -2736,7 +2736,7 @@
                                 Text(
                                   (count ~/ 25).toString(),
                                   style: const TextStyle(
-                                    color: Colors.black,
+                                    color: AppColors.black,
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -2753,7 +2753,7 @@
                                       });
                                     },
                                     child: const Icon(Icons.add,
-                                        size: 16, color: Colors.black),
+                                        size: 16, color: AppColors.black),
                                   ),
                                 ),
                               ],
@@ -2766,7 +2766,7 @@
                       margin: const EdgeInsets.all(16),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: const Color(0xff322F2A),
+                        color: AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
@@ -2786,7 +2786,7 @@
                                 fontFamily: "Helvetica Neue",
 
 
-                                color: Color(0xffE8D1AB),
+                                color: AppColors.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -2797,13 +2797,13 @@
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.white,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               getDurationSummaryLabel(),
                               style: const TextStyle(
-                                color: Colors.black,
+                                color: AppColors.black,
                                 fontSize: 12,
                               ),
                             ),
@@ -2816,7 +2816,7 @@
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xff322F2A),
+                        color: AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -2824,7 +2824,7 @@
                           /// ➕ ICON
                           Icon(
                             Icons.add,
-                            color: Color(0xffE8D1AB),
+                            color: AppColors.primary,
                             size: 18,
                           ),
 
@@ -2837,7 +2837,7 @@
                               fontFamily: "Helvetica Neue",
 
 
-                              color: Color(0xffE8D1AB),
+                              color: AppColors.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -2847,7 +2847,7 @@
                     ),*/
                     Container(
                       height: 0.5,
-                      color: Colors.white.withOpacity(0.15),
+                      color: AppColors.dividerDark,
                     ),
                   ],
                 );
@@ -2880,13 +2880,13 @@
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFE8D1AB), // light gold
-                    Color(0xFFD4A14D), // dark gold
+                    AppColors.primary, // light gold
+                    AppColors.primaryDark, // dark gold
                   ],
                 )
                     : null,
                 border: Border.all(
-                  color: ColorCode.kWhiteOpacity70,
+                  color: AppColors.white70,
                   width: 1,
                 ),
               ),
@@ -2897,7 +2897,7 @@
                   width: 8,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                 ),
               )
@@ -2907,7 +2907,7 @@
             Text(
               title,
               style: const TextStyle(
-                color: ColorCode.white,
+                color: AppColors.white,
                 fontSize: 14,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
@@ -2936,7 +2936,7 @@
           children: [
 
             /// 🔹 TITLE
-     /*       Text( title, style: TextStyle(color: ColorCode.white,fontFamily: "Outfit",fontSize: 12)),
+     /*       Text( title, style: TextStyle(color: AppColors.white,fontFamily: "Outfit",fontSize: 12)),
 
   SizedBox(height: 10,),*/
             /// 🔹 SELECT BOX
@@ -2983,12 +2983,12 @@
                   Container(
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Color(0xFF1D1D1B),
+                      color: AppColors.background,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: highlight
-                            ? ColorCode.kGoldBorder50   // ✅ selected
-                            : ColorCode.kWhiteOpacity30, // ❌ default
+                            ? AppColors.borderGold   // ✅ selected
+                            : AppColors.white30, // ❌ default
                         width: 0.8,
                       ),
                     ),
@@ -2997,13 +2997,13 @@
                       children: [
                         Text(
                           selectedTime ?? " ",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppColors.white),
                         ),
                         Icon(
                           isOpen
                               ? Icons.keyboard_arrow_up
                               : Icons.keyboard_arrow_down,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
 
                       ],
@@ -3015,14 +3015,14 @@
         top: -10,
         child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          color: Color(0xFF1D1D1B), // background match
+          color: AppColors.background, // background match
         child: Text(
         "$title",
         style: TextStyle(
         fontSize: 11,
           color: highlight
-              ? ColorCode.kButtonColor
-              : ColorCode.kWhiteOpacity_60,
+              ? AppColors.primary
+              : AppColors.white60,
           fontFamily: "Outfit",
         ),
         ),
@@ -3040,8 +3040,8 @@
               Container(
                 height: 220,
                 decoration: BoxDecoration(
-                  color: Color(0xFF1E1E1E),
-                  border: Border.all(color: ColorCode.kWhiteOpacity70,width: 0.5),
+                  color: AppColors.background,
+                  border: Border.all(color: AppColors.white70,width: 0.5),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: ListView.builder(
@@ -3079,13 +3079,13 @@
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Color(0xFFE8D1AB)
-                              : Colors.transparent,
+                              ? AppColors.primary
+                              : AppColors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isSelected
-                                ? Color(0xFFE8D1AB)
-                                : Colors.transparent,
+                                ? AppColors.primary
+                                : AppColors.transparent,
                           ),
                         ),
 
@@ -3100,8 +3100,8 @@
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: isSelected
-                                      ? Colors.black
-                                      : Colors.white54,
+                                      ? AppColors.black
+                                      : AppColors.white60,
                                   width: 1.5,
                                 ),
                               ),
@@ -3111,7 +3111,7 @@
                                   width: 8,
                                   height: 8,
                                   decoration: BoxDecoration(
-                                    color: Colors.black,
+                                    color: AppColors.black,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -3126,8 +3126,8 @@
                               time,
                               style: TextStyle(
                                 color: isSelected
-                                    ? Colors.black
-                                    : Colors.white,
+                                    ? AppColors.black
+                                    : AppColors.white,
                                 fontSize: 14,
                               ),
                             ),
