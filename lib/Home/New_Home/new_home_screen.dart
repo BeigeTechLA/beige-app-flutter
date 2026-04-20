@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart';
@@ -129,34 +130,34 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   ];
   final List<String> featuredNames = [
     "Alec H",
-    "Benson F",
+   /* "Benson F",*/
     "Christopher R",
     "Corey B",
     "Cornelius M",
     "Daniel A",
     "Daniel C",
     "Gary Ahmed",
-    "Jesse S.",
+   /* "Jesse S.",*/
     "Mikey D",
     "Nathan Grant"
   ];
 
   final List<String> featuredImages = [
     "assets/images/Alec+H.png",
-    "assets/images/Benson+F.png",
+    // "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
     "assets/images/Cornelius+M. (1).png",
     "assets/images/Daniel+A.png",
     "assets/images/Daniel+C.png",
     "assets/images/Gary+Ahmed.png",
-    "assets/images/Jesse+S.png",
+  /*  "assets/images/Jesse+S.png",*/
     "assets/images/Mikey+D (1).jpg",
     "assets/images/Nathan+Grant.png"
   ];
   final List<String> images = [
     "assets/images/Alec+H.png",
-    "assets/images/Benson+F.png",
+    // "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
     "assets/images/Cornelius+M. (1).png",
@@ -929,8 +930,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                         padding: const EdgeInsets.only(left: 10),
                         child: Row(
                           children: [
-                            _buildServiceCard(0, "Photo", "assets/new_home/photo_new.png"),
-                            _buildServiceCard(1, "Video", "assets/new_home/Image_fx (5) 1.png"),
+                            _buildServiceCard(0, "Photo", "assets/new_home/photography.png"),
+                            _buildServiceCard(1, "Video", "assets/new_home/Videography.png"),
                             _buildServiceCard(2, "Editing", "assets/new_home/edit_new.png"),
                             _buildServiceCard(3, "Livestream", "assets/new_home/Livestream_new.png"),
                             _buildServiceCard(4, "Studio", "assets/new_home/stuido_new.png"),
@@ -1006,34 +1007,29 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                           borderRadius: BorderRadius.circular(20),
                                           child: (homeData?.continueBooking?.imageUrl != null &&
                                               homeData!.continueBooking!.imageUrl!.trim().isNotEmpty)
-                                              ? Image.network(
-                                            ApiService.imageURL +
-                          homeData!.continueBooking!.imageUrl!,
+                                              ? CachedNetworkImage(
+                                            imageUrl: ApiService.imageURL +
+                                                homeData!.continueBooking!.imageUrl!,
                                             height: 80,
                                             width: 80,
                                             fit: BoxFit.cover,
 
-                                            /// 🔥 Loading time pe loader
-                                            loadingBuilder: (context, child, loadingProgress) {
-                                              if (loadingProgress == null) return child;
-                                              return SizedBox(
-                          height: 80,
-                          width: 80,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                                              );
-                                            },
+                                            /// 🔥 First time loader only
+                                            placeholder: (context, url) => const SizedBox(
+                                              height: 80,
+                                              width: 80,
+                                              child: Center(
+                                                child: AppLoader(),
+                                              ),
+                                            ),
 
-                                            /// ❌ Error aaye to placeholder
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return SvgPicture.asset(
-                          "assets/svg/imag_placeholder.svg",
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.cover,
-                                              );
-                                            },
+                                            /// ❌ Error
+                                            errorWidget: (context, url, error) => SvgPicture.asset(
+                                              "assets/svg/imag_placeholder.svg",
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                            ),
                                           )
                                               : SvgPicture.asset(
                                             "assets/svg/imag_placeholder.svg",
@@ -1042,6 +1038,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                             fit: BoxFit.cover,
                                           ),
                                         ),
+
 
                                         const SizedBox(width: 15),
 

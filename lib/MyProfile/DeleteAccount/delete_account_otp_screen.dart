@@ -76,9 +76,9 @@ void resetTimer() {
 
     try {
       final response = await ApiService().postData(
-        ApiEndpoints.user_delete, // 👉 auth/user/delete-account/confirm
+        ApiEndpoints.user_delete, //
         {
-          "otp": 111111,
+          "otp": enteredOtp
         },
       );
 
@@ -108,45 +108,36 @@ void resetTimer() {
       setState(() => isLoading = false);
     }
   }
-  /*Future<void> _resendOtp() async {
-
-    if (seconds != 0) {
-      print("⛔ Wait for timer to finish");
-      return;
-    }
+  Future<void> _resendOtp() async {
+    if (seconds != 0) return; // safety check
 
     setState(() => isLoading = true);
 
     try {
-      final apiService = ApiService();
-
-      final response = await apiService.postData(
+      final response = await ApiService().postData(
         ApiEndpoints.reset_otp,
         {
-          "email": widget.email,
+          // 👇 jo required field ho (email / phone)
+          // "email": widget.email,
         },
       );
 
-      print("RESEND OTP RESPONSE => $response");
+      if (response != null && response['error'] == false) {
+        TopMessage.show(context, "OTP sent successfully");
 
-      if (response['error'] == false) {
-
-        timer?.cancel();
-        resetTimer();
-
-        ("OTP sent successfully");
+        timer?.cancel();  // old timer stop
+        resetTimer();     // restart 59 sec
 
       } else {
-        _showSnack(response['message'] ?? "Failed to resend OTP");
+        TopMessage.show(context, response['message'] ?? "Failed to resend OTP");
       }
 
     } catch (e) {
-      print("ERROR => $e");
-      _showSnack("Something went wrong");
+      TopMessage.show(context, "Something went wrong");
     } finally {
       setState(() => isLoading = false);
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -271,11 +262,12 @@ void resetTimer() {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                InkWell(
-                  onTap: () {
-                    timer?.cancel();  // stop old timer
-                    resetTimer();     // restart new timer
-                  },
+                InkWell (
+            onTap: seconds == 0
+            ? () async {
+    await _resendOtp();   // API call
+    }
+      : null,
                   child: Text(
                     "Resend OTP",
                     style: TextStyle(

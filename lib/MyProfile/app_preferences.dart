@@ -60,6 +60,59 @@ class _AppPreferencesState extends State<AppPreferences> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
 
+                  /// 🌙 DARK MODE
+             /*     Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
+                    ),
+                      color: ColorCode.k282828,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              images.chando1,
+                              height: 24,
+                              width: 24,
+                              colorFilter: const ColorFilter.mode(
+                                ColorCode.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Text(
+                              "Dark Mode",
+                              style: TextStyle(
+                                color: ColorCode.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 41,
+                          height: 26,
+                          child: Switch(
+                            value: isDarkMode,
+                            activeColor: Colors.amber,
+                            onChanged: (value) {
+                              setState(() {
+                                isDarkMode = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),*/
+
+
+
+
+                  SizedBox(height: 20,),
+
                   /// 🗑 DELETE ACCOUNT
                   InkWell(
                     onTap: () {

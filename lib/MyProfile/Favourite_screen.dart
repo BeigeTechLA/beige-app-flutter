@@ -142,7 +142,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                       item['profile_image_url']),
                                   width: double.infinity,
                                   height: 220,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fill,
                                 )
                                     : SvgPicture.asset(
                                   "assets/svg/imag_placeholder.svg",

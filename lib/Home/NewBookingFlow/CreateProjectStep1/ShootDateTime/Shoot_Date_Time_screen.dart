@@ -7,7 +7,7 @@
   import '../../../../main.dart';
   import '../../../../service/api_endpoints.dart';
   import '../../../../service/api_service.dart';
-  import '../../../../app/colors.dart';
+  import '../../../../utility/ColorCode.dart';
   import '../../More_Details/more_details_screen.dart';
 
   class ShootDateTimeScreen extends StatefulWidget {
@@ -16,9 +16,10 @@
     final int ShootTypeId;
     final int bookingId;
     final int contentTypeId;
+    final String? shootTypeName;
 
     const ShootDateTimeScreen({super.key,
-      required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
+      required this.ShootTypeId, required this.bookingId, required this.contentTypeId, this.shootTypeName});
 
     @override
     State<ShootDateTimeScreen> createState() => _ShootDateTimeScreenState();
@@ -26,6 +27,9 @@
 
   class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
     bool isToday = false;
+    bool isStartOpen = false;
+    bool isEndOpen = false;
+    static const Set<int> _weddingShootTypeIds = {9, 16};
 
     Map<DateTime, bool> expandedMap = {};
     Map<DateTime, TimeOfDay?> startTimes = {};
@@ -40,9 +44,201 @@
       return selectedDates.isNotEmpty;
     }
 
+    String? startTimeStr;
+    String? endTimeStr;
+
+    /// MULTIPLE NO (PER DATE)
+    Map<DateTime, String?> startTimeMap = {};
+    Map<DateTime, String?> endTimeMap = {};
+
+
+    bool get isWeddingShoot => _weddingShootTypeIds.contains(widget.ShootTypeId);
+
+    int get includedPhotosPerHour => isWeddingShoot ? 50 : 25;
+
+    int get extraPhotosPerAddOn => 25;
+
+    int _calculateDurationInMinutes(TimeOfDay start, TimeOfDay end) {
+      final startMin = start.hour * 60 + start.minute;
+      final endMin = end.hour * 60 + end.minute;
+
+      if (endMin >= startMin) {
+        return endMin - startMin;
+      }
+
+      return (24 * 60 - startMin) + endMin;
+    }
+
+    TimeOfDay? convertStringToTime(String? timeStr) {
+      if (timeStr == null) return null;
+
+      final now = DateTime.now();
+      final dt = parseTime(timeStr, now);
+
+      return TimeOfDay(hour: dt.hour, minute: dt.minute);
+    }
+
+    int getTotalSelectedDurationInMinutes() {
+      if (selectedIndex == 1) {
+        final start = convertStringToTime(startTimeStr);
+        final end = convertStringToTime(endTimeStr);
+
+        if (start == null || end == null) return 0;
+
+        return _calculateDurationInMinutes(start, end);
+      }
+
+      if (selectedDates.isEmpty) return 0;
+
+      if (istimingsame) {
+        final start = convertStringToTime(startTimeStr);
+        final end = convertStringToTime(endTimeStr);
+
+        if (start == null || end == null) return 0;
+
+        return _calculateDurationInMinutes(start, end) * selectedDates.length;
+      }
+
+      int totalMinutes = 0;
+
+      for (final date in selectedDates) {
+        final start = startTimes[date];
+        final end = endTimes[date];
+
+        if (start == null || end == null) continue;
+
+        totalMinutes += _calculateDurationInMinutes(start, end);
+      }
+
+      return totalMinutes;
+    }
+    List<String> generateTimeList({
+      required bool isStart,
+      DateTime? date,
+    }) {
+      List<String> times = [];
+
+      DateTime now = DateTime.now();
+      DateTime baseDate = date ?? selectedDate ?? now;
+
+      /// 🔥 4 HOUR RULE
+      DateTime minTime = now.add(Duration(hours: 4));
+
+      /// 🔥 LOOP SAME AS SINGLE DAY (IMPORTANT)
+      DateTime startOfDay = DateTime(baseDate.year, baseDate.month, baseDate.day, 0, 0);
+      DateTime endOfDay = startOfDay.add(Duration(days: 1));
+
+      DateTime current = startOfDay;
+
+      while (current.isBefore(endOfDay)) {
+
+        /// 🔥 CHECK TODAY
+        bool isToday =
+            baseDate.year == now.year &&
+                baseDate.month == now.month &&
+                baseDate.day == now.day;
+
+        /// ✅ APPLY SAME RULE AS SINGLE DAY
+        if (isToday && current.isBefore(minTime)) {
+          current = current.add(Duration(minutes: 15));
+          continue;
+        }
+
+        /// 🔥 END TIME FILTER
+        if (!isStart) {
+          String? startStr;
+
+          if (date != null) {
+            startStr = startTimeMap[date];
+          } else {
+            startStr = startTimeStr;
+          }
+
+          if (startStr != null) {
+            DateTime startDT = parseTime(startStr, baseDate);
+
+            if (!current.isAfter(startDT)) {
+              current = current.add(Duration(minutes: 15));
+              continue;
+            }
+          }
+        }
+
+        /// ✅ FINAL FORMAT (12 HOUR SAME AS SINGLE)
+        final time = TimeOfDay.fromDateTime(current);
+        times.add(time.format(context));
+
+        current = current.add(Duration(minutes: 15));
+      }
+
+      return times;
+    }
+
+
+    int getRoundedBookedHours() {
+      final totalMinutes = getTotalSelectedDurationInMinutes();
+      if (totalMinutes <= 0) return 0;
+      return (totalMinutes / 60).ceil();
+    }
+
+    /*int getIncludedPhotoCount() {
+      final bookedHours = getRoundedBookedHours();
+      if (bookedHours == 0) return 0;
+      return bookedHours * includedPhotosPerHour;
+    }*/
+
+    int getIncludedPhotoCount() {
+      final hours = getRoundedBookedHours();
+
+      if (hours == 0) return 0;
+
+      // 🔥 Wedding check (NAME se bhi kar sakte ho)
+      if ((widget.shootTypeName ?? "").toLowerCase() == "wedding") {
+        return hours * 50;
+      } else {
+        return hours * 25;
+      }
+    }
+
+    int getTotalPhotos() {
+
+      /// 🔥 VIDEO ONLY → NO PHOTOS
+      if (widget.contentTypeId == 1) {
+        return 0;
+      }
+
+      int total = getIncludedPhotoCount();
+
+      photoCounts.forEach((key, value) {
+        total += value;
+      });
+
+      return total;
+    }
+    int getTotalVideos() {
+      int total = 0;
+
+      videoCounts.forEach((key, value) {
+        total += value;
+      });
+
+      return total;
+    }
+    String getDurationSummaryLabel() {
+      final bookedHours = getRoundedBookedHours();
+
+      if (bookedHours > 0) {
+        return "$bookedHours ${bookedHours == 1 ? "Hour" : "Hours"} Duration";
+      }
+
+      return "Select Duration";
+    }
+
     String getDurationText(DateTime date) {
-      final start = startTimes[date];
-      final end = endTimes[date];
+      final key = normalizeDate(date);
+
+      final start = startTimes[key];
+      final end = endTimes[key];
 
       if (start == null || end == null) return "Duration:00";
 
@@ -54,14 +250,12 @@
       if (endMin >= startMin) {
         diff = endMin - startMin;
       } else {
-        /// 🔥 NEXT DAY SUPPORT
         diff = (24 * 60 - startMin) + endMin;
       }
 
       final hours = diff ~/ 60;
       final minutes = diff % 60;
 
-      /// 🔥 FORMAT LOGIC
       if (hours > 0 && minutes > 0) {
         return "Duration: ${hours}h ${minutes}m";
       } else if (hours > 0) {
@@ -70,90 +264,38 @@
         return "Duration: ${minutes}m";
       }
     }
-    Future<void> pickTime(DateTime date, bool isStart) async {
-      final picked = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
 
-      if (picked != null) {
-        setState(() {
-          if (isStart) {
-            startTimes[date] = picked;
-          } else {
-            endTimes[date] = picked;
-          }
-        });
+
+    DateTime parseTime(String time, DateTime date) {
+      try {
+        final parts = time.split(' ');
+        final timePart = parts[0]; // 12:45
+        final period = parts[1];   // AM / PM
+
+        final t = timePart.split(':');
+        int hour = int.parse(t[0]);
+        int minute = int.parse(t[1]);
+
+        if (period == "PM" && hour != 12) {
+          hour += 12;
+        } else if (period == "AM" && hour == 12) {
+          hour = 0;
+        }
+
+        return DateTime(
+          date.year,
+          date.month,
+          date.day,
+          hour,
+          minute,
+        );
+      } catch (e) {
+        print("PARSE ERROR: $e");
+        return date; // fallback
       }
     }
 
-    Future<void> selectShootTime(
-        BuildContext context,
-        TextEditingController controller,
-        bool isStartTime,
-        ) async {
 
-      TimeOfDay initial = isStartTime
-          ? (shootStartTime ?? TimeOfDay.now())
-          : (shootEndTime ?? TimeOfDay.now());
-
-      final picked = await showTimePicker(
-        context: context,
-        initialTime: initial,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              dialogBackgroundColor: const Color(0xFF121212),
-              colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
-                onPrimary: Colors.white,
-                surface: Color(0xFF1E1E1E),
-                onSurface: Colors.white,
-              ),
-              timePickerTheme: const TimePickerThemeData(
-                backgroundColor: Color(0xFF121212),
-                dialBackgroundColor: Color(0xFF121212),
-                dialHandColor: Colors.white,
-                dialTextColor: Colors.grey,
-                hourMinuteColor: AppColors.primary,
-                hourMinuteTextColor: Colors.black,
-                dayPeriodColor: AppColors.primary,
-                dayPeriodTextColor: Colors.white,
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-
-      if (picked != null) {
-        setState(() {
-          if (isStartTime) {
-            shootStartTime = picked;
-          } else {
-            shootEndTime = picked;
-          }
-
-          controller.text = picked.format(context);
-        });
-      }
-    }
-
-    DateTime startDate = DateTime.now();
-    DateTime endDate = DateTime(
-      DateTime.now().year,
-      DateTime.now().month + 1,
-      DateTime.now().day,
-    );
-
-    void generateDates() {
-      DateTime current = startDate;
-
-      while (current.isBefore(endDate) || current == endDate) {
-        allDates.add(current);
-        current = current.add(Duration(days: 1));
-      }
-    }
 
     List<DateTime> allDates = [];
     List<DateTime> selectedDates = [];
@@ -198,13 +340,41 @@
 
       _edittype();
     }
+    String getFinalSummaryText() {
+      final photos = getTotalPhotos();
+      final videos = getTotalVideos();
 
+      /// ONLY PHOTO
+      if (photos > 0 && videos == 0) {
+        return "You’ll Receive $photos Photos";
+      }
+
+      /// ONLY VIDEO
+      if (videos > 0 && photos == 0) {
+        return "You’ll Receive $videos Videos";
+      }
+
+      /// BOTH
+      if (photos > 0 && videos > 0) {
+        return "You’ll Receive $photos Photos + $videos Videos";
+      }
+
+      return "Select Edits";
+    }
     String _apiDateFormat(DateTime date) {
 
       return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
     }
+    String getTotalDuration() {
+      final totalMinutes = getTotalSelectedDurationInMinutes();
 
+      if (totalMinutes <= 0) return "0 Hour";
+
+      final hours = (totalMinutes / 60).ceil();
+
+      return "$hours ${hours == 1 ? "Hour" : "Hours"}";
+    }
     String formatDatesAlt(List<DateTime> dates) {
       if (dates.isEmpty) return "";
 
@@ -242,6 +412,17 @@
       });
 
       return result.join(", ");
+    }
+    String getDaysAndHours() {
+      final totalMinutes = getTotalSelectedDurationInMinutes();
+
+      if (totalMinutes <= 0) return "0 Day • 0 Hour";
+
+      final hours = (totalMinutes / 60).ceil();
+      final days = selectedDates.length;
+
+      return "$days ${days == 1 ? "Day" : "Days"} • "
+          "$hours ${hours == 1 ? "Hour" : "Hours"}";
     }
     String formatSelectedDates(List<DateTime> dates) {
       if (dates.isEmpty) return "";
@@ -281,7 +462,9 @@
 
       return "Selected Days: ${result.join(', ')}";
     }
-
+    DateTime normalizeDate(DateTime d) {
+      return DateTime(d.year, d.month, d.day);
+    }
     bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
       final startMinutes = start.hour * 60 + start.minute;
       final endMinutes = end.hour * 60 + end.minute;
@@ -342,19 +525,33 @@
 
       // 🎬 Video Content
       if (widget.contentTypeId == 1) {
-        return "Professional editing includes color grading,sound mixing, and basic revisions.";
+        return "Professional editing includes color grading, sound mixing, and basic revisions.";
       }
 
       // 📸 Photo Content (Special Case 16 & 9)
-      if ((widget.ShootTypeId == 16 || widget.ShootTypeId == 9) &&
+      if (isWeddingShoot &&
           (widget.contentTypeId == 2 || widget.contentTypeId == 3)) {
-        // return "50 edited photos per hour for weddings";
-        return "Professional editing includes color grading,sound mixing, and basic revisions.";
+        return "Wedding shoots include 50 edited photos per hour, with extra add-ons available in sets of 25 photos.";
       }
 
       // 📷 Default Photo
-      return "Professional editing includes color grading,sound mixing, and basic revisions.";
-      // return "25 edited photos per hour";
+      return "This shoot includes 25 edited photos per hour, with extra add-ons available in sets of 25 photos.";
+    }
+
+    String getPhotoInclusionMessage() {
+      final includedPhotos = getIncludedPhotoCount();
+      final bookedHours = getRoundedBookedHours();
+
+      if (includedPhotos == 0 || bookedHours == 0) {
+        return isWeddingShoot
+            ? "Wedding shoots include 50 edited photos per hour. You can add 25 extra photos anytime."
+            : "This shoot includes 25 edited photos per hour. You can add 25 extra photos anytime.";
+      }
+
+      final photoLabel = includedPhotos == 1 ? "photo" : "photos";
+      final hourLabel = bookedHours == 1 ? "hour" : "hours";
+
+      return "You’ll receive $includedPhotos edited $photoLabel for $bookedHours $hourLabel. Need more? Add 25 extra photos.";
     }
 
 
@@ -372,18 +569,6 @@
     }
 
 
-    String getContentTypeTitle(int contentTypeId) {
-      switch (contentTypeId) {
-        case 1:
-          return "Video Shoot Type";
-        case 2:
-          return "Photo Shoot Type";
-        case 3:
-          return "Photo & Video Shoot Type";
-        default:
-          return "Shoot Type";
-      }
-    }
 
 
     String getEditTypeDisplayText() {
@@ -467,15 +652,26 @@
         }
       });
 
-      photoCounts.forEach((key, count) {
+/*      photoCounts.forEach((key, count) {
         if (count > 0) {
           String apiKey = photoEditTypes[key]['key'];
           for (int i = 0; i < count; i++) {
             photoEditKeys.add(apiKey);
           }
         }
-      });
+      });*/
 
+      photoCounts.forEach((key, count) {
+        if (count > 0) {
+          String apiKey = photoEditTypes[key]['key'];
+
+          int unitCount = count ~/ 25; // 🔥 MAIN FIX
+
+          for (int i = 0; i < unitCount; i++) {
+            photoEditKeys.add(apiKey);
+          }
+        }
+      });
       Map<String, dynamic> payload = {};
 
       /// ================= SINGLE DAY =================
@@ -668,7 +864,7 @@
               useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
+                primary: ColorCode.kButtonColor,
                 onPrimary: Colors.black,
                 surface: Color(0xFF121212),
                 onSurface: Colors.white,
@@ -700,7 +896,7 @@
               ),
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
+                  foregroundColor: ColorCode.kButtonColor,
                   textStyle: const TextStyle(
                     fontFamily: "Unbounded",
                     fontWeight: FontWeight.w600,
@@ -771,7 +967,7 @@
               useMaterial3: true,
               dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
+                primary: ColorCode.kButtonColor,
                 onPrimary: Colors.black,
                 surface: Color(0xFF121212),
                 onSurface: Colors.white,
@@ -947,164 +1143,6 @@
       controller.text = "$hour:$minute $period";
     }
 
-
-    Future<void> _selectTime(
-        BuildContext context,
-        TextEditingController? controller,
-        bool isStartTime,
-        DateTime? date,
-        ) async {
-      final now = DateTime.now();
-
-      /// 🔥 BASE DATE (ALL CASE COVER)
-      DateTime? baseDate;
-
-      if (date != null) {
-        baseDate = date; // Multiple NO
-      } else if (selectedDate != null) {
-        baseDate = selectedDate; // Single Day
-      }else if (selectedDates.isNotEmpty && date == null) {
-        baseDate = selectedDates.first; // or remove this block completely
-      }
-
-      if (baseDate == null) return;
-
-      /// 🔥 CHECK TODAY
-      bool isSameDay =
-          baseDate.year == now.year &&
-              baseDate.month == now.month &&
-              baseDate.day == now.day;
-
-      /// 🔥 INITIAL TIME
-      TimeOfDay initial;
-
-      if (date != null) {
-        initial = isStartTime
-            ? (startTimes[date] ?? TimeOfDay.now())
-            : (endTimes[date] ?? TimeOfDay.now());
-      } else {
-        initial = isStartTime
-            ? (startTime ?? TimeOfDay.now())
-            : (endTime ?? TimeOfDay.now());
-      }
-
-      /// 🔥 TODAY START TIME → AUTO +4 HOURS
-      /*if (isSameDay && isStartTime) {
-        final min = now.add(const Duration(hours: 4));
-        initial = TimeOfDay(hour: min.hour, minute: min.minute);
-      }*/
-
-      /// 🔥 TIME PICKER WITH THEME
-      final picked = await showTimePicker(
-        context: context,
-        initialTime: initial,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              useMaterial3: true,
-              dialogBackgroundColor: const Color(0xFF121212),
-              colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
-                onPrimary: Colors.black,
-                surface: Color(0xFF121212),
-                onSurface: Colors.white,
-              ),
-              timePickerTheme: const TimePickerThemeData(
-                backgroundColor: Color(0xFF121212),
-                dialBackgroundColor: Color(0xFF121212),
-                dialHandColor: Colors.white,
-                dialTextColor: Colors.grey,
-                hourMinuteColor: AppColors.primary,
-                hourMinuteTextColor: Colors.black,
-                dayPeriodColor: AppColors.primary,
-                dayPeriodTextColor: Colors.white,
-              ),
-            ),
-            child: child!,
-          );
-        },
-      );
-
-      if (picked == null || !mounted) return;
-
-      /// 🔥 VALIDATION (4 HOUR RULE)
-      if (isStartTime) {
-        final minAllowed = now.add(const Duration(hours: 4));
-/*
-        final pickedDT = DateTime(
-          baseDate.year,
-          baseDate.month,
-          baseDate.day,
-          picked.hour,
-          picked.minute,
-        );*/
-
-        final pickedDT = DateTime(
-          baseDate.year,
-          baseDate.month,
-          baseDate.day,
-          picked.hour,
-          picked.minute,
-        );
-
-        /// 🔥 APPLY ONLY IF TODAY
-        bool isToday =
-            baseDate.year == now.year &&
-                baseDate.month == now.month &&
-                baseDate.day == now.day;
-
-        /// 🔥 ONLY APPLY FOR TODAY
-        if (isToday && pickedDT.isBefore(minAllowed)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Select time after 4 hours from now"),
-              duration: Duration(seconds: 1),
-            ),
-          );
-          return;
-        }
-
-        /// 🔥 FINAL CORRECT CHECK (DATE + TIME)
-        if (pickedDT.isBefore(minAllowed)) {
-          final min = TimeOfDay.fromDateTime(minAllowed);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Select time after 4 hours from now"),
-              duration: Duration(seconds: 1),
-            ),
-          );
-          return;
-        }
-      }
-
-      /// 🔥 SAVE DATA
-      setState(() {
-        if (date != null) {
-          /// MULTIPLE (NO)
-          if (isStartTime) {
-            startTimes[date] = picked;
-          } else {
-            endTimes[date] = picked;
-          }
-        } else {
-          /// SINGLE / MULTIPLE YES
-          if (isStartTime) {
-            startTime = picked;
-            if (controller != null) {
-              _updateTimeText(controller, picked);
-            }
-
-          } else {
-            endTime = picked;
-            if (controller != null) {
-              _updateTimeText(controller, picked);
-            }
-          }
-
-        }
-      });
-    }
     @override
     Widget build(BuildContext context) {
       return Scaffold(
@@ -1128,7 +1166,7 @@
               Text(
                 "Create Project",
                 style: TextStyle(
-                  color: AppColors.white,
+                  color: ColorCode.white,
                   fontSize: 14,
                   fontFamily: "Outfit",
                   fontWeight: FontWeight.w400,
@@ -1140,7 +1178,7 @@
                 child: Text(
                   "1/3",
                   style: TextStyle(
-                    color: AppColors.white,
+                    color: ColorCode.white,
                     fontSize: 14,
                     fontFamily: "Outfit",
                     fontWeight: FontWeight.w400,
@@ -1169,7 +1207,7 @@
                             margin: const EdgeInsets.only(right: 8),
                             height: 5,
                             decoration: BoxDecoration(
-                              color: AppColors.textSecondary, // grey background
+                              color: ColorCode.kSubtextColor, // grey background
                               borderRadius: BorderRadius.circular(64),
                             ),
                             child: isActive
@@ -1179,7 +1217,7 @@
                                 height: 5,
                                 width: 120, // 🔥 colored portion only
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary,
+                                  color: ColorCode.kButtonColor,
                                   borderRadius: BorderRadius.circular(64),
                                 ),
                               ),
@@ -1218,19 +1256,19 @@
                               children: [
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedIndex = 1;
+                            onTap: () {
+                      setState(() {
+                      selectedIndex = 1;
 
-                                        selectedDates.clear();   // 🔥 ADD THIS
-                                        startTimes.clear();
-                                        endTimes.clear();
-                                        startTimeController.clear();
-                                        endTimeController.clear();
-                                        startTime = null;
-                                        endTime = null;
-                                      });
-                                    },
+                      /// 🔥 RESET ADD HERE
+                      startTimeStr = null;
+                      endTimeStr = null;
+                      startTimeMap.clear();
+                      endTimeMap.clear();
+                      isStartOpen = false;
+                      isEndOpen = false;
+                      });
+                      },
                                     child: Container(
                                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
                                       decoration: BoxDecoration(
@@ -1312,14 +1350,14 @@
                                     onTap: () {
                                       setState(() {
                                         selectedIndex = 2;
-                                        selectedDates.clear();   // 🔥 ADD THIS
-                                        startTimes.clear();      // 🔥 ADD THIS
-                                        endTimes.clear();
 
-                                        startTimeController.clear();
-                                        endTimeController.clear();
-                                        startTime = null;
-                                        endTime = null;
+                                        /// 🔥 RESET ADD HERE
+                                        startTimeStr = null;
+                                        endTimeStr = null;
+                                        startTimeMap.clear();
+                                        endTimeMap.clear();
+                                        isStartOpen = false;
+                                        isEndOpen = false;
                                       });
                                     },
                                     child: Container(
@@ -1495,26 +1533,38 @@
                                   _buildOption(
                                     title: "Yes",
                                     isSelected: istimingsame == true,
-                                    onTap: () {
-                                      setState(() {
-                                        istimingsame = true;
-                                      });
-                                    },
+                                      onTap: () {
+                                        setState(() {
+                                          istimingsame = true;
+
+                                          /// 🔥 RESET ADD HERE
+                                          startTimeStr = null;
+                                          endTimeStr = null;
+                                          startTimeMap.clear();
+                                          endTimeMap.clear();
+                                          isStartOpen = false;
+                                          isEndOpen = false;
+                                        });
+                                      }
                                   ),
                                   const SizedBox(width: 24),
                                   _buildOption(
 
                                     title: "No",
                                     isSelected: istimingsame == false,
-                                    onTap: () {
-                                      setState(() {
-                                        istimingsame = false;
+                                      onTap: () {
+                                        setState(() {
+                                          istimingsame = false;
 
-                                        // 🔥 CLEAR OLD DATA
-                                        resetEditTypes();
-
-                                      });
-                                    },
+                                          /// 🔥 RESET ADD HERE
+                                          startTimeStr = null;
+                                          endTimeStr = null;
+                                          startTimeMap.clear();
+                                          endTimeMap.clear();
+                                          isStartOpen = false;
+                                          isEndOpen = false;
+                                        });
+                                      }
 
                                   ),
                                 ],
@@ -1543,6 +1593,11 @@
                                           GestureDetector(
                                             onTap: () {
                                               setState(() {
+
+                                                /// 🔥 sab close karo
+                                                expandedMap.updateAll((key, value) => false);
+
+                                                /// 🔥 sirf current open karo
                                                 expandedMap[date] = !isOpen;
                                               });
                                             },
@@ -1581,7 +1636,7 @@
 
                                                   /// Start Time
 
-                                                      CustomInputField(
+                                                    /*  CustomInputField(
                                     title: "Start Time",
                                     controller: TextEditingController(
                                     text: startTimes[date]?.format(context) ?? "",
@@ -1594,7 +1649,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                     "assets/svg/Group 2087328870.svg",
-                                      color: AppColors.white,
+                                      color: ColorCode.white,
                                     ),
                                     ),
                                     ),
@@ -1612,11 +1667,55 @@
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
                                                         "assets/svg/Group 2087328870.svg",
-                                                        color: AppColors.white,
+                                                        color: ColorCode.white,
                                                       ),
                                                     ),
-                                                  ),
+                                                  ),*/
 
+                                                  buildTimeDropdown(
+                                                    key: ValueKey("${date.toString()}_start"),
+                                                    title: "Start Time",
+                                                    selectedTime: startTimeMap[normalizeDate(date)],
+                                                    isStart: true,
+                                                    date: date,
+                                                    onSelect: (val) {
+                                                      final key = normalizeDate(date);
+
+                                                      setState(() {
+                                                        startTimeMap[key] = val;
+                                                        endTimeMap[key] = null;
+
+                                                        final dt = parseTime(val, key);
+
+                                                        startTimes[key] = TimeOfDay(
+                                                          hour: dt.hour,
+                                                          minute: dt.minute,
+                                                        );
+                                                      });
+                                                    },
+                                                  ),
+                                                  SizedBox(height: 10,),
+                                                  buildTimeDropdown(
+                                                    key: ValueKey("${date.toString()}_end"),
+                                                    title: "End Time",
+                                                    selectedTime: endTimeMap[normalizeDate(date)],
+                                                    isStart: false,
+                                                    date: date,
+                                                    onSelect: (val) {
+                                                      final key = normalizeDate(date);
+
+                                                      setState(() {
+                                                        endTimeMap[key] = val;
+
+                                                        final dt = parseTime(val, key);
+
+                                                        endTimes[key] = TimeOfDay(
+                                                          hour: dt.hour,
+                                                          minute: dt.minute,
+                                                        );
+                                                      });
+                                                    },
+                                                  ),
                                                   const SizedBox(height: 16),
 
                                                   /// Duration
@@ -1651,7 +1750,7 @@
                               if (istimingsame == true) ...[
                                 SizedBox(height: 22),
 
-                                /// ✅ START TIME
+                          /*      /// ✅ START TIME
                                 CustomInputField(
                                   title: "Start Time",
                                   controller: startTimeController,
@@ -1670,7 +1769,7 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: AppColors.white,
+                                      color: ColorCode.white,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1698,13 +1797,50 @@
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
                                       "assets/svg/Group 2087328870.svg",
-                                      color: AppColors.white,
+                                      color: ColorCode.white,
                                       width: 20,
                                       height: 20,
                                     ),
                                   ),
-                                ),
+                                ),*/
+      buildTimeDropdown(
+      title: "Start Time",
+      selectedTime: startTimeStr,
+      isStart: true,
+        onSelect: (val) {
+          setState(() {
+            startTimeStr = val;
+            endTimeStr = null;
 
+            final dt = parseTime(val, selectedDate ?? DateTime.now());
+
+            startTime = TimeOfDay(
+              hour: dt.hour,
+              minute: dt.minute,
+            );
+          });
+        },
+      ),
+                                SizedBox(height: 10,),
+      buildTimeDropdown(
+      title: "End Time",
+      selectedTime: endTimeStr,
+      isStart: false,
+        onSelect: (val) {
+          setState(() {
+            endTimeStr = val;
+
+            final dt = parseTime(val, selectedDate ?? DateTime.now());
+
+            endTime = TimeOfDay(
+              hour: dt.hour,
+              minute: dt.minute,
+            );
+          });
+        },
+
+                                ),
+                                const SizedBox(height: 16),
                                 SizedBox(height: 12),
 
                                 Row(
@@ -1760,14 +1896,14 @@
 
                                             /// 🔥 DYNAMIC TIME
                                             Text(
-                                              startTime != null && endTime != null
-                                                  ? "${startTime!.format(context)} – ${endTime!.format(context)}"
-                                                  : "Select Time",
+      startTimeStr != null && endTimeStr != null
+      ? "$startTimeStr – $endTimeStr"
+          : "Select Time",
                                               style: TextStyle(
                                                 fontFamily: "Helvetica Neue",
 
 
-                                                color: AppColors.white70,
+                                                color: ColorCode.kWhiteOpacity70,
                                                 fontSize: 11,
                                               ),
                                             ),
@@ -1777,9 +1913,9 @@
 
                                       /// ⏱ DYNAMIC HOURS
                                       Text(
-                                        getTotalDuration(), // 👇 function below
+                                        getDaysAndHours(), // 👇 function below
                                         style: TextStyle(
-                                          color: AppColors.primary,
+                                          color: ColorCode.kButtonColor,
                                           fontSize: 14,
                                           fontFamily: "Helvetica Neue",
 
@@ -1832,78 +1968,38 @@
                                 width: 20,
                                 height: 20,
                                 colorFilter: const ColorFilter.mode(
-                                  AppColors.white70,
+                                  ColorCode.kWhiteOpacity70,
                                   BlendMode.srcIn,
                                 ),
                               ),
                             ),
                           ),
                           SizedBox(height: 30,),
-                          /*   timeField(
-                        controller: startTimeController,
-                        label: "Start Time*",
-                        onTap: () {
-                          if (!isDateSelected()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Please select date first")),
-                            );
-                            return;
-                          }
-                          // Updated call: 3 arguments (context, controller, isStartTime)
-                          _selectTime(context, startTimeController, true);
-                        },
-                                        ),*/
-                          CustomInputField(
+
+
+                          buildTimeDropdown(
                             title: "Start Time",
-                            controller: startTimeController,
-                            readOnly: true,
-                            onTap: () {
-                              if (!isDateSelected()) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please select date first")),
-                                );
-                                return;
-                              }
-
-                              _selectTime(context, startTimeController, true, null); // ✅ FIX
+                            selectedTime: startTimeStr,
+                            isStart: true,
+                            onSelect: (val) {
+                              setState(() {
+                                startTimeStr = val;
+                                endTimeStr = null; // reset end
+                              });
                             },
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: SvgPicture.asset(
-                                "assets/svg/Group 2087328870.svg",
-                                width: 20,
-                                height: 20,
-                                color: AppColors.white,
-                              ),
-                            ),
                           ),
-
-                          SizedBox(height: 30),
-
-                          CustomInputField(
+                          SizedBox(height: 10,),
+                          buildTimeDropdown(
                             title: "End Time",
-                            controller: endTimeController,
-                            readOnly: true,
-                            onTap: () {
-                              if (!isDateSelected()) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please select date first")),
-                                );
-                                return;
-                              }
-
-                              _selectTime(context, endTimeController, false, null); // ✅ FIX
+                            selectedTime: endTimeStr,
+                            isStart: false,
+                            onSelect: (val) {
+                              setState(() {
+                                endTimeStr = val;
+                              });
                             },
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: SvgPicture.asset(
-                                "assets/svg/Group 2087328870.svg",
-                                width: 20,
-                                height: 20,
-                                color: AppColors.white,
-                              ),
-                            ),
                           ),
+                          const SizedBox(height: 16),
                         ],
 
 
@@ -1964,7 +2060,7 @@
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceVariant,
+                                  color: ColorCode.k282828,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
@@ -2000,9 +2096,9 @@
                                         SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            getEditingDescription(),
+                                            "Professional editing includes color grading, sound mixing, and basic revisions",
                                             style: const TextStyle(
-                                              color: AppColors.white70,
+                                              color: ColorCode.kWhiteOpacity70,
                                               fontSize: 13,
                                               fontFamily: "Outfit",
                                             ),
@@ -2036,19 +2132,19 @@
                                       suffixIcon: const Icon(
                                         Icons.keyboard_arrow_down,
 
-                                        color: AppColors.white70,
+                                        color: ColorCode.kWhiteOpacity70,
                                       ),
                                       contentPadding:
                                       const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: AppColors.white70, width: 0.5),
+                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide:
-                                        const BorderSide(color: AppColors.white70, width: 0.5),
+                                        const BorderSide(color: ColorCode.kWhiteOpacity70, width: 0.5),
                                       ),
                                     ),
                                   ),
@@ -2062,110 +2158,62 @@
                                     VideoEdits('Video Edits', editTypes),
 
                                   /// ✅ PHOTO ONLY IF DATA AVAILABLE
-                                  if (photoEditTypes.isNotEmpty)
+                                /*  if (photoEditTypes.isNotEmpty)
+                                    PhotoEdits('Photo Edits', photoEditTypes),*/
+                                  if (widget.contentTypeId != 1 && photoEditTypes.isNotEmpty)
                                     PhotoEdits('Photo Edits', photoEditTypes),
 
-                                ],
-                              ),
 
-                              SizedBox(height: 12,),
-                          /*    Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xffE8D1AB), // Beige/Cream color
-                                  borderRadius: BorderRadius.circular(8), // Fully rounded like the image
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Sparkle Icon Container
-                                    Container(
-                                      width: 34,
-                                      height: 34,
-                                      padding: EdgeInsets.all(8),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child:  Center(
-                                        child: Image.asset('assets/images/star.png'),
-                                      ),
-                                    ),
-
-                                    const SizedBox(width: 5),
-
-                                    // Text
-                                    const Expanded(
-                                      child: Text(
-                                        "You’ll Receive 125 Photos + 2 Videos",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff101010),
-
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),*/
-
-                              if (selectedEditTypeNames.isNotEmpty) ...[
-                                const SizedBox(height: 14),
-
-                                /* Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: List.generate(selectedEditTypeNames.length, (index) {
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     decoration: BoxDecoration(
-                                      color: AppColors.surfaceVariant,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: AppColors.white70,
-                                        width: 0.5,
-                                      ),
+                                      color: const Color(0xffE8D1AB), // Beige/Cream color
+                                      borderRadius: BorderRadius.circular(12), // Fully rounded like the image
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
                                     ),
                                     child: Row(
-                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(
-                                          selectedEditTypeNames[index],
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13,
-                                            fontFamily: "Outfit",
+                                        // Sparkle Icon Container
+                                        Container(
+                                          width: 34,
+                                          height: 34,
+                                          padding: EdgeInsets.all(8),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.black,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child:  Center(
+                                            child: Image.asset('assets/images/star.png'),
                                           ),
                                         ),
-                                        const SizedBox(width: 6),
 
-                                        /// ❌ REMOVE ICON
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedEditTypeIds.removeAt(index);
-                                              selectedEditTypeNames.removeAt(index);
-                                            });
-                                          },
-                                          child: const Icon(
-                                            Icons.close,
-                                            size: 16,
-                                            color: Colors.white70,
+                                        const SizedBox(width: 5),
+
+                                        // Text
+                                        Expanded(
+                                          child: Text(
+                                            getFinalSummaryText(),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontFamily: "Outfit",
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xff101010),
+
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  );
-                                }),
-                              ),*/
-                              ]
+                                  ),
+                                ],
+                              ),
+
                             ],
                           ],
                         ),
@@ -2227,8 +2275,8 @@
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFormValid
-                        ? AppColors.primary   // ✅ active
-                        : AppColors.surfaceVariant,       // ❌ disabled
+                        ? ColorCode.kButtonColor   // ✅ active
+                        : ColorCode.k282828,       // ❌ disabled
                     foregroundColor: isFormValid
                         ? Colors.black
                         : Colors.grey.shade500,
@@ -2317,9 +2365,10 @@
                   GestureDetector(
                     onTap: () => _selectDateMultiple(context),
                     child: SvgPicture.asset(
-                      'assets/svg/Calendar_Mark-2.svg',
+                      'assets/svg/calendar-03.svg',
                       width: 24,
                       height: 24,
+
                     ),
                   ),
                 ],
@@ -2446,7 +2495,7 @@
                   children: [
                     Text(title,
                         style: TextStyle(
-                          color: AppColors.white,
+                          color: ColorCode.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         )),
@@ -2530,7 +2579,7 @@
                                     .toString()
                                     .padLeft(2, '0'),
                                 style: TextStyle(
-                                  color: AppColors.textHeading,
+                                  color: ColorCode.kHeadingColor,
                                   fontSize: 13,
                                   fontFamily: "Helvetica Neue",
                                   fontWeight: FontWeight.w600
@@ -2583,15 +2632,11 @@
         ),
         child: Column(
           children: [
-            /// 🔥 HEADER
+            /// HEADER
             GestureDetector(
               onTap: () {
                 setState(() {
                   isPhotoOpen = !isPhotoOpen;
-
-                  /*if (!isPhotoOpen) {
-                    photoCounts.clear();
-                  }*/
                 });
               },
               child: Container(
@@ -2603,14 +2648,11 @@
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    Text(title,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
                     Icon(
                       isPhotoOpen
                           ? Icons.keyboard_arrow_up
@@ -2622,7 +2664,7 @@
               ),
             ),
 
-            /// 🔥 BODY
+            /// BODY
             if (isPhotoOpen)
               ...data.asMap().entries.map((entry) {
                 int id = entry.key;
@@ -2644,34 +2686,15 @@
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                Text(name,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 3),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.add,
-                                      size: 14,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 1),
-                                    Expanded(
-                                      child: Text(
-                                        note,
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 11,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
+                                Text(note,
+                                    style: const TextStyle(
+                                        color: Colors.grey, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -2694,9 +2717,9 @@
                                         int current = photoCounts[id] ?? 0;
 
                                         if (current > 0) {
-                                          current--;
+                                          current -= 25;
 
-                                          if (current == 0) {
+                                          if (current <= 0) {
                                             photoCounts.remove(id);
                                           } else {
                                             photoCounts[id] = current;
@@ -2709,15 +2732,12 @@
                                   ),
                                 ),
 
-                                /// COUNT
+                                /// COUNT (🔥 SHOW 1,2,3)
                                 Text(
-                                  count.toString().padLeft(2, '0'),
+                                  (count ~/ 25).toString(),
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 13,
-                                    fontFamily: "Helvetica Neue",
-
-
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -2728,7 +2748,7 @@
                                     onTap: () {
                                       setState(() {
                                         int current = photoCounts[id] ?? 0;
-                                        current++;
+                                        current += 25; // 🔥 ADD 25
                                         photoCounts[id] = current;
                                       });
                                     },
@@ -2742,8 +2762,89 @@
                         ],
                       ),
                     ),
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff322F2A),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          /// 📸 ICON
+                          Center(
+                            child: Image.asset("assets/Icons/emoji_photo.png",height: 15,),
+                          ),
 
-                    /// DIVIDER
+                          const SizedBox(width: 10),
+
+                          /// TEXT
+                          Expanded(
+                            child: Text(
+                              "Includes ${getIncludedPhotoCount()} free photo edits",
+                              style: const TextStyle(
+                                fontFamily: "Helvetica Neue",
+
+
+                                color: Color(0xffE8D1AB),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+
+                          /// DURATION
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              getDurationSummaryLabel(),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    /// 🔥 ADD THIS BELOW INCLUDE BOX
+                   /* Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff322F2A),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          /// ➕ ICON
+                          Icon(
+                            Icons.add,
+                            color: Color(0xffE8D1AB),
+                            size: 18,
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          /// TEXT
+                          Text(
+                            "25 Added Extra",
+                            style: const TextStyle(
+                              fontFamily: "Helvetica Neue",
+
+
+                              color: Color(0xffE8D1AB),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),*/
                     Container(
                       height: 0.5,
                       color: Colors.white.withOpacity(0.15),
@@ -2752,113 +2853,12 @@
                 );
               }).toList(),
 
-            /// 🔥 EXTRA SECTION (ONLY ONCE, NOT INSIDE LOOP)
-            /*  if (isPhotoOpen)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xff322F2A),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          children: [
-                            /// LEFT TEXT
-                            Expanded(
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    "📸 ",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Includes 100 free photo edits",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
 
-                            /// RIGHT BOX (INSIDE SAME CONTAINER)
-                       *//*     Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              child: const Text(
-                                "4 Hour Duration",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),*//*
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                        Container(
-
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xff322F2A),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "+ 25 Added Extra",
-                              style:
-                              TextStyle(
-                                color: const Color(0xFFE8D1AB),
-                                fontSize: 12,
-                                fontFamily: 'Helvetica Neue',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),*/
           ],
         ),
       );
     }
 
-
-    String getTotalDuration() {
-      if (startTime == null || endTime == null || selectedDates.isEmpty) {
-        return "0 Hour";
-      }
-
-      final startMin = startTime!.hour * 60 + startTime!.minute;
-      final endMin = endTime!.hour * 60 + endTime!.minute;
-
-      int diff;
-
-      if (endMin >= startMin) {
-        diff = endMin - startMin;
-      } else {
-        diff = (24 * 60 - startMin) + endMin;
-      }
-
-      final hoursPerDay = diff ~/ 60;
-
-      final totalDays = selectedDates.length;
-      final totalHours = hoursPerDay * totalDays;
-      return "$totalDays Hours / $totalHours Days";
-
-    }
 
     Widget _buildOption({
       required String title,
@@ -2886,7 +2886,7 @@
                 )
                     : null,
                 border: Border.all(
-                  color: AppColors.white70,
+                  color: ColorCode.kWhiteOpacity70,
                   width: 1,
                 ),
               ),
@@ -2907,7 +2907,7 @@
             Text(
               title,
               style: const TextStyle(
-                color: AppColors.white,
+                color: ColorCode.white,
                 fontSize: 14,
                 fontFamily: "Outfit",
                 fontWeight: FontWeight.w400,
@@ -2918,4 +2918,227 @@
       );
     }
 
+      Widget buildTimeDropdown({
+          Key? key, // ✅ FIX ADD THIS
+        required String title,
+        required String? selectedTime,
+        required Function(String) onSelect,
+        required bool isStart,
+        DateTime? date,
+      }) {
+        bool isOpen = isStart ? isStartOpen : isEndOpen;
+        bool highlight = selectedTime != null;
+
+        final list = generateTimeList(isStart: isStart, date: date);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// 🔹 TITLE
+     /*       Text( title, style: TextStyle(color: ColorCode.white,fontFamily: "Outfit",fontSize: 12)),
+
+  SizedBox(height: 10,),*/
+            /// 🔹 SELECT BOX
+            GestureDetector(
+              onTap: () {
+
+                if (selectedIndex == 1 && selectedDate == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please select date first")),
+                  );
+                  return;
+                }
+
+                if (selectedIndex == 2 && selectedDates.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please select date first")),
+                  );
+                  return;
+                }
+
+                if (isStart) {
+                  setState(() {
+                    isStartOpen = !isStartOpen;
+                    isEndOpen = false;
+                  });
+                } else {
+                  if (selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Please select start time first")),
+                    );
+                    return;
+                  }
+
+                  setState(() {
+                    isEndOpen = !isEndOpen;
+                    isStartOpen = false;
+                  });
+                }
+              },
+
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF1D1D1B),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: highlight
+                            ? ColorCode.kGoldBorder50   // ✅ selected
+                            : ColorCode.kWhiteOpacity30, // ❌ default
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          selectedTime ?? " ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Icon(
+                          isOpen
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                        ),
+
+                      ],
+                    ),
+
+                  ),
+        Positioned(
+        left: 14,
+        top: -10,
+        child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          color: Color(0xFF1D1D1B), // background match
+        child: Text(
+        "$title",
+        style: TextStyle(
+        fontSize: 11,
+          color: highlight
+              ? ColorCode.kButtonColor
+              : ColorCode.kWhiteOpacity_60,
+          fontFamily: "Outfit",
+        ),
+        ),
+        ))
+
+                ],
+
+              ),
+            ),
+
+            SizedBox(height: 10),
+
+            /// 🔥 DROPDOWN LIST
+            if (isOpen)
+              Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  color: Color(0xFF1E1E1E),
+                  border: Border.all(color: ColorCode.kWhiteOpacity70,width: 0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final time = list[index];
+                    final isSelected = time == selectedTime;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          onSelect(time);
+
+                          /// 🔥 AUTO NEXT TIME
+                          if (isStart) {
+                            int i = list.indexOf(time);
+                            if (i != -1 && i + 1 < list.length) {
+                              if (date != null) {
+                                endTimeMap[date] = list[i + 1];
+                              } else {
+                                endTimeStr = list[i + 1];
+                              }
+                            }
+
+                            isStartOpen = false;
+                            isEndOpen = true;
+                          } else {
+                            isEndOpen = false;
+                          }
+                        });
+                      },
+
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Color(0xFFE8D1AB)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isSelected
+                                ? Color(0xFFE8D1AB)
+                                : Colors.transparent,
+                          ),
+                        ),
+
+                        child: Row(
+                          children: [
+
+                            /// 🔘 RADIO
+                            Container(
+                              width: 18,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white54,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: isSelected
+                                  ? Center(
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              )
+                                  : null,
+                            ),
+
+                            SizedBox(width: 12),
+
+                            /// ⏰ TIME TEXT
+                            Text(
+                              time,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        );
+      }
   }

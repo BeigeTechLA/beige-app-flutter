@@ -88,12 +88,22 @@ class _UpcomingBookingEventSummaryState
     final date = DateTime.parse(isoTime).toLocal();
     return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
-  String getCreativeImage() {
-    final String image = bookingData?['creative']?['profile_image_url'] ?? '';
+  String getFinalImage() {
+    final String fallback = "assets/svg/imag_placeholder.svg";
 
-    if (image.isEmpty) return "";
+    final String profileImage =
+        bookingData?['creative']?['profile_image_url'] ?? '';
 
-    return ApiService().getImageURL(image);
+    final String eventImage =
+        bookingData?['event']?['image_url'] ?? '';
+
+    if (profileImage.isNotEmpty) {
+      return ApiService().getImageURL(profileImage);
+    } else if (eventImage.isNotEmpty) {
+      return ApiService().getImageURL(eventImage);
+    } else {
+      return fallback;
+    }
   }
   String formatBudget() {
     final budgetString = bookingData?['event']?['budget'];
@@ -117,6 +127,7 @@ class _UpcomingBookingEventSummaryState
     final multiDay = event?['multi_day'];
     final days = multiDay?['days'] ?? [];
     final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
+    final image = getFinalImage();
     return Scaffold(
 
       body: Stack(
@@ -133,33 +144,20 @@ class _UpcomingBookingEventSummaryState
                     SizedBox(
                       height: 280,
                       width: double.infinity,
-                      child: (getCreativeImage().isEmpty)
-
-                      /// ✅ EMPTY → SVG
-                          ? Container(
-                        color: Colors.black12,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            "assets/svg/imag_placeholder.svg",
-                            height: 80,
-                          ),
-                        ),
-                      )
+                      child: image.startsWith("http")
 
                       /// ✅ NETWORK IMAGE
-                          : Image.network(
-                        getCreativeImage(),
+                          ? Image.network(
+                        image,
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
-
-                        loadingBuilder: (context, child, loadingProgress) {
+                       /* loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return const Center(
                             child: CircularProgressIndicator(color: Colors.white),
                           );
-                        },
-
+                        },*/
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.black12,
@@ -171,6 +169,17 @@ class _UpcomingBookingEventSummaryState
                             ),
                           );
                         },
+                      )
+
+                      /// ✅ SVG PLACEHOLDER
+                          : Container(
+                        color: Colors.black12,
+                        child: Center(
+                          child: SvgPicture.asset(
+                            image,
+                            height: 80,
+                          ),
+                        ),
                       ),
                     ),
 
@@ -280,8 +289,9 @@ class _UpcomingBookingEventSummaryState
 
                       infoRow(
                         "assets/svg/Group 2087328870.svg",
-                        "${DateTimeUtils.formatTime(day['start_time'])} - ${DateTimeUtils.formatTime(day['end_time'])} "
-                            "(${day['duration_hours']}h)",
+                        "${DateTimeUtils.formatTime(day['start_time'])} - "
+                            "${DateTimeUtils.formatTime(day['end_time'])} "
+                            "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
                       ),
 
                       const SizedBox(height: 10),
@@ -301,8 +311,9 @@ class _UpcomingBookingEventSummaryState
           if (event?['start_time'] != null && event?['end_time'] != null)
             infoRow(
               "assets/svg/Group 2087328870.svg",
-              "${DateTimeUtils.formatTime(event?['start_time'])} - ${DateTimeUtils.formatTime(event?['end_time'])} "
-                  "(${event?['duration_hours']}h)",
+              "${DateTimeUtils.formatTime(event?['start_time'])} - "
+                  "${DateTimeUtils.formatTime(event?['end_time'])} "
+                  "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
             ),
         ],
 
@@ -424,6 +435,8 @@ class _UpcomingBookingEventSummaryState
           height: 55,
           child: ElevatedButton(
             onPressed: () {
+
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -442,13 +455,11 @@ class _UpcomingBookingEventSummaryState
                         ? (days.isNotEmpty ? days.first['end_time'] : '')
                         : event?['end_time'] ?? '',
 
-                    durationHours: event?['duration_hours'] ?? 0,
+                    durationHours: (event?['duration_hours'] ?? 0).toDouble(),
                     multiDays: days,
 
                     location: bookingData?['event']?['location'] ?? '',
-                    imageUrl: getCreativeImage().isNotEmpty
-                        ? getCreativeImage()
-                        : "assets/images/home2.png",
+                    imageUrl: getFinalImage(),
                     bookingId: widget.bookingId, shootTypeId: widget.shootTypeId,
                     contentType: widget.contentType,
                   ),

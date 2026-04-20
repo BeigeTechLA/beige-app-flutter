@@ -1079,7 +1079,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               /// ================= SINGLE =================
                               Expanded(
                                 child: GestureDetector(
-                                 /* onTap: () {
+                                  /* onTap: () {
                                     if (isSingleLocked) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(content: Text("Single Day not allowed")),
@@ -1459,7 +1459,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         text: startTimes[date]?.format(context) ?? "",
                                                       ),
                                                       readOnly: true,
-                                                   /*   onTap: () {
+                                                      /*   onTap: () {
                                                         _selectTime(context, null, true, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
@@ -1478,7 +1478,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                                         text: endTimes[date]?.format(context) ?? "",
                                                       ),
                                                       readOnly: true,
-                                                    /*  onTap: () {
+                                                      /*  onTap: () {
                                                         _selectTime(context, null, false, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
@@ -1530,7 +1530,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                     title: "Start Time",
                                     controller: startTimeController,
                                     readOnly: true,
-                                   /* onTap: () {
+                                    /* onTap: () {
                                       if (selectedDates.isEmpty) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text("Please select date first")),
@@ -1559,7 +1559,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                                     title: "End Time",
                                     controller: endTimeController,
                                     readOnly: true,
-                                   /* onTap: () {
+                                    /* onTap: () {
                                       if (selectedDates.isEmpty) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(content: Text("Please select date first")),
@@ -1663,7 +1663,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               title: "Start Time",
                               controller: startTimeController,
                               readOnly: true,
-                           /*   onTap: () {
+                              /*   onTap: () {
                                 if (!isDateSelected()) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Please select date first")),
@@ -1691,7 +1691,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                               title: "End Time",
                               controller: endTimeController,
                               readOnly: true,
-                             /* onTap: () {
+                              /* onTap: () {
                                 if (!isDateSelected()) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Please select date first")),
@@ -1750,7 +1750,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
         padding: const EdgeInsets.fromLTRB(5, 10, 16, 15),
         child: Row(
           children: [
-         /*   Expanded(
+            /*   Expanded(
               child:  OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
@@ -1767,7 +1767,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-               /* onPressed: isFormValid && !isSubmitting
+                /* onPressed: isFormValid && !isSubmitting
                     ? () {
                   debugPrint("✅ Continue clicked");
                   _ShootDate_Time(); // 🔥 API CALL
@@ -1906,7 +1906,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                 );
 
                 return GestureDetector(
-                  onTap: isPast
+                /*  onTap: isPast
                       ? null
                       : () {
                     List<DateTime> updated =
@@ -1923,6 +1923,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
 
                     /// 🔥 UI refresh
                     (context as Element).markNeedsBuild();
+                  },*/
+                  onTap: () {
+
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 9),

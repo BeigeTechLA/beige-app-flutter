@@ -30,8 +30,6 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
   int currentStep = 1;
   bool loding   = false;
 
- // checkbox
-  // quantity = totalQuantity;
 
   String? locationError;
 
@@ -204,18 +202,20 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
     }
   }*/
 
-  // String getContentTypeIcon(int contentTypeId) {
-  //   switch (contentTypeId) {
-  //     case 1:
-  //       return "assets/svg/video.svg";   // Videography
-  //     case 2:
-  //       return "assets/svg/Photo.svg";   // Photography
-  //     case 3:
-  //       return "assets/svg/video_photo.svg"; // Both
-  //     default:
-  //       return "assets/svg/default.svg";
-  //   }
-  // }
+/*
+  String getContentTypeIcon(int contentTypeId) {
+    switch (contentTypeId) {
+      case 1:
+        return "assets/svg/video.svg";   // Videography
+      case 2:
+        return "assets/svg/Photo.svg";   // Photography
+      case 3:
+        return "assets/svg/video_photo.svg"; // Both
+      default:
+        return "assets/svg/default.svg";
+    }
+  }
+*/
 
 
   @override

@@ -13,17 +13,48 @@ class DateTimeUtils {
     }
   }
 
-  /// ✅ Format Time → 12hr (hh:mm a)
   static String formatTime(String? time) {
     if (time == null || time.isEmpty) return "--";
+
     try {
-      final parsed = DateFormat("HH:mm:ss").parse(time);
+      DateTime parsed;
+
+      /// 🔥 CASE 1: HH:mm:ss (normal API)
+      if (time.contains(":") && time.length == 8) {
+        parsed = DateFormat("HH:mm:ss").parse(time);
+      }
+
+      /// 🔥 CASE 2: HH:mm (sometimes API gives this)
+      else if (time.contains(":") && time.length == 5) {
+        parsed = DateFormat("HH:mm").parse(time);
+      }
+
+      /// 🔥 CASE 3: already ISO format
+      else {
+        parsed = DateTime.parse(time);
+      }
+
       return DateFormat("hh:mm a").format(parsed);
     } catch (e) {
       return "--";
     }
   }
+  static String formatDuration(double? hours) {
 
+    if (hours == null) return "--";
+
+    int h = hours.floor();
+    int m = ((hours - h) * 60).round();
+
+    if (m == 60) {
+      h += 1;
+      m = 0;
+    }
+
+    if (m == 0) return "${h}h";
+
+    return "${h}h ${m}m";
+  }
   /// ✅ Date + Time together
   static String formatDateTime(String? date, String? time) {
     if (date == null || time == null) return "--";
