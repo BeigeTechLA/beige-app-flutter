@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:beige/OnbodingScreen/onboding_screen.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
+import '../app/route_names.dart';
 import '../app/text_styles.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -61,12 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
         Future.delayed(const Duration(milliseconds: 600), () {
           if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => OnboardingScreen(),
-            ),
-          );
+          context.goNamed(RouteNames.onboarding);
         });
       }
     });

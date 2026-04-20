@@ -1,9 +1,9 @@
-import 'package:beige/auth/new_login_screen.dart';
-import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 
@@ -129,12 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NewLoginScreen(),
-                        ),
-                      );
+                      context.pushNamed(RouteNames.login);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
@@ -159,12 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               /// ---------------- SIGN UP TEXT ----------------
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>  NewSingUpScreen(),
-                    ),
-                  );
+                  context.pushNamed(RouteNames.signup);
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.lg),
@@ -199,12 +189,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.only(top: AppSpacing.lg, right: AppSpacing.lg),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const NewLoginScreen(),
-                      ),
-                    );
+                    context.goNamed(RouteNames.login);
                   },
                   child: Text(
                     "Skip",
