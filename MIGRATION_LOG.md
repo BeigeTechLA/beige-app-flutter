@@ -37,6 +37,23 @@
 
 ---
 
+### 2026-04-20: Phase 3 Foundations — Firebase Integration (Analytics & Crashlytics)
+- **Changes**:
+  - Configured `firebase_core`, `firebase_analytics`, and `firebase_crashlytics` in `pubspec.yaml`.
+  - Created `FirebaseService`, `AnalyticsService`, and `CrashlyticsService` in `lib/core/firebase/`.
+  - Implemented flavored `firebase_options.dart` supporting both `dev` and `prod` configurations manually (CLI-bypass).
+  - Wired `startApp()` in `main.dart` with `runZonedGuarded` and global error handlers (`FlutterError.onError`, `PlatformDispatcher.instance.onError`).
+  - Added `AnalyticsService.observer` to `GoRouter` in `lib/app/router.dart`.
+  - Applied native Gradle plugins for GMS and Crashlytics in Android.
+  - Placed flavor-specific `google-services.json` and `GoogleService-Info.plist` files.
+- **Decisions**:
+  - **Manual `firebase_options.dart`**: Decided to build the options class manually using factory logic for flavors instead of running `flutterfire configure`. This avoids dependency on binary CLI tools and allows more precise control over flavored credentials provided in the audit.
+  - **Shared Project ID**: Noticed both `dev` and `prod` configs use the same Firebase project but different package names (`.dev` suffix). Maintained separate directory structures for future project splitting.
+  - **Passive Analytics**: Attached the observer to the router directly for automatic screen tracking without polluting widget code.
+- **Constraints Maintained**: Zero visual impact. Zero regression in existing Stripe/Google Maps functionality. All new files follow the target folder structure from `MIGRATION_RULES.md`.
+
+---
+
 ### 2026-04-19: Phase 3.1 Design Token Migration — Batch 7 (Delete Account & Home Feed Initial)
 - **Changes**: Migrated `delete_account.dart`, `delete_account_otp_screen.dart`, `new_home_screen.dart`, and `home_controller.dart`.
 - **Decisions**: 
