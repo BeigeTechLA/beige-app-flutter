@@ -7,7 +7,7 @@
 
 ## 1. EXECUTIVE SUMMARY
 
-**Overall project health: 2 / 10.** The Beige app is a functional 27-screen Flutter application with working flavors, Stripe integration, and Google Maps, but it has zero architectural foundation for scale. Every screen is a monolithic `StatefulWidget` making direct `ApiService()` calls (83 instances), with 100% `setState`, zero tests (0% coverage), zero state management library, zero named routes, zero design tokens, zero Firebase integration, and 613 static analysis issues including a broken internet-connectivity check and auth token logging in production. The biggest risks are: (1) the 11 god widgets exceeding 1,000 lines that must be decomposed before migration, (2) the complete absence of a repository/domain layer requiring every screen to be rewired, and (3) zero test coverage meaning regressions will be invisible during migration. Estimated total effort to reach target architecture: **28–42 working days** for a single developer, or **14–21 days** with two developers working in parallel on independent feature tracks.
+**Overall project health: 4 / 10.** The Beige app has successfully established its architectural foundation. We have implemented a centralized design system, a robust network layer with Dio and interceptors, a declarative navigation system via GoRouter, and a full Firebase integration (Analytics & Crashlytics) supports both dev and prod flavors. Core infrastructure (ProviderScope, exception handling, and core providers) is in place. Initial features including Splash, Onboarding, and the Main App Shell have been migrated to the new architecture. The remaining work focuses on migrating complex feature modules (Booking, Profile, Auth) and establishing the full test suite. Summary: Foundations are solid, feature migration is underway.
 
 ---
 
@@ -32,16 +32,16 @@ Every item below must be in place before any feature screen is migrated. Nothing
 
 | # | Item | Path | Exists? |
 |---|---|---|---|
-| 9 | `ProviderScope` wrapping `MaterialApp` | `lib/main.dart` | ❌ No — `flutter_riverpod` not in pubspec |
-| 10 | GoRouter configuration | `lib/app/router.dart` | ❌ No — `go_router` not in pubspec |
-| 11 | Route name constants | `lib/app/route_names.dart` | ❌ No — zero named routes |
-| 12 | DioClient with interceptors | `lib/core/network/dio_client.dart` | ❌ No — `http` package is primary; Dio used raw in 1 method |
-| 13 | Sealed AppException hierarchy | `lib/core/network/exceptions/` | ❌ No — `Exception('string')` thrown everywhere |
-| 14 | ExceptionHandler.guardAsync() | `lib/core/network/exception_handler.dart` | ❌ No — raw try/catch in every widget |
-| 15 | FirebaseService.initialize() | `lib/core/firebase/firebase_service.dart` | ❌ No — zero Firebase packages |
-| 16 | AnalyticsService + AnalyticsEvents | `lib/core/firebase/analytics_service.dart` | ❌ No |
-| 17 | CrashlyticsService + CrashlyticsKeys | `lib/core/firebase/crashlytics_service.dart` | ❌ No |
-| 18 | AppAnalyticsObserver on router | `lib/core/firebase/app_analytics_observer.dart` | ❌ No |
+| 9 | `ProviderScope` wrapping `MaterialApp` | `lib/main.dart` | ✅ Done |
+| 10 | GoRouter configuration | `lib/app/router.dart` | ✅ Done |
+| 11 | Route name constants | `lib/app/route_names.dart` | ✅ Done |
+| 12 | DioClient with interceptors | `lib/core/network/dio_client.dart` | ✅ Done |
+| 13 | Sealed AppException hierarchy | `lib/core/network/exceptions/` | ✅ Done |
+| 14 | ExceptionHandler.guardAsync() | `lib/core/network/exception_handler.dart` | ✅ Done |
+| 15 | FirebaseService.initialize() | `lib/core/firebase/firebase_service.dart` | ✅ Done |
+| 16 | AnalyticsService + AnalyticsEvents | `lib/core/firebase/analytics_service.dart` | ✅ Done |
+| 17 | CrashlyticsService + CrashlyticsKeys | `lib/core/firebase/crashlytics_service.dart` | ✅ Done |
+| 18 | AppAnalyticsObserver on router | `lib/app/router.dart` | ✅ Done |
 
 ### Testing
 
@@ -55,12 +55,12 @@ Every item below must be in place before any feature screen is migrated. Nothing
 
 | # | Item | Path | Exists? |
 |---|---|---|---|
-| 22 | `lib/core/` folder structure | `lib/core/` | ❌ No |
-| 23 | `lib/features/` folder structure | `lib/features/` | ❌ No |
-| 24 | `lib/shared/` folder structure | `lib/shared/` | ❌ No |
-| 25 | `core_providers.dart` | `lib/core/providers/core_providers.dart` | ❌ No |
+| 22 | `lib/core/` folder structure | `lib/core/` | ✅ Done |
+| 23 | `lib/features/` folder structure | `lib/features/` | ✅ Done |
+| 24 | `lib/shared/` folder structure | `lib/shared/` | ✅ Done |
+| 25 | `core_providers.dart` | `lib/core/providers/core_providers.dart` | ✅ Done |
 
-**Checklist score: 8 / 25 items exist.** (Design tokens complete, infrastructure pending)
+**Checklist score: 22 / 25 items exist.** (Infrastructure foundations complete, testing helpers pending)
 
 ---
 
@@ -70,9 +70,9 @@ Features are ordered by: isolation (no dependencies first), complexity (simplest
 
 | Order | Feature | Screens | Files | Current State | API Calls | Complexity | Dependencies | Est. Days |
 |---|---|---|---|---|---|---|---|---|
-| 1 | **Splash** | SplashScreen | 1 | setState + Timer | 0 | Trivial | None — standalone entry point | 0.5 |
-| 2 | **Onboarding** | OnboardingScreen | 1 | setState + PageController | 0 | Low | None | 0.5 |
-| 3 | **App Shell** | MainScreen | 1 | setState (tab index) | 0 | Low | GoRouter `ShellRoute` + `IndexedStack` | 1 |
+| 1 | **Splash** | SplashScreen | 1 | Migrated to ConsumerState + GoRouter | 0 | Trivial | None — standalone entry point | ✅ Done |
+| 2 | **Onboarding** | OnboardingScreen | 1 | Migrated to AppColors/GoRouter | 0 | Low | None | ✅ Done |
+| 3 | **App Shell** | MainScreen | 1 | StatefulShellRoute.indexedStack | 0 | Low | GoRouter `ShellRoute` + `IndexedStack` | ✅ Done |
 | 4 | **Password Success** | PasswordSuccessfull | 1 | setState + Future.delayed | 0 | Trivial | Auth route only | 0.25 |
 | 5 | **Shoot Updated** | ShootUpdatedScreen | 1 | setState | 0 | Trivial | Nav route only | 0.25 |
 | 6 | **Booking Type Selection** | MySelectBookingType | 1 | setState | 0 | Low | Date/time UI only, no API | 1 |
@@ -124,7 +124,7 @@ Features are ordered by: isolation (no dependencies first), complexity (simplest
 
 | # | Blocker | Why It Blocks | Resolution |
 |---|---|---|---|
-| 1 | **Firebase project does not exist** | Cannot create `FirebaseService.initialize()`, `CrashlyticsService`, or `AnalyticsService` without Firebase project credentials (`google-services.json`, `GoogleService-Info.plist`) | Create Firebase projects (dev + prod) in Firebase Console; run `flutterfire configure` to generate config files |
+| 1 | **Firebase project setup** | ✅ Done — config files placed for dev/prod flavors | Create Firebase projects (dev + prod) in Firebase Console; run `flutterfire configure` to generate config files |
 | 2 | **No target packages in pubspec** | `flutter_riverpod`, `go_router`, `freezed`, `json_annotation`, `build_runner`, `mocktail` — none are declared | Add all target packages to `pubspec.yaml` in a single foundation PR |
 | 3 | **`lib/app/`, `lib/core/`, `lib/features/`, `lib/shared/` do not exist** | No target folder structure to migrate into | Create complete directory skeleton in foundation PR |
 
@@ -212,8 +212,8 @@ Features are ordered by: isolation (no dependencies first), complexity (simplest
 | Create `ProviderScope` → `MaterialApp.router` wiring in `main.dart` | 0.5 |
 | Create `core_providers.dart` (Dio, SharedPreferences, connectivity) | 0.5 |
 | Create Firebase projects (dev + prod), download config files, wire Gradle + Xcode | 1 |
-| Build `FirebaseService`, `CrashlyticsService`, `AnalyticsService`, `AnalyticsEvents`, `CrashlyticsKeys` | 1.5 |
-| Update `startApp()` with `runZonedGuarded` + `FlutterError.onError` + `PlatformDispatcher.instance.onError` | 0.5 |
+| Build `FirebaseService`, `CrashlyticsService`, `AnalyticsService`, `AnalyticsEvents`, `CrashlyticsKeys` | ✅ Done |
+| Update `startApp()` with `runZonedGuarded` + `FlutterError.onError` + `PlatformDispatcher.instance.onError` | ✅ Done |
 | Create `test/helpers/` (`pump_app.dart`, `mocks.dart`, `test_data.dart`) | 0.5 |
 | **Subtotal** | **~14 days** |
 

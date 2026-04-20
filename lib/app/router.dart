@@ -1,5 +1,8 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../Booking/MY_SelectBookingType.dart';
@@ -41,6 +44,7 @@ import '../auth/new_forgot_passwrod_screen.dart';
 import '../auth/new_login_screen.dart';
 import '../auth/new_new_passwrod_screen.dart';
 import '../auth/new_sing_up_screen.dart';
+import '../core/firebase/analytics_service.dart';
 import '../core/providers/auth_state_provider.dart';
 import 'route_names.dart';
 
@@ -61,31 +65,45 @@ const _publicRoutes = {
 };
 
 /// GoRouter provider — uses [authStateProvider] for redirect logic.
-/// Rebuild is triggered when auth state changes (login/logout).
 final routerProvider = Provider<GoRouter>((ref) {
-  final isLoggedIn = ref.watch(authStateProvider);
+  // Use a ValueNotifier to bridge Riverpod state to GoRouter's Listenable requirement.
+  // We use ref.read here to get the INITIAL value without making this provider rebuild.
+  final authNotifier = ValueNotifier<bool>(ref.read(authStateProvider));
+  
+  // Update the notifier whenever the auth state provider changes.
+  // This notifies GoRouter to re-run its redirect logic.
+  ref.listen(authStateProvider, (_, next) {
+    authNotifier.value = next;
+  });
+
+  // Clean up the notifier when the provider is disposed.
+  ref.onDispose(() => authNotifier.dispose());
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
+    observers: [AnalyticsService.observer],
+    refreshListenable: authNotifier,
     redirect: (context, state) {
+      final isLoggedIn = authNotifier.value;
       final location = state.matchedLocation;
-
-      // Splash and onboarding always accessible
-      if (location == '/splash' || location == '/onboarding') {
-        return null;
-      }
 
       final isPublicRoute = _publicRoutes.contains(location);
 
-      // Not logged in and trying to access protected route → login
-      if (!isLoggedIn && !isPublicRoute) {
-        return '/login';
-      }
-
-      // Logged in and trying to access auth route → home
-      if (isLoggedIn && isPublicRoute && location != '/splash' && location != '/onboarding') {
-        return '/';
+      // Logged in and trying to access auth/splash/onboarding route → home
+      // We allow /splash for the initial animation, but if we are navigated to it 
+      // while logged in (or if we are already there and just logged in), 
+      // the redirect should eventually decide where to go.
+      if (isLoggedIn) {
+        // If logged in, don't stay on public routes (splash, onboarding, login, signup)
+        if (isPublicRoute) {
+          return '/';
+        }
+      } else {
+        // Not logged in and trying to access protected route → login
+        if (!isPublicRoute) {
+          return '/login';
+        }
       }
 
       return null;
@@ -489,24 +507,65 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: navigationShell.currentIndex,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 80, sigmaY: 70),
+          child: BottomNavigationBar(
+            currentIndex: navigationShell.currentIndex,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.white70,
+            onTap: (index) => navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            ),
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  navigationShell.currentIndex == 0
+                      ? "assets/svg/new_bottom_image/active_Home.svg"
+                      : "assets/svg/new_bottom_image/in_active_Home.svg",
+                ),
+                label: "Home",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  navigationShell.currentIndex == 1
+                      ? "assets/svg/new_bottom_image/active_Book a Shoot.svg"
+                      : "assets/svg/new_bottom_image/in_active_Book_Shoot.svg",
+                ),
+                label: "Book Shoot",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  navigationShell.currentIndex == 2
+                      ? "assets/svg/new_bottom_image/active_My Shoots.svg"
+                      : "assets/svg/new_bottom_image/in_active_My Shoots.svg",
+                ),
+                label: "My Shoots",
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(
+                  navigationShell.currentIndex == 3
+                      ? "assets/svg/new_bottom_image/active_Messages.svg"
+                      : "assets/svg/new_bottom_image/in_active_Messages.svg",
+                ),
+                label: "Messages",
+              ),
+            ],
+          ),
         ),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Book Shoot'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'My Shoots'),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
-        ],
       ),
+    );
+  }
+  Widget _buildIcon(String path) {
+    return SvgPicture.asset(
+      path,
+      height: 26,
+      width: 26,
+      fit: BoxFit.cover,
     );
   }
 }

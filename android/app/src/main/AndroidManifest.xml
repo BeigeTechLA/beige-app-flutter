@@ -23,6 +23,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDAYO6R9fVnd-TlUOmgdzifvqwX9BanXzw"/>
 
+        <meta-data
+            android:name="google_analytics_automatic_screen_reporting_enabled"
+            android:value="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
