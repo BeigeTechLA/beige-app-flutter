@@ -1,10 +1,11 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart' show SvgPicture;
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../app/route_names.dart';
 import '../Customtextfiled/CustomInputField.dart';
-import '../Home/NewBookingFlow/More_Details/more_details_screen.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
@@ -12,7 +13,6 @@ import '../app/text_styles.dart';
 import '../app/spacing.dart';
 import '../app/radii.dart';
 import '../app/assets.dart';
-import 'bookin_review_confirm.dart';
 
 class MySelectbookingtype extends StatefulWidget {
   final int bookingId;
@@ -612,15 +612,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       );
 
       if (response != null && response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BookinReviewConfirm(
-              // contentTypeId: widget.contentTypeId,
-              bookingId: widget.bookingId,
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.bookingReviewConfirm, extra: {
+          'bookingId': widget.bookingId,
+        });
       }
     } catch (e) {
       debugPrint("❌ API Error → $e");
@@ -836,12 +830,12 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => context.pop(),
                           child: const Text("Cancel"),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pop(context, tempSelected);
+                            context.pop(tempSelected);
                           },
                           child: const Text("OK"),
                         ),
@@ -1008,7 +1002,7 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
         elevation: 0,
         leadingWidth: 40, // 🔥 important
         leading: InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: () => context.pop(),
           child: Padding(
             padding: const EdgeInsets.all(7),
             child: SvgPicture.asset(
@@ -1775,15 +1769,9 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                     : null, // ❌ disabled when false
 */
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookinReviewConfirm(
-                        // contentTypeId: widget.contentTypeId,
-                        bookingId: widget.bookingId,
-                      ),
-                    ),
-                  );
+                  context.pushNamed(RouteNames.bookingReviewConfirm, extra: {
+                    'bookingId': widget.bookingId,
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFormValid

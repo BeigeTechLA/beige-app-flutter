@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:beige/MyProfile/my_profile.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,12 +15,12 @@ import 'package:http/http.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../app/route_names.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/google_config.dart';
 import '../app/colors.dart';
-import 'Change_Password_screen.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 
@@ -239,7 +239,7 @@ class _EditProfileState extends State<EditProfile> {
         );
 
         // ✅ BACK TO PREVIOUS SCREEN
-        Navigator.pop(context, true);
+        context.pop(true);
       } else {
         debugPrint("❌ PROFILE UPDATE FAILED");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -317,7 +317,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
 
                       InkWell(
-                        onTap: () => Navigator.pop(context), // ❌ close bottom sheet
+                        onTap: () => context.pop(), // ❌ close bottom sheet
                         borderRadius: BorderRadius.circular(20),
                         child:  Padding(
                           padding: EdgeInsets.all(6),
@@ -517,7 +517,7 @@ class _EditProfileState extends State<EditProfile> {
                           isSaving = false;
                         });
 
-                        Navigator.pop(context);
+                        context.pop();
                       },
                       child:  Text(
                         "Save",
@@ -752,7 +752,7 @@ class _EditProfileState extends State<EditProfile> {
                       left: 16,
                       child: InkWell(
                         onTap: () {
-                          Navigator.pop(context, true);
+                          context.pop(true);
                         },
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
@@ -1213,12 +1213,7 @@ class _EditProfileState extends State<EditProfile> {
 
                       suffixIcon: GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChangePasswordScreen(),
-                            ),
-                          );
+                          context.pushNamed(RouteNames.changePassword);
                         },
                         child: const Icon(
                           Icons.edit,
@@ -1256,14 +1251,9 @@ class _EditProfileState extends State<EditProfile> {
                     readOnly: true,
                     suffixIcon: GestureDetector(
                       onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ChangePasswordScreen(
-                              email: emailController.text,
-                            ),
-                          ),
-                        );
+                        await context.pushNamed(RouteNames.changePassword, extra: {
+                          'email': emailController.text,
+                        });
                       },
                       child: SizedBox(
                         height: 15,

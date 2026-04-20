@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+
 import '../app/colors.dart';
+import '../app/route_names.dart';
 import '../app/text_styles.dart';
 import '../app/radii.dart';
 import '../app/assets.dart';
-import 'DeleteAccount/delete_account.dart';
-import 'DeleteAccount/delete_account_otp_screen.dart';
 
 class AppPreferences extends StatefulWidget {
   const AppPreferences({super.key});
@@ -28,7 +29,7 @@ class _AppPreferencesState extends State<AppPreferences> {
 
               /// 🔙 BACK BUTTON
               InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
                 child: SvgPicture.asset(
                   AppAssets.back,
                   height: 24,
@@ -116,10 +117,7 @@ class _AppPreferencesState extends State<AppPreferences> {
                   /// 🗑 DELETE ACCOUNT
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => DeleteAccount()),
-                      );
+                      context.pushNamed(RouteNames.deleteAccount);
                     },
                     child: Container(
                       padding: EdgeInsets.all(20),

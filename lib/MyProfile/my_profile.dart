@@ -1,16 +1,14 @@
-import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart' show Lottie;
+
+import '../app/route_names.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import '../app/colors.dart';
-import 'Booking_History_screen.dart';
-import 'Favourite_screen.dart';
-import 'app_preferences.dart';
-import 'edit_profile.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({super.key});
@@ -111,7 +109,7 @@ class _MyProfileState extends State<MyProfile> {
                   left: 16,
                   child:  InkWell(
                     onTap: () {
-                      Navigator.pop(context);
+                      context.pop();
                     },
                     child:SvgPicture.asset(
                       "assets/svg/back.svg",
@@ -245,12 +243,7 @@ class _MyProfileState extends State<MyProfile> {
             InkWell(
               onTap: () async {
 
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const EditProfile(),
-                  ),
-                );
+                final result = await context.pushNamed<bool>(RouteNames.editProfile);
 
                 if (result == true) {
                   _fetchMyProfile(); // 👈 Profile refresh
@@ -324,23 +317,13 @@ class _MyProfileState extends State<MyProfile> {
                   "assets/svg/my_profile/Favourites.svg",
                   "Favourites",
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>  FavouriteScreen(),
-                      ),
-                    );
+                    context.pushNamed(RouteNames.favourites);
                   },
                 ),
 
                 _divider(),
                 _menuRow("assets/svg/my_profile/BookingHistory.svg", "Booking History", onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>  BookingHistoryScreen(),
-                    ),
-                  );
+                  context.pushNamed(RouteNames.bookingHistory);
                 }),
               ],
             ),
@@ -415,12 +398,7 @@ class _MyProfileState extends State<MyProfile> {
               children: [
                 _menuRow("assets/svg/my_profile/App_Preferences.svg", "App Preferences",
                 onTap: () {
-          Navigator.push(
-          context,
-          MaterialPageRoute(
-          builder: (_) =>  AppPreferences(),
-          ),
-          );
+          context.pushNamed(RouteNames.appPreferences);
           }),
                 _divider(),
                 _menuRow(
@@ -563,7 +541,7 @@ class _MyProfileState extends State<MyProfile> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        context.pop();
                       },
                       style: OutlinedButton.styleFrom(
                         side:  BorderSide(color: AppColors.white60),
@@ -590,13 +568,9 @@ class _MyProfileState extends State<MyProfile> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        await SharedService.logout(); // 🔥 clear all prefs
-
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (_) => NewLoginScreen()),
-                              (route) => false,
-                        );
+                        await SharedService.logout();
+                        if (!context.mounted) return;
+                        context.goNamed(RouteNames.login);
                       },
 
                       style: ElevatedButton.styleFrom(

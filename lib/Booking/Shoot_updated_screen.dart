@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
-import '../MainScreen.dart';
 import '../app/assets.dart';
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 
@@ -64,11 +65,7 @@ class _ShootUpdatedScreenState extends State<ShootUpdatedScreen> {
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: GestureDetector(
           onTap: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const Mainscreen()),
-                  (route) => false,
-            );
+            context.goNamed(RouteNames.home);
           },
           child: Container(
             height: 55,
