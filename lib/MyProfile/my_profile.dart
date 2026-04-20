@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart' show Lottie;
 
 import '../app/route_names.dart';
+import '../core/providers/auth_state_provider.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import '../app/colors.dart';
 
-class MyProfile extends StatefulWidget {
+class MyProfile extends ConsumerStatefulWidget {
   const MyProfile({super.key});
 
   @override
-  State<MyProfile> createState() => _MyProfileState();
+  ConsumerState<MyProfile> createState() => _MyProfileState();
 }
 
-class _MyProfileState extends State<MyProfile> {
+class _MyProfileState extends ConsumerState<MyProfile> {
 
 
   bool isLoading =true;
@@ -569,7 +571,11 @@ class _MyProfileState extends State<MyProfile> {
                     child: ElevatedButton(
                       onPressed: () async {
                         await SharedService.logout();
-                        if (!context.mounted) return;
+                        if (!mounted) return;
+                        
+                        /// ✅ UPDATE AUTH STATE
+                        ref.read(authStateProvider.notifier).updateState(false);
+                        
                         context.goNamed(RouteNames.login);
                       },
 

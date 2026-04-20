@@ -1326,9 +1326,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                     }
 
                     // 🚀 GO NEXT SCREEN
-                    context.goNamed(RouteNames.reviewConfirm, extra: {
-                      'bookingId': widget.bookingId,
-                    });
+                    context.goNamed(
+                     RouteNames.reviewConfirm,
+                     pathParameters: {'bookingId': widget.bookingId.toString()},
+                   );
                   },
 
 
@@ -1652,9 +1653,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: GestureDetector(
                         onTap: () {
-                          context.pushNamed(RouteNames.reviewConfirm, extra: {
-                            'bookingId': widget.bookingId,
-                          });
+                          context.pushNamed(
+                           RouteNames.reviewConfirm,
+                           pathParameters: {'bookingId': widget.bookingId.toString()},
+                         );
                         },
                         child: const Text(
                           "Complete your Shoot",
@@ -1700,9 +1702,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           );
                         }
             
-                        context.pushNamed(RouteNames.reviewConfirm, extra: {
-                          'bookingId': widget.bookingId,
-                        });
+                        context.pushNamed(
+                         RouteNames.reviewConfirm,
+                         pathParameters: {'bookingId': widget.bookingId.toString()},
+                       );
                       },
             
                       style: ElevatedButton.styleFrom(
@@ -2192,9 +2195,10 @@ class _SelectYourDreamTeamState extends State<SelectYourDreamTeam> {
                           child: TextButton(
                             onPressed: () {
                               context.pop();
-                              context.pushNamed(RouteNames.reviewConfirm, extra: {
-                                'bookingId': widget.bookingId,
-                              });
+                              context.pushNamed(
+                               RouteNames.reviewConfirm,
+                               pathParameters: {'bookingId': widget.bookingId.toString()},
+                             );
                             },
                             child: const Text(
                               "Yes, Continue",

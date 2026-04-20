@@ -363,49 +363,50 @@ class _UpcomingEventSummaryManagebookingState
                         Row(
                           children: [
                             // ✅ Back Button
-                           /* Expanded(
-                                child: SizedBox(
-                                  height: 55,
-                                  child: OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: AppColors.textHeading,
-                                      side: const BorderSide(
-                                        color: AppColors.white70,
-                                        width: 0.5,        // ⭐ BORDER WIDTH 0.5
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                            Expanded(
+                              child: SizedBox(
+                                height: 55,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.textHeading,
+                                    side: const BorderSide(
+                                      color: AppColors.white70,
+                                      width: 0.5,
                                     ),
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (_) =>CancelBooking(
-                                          bookingId: widget.bookingId,
-                                          projectName: widget.projectName,
-                                          eventDate: widget.eventDate,
-                                          startTime: widget.startTime,
-                                          endTime: widget.endTime,
-                                          durationHours: widget.durationHours,
-                                          location: widget.location,
-                                          contentType: widget.contentType,
-                                          imageUrl: widget.imageUrl,
-                                        )),
-                                      );
-                                    },
-                                    child: const Text(
-                                      "Cancel",
-                                      style: TextStyle(
-                                        color: AppColors.white,
-                                        fontFamily: 'Unbounded',
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                )
-
-                            ),*/
+                                  onPressed: () {
+                                    context.pushNamed(
+                                      RouteNames.cancelBooking,
+                                      pathParameters: {
+                                        'bookingId': widget.bookingId.toString()
+                                      },
+                                      extra: {
+                                        'projectName': widget.projectName,
+                                        'eventDate': widget.eventDate,
+                                        'startTime': widget.startTime,
+                                        'endTime': widget.endTime,
+                                        'durationHours': widget.durationHours?.toInt(),
+                                        'location': widget.location,
+                                        'contentType': widget.contentType,
+                                        'imageUrl': widget.imageUrl,
+                                      },
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontFamily: 'Unbounded',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
 
                             // const SizedBox(width: 12),
 
@@ -422,9 +423,10 @@ class _UpcomingEventSummaryManagebookingState
                                     ),
                                   ),
                                   onPressed: () {
-                                    context.goNamed(RouteNames.selectBookingType, extra: {
-                                      'bookingId': widget.bookingId,
-                                    });
+                                    context.goNamed(
+                                      RouteNames.selectBookingType,
+                                      pathParameters: {'bookingId': widget.bookingId.toString()},
+                                    );
                                   },
                                   child: const Text(
                                     "Reschedule",//

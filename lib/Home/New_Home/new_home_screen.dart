@@ -407,21 +407,24 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         break;
 
       case "summary":
-        context.pushNamed(RouteNames.reviewConfirm, extra: {
-          'bookingId': bookingId,
-        });
+        context.pushNamed(
+          RouteNames.reviewConfirm,
+          pathParameters: {'bookingId': bookingId.toString()},
+        );
         break;
 
       case "payment_method":
-        context.pushNamed(RouteNames.reviewConfirm, extra: {
-          'bookingId': bookingId,
-        });
+        context.pushNamed(
+          RouteNames.reviewConfirm,
+          pathParameters: {'bookingId': bookingId.toString()},
+        );
         break;
 
       case "pay_now":
-        context.pushNamed(RouteNames.reviewConfirm, extra: {
-          'bookingId': bookingId,
-        });
+        context.pushNamed(
+          RouteNames.reviewConfirm,
+          pathParameters: {'bookingId': bookingId.toString()},
+        );
         break;
 
       default:
@@ -1825,10 +1828,11 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                               Expanded(
                                                 child: GestureDetector(
                                                   onTap: () {
-                                                    context.pushNamed(RouteNames.recommendedDetails, extra: {
-                                                      'id': data.id,
-                                                      'bookingId': 121,
-                                                    });
+                                                    context.pushNamed(
+                                                      RouteNames.recommendedDetails,
+                                                      pathParameters: {'id': data.id.toString()},
+                                                      queryParameters: {'bookingId': '121'},
+                                                    );
                                                   },
                                                   child: Container(
                                                     height: 35,
@@ -3486,10 +3490,11 @@ SizedBox(height: 10,),
 
                     GestureDetector(
                       onTap: () {
-                        context.pushNamed(RouteNames.recommendedDetails, extra: {
-                          'id': item.id,
-                          'bookingId': 121,
-                        });
+                        context.pushNamed(
+                          RouteNames.recommendedDetails,
+                          pathParameters: {'id': item.id.toString()},
+                          queryParameters: {'bookingId': '121'},
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

@@ -316,12 +316,15 @@ class _ReviewConfirmScreenState extends State<ReviewConfirmScreen> {
 
       /// 🔥 7️⃣ NAVIGATE SUCCESS SCREEN
       if (mounted) {
-        context.goNamed(RouteNames.paymentSuccess, extra: {
-          'bookingId': widget.bookingId,
-          'fullName': nameController.text.trim(),
-          'phone': phoneController.text.trim(),
-          'paymentMethod': getPaymentMethod(),
-        });
+        context.goNamed(
+          RouteNames.paymentSuccess,
+          pathParameters: {'bookingId': widget.bookingId.toString()},
+          extra: {
+            'fullName': nameController.text.trim(),
+            'phone': phoneController.text.trim(),
+            'paymentMethod': getPaymentMethod(),
+          },
+        );
       }
 
     } on StripeException catch (e) {

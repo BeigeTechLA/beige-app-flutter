@@ -612,9 +612,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
       );
 
       if (response != null && response['error'] == false) {
-        context.pushNamed(RouteNames.bookingReviewConfirm, extra: {
-          'bookingId': widget.bookingId,
-        });
+        context.pushNamed(
+          RouteNames.bookingReviewConfirm,
+          pathParameters: {'bookingId': widget.bookingId.toString()},
+        );
       }
     } catch (e) {
       debugPrint("❌ API Error → $e");
@@ -1769,9 +1770,10 @@ class _MySelectbookingtypeState extends State<MySelectbookingtype> {
                     : null, // ❌ disabled when false
 */
                 onPressed: () {
-                  context.pushNamed(RouteNames.bookingReviewConfirm, extra: {
-                    'bookingId': widget.bookingId,
-                  });
+                  context.pushNamed(
+                    RouteNames.bookingReviewConfirm,
+                    pathParameters: {'bookingId': widget.bookingId.toString()},
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFormValid

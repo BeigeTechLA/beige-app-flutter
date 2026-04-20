@@ -1,25 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/route_names.dart';
+import '../../core/providers/auth_state_provider.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import '../../app/colors.dart';
 import '../../app/text_styles.dart';
 import '../../app/radii.dart';
+import '../../service/shared_service.dart';
 import '../../widgets/TopMessage.dart';
 
-class DeleteAccountOtpScreen extends StatefulWidget {
+class DeleteAccountOtpScreen extends ConsumerStatefulWidget {
   const DeleteAccountOtpScreen({super.key});
 
   @override
-  State<DeleteAccountOtpScreen> createState() => _DeleteAccountOtpScreenState();
+  ConsumerState<DeleteAccountOtpScreen> createState() => _DeleteAccountOtpScreenState();
 }
 
-class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
+class _DeleteAccountOtpScreenState extends ConsumerState<DeleteAccountOtpScreen> {
   int seconds = 59;
   Timer? timer;
   bool isOtpFilled = false;
@@ -88,6 +91,13 @@ void resetTimer() {
       if (response != null && response['error'] == false) {
         debugPrint("✅ ACCOUNT DELETED SUCCESSFULLY");
 
+        /// ✅ CLEAR SESSION
+        await SharedService.logout();
+
+        if (!mounted) return;
+
+        /// ✅ UPDATE AUTH STATE
+        ref.read(authStateProvider.notifier).updateState(false);
 
         context.goNamed(RouteNames.login);
       } else {

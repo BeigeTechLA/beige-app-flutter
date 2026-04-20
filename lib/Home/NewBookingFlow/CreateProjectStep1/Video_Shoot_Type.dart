@@ -495,7 +495,7 @@ String getContentTypeTitle(int contentTypeId) {
           children: [
             Expanded(
               child:  OutlinedButton(
-                onPressed: () => Navigator.pop(context, widget.bookingId),
+                onPressed: () => context.pop(widget.bookingId),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.grey),

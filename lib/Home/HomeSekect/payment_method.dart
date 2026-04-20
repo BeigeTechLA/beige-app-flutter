@@ -311,9 +311,10 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 ...savedCards.map((card) {
                   return InkWell(
                     onTap: () {
-                      context.pushNamed(RouteNames.reviewConfirm, extra: {
-                        'bookingId': widget.bookingId,
-                      });
+                      context.pushNamed(
+                        RouteNames.reviewConfirm,
+                        pathParameters: {'bookingId': widget.bookingId.toString()},
+                      );
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),

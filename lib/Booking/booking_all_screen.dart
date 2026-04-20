@@ -406,11 +406,14 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
 
     return GestureDetector(
       onTap: () {
-        context.pushNamed(RouteNames.bookingEventSummary, extra: {
-          'bookingId': bookingId,
-          'contentType': contentType,
-          'shootTypeId': shootTypeId,
-        });
+        context.pushNamed(
+          RouteNames.bookingEventSummary,
+          pathParameters: {'bookingId': bookingId.toString()},
+          extra: {
+            'contentType': contentType,
+            'shootTypeId': shootTypeId,
+          },
+        );
       },
       child: bookingCard(
         imagePath: finalImage,
@@ -422,19 +425,22 @@ class _BookingAllScreenState extends State<BookingAllScreen> {
         buttonText: "Manage Shoot",
         onButtonTap: () {
           print("Manage Shoot button clicked"); // ✅ print
-          context.pushNamed(RouteNames.manageBooking, extra: {
-            'bookingId': bookingId,
-            'projectName': projectName,
-            'contentType': contentType,
-            'eventDate': eventDate,
-            'startTime': startTime,
-            'endTime': endTime,
-            'multiDays': shoot['multi_day']?['days'] ?? [],
-            'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
-            'location': shoot['location'] ?? '',
-            'imageUrl': finalImage,
-            'shootTypeId': shootTypeId,
-          });
+          context.pushNamed(
+            RouteNames.manageBooking,
+            pathParameters: {'bookingId': bookingId.toString()},
+            extra: {
+              'projectName': projectName,
+              'contentType': contentType,
+              'eventDate': eventDate,
+              'startTime': startTime,
+              'endTime': endTime,
+              'multiDays': shoot['multi_day']?['days'] ?? [],
+              'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
+              'location': shoot['location'] ?? '',
+              'imageUrl': finalImage,
+              'shootTypeId': shootTypeId,
+            },
+          );
         },
       ),
     );
