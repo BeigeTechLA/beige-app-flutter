@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/route_names.dart';
 import '../../service/api_endpoints.dart';
 import '../../service/api_service.dart';
 import 'package:beige/app/colors.dart';
@@ -165,14 +167,9 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
       if (response != null && response['error'] == false) {
 
         /// ✅ SUCCESS
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ReviewConfirmScreen(
-              bookingId: widget.bookingId,
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.reviewConfirm, extra: {
+          'bookingId': widget.bookingId,
+        });
 
       } else {
 
@@ -263,7 +260,7 @@ class _RecommendedDetilsScreenState extends State<RecommendedDetilsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
-                            onTap: () => Navigator.pop(context),
+                            onTap: () => context.pop(),
                             child: SvgPicture.asset(
                               "assets/svg/back.svg",
                               height: 24,

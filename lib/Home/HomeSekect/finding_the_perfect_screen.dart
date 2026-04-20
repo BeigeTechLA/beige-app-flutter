@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
 
-import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
+import '../../app/route_names.dart';
 
 class FindingThePerfectScreen extends StatefulWidget {
   final int bookingId;
@@ -34,18 +35,12 @@ class _FindingThePerfectScreenState extends State<FindingThePerfectScreen>
     /// ⏱ Auto navigate after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (_) =>  SelectYourDreamTeam(
-              bookingId: widget.bookingId,
-              contentTypeId: widget.contentTypeId,
-              specialtyId: widget.specialtyId,
-              ShootTypeId: widget.ShootTypeId,
-
-            ), // 👈 next screen
-        ),
-      );
+      context.goNamed(RouteNames.selectDreamTeam, extra: {
+        'bookingId': widget.bookingId,
+        'contentTypeId': widget.contentTypeId,
+        'specialtyId': widget.specialtyId,
+        'shootTypeId': widget.ShootTypeId,
+      });
     });
   }
 

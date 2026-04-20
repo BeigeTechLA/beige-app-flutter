@@ -1,28 +1,20 @@
 import 'dart:ui';
+
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Model/HomeModel.dart';
-import '../../MyProfile/my_profile.dart';
+import '../../app/route_names.dart';
 import '../../service/api_service.dart';
 import '../../widgets/loding.dart';
-import '../HomeSekect/Home_view_profile.dart';
-import '../HomeSekect/change_location_screen.dart';
-import '../HomeSekect/recommended_detils_screen.dart';
-import '../NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
-import '../NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
-import '../NewBookingFlow/CreateProjectStep1/ShootDateTime/Shoot_Date_Time_screen.dart';
-import '../NewBookingFlow/CreateProjectStep1/Video_Shoot_Type.dart';
-import '../NewBookingFlow/More_Details/crew_size_matching_screen.dart';
-import '../NewBookingFlow/More_Details/more_details_screen.dart';
-import '../NewBookingFlow/More_Details/select_your_dream_team.dart';
 import 'home_controller.dart';
 
 class NewHomeScreen extends StatefulWidget {
@@ -353,120 +345,87 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     switch (screen) {
 
       case "save_content_type":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => ContentTypeScreen()));
+        context.pushNamed(RouteNames.contentType);
         break;
 
       case "save_shoot_type":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => VideoShootType(
-                bookingId: bookingId,
-                contentTypeId: contentTypeId,
-              ),
-            ));
+        context.pushNamed(RouteNames.videoShootType, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+        });
         break;
 
       case "get_edit_types":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => VideoShootType(
-                bookingId: bookingId,
-                contentTypeId: contentTypeId,
-              ),
-            ));
+        context.pushNamed(RouteNames.videoShootType, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+        });
         break;
 
-      case "save_time": // 🔥 STEP 4
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => ShootDateTimeScreen(
-                bookingId: bookingId,
-                contentTypeId: contentTypeId,
-                ShootTypeId: shootTypeId,
-              ),
-            ));
+      case "save_time":
+        context.pushNamed(RouteNames.shootDateTime, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+          'shootTypeId': shootTypeId,
+        });
         break;
 
       case "save_details":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => MoreDetailsScreen(
-                bookingId: bookingId,
-                contentTypeId: contentTypeId,
-                ShootTypeId: shootTypeId,
-                /*initialData: data,*/
-                specialtyId: 22,
-
-              ),
-            ));
+        context.pushNamed(RouteNames.moreDetails, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+          'shootTypeId': shootTypeId,
+          'specialtyId': 22,
+        });
         break;
 
       case "crew_recommendation":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => CrewSizeMatchingScreen(
-                bookingId: bookingId,
-                contentTypeId:contentTypeId,
-                specialtyId:22,
-                ShootTypeId: shootTypeId,
-              ),
-            ));
+        context.pushNamed(RouteNames.crewSizeMatching, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+          'specialtyId': 22,
+          'shootTypeId': shootTypeId,
+        });
         break;
 
-      case "creative_matches": // 🔥 STEP 7
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => SelectYourDreamTeam(
-                bookingId: bookingId,
-                contentTypeId:contentTypeId,
-                specialtyId:22,
-                ShootTypeId: shootTypeId,
-              ),
-            ));
+      case "creative_matches":
+        context.pushNamed(RouteNames.selectDreamTeam, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+          'specialtyId': 22,
+          'shootTypeId': shootTypeId,
+        });
         break;
 
       case "selected_creatives":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => SelectYourDreamTeam(
-                bookingId: bookingId,
-                contentTypeId:contentTypeId,
-                specialtyId:22,
-                ShootTypeId: shootTypeId,
-
-              ),
-            ));
+        context.pushNamed(RouteNames.selectDreamTeam, extra: {
+          'bookingId': bookingId,
+          'contentTypeId': contentTypeId,
+          'specialtyId': 22,
+          'shootTypeId': shootTypeId,
+        });
         break;
 
       case "summary":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => ReviewConfirmScreen(
-                bookingId: bookingId,
-              ),
-            ));
+        context.pushNamed(RouteNames.reviewConfirm, extra: {
+          'bookingId': bookingId,
+        });
         break;
 
       case "payment_method":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => ReviewConfirmScreen(
-                bookingId: bookingId,
-              ),
-            ));
+        context.pushNamed(RouteNames.reviewConfirm, extra: {
+          'bookingId': bookingId,
+        });
         break;
 
       case "pay_now":
-        Navigator.push(context,
-            MaterialPageRoute(
-              builder: (_) => ReviewConfirmScreen(
-                bookingId: bookingId,
-              ),
-            ));
+        context.pushNamed(RouteNames.reviewConfirm, extra: {
+          'bookingId': bookingId,
+        });
         break;
+
       default:
-        print("❌ Unknown screen: $screen");
+        debugPrint("Unknown screen: $screen");
     }
   }
 
@@ -498,17 +457,12 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
         bookingId = response['data']?['booking_id'];
 
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => VideoShootType(
-              contentTypeId: contentType,
-              bookingId: bookingId!,
-            ),
-          ),
-        );
+        final result = await context.pushNamed<int>(RouteNames.videoShootType, extra: {
+          'bookingId': bookingId!,
+          'contentTypeId': contentType,
+        });
 
-        if (result != null && result is int) {
+        if (result != null) {
           bookingId = result;
         }
       }
@@ -638,14 +592,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                       const SizedBox(height: 4),
                                       GestureDetector(
                                         onTap: () async {
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => const ChangeLocationScreen(),
-                                            ),
-                                          );
+                                          final result = await context.pushNamed<Map<String, dynamic>>(RouteNames.changeLocation);
 
-                                          if (result != null && result is Map<String, dynamic>) {
+                                          if (result != null) {
                                             setState(() {
                                               isLoading = true;
                                             });
@@ -689,13 +638,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         child:SvgPicture.asset("assets/svg/notification.1.svg")
                                       ),
                                       GestureDetector(
-                                        onTap: () async{
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const MyProfile(),
-                                            ),
-                                          );
+                                        onTap: () async {
+                                          await context.pushNamed(RouteNames.profile);
                                           fetchData();
                                         },
 
@@ -1881,15 +1825,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                               Expanded(
                                                 child: GestureDetector(
                                                   onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => RecommendedDetilsScreen(
-                                                          id: data.id, // ✅ correct
-                                                          bookingId: 121,
-                                                        ),
-                                                      ),
-                                                    );
+                                                    context.pushNamed(RouteNames.recommendedDetails, extra: {
+                                                      'id': data.id,
+                                                      'bookingId': 121,
+                                                    });
                                                   },
                                                   child: Container(
                                                     height: 35,
@@ -2750,12 +2689,7 @@ SizedBox(height: 10,),
                 /// 🔥 BUTTON
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ContentTypeScreen(fromHome: true),
-                      ),
-                    );
+                    context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -2858,12 +2792,7 @@ SizedBox(height: 10,),
                   GestureDetector(
                     onTap: () {
                       if (data["button"] == "Book a Shoot") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ContentTypeScreen(fromHome: true),
-                          ),
-                        );
+                        context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
                       } else if (data["button"] == " Explore Creatives") {
                         scrollTo(featuredKey);
                       } else if (data["button"] == "Find Your Creative") {
@@ -3557,15 +3486,10 @@ SizedBox(height: 10,),
 
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecommendedDetilsScreen(
-                          id: item.id, // ✅ correct
-                          bookingId: 121,
-                        ),
-                          ),
-                        );
+                        context.pushNamed(RouteNames.recommendedDetails, extra: {
+                          'id': item.id,
+                          'bookingId': 121,
+                        });
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -129,7 +130,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
           const SnackBar(content: Text("Location updated successfully")),
         );
 
-        Navigator.pop(context, payload); // return updated data
+        context.pop(payload); // return updated data
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response?['message'] ?? "Update failed")),

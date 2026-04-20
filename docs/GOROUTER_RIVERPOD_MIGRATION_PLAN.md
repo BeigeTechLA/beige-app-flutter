@@ -42,8 +42,8 @@
 | **4** | Auth redirect guard in GoRouter | 2 modified | 1 created | `refactor(auth)` | ✅ Done | — |
 | **5** | Migrate auth screen Navigator calls (6 files) | 6 modified | 0 | `refactor(auth)` | ✅ Done | `e189160` |
 | **6** | Migrate splash + onboarding Navigator calls | 2 modified | 0 | `refactor(navigation)` | ✅ Done | `c51ade5` |
-| **7** | Migrate home screen Navigator calls (part 1) | 3 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
-| **8** | Migrate home screen Navigator calls (part 2) | 3 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
+| **7** | Migrate home screen Navigator calls (part 1) | 3 modified | 0 | `refactor(navigation)` | ✅ Done | — |
+| **8** | Migrate home screen Navigator calls (part 2) | 3 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 | **9** | Migrate booking flow Navigator calls (part 1) | 5 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
 | **10** | Migrate booking flow Navigator calls (part 2) | 5 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
 | **11** | Migrate profile Navigator calls | 5 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
