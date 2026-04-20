@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../app/route_names.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../app/colors.dart';
-import '../../HomeSekect/finding_the_perfect_screen.dart';
 
 class CrewSizeMatchingScreen extends StatefulWidget {
   final int specialtyId;
@@ -114,7 +115,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,
@@ -697,7 +698,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                 height: 55,
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    context.pop();
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
@@ -728,17 +729,12 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FindingThePerfectScreen(
-                          bookingId: widget.bookingId,
-                          contentTypeId: widget.contentTypeId,
-                          specialtyId: widget.specialtyId,
-                          ShootTypeId: widget.ShootTypeId,
-                        ),
-                      ),
-                    );
+                    context.pushNamed(RouteNames.findingPerfect, extra: {
+                      'bookingId': widget.bookingId,
+                      'contentTypeId': widget.contentTypeId,
+                      'specialtyId': widget.specialtyId,
+                      'shootTypeId': widget.ShootTypeId,
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

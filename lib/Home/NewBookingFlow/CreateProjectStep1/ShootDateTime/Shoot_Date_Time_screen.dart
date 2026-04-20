@@ -1,14 +1,14 @@
   import 'package:calendar_date_picker2/calendar_date_picker2.dart';
   import 'package:flutter/material.dart';
   import 'package:flutter_svg/svg.dart';
+  import 'package:go_router/go_router.dart';
   import 'package:intl/intl.dart';
 
+  import '../../../../app/route_names.dart';
   import '../../../../Customtextfiled/CustomInputField.dart';
-  import '../../../../main.dart';
   import '../../../../service/api_endpoints.dart';
   import '../../../../service/api_service.dart';
   import '../../../../app/colors.dart';
-  import '../../More_Details/more_details_screen.dart';
 
   class ShootDateTimeScreen extends StatefulWidget {
 
@@ -801,17 +801,12 @@
         );
 
         if (response != null && response['error'] == false) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => MoreDetailsScreen(
-                contentTypeId: widget.contentTypeId,
-                specialtyId: 22,
-                ShootTypeId: widget.ShootTypeId,
-                bookingId: widget.bookingId,
-              ),
-            ),
-          );
+          context.pushNamed(RouteNames.moreDetails, extra: {
+            'bookingId': widget.bookingId,
+            'contentTypeId': widget.contentTypeId,
+            'shootTypeId': widget.ShootTypeId,
+            'specialtyId': 22,
+          });
         }
       } catch (e) {
         debugPrint("❌ API Error → $e");
@@ -1107,12 +1102,12 @@
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => context.pop(),
                             child: const Text("Cancel"),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context, tempSelected);
+                              context.pop(tempSelected);
                             },
                             child: const Text("OK"),
                           ),
@@ -1156,7 +1151,7 @@
               Align(
                 alignment: Alignment.centerLeft,
                 child: InkWell(
-                  onTap: () => Navigator.pop(context,true),
+                  onTap: () => context.pop(true),
                   child: SvgPicture.asset(
                     "assets/svg/back.svg",
                     height: 24,
@@ -2251,7 +2246,7 @@
             children: [
               Expanded(
                 child:  OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => context.pop(),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.white,
                     side: const BorderSide(color: AppColors.disabled),

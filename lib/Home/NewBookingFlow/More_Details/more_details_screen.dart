@@ -2,17 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
+import '../../../app/route_names.dart';
 import '../../../Customtextfiled/CustomInputField.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../service/google_config.dart';
 import '../../../app/colors.dart';
-import 'crew_size_matching_screen.dart';
 
 class MoreDetailsScreen extends StatefulWidget {
   final int specialtyId;
@@ -110,17 +111,12 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
       );
 
       if (response != null && response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CrewSizeMatchingScreen(
-              bookingId: widget.bookingId,
-              contentTypeId: widget.contentTypeId,
-              specialtyId: widget.specialtyId,
-              ShootTypeId: widget.ShootTypeId,
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.crewSizeMatching, extra: {
+          'bookingId': widget.bookingId,
+          'contentTypeId': widget.contentTypeId,
+          'specialtyId': widget.specialtyId,
+          'shootTypeId': widget.ShootTypeId,
+        });
       }
     } catch (e) {
       debugPrint("❌ API Error → $e");
@@ -408,7 +404,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context),
+                onTap: () => context.pop(),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,
@@ -1113,7 +1109,7 @@ class _MoreDetailsScreenState extends State<MoreDetailsScreen> {
           children: [
             Expanded(
               child:  OutlinedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.grey),

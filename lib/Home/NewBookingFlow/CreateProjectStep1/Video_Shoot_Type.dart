@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../../app/route_names.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart';
 import '../../../app/colors.dart';
-import 'ShootDateTime/Shoot_Date_Time_screen.dart';
 class VideoShootType extends StatefulWidget {
   final int bookingId;
   final int contentTypeId;
@@ -142,19 +143,14 @@ Future<void> select_shoottype() async {
 
     if (response != null && response['error'] == false) {
       final bookingId = response['data']?['booking_id'];
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ShootDateTimeScreen(
-            ShootTypeId: selectedShootTypeId!,
-            bookingId: bookingId,
-            contentTypeId: widget.contentTypeId,
-            shootTypeName: selectedShootTypeName,
-          ),
-        ),
-      );
+      final result = await context.pushNamed<Map>(RouteNames.shootDateTime, extra: {
+        'bookingId': bookingId,
+        'contentTypeId': widget.contentTypeId,
+        'shootTypeId': selectedShootTypeId!,
+        'shootTypeName': selectedShootTypeName,
+      });
 
-      if (result != null && result is Map) {
+      if (result != null) {
         setState(() {
           selectedShootTypeId = result["id"];
           selectedShootTypeName = result["name"];
@@ -231,7 +227,7 @@ String getContentTypeTitle(int contentTypeId) {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => Navigator.pop(context, widget.bookingId),
+                onTap: () => context.pop(widget.bookingId),
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
                   height: 24,

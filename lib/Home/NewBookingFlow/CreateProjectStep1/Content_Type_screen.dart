@@ -3,11 +3,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/route_names.dart';
 import '../../../service/api_endpoints.dart';
 import '../../../service/api_service.dart' show ApiService;
 import '../../../app/colors.dart';
-import 'Video_Shoot_Type.dart';
 
 class ContentTypeScreen extends StatefulWidget {
   final int? value;
@@ -243,18 +244,13 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
         /// 🔥 FIRST TIME SAVE
         bookingId = response['data']?['booking_id'];
 
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => VideoShootType(
-              contentTypeId: contentTypeToSend,
-              bookingId: bookingId!,
-            ),
-          ),
-        );
+        final result = await context.pushNamed<int>(RouteNames.videoShootType, extra: {
+          'bookingId': bookingId!,
+          'contentTypeId': contentTypeToSend,
+        });
 
         /// 🔥 BACK SE ID LE
-        if (result != null && result is int) {
+        if (result != null) {
           bookingId = result;
         }
       }
@@ -279,7 +275,7 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 alignment: Alignment.centerLeft,
                 child: widget.fromHome   // 👈 condition
                     ? InkWell(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () => context.pop(),
                   child: SvgPicture.asset(
                     "assets/svg/back.svg",
                     height: 24,
