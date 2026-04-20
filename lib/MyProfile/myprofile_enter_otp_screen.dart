@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
+import '../app/route_names.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../app/colors.dart';
 import '../app/text_styles.dart';
 import '../app/radii.dart';
-import '../widgets/TopMessage.dart';
-import 'myprofile_new_password_screen.dart';
 
 class EnterOtpCodeScreen extends StatefulWidget {
   final String email;
@@ -77,15 +77,10 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
 
         if (!mounted) return;
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => MyprofileNewPasswordScreen(
-              otp: enteredOtp ,
-              email: widget.email,
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.profileNewPassword, extra: {
+          'otp': enteredOtp,
+          'email': widget.email,
+        });
       } else {
         print("❌ OTP Verification Failed => ${response['message']}");
         _showSnack(response['message'] ?? "Invalid OTP");
@@ -199,7 +194,7 @@ class _EnterOtpCodeScreenState extends State<EnterOtpCodeScreen> {
                     children: [
 
                       InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => context.pop(),
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
                           height: 24,

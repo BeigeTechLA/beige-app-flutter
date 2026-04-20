@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
+import '../app/route_names.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -125,7 +127,7 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pop(context,true);
+                  context.pop(true);
                 },
                 child: SvgPicture.asset(
                   "assets/svg/back.svg",
@@ -372,7 +374,8 @@ class _MyprofileNewPasswordScreenState extends State<MyprofileNewPasswordScreen>
       pageBuilder: (_, __, ___) {
 
         Future.delayed(const Duration(seconds: 2), () {
-          Navigator.popUntil(context, (route) => route.isFirst);
+          if (!mounted) return;
+          context.goNamed(RouteNames.home);
         });
 
         return Stack(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+
+import '../app/route_names.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
@@ -7,7 +10,6 @@ import '../app/colors.dart';
 import '../app/text_styles.dart';
 import '../app/radii.dart';
 import '../widgets/TopMessage.dart';
-import 'myprofile_enter_otp_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final String email;
@@ -43,14 +45,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       );
 
       if (response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>  EnterOtpCodeScreen(
-              email: emailController.text.trim(), // ✅ pass email
-            ),
-          ),
-        );
+        context.pushNamed(RouteNames.profileOtp, extra: {
+          'email': emailController.text.trim(),
+        });
       } else {
         _showSnack(response['message'] ?? "Failed to send OTP");
       }
@@ -110,12 +107,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (response['error'] == false) {
         if (!mounted) return;
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EnterOtpCodeScreen(email: email),
-          ),
-        );
+        context.pushNamed(RouteNames.profileOtp, extra: {
+          'email': email,
+        });
       } else {
         /// BACKEND ERROR MESSAGE
         TopMessage.show(
@@ -175,7 +169,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     children: [
 
                       InkWell(
-                        onTap: () => Navigator.pop(context,true),
+                        onTap: () => context.pop(true),
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
                           height: 24,

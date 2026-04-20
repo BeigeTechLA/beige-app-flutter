@@ -48,7 +48,7 @@
 | **10** | Migrate booking flow Navigator calls (part 2) | 4 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 | **11** | Migrate booking management screens | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 | **12** | Migrate remaining booking + profile (part 1) | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
-| **13** | Remove global navigator keys + dead code | 2 modified | 0 | `refactor(navigation)` | ⬜ Pending | — |
+| **13** | Migrate remaining profile screens | 5 modified | 0 | `refactor(navigation)` | ✅ Done | — |
 
 ---
 
