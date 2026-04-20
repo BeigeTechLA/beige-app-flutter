@@ -1,12 +1,12 @@
-import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../app/assets.dart';
 import '../app/colors.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
-import '../MainScreen.dart';
 
 class PasswordSuccessfull extends StatefulWidget {
   const PasswordSuccessfull({super.key});
@@ -21,14 +21,10 @@ class _PasswordSuccessfullState extends State<PasswordSuccessfull> {
   void initState() {
     super.initState();
 
-    /// ⏳ 5 second delay then go to MainScreen
+    /// ⏳ 3 second delay then go to login
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const NewLoginScreen()),
-              (route) => false,
-        );
+        context.goNamed(RouteNames.login);
       }
     });
   }

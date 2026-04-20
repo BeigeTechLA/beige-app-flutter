@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../widgets/TopMessage.dart';
-import 'new_login_screen.dart';
-import 'new_new_passwrod_screen.dart';
 
 class NewForgotOtpScreen extends StatefulWidget {
   final String email;
@@ -111,14 +111,9 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
 
         if (!mounted) return;
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => NewNewPasswrodScreen(
-              otp: enteredOtp ,
-              email: widget.email,
-            ),
-          ),
+        context.goNamed(
+          RouteNames.resetPassword,
+          extra: {'email': widget.email, 'otp': enteredOtp},
         );
       } else {
         print("❌ OTP Verification Failed => ${response['message']}");
@@ -214,7 +209,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
                         left: 16,
                         child: InkWell(
                           onTap: () {
-                            Navigator.pop(context);
+                            context.pop();
                           },
                           child: SvgPicture.asset(
                             "assets/svg/back.svg",
@@ -540,12 +535,7 @@ class _NewForgotOtpScreenState extends State<NewForgotOtpScreen> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const NewLoginScreen(),
-                  ),
-                );
+                context.goNamed(RouteNames.login);
               },
               child: const Text(
                 "Login",

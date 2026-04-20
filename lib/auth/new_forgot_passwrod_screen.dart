@@ -1,16 +1,16 @@
-import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../widgets/TopMessage.dart';
-import 'new_forgot_otp_screen.dart';
 
 class NewForgotPasswrodScreen extends StatefulWidget {
   const NewForgotPasswrodScreen({super.key});
@@ -72,13 +72,9 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
 
         if (!mounted) return;
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => NewForgotOtpScreen(
-              email: emailController.text.trim(),
-            ),
-          ),
+        context.pushNamed(
+          RouteNames.forgotOtp,
+          extra: emailController.text.trim(),
         );
 
       } else {
@@ -172,7 +168,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
                         left: 16,
                         child: InkWell(
                           onTap: () {
-                            Navigator.pop(context); // 🔥 screen pop karega
+                            context.pop();
                           },
                           child: SvgPicture.asset(
                             "assets/svg/back.svg",
@@ -416,12 +412,7 @@ class _NewForgotPasswrodScreenState extends State<NewForgotPasswrodScreen> {
               ),
               InkWell(
                 onTap: () {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const NewLoginScreen(),
-                    ),
-                  );
+                  context.goNamed(RouteNames.login);
                 },
                 child: const Text(
                   "Login",

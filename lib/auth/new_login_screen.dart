@@ -1,11 +1,12 @@
-  import 'package:beige/MainScreen.dart';
   import 'package:flutter/material.dart';
   import 'package:flutter/services.dart';
   import 'package:flutter_svg/svg.dart';
+  import 'package:go_router/go_router.dart';
   import 'package:shared_preferences/shared_preferences.dart';
 
   import '../app/colors.dart';
   import '../app/radii.dart';
+  import '../app/route_names.dart';
   import '../app/spacing.dart';
   import '../app/text_styles.dart';
   import '../Customtextfiled/CustomInputField.dart';
@@ -13,8 +14,6 @@
   import '../service/api_service.dart';
   import '../service/shared_service.dart';
   import '../widgets/TopMessage.dart';
-  import 'new_forgot_passwrod_screen.dart';
-  import 'new_sing_up_screen.dart';
 
   class NewLoginScreen extends StatefulWidget {
     const NewLoginScreen({super.key});
@@ -110,11 +109,7 @@
         if (!mounted) return;
 
         /// ✅ NAVIGATE
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => Mainscreen()),
-              (route) => false,
-        );
+        context.goNamed(RouteNames.home);
 
       } catch (e) {
         TopMessage.show(context, "Something went wrong");
@@ -374,8 +369,7 @@
                                 const Spacer(),*/
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.push(context,
-                                        MaterialPageRoute(builder: (_) => NewForgotPasswrodScreen()));
+                                    context.pushNamed(RouteNames.forgotPassword);
                                   },
                                   child: const Text(
                                     "Forgot Password?",
@@ -532,12 +526,7 @@
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const NewSingUpScreen(),
-                    ),
-                  );
+                  context.pushNamed(RouteNames.signup);
                 },
                 child: const Text(
                   "Sign Up",

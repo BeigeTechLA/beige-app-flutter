@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
 import '../service/api_endpoints.dart';
 import '../service/api_service.dart';
 import '../widgets/TopMessage.dart';
-import 'Password_successfull.dart';
-import 'new_forgot_otp_screen.dart';
 
 class NewNewPasswrodScreen extends StatefulWidget {
   final String email;
@@ -83,12 +83,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
 
         if (!mounted) return;
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const PasswordSuccessfull(),
-          ),
-        );
+        context.goNamed(RouteNames.passwordSuccess);
       } else {
         print("❌ Reset Failed => ${response['message']}");
         _showSnack(response['message'] ?? "Failed to reset password");
@@ -150,7 +145,7 @@ class _NewNewPasswrodScreenState extends State<NewNewPasswrodScreen> {
                     left: 16,
                     child: InkWell(
                       onTap: () {
-                        Navigator.pop(context); // 🔥 screen pop karega
+                        context.pop();
                       },
                       child: SvgPicture.asset(
                         "assets/svg/back.svg",

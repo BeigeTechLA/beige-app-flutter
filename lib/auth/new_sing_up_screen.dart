@@ -1,14 +1,13 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:beige/OnbodingScreen/onboding_screen.dart';
-import 'package:beige/auth/new_login_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../app/colors.dart';
 import '../app/radii.dart';
+import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
@@ -180,7 +180,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                       ),
 
                       InkWell(
-                        onTap: () => Navigator.pop(context), // ❌ close bottom sheet
+                        onTap: () => context.pop(),
                         borderRadius: BorderRadius.circular(20),
                         child:  Padding(
                           padding: EdgeInsets.all(6),
@@ -348,7 +348,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                           });
                         }
 
-                        Navigator.pop(context);
+                        context.pop();
                       },
                       child:  Text(
                         "Save",
@@ -655,10 +655,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
       if (response['error'] == false &&
           (response['code'] == 200 || response['code'] == 201)) {
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const NewLoginScreen()),
-        );
+        context.goNamed(RouteNames.login);
 
       } else {
         TopMessage.show(context, response['message'] ?? "Signup failed");
@@ -776,7 +773,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                           left: 16,
                           child:InkWell(
                             onTap: () {
-                              Navigator.pop(context);
+                              context.pop();
                             },
                             child: SvgPicture.asset(
                               "assets/svg/back.svg",
@@ -1310,12 +1307,7 @@ class _NewSingUpScreenState extends State<NewSingUpScreen> {
                     ),
                     InkWell(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>  NewLoginScreen(),
-                          ),
-                        );
+                        context.goNamed(RouteNames.login);
                       },
                       child: const Text(
                         "Login",
