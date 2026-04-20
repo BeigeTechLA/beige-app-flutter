@@ -1,20 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/colors.dart';
 import '../app/route_names.dart';
 import '../app/text_styles.dart';
+import '../core/providers/auth_state_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   int currentIndex = 0;
   Timer? _timer;
   bool _precacheDone = false; // ✅ double call rokne ke liye
@@ -63,7 +65,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
         Future.delayed(const Duration(milliseconds: 600), () {
           if (!mounted) return;
-          context.goNamed(RouteNames.onboarding);
+          
+          final isLoggedIn = ref.read(authStateProvider);
+          if (isLoggedIn) {
+            context.goNamed(RouteNames.home);
+          } else {
+            context.goNamed(RouteNames.onboarding);
+          }
         });
       }
     });

@@ -1,5 +1,6 @@
   import 'package:flutter/material.dart';
   import 'package:flutter/services.dart';
+  import 'package:flutter_riverpod/flutter_riverpod.dart';
   import 'package:flutter_svg/svg.dart';
   import 'package:go_router/go_router.dart';
   import 'package:shared_preferences/shared_preferences.dart';
@@ -10,19 +11,20 @@
   import '../app/spacing.dart';
   import '../app/text_styles.dart';
   import '../Customtextfiled/CustomInputField.dart';
+  import '../core/providers/auth_state_provider.dart';
   import '../service/api_endpoints.dart';
   import '../service/api_service.dart';
   import '../service/shared_service.dart';
   import '../widgets/TopMessage.dart';
 
-  class NewLoginScreen extends StatefulWidget {
+  class NewLoginScreen extends ConsumerStatefulWidget {
     const NewLoginScreen({super.key});
 
     @override
-    State<NewLoginScreen> createState() => _NewLoginScreenState();
+    ConsumerState<NewLoginScreen> createState() => _NewLoginScreenState();
   }
 
-  class _NewLoginScreenState extends State<NewLoginScreen> {
+  class _NewLoginScreenState extends ConsumerState<NewLoginScreen> {
 
     bool showConfirmPassword = false;
     bool savePassword = false;
@@ -107,6 +109,9 @@
         }
 
         if (!mounted) return;
+
+        /// ✅ UPDATE AUTH STATE
+        ref.read(authStateProvider.notifier).updateState(true);
 
         /// ✅ NAVIGATE
         context.goNamed(RouteNames.home);
