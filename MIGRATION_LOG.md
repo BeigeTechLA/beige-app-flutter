@@ -5,6 +5,30 @@
 
 ---
 
+### 2026-04-22: Screen & Directory Rename — Naming Convention Standardization
+
+- **Changes**:
+  - Renamed 30 screen files and 26 screen classes across the entire codebase to follow consistent naming conventions.
+  - Fixed 8 typos in class names (`Passwrod`, `SingUp`, `Detils`, `Bookin`, `Successfull`, `Onboding`, `Sekect`, `Myprofile`).
+  - Added `Screen` suffix to 12 classes that were missing it.
+  - Dropped legacy "New" prefix from 6 classes.
+  - Clarified 6 vague screen names (e.g., `MoreDetailsScreen` → `ShootDetailsScreen`, `FindingThePerfectScreen` → `FindCreativeScreen`).
+  - Aligned 8 class names from "Booking" to "Shoot" domain terminology to match UI tab labels.
+  - Restructured directories:
+    - `lib/OnbodingScreen/` → `lib/OnboardingScreen/` (typo fix)
+    - `lib/Home/New_Home/` + `lib/Home/HomeSekect/` → `lib/Home/home/` (consolidated)
+    - `lib/Home/NewBookingFlow/` → `lib/Home/book_shoot/` (flattened, matches Tab 1 "Book a Shoot")
+    - `lib/Booking/` → `lib/my_shoot/` (matches Tab 2 "My Shoots")
+  - Updated all imports in `router.dart`, `main_screen.dart`, and cross-file references.
+- **Decisions**:
+  - **"Shoot" over "Booking"**: User-facing terminology is "Shoots" (tab labels: "Book Shoot", "My Shoots"). Aligned directory and class names to match domain language. "Booking" was an internal backend term that leaked into the UI layer.
+  - **Directory `my_shoot/` not `my_shoots/`**: Singular form for directory names — consistent with `lib/auth/` (not `lib/auths/`), `lib/Home/book_shoot/` (not `book_shoots/`).
+  - **Kept `lib/Home/` parent**: Not renamed yet — will move to `lib/features/` structure during Phase 4 feature migration.
+  - **`MainScreen.dart` → `main_screen.dart`**: File renamed + class casing fixed (`Mainscreen` → `MainScreen`). This file is legacy (replaced by `_MainShell` in GoRouter) but kept for reference.
+- **Constraints Maintained**: `flutter analyze` — zero errors (591 info/warnings, all pre-existing). All imports verified with zero stale references.
+
+---
+
 ### 2026-04-19: Phase 2 — Critical Bug Fixes
 - **Changes**:
   - Removed auth token `print()` from `api_service.dart:24` — was logging Bearer token on every API call in production.

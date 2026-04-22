@@ -5,45 +5,45 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../Booking/MY_SelectBookingType.dart';
-import '../Booking/Shoot_updated_screen.dart';
-import '../Booking/bookin_review_confirm.dart';
-import '../Booking/booking_all_screen.dart';
-import '../Booking/cancel_booking.dart';
-import '../Booking/upcoming_booking_event_summary.dart';
-import '../Booking/upcoming_event_summary_managebooking.dart';
-import '../Home/HomeSekect/Home_view_profile.dart';
-import '../Home/HomeSekect/change_location_screen.dart';
-import '../Home/HomeSekect/finding_the_perfect_screen.dart';
-import '../Home/HomeSekect/payment_method.dart';
-import '../Home/HomeSekect/recommended_detils_screen.dart';
-import '../Home/NewBookingFlow/Book_Confirm/PaymentSuccessScreen.dart';
-import '../Home/NewBookingFlow/Book_Confirm/review_confirm_screen.dart';
-import '../Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
-import '../Home/NewBookingFlow/CreateProjectStep1/ShootDateTime/Shoot_Date_Time_screen.dart';
-import '../Home/NewBookingFlow/CreateProjectStep1/Video_Shoot_Type.dart';
-import '../Home/NewBookingFlow/More_Details/crew_size_matching_screen.dart';
-import '../Home/NewBookingFlow/More_Details/more_details_screen.dart';
-import '../Home/NewBookingFlow/More_Details/select_your_dream_team.dart';
-import '../Home/New_Home/new_home_screen.dart';
-import '../MyProfile/Booking_History_screen.dart';
-import '../MyProfile/Change_Password_screen.dart';
-import '../MyProfile/DeleteAccount/delete_account.dart';
+import '../my_shoot/cancel_shoot_screen.dart';
+import '../my_shoot/manage_shoot_screen.dart';
+import '../my_shoot/my_shoots_screen.dart';
+import '../my_shoot/shoot_edit_review_screen.dart';
+import '../my_shoot/shoot_summary_screen.dart';
+import '../my_shoot/shoot_type_selection_screen.dart';
+import '../my_shoot/shoot_update_success_screen.dart';
+import '../Home/book_shoot/content_type_screen.dart';
+import '../Home/book_shoot/crew_selection_screen.dart';
+import '../Home/book_shoot/crew_size_matching_screen.dart';
+import '../Home/book_shoot/payment_method_screen.dart';
+import '../Home/book_shoot/payment_success_screen.dart';
+import '../Home/book_shoot/shoot_date_time_screen.dart';
+import '../Home/book_shoot/shoot_details_screen.dart';
+import '../Home/book_shoot/shoot_review_screen.dart';
+import '../Home/book_shoot/shoot_type_screen.dart';
+import '../Home/home/change_location_screen.dart';
+import '../Home/home/creative_profile_screen.dart';
+import '../Home/home/find_creative_screen.dart';
+import '../Home/home/home_screen.dart';
+import '../Home/home/recommended_creative_detail_screen.dart';
 import '../MyProfile/DeleteAccount/delete_account_otp_screen.dart';
-import '../MyProfile/Favourite_screen.dart';
-import '../MyProfile/app_preferences.dart';
-import '../MyProfile/edit_profile.dart';
-import '../MyProfile/my_profile.dart';
-import '../MyProfile/myprofile_enter_otp_screen.dart';
-import '../MyProfile/myprofile_new_password_screen.dart';
-import '../OnbodingScreen/onboding_screen.dart';
+import '../MyProfile/DeleteAccount/delete_account_screen.dart';
+import '../MyProfile/app_preferences_screen.dart';
+import '../MyProfile/change_password_screen.dart';
+import '../MyProfile/edit_profile_screen.dart';
+import '../MyProfile/favorites_screen.dart';
+import '../MyProfile/profile_new_password_screen.dart';
+import '../MyProfile/profile_otp_screen.dart';
+import '../MyProfile/profile_screen.dart';
+import '../MyProfile/shoot_history_screen.dart';
+import '../OnboardingScreen/onboarding_screen.dart';
 import '../SplashScreen/splash_screen.dart';
-import '../auth/Password_successfull.dart';
-import '../auth/new_forgot_otp_screen.dart';
-import '../auth/new_forgot_passwrod_screen.dart';
-import '../auth/new_login_screen.dart';
-import '../auth/new_new_passwrod_screen.dart';
-import '../auth/new_sing_up_screen.dart';
+import '../auth/forgot_password_otp_screen.dart';
+import '../auth/forgot_password_screen.dart';
+import '../auth/login_screen.dart';
+import '../auth/password_reset_success_screen.dart';
+import '../auth/reset_password_screen.dart';
+import '../auth/sign_up_screen.dart';
 import '../core/firebase/analytics_service.dart';
 import '../core/providers/auth_state_provider.dart';
 import 'route_names.dart';
@@ -123,24 +123,24 @@ final routerProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: '/login',
       name: RouteNames.login,
-      builder: (context, state) => const NewLoginScreen(),
+      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/signup',
       name: RouteNames.signup,
-      builder: (context, state) => const NewSingUpScreen(),
+      builder: (context, state) => const SignUpScreen(),
     ),
     GoRoute(
       path: '/forgot-password',
       name: RouteNames.forgotPassword,
-      builder: (context, state) => const NewForgotPasswrodScreen(),
+      builder: (context, state) => const ForgotPasswordScreen(),
     ),
     GoRoute(
       path: '/forgot-otp',
       name: RouteNames.forgotOtp,
       builder: (context, state) {
         final email = state.extra as String? ?? '';
-        return NewForgotOtpScreen(email: email);
+        return ForgotPasswordOtpScreen(email: email);
       },
     ),
     GoRoute(
@@ -148,7 +148,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.resetPassword,
       builder: (context, state) {
         final data = state.extra as Map<String, String>? ?? {};
-        return NewNewPasswrodScreen(
+        return ResetPasswordScreen(
           email: data['email'] ?? '',
           otp: data['otp'] ?? '',
         );
@@ -157,7 +157,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: '/password-success',
       name: RouteNames.passwordSuccess,
-      builder: (context, state) => const PasswordSuccessfull(),
+      builder: (context, state) => const PasswordResetSuccessScreen(),
     ),
 
     // ── Main Shell (bottom nav with IndexedStack) ──────────────────
@@ -172,7 +172,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             GoRoute(
               path: '/',
               name: RouteNames.home,
-              builder: (context, state) => const NewHomeScreen(),
+              builder: (context, state) => const HomeScreen(),
             ),
           ],
         ),
@@ -192,7 +192,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             GoRoute(
               path: '/my-shoots',
               name: RouteNames.myShoots,
-              builder: (context, state) => const BookingAllScreen(),
+              builder: (context, state) => const MyShootsScreen(),
             ),
           ],
         ),
@@ -215,7 +215,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.viewProfile,
       builder: (context, state) {
         final id = int.parse(state.pathParameters['id']!);
-        return HomeViewProfile(id: id);
+        return CreativeProfileScreen(id: id);
       },
     ),
     GoRoute(
@@ -224,7 +224,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       builder: (context, state) {
         final id = int.parse(state.pathParameters['id']!);
         final bookingId = int.parse(state.uri.queryParameters['bookingId'] ?? '0');
-        return RecommendedDetilsScreen(id: id, bookingId: bookingId);
+        return RecommendedCreativeDetailScreen(id: id, bookingId: bookingId);
       },
     ),
     GoRoute(
@@ -237,7 +237,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.findingPerfect,
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return FindingThePerfectScreen(
+        return FindCreativeScreen(
           bookingId: data['bookingId'] as int? ?? 0,
           specialtyId: data['specialtyId'] as int? ?? 0,
           ShootTypeId: data['ShootTypeId'] as int? ?? 0,
@@ -272,7 +272,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.videoShootType,
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return VideoShootType(
+        return ShootTypeScreen(
           contentTypeId: data['contentTypeId'] as int? ?? 0,
           bookingId: data['bookingId'] as int? ?? 0,
         );
@@ -295,7 +295,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.moreDetails,
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return MoreDetailsScreen(
+        return ShootDetailsScreen(
           contentTypeId: data['contentTypeId'] as int? ?? 0,
           specialtyId: data['specialtyId'] as int? ?? 0,
           ShootTypeId: data['ShootTypeId'] as int? ?? 0,
@@ -321,7 +321,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.selectDreamTeam,
       builder: (context, state) {
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return SelectYourDreamTeam(
+        return CrewSelectionScreen(
           specialtyId: data['specialtyId'] as int? ?? 0,
           ShootTypeId: data['ShootTypeId'] as int? ?? 0,
           bookingId: data['bookingId'] as int? ?? 0,
@@ -334,7 +334,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.reviewConfirm,
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return ReviewConfirmScreen(bookingId: bookingId);
+        return ShootReviewScreen(bookingId: bookingId);
       },
     ),
     GoRoute(
@@ -359,7 +359,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return UpcomingBookingEventSummary(
+        return ShootSummaryScreen(
           bookingId: bookingId,
           contentType: data['contentType'] as String?,
           shootTypeId: data['shootTypeId'] as int? ?? 0,
@@ -372,7 +372,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return UpcomingEventSummaryManagebooking(
+        return ManageShootScreen(
           bookingId: bookingId,
           shootTypeId: data['shootTypeId'] as int? ?? 0,
           projectName: data['projectName'] as String?,
@@ -393,7 +393,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.bookingReviewConfirm,
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return BookinReviewConfirm(bookingId: bookingId);
+        return ShootEditReviewScreen(bookingId: bookingId);
       },
     ),
     GoRoute(
@@ -402,7 +402,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
         final data = state.extra as Map<String, dynamic>? ?? {};
-        return CancelBooking(
+        return CancelShootScreen(
           bookingId: bookingId,
           projectName: data['projectName'] as String?,
           eventDate: data['eventDate'] as String?,
@@ -420,25 +420,25 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.selectBookingType,
       builder: (context, state) {
         final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return MySelectbookingtype(bookingId: bookingId);
+        return ShootTypeSelectionScreen(bookingId: bookingId);
       },
     ),
     GoRoute(
       path: '/shoot-updated',
       name: RouteNames.shootUpdated,
-      builder: (context, state) => const ShootUpdatedScreen(),
+      builder: (context, state) => const ShootUpdateSuccessScreen(),
     ),
 
     // ── Profile ────────────────────────────────────────────────────
     GoRoute(
       path: '/profile',
       name: RouteNames.profile,
-      builder: (context, state) => const MyProfile(),
+      builder: (context, state) => const ProfileScreen(),
     ),
     GoRoute(
       path: '/edit-profile',
       name: RouteNames.editProfile,
-      builder: (context, state) => const EditProfile(),
+      builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
       path: '/change-password',
@@ -453,7 +453,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.profileOtp,
       builder: (context, state) {
         final email = state.extra as String? ?? '';
-        return EnterOtpCodeScreen(email: email);
+        return ProfileOtpScreen(email: email);
       },
     ),
     GoRoute(
@@ -461,7 +461,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       name: RouteNames.profileNewPassword,
       builder: (context, state) {
         final data = state.extra as Map<String, String>? ?? {};
-        return MyprofileNewPasswordScreen(
+        return ProfileNewPasswordScreen(
           email: data['email'] ?? '',
           otp: data['otp'] ?? '',
         );
@@ -470,22 +470,22 @@ final routerProvider = Provider<GoRouter>((ref) {
     GoRoute(
       path: '/booking-history',
       name: RouteNames.bookingHistory,
-      builder: (context, state) => const BookingHistoryScreen(),
+      builder: (context, state) => const ShootHistoryScreen(),
     ),
     GoRoute(
       path: '/favourites',
       name: RouteNames.favourites,
-      builder: (context, state) => const FavouriteScreen(),
+      builder: (context, state) => const FavoritesScreen(),
     ),
     GoRoute(
       path: '/app-preferences',
       name: RouteNames.appPreferences,
-      builder: (context, state) => const AppPreferences(),
+      builder: (context, state) => const AppPreferencesScreen(),
     ),
     GoRoute(
       path: '/delete-account',
       name: RouteNames.deleteAccount,
-      builder: (context, state) => const DeleteAccount(),
+      builder: (context, state) => const DeleteAccountScreen(),
     ),
     GoRoute(
       path: '/delete-account-otp',

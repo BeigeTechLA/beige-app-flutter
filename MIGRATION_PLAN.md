@@ -68,32 +68,241 @@ Every item below must be in place before any feature screen is migrated. Nothing
 
 Features are ordered by: isolation (no dependencies first), complexity (simplest first), and dependency direction (if B needs A's providers, A migrates first).
 
-| Order | Feature | Screens | Files | Current State | API Calls | Complexity | Dependencies | Est. Days |
-|---|---|---|---|---|---|---|---|---|
-| 1 | **Splash** | SplashScreen | 1 | Migrated to ConsumerState + GoRouter | 0 | Trivial | None — standalone entry point | ✅ Done |
-| 2 | **Onboarding** | OnboardingScreen | 1 | Migrated to AppColors/GoRouter | 0 | Low | None | ✅ Done |
-| 3 | **App Shell** | MainScreen | 1 | StatefulShellRoute.indexedStack | 0 | Low | GoRouter `ShellRoute` + `IndexedStack` | ✅ Done |
-| 4 | **Password Success** | PasswordSuccessfull | 1 | setState + Future.delayed | 0 | Trivial | Auth route only | 0.25 |
-| 5 | **Shoot Updated** | ShootUpdatedScreen | 1 | setState | 0 | Trivial | Nav route only | 0.25 |
-| 6 | **Booking Type Selection** | MySelectBookingType | 1 | setState | 0 | Low | Date/time UI only, no API | 1 |
-| 7 | **Profile — View** | MyProfile, BookingHistoryScreen, FavouriteScreen | 3 | setState | ~8 | Medium | Auth provider (token), API repository | 2 |
-| 8 | **Profile — Edit** | EditProfile | 1 | setState | ~6 | High | Image upload, map, location, auth provider | 2 |
-| 9 | **Profile — Settings** | AppPreferences, ChangePasswordScreen, MyProfileEnterOtpScreen, MyProfileNewPasswordScreen | 4 | setState + Timer | ~6 | Medium | Auth provider, OTP timer | 2 |
-| 10 | **Profile — Delete Account** | DeleteAccount, DeleteAccountOtpScreen | 2 | setState + Timer | ~3 | Medium | Auth provider, OTP timer | 1 |
-| 11 | **Home Feed** | NewHomeScreen, HomeController | 2 | setState + AnimationController | ~6 | High | Auth provider, home repository, location provider | 3 |
-| 12 | **Creative Profiles** | HomeViewProfile, RecommendedDetilsScreen | 2 | setState | ~12 | Medium | Home provider, favourites provider | 2 |
-| 13 | **Location** | ChangeLocationScreen, FindingThePerfectScreen | 2 | setState | ~3 | Medium | Map, geolocation, profile provider | 1.5 |
-| 14 | **New Booking — Step 1** | ContentTypeScreen, VideoShootType | 2 | setState | ~6 | Medium | Booking repository | 2 |
-| 15 | **New Booking — Step 2** | ShootDateTimeScreen | 1 | setState | ~3 | High | 2,920 lines — must decompose first | 3 |
-| 16 | **New Booking — Step 3** | MoreDetailsScreen, CrewSizeMatchingScreen, SelectYourDreamTeam | 3 | setState | ~12 | High | Booking state from steps 1–2, file upload | 3 |
-| 17 | **New Booking — Review & Pay** | ReviewConfirmScreen, PaymentMethodScreen, PaymentSuccessScreen | 3 | setState | ~10 | High | Stripe, booking state from all prior steps | 3 |
-| 18 | **Booking Management** | BookingAllScreen, UpcomingBookingEventSummary, UpcomingEventSummaryManagebooking, BookinReviewConfirm, CancelBooking | 5 | setState | ~16 | High | Booking repository, auth provider | 3 |
-| 19 | **Auth — Login** | NewLoginScreen | 1 | setState | ~3 | High | Auth repository, token storage, navigation redirect | 2 |
-| 20 | **Auth — Signup** | NewSingUpScreen | 1 | setState | ~6 | Critical | 1,781 lines god widget — **must decompose into 3–4 screens first** (registration form, OTP verification, location/map, image upload) | 4 |
-| 21 | **Auth — Forgot Password** | NewForgotPasswrodScreen, NewForgotOtpScreen, NewNewPasswrodScreen | 3 | setState + Timer | ~6 | High | Auth repository, OTP timer, navigation chain | 2 |
-| 22 | **Internet Connectivity** | InternetHelper, InternetService | 2 | Static streams + global flags | 0 | Medium | Global connectivity provider | 1 |
+**Total: ~39 screens across 7 feature groups (22 migration units).**
 
-**Total feature migration: ~39 screens across 22 migration units.**
+---
+
+### Feature Group A — Completed Migrations (Units 1–3)
+
+| Unit | Screen Class | File Path | Status |
+|---|---|---|---|
+| 1 | `SplashScreen` | `lib/SplashScreen/splash_screen.dart` | ✅ Done |
+| 2 | `OnboardingScreen` | `lib/OnboardingScreen/onboarding_screen.dart` | ✅ Done |
+| 3 | `MainScreen` (→ `_MainShell`) | `lib/main_screen.dart` → `lib/app/router.dart` | ✅ Done |
+
+**Navigation:**
+```
+SplashScreen → OnboardingScreen → LoginScreen
+                                → MainScreen [if logged in]
+```
+
+---
+
+### Feature Group B — Standalone Screens (Units 4–6) | Est. 1.5 days
+
+Simple screens with no API calls. Migrate first to build momentum.
+
+| Unit | Screen Class | File Path | Current State | Complexity |
+|---|---|---|---|---|
+| 4 | `PasswordResetSuccessScreen` | `lib/auth/password_reset_success_screen.dart` | setState + Future.delayed | Trivial |
+| 5 | `ShootUpdateSuccessScreen` | `lib/my_shoot/shoot_update_success_screen.dart` | setState | Trivial |
+| 6 | `ShootTypeSelectionScreen` | `lib/my_shoot/shoot_type_selection_screen.dart` | setState | Low |
+
+**Dependencies:** None — pure UI, no API calls, no shared state.
+
+**Navigation (these are leaf screens):**
+```
+... → PasswordResetSuccessScreen → LoginScreen [after 3s]
+... → ShootUpdateSuccessScreen → MainScreen [clears stack]
+ShootSummaryScreen → ShootTypeSelectionScreen → [back]
+```
+
+---
+
+### Feature Group C — Profile (Units 7–10) | Est. 7 days
+
+All screens under `lib/MyProfile/`. Migrate together — they share auth provider and profile API repository.
+
+| Unit | Screen Class | File Path | API Calls | Complexity |
+|---|---|---|---|---|
+| 7 | `ProfileScreen` | `lib/MyProfile/profile_screen.dart` | ~3 | Medium |
+| 7 | `ShootHistoryScreen` | `lib/MyProfile/shoot_history_screen.dart` | ~3 | Medium |
+| 7 | `FavoritesScreen` | `lib/MyProfile/favorites_screen.dart` | ~2 | Medium |
+| 8 | `EditProfileScreen` | `lib/MyProfile/edit_profile_screen.dart` | ~6 | High |
+| 9 | `AppPreferencesScreen` | `lib/MyProfile/app_preferences_screen.dart` | 0 | Low |
+| 9 | `ChangePasswordScreen` | `lib/MyProfile/change_password_screen.dart` | ~2 | Medium |
+| 9 | `ProfileOtpScreen` | `lib/MyProfile/profile_otp_screen.dart` | ~2 | Medium |
+| 9 | `ProfileNewPasswordScreen` | `lib/MyProfile/profile_new_password_screen.dart` | ~2 | Medium |
+| 10 | `DeleteAccountScreen` | `lib/MyProfile/DeleteAccount/delete_account_screen.dart` | ~1 | Medium |
+| 10 | `DeleteAccountOtpScreen` | `lib/MyProfile/DeleteAccount/delete_account_otp_screen.dart` | ~2 | Medium |
+
+**Dependencies:** Auth provider (token), profile API repository, image upload (EditProfile), Google Maps (EditProfile).
+
+**Navigation:**
+```
+ProfileScreen
+  ├── EditProfileScreen [returns bool]
+  ├── ShootHistoryScreen
+  ├── FavoritesScreen
+  ├── AppPreferencesScreen
+  │     └── ChangePasswordScreen
+  │           └── ProfileOtpScreen(email)
+  │                 └── ProfileNewPasswordScreen(email, otp)
+  ├── DeleteAccountScreen
+  │     └── DeleteAccountOtpScreen → SplashScreen
+  └── Logout → SplashScreen
+```
+
+**Migration order within group:** Unit 7 (view) → 9 (settings) → 10 (delete) → 8 (edit, highest complexity last).
+
+---
+
+### Feature Group D — Home Tab (Units 11–13) | Est. 6.5 days
+
+All screens under `lib/Home/home/`. Home feed is the god widget (3,838 lines).
+
+| Unit | Screen Class | File Path | API Calls | Complexity |
+|---|---|---|---|---|
+| 11 | `HomeScreen` | `lib/Home/home/home_screen.dart` | ~4 | High |
+| 11 | `HomeController` | `lib/Home/home/home_controller.dart` | ~2 | High |
+| 12 | `CreativeProfileScreen` | `lib/Home/home/creative_profile_screen.dart` | ~6 | Medium |
+| 12 | `RecommendedCreativeDetailScreen` | `lib/Home/home/recommended_creative_detail_screen.dart` | ~6 | Medium |
+| 13 | `ChangeLocationScreen` | `lib/Home/home/change_location_screen.dart` | ~1 | Medium |
+| 13 | `FindCreativeScreen` | `lib/Home/home/find_creative_screen.dart` | ~2 | Medium |
+
+**Dependencies:** Auth provider, home repository, location provider, favourites provider, Google Maps + geolocation.
+
+**Navigation:**
+```
+HomeScreen (Tab 0)
+  ├── CreativeProfileScreen(id)
+  │     └── ContentTypeScreen(...)
+  ├── RecommendedCreativeDetailScreen(id, bookingId)
+  │     └── ContentTypeScreen(...)
+  ├── FindCreativeScreen(bookingId, specialtyId, ...)
+  │     └── ContentTypeScreen(...)
+  ├── ChangeLocationScreen [returns location payload]
+  └── ProfileScreen [→ Feature Group C]
+```
+
+**Migration order within group:** Unit 13 (location, simplest) → 12 (creative profiles) → 11 (home feed, must decompose).
+
+---
+
+### Feature Group E — Book a Shoot Flow (Units 14–17) | Est. 11 days
+
+All screens under `lib/Home/book_shoot/`. Linear multi-step flow — state carries forward through each step.
+
+| Unit | Screen Class | File Path | API Calls | Complexity |
+|---|---|---|---|---|
+| 14 | `ContentTypeScreen` | `lib/Home/book_shoot/content_type_screen.dart` | ~3 | Medium |
+| 14 | `ShootTypeScreen` | `lib/Home/book_shoot/shoot_type_screen.dart` | ~3 | Medium |
+| 15 | `ShootDateTimeScreen` | `lib/Home/book_shoot/shoot_date_time_screen.dart` | ~3 | High |
+| 16 | `ShootDetailsScreen` | `lib/Home/book_shoot/shoot_details_screen.dart` | ~4 | High |
+| 16 | `CrewSizeMatchingScreen` | `lib/Home/book_shoot/crew_size_matching_screen.dart` | ~4 | High |
+| 16 | `CrewSelectionScreen` | `lib/Home/book_shoot/crew_selection_screen.dart` | ~4 | High |
+| 17 | `ShootReviewScreen` | `lib/Home/book_shoot/shoot_review_screen.dart` | ~4 | High |
+| 17 | `PaymentMethodScreen` | `lib/Home/book_shoot/payment_method_screen.dart` | ~3 | High |
+| 17 | `PaymentSuccessScreen` | `lib/Home/book_shoot/payment_success_screen.dart` | ~3 | Medium |
+
+**Dependencies:** Booking repository, booking state (accumulates across steps), Stripe payment, file upload (ShootDetailsScreen).
+
+**Navigation (linear flow):**
+```
+ContentTypeScreen (Tab 1 root, or pushed from Home)
+  └── ShootTypeScreen(contentTypeId, bookingId)
+        └── ShootDateTimeScreen(bookingId, contentTypeId, specialtyId)
+              └── ShootDetailsScreen(bookingId, contentTypeId, specialtyId, shootTypeId)
+                    └── CrewSizeMatchingScreen(bookingId, ...)
+                          └── CrewSelectionScreen(bookingId, ...)
+                                └── ShootReviewScreen(bookingId)
+                                      ├── PaymentMethodScreen(bookingId)
+                                      └── PaymentSuccessScreen(bookingId, ...) → MainScreen
+```
+
+**Migration order within group:** Unit 14 (step 1) → 15 (step 2, must decompose 2,920 lines) → 16 (step 3) → 17 (review & pay).
+
+**Key consideration:** `ShootDateTimeScreen` is 2,920 lines — decompose before migrating.
+
+---
+
+### Feature Group F — My Shoots Tab (Unit 18) | Est. 3 days
+
+All screens under `lib/my_shoot/`. Manage existing shoots — view, edit, cancel.
+
+| Unit | Screen Class | File Path | API Calls | Complexity |
+|---|---|---|---|---|
+| 18 | `MyShootsScreen` | `lib/my_shoot/my_shoots_screen.dart` | ~4 | High |
+| 18 | `ShootSummaryScreen` | `lib/my_shoot/shoot_summary_screen.dart` | ~4 | High |
+| 18 | `ManageShootScreen` | `lib/my_shoot/manage_shoot_screen.dart` | ~3 | High |
+| 18 | `ShootEditReviewScreen` | `lib/my_shoot/shoot_edit_review_screen.dart` | ~3 | High |
+| 18 | `CancelShootScreen` | `lib/my_shoot/cancel_shoot_screen.dart` | ~2 | Medium |
+
+**Dependencies:** Booking repository, auth provider. Shares booking models with Feature Group E.
+
+**Navigation:**
+```
+MyShootsScreen (Tab 2 root)
+  ├── ShootSummaryScreen(bookingId, contentType, shootTypeId)
+  │     └── ShootTypeSelectionScreen(bookingId) [Feature Group B]
+  ├── ManageShootScreen(bookingId, ...)
+  │     ├── ManageShootScreen (self-refresh)
+  │     ├── ShootEditReviewScreen(bookingId)
+  │     └── CancelShootScreen(bookingId, ...) → MyShootsScreen
+  └── ShootUpdateSuccessScreen [Feature Group B] → MainScreen
+```
+
+**Migration order within group:** `MyShootsScreen` (list) → `ShootSummaryScreen` → `ManageShootScreen` → `ShootEditReviewScreen` → `CancelShootScreen`.
+
+---
+
+### Feature Group G — Auth (Units 19–21) | Est. 8 days
+
+All screens under `lib/auth/`. Migrated last — highest risk, touches token storage and navigation redirect.
+
+| Unit | Screen Class | File Path | API Calls | Complexity |
+|---|---|---|---|---|
+| 19 | `LoginScreen` | `lib/auth/login_screen.dart` | ~3 | High |
+| 20 | `SignUpScreen` | `lib/auth/sign_up_screen.dart` | ~6 | Critical |
+| 21 | `ForgotPasswordScreen` | `lib/auth/forgot_password_screen.dart` | ~2 | High |
+| 21 | `ForgotPasswordOtpScreen` | `lib/auth/forgot_password_otp_screen.dart` | ~2 | High |
+| 21 | `ResetPasswordScreen` | `lib/auth/reset_password_screen.dart` | ~2 | High |
+
+**Dependencies:** Auth repository, token storage (SharedPreferences), Google Sign-In (SignUpScreen), navigation redirect on auth state change.
+
+**Navigation:**
+```
+LoginScreen
+  ├── → MainScreen [after successful login]
+  ├── → ForgotPasswordScreen
+  │     └── ForgotPasswordOtpScreen(email)
+  │           └── ResetPasswordScreen(email, otp)
+  │                 └── PasswordResetSuccessScreen [Feature Group B]
+  │                       └── LoginScreen [after 3s]
+  └── → SignUpScreen
+        └── LoginScreen [on success]
+```
+
+**Migration order within group:** Unit 21 (forgot password, 3 simple screens) → 19 (login) → 20 (signup, must decompose 1,781 lines).
+
+**Key consideration:** `SignUpScreen` is 1,781 lines — **must decompose into 3–4 sub-screens** (registration form, OTP verification, location/map, image upload) before migrating.
+
+---
+
+### Feature Group H — Infrastructure (Unit 22) | Est. 1 day
+
+| Unit | Class | File Path | Complexity |
+|---|---|---|---|
+| 22 | `InternetHelper` | `lib/service/internet_service.dart` | Medium |
+| 22 | `InternetService` | `lib/service/internet_service.dart` | Medium |
+
+**Dependencies:** Global connectivity provider. Can be migrated at any point.
+
+---
+
+### Migration Summary by Group
+
+| Group | Feature | Screens | Est. Days | Migrate After |
+|---|---|---|---|---|
+| A | Completed (Splash, Onboarding, Shell) | 3 | ✅ Done | — |
+| B | Standalone screens | 3 | 1.5 | A |
+| C | Profile | 10 | 7 | B (needs auth provider) |
+| D | Home tab | 6 | 6.5 | C (ProfileScreen accessed from Home) |
+| E | Book a Shoot flow | 9 | 11 | D (ContentTypeScreen pushed from Home) |
+| F | My Shoots tab | 5 | 3 | E (shares booking models) |
+| G | Auth | 5 | 8 | All (highest risk, migrate last) |
+| H | Internet connectivity | 2 | 1 | Any time |
+| | **Total** | **~39** | **~38.5 days** | |
 
 ---
 
