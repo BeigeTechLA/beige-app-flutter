@@ -1,9 +1,14 @@
+import 'dart:ui';
+
+import 'package:beige/Home/New_Home/new_home_screen.dart';
+import 'package:beige/MainScreen.dart';
 import 'package:beige/auth/new_login_screen.dart';
 import 'package:beige/auth/new_sing_up_screen.dart';
 import 'package:flutter/material.dart';
 
 
 import '../utility/ColorCode.dart';
+import '../utility/commen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -210,7 +215,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const NewLoginScreen(),
+                        builder: (_) => const Mainscreen(),
                       ),
                     );
                   },
@@ -231,4 +236,5 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+
 }

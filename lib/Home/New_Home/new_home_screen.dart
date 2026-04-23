@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:beige/auth/new_login_screen.dart';
 import 'package:beige/utility/ColorCode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../Model/HomeModel.dart';
 import '../../MyProfile/my_profile.dart';
 import '../../service/api_service.dart';
+import '../../utility/commen.dart';
 import '../../widgets/loding.dart';
 import '../HomeSekect/Home_view_profile.dart';
 import '../HomeSekect/change_location_screen.dart';
@@ -568,6 +570,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     _inspiredController.dispose(); // ✅ ADD THIS
     _bookingSwipeController.dispose();
     _borderController.dispose();
+    _cardController.dispose();
+    _pageController.dispose();
+    _studioController.dispose();
+    _bookingController.dispose();
 
     super.dispose();
   }
@@ -633,39 +639,40 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => const ChangeLocationScreen(),
-                                            ),
-                                          );
+                                      if ((homeData?.location ?? "").isNotEmpty)
+                                        GestureDetector(
+                                          onTap: () async {
+                                            final result = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => const ChangeLocationScreen(),
+                                              ),
+                                            );
 
-                                          if (result != null && result is Map<String, dynamic>) {
-                                            setState(() {
-                                              isLoading = true;
-                                            });
-                                            fetchData();
-                                          }
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Flexible(
-                                                child:
-                                                Text(
-                                                    homeData?.location ?? "Loading...",
-
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.6),
-                                                        fontSize: 15,
-                                                        fontFamily: "Outfit"))),
-                                            const Icon(Icons.expand_more,
-                                                color: Colors.white, size: 20),
-                                          ],
-                                        ),
-                                      )
+                                            if (result != null && result is Map<String, dynamic>) {
+                                              setState(() {
+                                                isLoading = true;
+                                              });
+                                              fetchData();
+                                            }
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  homeData!.location,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: Colors.white.withOpacity(0.6),
+                                                    fontSize: 15,
+                                                    fontFamily: "Outfit",
+                                                  ),
+                                                ),
+                                              ),
+                                              const Icon(Icons.expand_more, color: Colors.white, size: 20),
+                                            ],
+                                          ),
+                                        )
                                     ],
                                   ),
                                 ),
@@ -687,13 +694,16 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                       ),
                                       GestureDetector(
                                         onTap: () async{
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const MyProfile(),
-                                            ),
-                                          );
-                                          fetchData();
+                                          checkLogin(context, () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (
+                                                    context) => const MyProfile(),
+                                              ),
+                                            );
+                                            fetchData();
+                                          });
                                         },
 
                                         child: CircleAvatar(
@@ -1730,9 +1740,212 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
         ),
       ],
     ),
-
-
                       const SizedBox(height: 10),
+
+                      /// 🔥 ONLY SHOW WHEN DATA AVAILABLE
+                      (homeData?.featuredCreatives ?? []).isNotEmpty
+                          ? Column(
+                        children: [
+
+                          /// 🔹 DIVIDER
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: Container(
+                              height: 1,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.09),
+                                    Colors.white.withOpacity(0.09),
+                                    Colors.white.withOpacity(0.09),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          /// 🔹 HEADING
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "We Think You’ll Love These",
+                                  style: TextStyle(
+                                    color: ColorCode.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "Unbounded",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// 🔹 LIST VIEW
+                          SizedBox(
+                            height: 280,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: homeData!.featuredCreatives.length,
+                              itemBuilder: (context, index) {
+                                final data = homeData!.featuredCreatives[index];
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 12, right: 4),
+                                  child: Container(
+                                    width: 210,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(22),
+                                    ),
+                                    child: Stack(
+                                      children: [
+
+                                        /// 🔥 IMAGE
+                                        Positioned.fill(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(22),
+                                            child: data.profileImage.isNotEmpty
+                                                ? Image.network(
+                                              ApiService.imageURL + data.profileImage,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Center(
+                                                  child: SvgPicture.asset(
+                                                    "assets/svg/imag_placeholder.svg",
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                                : SvgPicture.asset(
+                                              "assets/svg/imag_placeholder.svg",
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+
+                                        /// 🔥 GRADIENT
+                                        Positioned.fill(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(22),
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                stops: const [0.4, 1.0],
+                                                colors: [
+                                                  Colors.transparent,
+                                                  Colors.black,
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+
+                                        /// 🔥 TEXT + BUTTON
+                                        Positioned(
+                                          bottom: 15,
+                                          left: 12,
+                                          right: 12,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data.name,
+                                                style: const TextStyle(
+                                                  color: ColorCode.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              Text(
+                                                data.title ?? "Creative Professional",
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+
+                                              const SizedBox(height: 12),
+
+                                              Row(
+                                                children: [
+
+                                                  /// 🔥 VIEW PROFILE
+                                                  Expanded(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                RecommendedDetilsScreen(
+                                                                  id: data.id,
+                                                                  bookingId: 121,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        height: 35,
+                                                        alignment: Alignment.center,
+                                                        decoration: BoxDecoration(
+                                                          color: ColorCode.kButtonColor,
+                                                          borderRadius:
+                                                          BorderRadius.circular(40),
+                                                        ),
+                                                        child: const Text(
+                                                          "View Profile",
+                                                          style: TextStyle(
+                                                            color: ColorCode.black,
+                                                            fontSize: 12,
+                                                            fontWeight: FontWeight.w700,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+
+                                                  const SizedBox(width: 10),
+
+                                                  /// 🔥 ICON
+                                                  Container(
+                                                    height: 38,
+                                                    width: 38,
+                                                    child: Center(
+                                                      child: SvgPicture.asset(
+                                                        "assets/svg/home_view_profile.svg",
+                                                        height: 36,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+                        ],
+                      )
+
+                          : const SizedBox(),
+
+                     /* const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Container(
@@ -1791,9 +2004,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           itemCount: homeData?.featuredCreatives.length ?? 0,
                           itemBuilder: (context, index) {
                             final data = homeData!.featuredCreatives[index];
-                            /*  final item = featuredCreatives[index];
+                            *//*  final item = featuredCreatives[index];
                         final int userId = item["id"];
-                        bool isFavourite = favouriteUsers.contains(userId);*/
+                        bool isFavourite = favouriteUsers.contains(userId);*//*
                             return Padding(
                               padding: const EdgeInsets.only(left: 12, right: 4),
                               child: Container(
@@ -1939,7 +2152,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           },
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 10),*/
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Container(
@@ -2320,7 +2533,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const Text(
-                                  "Top ",
+                                  "Top",
                                   style: TextStyle(
                                     color: ColorCode.white,
                                     fontSize: 16,
@@ -2638,7 +2851,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       const SizedBox(height: 20),
 
                       // --- Top Creatives Section ---
-                      Padding(
+                      (homeData?.mainCreatives ?? []).isNotEmpty
+                          ? Padding(
                         key: topCreativeKey,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
@@ -2647,20 +2861,21 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                           children: [
                             const Text(
                               "Top Creatives Near you",
-                              style: TextStyle(color: ColorCode.white,
+                              style: TextStyle(
+                                color: ColorCode.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
-                                height: 1.2,
                               ),
                             ),
                             const SizedBox(height: 10),
-                            // AB YE CALL KAREIN:
-                            _buildTopCreativesStack(context),
 
+                            /// 🔥 STACK
+                            _buildTopCreativesStack(context),
                           ],
                         ),
-                      ),
+                      )
+                          : const SizedBox()
 
                     ]
                 )
@@ -2673,6 +2888,110 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
             const AppLoader(),*/
         ],
       ),
+    );
+  }
+  void showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6), // background blur feel
+      builder: (context) {
+        return Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Colors.white.withOpacity(0.15),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    /// TITLE
+                    Text(
+                      "Please Login to Continue",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    /// OK BUTTON
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => NewLoginScreen()),
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: ColorCode.popButtonBackground,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Ok",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            color: ColorCode.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// CANCEL BUTTON
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: ColorCode.popButtonBackground,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                          //  color: ColorCode.white,
+                            fontSize: 16,
+                            fontFamily: "Outfit",
+                            color: ColorCode.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
   Widget _buildEmptyBookingCard() {
@@ -2750,14 +3069,16 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 SizedBox(height: 10,),
                 /// 🔥 BUTTON
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ContentTypeScreen(fromHome: true),
-                      ),
-                    );
-                  },
+                onTap: () {
+    checkLogin(context, () {
+    Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) => ContentTypeScreen(fromHome: true),
+    ),
+    );
+    });
+    },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 9),
@@ -2857,20 +3178,32 @@ SizedBox(height: 10,),
 
                   /// BUTTON
                   GestureDetector(
-                    onTap: () {
-                      if (data["button"] == "Book a Shoot") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ContentTypeScreen(fromHome: true),
-                          ),
-                        );
-                      } else if (data["button"] == " Explore Creatives") {
-                        scrollTo(featuredKey);
-                      } else if (data["button"] == "Find Your Creative") {
-                        scrollTo(topCreativeKey);
-                      }
-                    },
+                      onTap: () {
+                        if (data["button"] == "Book a Shoot") {
+
+                          checkLogin(context, () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ContentTypeScreen(fromHome: true),
+                              ),
+                            );
+                          });
+
+                        } else if (data["button"] == " Explore Creatives") {
+
+                          checkLogin(context, () {
+                            scrollTo(featuredKey);
+                          });
+
+                        } else if (data["button"] == "Find Your Creative") {
+
+                          checkLogin(context, () {
+                            scrollTo(topCreativeKey);
+                          });
+
+                        }
+                      },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), // 🔥 better button size
                       decoration: BoxDecoration(
@@ -3068,93 +3401,15 @@ SizedBox(height: 10,),
       ),
     );
   }
-  Widget _buildProjectCard(String title, String date, String files,
-      String img) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF222222), // 👈 Figma background
-        borderRadius: BorderRadius.circular(22),
-
-        // 👇 Gradient Border Trick
-        border: Border.all(
-          width: 0.5,
-          color: Colors.white.withOpacity(0.10), // fallback
-        ),
-
-        // 👇 Shadow for premium look (optional)
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-
-      // 👇 Gradient Border Overlay
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Image.asset(
-              img,
-              height: 80,
-              width: 80,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 15),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold)),
-                Text(date,
-                    style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 12)),
-                const SizedBox(height: 8),
-                Text(files,
-                    style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12)),
-              ],
-            ),
-          ),
-
-          Column(
-            children: [
-              _buildSmallCircleBtn("assets/svg/eyes1.svg"),
-              const SizedBox(height: 8),
-              _buildSmallCircleBtn("assets/svg/install.svg"),
-            ],
-          )
-        ],
-      ),
-    );
+  void checkLogin(BuildContext context, VoidCallback onSuccess) {
+    if (AuthManager().isLoggedIn) {
+      onSuccess(); // ✅ direct open
+    } else {
+      showLoginDialog(context); // ❌ popup open
+    }
   }
 
-  Widget _buildSmallCircleBtn(String svgPath) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        shape: BoxShape.circle,
-      ),
-      child: SvgPicture.asset(
-        svgPath,
-        height: 18,
-        width: 18,
-        color: Colors.white, // optional (remove if original color chahiye)
-      ),
-    );
-  }
+
 
 
   Widget _buildServiceCard(
@@ -3163,24 +3418,30 @@ SizedBox(height: 10,),
 
     return GestureDetector(
       onTap: () {
+
         setState(() {
           selectedIndex = index;
         });
 
         playBorderAnimationOnce();
 
-        if (title == "Photo") {
-          _continueBooking(2);
-        } else if (title == "Video") {
-          _continueBooking(1);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("$title Coming Soon"),
-              duration: const Duration(seconds: 1), // ✅ 1 sec
-            ),
-          );
-        }
+        // 🔥 LOGIN CHECK ADD
+        checkLogin(context, () {
+
+          if (title == "Photo") {
+            _continueBooking(2);
+          } else if (title == "Video") {
+            _continueBooking(1);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("$title Coming Soon"),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          }
+
+        });
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -3338,25 +3599,6 @@ SizedBox(height: 10,),
 
   Widget _buildTopCreativesStack(BuildContext context) {
     final list = homeData?.mainCreatives ?? [];
-
-    /// ✅ 🔥 NO DATA HANDLE
-    if (list.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            SizedBox(height: 10),
-            Text(
-              "No Creatives Found",
-                style:
-                TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
-                )
-            ),
-          ],
-        ),
-      );
-    }
 
     return GestureDetector(
   /*    onTap: () {
@@ -3673,7 +3915,6 @@ class BeveledTrayPainter extends CustomPainter {
     double w = size.width;
     double h = size.height;
 
-    // Dimensions (Aap inhe adjust kar sakte hain)
     double bevelHeight = 12; // Kitna neeche jayega
     double slopeWidth = 15;  // Tirchi line ki width
     double shoulderWidth = w * 0.18; // Side ki strips ki width
@@ -3796,8 +4037,6 @@ class BorderAnimationPainter extends CustomPainter {
       )
       ..lineTo(size.width, size.height * 0.5);
 
-    // 2. FIXED BORDER LINE (Jo hamesha dikhegi)
-    // Maine opacity 0.3 rakhi hai taaki ek "Fixed Line" ka effect aaye
     canvas.drawPath(
       bottomPath,
       Paint()

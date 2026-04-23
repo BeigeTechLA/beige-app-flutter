@@ -9,7 +9,8 @@
   import '../service/api_service.dart';
   import '../service/shared_service.dart';
   import '../utility/ColorCode.dart';
-  import '../widgets/TopMessage.dart';
+  import '../utility/commen.dart';
+import '../widgets/TopMessage.dart';
   import 'new_forgot_passwrod_screen.dart';
   import 'new_sing_up_screen.dart';
 
@@ -105,6 +106,7 @@
         }
 
         if (!mounted) return;
+        AuthManager().login();
 
         /// ✅ NAVIGATE
         Navigator.pushAndRemoveUntil(
