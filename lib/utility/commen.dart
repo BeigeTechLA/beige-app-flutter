@@ -23,3 +23,23 @@ class TicketClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
+
+class AuthManager {
+  static final AuthManager _instance = AuthManager._internal();
+
+  factory AuthManager() => _instance;
+
+  AuthManager._internal();
+
+  bool _isLoggedIn = false;
+
+  bool get isLoggedIn => _isLoggedIn;
+
+  void login() {
+    _isLoggedIn = true;
+  }
+
+  void logout() {
+    _isLoggedIn = false;
+  }
+}

@@ -15,7 +15,7 @@ class ColorCode {
   static const Color kWhiteOpacity36 = Color(0x5CFFFFFF); // 36% white
   static const Color kWhiteOpacity_60 = Color(0x99FFFFFF); // 60% white
   static const Color kWhiteOpacity30 = Color(0x4DFFFFFF); // 30% white
-  // static  const Color kBackgroundColor = Color(0xFFFAF9F6);
+  static const Color popButtonBackground = Color(0x5C000000); // 36% black
   static const Color kCircleBorder = Color(0xFFDDDDDD);
   static const Color k262624 = Color(0xFF262624);
   static const Color kGold40 = Color(0x66E9BE78);  // E9BE78 with 40% opacity
