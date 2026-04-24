@@ -2538,7 +2538,7 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const Text(
-                                  "Top",
+                                  "Top ",
                                   style: TextStyle(
                                     color: ColorCode.white,
                                     fontSize: 16,
