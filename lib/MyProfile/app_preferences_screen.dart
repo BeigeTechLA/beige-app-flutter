@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,26 +9,19 @@ import '../app/text_styles.dart';
 import '../app/radii.dart';
 import '../app/assets.dart';
 
-class AppPreferencesScreen extends StatefulWidget {
+class AppPreferencesScreen extends ConsumerWidget {
   const AppPreferencesScreen({super.key});
 
   @override
-  State<AppPreferencesScreen> createState() => _AppPreferencesScreenState();
-}
-
-class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-
       body: SafeArea(
         child: Padding(
-          padding:  EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// 🔙 BACK BUTTON
+              /// BACK BUTTON
               InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
@@ -43,7 +37,7 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
 
               const SizedBox(height: 16),
 
-              /// 🏷 TITLE
+              /// TITLE
               Text(
                 "App Preferences",
                 style: TextStyle(
@@ -56,72 +50,20 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
 
               const SizedBox(height: 20),
 
-
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 20),
 
-                  /// 🌙 DARK MODE
-             /*     Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(12)
-                    ),
-                      color: ColorCode.k282828,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              images.chando1,
-                              height: 24,
-                              width: 24,
-                              colorFilter: const ColorFilter.mode(
-                                ColorCode.white,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            const SizedBox(width: 15),
-                            Text(
-                              "Dark Mode",
-                              style: TextStyle(
-                                color: ColorCode.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 41,
-                          height: 26,
-                          child: Switch(
-                            value: isDarkMode,
-                            activeColor: Colors.amber,
-                            onChanged: (value) {
-                              setState(() {
-                                isDarkMode = value;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),*/
-
-
-
-
-                  SizedBox(height: 20,),
-
-                  /// 🗑 DELETE ACCOUNT
+                  /// DELETE ACCOUNT
                   InkWell(
                     onTap: () {
                       context.pushNamed(RouteNames.deleteAccount);
                     },
                     child: Container(
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(borderRadius: AppRadii.mdAll,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: AppRadii.mdAll,
                         color: AppColors.surfaceVariant,
                       ),
                       child: Row(
@@ -156,15 +98,13 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
                     ),
                   ),
 
+                  const SizedBox(height: 20),
 
-
-
-                  SizedBox(height: 20,),
-
-                  /// ℹ APP VERSION
+                  /// APP VERSION
                   Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(borderRadius: AppRadii.mdAll,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: AppRadii.mdAll,
                       color: AppColors.surfaceVariant,
                     ),
                     child: Row(
@@ -179,7 +119,7 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
                           ),
                         ),
                         const SizedBox(width: 15),
-                        Text(
+                        const Text(
                           "App Version V1.0",
                           style: TextStyle(
                             color: Colors.white70,
@@ -190,10 +130,7 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
                     ),
                   ),
 
-
-
-
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                 ],
               ),
             ],

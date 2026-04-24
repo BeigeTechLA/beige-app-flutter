@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
@@ -8,14 +9,14 @@ import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 
-class PasswordResetSuccessScreen extends StatefulWidget {
+class PasswordResetSuccessScreen extends ConsumerStatefulWidget {
   const PasswordResetSuccessScreen({super.key});
 
   @override
-  State<PasswordResetSuccessScreen> createState() => _PasswordResetSuccessScreenState();
+  ConsumerState<PasswordResetSuccessScreen> createState() => _PasswordResetSuccessScreenState();
 }
 
-class _PasswordResetSuccessScreenState extends State<PasswordResetSuccessScreen> {
+class _PasswordResetSuccessScreenState extends ConsumerState<PasswordResetSuccessScreen> {
 
   @override
   void initState() {

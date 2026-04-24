@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,22 +21,21 @@ import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 import '../Customtextfiled/CustomInputField.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
+import '../features/auth/presentation/providers/signup_notifier.dart';
+import '../features/auth/presentation/providers/signup_state.dart';
 import '../service/google_config.dart';
-import '../service/shared_service.dart';
 import '../widgets/TopMessage.dart';
 import '../widgets/loding.dart';
 
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool isLocationSelected = false;
   bool isProgrammaticChange = false;
   File? profileImage;
@@ -44,7 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool showPassword = false;
   bool showConfirmPassword = false;
   bool savePassword = false;
-  bool isLoggingIn = false;
+
   double? selectedLat;
   double? selectedLng;
   GoogleMapController? mapController;
@@ -629,43 +629,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    setState(() => isLoggingIn = true);
-
-    try {
-
-      final response = await ApiService().postMultipart(
-        ApiEndpoints.singup,
-        {
-          "name": name,
-          "email": email,
-          "user_type": "3",
-          "password": password,
-          "location": location,
-          "lat": selectedLat.toString(),
-          "lng": selectedLng.toString(),
-        },
-        profileImage,
-      );
-
-      if (response == null) {
-        TopMessage.show(context, "No response from server");
-        return;
-      }
-
-      if (response['error'] == false &&
-          (response['code'] == 200 || response['code'] == 201)) {
-
-        context.goNamed(RouteNames.login);
-
-      } else {
-        TopMessage.show(context, response['message'] ?? "Signup failed");
-      }
-
-    } catch (e) {
-      TopMessage.show(context, "Server error");
-    } finally {
-      setState(() => isLoggingIn = false);
-    }
+    ref.read(signupNotifierProvider.notifier).signUp(
+      name: name,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,
+      location: location,
+      latitude: selectedLat!,
+      longitude: selectedLng!,
+      profileImage: profileImage,
+    );
   }
 
 
@@ -698,6 +671,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final signupState = ref.watch(signupNotifierProvider);
+    final isLoggingIn = signupState.status == SignupStatus.loading;
+
+    ref.listen(signupNotifierProvider, (prev, next) {
+      if (next.status == SignupStatus.success) {
+        context.goNamed(RouteNames.login);
+      }
+      if (next.status == SignupStatus.error && next.errorMessage != null) {
+        TopMessage.show(context, next.errorMessage!);
+      }
+    });
+
     String _darkMapStyle = '''
 [
   {

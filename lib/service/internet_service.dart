@@ -5,13 +5,13 @@ class InternetService {
   final Connectivity _connectivity = Connectivity();
 
   Stream<bool> get connectionStream async* {
-    await for (final result in _connectivity.onConnectivityChanged) {
-      yield result != ConnectivityResult.none;
+    await for (final results in _connectivity.onConnectivityChanged) {
+      yield !results.contains(ConnectivityResult.none);
     }
   }
 
   Future<bool> hasInternet() async {
-    final result = await _connectivity.checkConnectivity();
-    return result != ConnectivityResult.none;
+    final results = await _connectivity.checkConnectivity();
+    return !results.contains(ConnectivityResult.none);
   }
 }

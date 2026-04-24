@@ -2,117 +2,44 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/route_names.dart';
-import '../service/api_service.dart';
-import '../service/api_endpoints.dart';
+import '../core/network/api_endpoints.dart';
 import '../app/colors.dart';
-import '../widgets/loding.dart';
+import '../features/shoot/presentation/providers/my_shoots_notifier.dart';
 
-class MyShootsScreen extends StatefulWidget {
+class MyShootsScreen extends ConsumerStatefulWidget {
   const MyShootsScreen({super.key});
 
   @override
-  State<MyShootsScreen> createState() => _MyShootsScreenState();
+  ConsumerState<MyShootsScreen> createState() => _MyShootsScreenState();
 }
 
-class _MyShootsScreenState extends State<MyShootsScreen> {
+class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
   bool isUpcomingSelected = true;
 
-  List<dynamic> upcomingShoots = [];
-  List<dynamic> completedShoots = [];
-
-  bool isUpcomingLoading = true;
-  bool isCompletedLoading = true;
-
-
-    String? selectedPayment;
+  String? selectedPayment;
   int selectedIndex = 0;
 
-  bool isLoading = true;
-  @override
-  void initState() {
-    super.initState();
-    fetchAll();
-
+  String _imageUrl(String? path) {
+    if (path == null || path.isEmpty) return '';
+    return '${ApiEndpoints.imageUrl}$path';
   }
-
-  Future<void> fetchAll() async {
-    setState(() => isLoading = true);
-
-    await Future.wait([
-      _fetchUpcoming(),
-      _fetchCompleted(),
-    ]);
-
-    setState(() => isLoading = false);
-  }
-  Future<void> _fetchUpcoming() async {
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.creatives_myshoots}?status=upcoming",
-      );
-   print("upcoming DATA =$response");
-      if (response != null && response['error'] == false) {
-        upcomingShoots = response['data'];
-      }
-    } catch (e) {
-      debugPrint("Upcoming Error: $e");
-    }
-    setState(() => isUpcomingLoading = false);
-  }
-
-  Future<void> _fetchCompleted() async {
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.creatives_myshoots}?status=completed",
-      );
-
-      if (response != null && response['error'] == false) {
-        completedShoots = response['data'];
-      }
-    } catch (e) {
-      debugPrint("Completed Error: $e");
-    }
-    setState(() => isCompletedLoading = false);
-  }
-
-
-/*
-
-  Future<void> _fetchHomeReview() async {
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking_select}?service_type=3&event_date=2025-12-31&payment_status=1",
-      );
-
-      if (response != null && response['error'] == false) {
-        final data = response['data'];
-
-
-      }
-    } catch (e) {
-      debugPrint("Profile API Error: $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-*/
-
-  // ================= UI =================
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final shootsState = ref.watch(myShootsNotifierProvider);
+    final upcomingShoots = shootsState.upcomingShoots;
+    final completedShoots = shootsState.completedShoots;
+    final isLoading = shootsState.status == MyShootsStatus.loading;
 
+    return Scaffold(
       body: Stack(
         children: [
           Padding(
-
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,10 +74,10 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                       height: 55,
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05), // 🔥 glass effect
+                        color: Colors.white.withValues(alpha:0.05), // 🔥 glass effect
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha:0.1),
                         ),
                       ),
                       child: Row(
@@ -234,7 +161,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                 /// LIST
                 Expanded(
                   child: isUpcomingSelected
-                      ? isUpcomingLoading
+                      ? isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : upcomingShoots.isEmpty
                       ? Center(
@@ -273,7 +200,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                           upcomingShoots[index]);
                     },
                   )
-                      : isCompletedLoading
+                      : isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : completedShoots.isEmpty
                       ? const Center(
@@ -293,8 +220,13 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
               ],
             ),
           ),
-          if (isLoading)
-            const AppLoader(),
+          if (shootsState.status == MyShootsStatus.error)
+            Center(
+              child: Text(
+                shootsState.errorMessage ?? "Something went wrong",
+                style: const TextStyle(color: AppColors.white70, fontSize: 14),
+              ),
+            ),
         ],
 
       ),
@@ -385,9 +317,9 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
     String finalImage;
 
     if (profileImageRaw.isNotEmpty) {
-      finalImage = ApiService().getImageURL(profileImageRaw);
+      finalImage = _imageUrl(profileImageRaw);
     } else if (shootImageRaw.isNotEmpty) {
-      finalImage = ApiService().getImageURL(shootImageRaw);
+      finalImage = _imageUrl(shootImageRaw);
     } else {
       finalImage = fallbackImage;
     }
@@ -424,7 +356,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
         showEditIcon: true,
         buttonText: "Manage Shoot",
         onButtonTap: () {
-          print("Manage Shoot button clicked"); // ✅ print
           context.pushNamed(
             RouteNames.manageBooking,
             pathParameters: {'bookingId': bookingId.toString()},
@@ -459,15 +390,14 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
     String finalImage;
 
     if (profileImageRaw.isNotEmpty) {
-      finalImage = ApiService().getImageURL(profileImageRaw);
+      finalImage = _imageUrl(profileImageRaw);
     } else if (shootImageRaw.isNotEmpty) {
-      finalImage = ApiService().getImageURL(shootImageRaw);
+      finalImage = _imageUrl(shootImageRaw);
     } else {
       finalImage = fallbackImage;
     }
 
     /// SAFE DATA
-    final int bookingId = shoot['booking_id'] ?? 0;
     final String projectName = shoot['project_name'] ?? '';
     final String eventDate = shoot['event_date'] ?? '';
     final String startTime = shoot['start_time'] ?? '';
@@ -499,8 +429,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
     bool showEditIcon = false,
     VoidCallback? onEditTap,
   }) {
-    final isNetwork = imagePath.startsWith("http");
-
     return Container(
         margin: const EdgeInsets.only(bottom: 16,top: 20),
         height: 280,
@@ -518,10 +446,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                     : Image.network(
                   imagePath,
                   fit: BoxFit.cover,
-                /*  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return CircularProgressIndicator(strokeWidth: 2);
-                  },*/
                   errorBuilder: (context, error, stackTrace) {
                     return SvgPicture.asset(
                       "assets/svg/imag_placeholder.svg",
@@ -530,8 +454,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                   },
                 ),
               ),
-
-    // ❌ TOP BLUR REMOVED COMPLETELY
 
     Container(
     height: 280,
@@ -546,8 +468,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
     Colors.transparent,
     Colors.transparent,
     Colors.transparent,
-    // Colors.black54,
-    // Colors.black87,
     Colors.black,
     Colors.black,
     ],
@@ -582,14 +502,6 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
     ),
     ),
     const SizedBox(height: 14),
-  /*  Text(
-    "$date | $time",
-    style: const TextStyle(
-    color: Colors.white70,
-    fontSize: 10,
-    ),
-    ),
-    const SizedBox(height: 10),*/
 
     Row(
     children: [
@@ -699,7 +611,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Divider(color: Colors.white.withOpacity(0.15)),
+                    Divider(color: Colors.white.withValues(alpha:0.15)),
                     const SizedBox(height: 16),
 
                     filterDropdown("Booking Type"),
@@ -757,13 +669,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                               ),
                             ),
                             child: TextButton(
-                              onPressed: () {
-                                // setState(() {
-                                //   selectedIndex = 0;
-                                //   priceRange =
-                                //   const RangeValues(100, 15000);
-                                // });
-                              },
+                              onPressed: () {},
                               child: const Text(
                                 "Clear All",
                                 style: TextStyle(
@@ -827,7 +733,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
           Text(
             hint,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha:0.6),
               fontSize: 14,
             ),
           ),
@@ -880,7 +786,7 @@ class _MyShootsScreenState extends State<MyShootsScreen> {
                 fontFamily: "Outfit",
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha:0.8),
               ),
             ),
 

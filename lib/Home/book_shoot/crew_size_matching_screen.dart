@@ -1,15 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
+import '../../core/network/api_endpoints.dart';
 import '../../app/colors.dart';
+import '../../features/booking/presentation/providers/crew_recommendation_notifier.dart';
 
-class CrewSizeMatchingScreen extends StatefulWidget {
+class CrewSizeMatchingScreen extends ConsumerStatefulWidget {
   final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
@@ -17,80 +18,19 @@ class CrewSizeMatchingScreen extends StatefulWidget {
   const CrewSizeMatchingScreen({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
-  State<CrewSizeMatchingScreen> createState() => _CrewSizeMatchingScreenState();
+  ConsumerState<CrewSizeMatchingScreen> createState() => _CrewSizeMatchingScreenState();
 }
 
-class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
+class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen> {
 
   int currentStep = 1;
-  bool isLoading =true;
 
-  List<String> defaultOutput = [];
-
-  String shootName = "";
-  String contentType = "";
-  int minCrew = 0;
-  int maxCrew = 0;
-
-
-  List<Map<String, dynamic>> roles = [];
-  List<String> reasoning = [];
-  String shootImageUrl = "";
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    _CrewSizeMatching();
-  }
-  Future<void> _CrewSizeMatching() async {
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/crew-recommendation",
-      );
-
-      debugPrint("API Response → $response");
-
-      if (response != null && response['error'] == false) {
-        final data = response['data'];
-
-        setState(() {
-          shootName = data['shoot_type']['name'] ?? "";
-          contentType = data['shoot_type']['content_type'] ?? "";
-
-          // ✅ ADD THIS
-          shootImageUrl = data['shoot_type']['image_url'] ?? "";
-
-          minCrew = data['recommended_crew']['min'] ?? 0;
-          maxCrew = data['recommended_crew']['max'] ?? 0;
-
-          defaultOutput = List<String>.from(data['default_output'] ?? []);
-
-
-          roles = List<Map<String, dynamic>>.from(
-            data['recommended_crew']['roles'] ?? [],
-          );
-
-          reasoning = List<String>.from(data['reasoning'] ?? []);
-        });
-
-      }
-    } catch (e) {
-      debugPrint("API Error → $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  String getShootImage() {
+  String getShootImage(String shootImageUrl) {
     if (shootImageUrl.isEmpty) return "";
-    return ApiService().getImageURL(shootImageUrl);
+    return '${ApiEndpoints.imageUrl}$shootImageUrl';
   }
 
-  String getDefaultOutputText() {
+  String getDefaultOutputText(List<String> defaultOutput) {
     if (defaultOutput.isEmpty) return "-";
 
     if (defaultOutput.length == 1) {
@@ -102,6 +42,22 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final crewState = ref.watch(crewRecommendationNotifierProvider(widget.bookingId));
+    final crewData = crewState.data;
+    final isLoading = crewState.status == CrewRecommendationStatus.loading;
+
+    // Extract data from notifier state
+    final shootName = (crewData['shoot_type'] as Map?)?['name'] as String? ?? "";
+    final contentType = (crewData['shoot_type'] as Map?)?['content_type'] as String? ?? "";
+    final shootImageUrl = (crewData['shoot_type'] as Map?)?['image_url'] as String? ?? "";
+    final minCrew = (crewData['recommended_crew'] as Map?)?['min'] as int? ?? 0;
+    final maxCrew = (crewData['recommended_crew'] as Map?)?['max'] as int? ?? 0;
+    final defaultOutput = List<String>.from(crewData['default_output'] ?? []);
+    final roles = List<Map<String, dynamic>>.from(
+      (crewData['recommended_crew'] as Map?)?['roles'] ?? [],
+    );
+    final reasoning = List<String>.from(crewData['reasoning'] ?? []);
+
     return Scaffold(
 
       appBar: AppBar(
@@ -273,7 +229,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                     height: 280,
                                     width: double.infinity,
                                     child: CachedNetworkImage(
-                                      imageUrl: getShootImage(),
+                                      imageUrl: getShootImage(shootImageUrl),
                                       fit: BoxFit.cover,
 
                                       // ⏳ loading
@@ -290,7 +246,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
 
                                       // ✅ success
                                       imageBuilder: (context, imageProvider) {
-                                        debugPrint("✅ IMAGE LOADED → ${getShootImage()}");
+                                        debugPrint("✅ IMAGE LOADED → ${getShootImage(shootImageUrl)}");
                                         return Image(
                                           image: imageProvider,
                                           fit: BoxFit.cover,
@@ -380,7 +336,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                                       Row(
                                         children: [
                                           Text(
-                                            getDefaultOutputText(),
+                                            getDefaultOutputText(defaultOutput),
                                             style: const TextStyle(
                                               color: AppColors.white,
                                               fontSize: 14,
@@ -733,7 +689,7 @@ class _CrewSizeMatchingScreenState extends State<CrewSizeMatchingScreen> {
                       'bookingId': widget.bookingId,
                       'contentTypeId': widget.contentTypeId,
                       'specialtyId': widget.specialtyId,
-                      'shootTypeId': widget.ShootTypeId,
+                      'ShootTypeId': widget.ShootTypeId,
                     });
                   },
                   style: ElevatedButton.styleFrom(

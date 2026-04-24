@@ -1,77 +1,48 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../app/route_names.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
+import '../core/network/api_endpoints.dart';
 import '../app/colors.dart';
+import '../features/shoot/presentation/providers/cancel_shoot_notifier.dart';
 import '../widgets/TopMessage.dart';
 
-
-class CancelShootScreen extends StatefulWidget {
+class CancelShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
 
-  final String ? projectName;
-  final String ? eventDate;
-  final String ?startTime;
-  final String ?endTime;
-  final int ?durationHours;
-  final String ?location;
+  final String? projectName;
+  final String? eventDate;
+  final String? startTime;
+  final String? endTime;
+  final int? durationHours;
+  final String? location;
   final String? contentType;
-  final String? imageUrl; // ✅ ADD THIS
+  final String? imageUrl;
 
   const CancelShootScreen({super.key, required this.bookingId, this.projectName, this.eventDate, this.startTime, this.endTime, this.durationHours, this.location, this.contentType, this.imageUrl});
 
   @override
-  State<CancelShootScreen> createState() => _CancelShootScreenState();
+  ConsumerState<CancelShootScreen> createState() => _CancelShootScreenState();
 }
 
-class _CancelShootScreenState extends State<CancelShootScreen> {
+class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
 
-
-  bool isCancelling = false;
-
-  Future<void> _Cancelshoot() async {
-    if (isCancelling) return;
-
-    setState(() => isCancelling = true);
-
-    try {
-      final response = await ApiService().putData(
-        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}/cancel",
-        {},
-      );
-
-      if (response != null && response['error'] == false) {
-        // ✅ SUCCESS
-        AppointmentCancelledDialog(context);
-      } else {
-        _showSnack(response?['message'] ?? "Failed to cancel booking");
-      }
-    } catch (e) {
-      debugPrint("Cancel Booking Error: $e");
-      _showSnack("Something went wrong. Please try again.");
-    } finally {
-      if (mounted) setState(() => isCancelling = false);
-    }
-  }
   void _showSnack(String message) {
     TopMessage.show(context, message);
-
   }
 
-  String getFullImageUrl() {
+  String _getFullImageUrl() {
     final url = widget.imageUrl ?? "";
     if (url.isEmpty) return "";
-
     if (url.startsWith("http")) return url;
-
-    return ApiService().getImageURL(url);
+    return '${ApiEndpoints.imageUrl}$url';
   }
+
   String formatTime(String? time) {
     if (time == null || time.isEmpty) return "--";
     final parsed = DateFormat("HH:mm:ss").parse(time);
@@ -86,6 +57,17 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cancelState = ref.watch(cancelShootNotifierProvider);
+    final isCancelling = cancelState.status == CancelShootStatus.cancelling;
+
+    ref.listen<CancelShootState>(cancelShootNotifierProvider, (prev, next) {
+      if (next.status == CancelShootStatus.cancelled) {
+        _showAppointmentCancelledDialog(context);
+      } else if (next.status == CancelShootStatus.error) {
+        _showSnack(next.errorMessage ?? "Failed to cancel booking");
+      }
+    });
+
     return Scaffold(
       body: Stack(
         children: [
@@ -95,9 +77,9 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                getFullImageUrl().isNotEmpty
+                _getFullImageUrl().isNotEmpty
                     ? Image.network(
-                  getFullImageUrl(),
+                  _getFullImageUrl(),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
                     return SvgPicture.asset(
@@ -116,7 +98,7 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: Container(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha:0.25),
                   ),
                 ),
               ],
@@ -210,9 +192,9 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
-                              child: getFullImageUrl().isNotEmpty
+                              child: _getFullImageUrl().isNotEmpty
                                   ? Image.network(
-                                getFullImageUrl(),
+                                _getFullImageUrl(),
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
@@ -239,18 +221,6 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children:  [
-                                  Row(
-                                    children: [
-                                      // Icon(Icons.star, size: 14, color: Colors.amber),
-                                      SizedBox(width: 4),
-                                 /*     Text(
-                                        "4.5 (120)",
-                                        style: TextStyle(fontSize: 14, color: AppColors.white70,  fontWeight: FontWeight.w500,
-                                          fontFamily: "Outfit",
-                                        ),
-                                      ),*/
-                                    ],
-                                  ),
                                   SizedBox(height: 6),
                                   Text(
                                     widget.projectName ?? "N/A",
@@ -272,15 +242,6 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                                   ),
 
                                   SizedBox(height: 10),
-                               /*   Text(
-                                    "From \$450/Hr",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.primary,
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),*/
                                 ],
                               ),
                             )
@@ -318,7 +279,7 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha:0.9),
                             ),
                           ),
                             child: Column(
@@ -393,7 +354,10 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  onPressed: isCancelling ? null : _Cancelshoot,
+                                  onPressed: isCancelling
+                                      ? null
+                                      : () => ref.read(cancelShootNotifierProvider.notifier)
+                                          .cancelShoot(bookingId: widget.bookingId),
 
                                   child: isCancelling
                                       ?  CircularProgressIndicator(
@@ -433,9 +397,6 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
       children: [
         SvgPicture.asset(
           iconPath,
-          /* height: 16,
-            width: 16,*/
-
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -453,12 +414,12 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
       ],
     );
   }
-  void AppointmentCancelledDialog(BuildContext context) {
+  void _showAppointmentCancelledDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: "Schedule Updated",
-      barrierColor: Colors.black.withOpacity(0.35), // dark overlay
+      barrierColor: Colors.black.withValues(alpha:0.35), // dark overlay
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (_, __, ___) {
         return BackdropFilter(
@@ -562,15 +523,6 @@ class _CancelShootScreenState extends State<CancelShootScreen> {
           ),
         );
       },
-      /*  transitionBuilder: (_, anim, __, child) {
-        return FadeTransition(
-          opacity: anim,
-          child: ScaleTransition(
-            scale: Tween(begin: 0.95, end: 1.0).animate(anim),
-            child: child,
-          ),
-        );
-      },*/
     );
   }
 }

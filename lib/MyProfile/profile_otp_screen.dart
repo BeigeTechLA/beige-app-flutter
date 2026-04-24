@@ -1,153 +1,40 @@
 import 'dart:async';
 
-import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/route_names.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
 import '../app/colors.dart';
 import '../app/text_styles.dart';
-import '../app/radii.dart';
+import '../widgets/TopMessage.dart';
+import '../features/auth/presentation/providers/forgot_password_otp_notifier.dart';
+import '../features/auth/presentation/providers/forgot_password_otp_state.dart';
 
-class ProfileOtpScreen extends StatefulWidget {
+class ProfileOtpScreen extends ConsumerStatefulWidget {
   final String email;
   const ProfileOtpScreen({super.key, required this.email});
 
   @override
-  State<ProfileOtpScreen> createState() => _ProfileOtpScreenState();
+  ConsumerState<ProfileOtpScreen> createState() => _ProfileOtpScreenState();
 }
 
-class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
-  @override
+class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
   int seconds = 59;
   Timer? timer;
   bool isOtpFilled = false;
 
-  // ⭐ 6 FocusNodes for 6 OTP boxes
   List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
+  List<TextEditingController> controllers =
+      List.generate(6, (index) => TextEditingController());
 
-  String get enteredOtp {
-    return controllers.map((c) => c.text).join();
-  }
-
-  bool isLoading = false;
-
-
-
-  Future<void> _verifyOtp() async {
-    if (!isOtpFilled) {
-      print("❌ OTP Not Filled Completely");
-      _showSnack("Please enter complete OTP");
-      return;
-    }
-
-    print("📢 Verify OTP Clicked");
-    print("📧 Email => ${widget.email}");
-    print("🔢 Entered OTP => $enteredOtp");
-
-    setState(() => isLoading = true);
-
-    try {
-      final apiService = ApiService();
-
-      print("🚀 VERIFY OTP API CALL START");
-      print("📡 Endpoint => ${ApiEndpoints.forgotpassword_verify_otp}");
-
-      final response = await apiService.postData(
-        ApiEndpoints.forgotpassword_verify_otp,
-        {
-          "email": widget.email,
-          "otp": enteredOtp,
-        },
-      );
-
-      print("📩 API RESPONSE => $response");
-
-      if (response == null) {
-        print("❌ Response NULL");
-        _showSnack("Server error");
-        return;
-      }
-
-      if (response['error'] == false) {
-        print("✅ OTP Verified Successfully");
-
-        if (!mounted) return;
-
-        context.pushNamed(RouteNames.profileNewPassword, extra: {
-          'otp': enteredOtp,
-          'email': widget.email,
-        });
-      } else {
-        print("❌ OTP Verification Failed => ${response['message']}");
-        _showSnack(response['message'] ?? "Invalid OTP");
-      }
-    } catch (e) {
-      print("🔥 Exception => $e");
-      _showSnack("Something went wrong");
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
-      print("🛑 VERIFY OTP API CALL END");
-    }
-  }
-
-  Future<void> _resendOtp() async {
-
-    if (seconds != 0) {
-      print("⛔ Wait for timer to finish");
-      return;
-    }
-
-    setState(() => isLoading = true);
-
-    try {
-      final apiService = ApiService();
-
-      final response = await apiService.postData(
-        ApiEndpoints.reset_otp,
-        {
-          "email": widget.email,
-        },
-      );
-
-      print("RESEND OTP RESPONSE => $response");
-
-      if (response['error'] == false) {
-
-        timer?.cancel();
-        resetTimer();
-        
-
-      } else {
-        _showSnack(response['message'] ?? "Failed to resend OTP");
-      }
-
-    } catch (e) {
-      print("ERROR => $e");
-      _showSnack("Something went wrong");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  void _showSnack(String message) {
-    TopMessage.show(context, message);
-  }
-
-
-
+  String get enteredOtp => controllers.map((c) => c.text).join();
 
   void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       if (seconds > 0) {
-        setState(() {
-          seconds--;
-        });
+        setState(() => seconds--);
       } else {
         timer!.cancel();
       }
@@ -155,30 +42,58 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
   }
 
   void resetTimer() {
-    setState(() {
-      seconds = 59;      // timer reset
-    });
-    startTimer();        // start again
+    setState(() => seconds = 59);
+    startTimer();
   }
-
 
   @override
   void initState() {
     super.initState();
     startTimer();
-
-    // ⭐ refresh UI on focus change
     for (var node in focusNodes) {
-      node.addListener(() {
-        setState(() {});
-      });
+      node.addListener(() => setState(() {}));
     }
   }
-  List<TextEditingController> controllers =
-  List.generate(6, (index) => TextEditingController());
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    for (var ctrl in controllers) {
+      ctrl.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final otpState = ref.watch(forgotPasswordOtpNotifierProvider);
+    final isLoading =
+        otpState.verifyStatus == OtpVerifyStatus.loading;
+
+    ref.listen<ForgotPasswordOtpState>(forgotPasswordOtpNotifierProvider,
+        (prev, next) {
+      if (next.verifyStatus == OtpVerifyStatus.success) {
+        context.pushNamed(RouteNames.profileNewPassword, extra: {
+          'otp': enteredOtp,
+          'email': widget.email,
+        });
+      } else if (next.verifyStatus == OtpVerifyStatus.error &&
+          next.errorMessage != null) {
+        TopMessage.show(context, next.errorMessage!);
+      }
+
+      if (next.resendStatus == OtpResendStatus.success) {
+        timer?.cancel();
+        resetTimer();
+      } else if (next.resendStatus == OtpResendStatus.error &&
+          next.errorMessage != null) {
+        TopMessage.show(context, next.errorMessage!);
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -186,13 +101,11 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       InkWell(
                         onTap: () => context.pop(),
                         child: SvgPicture.asset(
@@ -200,49 +113,51 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
                           height: 24,
                         ),
                       ),
-                      SizedBox(height: 10),
-
+                      const SizedBox(height: 10),
                       Text(
                         "Enter OTP code",
                         style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: AppTextStyles.fontFamilyDisplay,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.white),
+                          fontSize: 20,
+                          fontFamily: AppTextStyles.fontFamilyDisplay,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.white,
+                        ),
                       ),
-
                       const SizedBox(height: 6),
-
                       const Text(
                         "Enter 6 digit OTP sent to your registered email ID\nreset your password.",
-                        style: TextStyle(fontSize: 12, fontFamily: AppTextStyles.fontFamilyBody, color: AppColors.white60),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: AppTextStyles.fontFamilyBody,
+                          color: AppColors.white60,
+                        ),
                       ),
-
                       const SizedBox(height: 20),
 
-                      // ⭐ OTP BOXES WITH FOCUS COLOR CHANGE
+                      /// OTP BOXES
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(6, (index) {
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
                               child: Container(
                                 height: 60,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-
-                                  // ⭐ Border color logic
                                   border: Border.all(
                                     color: (focusNodes[index].hasFocus ||
-                                        controllers[index].text.isNotEmpty)
+                                            controllers[index]
+                                                .text
+                                                .isNotEmpty)
                                         ? AppColors.borderGold
                                         : AppColors.white60,
                                     width: 0.5,
                                   ),
                                 ),
                                 child: TextField(
-                                  controller: controllers[index],          // ⭐ added controller
+                                  controller: controllers[index],
                                   focusNode: focusNodes[index],
                                   textAlign: TextAlign.center,
                                   keyboardType: TextInputType.number,
@@ -257,15 +172,15 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
                                   ),
                                   onChanged: (value) {
                                     setState(() {
-                                      isOtpFilled = controllers.every((c) => c.text.trim().isNotEmpty);
-                                    }
-                                    ); // ⭐ refresh for color update
-
+                                      isOtpFilled = controllers.every(
+                                          (c) => c.text.trim().isNotEmpty);
+                                    });
                                     if (value.isNotEmpty && index < 5) {
                                       FocusScope.of(context).nextFocus();
                                     }
                                     if (value.isEmpty && index > 0) {
-                                      FocusScope.of(context).previousFocus();
+                                      FocusScope.of(context)
+                                          .previousFocus();
                                     }
                                   },
                                 ),
@@ -275,9 +190,7 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
                         }),
                       ),
 
-
                       const SizedBox(height: 10),
-
                       Row(
                         children: [
                           Text(
@@ -297,37 +210,40 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   InkWell(
-                    onTap: seconds == 0 ? _resendOtp : null,
+                    onTap: seconds == 0
+                        ? () => ref
+                            .read(
+                                forgotPasswordOtpNotifierProvider.notifier)
+                            .resendOtp(email: widget.email)
+                        : null,
                     child: Text(
                       "Resend OTP",
-                      style:  TextStyle(
-                        color: seconds == 0
-                            ? AppColors.white
-                            : AppColors.white,
+                      style: TextStyle(
+                        color: AppColors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),
                     ),
-                  )
-
+                  ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: isOtpFilled ? _verifyOtp : null,
+                  onPressed: (isOtpFilled && !isLoading)
+                      ? () => ref
+                          .read(
+                              forgotPasswordOtpNotifierProvider.notifier)
+                          .verifyOtp(email: widget.email, otp: enteredOtp)
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOtpFilled
                         ? AppColors.primary
@@ -348,9 +264,7 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
                   ),
                 ),
               ),
-
-
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -358,4 +272,3 @@ class _ProfileOtpScreenState extends State<ProfileOtpScreen> {
     );
   }
 }
-

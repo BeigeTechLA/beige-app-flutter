@@ -395,16 +395,16 @@ LoginScreen
 | Code quality & testing audit | ✅ Done | — |
 | Migration readiness report | ✅ This document | — |
 
-### Phase 2 — Critical Bug Fixes (before anything else)
+### Phase 2 — Critical Bug Fixes ✅ COMPLETE
 
-| Task | Est. Days |
+| Task | Status |
 |---|---|
-| Fix broken internet connectivity check (`internet_service.dart`) | 0.25 |
-| Remove auth token `print()` from `api_service.dart` | 0.1 |
-| Fix `SharedService.imageURL` wrong S3 bucket | 0.1 |
-| Fix trailing space in `my_profile_photo` endpoint | 0.1 |
-| Add `InstrumentSans` to pubspec or remove from code | 0.1 |
-| **Subtotal** | **~0.5 days** |
+| Fix broken internet connectivity check (`internet_service.dart`) | ✅ Done — `List<ConnectivityResult>` comparison fixed |
+| Remove auth token `print()` from `api_service.dart` | ✅ Done |
+| Fix `SharedService.imageURL` wrong S3 bucket | ✅ Done — corrected to CloudFront URL |
+| Fix trailing space in `my_profile_photo` endpoint | ✅ Done — fixed in Phase 3 `ApiEndpoints` migration |
+| Add `InstrumentSans` to pubspec or remove from code | ✅ Skipped — only in commented-out code |
+| Add try/catch to `putData()` and `deleteData()` | ✅ Done |
 
 ### Phase 3 — Foundations
 

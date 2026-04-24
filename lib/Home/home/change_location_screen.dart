@@ -1,28 +1,28 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
-import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/app/radii.dart';
 
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
+import '../../app/colors.dart';
+import '../../features/profile/presentation/providers/profile_providers.dart';
 import '../../service/google_config.dart';
 
-class ChangeLocationScreen extends StatefulWidget {
+class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});
 
   @override
-  State<ChangeLocationScreen> createState() => _ChangeLocationScreenState();
+  ConsumerState<ChangeLocationScreen> createState() =>
+      _ChangeLocationScreenState();
 }
 
-class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
+class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   final Completer<GoogleMapController> _mapController = Completer();
   GoogleMapController? mapController;
 
@@ -42,6 +42,12 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocusNode.dispose();
+    super.dispose();
+  }
 
   // ================= CURRENT LOCATION =================
   Future<void> _getCurrentLocation() async {
@@ -106,7 +112,7 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
     }
   }
 
-  Future<void> changeLocationApi() async {
+  Future<void> _changeLocationApi() async {
     if (selectedLatLng == null) return;
 
     final payload = {
@@ -115,33 +121,22 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
       "lng": selectedLatLng!.longitude,
     };
 
-    try {
-      debugPrint("📤 CHANGE LOCATION PAYLOAD = $payload");
+    final repo = ref.read(profileRepositoryProvider);
+    final result = await repo.updateProfile(data: payload);
 
-      final response = await ApiService().putData(
-        ApiEndpoints.chnage_location,
-        payload,
-      );
+    if (!mounted) return;
 
-      debugPrint("📥 CHANGE LOCATION RESPONSE = $response");
-
-      if (response != null && response['error'] == false) {
+    result.fold(
+      (error) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      ),
+      (_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Location updated successfully")),
         );
-
-        context.pop(payload); // return updated data
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response?['message'] ?? "Update failed")),
-        );
-      }
-    } catch (e) {
-      debugPrint("❌ CHANGE LOCATION ERROR = $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong")),
-      );
-    }
+        context.pop(payload);
+      },
+    );
   }
 
   // ================= DARK MAP STYLE =================
@@ -222,7 +217,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   padding: const EdgeInsets.all(12),
                   child: SvgPicture.asset(
                     "assets/svg/serch.svg",
-                    color: Colors.white,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
                     height: 20,
                     width: 20,
                   ),
@@ -321,9 +319,6 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   scrollGesturesEnabled: true,
                   tiltGesturesEnabled: true,
                   rotateGesturesEnabled: true,
-              /*    myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  compassEnabled: true,*/
                   onTap: (latLng) async {
                     setState(() => selectedLatLng = latLng);
                     await _getAddressFromLatLng(latLng);
@@ -361,7 +356,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                             padding: const EdgeInsets.all(14),
                             child: SvgPicture.asset(
                               "assets/svg/zoom+.svg",
-                              color: Colors.black,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.black,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
@@ -383,7 +381,10 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                             padding: const EdgeInsets.all(14),
                             child: SvgPicture.asset(
                               "assets/svg/zoom-.svg",
-                              color: Colors.black,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.black,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
@@ -394,36 +395,9 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
               ],
             ),
           ),
-     /*     Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    selectedAddress,
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      decoration: TextDecoration.underline,
-                      fontSize: 14,
-                      fontFamily: "Outfit",
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),*/
         ],
       ),
       bottomNavigationBar: ClipRRect(
-      /*  borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),*/
         child: Stack(
           children: [
 
@@ -433,12 +407,6 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                 sigmaX: 40,  // 👈 side blur
                 sigmaY: 60,  // 👈 MORE vertical blur (bottom heavy 🔥)
               ),
-              /*child: Container(
-                height: 160,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1D1D1B).withOpacity(0.6), // 👈 figma color
-                ),
-              ),*/
             ),
 
             /// 🔥 TOP FADE (important for smooth merge)
@@ -450,8 +418,8 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.4),
-                    Colors.black.withOpacity(0.7),
+                    Colors.black.withValues(alpha: 0.4),
+                    Colors.black.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -488,14 +456,14 @@ class _ChangeLocationScreenState extends State<ChangeLocationScreen> {
                         backgroundColor: AppColors.primary,
                         minimumSize: const Size(double.infinity, 52),
                         elevation: 10,
-                        shadowColor: Colors.black.withOpacity(0.6),
+                        shadowColor: Colors.black.withValues(alpha: 0.6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18),
                         ),
                       ),
                       onPressed: () async {
                         if (selectedLatLng == null) return;
-                        await changeLocationApi();
+                        await _changeLocationApi();
                       },
                       child: const Text(
                         "Save",

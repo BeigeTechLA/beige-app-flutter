@@ -1,18 +1,17 @@
   import 'package:calendar_date_picker2/calendar_date_picker2.dart';
   import 'package:flutter/material.dart';
+  import 'package:flutter_riverpod/flutter_riverpod.dart';
   import 'package:flutter_svg/svg.dart';
   import 'package:go_router/go_router.dart';
   import 'package:intl/intl.dart';
 
   import '../../app/route_names.dart';
   import '../../Customtextfiled/CustomInputField.dart';
-  import '../../service/api_endpoints.dart';
-  import '../../service/api_service.dart';
   import '../../app/colors.dart';
+  import '../../features/booking/presentation/providers/shoot_date_time_notifier.dart';
 
-  class ShootDateTimeScreen extends StatefulWidget {
+  class ShootDateTimeScreen extends ConsumerStatefulWidget {
 
-    // final int specialtyId;
     final int ShootTypeId;
     final int bookingId;
     final int contentTypeId;
@@ -22,10 +21,10 @@
       required this.ShootTypeId, required this.bookingId, required this.contentTypeId, this.shootTypeName});
 
     @override
-    State<ShootDateTimeScreen> createState() => _ShootDateTimeScreenState();
+    ConsumerState<ShootDateTimeScreen> createState() => _ShootDateTimeScreenState();
   }
 
-  class _ShootDateTimeScreenState extends State<ShootDateTimeScreen> {
+  class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     bool isToday = false;
     bool isStartOpen = false;
     bool isEndOpen = false;
@@ -333,12 +332,10 @@
       return selectedDate != null;
     }
 
-    bool isLoading =true;
+    bool isLoading = true;
     @override
     void initState() {
       super.initState();
-
-      _edittype();
     }
     String getFinalSummaryText() {
       final photos = getTotalPhotos();
@@ -600,28 +597,16 @@
       return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
     }
 
-    Future<void> _edittype() async {
-      setState(() => isLoading = true);
-
-      try {
-        final response = await ApiService().fetchData(
-          "${ApiEndpoints.booking_shoot_types}${widget.ShootTypeId}/edit-types",
-        );
-
-        debugPrint("API Response → $response");
-
-        if (response != null && response['error'] == false) {
-          final data = response['data'];
-
-          setState(() {
-            editTypes = data['video_edit_types'] ?? [];
-            photoEditTypes = data['photo_edit_types'] ?? [];
-          });
-        }
-      } catch (e) {
-        debugPrint("API Error → $e");
-      } finally {
-        setState(() => isLoading = false);
+    void _syncEditTypesFromNotifier(ShootDateTimeState dtState) {
+      if (dtState.status == ShootDateTimeStatus.loaded ||
+          dtState.status == ShootDateTimeStatus.success) {
+        editTypes = dtState.videoEditTypes;
+        photoEditTypes = dtState.photoEditTypes;
+        isLoading = false;
+      } else if (dtState.status == ShootDateTimeStatus.loading) {
+        isLoading = true;
+      } else if (dtState.status == ShootDateTimeStatus.error) {
+        isLoading = false;
       }
     }
 
@@ -792,27 +777,31 @@
         };
       }
 
-      debugPrint("📤 FINAL PAYLOAD → $payload");
+      await ref
+          .read(shootDateTimeNotifierProvider(widget.ShootTypeId).notifier)
+          .saveBookingTime(
+            bookingId: widget.bookingId,
+            payload: payload,
+          );
 
-      try {
-        final response = await ApiService().putData(
-          "${ApiEndpoints.booking}/${widget.bookingId}/time",
-          payload,
+      if (!mounted) return;
+
+      final dtState = ref.read(shootDateTimeNotifierProvider(widget.ShootTypeId));
+
+      if (dtState.status == ShootDateTimeStatus.success) {
+        context.pushNamed(RouteNames.moreDetails, extra: {
+          'bookingId': widget.bookingId,
+          'contentTypeId': widget.contentTypeId,
+          'ShootTypeId': widget.ShootTypeId,
+          'specialtyId': 22,
+        });
+      } else if (dtState.status == ShootDateTimeStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(dtState.errorMessage ?? "Something went wrong")),
         );
-
-        if (response != null && response['error'] == false) {
-          context.pushNamed(RouteNames.moreDetails, extra: {
-            'bookingId': widget.bookingId,
-            'contentTypeId': widget.contentTypeId,
-            'shootTypeId': widget.ShootTypeId,
-            'specialtyId': 22,
-          });
-        }
-      } catch (e) {
-        debugPrint("❌ API Error → $e");
-      } finally {
-        setState(() => isSubmitting = false);
       }
+
+      setState(() => isSubmitting = false);
     }
     String _formatTime(TimeOfDay time) {
       final hour = time.hour.toString().padLeft(2, '0');
@@ -1140,6 +1129,9 @@
 
     @override
     Widget build(BuildContext context) {
+      final dtState = ref.watch(shootDateTimeNotifierProvider(widget.ShootTypeId));
+      _syncEditTypesFromNotifier(dtState);
+
       return Scaffold(
         appBar: AppBar(
           elevation: 0,

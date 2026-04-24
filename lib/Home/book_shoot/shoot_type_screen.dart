@@ -1,200 +1,82 @@
-import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
+import '../../core/network/api_endpoints.dart';
 import '../../app/colors.dart';
-class ShootTypeScreen extends StatefulWidget {
+import '../../features/booking/presentation/providers/shoot_type_notifier.dart';
+
+class ShootTypeScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final int contentTypeId;
-  // final int  specialtyId;
   const ShootTypeScreen({super.key, required this.contentTypeId, required this.bookingId});
 
   @override
-  State<ShootTypeScreen> createState() => _ShootTypeScreenState();
+  ConsumerState<ShootTypeScreen> createState() => _ShootTypeScreenState();
 }
-class _ShootTypeScreenState extends State<ShootTypeScreen>
-{
 
-bool  isLoading =true;
-
-  // int selectedIndex = -1;
-List<Map<String, dynamic>> shootTypes = [];
-
-int? selectedContentTypeId; //
-/*
-int? selectedShootTypeId;
-String? selectedShootTypeName;
-*/
-
-
+class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
   int selectedIndex = -1;
   int? selectedShootTypeId;
   String? selectedShootTypeName;
 
-
-@override
-void initState() {
-  super.initState();
-
-  if (shootTypes.isEmpty) {
-    _callBookingApi(widget.contentTypeId);
-  }
-}
-  Future<void> _callBookingApi(int contentTypeId) async {
-    setState(() {
-      isLoading = true;
-      // shootTypes.clear();
-    });
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking_shoot_types}$contentTypeId",
+  Future<void> _selectShootType() async {
+    if (selectedShootTypeId == null || selectedShootTypeName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select shoot type")),
       );
-
-      if (response != null &&
-          response['error'] == false &&
-          response['data'] is List) {
-
-        // ✅ DATA LOAD
-        shootTypes = response['data']
-            .map<Map<String, dynamic>>((e) => {
-          "id": e['shoot_type_id'],
-          "name": e['name'],
-          "image": e['image_url'],
-          "content_type": e['content_type'],
-          "tags": _parseTags(e['tags']),
-        })
-            .toList();
-
-        debugPrint("✅ ShootTypes Loaded → ${shootTypes.length}");
-
-        // 🔥🔥 MOST IMPORTANT FIX (RESTORE SELECTION AFTER DATA)
-        if (selectedShootTypeId != null) {
-          final index = shootTypes.indexWhere(
-                (e) => e['id'] == selectedShootTypeId,
-          );
-
-          if (index != -1) {
-            selectedIndex = index;
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint("❌ ShootType API Error → $e");
-    } finally {
-      setState(() => isLoading = false);
+      return;
     }
-  }
 
+    await ref
+        .read(shootTypeNotifierProvider(widget.contentTypeId).notifier)
+        .selectShootType(
+          bookingId: widget.bookingId,
+          contentTypeId: widget.contentTypeId,
+          shootTypeId: selectedShootTypeId!,
+          shootTypeName: selectedShootTypeName!,
+        );
 
+    if (!mounted) return;
 
-List<dynamic> _parseTags(dynamic tags) {
-  if (tags == null) return [];
+    final notifierState = ref.read(shootTypeNotifierProvider(widget.contentTypeId));
 
-  try {
-    if (tags is String) {
-      return jsonDecode(tags);
-    } else if (tags is List) {
-      return tags;
-    }
-  } catch (e) {
-    debugPrint("⚠️ Tag parse error → $tags");
-  }
-
-  return [];
-}
-Future<void> select_shoottype() async {
-  if (selectedShootTypeId == null || selectedShootTypeName == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please select shoot type")),
-    );
-    return;
-  }
-
-
-  setState(() => isLoading = true);
-
-  final body = {
-    "project_name": selectedShootTypeName, // ✅ FIRST API NAME
-    "content_type": widget.contentTypeId,  // ✅ dynamic
-    "shoot_type_id": selectedShootTypeId,  // ✅ dynamic
-    "specialty_id": 22,    // ✅ dynamic
-    // "deliverable_option": 1,
-    // "service_type": 2,
-  };
-
-  debugPrint("📤 BOOKING PAYLOAD → $body");
-
-  try {
-    final response = await ApiService().postData(
-      // ApiEndpoints.booking,
-       "${ApiEndpoints.booking}/${widget.bookingId}",
-      body,
-    );
-
-    debugPrint("📥 BOOKING RESPONSE → $response");
-
-    if (response != null && response['error'] == false) {
-      final bookingId = response['data']?['booking_id'];
+    if (notifierState.status == ShootTypeStatus.success) {
+      final bookingId = notifierState.bookingId ?? widget.bookingId;
       final result = await context.pushNamed<Map>(RouteNames.shootDateTime, extra: {
         'bookingId': bookingId,
         'contentTypeId': widget.contentTypeId,
-        'shootTypeId': selectedShootTypeId!,
+        'ShootTypeId': selectedShootTypeId!,
         'shootTypeName': selectedShootTypeName,
       });
 
       if (result != null) {
         setState(() {
-          selectedShootTypeId = result["id"];
-          selectedShootTypeName = result["name"];
+          selectedShootTypeId = result['id'] as int?;
+          selectedShootTypeName = result['name'] as String?;
 
-          final index = shootTypes.indexWhere(
-                (e) => e['id'] == selectedShootTypeId,
-          );
-
-          if (index != -1) {
-            selectedIndex = index;
-          }
+          final shootTypes = ref.read(shootTypeNotifierProvider(widget.contentTypeId)).shootTypes;
+          final index = shootTypes.indexWhere((e) => e['id'] == selectedShootTypeId);
+          if (index != -1) selectedIndex = index;
         });
       }
-
-      if (result != null) {
-        setState(() {
-          selectedShootTypeId = result["id"];
-          selectedShootTypeName = result["name"];
-
-          final index = shootTypes.indexWhere(
-                (e) => e['id'] == selectedShootTypeId,
-          );
-
-          if (index != -1) {
-            selectedIndex = index;
-          }
-        });
+    } else if (notifierState.status == ShootTypeStatus.error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(notifierState.errorMessage ?? "Something went wrong")),
+        );
       }
-
-      if (result == true) {
-        // 🔥 DO NOTHING (state preserve)
-        return;
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response['message'] ?? "Something went wrong")),
-      );
     }
-  } catch (e) {
-    debugPrint("❌ Booking API Error → $e");
-  } finally {
-    setState(() => isLoading = false);
   }
-}
+
+  String _getFullImageUrl(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return '';
+    return '${ApiEndpoints.imageUrl}$imagePath';
+  }
 
 
 String getContentTypeTitle(int contentTypeId) {
@@ -211,8 +93,10 @@ String getContentTypeTitle(int contentTypeId) {
 }
 
 
-@override
+  @override
   Widget build(BuildContext context) {
+    final shootState = ref.watch(shootTypeNotifierProvider(widget.contentTypeId));
+    final shootTypes = shootState.shootTypes;
 
     return Scaffold(
 
@@ -327,13 +211,7 @@ String getContentTypeTitle(int contentTypeId) {
                       final String tagsText = tags.join(" , ");
 
                       final imagePath = item['image']?.toString() ?? '';
-                      final fullImageUrl = imagePath.isNotEmpty
-                          ? ApiService().getImageURL(imagePath)
-                          : '';
-
-
-                      debugPrint("🧾 RAW IMAGE PATH → $imagePath");
-                      debugPrint("🖼 FULL IMAGE URL → $fullImageUrl");
+                      final fullImageUrl = _getFullImageUrl(imagePath);
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,8 +227,6 @@ String getContentTypeTitle(int contentTypeId) {
                                 selectedShootTypeName = item['name'];
                               });
 
-                              debugPrint("✅ Selected ID → $selectedShootTypeId");
-                              debugPrint("✅ Selected Name → $selectedShootTypeName");
                             },
                             child: Container(
 
@@ -426,19 +302,6 @@ String getContentTypeTitle(int contentTypeId) {
 
                                   /// 🔹 RIGHT RADIO BUTTON
                                   InkWell(
-                               /*     splashColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    onTap: () {
-                                      setState(() {
-                                        selectedIndex = index;
-                                        selectedShootTypeId = item['id'];
-                                        selectedShootTypeName = item['name']; // ✅ IMPORTANT FIX
-                                      });
-
-                                      debugPrint("✅ Selected ID → $selectedShootTypeId");
-                                      debugPrint("✅ Selected Name → $selectedShootTypeName");
-                                    },*/
                                     child: Container(
                                       height: 25,
                                       width: 30,
@@ -513,7 +376,7 @@ String getContentTypeTitle(int contentTypeId) {
                 onPressed: selectedShootTypeId == null
                     ? null
                     : () {
-                  select_shoottype(); // 🔥 PRE API CALL
+                  _selectShootType();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: selectedIndex == -1

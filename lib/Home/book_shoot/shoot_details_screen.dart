@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geocoding/geocoding.dart';
@@ -10,12 +11,11 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 
 import '../../app/route_names.dart';
 import '../../Customtextfiled/CustomInputField.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
 import '../../service/google_config.dart';
 import '../../app/colors.dart';
+import '../../features/booking/presentation/providers/shoot_details_notifier.dart';
 
-class ShootDetailsScreen extends StatefulWidget {
+class ShootDetailsScreen extends ConsumerStatefulWidget {
   final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
@@ -23,10 +23,10 @@ class ShootDetailsScreen extends StatefulWidget {
   const ShootDetailsScreen({super.key, required this.contentTypeId, required this.specialtyId, required this.ShootTypeId, required this.bookingId});
 
   @override
-  State<ShootDetailsScreen> createState() => _ShootDetailsScreenState();
+  ConsumerState<ShootDetailsScreen> createState() => _ShootDetailsScreenState();
 }
 
-class _ShootDetailsScreenState extends State<ShootDetailsScreen> {
+class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   int currentStep = 1;
   bool loding   = false;
@@ -102,26 +102,32 @@ class _ShootDetailsScreenState extends State<ShootDetailsScreen> {
           .toList(),
     };
 
-    debugPrint("📤 REQUEST BODY → $payload");
+    await ref
+        .read(shootDetailsNotifierProvider(widget.bookingId).notifier)
+        .saveDetails(bookingId: widget.bookingId, payload: payload);
 
-    try {
-      final response = await ApiService().putData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/details",
-        payload,
+    if (!mounted) return;
+
+    final detailsState = ref.read(shootDetailsNotifierProvider(widget.bookingId));
+
+    if (detailsState.status == ShootDetailsStatus.success) {
+      context.pushNamed(RouteNames.crewSizeMatching, extra: {
+        'bookingId': widget.bookingId,
+        'contentTypeId': widget.contentTypeId,
+        'specialtyId': widget.specialtyId,
+        'ShootTypeId': widget.ShootTypeId,
+      });
+    } else if (detailsState.status == ShootDetailsStatus.error) {
+      setState(() {
+        isSubmitting = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(detailsState.errorMessage ?? "Error saving details")),
       );
-
-      if (response != null && response['error'] == false) {
-        context.pushNamed(RouteNames.crewSizeMatching, extra: {
-          'bookingId': widget.bookingId,
-          'contentTypeId': widget.contentTypeId,
-          'specialtyId': widget.specialtyId,
-          'shootTypeId': widget.ShootTypeId,
-        });
-      }
-    } catch (e) {
-      debugPrint("❌ API Error → $e");
-    } finally {
-      setState(() => isSubmitting = false);
+    } else {
+      setState(() {
+        isSubmitting = false;
+      });
     }
   }
 

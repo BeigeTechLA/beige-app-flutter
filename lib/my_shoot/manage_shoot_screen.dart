@@ -1,16 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../app/route_names.dart';
-import '../service/api_service.dart';
+import '../core/network/api_endpoints.dart';
 import '../app/colors.dart';
 import '../utility/date_time_utils.dart';
 
-class ManageShootScreen extends StatefulWidget {
+class ManageShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final String ? projectName;
   final String ? eventDate;
@@ -37,23 +37,18 @@ class ManageShootScreen extends StatefulWidget {
   });
 
   @override
-  State<ManageShootScreen> createState() => _ManageShootScreenState();
+  ConsumerState<ManageShootScreen> createState() => _ManageShootScreenState();
 
 }
 
 class _ManageShootScreenState
-    extends State<ManageShootScreen> {
+    extends ConsumerState<ManageShootScreen> {
 
-  String getFullImageUrl() {
+  String _getFullImageUrl() {
     final url = widget.imageUrl ?? "";
     if (url.isEmpty) return "";
-
-    if (url.startsWith("http")) {
-      return url;
-    }
-
-
-    return ApiService().getImageURL(url);
+    if (url.startsWith("http")) return url;
+    return '${ApiEndpoints.imageUrl}$url';
   }
 
 
@@ -69,9 +64,9 @@ class _ManageShootScreenState
               fit: StackFit.expand,
               children: [
                 /// 🔹 FULL IMAGE
-                getFullImageUrl().isNotEmpty
+                _getFullImageUrl().isNotEmpty
                     ? Image.network(
-                  getFullImageUrl(),
+                  _getFullImageUrl(),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
                     return SvgPicture.asset(
@@ -92,7 +87,7 @@ class _ManageShootScreenState
                     sigmaY: 12, // 👈 vertical blur
                   ),
                   child: Container(
-                    color: Colors.black.withOpacity(0.25), // 👈 dark tint
+                    color: Colors.black.withValues(alpha:0.25), // 👈 dark tint
                   ),
                 ),
               ],
@@ -185,10 +180,10 @@ class _ManageShootScreenState
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
-                              child: getFullImageUrl().isNotEmpty
+                              child: _getFullImageUrl().isNotEmpty
                                   ? Image(
                                 image: ResizeImage(
-                                  NetworkImage(getFullImageUrl()),
+                                  NetworkImage(_getFullImageUrl()),
                                   width: 400,
                                 ),
                                 height: 144,
@@ -229,18 +224,6 @@ class _ManageShootScreenState
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children:  [
-                           /*       Row(
-                                    children: [
-                                      Icon(Icons.star, size: 14, color: Colors.amber),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        "4.5 (120)",
-                                        style: TextStyle(fontSize: 14, color: AppColors.white70,  fontWeight: FontWeight.w500,
-                                          fontFamily: "Outfit",
-                                        ),
-                                      ),
-                                    ],
-                                  ),*/
                                   SizedBox(height: 6),
                                   Text(
                                     widget.projectName ?? "N/A",
@@ -300,7 +283,7 @@ class _ManageShootScreenState
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha:0.9),
                             ),
                           ),
                           child:Column(
@@ -463,7 +446,10 @@ class _ManageShootScreenState
   iconPath,
   height: 16,
   width: 16,
-  color: Colors.black87,
+  colorFilter: const ColorFilter.mode(
+    Colors.black87,
+    BlendMode.srcIn,
+  ),
   ),
         const SizedBox(width: 8),
         Expanded(

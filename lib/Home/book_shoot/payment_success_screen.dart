@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../app/colors.dart';
 import '../../app/route_names.dart';
 
-class PaymentSuccessScreen extends StatelessWidget {
+class PaymentSuccessScreen extends ConsumerWidget {
   final int bookingId;
   final String fullName;
   final String phone;
@@ -20,7 +21,7 @@ class PaymentSuccessScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return WillPopScope(
       onWillPop: () async {
         /// 🔥 BACK PRESS → GO TO HOME

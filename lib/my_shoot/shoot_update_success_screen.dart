@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
@@ -9,14 +10,14 @@ import '../app/route_names.dart';
 import '../app/spacing.dart';
 import '../app/text_styles.dart';
 
-class ShootUpdateSuccessScreen extends StatefulWidget {
+class ShootUpdateSuccessScreen extends ConsumerStatefulWidget {
   const ShootUpdateSuccessScreen({super.key});
 
   @override
-  State<ShootUpdateSuccessScreen> createState() => _ShootUpdateSuccessScreenState();
+  ConsumerState<ShootUpdateSuccessScreen> createState() => _ShootUpdateSuccessScreenState();
 }
 
-class _ShootUpdateSuccessScreenState extends State<ShootUpdateSuccessScreen> {
+class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

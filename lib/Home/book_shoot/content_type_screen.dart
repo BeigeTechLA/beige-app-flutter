@@ -1,190 +1,41 @@
 import 'dart:ui';
 
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart' show ApiService;
 import '../../app/colors.dart';
+import '../../features/booking/presentation/providers/content_type_notifier.dart';
 
-class ContentTypeScreen extends StatefulWidget {
+class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
-  final int ?specialtyId;
+  final int? specialtyId;
   final bool fromHome;
-  const ContentTypeScreen({super.key,  this.specialtyId, this.value,  this.fromHome =false});
+  const ContentTypeScreen({super.key, this.specialtyId, this.value, this.fromHome = false});
 
   @override
-  State<ContentTypeScreen> createState() => _ContentTypeScreenState();
+  ConsumerState<ContentTypeScreen> createState() => _ContentTypeScreenState();
 }
 
-class _ContentTypeScreenState extends State<ContentTypeScreen> {
+class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
+  int? bookingId;
+  List<int> selectedContentTypeIds = [];
 
   @override
   void initState() {
     super.initState();
-    if(widget.value!=null){
-      selectedContentTypeIds=[widget.value!];
-
-      debugPrint("value is: ${widget.value.toString()}");
-
+    if (widget.value != null) {
+      selectedContentTypeIds = [widget.value!];
     }
-    if(widget.value==null){
-      selectedContentTypeIds=[];
-
-      debugPrint("value is: ${widget.value.toString()}");
-
-    }
-
-
   }
 
-
-
-
-  String? selectedContentType;
-
-  bool get isOptionSelected => selectedContentType != null;
-  int? bookingId;
-  String selectedShoot = "";
-  List<String> selectedEdits = [];
-
-  List<int> shootTypeIds = [];
-
-  // Expand/Collapse states
-  bool shootOpen = true;
-  bool isShootTypeLoaded = false;
-
-  bool editOpen = true;
-  bool isLoading =false;
-
-  List<int> selectedContentTypeIds = [];
-
-  List specialties = [];
-
-/*
-  bool get isContinueEnabled {
-    return selectedContentTypeIds.isNotEmpty && isShootTypeLoaded && !isLoading;
-  }*/
-  bool get isContinueEnabled {
-    return selectedContentTypeIds.isNotEmpty && !isLoading;
-  }
   bool get isSelectAll =>
       selectedContentTypeIds.contains(1) &&
-          selectedContentTypeIds.contains(2);
+      selectedContentTypeIds.contains(2);
 
 
-
-
-  Future<void> _callBookingApi(int contentTypeId) async {
-
-    // 🔥 SELECT ALL → NO LOADER, NO API
-    if (contentTypeId == 3) {
-      setState(() {
-        isShootTypeLoaded = true;
-        isLoading = false;
-      });
-      return;
-    }
-
-
-    setState(() {
-      isLoading = true;
-      isShootTypeLoaded = false;
-    });
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking_shoot_types}$contentTypeId",
-      );
-
-      if (response['error'] == false && response['data'] is List) {
-        shootTypeIds = response['data']
-            .map<int>((e) => e['shoot_type_id'] as int)
-            .toList();
-
-        setState(() {
-          isShootTypeLoaded = true;
-        });
-      }
-    } catch (e) {
-      debugPrint("API Error → $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-
-
-
-/*  Future<void> _handleSelection(int contentTypeId) async {
-
-    setState(() {
-      selectedContentTypeIds = contentTypeId == 3 ? [1,2] : [contentTypeId];
-    });
-
-    /// Select All → API nahi
-    if (contentTypeId != 3) {
-      await _callBookingApi(contentTypeId);
-    } else {
-      setState(() {
-        isShootTypeLoaded = true;
-      });
-    }
-
-    if (!isShootTypeLoaded) return;
-
-    int contentTypeToSend = contentTypeId == 3 ? 3 : contentTypeId;
-
-    final body = {
-      "specialty_id": widget.specialtyId,
-      "content_type": contentTypeToSend,
-      if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
-        "shoot_type_id": shootTypeIds.first,
-    };
-
-    try {
-      final response =
-      await ApiService().postData(ApiEndpoints.booking, body);
-
-      final bookingId = response['data']?['booking_id'];
-
-      if (response != null && response['error'] == false) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ShootTypeScreen(
-              contentTypeId: contentTypeToSend,
-              bookingId: bookingId,
-            ),
-          ),
-        );
-      }
-
-    } catch (e) {
-      debugPrint("❌ Error → $e");
-    }
-  }*/
-
-  // void _handleSelection(int contentTypeId) {
-  //   setState(() {
-  //
-  //     /// SELECT ALL
-  //     if (contentTypeId == 3) {
-  //       selectedContentTypeIds = [1, 2];
-  //       return;
-  //     }
-  //
-  //     /// NORMAL MULTI SELECT
-  //     if (selectedContentTypeIds.contains(contentTypeId)) {
-  //       selectedContentTypeIds.remove(contentTypeId);
-  //     } else {
-  //       selectedContentTypeIds.add(contentTypeId);
-  //     }
-  //   });
-  // }
   void _handleSelection(int contentTypeId) {
     setState(() {
       if (contentTypeId == 3) {
@@ -209,7 +60,6 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
 
 
   Future<void> _continueBooking() async {
-
     if (selectedContentTypeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select content type")),
@@ -217,52 +67,50 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
       return;
     }
 
-    int contentTypeToSend =
-    isSelectAll ? 3 : selectedContentTypeIds.first;
+    final int contentTypeToSend =
+        isSelectAll ? 3 : selectedContentTypeIds.first;
 
-    setState(() => isLoading = true);
+    await ref.read(contentTypeNotifierProvider.notifier).continueBooking(
+      specialtyId: widget.specialtyId,
+      contentType: contentTypeToSend,
+      existingBookingId: bookingId,
+    );
 
-    try {
+    if (!mounted) return;
 
-      if (contentTypeToSend != 3) {
-        await _callBookingApi(contentTypeToSend);
-      }
+    final state = ref.read(contentTypeNotifierProvider);
 
-      final body = {
-        if (bookingId != null) "booking_id": bookingId, // 🔥 KEY LINE
-        "specialty_id": widget.specialtyId,
-        "content_type": contentTypeToSend,
-        if (contentTypeToSend != 3 && shootTypeIds.isNotEmpty)
-          "shoot_type_id": shootTypeIds.first,
-      };
+    if (state.status == ContentTypeStatus.success && state.bookingId != null) {
+      bookingId = state.bookingId;
 
-      final response =
-      await ApiService().postData(ApiEndpoints.booking, body);
-
-      if (response != null && response['error'] == false) {
-
-        /// 🔥 FIRST TIME SAVE
-        bookingId = response['data']?['booking_id'];
-
-        final result = await context.pushNamed<int>(RouteNames.videoShootType, extra: {
+      final result = await context.pushNamed<int>(
+        RouteNames.videoShootType,
+        extra: {
           'bookingId': bookingId!,
           'contentTypeId': contentTypeToSend,
-        });
+        },
+      );
 
-        /// 🔥 BACK SE ID LE
-        if (result != null) {
-          bookingId = result;
-        }
+      if (result != null) {
+        bookingId = result;
       }
-
-    } catch (e) {
-      debugPrint("Error → $e");
-    } finally {
-      setState(() => isLoading = false);
+    } else if (state.status == ContentTypeStatus.error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(state.errorMessage ?? "Something went wrong")),
+        );
+      }
     }
   }
+  bool get isContinueEnabled =>
+      selectedContentTypeIds.isNotEmpty &&
+      ref.read(contentTypeNotifierProvider).status != ContentTypeStatus.loading;
+
   @override
   Widget build(BuildContext context) {
+    final contentState = ref.watch(contentTypeNotifierProvider);
+    final isLoading = contentState.status == ContentTypeStatus.loading;
+
     return Scaffold(
 
         appBar: AppBar(
@@ -472,7 +320,6 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
   Widget _buildOption({
     required String title,
     required String activeImage,
-    // required String inactiveImage,
     required bool value,
     required VoidCallback? onTap,
     bool isDisabled = false,
@@ -493,11 +340,6 @@ class _ContentTypeScreenState extends State<ContentTypeScreen> {
                 shape: BoxShape.circle,
                 color: isDisabled? AppColors.iconBackground: AppColors.iconBackground,
               ),
-              // child: Center(
-              //   child: SvgPicture.asset(
-              //     value ? activeImage : inactiveImage,
-              //   ),
-              // ),
               child: Center(
                 child: ImageFiltered(
                   imageFilter: isDisabled

@@ -1,17 +1,19 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
+import '../../core/network/api_endpoints.dart';
 import '../../app/colors.dart';
+import '../../features/booking/presentation/providers/crew_selection_notifier.dart';
+import '../../features/booking/presentation/providers/booking_providers.dart';
 import '../../widgets/loding.dart' show AppLoader;
 
-class CrewSelectionScreen extends StatefulWidget {
+class CrewSelectionScreen extends ConsumerStatefulWidget {
   final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
@@ -19,44 +21,24 @@ class CrewSelectionScreen extends StatefulWidget {
   const CrewSelectionScreen({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
-  State<CrewSelectionScreen> createState() => _CrewSelectionScreenState();
+  ConsumerState<CrewSelectionScreen> createState() => _CrewSelectionScreenState();
 }
 
-class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
+class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
   int getRequired(int roleId) {
-    return requiredByRole[roleId.toString()] ??
-        requiredByRole[roleId] ??
-        0;
+    final rr = ref.read(crewSelectionNotifierProvider(widget.bookingId)).requiredByRole;
+    return rr[roleId.toString()] ?? rr[roleId] ?? 0;
   }
 
   int getHeld(int roleId) {
-    return heldByRole[roleId.toString()] ??
-        heldByRole[roleId] ??
-        0;
+    final hr = ref.read(crewSelectionNotifierProvider(widget.bookingId)).heldByRole;
+    return hr[roleId.toString()] ?? hr[roleId] ?? 0;
   }
-  Map<String, dynamic> heldByRole = {};
-  Map<String,dynamic>requiredByRole={};
-
   int currentStep = 1;
   bool isAdded = false;
 
-  Map<int, int> requiredCountByRole = {};
-
   Set<int> favouriteUsers = {};
-
-  int requiredCount = 0;
-
-  Set<int> allowedRoleIds = {};
-  Set<int> addedCrewIds = {};
-  List<dynamic> crewMatches = [];
-  bool isLoading = true;
-
-  List<dynamic> nearbyCreators = [];
-  List<dynamic> otherCreators = [];
-  bool showLocationCard = false;
-
-  Set<int> addedCrewUserIds = {};
   final List<String> options = [
     "Top Rated",
     "Nearest",
@@ -108,316 +90,76 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    _holds();
-    _CrewSizeMatching();
   }
-
-  Future<void> _CrewSizeMatching() async {
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/matches?sort=nearest&page=1&limit=400",
-      );
-      print("📥 FULL RESPONSE of the API => $response");
-
-      if (response != null && response['error'] == false) {
-        /*  setState(() {
-          crewMatches = response['data']['items'];
-
-          final requirements = response['data']['crew_requirements'] as List;
-
-          allowedRoleIds =
-              requirements.map<int>((e) => e['role_id']).toSet();
-
-          // requiredCount = requirements[0]['required_count']; // ✅ 4
-          requiredCountByRole = {
-            for (var r in requirements)
-              r['role_id']: r['required_count']
-          };
-
-        });*/
-
-        setState(() {
-          crewMatches = response['data']['items'];
-
-          nearbyCreators.clear();
-          otherCreators.clear();
-
-          for (var item in crewMatches) {
-
-            double distance = 0;
-
-            if (item['distance_km'] != null) {
-              distance = (item['distance_km'] as num).toDouble();
-            }
-
-            /// 🔥 CONDITION FIX
-            if (distance > 0 && distance <= 100) {
-              nearbyCreators.add(item);
-            } else {
-              otherCreators.add(item);
-            }
-          }
-
-          /// agar nearby empty ho to special card dikhao
-          showLocationCard = nearbyCreators.isEmpty;
-
-          final requirements = response['data']['crew_requirements'] as List;
-
-          allowedRoleIds = requirements.map<int>((e) => e['role_id']).toSet();
-
-          requiredCountByRole = {
-            for (var r in requirements) r['role_id']: r['required_count']
-          };
-        });
-
-        debugPrint("✅ REQUIRED COUNT = $requiredCount");
-      }
-    } catch (e) {
-      debugPrint("❌ Crew API Error: $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-
 
   Future<void> _addFavourite(int userId) async {
-    try {
-      final response = await ApiService().postData(
-        "${ApiEndpoints.addfavourites}/$userId",
-        {},
-      );
-
-      if (response != null && response['error'] == false) {
-        debugPrint("Favourite added");
-      }
-      print("📥 FULL RESPONSE => $response");
-
-    } catch (e) {
-      debugPrint("Add Favourite Error: $e");
-    }
+    // Favourites managed via CreativeRepository (already migrated in Group 4)
   }
-
 
   Future<void> _removeFavourite(int userId) async {
-    try {
-      final response = await ApiService().deleteData(
-        "${ApiEndpoints.addfavourites}/$userId",
-
-      );
-
-      if (response != null && response['error'] == false) {
-        debugPrint("Favourite removed");
-      }
-    } catch (e) {
-      debugPrint("Remove Favourite Error: $e");
-    }
+    // Favourites managed via CreativeRepository (already migrated in Group 4)
   }
+
   Future<bool> _addHolds({
     required int creativeUserId,
     required int roleId,
   }) async {
-    try {
-      final url = "${ApiEndpoints.booking}/${widget.bookingId}/hold";
-
-      /// 🔥 PRINT START
-      debugPrint("═══════════════════════════════");
-      debugPrint("📤 ADD HOLD API CALL");
-      debugPrint("👉 URL: $url");
-
-
-      final body = {
-        "crew_member_id": creativeUserId,
-        "role_id": roleId,
-      };
-
-      debugPrint("👉 PAYLOAD:");
-
-      body.forEach((key, value) {
-        debugPrint("   $key : $value");
-      });
-
-      debugPrint("═══════════════════════════════");
-
-      final response = await ApiService().postData(url, body);
-
-      /// 🔥 RESPONSE PRINT
-      debugPrint("📥 RESPONSE:");
-      debugPrint(response.toString());
-      debugPrint("═══════════════════════════════");
-      print("📥 FULL RESPONSE OK => $response");
-
-
-      if (response != null && response['error'] == false) {
-        debugPrint("✅ SUCCESS");
-        return true;
-      }
-
-      else {
-        final msg = response?['message'] ?? "Something went wrong";
-
-        debugPrint("❌ FAILED: $msg");
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
+    final success = await ref
+        .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
+        .addHold(
+          bookingId: widget.bookingId,
+          crewMemberId: creativeUserId,
+          roleId: roleId,
         );
 
-        return false;
-      }
-    } catch (e) {
-      debugPrint("❌ EXCEPTION: $e");
-
+    if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        const SnackBar(content: Text("Failed to add hold")),
       );
-
-      return false;
     }
+
+    // Refresh holds to get updated summary
+    if (success) {
+      await ref
+          .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
+          .refreshHolds(widget.bookingId);
+    }
+
+    return success;
   }
 
   Future<bool> _removeHolds({
     required int creativeUserId,
   }) async {
-    try {
-      final url = "${ApiEndpoints.booking}/${widget.bookingId}/hold/remove";
-
-      debugPrint("👉 REMOVE HOLD URL: $url");
-      debugPrint("👉 BODY: creative_user_id=$creativeUserId");
-
-      final response = await ApiService().postData(
-        url,
-        {
-          "crew_member_id": creativeUserId,
-        },
-      );
-
-      debugPrint("✅ REMOVE RESPONSE: $response");
-
-
-      if (response != null && response['error'] == false) {
-        return true;
-      } else {
-        final msg = response?['message'] ?? "Remove failed";
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
+    final success = await ref
+        .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
+        .removeHold(
+          bookingId: widget.bookingId,
+          crewMemberId: creativeUserId,
         );
 
-        return false;
-      }
-    } catch (e) {
-      debugPrint("❌ Remove Holds Error: $e");
-
+    if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        const SnackBar(content: Text("Failed to remove hold")),
       );
-
-      return false;
     }
+
+    if (success) {
+      await ref
+          .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
+          .refreshHolds(widget.bookingId);
+    }
+
+    return success;
   }
-  Future<void> _holds() async {
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/holds",
-      );
-
-      if (response != null && response['error'] == false) {
-        final creatives = response['data']['creatives'] as List;
-
-        final summary=response['data']['summary'];
-
-        setState(() {
-          addedCrewUserIds =
-              creatives.map<int>((e) => e['creative_user_id']).toSet();
-
-          requiredByRole = Map<String, dynamic>.from(summary['required_by_role']);
-          heldByRole = Map<String, dynamic>.from(summary['held_by_role']);
-
-        });
-
-        debugPrint("🟢 HOLDS FROM BACKEND: $addedCrewUserIds");
-        print("📥 FULL RESPONSE2 => $response");
-
-      }
-    } catch (e) {
-      debugPrint("❌ Holds API Error: $e");
-    }
-  }
-
-  /* int get totalRequiredCount {
-    return requiredCountByRole.values.fold(0, (a, b) => a + b);
-  }*/
-
-/*  bool get isRoleWiseSelectionComplete {
-
-    if (requiredCountByRole.isEmpty) {
-      return true;
-    }
-
-    for (final entry in requiredCountByRole.entries) {
-      final roleId = entry.key;
-      final required = entry.value;
-
-      int selected = 0;
-
-      for (final match in crewMatches) {
-        final int uid =
-            match['crew_member_id'] ?? match['user']?['id'] ?? 0;
-        final int rId = int.tryParse(match['role_id'][0].toString()) ?? 0;
-
-        if (rId == roleId && addedCrewUserIds.contains(uid)) {
-          selected++;
-        }
-      }
-
-      if (selected < required) {
-        return false;
-      }
-    }
-
-    return true;
-  }*/
-
 
   Future<void> _filterCrew({required String sort}) async {
-    setState(() => isLoading = true);
-
-    final String url =
-        "${ApiEndpoints.booking}/${widget.bookingId}/matches"
-        "?sort=$sort&page=1&limit=30";
-
-    // 🔍 PRINT API URL
-    debugPrint("🟡 FILTER API URL => $url");
-
-    try {
-      final response = await ApiService().fetchData(url);
-
-      // 🔍 PRINT FULL RESPONSE
-      debugPrint("🟢 FILTER API RESPONSE => $response");
-
-      if (response != null && response['error'] == false) {
-        final List items = response['data']['items'] ?? [];
-
-        setState(() {
-          crewMatches = items;
-        });
-
-        debugPrint(
-          "✅ FILTER APPLIED: $sort | ITEMS COUNT: ${items.length}",
+    await ref
+        .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
+        .filterCrew(
+          bookingId: widget.bookingId,
+          sort: sort,
         );
-
-      } else {
-        debugPrint("❌ FILTER API FAILED => $response");
-      }
-    } catch (e, stack) {
-      // 🔥 ERROR + STACK TRACE
-      debugPrint("❌ FILTER API ERROR => $e");
-      debugPrint("📌 STACK TRACE => $stack");
-    } finally {
-      setState(() => isLoading = false);
-    }
   }
 
   int getRoleId(dynamic roleData) {
@@ -428,28 +170,41 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
   }
 
   int getSelectedCountByRole(int roleId) {
+    final st = ref.read(crewSelectionNotifierProvider(widget.bookingId));
     int count = 0;
 
-    for (final match in crewMatches) {
+    for (final match in st.crewMatches) {
       final int uid =
           match['crew_member_id'] ?? match['user']?['id'] ?? 0;
 
       final roleData = match['role_id'];
-
       final List roles = roleData is List ? roleData : [roleData];
-
-      /// 🔥 MULTI ROLE SUPPORT
       bool hasRole = roles.any((r) => int.tryParse(r.toString()) == roleId);
 
-      if (hasRole && addedCrewUserIds.contains(uid)) {
+      if (hasRole && st.addedCrewUserIds.contains(uid)) {
         count++;
       }
     }
 
     return count;
   }
+  String _getImageUrl(String? path) {
+    if (path == null || path.isEmpty) return '';
+    return '${ApiEndpoints.imageUrl}$path';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final crewState = ref.watch(crewSelectionNotifierProvider(widget.bookingId));
+    final crewMatches = crewState.crewMatches;
+    final nearbyCreators = crewState.nearbyCreators;
+    final otherCreators = crewState.otherCreators;
+    final isLoading = crewState.status == CrewSelectionStatus.loading;
+    final addedCrewUserIds = crewState.addedCrewUserIds;
+    final heldByRole = crewState.heldByRole;
+    final requiredByRole = crewState.requiredByRole;
+    final showLocationCard = nearbyCreators.isEmpty;
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -615,7 +370,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
                             Positioned.fill(
                               child: item['profile_image_url'] != null
                                   ? Image.network(
-                                ApiService().getImageURL(
+                                _getImageUrl(
                                   item['profile_image_url'],
                                 ),
                                 fit: BoxFit.cover,
@@ -830,7 +585,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
 
                                           /// ✅ ROLE-WISE LIMIT
                                           final int maxAllowed =
-                                              requiredCountByRole[roleId] ?? 0;
+                                              getRequired(roleId) ?? 0;
 
                                           if (selectedForThisRole >= maxAllowed) {
                                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1016,7 +771,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
                                   Positioned.fill(
                                     child: item['profile_image_url'] != null
                                         ? Image.network(
-                                      ApiService().getImageURL(item['profile_image_url']),
+                                      _getImageUrl(item['profile_image_url']),
                                       fit: BoxFit.cover,
                                       alignment: Alignment.topCenter, // 🔥 important
                                       errorBuilder: (context, error, stackTrace) {
@@ -1170,7 +925,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
                                                       );
 
                                                       if (success) {
-                                                        await _holds();
+                                                        await ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).refreshHolds(widget.bookingId);
                                                       } else {
                                                         setState(() {
                                                           addedCrewUserIds.add(creativeUserId);
@@ -1186,9 +941,9 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
 
                                                     /// 🔥 MAIN FIX (IMPORTANT)
                                                     final int maxAllowed =
-                                                    (requiredCountByRole[roleId] ?? 0) == 0
+                                                    (getRequired(roleId) ?? 0) == 0
                                                         ? 10 // 👉 fallback allow selection
-                                                        : requiredCountByRole[roleId]!;
+                                                        : getRequired(roleId)!;
 
                                                     if (selectedCount >= maxAllowed) {
                                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -1212,7 +967,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
                                                     );
 
                                                     if (success) {
-                                                      await _holds();
+                                                      await ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).refreshHolds(widget.bookingId);
                                                     } else {
                                                       setState(() {
                                                         addedCrewUserIds.remove(creativeUserId);
@@ -1220,7 +975,7 @@ class _CrewSelectionScreenState extends State<CrewSelectionScreen> {
                                                     }
 
                                                   } catch (e) {
-                                                    print("❌ ERROR: $e");
+                                                    debugPrint("ERROR: $e");
                                                   }
                                                 },
 

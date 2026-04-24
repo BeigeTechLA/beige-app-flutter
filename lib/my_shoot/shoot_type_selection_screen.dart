@@ -1,29 +1,29 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../app/route_names.dart';
 import '../Customtextfiled/CustomInputField.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
+import '../features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import '../app/colors.dart';
 import '../app/text_styles.dart';
 import '../app/spacing.dart';
 import '../app/radii.dart';
 import '../app/assets.dart';
 
-class ShootTypeSelectionScreen extends StatefulWidget {
+class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   final int bookingId;
 
   const ShootTypeSelectionScreen({super.key, required this.bookingId});
 
   @override
-  State<ShootTypeSelectionScreen> createState() => _ShootTypeSelectionScreenState();
+  ConsumerState<ShootTypeSelectionScreen> createState() => _ShootTypeSelectionScreenState();
 }
 
-class _ShootTypeSelectionScreenState extends State<ShootTypeSelectionScreen> {
+class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScreen> {
 
   Map<DateTime, bool> expandedMap = {};
   Map<DateTime, TimeOfDay?> startTimes = {};
@@ -190,13 +190,8 @@ class _ShootTypeSelectionScreenState extends State<ShootTypeSelectionScreen> {
     return selectedDate != null;
   }
 
-  bool isLoading =true;
-  @override
-  void initState() {
-    super.initState();
-
-    time();
-  }
+  bool isLoading = true;
+  bool _hasSynced = false;
 
   String _apiDateFormat(DateTime date) {
 
@@ -366,156 +361,118 @@ class _ShootTypeSelectionScreenState extends State<ShootTypeSelectionScreen> {
   }*/
 
 
-  Future<void> time() async {
-    setState(() => isLoading = true);
+  void _syncFromNotifier(Map<String, dynamic> data) {
+    if (_hasSynced) return;
+    _hasSynced = true;
 
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/time",
-      );
+    setState(() {
+      editTypes = data['video_edit_types'] ?? [];
+      photoEditTypes = data['photo_edit_types'] ?? [];
 
-      debugPrint("API Response → $response");
+      selectedDates.clear();
+      startTimes.clear();
+      endTimes.clear();
 
-      if (response != null && response['error'] == false) {
-        final data = response['data'];
+      if (data['booking_type'] == "single_day") {
+        selectedIndex = 1;
+        isSingleLocked = false;
+        isMultiLocked = true;
 
-        setState(() {
-          /// ✅ Edit types
-          editTypes = data['video_edit_types'] ?? [];
-          photoEditTypes = data['photo_edit_types'] ?? [];
-
-          /// RESET COMMON
-          selectedDates.clear();
-          startTimes.clear();
-          endTimes.clear();
-
-          /// =========================
-          /// 🔥 SINGLE DAY
-          /// =========================
-          if (data['booking_type'] == "single_day") {
-            selectedIndex = 1;
-
-            /// ✅ LOCK FIX
-            isSingleLocked = false; // allow
-            isMultiLocked = true;   // block
-
-            /// DATE
-            if (data['event_date'] != null) {
-              selectedDate = DateTime.parse(data['event_date']);
-
-              dateController.text =
+        if (data['event_date'] != null) {
+          selectedDate = DateTime.parse(data['event_date']);
+          dateController.text =
               "${selectedDate!.day.toString().padLeft(2, '0')}-"
-                  "${selectedDate!.month.toString().padLeft(2, '0')}-"
-                  "${selectedDate!.year}";
-            }
+              "${selectedDate!.month.toString().padLeft(2, '0')}-"
+              "${selectedDate!.year}";
+        }
 
-            /// START TIME
-            if (data['start_time'] != null) {
-              final s = data['start_time'].split(":");
-              startTime = TimeOfDay(
+        if (data['start_time'] != null) {
+          final s = data['start_time'].split(":");
+          startTime = TimeOfDay(
+            hour: int.parse(s[0]),
+            minute: int.parse(s[1]),
+          );
+          _updateTimeText(startTimeController, startTime!);
+        }
+
+        if (data['end_time'] != null) {
+          final e = data['end_time'].split(":");
+          endTime = TimeOfDay(
+            hour: int.parse(e[0]),
+            minute: int.parse(e[1]),
+          );
+          _updateTimeText(endTimeController, endTime!);
+        }
+
+        selectedDates.clear();
+        startTimes.clear();
+        endTimes.clear();
+      } else if (data['booking_type'] == "multi_day") {
+        selectedIndex = 2;
+        isSingleLocked = true;
+        isMultiLocked = false;
+
+        final multiDay = data['multi_day'];
+
+        selectedDate = null;
+        dateController.clear();
+
+        if (multiDay != null && multiDay['selected_dates'] != null) {
+          selectedDates = (multiDay['selected_dates'] as List)
+              .map((d) => DateTime.parse(d))
+              .toList();
+        }
+
+        istimingsame =
+            multiDay?['same_timings_for_all_selected_dates'] ?? true;
+
+        if (istimingsame == true && multiDay?['shared_time'] != null) {
+          final shared = multiDay['shared_time'];
+
+          if (shared['start_time'] != null) {
+            final s = shared['start_time'].split(":");
+            startTime = TimeOfDay(
+              hour: int.parse(s[0]),
+              minute: int.parse(s[1]),
+            );
+            _updateTimeText(startTimeController, startTime!);
+          }
+
+          if (shared['end_time'] != null) {
+            final e = shared['end_time'].split(":");
+            endTime = TimeOfDay(
+              hour: int.parse(e[0]),
+              minute: int.parse(e[1]),
+            );
+            _updateTimeText(endTimeController, endTime!);
+          }
+        }
+
+        if (multiDay?['days'] != null) {
+          for (var day in multiDay['days']) {
+            final date = DateTime.parse(day['date']);
+
+            if (day['start_time'] != null) {
+              final s = day['start_time'].split(":");
+              startTimes[date] = TimeOfDay(
                 hour: int.parse(s[0]),
                 minute: int.parse(s[1]),
               );
-              _updateTimeText(startTimeController, startTime!);
             }
 
-            /// END TIME
-            if (data['end_time'] != null) {
-              final e = data['end_time'].split(":");
-              endTime = TimeOfDay(
+            if (day['end_time'] != null) {
+              final e = day['end_time'].split(":");
+              endTimes[date] = TimeOfDay(
                 hour: int.parse(e[0]),
                 minute: int.parse(e[1]),
               );
-              _updateTimeText(endTimeController, endTime!);
-            }
-
-            /// CLEAR MULTI UI
-            selectedDates.clear();
-            startTimes.clear();
-            endTimes.clear();
-          }
-
-          /// =========================
-          /// 🔥 MULTI DAY
-          /// =========================
-          else if (data['booking_type'] == "multi_day") {
-            selectedIndex = 2;
-
-            /// ✅ LOCK FIX
-            isSingleLocked = true;  // block
-            isMultiLocked = false;  // allow
-
-            final multiDay = data['multi_day'];
-
-            /// CLEAR SINGLE UI
-            selectedDate = null;
-            dateController.clear();
-
-            /// ✅ SELECTED DATES
-            if (multiDay != null && multiDay['selected_dates'] != null) {
-              selectedDates = (multiDay['selected_dates'] as List)
-                  .map((d) => DateTime.parse(d))
-                  .toList();
-            }
-
-            /// ✅ SAME TIME FLAG
-            istimingsame =
-                multiDay?['same_timings_for_all_selected_dates'] ?? true;
-
-            /// ✅ SHARED TIME
-            if (istimingsame == true &&
-                multiDay?['shared_time'] != null) {
-              final shared = multiDay['shared_time'];
-
-              if (shared['start_time'] != null) {
-                final s = shared['start_time'].split(":");
-                startTime = TimeOfDay(
-                  hour: int.parse(s[0]),
-                  minute: int.parse(s[1]),
-                );
-                _updateTimeText(startTimeController, startTime!);
-              }
-
-              if (shared['end_time'] != null) {
-                final e = shared['end_time'].split(":");
-                endTime = TimeOfDay(
-                  hour: int.parse(e[0]),
-                  minute: int.parse(e[1]),
-                );
-                _updateTimeText(endTimeController, endTime!);
-              }
-            }
-
-            /// ✅ PER DAY TIME
-            if (multiDay?['days'] != null) {
-              for (var day in multiDay['days']) {
-                final date = DateTime.parse(day['date']);
-
-                if (day['start_time'] != null) {
-                  final s = day['start_time'].split(":");
-                  startTimes[date] = TimeOfDay(
-                    hour: int.parse(s[0]),
-                    minute: int.parse(s[1]),
-                  );
-                }
-
-                if (day['end_time'] != null) {
-                  final e = day['end_time'].split(":");
-                  endTimes[date] = TimeOfDay(
-                    hour: int.parse(e[0]),
-                    minute: int.parse(e[1]),
-                  );
-                }
-              }
             }
           }
-        });
+        }
       }
-    } catch (e) {
-      debugPrint("API Error → $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
+
+      isLoading = false;
+    });
   }
 
 
@@ -603,25 +560,27 @@ class _ShootTypeSelectionScreenState extends State<ShootTypeSelectionScreen> {
       };
     }
 
-    debugPrint("📤 FINAL PAYLOAD → $payload");
+    final notifier = ref.read(
+      shootTypeSelectionNotifierProvider(widget.bookingId).notifier,
+    );
 
-    try {
-      final response = await ApiService().putData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/time",
-        payload,
+    final success = await notifier.saveBookingTime(
+      bookingId: widget.bookingId,
+      data: payload,
+    );
+
+    if (success && mounted) {
+      context.pushNamed(
+        RouteNames.bookingReviewConfirm,
+        pathParameters: {'bookingId': widget.bookingId.toString()},
       );
-
-      if (response != null && response['error'] == false) {
-        context.pushNamed(
-          RouteNames.bookingReviewConfirm,
-          pathParameters: {'bookingId': widget.bookingId.toString()},
-        );
-      }
-    } catch (e) {
-      debugPrint("❌ API Error → $e");
-    } finally {
-      setState(() => isSubmitting = false);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to save booking time")),
+      );
     }
+
+    if (mounted) setState(() => isSubmitting = false);
   }
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
@@ -998,6 +957,21 @@ class _ShootTypeSelectionScreenState extends State<ShootTypeSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectionState = ref.watch(
+      shootTypeSelectionNotifierProvider(widget.bookingId),
+    );
+
+    if (selectionState.status == ShootTypeSelectionStatus.loaded &&
+        !_hasSynced) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _syncFromNotifier(selectionState.bookingTimeData);
+      });
+    }
+
+    if (selectionState.status == ShootTypeSelectionStatus.loading) {
+      isLoading = true;
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,

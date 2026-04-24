@@ -7,10 +7,9 @@ import 'package:lottie/lottie.dart' show Lottie;
 
 import '../app/route_names.dart';
 import '../core/providers/auth_state_provider.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
 import '../service/shared_service.dart';
 import '../app/colors.dart';
+import '../features/profile/presentation/providers/profile_notifier.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -20,76 +19,20 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-
-
-  bool isLoading =true;
-
-
-  List<dynamic> myprofile = [];
-
-
-  Map<String, dynamic>? myProfile;
-  @override
-  void initState() {
-    super.initState();
-    _fetchMyProfile();
-  }
-
-  Future<void> _fetchMyProfile() async {
-    debugPrint("🟢 MY PROFILE API CALL STARTED");
-
-    try {
-      final response = await ApiService().fetchData(ApiEndpoints.my_profile);
-
-      debugPrint("🟡 API RESPONSE: $response");
-
-      if (response != null && response['error'] == false) {
-        final user = response['data']['user'];
-
-        setState(() {
-          myProfile = user;
-
-
-          isLoading = false;
-        });
-
-        debugPrint("✅ PROFILE DATA SET IN TEXTFIELDS");
-      } else {
-        isLoading = false;
-      }
-    } catch (e) {
-      debugPrint("🚨 FETCH ERROR: $e");
-      isLoading = false;
-    }
-  }
-
-
-  String? getProfileImageUrl() {
-    if (myProfile == null) return null;
-
-    final image = myProfile!['user_profile_image_url'];
-
-    if (image == null || image.toString().isEmpty) return null;
-
-    return ApiService.imageURL + image;
-  }
-
-
   @override
   Widget build(BuildContext context) {
+    final profileState = ref.watch(profileNotifierProvider);
+    final myProfile = profileState.profile;
+    final profileImageUrl = profileState.profileImageUrl;
+
     return Scaffold(
-
-
       body: SingleChildScrollView(
         child: Column(
           children: [
-
-            ///  HEADER SECTION
+            /// HEADER SECTION
             Stack(
               clipBehavior: Clip.none,
               children: [
-
-                /// 🔹 BACKGROUND HEADER
                 SizedBox(
                   width: double.infinity,
                   height: 200,
@@ -104,26 +47,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                 ),
-
-                /// 🔹 BACK BUTTON
                 Positioned(
                   top: 90,
                   left: 16,
-                  child:  InkWell(
-                    onTap: () {
-                      context.pop();
-                    },
-                    child:SvgPicture.asset(
+                  child: InkWell(
+                    onTap: () => context.pop(),
+                    child: SvgPicture.asset(
                       "assets/svg/back.svg",
-                      color: AppColors.black,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.black,
+                        BlendMode.srcIn,
+                      ),
                       height: 24,
                     ),
                   ),
                 ),
-
-                /// 🔹 TITLE (CENTERED)
                 const Positioned(
-                  top:90 ,
+                  top: 90,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -138,8 +78,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                 ),
-
-                /// 🔹 PROFILE IMAGE (CUT INTO CURVE)
                 Positioned(
                   bottom: -48,
                   left: 0,
@@ -157,53 +95,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             radius: 48,
                             backgroundColor: Colors.grey.shade200,
                             child: ClipOval(
-                              child: getProfileImageUrl() == null
-
-                              /// ❌ NO IMAGE → PERSON ICON
+                              child: profileImageUrl == null
                                   ? Center(
-                                child: SvgPicture.asset(
-                                  "assets/svg/persone.svg",
-                                  width: 96,
-                                  height: 96,
-
-                                ),
-                              )
-
-                              /// ✅ IMAGE AVAILABLE
-                                  : Image.network(
-                                getProfileImageUrl()!,
-                                width: 96,
-                                height: 96,
-                                fit: BoxFit.cover,
-
-                                /// 🔄 LOADING → LOTTIE
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-
-                                  return Center(
-                                    child: SizedBox(
-                                      width: 96,
-                                      height: 96,
-                                      child: Lottie.asset(
-                                        "assets/lottie/loading_spinner.json",
-                                        fit: BoxFit.contain,
+                                      child: SvgPicture.asset(
+                                        "assets/svg/persone.svg",
+                                        width: 96,
+                                        height: 96,
                                       ),
-                                    ),
-                                  );
-                                },
-
-                                /// ❌ ERROR → PERSON ICON
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(
-                                    child: SvgPicture.asset(
-                                      "assets/svg/persone.svg",
+                                    )
+                                  : Image.network(
+                                      profileImageUrl,
                                       width: 96,
                                       height: 96,
-
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: SizedBox(
+                                            width: 96,
+                                            height: 96,
+                                            child: Lottie.asset(
+                                              "assets/lottie/loading_spinner.json",
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Center(
+                                          child: SvgPicture.asset(
+                                            "assets/svg/persone.svg",
+                                            width: 96,
+                                            height: 96,
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
                             ),
                           ),
                         ),
@@ -214,14 +145,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
 
-
-
             const SizedBox(height: 60),
 
-            /// 🔹 USER INFO
-             Text(
+            Text(
               myProfile?['name'] ?? 'USER',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: "Outfit",
                 color: Colors.white,
                 fontSize: 20,
@@ -229,9 +157,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 4),
-             Text(
+            Text(
               "${myProfile?['email'] ?? ''}",
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.white60,
                 fontFamily: "Outfit",
                 fontSize: 14,
@@ -241,19 +169,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 14),
 
-            /// 🔹 EDIT BUTTON
             InkWell(
               onTap: () async {
-
-                final result = await context.pushNamed<bool>(RouteNames.editProfile);
-
+                final result =
+                    await context.pushNamed<bool>(RouteNames.editProfile);
                 if (result == true) {
-                  _fetchMyProfile(); // 👈 Profile refresh
+                  ref.invalidate(profileNotifierProvider);
                 }
-
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(24),
@@ -270,17 +196,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
 
-
             Padding(
-              padding:  EdgeInsets.all(12),
-              child: Divider(color: AppColors.dividerDark,),
+              padding: const EdgeInsets.all(12),
+              child: Divider(color: AppColors.dividerDark),
             ),
 
-
-
-
             _profileMenuCard(),
-
 
             const SizedBox(height: 30),
           ],
@@ -294,17 +215,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Text("My Account",style: TextStyle(
+                Text(
+                  "My Account",
+                  style: TextStyle(
                     color: AppColors.white,
                     fontFamily: "Unbounded",
                     fontSize: 14,
-                    fontWeight: FontWeight.w500
-                ),)
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -318,39 +241,93 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 _menuRow(
                   "assets/svg/my_profile/Favourites.svg",
                   "Favourites",
-                  onTap: () {
-                    context.pushNamed(RouteNames.favourites);
+                  onTap: () => context.pushNamed(RouteNames.favourites),
+                ),
+                _divider(),
+                _menuRow(
+                  "assets/svg/my_profile/BookingHistory.svg",
+                  "Booking History",
+                  onTap: () => context.pushNamed(RouteNames.bookingHistory),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Divider(color: AppColors.dividerDark),
+          ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Text(
+                  "Legal",
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontFamily: "Unbounded",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF2A2A2A),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                _menuRow(
+                  "assets/svg/my_profile/Terms & Condition.svg",
+                  "Terms & Condition",
+                  onTap: () async {
+                    final uri =
+                        Uri.parse("https://beige.app/terms-and-conditions");
+                    if (await canLaunchUrl(uri)) {
+                      launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
                   },
                 ),
-
                 _divider(),
-                _menuRow("assets/svg/my_profile/BookingHistory.svg", "Booking History", onTap: () {
-                  context.pushNamed(RouteNames.bookingHistory);
-                }),
+                _menuRow(
+                  "assets/svg/my_profile/Privacy Policy.svg",
+                  "Privacy Policy",
+                  onTap: () async {
+                    final uri =
+                        Uri.parse("https://beige.app/privacy-policy");
+                    if (await canLaunchUrl(uri)) {
+                      launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                ),
               ],
             ),
           ),
-
-          SizedBox(height: 10,),
           Padding(
-            padding:  EdgeInsets.all(12),
-            child: Divider(color: AppColors.dividerDark,),
+            padding: const EdgeInsets.all(12),
+            child: Divider(color: AppColors.dividerDark),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Text("Legal",style: TextStyle(
+                Text(
+                  "Settings",
+                  style: TextStyle(
                     color: AppColors.white,
                     fontFamily: "Unbounded",
                     fontSize: 14,
-                    fontWeight: FontWeight.w500
-                ),)
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(height: 10,),
-
+          const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
               color: const Color(0xFF2A2A2A),
@@ -358,65 +335,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             child: Column(
               children: [
-                _menuRow("assets/svg/my_profile/Terms & Condition.svg", "Terms & Condition", onTap: () async {
-                  final uri = Uri.parse("https://beige.app/terms-and-conditions");
-                  if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
-                }),
-                _divider(),
-                _menuRow("assets/svg/my_profile/Privacy Policy.svg", "Privacy Policy", onTap: () async {
-                  final uri = Uri.parse("https://beige.app/privacy-policy");
-                  if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
-                }),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding:  EdgeInsets.all(12),
-            child: Divider(color: AppColors.dividerDark,),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Text("Settings",style: TextStyle(
-                    color: AppColors.white,
-                    fontFamily: "Unbounded",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500
-                ),)
-              ],
-            ),
-          ),
-          SizedBox(height: 10,),
-
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                _menuRow("assets/svg/my_profile/App_Preferences.svg", "App Preferences",
-                onTap: () {
-          context.pushNamed(RouteNames.appPreferences);
-          }),
+                _menuRow(
+                  "assets/svg/my_profile/App_Preferences.svg",
+                  "App Preferences",
+                  onTap: () => context.pushNamed(RouteNames.appPreferences),
+                ),
                 _divider(),
                 _menuRow(
                   "assets/svg/my_profile/Logout.svg",
                   "Logout",
                   onTap: _showLogoutBottomSheet,
                 ),
-
               ],
             ),
           ),
         ],
       ),
     );
-
-
   }
 
   Widget _menuRow(String iconPath, String title, {VoidCallback? onTap}) {
@@ -439,7 +374,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   iconPath,
                   height: 22,
                   width: 22,
-                  color: AppColors.white,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -458,7 +396,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               "assets/svg/my_profile/layer1.svg",
               height: 15,
               width: 20,
-              color: AppColors.white,
+              colorFilter: const ColorFilter.mode(
+                AppColors.white,
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),
@@ -469,10 +410,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _divider() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(
-        height: 1,
-        color: Colors.white12,
-      ),
+      child: Divider(height: 1, color: Colors.white12),
     );
   }
 
@@ -491,20 +429,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
-              /// DRAG INDICATOR
               Container(
                 height: 5,
                 width: 30,
-                margin:  EdgeInsets.only(bottom: 16),
+                margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
                   color: AppColors.white70,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
-
-               Text(
+              const Text(
                 "Logout",
                 style: TextStyle(
                   color: Colors.white,
@@ -513,10 +447,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
               const SizedBox(height: 8),
-
-              /// SUBTITLE
               const Text(
                 "Are you sure you want to log out?",
                 style: TextStyle(
@@ -525,34 +456,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   fontFamily: "Outfit",
                 ),
               ),
-              SizedBox(height: 14),
-
-              Divider(
-                height: 1,
-                color: AppColors.dividerDark,
-              ),
-
-               SizedBox(height: 10),
-
-
-
-              /// BUTTONS
+              const SizedBox(height: 14),
+              Divider(height: 1, color: AppColors.dividerDark),
+              const SizedBox(height: 10),
               Row(
                 children: [
-                  /// CANCEL
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        context.pop();
-                      },
+                      onPressed: () => context.pop(),
                       style: OutlinedButton.styleFrom(
-                        side:  BorderSide(color: AppColors.white60),
+                        side: const BorderSide(color: AppColors.white60),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child:  Text(
+                      child: const Text(
                         "Cancel",
                         style: TextStyle(
                           fontSize: 14,
@@ -563,30 +482,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
-                  /// LOGOUT
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         await SharedService.logout();
                         if (!mounted) return;
-                        
-                        /// ✅ UPDATE AUTH STATE
-                        ref.read(authStateProvider.notifier).updateState(false);
-                        
+                        ref
+                            .read(authStateProvider.notifier)
+                            .updateState(false);
                         context.goNamed(RouteNames.login);
                       },
-
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  AppColors.primary,
-                        padding:  EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child:  Text(
+                      child: const Text(
                         "Yes, Logout",
                         style: TextStyle(
                           fontSize: 14,
@@ -599,7 +513,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 12),
             ],
           ),

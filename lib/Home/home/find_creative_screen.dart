@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/app/radii.dart';
 
+import '../../app/colors.dart';
 import '../../app/route_names.dart';
 
-class FindCreativeScreen extends StatefulWidget {
+class FindCreativeScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final int specialtyId;
   final int ShootTypeId;
-
   final int contentTypeId;
-  const FindCreativeScreen({super.key, required this.bookingId, required this.specialtyId, required this.ShootTypeId, required this.contentTypeId});
+
+  const FindCreativeScreen({
+    super.key,
+    required this.bookingId,
+    required this.specialtyId,
+    required this.ShootTypeId,
+    required this.contentTypeId,
+  });
 
   @override
-  State<FindCreativeScreen> createState() =>
+  ConsumerState<FindCreativeScreen> createState() =>
       _FindCreativeScreenState();
 }
 
-class _FindCreativeScreenState extends State<FindCreativeScreen>
+class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
@@ -71,7 +76,7 @@ class _FindCreativeScreenState extends State<FindCreativeScreen>
                     gradient: RadialGradient(
                       colors: [
                         AppColors.white
-                            .withOpacity(0.35 * _controller.value),
+                            .withValues(alpha: 0.35 * _controller.value),
                         Colors.transparent,
                       ],
                     ),
@@ -118,23 +123,4 @@ class _FindCreativeScreenState extends State<FindCreativeScreen>
       ),
     );
   }
-  Widget _star({required double size, required double delay}) {
-    return ScaleTransition(
-      scale: Tween(begin: 0.6, end: 1.2).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Interval(delay, delay + 0.5, curve: Curves.easeInOut),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Icon(
-          Icons.auto_awesome,
-          size: size,
-          color: AppColors.primary,
-        ),
-      ),
-    );
-  }
-
 }

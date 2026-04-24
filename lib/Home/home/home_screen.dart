@@ -1,40 +1,38 @@
 import 'dart:ui';
 
-import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/app/radii.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Model/HomeModel.dart';
+import '../../app/colors.dart';
 import '../../app/route_names.dart';
-import '../../service/api_service.dart';
+import '../../core/network/api_endpoints.dart';
+import '../../features/home/presentation/providers/home_notifier.dart';
+import '../../features/home/presentation/providers/home_providers.dart';
 import '../../widgets/loding.dart';
-import 'home_controller.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStateMixin {
 
-  final HomeController controller = HomeController();
   final GlobalKey featuredKey = GlobalKey();
   final GlobalKey topCreativeKey = GlobalKey();
-  List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
-  int ? contentTypeId;
-  HomeModel? homeData;
-  bool isLoading = true;
+  int? contentTypeId;
   int? bookingId;
   int _currentCard = 0;
+
+  HomeModel? get homeData => ref.read(homeNotifierProvider).homeData;
+  List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
 
   late AnimationController _controller;
   late PageController _studioController;
@@ -60,19 +58,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   final int _initialPage = 1000;
 
-  Future<void> fetchData() async {
-    final data = await controller.fetchHomeData();
-
-    if (data != null) {
-      setState(() {
-        homeData = data;
-
-        isLoading = false;
-      });
-    } else {
-      setState(() => isLoading = false);
-    }
-  }
 
 
   void scrollTo(GlobalKey key) {
@@ -292,12 +277,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         return Colors.red;
     }
   }
-  /*final PageController _studioController = PageController(
-
-      viewportFraction: 0.75);
-  int _activeStudioIndex = 0;*/
-
-
   final PageController _pageController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65,
@@ -449,37 +428,41 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     AppColors.white70
   ];
   Future<void> _continueBooking(int contentType) async {
+    final repo = ref.read(homeRepositoryProvider);
+    final result = await repo.createBooking(
+      contentType: contentType,
+      bookingId: bookingId,
+    );
 
-    setState(() => isLoading = true);
+    if (!mounted) return;
 
-    try {
-      final response =
-      await controller.createBooking(contentType, bookingId);
+    result.fold(
+      (error) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error.message)),
+      ),
+      (response) async {
+        if (response['error'] == false) {
+          bookingId = response['data']?['booking_id'];
 
-      if (response != null && response['error'] == false) {
+          final navResult = await context.pushNamed<int>(
+            RouteNames.videoShootType,
+            extra: {
+              'bookingId': bookingId!,
+              'contentTypeId': contentType,
+            },
+          );
 
-        bookingId = response['data']?['booking_id'];
-
-        final result = await context.pushNamed<int>(RouteNames.videoShootType, extra: {
-          'bookingId': bookingId!,
-          'contentTypeId': contentType,
-        });
-
-        if (result != null) {
-          bookingId = result;
+          if (navResult != null) {
+            bookingId = navResult;
+          }
         }
-      }
-    } catch (e) {
-      print("Error → $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    fetchData();
 
 
     _studioController = PageController(
@@ -534,6 +517,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final homeState = ref.watch(homeNotifierProvider);
+    final homeData = homeState.homeData;
+    final isLoading = homeState.status == HomeStatus.loading;
+
     return Scaffold(
 
       body: Stack(
@@ -598,10 +585,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           final result = await context.pushNamed<Map<String, dynamic>>(RouteNames.changeLocation);
 
                                           if (result != null) {
-                                            setState(() {
-                                              isLoading = true;
-                                            });
-                                            fetchData();
+                                            ref.read(homeNotifierProvider.notifier).fetchHomeData();
                                           }
                                         },
                                         child: Row(
@@ -643,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       GestureDetector(
                                         onTap: () async {
                                           await context.pushNamed(RouteNames.profile);
-                                          fetchData();
+                                          ref.read(homeNotifierProvider.notifier).fetchHomeData();
                                         },
 
                                         child: CircleAvatar(
@@ -653,7 +637,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             child: homeData != null &&
                                                 homeData!.profileImageUrl.isNotEmpty
                                                 ? Image.network(
-                                              ApiService.imageURL + homeData!.profileImageUrl,
+                                              ApiEndpoints.imageUrl + homeData!.profileImageUrl,
                                               /* width: 40,
                                             height: 40,
                                             fit: BoxFit.cover,*/
@@ -955,7 +939,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           child: (homeData?.continueBooking?.imageUrl != null &&
                                               homeData!.continueBooking!.imageUrl!.trim().isNotEmpty)
                                               ? CachedNetworkImage(
-                                            imageUrl: ApiService.imageURL +
+                                            imageUrl: ApiEndpoints.imageUrl +
                                                 homeData!.continueBooking!.imageUrl!,
                                             height: 80,
                                             width: 80,
@@ -1757,7 +1741,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         borderRadius: BorderRadius.circular(22),
                                         child: data.profileImage.isNotEmpty
                                             ? Image.network(
-                                          ApiService.imageURL + data.profileImage,
+                                          ApiEndpoints.imageUrl + data.profileImage,
                                           fit: BoxFit.cover,
                                           errorBuilder: (context, error, stackTrace) {
                                             return Center(
@@ -2611,8 +2595,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 
           ),
-        /*  if (isLoading)
-            const AppLoader(),*/
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
         ],
       ),
     );
@@ -2848,7 +2834,7 @@ SizedBox(height: 10,),
             borderRadius: BorderRadius.circular(20),
             child: booking.imageUrl != null && booking.imageUrl!.isNotEmpty
                 ? Image.network(
-              ApiService.imageURL + booking.imageUrl!,
+              ApiEndpoints.imageUrl + booking.imageUrl!,
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -3425,7 +3411,7 @@ SizedBox(height: 10,),
         borderRadius: BorderRadius.circular(40),
         image: (imageUrl != null && imageUrl.isNotEmpty)
             ? DecorationImage(
-          image: NetworkImage(ApiService.imageURL + imageUrl),
+          image: NetworkImage(ApiEndpoints.imageUrl + imageUrl),
           fit: BoxFit.cover,
         )
             : null,

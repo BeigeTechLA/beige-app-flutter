@@ -1,95 +1,40 @@
 import 'package:beige/utility/date_time_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../app/route_names.dart';
-import '../service/api_endpoints.dart';
-import '../service/api_service.dart';
+import '../core/network/api_endpoints.dart';
 import '../app/colors.dart';
-import '../widgets/loding.dart';
+import '../features/shoot/presentation/providers/shoot_summary_notifier.dart';
 
-class ShootSummaryScreen extends StatefulWidget {
+class ShootSummaryScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final String? contentType;
   final int shootTypeId;
   const ShootSummaryScreen({super.key, required this.bookingId, this.contentType, required this.shootTypeId});
 
   @override
-  State<ShootSummaryScreen> createState() =>
+  ConsumerState<ShootSummaryScreen> createState() =>
       _ShootSummaryScreenState();
 }
 
 class _ShootSummaryScreenState
-    extends State<ShootSummaryScreen> {
+    extends ConsumerState<ShootSummaryScreen> {
 
-  Map<String, dynamic>? bookingData;
-  List<dynamic> timelineData = [];
-  bool loadingTimeline = true;
-  bool loading = true;
-
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchShootSummaryScreen();
-    _fetchTimeline();
-
+  String _imageUrl(String? path) {
+    if (path == null || path.isEmpty) return '';
+    return '${ApiEndpoints.imageUrl}$path';
   }
-
-
-
-  Future<void> _fetchShootSummaryScreen() async {
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}",
-      );
-
-      if (response != null && response['error'] == false) {
-        bookingData = response['data'];
-        debugPrint("response Error: $response");
-      }
-    } catch (e) {
-      debugPrint("Upcoming Error: $e");
-    }
-    setState(() => loading = false);
-  }
-
-  Future<void> _fetchTimeline() async {
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.creatives_myshoots}/${widget.bookingId}/timeline",
-      );
-
-      if (response != null && response['error'] == false) {
-        timelineData = response['data'] ?? [];
-      }
-    } catch (e) {
-      debugPrint("Timeline Error: $e");
-    }
-    loadingTimeline = false;
-  }
-
-
-/*  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "";
-
-    final d = DateTime.parse(date);
-    return DateFormat('dd,MM,yyyy').format(d); // 👉 04 08, 2026
-  }
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "";
-
-    final parsedTime = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsedTime); // 👉 03:27 PM
-  }*/
 
   String formatTimelineTime(String isoTime) {
     final date = DateTime.parse(isoTime).toLocal();
     return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
-  String getFinalImage() {
+
+  String _getFinalImage(Map<String, dynamic>? bookingData) {
     final String fallback = "assets/svg/imag_placeholder.svg";
 
     final String profileImage =
@@ -99,14 +44,15 @@ class _ShootSummaryScreenState
         bookingData?['event']?['image_url'] ?? '';
 
     if (profileImage.isNotEmpty) {
-      return ApiService().getImageURL(profileImage);
+      return _imageUrl(profileImage);
     } else if (eventImage.isNotEmpty) {
-      return ApiService().getImageURL(eventImage);
+      return _imageUrl(eventImage);
     } else {
       return fallback;
     }
   }
-  String formatBudget() {
+
+  String _formatBudget(Map<String, dynamic>? bookingData) {
     final budgetString = bookingData?['event']?['budget'];
 
     if (budgetString == null || budgetString.isEmpty) {
@@ -124,13 +70,16 @@ class _ShootSummaryScreenState
 
   @override
   Widget build(BuildContext context) {
+    final summaryState = ref.watch(shootSummaryNotifierProvider(widget.bookingId));
+    final bookingData = summaryState.shootDetails;
+    final loading = summaryState.status == ShootSummaryStatus.loading;
+
     final event = bookingData?['event'];
     final multiDay = event?['multi_day'];
     final days = multiDay?['days'] ?? [];
     final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
-    final image = getFinalImage();
+    final image = _getFinalImage(bookingData);
     return Scaffold(
-
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -146,19 +95,11 @@ class _ShootSummaryScreenState
                       height: 280,
                       width: double.infinity,
                       child: image.startsWith("http")
-
-                      /// ✅ NETWORK IMAGE
                           ? Image.network(
                         image,
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
-                       /* loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(color: Colors.white),
-                          );
-                        },*/
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.black12,
@@ -193,9 +134,9 @@ class _ShootSummaryScreenState
                           end: Alignment.bottomCenter,
                           stops: const [0.0, 0.5, 1.0],
                           colors: [
-                            Colors.black.withOpacity(0.6),
+                            Colors.black.withValues(alpha:0.6),
                             Colors.transparent,
-                            Colors.black.withOpacity(0.95),
+                            Colors.black.withValues(alpha:0.95),
                           ],
                         ),
                       ),
@@ -210,7 +151,10 @@ class _ShootSummaryScreenState
                         child: SvgPicture.asset(
                           "assets/svg/back.svg",
                           height: 24,
-                          color: Colors.white,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
@@ -332,10 +276,10 @@ class _ShootSummaryScreenState
     width: double.infinity,
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
-    color: Colors.white.withOpacity(0.05),
+    color: Colors.white.withValues(alpha:0.05),
     borderRadius: BorderRadius.circular(20),
     border: Border.all(
-    color: Colors.white.withOpacity(0.1),
+    color: Colors.white.withValues(alpha:0.1),
     ),
     ),
     child: Column(
@@ -401,7 +345,7 @@ class _ShootSummaryScreenState
     child: infoItem(
     icon: Icons.attach_money,
     title: "Event Budget",
-    value: formatBudget(),
+    value: _formatBudget(bookingData),
     ),
     ),
     const SizedBox(width: 16),
@@ -424,7 +368,9 @@ class _ShootSummaryScreenState
             ),
           ),
           if (loading)
-            const AppLoader()
+            const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
         ],
 
       ),
@@ -452,7 +398,7 @@ class _ShootSummaryScreenState
                 'durationHours': (event?['duration_hours'] ?? 0).toDouble(),
                 'multiDays': days,
                 'location': bookingData?['event']?['location'] ?? '',
-                'imageUrl': getFinalImage(),
+                'imageUrl': _getFinalImage(bookingData),
                 'bookingId': widget.bookingId,
                 'shootTypeId': widget.shootTypeId,
                 'contentType': widget.contentType,
@@ -488,9 +434,10 @@ class _ShootSummaryScreenState
         children: [
           SvgPicture.asset(
             iconPath,
-           /* height: 16,
-            width: 16,*/
-            color: AppColors.white,
+            colorFilter: const ColorFilter.mode(
+              AppColors.white,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -540,8 +487,8 @@ class _ShootSummaryScreenState
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primary.withOpacity(0.9),
-                AppColors.primary.withOpacity(0.6),
+                AppColors.primary.withValues(alpha:0.9),
+                AppColors.primary.withValues(alpha:0.6),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
@@ -571,7 +518,7 @@ class _ShootSummaryScreenState
                 fontFamily: "Outfit",
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha:0.6),
               ),
             ),
           ],
@@ -580,10 +527,10 @@ class _ShootSummaryScreenState
     );
   }
 
-  void showProjectTimelineDialog(BuildContext context) async {
-    loadingTimeline = true;
-    timelineData.clear();
-    await _fetchTimeline();
+  void showProjectTimelineDialog(BuildContext context) {
+    final currentState = ref.read(shootSummaryNotifierProvider(widget.bookingId));
+    final loadingTimeline = currentState.status == ShootSummaryStatus.loading;
+    final timelineData = currentState.timeline;
 
     showModalBottomSheet(
       context: context,

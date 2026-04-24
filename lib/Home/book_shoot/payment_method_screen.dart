@@ -1,249 +1,105 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/colors.dart';
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
+import '../../features/payment/presentation/providers/payment_method_notifier.dart';
 
-class PaymentMethodScreen extends StatefulWidget {
+class PaymentMethodScreen extends ConsumerStatefulWidget {
   final int bookingId;
   const PaymentMethodScreen({super.key, required this.bookingId});
 
   @override
-  State<PaymentMethodScreen> createState() => _PaymentMethodScreenState();
+  ConsumerState<PaymentMethodScreen> createState() =>
+      _PaymentMethodScreenState();
 }
 
-class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
-  List<dynamic> savedCards = [];
-  List<dynamic> recommended = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchBookSummary();
-    _createSetupIntent();
-  }
-
-
-  bool loading = true;
-  Map<String, dynamic>? paymentData;
-  String? setupIntentClientSecret;
-
-
+class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
   bool isProcessing = false;
-  Future<void> _fetchBookSummary() async {
-    setState(() => loading = true);
-
-    try {
-      debugPrint("🚀 API CALL START");
-      debugPrint("📡 API URL: ${ApiEndpoints.payment}");
-
-      final response = await ApiService().fetchData(
-        ApiEndpoints.payment,
-      );
-
-      debugPrint("📥 RAW RESPONSE:");
-      debugPrint(response.toString());
-
-      if (response != null) {
-        debugPrint("ℹ️ error flag: ${response['error']}");
-        debugPrint("ℹ️ message: ${response['message']}");
-      }
-
-      if (response != null && response['error'] == false) {
-        debugPrint("✅ API SUCCESS");
-
-        final data = response['data'];
-        debugPrint("📦 DATA OBJECT:");
-        debugPrint(data.toString());
-
-        setState(() {
-          savedCards = data['saved_cards'] ?? [];
-          recommended = data['recommended'] ?? [];
-          paymentData = data;
-        });
-      } else {
-        debugPrint("❌ API ERROR MESSAGE: ${response?['message']}");
-      }
-    } catch (e) {
-      debugPrint("❌ EXCEPTION OCCURRED:");
-      debugPrint(e.toString());
-    } finally {
-      if (mounted) {
-        setState(() => loading = false);
-        debugPrint("🛑 API CALL END");
-      }
-    }
-  }
-
-
-  Future<Map<String, dynamic>> _createSetupIntent() async {
-    try {
-      debugPrint("🚀 CREATE PAYMENT SHEET API START");
-
-      final response = await ApiService().postData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/paymentsheet",
-        {},
-      );
-
-      debugPrint("📥 FULL RESPONSE:");
-      debugPrint(response.toString());
-
-      if (response == null || response['error'] == true) {
-        throw response?['message'] ?? "PaymentSheet failed";
-      }
-
-      final data = response['data'];
-      final paymentSheet = data['payment_sheet'];
-
-      debugPrint("✅ PAYMENT SHEET DATA:");
-      debugPrint(paymentSheet.toString());
-
-      /// ✅ CORRECT CLIENT SECRET
-      setupIntentClientSecret =
-      paymentSheet['payment_intent_client_secret'];
-
-      debugPrint("✅ CLIENT SECRET:");
-      debugPrint(setupIntentClientSecret);
-
-      return paymentSheet; // 🔥 important
-    } catch (e) {
-      debugPrint("❌ CREATE PAYMENT SHEET ERROR: $e");
-      rethrow;
-    } finally {
-      debugPrint("🛑 CREATE PAYMENT SHEET API END");
-    }
-  }
-
   Future<void> _openStripeSheet() async {
-    if (isProcessing) {
-      debugPrint("⛔ Already Processing");
-      return;
-    }
+    if (isProcessing) return;
 
-    isProcessing = true;
+    setState(() => isProcessing = true);
+
+    final notifier = ref.read(
+      paymentMethodNotifierProvider(widget.bookingId).notifier,
+    );
 
     try {
-      debugPrint("🚀 STRIPE FLOW START");
+      // 1. Create payment sheet
+      final paymentSheet = await notifier.createPaymentSheet(
+        bookingId: widget.bookingId,
+      );
 
-      setState(() => loading = true);
+      if (paymentSheet == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to create payment sheet")),
+          );
+        }
+        return;
+      }
 
-      /// 1️⃣ Get Payment Sheet Data
-      final paymentSheet = await _createSetupIntent();
+      final clientSecret = paymentSheet['payment_intent_client_secret'];
 
-      final clientSecret =
-      paymentSheet['payment_intent_client_secret'];
-
-      debugPrint("🔑 CLIENT SECRET:");
-      debugPrint(clientSecret);
-
-      if (clientSecret == null || clientSecret.isEmpty) {
+      if (clientSecret == null || (clientSecret as String).isEmpty) {
         throw "Client secret missing";
       }
 
-      /// 2️⃣ Init Stripe Sheet
-      debugPrint("💳 INIT PAYMENT SHEET");
-
+      // 2. Init Stripe
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           customerId: paymentSheet['customer_id'],
-          customerEphemeralKeySecret:
-          paymentSheet['ephemeral_key_secret'],
+          customerEphemeralKeySecret: paymentSheet['ephemeral_key_secret'],
           merchantDisplayName: "BEIGE",
         ),
       );
 
-      debugPrint("✅ INIT DONE");
-
-      /// 3️⃣ Open Stripe UI
+      // 3. Present Stripe
       await Stripe.instance.presentPaymentSheet();
 
-      debugPrint("✅ PAYMENT SUCCESS (Stripe side)");
-
-      /// 4️⃣ Extract PaymentIntent ID
+      // 4. Confirm with backend
       final paymentIntentId = clientSecret.split('_secret').first;
 
-      debugPrint("🆔 PAYMENT INTENT ID:");
-      debugPrint(paymentIntentId);
+      final confirmed = await notifier.confirmPayment(
+        bookingId: widget.bookingId,
+        paymentIntentId: paymentIntentId,
+      );
 
-      /// 5️⃣ Call Backend Confirm API
-      await _attachPaymentMethodToBackend(paymentIntentId);
-
-      /// 6️⃣ Final API (optional)
-      // await _fetchReview();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("✅ Payment Completed")),
-        );
-      }
-
-      debugPrint("🎉 FULL PAYMENT FLOW DONE");
-    } on StripeException catch (e) {
-      debugPrint("❌ STRIPE ERROR: ${e.error.localizedMessage}");
-
-      if (e.error.code == FailureCode.Canceled) {
-        debugPrint("⚠️ User Cancelled");
+      if (!confirmed) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Payment confirmation failed")),
+          );
+        }
         return;
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.error.localizedMessage ?? "Payment failed"),
-          ),
+          const SnackBar(content: Text("Payment Completed")),
+        );
+      }
+    } on StripeException catch (e) {
+      if (e.error.code == FailureCode.Canceled) return;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
         );
       }
     } catch (e) {
-      debugPrint("❌ GENERAL ERROR: $e");
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
         );
       }
     } finally {
-      isProcessing = false;
-      if (mounted) setState(() => loading = false);
-
-      debugPrint("🛑 STRIPE FLOW END");
-    }
-  }
-
-
-  Future<void> _attachPaymentMethodToBackend(
-      String paymentIntentId) async {
-    try {
-      debugPrint("🔗 BACKEND CONFIRM START");
-
-      final payload = {
-        "payment_intent_id": paymentIntentId,
-      };
-
-      debugPrint("📤 PAYLOAD:");
-      debugPrint(payload.toString());
-
-      final response = await ApiService().postData(
-        "${ApiEndpoints.payment}/${widget.bookingId}/stripe/confirm",
-        payload,
-      );
-
-      debugPrint("📥 BACKEND RESPONSE:");
-      debugPrint(response.toString());
-
-      if (response == null || response['error'] == true) {
-        throw response?['message'] ?? "Backend confirm failed";
-      }
-
-      debugPrint("✅ BACKEND CONFIRM SUCCESS");
-    } catch (e) {
-      debugPrint("❌ BACKEND ERROR: $e");
-      rethrow;
+      if (mounted) setState(() => isProcessing = false);
     }
   }
 
@@ -252,6 +108,11 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final paymentState = ref.watch(
+      paymentMethodNotifierProvider(widget.bookingId),
+    );
+    final savedCards = paymentState.savedCards;
+
     return Scaffold(backgroundColor: AppColors.background,
 
       body: SafeArea(

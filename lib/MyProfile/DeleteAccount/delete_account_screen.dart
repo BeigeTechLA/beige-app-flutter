@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/route_names.dart';
-import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
 import '../../app/colors.dart';
 import '../../app/text_styles.dart';
 import '../../app/radii.dart';
-class DeleteAccountScreen extends StatefulWidget {
+import '../../features/profile/presentation/providers/delete_account_notifier.dart';
+
+class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
 
   @override
-  State<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
+  ConsumerState<DeleteAccountScreen> createState() =>
+      _DeleteAccountScreenState();
 }
 
-class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
- bool isLoading = false;
+class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
   String? selectedReason;
 
   final List<String> reasons = [
@@ -26,159 +27,129 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     "Others",
   ];
 
-
- Future<void> _requestDeleteAccount() async {
-   if (selectedReason == null) {
-     ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(
-         content: Text("Please select a reason"),
-         backgroundColor: AppColors.error,
-       ),
-     );
-     return;
-   }
-
-   setState(() => isLoading = true);
-
-   debugPrint("🟢 DELETE ACCOUNT API CALL STARTED");
-
-   try {
-     final response = await ApiService().postData(
-       ApiEndpoints.user_delete_account,
-       {
-         "delete_reason": selectedReason,
-       },
-     );
-
-     debugPrint("🟡 API RESPONSE: $response");
-
-     if (response != null && response['error'] == false) {
-       debugPrint("✅ DELETE REQUEST SUCCESS");
-
-       /// 👉 OTP SCREEN
-       context.pushNamed(RouteNames.deleteAccountOtp);
-     } else {
-       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
-           content: Text(response['message'] ?? "Something went wrong"),
-           backgroundColor: AppColors.error,
-         ),
-       );
-     }
-   } catch (e) {
-     debugPrint("🚨 DELETE ACCOUNT ERROR: $e");
-     ScaffoldMessenger.of(context).showSnackBar(
-       const SnackBar(
-         content: Text("Server error, please try again"),
-         backgroundColor: AppColors.error,
-       ),
-     );
-   } finally {
-     setState(() => isLoading = false);
-   }
- }
-
-
   @override
   Widget build(BuildContext context) {
+    final deleteState = ref.watch(deleteAccountNotifierProvider);
+    final isLoading = deleteState.status == DeleteAccountStatus.loading;
+
+    ref.listen<DeleteAccountState>(deleteAccountNotifierProvider,
+        (prev, next) {
+      if (next.status == DeleteAccountStatus.success) {
+        context.pushNamed(RouteNames.deleteAccountOtp);
+      } else if (next.status == DeleteAccountStatus.error &&
+          next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    });
+
     return Scaffold(
-   body: SafeArea(
-       child:Padding(
-         padding:  EdgeInsets.all(16),
-         child: Column(
-           crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// BACK BUTTON
+              InkWell(
+                onTap: () => context.pop(),
+                child: SvgPicture.asset(
+                  "assets/svg/back.svg",
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
 
-           children: [
-
-             /// 🔙 BACK BUTTON
-             InkWell(
-               onTap: () => context.pop(),
-               child:  SvgPicture.asset(
-                 "assets/svg/back.svg",
-                 height: 24,
-                 color: AppColors.white,
-               )
-             ),
-
-             const SizedBox(height: 16),
-
-             /// 🏷 TITLE
-             Text(
-               "Delete Account",
-               style: TextStyle(
-                 fontFamily: AppTextStyles.fontFamilyDisplay,
-                 fontSize: 16,
-                 fontWeight: FontWeight.w600,
-                 color: AppColors.white,
-               ),
-             ),
-
-              SizedBox(height: 20),
-
-
-             Text(
-               "This action will permanently delete your account and all associated data. If you need help or have questions, please contact us at support@beige.com",
-               style: TextStyle(
-                 fontSize: 14,
-                 color: AppColors.white70,
-                 height: 1.5,
-                 fontWeight: FontWeight.w400,
-                 fontFamily: AppTextStyles.fontFamilyBody
-               ),
-             ),
-
-             SizedBox(height: 20),
-             Container(
-               padding: EdgeInsets.all(20),
-
-               decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.lgAll),
-
-               child: Column(
-                 children: [
-                   Row(
-                     children: [
-                       Text("Why do you wish to leave Beige?",
-                         style: TextStyle(
-                             fontSize: 14,
-                             color: AppColors.white,
-                             fontWeight: FontWeight.w500,
-                             fontFamily: AppTextStyles.fontFamilyBody
-                         ),),
-                     ],
-                   ),
-                     const SizedBox(height: 8),
-
+              /// TITLE
+              Text(
+                "Delete Account",
+                style: TextStyle(
+                  fontFamily: AppTextStyles.fontFamilyDisplay,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "This action will permanently delete your account and all associated data. If you need help or have questions, please contact us at support@beige.com",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.white70,
+                  height: 1.5,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: AppTextStyles.fontFamilyBody,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: AppRadii.lgAll,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "Why do you wish to leave Beige?",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: AppTextStyles.fontFamilyBody,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
-                     "Please let us know the reason for deleting your account.",
-                     style: TextStyle(
-                       fontSize: 12,
-                       color: AppColors.white70,
-                       fontFamily: AppTextStyles.fontFamilyBody,
-                       fontWeight: FontWeight.w400
-
-                     ),
-                   ),
-
-                   ...reasons.map((reason) {
-                     return _buildReasonOption(reason);
-                   }).toList(),
-
-                 ],
-               ),
-             )
-           ],
-         ),
-       )
-   ),
-      bottomNavigationBar:
-      Padding(
+                      "Please let us know the reason for deleting your account.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.white70,
+                        fontFamily: AppTextStyles.fontFamilyBody,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    ...reasons.map((reason) => _buildReasonOption(reason)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
         child: SizedBox(
           height: 52,
           child: ElevatedButton(
-            onPressed: isLoading ? null : _requestDeleteAccount,
-
-
+            onPressed: isLoading
+                ? null
+                : () {
+                    if (selectedReason == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select a reason"),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                      return;
+                    }
+                    ref
+                        .read(deleteAccountNotifierProvider.notifier)
+                        .requestDelete(selectedReason!);
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               elevation: 0,
@@ -199,54 +170,42 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         ),
       ),
     );
-
-
   }
 
   Widget _buildReasonOption(String reason) {
     final bool isSelected = selectedReason == reason;
 
     return InkWell(
-      onTap: () {
-        setState(() {
-          selectedReason = reason;
-        });
-      },
+      onTap: () => setState(() => selectedReason = reason),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /// 🔘 CUSTOM RADIO
             Container(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.white70,
-
+                  color:
+                      isSelected ? AppColors.primary : AppColors.white70,
                 ),
               ),
               child: isSelected
                   ? Center(
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                  ),
-                ),
-              )
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    )
                   : null,
             ),
-
             const SizedBox(width: 14),
-
-            /// 📝 TEXT
             Expanded(
               child: Text(
                 reason,
@@ -263,5 +222,4 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       ),
     );
   }
-
 }

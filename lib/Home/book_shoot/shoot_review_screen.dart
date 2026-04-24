@@ -1,6 +1,7 @@
 import 'package:beige/widgets/TopMessage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -8,55 +9,34 @@ import 'package:intl/intl.dart';
 
 import '../../app/route_names.dart';
 import '../../Customtextfiled/CustomInputField.dart';
+import '../../features/booking/presentation/providers/booking_review_notifier.dart';
 import '../../service/api_endpoints.dart';
-import '../../service/api_service.dart';
 import '../../app/colors.dart';
 import '../../utility/date_time_utils.dart';
 import '../../widgets/loding.dart' show AppLoader;
 
-class ShootReviewScreen extends StatefulWidget {
-  // final int id;
+class ShootReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;
-  const ShootReviewScreen({super.key,  required this.bookingId});
+  const ShootReviewScreen({super.key, required this.bookingId});
 
   @override
-  State<ShootReviewScreen> createState() => _ShootReviewScreenState();
+  ConsumerState<ShootReviewScreen> createState() => _ShootReviewScreenState();
 }
 
-class _ShootReviewScreenState extends State<ShootReviewScreen> {
-
+class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  bool hasSavedCard = false;
 
   String? nameError;
   String? emailError;
   String? phoneError;
 
-  bool loading = true;
-  Map<String, dynamic>? paymentData;
-  String? setupIntentClientSecret;
-
-
-  Map<String, dynamic>? booking;
-  List<dynamic> heldCreatives = [];
-  Map<String, dynamic>? pricing;
-  Map<String, dynamic>? contact;
-  String creativeName = "";
-  String creativeRole = "";
-  String creativeImage = "";
-  String creativeRate = "";
-  String creativeRatingText = "";
-  String videoedittypesdata = "";
-  String photedittypesdata = "";
-  Map<String, dynamic>? crewSummary;
-
   int currentStep = 2;
-     bool payFullAdvance = true;
-    int selectedIndex = 0;
-     bool isLoading =true;
+  bool payFullAdvance = true;
+  int selectedIndex = 0;
+  bool isProcessing = false;
 
   String getRoleName(String roleId) {
     switch (roleId) {
@@ -68,25 +48,18 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
         return "Crew";
     }
   }
-  List<String> getAdditionalCrewSubtitles() {
+
+  List<String> getAdditionalCrewSubtitles(Map<String, dynamic>? crewSummary) {
     final extra = crewSummary?['extra_by_role'] ?? {};
-
     List<String> list = [];
-
     extra.forEach((key, value) {
       if (value > 0) {
         list.add("${getRoleName(key)}: $value");
       }
     });
-
     return list;
   }
 
-  void initState() {
-    super.initState();
-    _fetchHomeReview();
-    _createSetupIntent();
-  }
   @override
   void dispose() {
     nameController.dispose();
@@ -95,123 +68,39 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
     super.dispose();
   }
 
-  List<String> getShootSubtitles() {
-    final breakdown = pricing?['pricing_sections']?['shoot_cost']?['breakdown'] ?? [];
-
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
-  }
-
-  List<String> getEditingSubtitlesNew() {
-    final breakdown = pricing?['pricing_sections']?['editing_services']?['breakdown'] ?? [];
-
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
-  }
-
-  List<String> getAdditionalCrewSubtitlesNew() {
-    final breakdown = pricing?['pricing_sections']?['additional_crew']?['breakdown'] ?? [];
-
-    return breakdown
-        .map<String>((item) => "${item['label']} : \$${item['amount']}")
-        .toList();
-  }
-
-
-  double getShootAmount() {
+  double getShootAmount(Map<String, dynamic>? pricing) {
     return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
   }
 
-  double getEditingAmount() {
+  double getEditingAmount(Map<String, dynamic>? pricing) {
     return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
   }
 
-  double getAdditionalCrewAmount() {
+  double getAdditionalCrewAmount(Map<String, dynamic>? pricing) {
     return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
   }
-  Future<void> _fetchHomeReview() async {
-    setState(() => isLoading = true);
 
-    try {
-      final response = await ApiService().fetchData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/summary-details",
-      );
+  Future<void> _openStripeSheet() async {
+    if (isProcessing) return;
 
-      if (response != null && response['error'] == false) {
-        final data = response['data'];
-        final bookingData = data['booking'];
-
-        setState(() {
-          /// 🔹 MAIN DATA
-          booking = bookingData;
-          pricing = data['pricing'];
-          heldCreatives = data['held_creatives'] ?? [];
-          crewSummary = data['crew_summary'];
-
-          /// 🔹 EDIT TYPES
-          videoedittypesdata =
-              (bookingData['video_edit_types'] ?? []).toString();
-          photedittypesdata =
-              (bookingData['photo_edit_types'] ?? []).toString();
-
-          /// 🔹 PAYMENT
-          List savedCards = data['payment_methods']?['saved_cards'] ?? [];
-          hasSavedCard = savedCards.isNotEmpty;
-
-          if (!hasSavedCard) {
-            selectedIndex = 0;
-          }
-
-          /// 🔥 IMPORTANT (NAME + IMAGE)
-          creativeName = bookingData['shoot_type_name'] ?? "No Name";
-          creativeImage = bookingData['shoot_type_image_url'] ?? "";
-
-          creativeRole = getContentTypeTitle(
-            int.tryParse(bookingData['content_type'] ?? "0") ?? 0,
-          );
-        });
-
-        /// 🔍 DEBUG (check in console)
-        debugPrint("✅ NAME: $creativeName");
-        debugPrint("✅ IMAGE: $creativeImage");
-        debugPrint("✅ FULL BOOKING: $bookingData");
-      }
-    } catch (e) {
-      debugPrint("❌ Review API Error: $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-  bool isProcessing = false;
-/*void _snakbar(String message){
-    TopMessage.show(context, message);
-
-}*/
-  Map<String, int> groupEditTypes(List list) {
-    Map<String, int> grouped = {};
-
-    for (var item in list) {
-      grouped[item] = (grouped[item] ?? 0) + 1;
-    }
-
-    return grouped;
-  }
-  Future<bool> _fetchReview() async {
     if (nameController.text.isEmpty || phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill required fields")),
       );
-      return false;
+      return;
     }
 
-    setState(() => isLoading = true);
+    setState(() => isProcessing = true);
+
+    final notifier = ref.read(
+      bookingReviewNotifierProvider(widget.bookingId).notifier,
+    );
 
     try {
-      final response = await ApiService().putData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/payment",
-        {
+      // 1. Save contact info
+      final isSaved = await notifier.savePaymentInfo(
+        bookingId: widget.bookingId,
+        data: {
           "payment_method": getPaymentMethod(),
           "full_name": nameController.text.trim(),
           "email": emailController.text.trim(),
@@ -219,102 +108,66 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
         },
       );
 
-      if (response != null && response['error'] == false) {
-        debugPrint("✅ Details Saved");
-        return true; // 🔥 only return
-      } else {
-        debugPrint("❌ API Failed: $response");
-        return false;
+      if (!isSaved) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to save details")),
+          );
+        }
+        return;
       }
-    } catch (e) {
-      debugPrint("❌ ERROR: $e");
-      return false;
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-  Future<Map<String, dynamic>> _createSetupIntent() async {
-    try {
-      debugPrint("🚀 CREATE PAYMENT SHEET API START");
 
-      final response = await ApiService().postData(
-        "${ApiEndpoints.booking}/${widget.bookingId}/paymentsheet",
-        {},
+      // 2. Create payment sheet
+      final paymentSheet = await notifier.createPaymentSheet(
+        bookingId: widget.bookingId,
       );
 
-      debugPrint("📥 FULL RESPONSE:");
-      debugPrint(response.toString());
-
-      if (response == null || response['error'] == true) {
-        throw response?['message'] ?? "PaymentSheet failed";
+      if (paymentSheet == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to create payment sheet")),
+          );
+        }
+        return;
       }
 
-      final data = response['data'];
-      final paymentSheet = data['payment_sheet'];
+      final clientSecret = paymentSheet['payment_intent_client_secret'];
 
-      /// ✅ Correct client secret
-      setupIntentClientSecret =
-      paymentSheet['payment_intent_client_secret'];
-
-      debugPrint("✅ CLIENT SECRET:");
-      debugPrint(setupIntentClientSecret);
-
-      return paymentSheet; // 🔥 VERY IMPORTANT
-    } catch (e) {
-      debugPrint("❌ CREATE PAYMENT SHEET ERROR: $e");
-      rethrow;
-    } finally {
-      debugPrint("🛑 CREATE PAYMENT SHEET API END");
-    }
-  }
-  Future<void> _openStripeSheet() async {
-    if (isProcessing) return;
-
-    isProcessing = true;
-
-    try {
-      setState(() => loading = true);
-
-      /// 🔥 1️⃣ FIRST SAVE DETAILS
-      final isSaved = await _fetchReview();
-
-      if (!isSaved) return;
-
-      debugPrint("✅ Details saved, starting payment...");
-
-      /// 🔥 2️⃣ CREATE PAYMENT SHEET
-      final paymentSheet = await _createSetupIntent();
-
-      final clientSecret =
-      paymentSheet['payment_intent_client_secret'];
-
-      if (clientSecret == null || clientSecret.isEmpty) {
+      if (clientSecret == null || (clientSecret as String).isEmpty) {
         throw "Client secret missing";
       }
 
-      /// 🔥 3️⃣ INIT STRIPE
+      // 3. Init Stripe
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: clientSecret,
           customerId: paymentSheet['customer_id'],
-          customerEphemeralKeySecret:
-          paymentSheet['ephemeral_key_secret'],
+          customerEphemeralKeySecret: paymentSheet['ephemeral_key_secret'],
           merchantDisplayName: "BEIGE",
         ),
       );
 
-      /// 🔥 4️⃣ OPEN STRIPE
+      // 4. Present Stripe
       await Stripe.instance.presentPaymentSheet();
 
-      debugPrint("✅ Payment Success");
-
-      /// 🔥 5️⃣ GET PAYMENT INTENT ID
+      // 5. Confirm with backend
       final paymentIntentId = clientSecret.split('_secret').first;
 
-      /// 🔥 6️⃣ BACKEND CONFIRM
-      await _attachPaymentMethodToBackend(paymentIntentId);
+      final confirmed = await notifier.confirmPayment(
+        bookingId: widget.bookingId,
+        paymentIntentId: paymentIntentId,
+      );
 
-      /// 🔥 7️⃣ NAVIGATE SUCCESS SCREEN
+      if (!confirmed) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Payment confirmation failed")),
+          );
+        }
+        return;
+      }
+
+      // 6. Navigate to success
       if (mounted) {
         context.goNamed(
           RouteNames.paymentSuccess,
@@ -326,67 +179,23 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
           },
         );
       }
-
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
-      );
-    } catch (e) {
-      debugPrint("❌ ERROR: $e");
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
-      isProcessing = false;
-      if (mounted) setState(() => loading = false);
-    }
-  }
-
-  Future<void> _attachPaymentMethodToBackend(
-      String paymentIntentId) async {
-    try {
-      debugPrint("🔗 BACKEND CONFIRM START");
-
-      final payload = {
-        "payment_intent_id": paymentIntentId,
-      };
-
-      debugPrint("📤 PAYLOAD: $payload");
-
-      final response = await ApiService().postData(
-        "${ApiEndpoints.payment}/${widget.bookingId}/stripe/confirm",
-        payload,
-      );
-
-      debugPrint("📥 BACKEND RESPONSE:");
-      debugPrint(response.toString());
-
-      if (response == null || response['error'] == true) {
-        throw response?['message'] ?? "Backend confirm failed";
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
+        );
       }
-
-      debugPrint("✅ BACKEND CONFIRM SUCCESS");
     } catch (e) {
-      debugPrint("❌ BACKEND ERROR: $e");
-      rethrow;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => isProcessing = false);
     }
-  }
-
-
-  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "";
-
-    final d = DateTime.parse(date);
-    return DateFormat('MM-dd-yyyy').format(d); // 👉 04 08, 2026
-  }
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "";
-
-    final parsedTime = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsedTime); // 👉 03:27 PM
   }
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
@@ -431,6 +240,25 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final reviewState = ref.watch(
+      bookingReviewNotifierProvider(widget.bookingId),
+    );
+    final isLoading = reviewState.status == BookingReviewStatus.loading;
+    final booking = reviewState.booking;
+    final pricing = reviewState.pricing;
+    final crewSummary = reviewState.crewSummary;
+    final hasSavedCard = reviewState.hasSavedCard;
+
+    final creativeName = booking?['shoot_type_name'] ?? "No Name";
+    final creativeImage = booking?['shoot_type_image_url'] ?? "";
+    final creativeRole = getContentTypeTitle(
+      int.tryParse(booking?['content_type']?.toString() ?? "0") ?? 0,
+    );
+
+    if (!hasSavedCard && selectedIndex != 0) {
+      selectedIndex = 0;
+    }
+
     return Scaffold(
 
 
@@ -571,7 +399,7 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
                                       color: Colors.black12, // optional bg
                                       child: creativeImage.isNotEmpty
                                           ? Image.network(
-                                        "${ApiService.imageURL}$creativeImage",
+                                        "${ApiEndpoints.imageUrl}$creativeImage",
                                         fit: BoxFit.cover, // 🔥 proper crop
                                         alignment: Alignment.center, // 🔥 center focus
                                         errorBuilder: (_, __, ___) {
@@ -598,26 +426,8 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
 
-                                        /// ⭐ Rating
-                                        /*     Row(
-                                        children: [
-                                          const Icon(Icons.star, size: 14, color: Colors.amber),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            creativeRatingText,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: AppColors.white70,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: "Outfit",
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                            */
                                         const SizedBox(height: 6),
                                         Text(
-                                          // Content Type:creativeRole,
                                           "Content Type: $creativeRole",
                                           style: const TextStyle(
                                             fontSize: 12,
@@ -638,24 +448,7 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
                                         ),
 
 
-                                        /// 🎥 ROLE
-
-
                                         const SizedBox(height: 10),
-
-                                        /*       /// 💰 RATE
-                                      creativeRate.isNotEmpty
-                                          ? Text(
-                                        "From \$$creativeRate/Hr",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.primary,
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      )
-                                          : const SizedBox(),
-                            */
                                       ],
                                     ),
                                   ),
@@ -1046,42 +839,25 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
 
                                 const SizedBox(height: 14),
                                 Divider(color: AppColors.dividerDark),
-                                // --- SHOOT COST CARD ---
-                                // --- SHOOT COST CARD ---
                                 builderPricingCard(
                                   title: "Shoot Cost",
-                                  amount: getShootAmount(),
+                                  amount: getShootAmount(pricing),
                                   subtitles: [],
                                 ),
 
-                                // --- EDITING SERVICES CARD ---
-                                /* builderPricingCard(
-                          title: "Editing Services",
-                          amount: calculateEditingCost(),
-                          subtitles: [],
-                        ),*/
                                 builderPricingCard(
                                   title: "Editing Services",
-                                  amount: getEditingAmount(),
+                                  amount: getEditingAmount(pricing),
                                   subtitles: [],
-                                  // subtitles: getEditingSubtitles(),
                                 ),
 
                                 // --- ADDITIONAL CREW CARD ---
-                                if (getAdditionalCrewSubtitles().isNotEmpty)
+                                if (getAdditionalCrewSubtitles(crewSummary).isNotEmpty)
                                   builderPricingCard(
                                     title: "Additional Crew",
-                                    amount: getAdditionalCrewAmount(),
-                                    subtitles: getAdditionalCrewSubtitles(), // 🔥 YE ADD KAR
+                                    amount: getAdditionalCrewAmount(pricing),
+                                    subtitles: getAdditionalCrewSubtitles(crewSummary), // 🔥 YE ADD KAR
                                   ),
-
-                                /*
-                        if (calculateAdditionalCrew() > 0)
-                          builderPricingCard(
-                            title: "Additional Crew",
-                            amount: calculateAdditionalCrew(),
-                            subtitles: [],
-                          ),*/
 
                                 const SizedBox(height: 10),
                                 const Divider(color: AppColors.dividerDark),
@@ -1177,16 +953,6 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
       ),
     );
   }
- /* String _cleanText(String text) {
-    return text
-        .replaceAll('_', ' ')
-        .replaceAllMapped(RegExp(r'(\d+)'), (match) => match.group(0)!) // numbers safe
-        .split(' ')
-        .map((word) =>
-    word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '')
-        .join(' ');
-  }*/
-
   Widget infoRowBlack(String svgIcon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1461,78 +1227,4 @@ class _ShootReviewScreenState extends State<ShootReviewScreen> {
   }
 
 
-  double calculateShootCost() {
-    double base = (pricing?['base_amount'] ?? 0).toDouble();
-    double preProd = (pricing?['pre_production'] ?? 0).toDouble();
-    double rushFee = (pricing?['rush_fee'] ?? 0).toDouble();
-
-    return base + preProd + rushFee;   // ✅ Rush added
-  }
-
-  double calculateEditingCost() {
-    return (pricing?['editing_amount'] ?? 0).toDouble();
-  }
-
-  double calculateAdditionalCrew() {
-    return (pricing?['extra_creatives_amount'] ?? 0).toDouble();
-  }
-
-/// Calculates Shoot Cost: (Base Price of 1st Videographer + 1st Photographer) + Pre-prod + Rush
-  /*Map<String, dynamic> calculateShootCost() {
-    double preProd = pricing?['pre_production']?.toDouble() ?? 0.0;
-    double rushFee = pricing?['rush_fee']?.toDouble() ?? 0.0;
-    double shootCost = preProd + rushFee;
-
-    // Use crewSummary instead of bookingSummaryData
-    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
-    Map<int, int> processedCount = {};
-
-    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
-
-    for (var c in creatives) {
-      int roleId = c['role_id'];
-      // API keys are strings "1", "2", so we convert to string for lookup
-      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
-      int current = processedCount[roleId] ?? 0;
-
-      if (current < required) {
-        shootCost += (c['amount'] ?? 0).toDouble();
-        processedCount[roleId] = current + 1;
-      }
-    }
-
-    return {
-      "total": shootCost,
-      "hasPreProd": preProd > 0,
-      "hasRush": rushFee > 0,
-    };
-  }
-
-  Map<String, dynamic> calculateAdditionalCrew() {
-    double additionalTotal = 0;
-    Map<int, int> extraCount = {};
-
-    Map<String, dynamic> requiredByRole = crewSummary?['required_by_role'] ?? {};
-    Map<int, int> processedCount = {};
-
-    List<dynamic> creatives = pricing?['creative_price_breakdown'] ?? [];
-
-    for (var c in creatives) {
-      int roleId = c['role_id'];
-      int required = int.tryParse(requiredByRole[roleId.toString()]?.toString() ?? "0") ?? 0;
-      int current = processedCount[roleId] ?? 0;
-
-      if (current < required) {
-        processedCount[roleId] = current + 1;
-      } else {
-        additionalTotal += (c['amount'] ?? 0).toDouble();
-        extraCount[roleId] = (extraCount[roleId] ?? 0) + 1;
-      }
-    }
-
-    return {
-      "total": additionalTotal,
-      "counts": extraCount,
-    };
-  }*/
 }
