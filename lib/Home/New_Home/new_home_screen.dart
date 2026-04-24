@@ -3349,10 +3349,7 @@ SizedBox(height: 10,),
                           });
 
                         } else if (data["button"] == " Explore Creatives") {
-
-                          checkLogin(context, () {
-                            scrollTo(featuredKey);
-                          });
+                          scrollTo(featuredKey);
 
                         } else if (data["button"] == "Find Your Creative") {
 
