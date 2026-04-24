@@ -1,3 +1,4 @@
+/*
 // This is a basic Flutter widget test.
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
@@ -26,5 +27,21 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+  });
+}
+*/
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:beige/main.dart';
+
+void main() {
+  testWidgets('App loads test', (WidgetTester tester) async {
+
+    await tester.pumpWidget(
+      const MyApp(isLoggedIn: false),
+    );
+
+    expect(find.byType(MaterialApp), findsOneWidget);
   });
 }

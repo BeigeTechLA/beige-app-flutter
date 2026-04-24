@@ -1,7 +1,7 @@
-import 'package:beige/OnbodingScreen/onboding_screen.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-// import your next screen here
-// import 'package:your_app/NextScreen.dart';
+import 'package:beige/OnbodingScreen/onboding_screen.dart';
+import '../utility/ColorCode.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,55 +11,111 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  int currentIndex = 0;
+  Timer? _timer;
+  bool _precacheDone = false; // ✅ double call rokne ke liye
+
+  final List<String> centerImages = [
+    "assets/Splash/Property_1.png",
+    "assets/Splash/Property_2.png",
+    "assets/Splash/Property_3.png",
+    "assets/Splash/Property_4.png",
+    "assets/Splash/Propety_5.png",
+    "assets/Splash/Property_6.png",
+  ];
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    /// 2 SECOND DELAY THEN NAVIGATE
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => OnboardingScreen()),  // <-- Replace your screen here
-      );
+    // ✅ Context safe hai yahan, aur sirf ek baar chalega
+    if (!_precacheDone) {
+      _precacheDone = true;
+      _precacheAndStart();
+    }
+  }
+
+  Future<void> _precacheAndStart() async {
+    try {
+      for (final path in centerImages) {
+        await precacheImage(AssetImage(path), context);
+      }
+    } catch (e) {
+      debugPrint("Precache error: $e");
+    } finally {
+      // ✅ Error aaye ya na aaye, animation ZAROOR chalegi
+      if (mounted) _startImageSwap();
+    }
+  }
+
+  void _startImageSwap() {
+    _timer = Timer.periodic(const Duration(milliseconds: 450), (timer) {
+      if (currentIndex < centerImages.length - 1) {
+        setState(() {
+          currentIndex++;
+        });
+      } else {
+        timer.cancel();
+
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OnboardingScreen(),
+            ),
+          );
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          /// FULL SCREEN BACKGROUND IMAGE
-          Positioned.fill(
-            child: Image.asset(
-              "assets/Splash/Splash1.png",
-              fit: BoxFit.cover,
-            ),
+          /// 🔹 SOLID BACKGROUND
+          Container(
+            color: ColorCode.kHeadingColor,
           ),
 
-          /// CENTER IMAGE
+          /// 🔹 CENTER IMAGE (ONLY THIS CHANGES)
           Center(
             child: Image.asset(
-              "assets/Splash/Splash2.png",
-              width: 250,
-              height: 250,
+              centerImages[currentIndex],
+              width: 240,
               fit: BoxFit.contain,
             ),
           ),
 
-          /// TEXT AT BOTTOM
-          const Positioned(
-            bottom: 40,
+          /// 🔹 TAGLINE
+          Positioned(
+            bottom: MediaQuery.of(context).size.height * 0.05, // 👈 responsive bottom
             left: 0,
             right: 0,
-            child: Text(
-              "- Streamline your crew, equipment, & projects -",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05, // 👈 side spacing
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  "— Streamline your crew, equipment, & projects  —",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorCode.white,
+                    fontSize: 16,
+                    fontFamily: "Unbounded",
+                  ),
+                ),
               ),
             ),
           ),
@@ -68,4 +124,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
