@@ -1,3 +1,4 @@
+import 'package:beige/utility/commen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,7 @@ Future<void> startApp(Environment environment) async {
 
   final prefs = await SharedPreferences.getInstance();
   bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  await AuthManager().init(); // 🔥 IMPORTANT
 
   runApp(MyApp(isLoggedIn: isLoggedIn));
 }

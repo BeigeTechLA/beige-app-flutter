@@ -1,12 +1,14 @@
 import 'dart:ui';
 
 import 'package:beige/utility/ColorCode.dart';
+import 'package:beige/utility/commen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'Booking/booking_all_screen.dart';
 import 'Home/NewBookingFlow/CreateProjectStep1/Content_Type_screen.dart';
 import 'Home/New_Home/new_home_screen.dart';
+import 'auth/new_login_screen.dart';
 
 class Mainscreen extends StatefulWidget {
   const Mainscreen({super.key});
@@ -82,12 +84,25 @@ class _MainscreenState extends State<Mainscreen> {
               fontSize: 12,
             ),
 
-            onTap: (index) {
+     /*       onTap: (index) {
               setState(() {
                 _selectedIndex = index;
               });
-            },
+            },*/
+            onTap: (index) {
+              if (index == 0) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+                return;
+              }
 
+              checkLogin(context, () {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              });
+            },
             items: [
               BottomNavigationBarItem(
                 icon: _buildIcon(
@@ -137,6 +152,121 @@ class _MainscreenState extends State<Mainscreen> {
       fit: BoxFit.cover,
     );
   }
+  void showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.6), // background blur feel
+      builder: (context) {
+        return Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Colors.white.withOpacity(0.15),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    /// TITLE
+                    Text(
+                      "Please Login to Continue",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontFamily: "Outfit",
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.none,                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    /// OK BUTTON
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => NewLoginScreen()),
+                        );
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: ColorCode.popButtonBackground,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Ok",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            color: ColorCode.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    /// CANCEL BUTTON
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 50,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: ColorCode.popButtonBackground,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                            //  color: ColorCode.white,
+                            fontSize: 16,
+                            fontFamily: "Outfit",
+                            color: ColorCode.white,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.none,                      ),
+
+
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void checkLogin(BuildContext context, VoidCallback onSuccess) {
+    if (AuthManager().isLoggedIn) {
+      onSuccess(); // ✅ direct open
+    } else {
+      showLoginDialog(context); //
+    }
+  }
+
 }
 
 
