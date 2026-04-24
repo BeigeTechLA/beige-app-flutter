@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TicketClipper extends CustomClipper<Path> {
   @override
@@ -35,11 +36,25 @@ class AuthManager {
 
   bool get isLoggedIn => _isLoggedIn;
 
-  void login() {
-    _isLoggedIn = true;
+  /// 🔥 APP START pe call karo
+  Future<void> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
   }
 
-  void logout() {
+  /// ✅ LOGIN
+  Future<void> login() async {
+    _isLoggedIn = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+  }
+
+  /// ❌ LOGOUT
+  Future<void> logout() async {
     _isLoggedIn = false;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
   }
 }

@@ -90,6 +90,13 @@ class _MainscreenState extends State<Mainscreen> {
               });
             },*/
             onTap: (index) {
+              if (index == 0) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+                return;
+              }
+
               checkLogin(context, () {
                 setState(() {
                   _selectedIndex = index;
@@ -145,13 +152,6 @@ class _MainscreenState extends State<Mainscreen> {
       fit: BoxFit.cover,
     );
   }
-  void checkLogin(BuildContext context, VoidCallback onSuccess) {
-    if (AuthManager().isLoggedIn) {
-      onSuccess();
-    } else {
-      showLoginDialog(context);
-    }
-  }
   void showLoginDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -185,7 +185,7 @@ class _MainscreenState extends State<Mainscreen> {
                         fontSize: 18,
                         fontFamily: "Outfit",
                         fontWeight: FontWeight.w600,
-                      ),
+                        decoration: TextDecoration.none,                      ),
                     ),
 
                     const SizedBox(height: 25),
@@ -215,6 +215,7 @@ class _MainscreenState extends State<Mainscreen> {
                             color: ColorCode.white,
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
+                            decoration: TextDecoration.none,
                           ),
                         ),
                       ),
@@ -243,7 +244,9 @@ class _MainscreenState extends State<Mainscreen> {
                             fontFamily: "Outfit",
                             color: ColorCode.white,
                             fontWeight: FontWeight.w500,
-                          ),
+                            decoration: TextDecoration.none,                      ),
+
+
                         ),
                       ),
                     ),
@@ -256,6 +259,14 @@ class _MainscreenState extends State<Mainscreen> {
       },
     );
   }
+  void checkLogin(BuildContext context, VoidCallback onSuccess) {
+    if (AuthManager().isLoggedIn) {
+      onSuccess(); // ✅ direct open
+    } else {
+      showLoginDialog(context); //
+    }
+  }
+
 }
 
 

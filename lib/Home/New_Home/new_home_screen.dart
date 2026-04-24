@@ -42,31 +42,27 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   bool isLoading = true;
   int? bookingId;
   int _currentCard = 0;
+  int selectedIndex = -1;
+  int _activeStudioIndex = 0;
+  int _currentBookingIndex = 0;
+  int _currentCreativeIndex = 0;
 
+  late PageController _topInfluencerController;
   late AnimationController _controller;
   late PageController _studioController;
-  int _activeStudioIndex = 0;
-  final PageController _featuredController = PageController(
-      initialPage: 1000,
-      viewportFraction: 0.65);
-
+  late PageController _topCreativeController;
   late PageController _bookingController;
   late PageController _cardController;
-  int _currentBookingIndex = 0;
   late AnimationController _bookingSwipeController;
   late AnimationController _borderController;
-  int selectedIndex = -1;
+  late AnimationController _swipeController;
+
+  final int _initialPage = 1000;
   final PageController _inspiredController = PageController(
     initialPage: 1000,
 
     viewportFraction: 0.65,
   );
-
-  late AnimationController _swipeController;
-  int _currentCreativeIndex = 0;
-
-  final int _initialPage = 1000;
-
   Future<void> fetchData() async {
     final data = await controller.fetchHomeData();
 
@@ -129,28 +125,28 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
   ];
   final List<String> featuredNames = [
     "Alec H",
-    "Benson F",
+    // "Benson F",
     "Christopher R",
     "Corey B",
     "Cornelius M",
     "Daniel A",
     "Daniel C",
     "Gary Ahmed",
-    "Jesse S.",
+    // "Jesse S.",
     "Mikey D",
     "Nathan Grant"
   ];
 
   final List<String> featuredImages = [
     "assets/images/Alec+H.png",
-    "assets/images/Benson+F.png",
+    // "assets/images/Benson+F.png",
     "assets/images/Christopher+R.png",
     "assets/images/Corey+B.png",
     "assets/images/Cornelius+M. (1).png",
     "assets/images/Daniel+A.png",
     "assets/images/Daniel+C.png",
     "assets/images/Gary+Ahmed.png",
-    "assets/images/Jesse+S.png",
+    // "assets/images/Jesse+S.png",
     "assets/images/Mikey+D (1).jpg",
     "assets/images/Nathan+Grant.png"
   ];
@@ -523,7 +519,14 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     super.initState();
     fetchData();
 
-
+    _topInfluencerController = PageController(
+      initialPage: 1000,
+      viewportFraction: 0.65,
+    );
+    _topCreativeController = PageController(
+      initialPage: 1000,
+      viewportFraction: 0.65,
+    );
     _studioController = PageController(
       initialPage: studioList.length * 50, //
       viewportFraction: 0.7, //
@@ -560,8 +563,9 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
 
 
     );
-    
+
   }
+
 
   @override
   void dispose() {
@@ -574,7 +578,8 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
     _pageController.dispose();
     _studioController.dispose();
     _bookingController.dispose();
-
+    _topCreativeController.dispose();
+    _topInfluencerController.dispose();
     super.dispose();
   }
 
@@ -2650,10 +2655,10 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                             const SizedBox(height: 15),
 
 
-                            SizedBox(
+                         /*   SizedBox(
                               height: 340,
                               child: PageView.builder(
-                                controller: _featuredController,
+                                controller: _topCreativeController,
                                 itemCount: 10000,
                                 clipBehavior: Clip.none,
                                 itemBuilder: (context, index) {
@@ -2661,12 +2666,13 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   final realIndex = index % Topwords.length;
 
                                   return AnimatedBuilder(
-                                    animation: _featuredController,
+                                    animation: _topCreativeController,
                                     builder: (context, child) {
 
                                       double value = 0;
-                                      if (_featuredController.position.haveDimensions) {
-                                        value = index - (_featuredController.page ?? 0);
+                                      if (_topCreativeController.hasClients &&
+                                          _topCreativeController.position.haveDimensions){
+                                        value = index - (_topCreativeController.page ?? 0);
                                       }
 
                                       final double perspective = 0.0015;
@@ -2824,6 +2830,157 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                   );
                                 },
                               ),
+                            ),*/
+                            SizedBox(
+                              height: 340,
+                              child: PageView.builder(
+                                // Unique key taaki controller conflict na kare
+                                key: const PageStorageKey("top_influencer_slider"),
+                                controller: _topInfluencerController,
+                                itemCount: 10000,
+                                clipBehavior: Clip.none,
+                                itemBuilder: (context, index) {
+                                  final realIndex = index % Topwords.length;
+
+                                  return AnimatedBuilder(
+                                    animation: _topInfluencerController,
+                                    builder: (context, child) {
+                                      double value = 0;
+
+                                      // 🔥 ERROR FIX: Check if exactly one PageView is attached
+                                      if (_topInfluencerController.hasClients &&
+                                          _topInfluencerController.positions.length == 1) {
+                                        value = index - (_topInfluencerController.page ?? 1000.0);
+                                      } else {
+                                        value = (index - 1000).toDouble();
+                                      }
+
+                                      final double perspective = 0.0015;
+                                      double rotationValue = value.clamp(-1.0, 1.0);
+                                      double angle = rotationValue * -0.6;
+                                      double scale = (1 - (value.abs() * 0.15)).clamp(0.8, 1.0);
+
+                                      return Transform(
+                                        alignment: value < 0 ? Alignment.centerRight : Alignment.centerLeft,
+                                        transform: Matrix4.identity()
+                                          ..setEntry(3, 2, perspective)
+                                          ..rotateY(angle)
+                                          ..scale(scale),
+                                        child: Opacity(
+                                          opacity: (1 - (value.abs() * 0.7)).clamp(0.4, 1.0),
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 280,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            /// --- IMAGE SECTION ---
+                                            Container(
+                                              height: 240,
+                                              width: 230,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(22),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.4),
+                                                    blurRadius: 15,
+                                                    offset: const Offset(0, 10),
+                                                  ),
+                                                ],
+                                                image: DecorationImage(
+                                                  image: AssetImage(Topwords[realIndex]),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 12),
+
+                                            /// --- NAME SECTION ---
+                                            Text(
+                                              Topname[realIndex],
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: "Outfit",
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 10),
+
+                                            /// --- SOCIAL ICONS & FOLLOWERS ROW ---
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                /// INSTAGRAM
+                                                if (Topinstagram[realIndex].isNotEmpty && instaFollowers[realIndex] != "-")
+                                                  GestureDetector(
+                                                    onTap: () => openLink(Topinstagram[realIndex]),
+                                                    child: Row(
+                                                      children: [
+                                                        SvgPicture.asset("assets/svg/Instagram.svg", height: 16),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          instaFollowers[realIndex],
+                                                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                if (Topinstagram[realIndex].isNotEmpty && instaFollowers[realIndex] != "-")
+                                                  const SizedBox(width: 15),
+
+                                                /// YOUTUBE
+                                                if (Topyoutube[realIndex].isNotEmpty && youtubeFollowers[realIndex] != "-")
+                                                  GestureDetector(
+                                                    onTap: () => openLink(Topyoutube[realIndex]),
+                                                    child: Row(
+                                                      children: [
+                                                        SvgPicture.asset("assets/svg/Youtube.svg", height: 16),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          youtubeFollowers[realIndex],
+                                                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                if (Topyoutube[realIndex].isNotEmpty && youtubeFollowers[realIndex] != "-")
+                                                  const SizedBox(width: 15),
+
+                                                /// TIKTOK
+                                                if (Toptiktok[realIndex].isNotEmpty && tiktokFollowers[realIndex] != "-")
+                                                  GestureDetector(
+                                                    onTap: () => openLink(Toptiktok[realIndex]),
+                                                    child: Row(
+                                                      children: [
+                                                        SvgPicture.asset("assets/svg/Tiktok.svg", height: 16),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          tiktokFollowers[realIndex],
+                                                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -2851,11 +3008,11 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                       const SizedBox(height: 20),
 
                       // --- Top Creatives Section ---
-                      (homeData?.mainCreatives ?? []).isNotEmpty
-                          ? Padding(
+                      // --- Top Creatives Section ---
+                      if ((homeData?.mainCreatives ?? []).isNotEmpty)
+                        Padding(
                         key: topCreativeKey,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -2866,16 +3023,17 @@ class _NewHomeScreenState extends State<NewHomeScreen> with TickerProviderStateM
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Unbounded",
+                                height: 1.2,
                               ),
                             ),
                             const SizedBox(height: 10),
 
-                            /// 🔥 STACK
                             _buildTopCreativesStack(context),
                           ],
                         ),
                       )
-                          : const SizedBox()
+
+
 
                     ]
                 )
@@ -3597,11 +3755,162 @@ SizedBox(height: 10,),
     );
   }
 
+ /* Widget _buildTopCreativesStack(BuildContext context) {
+    final list = homeData?.mainCreatives ?? [];
+
+    if (list.isEmpty) {
+      return const SizedBox();
+    }
+
+    return GestureDetector(
+  *//*    onTap: () {
+        if (_swipeController.isAnimating) return;
+
+        _swipeController.forward().then((_) {
+          setState(() {
+            _currentCreativeIndex =
+                (_currentCreativeIndex + 1) % list.length;
+            _swipeController.reset();
+          });
+        });
+      },*//*
+
+      onHorizontalDragEnd: (details) {
+        if (_swipeController.isAnimating) return;
+
+        if (details.primaryVelocity == null) return;
+
+        /// 👉 LEFT
+        if (details.primaryVelocity! < 0) {
+          _swipeController.forward().then((_) {
+            setState(() {
+              _currentCreativeIndex =
+                  (_currentCreativeIndex + 1) % list.length;
+              _swipeController.reset();
+            });
+          });
+        }
+
+        /// 👉 RIGHT
+        else if (details.primaryVelocity! > 0) {
+          _swipeController.forward().then((_) {
+            setState(() {
+              _currentCreativeIndex =
+                  (_currentCreativeIndex - 1 + list.length) % list.length;
+              _swipeController.reset();
+            });
+          });
+        }
+      },
+
+      child: SizedBox(
+        height: 480,
+        width: double.infinity,
+        child: AnimatedBuilder(
+          animation: _swipeController,
+          builder: (context, child) {
+            double slide = _swipeController.value * MediaQuery.of(context).size.width;
+            double rotate = _swipeController.value * 0.15;
+            double opacity = 1 - _swipeController.value;
+
+            return ClipRect(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+
+                  /// 🔹 BACK CARD
+                  Transform.translate(
+                    offset: const Offset(0, -45),
+                    child: Transform.rotate(
+                      angle: 0.06,
+                      child: Transform.scale(
+                        scale: 0.88,
+                        child: Opacity(
+                          opacity: 0.3,
+                          child: IgnorePointer(
+                            child: _buildCreativeCard(
+                              list.isEmpty
+                                  ? 0
+                                  : (_currentCreativeIndex + 2) % list.length,
+                              isBackground: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  /// 🔹 MIDDLE CARD
+                  Transform.translate(
+                    offset: const Offset(0, -25),
+                    child: Transform.rotate(
+                      angle: -0.04,
+                      child: Transform.scale(
+                        scale: 0.94,
+                        child: Opacity(
+                          opacity: 0.6,
+                          child: IgnorePointer(
+                            child: _buildCreativeCard(
+                              list.isEmpty
+                                  ? 0
+                                  : (_currentCreativeIndex + 1) % list.length,
+                              isBackground: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  /// 🔹 FRONT CARD
+                  Transform.translate(
+                    offset: Offset(0, slide),
+                    child: Transform.rotate(
+                      angle: rotate,
+                      child: Opacity(
+                        opacity: opacity,
+                        child: _buildCreativeCard(
+                          list.isEmpty
+                              ? 0
+                              : _currentCreativeIndex % list.length,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }*/
+
+
   Widget _buildTopCreativesStack(BuildContext context) {
     final list = homeData?.mainCreatives ?? [];
 
+    /// ✅ 🔥 NO DATA HANDLE
+    if (list.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            SizedBox(height: 10),
+            Text(
+                "No Creatives Found",
+                style:
+                TextStyle(color: ColorCode.kButtonColor,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                )
+            ),
+          ],
+        ),
+      );
+    }
+
     return GestureDetector(
-  /*    onTap: () {
+      /*    onTap: () {
         if (_swipeController.isAnimating) return;
 
         _swipeController.forward().then((_) {
