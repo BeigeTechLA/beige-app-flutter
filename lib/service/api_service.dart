@@ -1,19 +1,18 @@
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as _dio;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'config.dart';
- // Make sure AppConfig.apiUrl is correctly set
+import '../config/env.dart';
 
 class ApiService {
-  final String _baseUrl = AppConfig.apiUrl;
+  final String _baseUrl = Env.apiUrl;
   String get baseUrl => _baseUrl;
 
-  static String imageURL = AppConfig.imageUrl; // Using image URL from AppConfig
+  static String imageURL = Env.imageUrl;
 
 
 
@@ -35,40 +34,60 @@ class ApiService {
     }
   }
 
+
   fetchData(String url) async {
     final headers = await createAuthorizationHeader();
 
-    final response =
-    await http.get(Uri.parse(_baseUrl + url), headers: headers);
+    try {
+      final response = await http
+          .get(Uri.parse(_baseUrl + url), headers: headers)
+          .timeout(const Duration(seconds: 20));
 
-    // final response = await http.get(Uri.parse(_baseUrl + url));
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Server Error');
+      }
 
-    if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
-      return json.decode(response.body);
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load data');
+    } on SocketException {
+      throw Exception("NO_INTERNET");
+    } on TimeoutException {
+      throw Exception("TIMEOUT");
+    } catch (e) {
+      throw Exception("UNKNOWN_ERROR");
     }
   }
 
 
 
-  postData(String url, Map<String, dynamic> data) async {
-    final headers = await createAuthorizationHeader();
+  Future<dynamic> postData(String url, Map<String, dynamic> data) async {
+    try {
+      final headers = await createAuthorizationHeader();
 
-    final response = await http.post(
-      Uri.parse(_baseUrl + url),
-      headers: headers,
-      body: jsonEncode(data),
-    );
+      final response = await http.post(
+        Uri.parse(_baseUrl + url),
+        headers: headers,
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
       final bodyRes = json.decode(response.body);
+
+      print("STATUS CODE => ${response.statusCode}");
+      print("RESPONSE BODY => $bodyRes");
+
+      // ✅ Success
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return bodyRes;
+      }
+
+      // 🔴 API error (400, 401 etc.)
       return bodyRes;
-    } else {
-      throw Exception('Failed to post data');
+
+    } catch (e) {
+      return {
+        "error": true,
+        "message": "Network error"
+      };
     }
   }
 
@@ -112,20 +131,54 @@ class ApiService {
     return prefs.getString('folder');  // folder stored while login
   }
 
- /* static Future<String> getImageURL(String image) async {
-    String folder = await getFolder() ?? ''; // Now calling the static getFolder
-    return imageURL + folder + image; // Combine URL with folder and image
-  }
-*/
-  static Future<String> getImageURL(String image) async {
-    String folder = await getFolder() ?? '';
-    return imageURL + folder + image;
+  Future<dynamic> postMultipartData(
+      String url,
+      Map<String, String> fields,
+      File? file,
+      ) async {
+    try {
+      var uri = Uri.parse(baseUrl + url);
+
+      var request = http.MultipartRequest('POST', uri);
+
+      /// Add fields
+      request.fields.addAll(fields);
+
+      print("📦 FIELDS => ${request.fields}");
+
+      /// Add file
+      if (file != null) {
+        print("📦 FILE PATH => ${file.path}");
+        print("📦 FILE SIZE => ${await file.length()} bytes");
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file', // ⚠️ MUST MATCH BACKEND
+            file.path,
+          ),
+        );
+      }
+
+      var response = await request.send();
+
+      print("🟠 STATUS CODE => ${response.statusCode}");
+
+      var responseBody = await response.stream.bytesToString();
+
+      print("🟢 RESPONSE BODY => $responseBody");
+
+      return jsonDecode(responseBody);
+
+    } catch (e) {
+      print("🔥 MULTIPART ERROR => $e");
+      return null;
+    }
   }
 
-  static String getImageURLSync(String folder, String image) {
-    return imageURL + folder + image;
-  }
 
+  String getImageURL(String imagePath) {
+    return imageURL + imagePath;
+  }
 
 
   postDataraw(String url, Map<String, dynamic> data) async {
@@ -149,7 +202,7 @@ class ApiService {
   /// 📌 WORKING MULTIPART POST
   Future<dynamic> postMultipart(
       String url,
-      Map<String, dynamic> fields,
+      Map<String, String> fields,
       File? imageFile,
       ) async {
     final prefs = await SharedPreferences.getInstance();
@@ -157,33 +210,40 @@ class ApiService {
 
     Dio dio = Dio();
 
-    // Remove JSON header (important for file upload)
     dio.options.headers = {
       "Accept": "application/json",
-      "Authorization": "Bearer $token",
+      if (token.isNotEmpty) "Authorization": "Bearer $token",
     };
 
-    // Create FormData
-    FormData formData = FormData.fromMap({
-      ...fields,
-      if (imageFile != null)
-        "photo": await MultipartFile.fromFile(
-          imageFile.path,
-          filename: imageFile.path.split("/").last,
-        )
-    });
+    try {
+      FormData formData = FormData.fromMap({
+        ...fields,
+        if (imageFile != null)
+          "file": await MultipartFile.fromFile(
+            imageFile.path,
+            filename: imageFile.path.split('/').last,
+          ),
+      });
 
-    print("📤 FINAL MULTIPART DATA: ${formData.fields}");
-    print("📸 SENDING IMAGE: ${imageFile?.path}");
+      final response = await dio.post(
+        _baseUrl + url,
+        data: formData,
+      );
 
-    final response = await dio.post(
-      _baseUrl + url,
-      data: formData,
-    );
+      return response.data;
 
-    return response.data;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // 🔥 Backend ka actual error return karo
+        return e.response?.data;
+      } else {
+        return {
+          "error": true,
+          "message": "Something went wrong"
+        };
+      }
+    }
   }
-
 
 
 

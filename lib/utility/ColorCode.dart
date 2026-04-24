@@ -1,15 +1,67 @@
 import 'package:flutter/material.dart';
 
 class ColorCode {
-
+  static const Color kBlackOpacity16 = Color(0x29000000);
+  // ⭐ New Colors from UI/UX
+  static const Color kBlackDark = Color(0xFF0A0A0A); // #0A0A0A
+  static const Color kGoldLight20 = Color(0x33E8D5B5); // #E8D5B5 with 20% opacity
+  static const Color kDarkText = Color(0xFF4E4B44);    // #4E4B44
+  /// ⭐ Figma Border (#E8D1AB 50%)
+  static const Color kGoldBorder50 = Color(0x80E8D1AB);
   static const Color kButtonColor = Color(0xFFE8D1AB);
   static const Color kHeadingColor = Color(0xFF1D1D1B); // (dark)
   static  const Color kSubtextColor = Color(0xFF474746);
   static const Color kSubtextOpacity = Color(0x991D1D1B); // 60% opacity
-  static  const Color kBackgroundColor = Color(0xFFFAF9F6);
-
+  static const Color kWhiteOpacity36 = Color(0x5CFFFFFF); // 36% white
+  static const Color kWhiteOpacity_60 = Color(0x99FFFFFF); // 60% white
+  static const Color kWhiteOpacity30 = Color(0x4DFFFFFF); // 30% white
+  // static  const Color kBackgroundColor = Color(0xFFFAF9F6);
+  static const Color kCircleBorder = Color(0xFFDDDDDD);
+  static const Color k262624 = Color(0xFF262624);
+  static const Color kGold40 = Color(0x66E9BE78);  // E9BE78 with 40% opacity
+  static const Color k777571 = Color(0xFF777571);
+  static const Color k282828 = Color(0xFF282828);
+  static const Color kWhiteOpacity60 = Color(0x99FFFFFF); // #FFFFFF99 → 60% opacity
+  static const Color k2A2A2A = Color(0xFF2A2A2A);
+  static const Color bcakgroundcolor = Color(0xFF1D1D1B);
+  /// ⭐ Divider / Border Color (White 12% opacity)
+    static const Color kDividerWhite12 = Color(0x1FFFFFFF);
+  static const Color k5D5D5D = Color(0xFF5D5D5D);
+  static const Color k737373 = Color(0xFF737373); //Medium grey
+  /// ⭐ Figma Border (#DDDDDD 50%)
+  static const Color kBorderLight = Color(0x80DDDDDD);
+  // ⭐ Light Red / Remove Background
+  static const Color kLightRed = Color(0xFFFFC9C9);
+  static const Color kIconBackground = Color(0xFF171717);
+  static const Color kBlackOpacity70 = Color(0xB2000000);
   static const Color kCreamSoft = Color(0xFFECE1CE);
+  static const Color k1D1D1B_Opacity70 = Color(0xB21D1D1B);//70
+  static const Color kBlackOpacity12 = Color(0x1F000000);
 
+
+  static const Color circular = Color(0xFF171717);
+  static const Color kCardBottom = Color(0xFF0D0D0D);
+
+  /// ⭐ Bottom Border Gold
+  static const Color kGoldBorder = Color(0xFFE8D1AB);
+
+  /// ⭐ NEW COLOR ADDED (#FFFFFFB2 → 70% white)
+  static const Color kWhiteOpacity70 = Color(0xB2FFFFFF);
+  /// ⭐ Gold Gradient Colors (From Design)
+  static const Color kGoldGradientLight = Color(0xFFE8D1AB); // #E8D1AB
+  static const Color kGoldGradientDark  = Color(0xFFD4A14D); // #D4A14D
+
+  // ⭐ Divider Gradient Colors
+  static const Color kDividerStart = Color(0x17FFFFFF); // 9% opacity
+  static const Color kDividerCenter = Color(0xFFFFFFF); // full white
+  static const Color kDividerEnd = Color(0x17FFFFFF); // 9% opacity // #D4A14D
+
+
+  static const Color kCircleGradientTop = Color(0xFF1D1D1B);
+  static const Color kCircleGradientBottom = Color(0xFF434341);
+  static const Color kCircleBorderDark = Color(0xFF1D1D1B);
+
+  static const Color kBlackOpacity10 = Color(0x1A000000); // #0000001A
 
   static const Color wine = Color(0xFF5A0760);
   static const Color white = Color(0xFFFFFFFF);
