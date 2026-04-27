@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../app/colors.dart';
-import '../app/radii.dart';
-import '../app/route_names.dart';
-import '../app/spacing.dart';
-import '../app/text_styles.dart';
-import '../Customtextfiled/CustomInputField.dart';
-import '../features/auth/presentation/providers/forgot_password_notifier.dart';
-import '../features/auth/presentation/providers/forgot_password_state.dart';
-import '../widgets/TopMessage.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/features/auth/presentation/providers/forgot_password_notifier.dart';
+import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
+import 'package:beige/widgets/TopMessage.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
