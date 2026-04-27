@@ -8,7 +8,7 @@ import 'app/text_styles.dart';
 
 import 'my_shoot/my_shoots_screen.dart';
 import 'Home/book_shoot/content_type_screen.dart';
-import 'Home/home/home_screen.dart';
+import 'features/home/presentation/screens/home_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

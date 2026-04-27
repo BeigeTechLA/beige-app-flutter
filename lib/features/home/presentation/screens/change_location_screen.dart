@@ -10,9 +10,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
-import '../../app/colors.dart';
-import '../../features/profile/presentation/providers/profile_providers.dart';
-import '../../service/google_config.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
+import 'package:beige/service/google_config.dart';
 
 class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});

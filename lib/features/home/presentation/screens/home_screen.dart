@@ -8,13 +8,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../Model/HomeModel.dart';
-import '../../app/colors.dart';
-import '../../app/route_names.dart';
-import '../../core/network/api_endpoints.dart';
-import '../../features/home/presentation/providers/home_notifier.dart';
-import '../../features/home/presentation/providers/home_providers.dart';
-import '../../widgets/loding.dart';
+import 'package:beige/Model/HomeModel.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/features/home/presentation/providers/home_notifier.dart';
+import 'package:beige/features/home/presentation/providers/home_providers.dart';
+import 'package:beige/widgets/loding.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});

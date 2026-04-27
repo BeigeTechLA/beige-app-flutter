@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/colors.dart';
-import '../../core/network/api_endpoints.dart';
-import '../../features/creative/presentation/providers/creative_profile_notifier.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/features/creative/presentation/providers/creative_profile_notifier.dart';
 
 class RecommendedCreativeDetailScreen extends ConsumerStatefulWidget {
   final int id;
