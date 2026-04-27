@@ -36,8 +36,8 @@ import '../features/profile/presentation/screens/profile_new_password_screen.dar
 import '../features/profile/presentation/screens/profile_otp_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/profile/presentation/screens/shoot_history_screen.dart';
-import '../OnboardingScreen/onboarding_screen.dart';
-import '../SplashScreen/splash_screen.dart';
+import '../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../features/splash/presentation/screens/splash_screen.dart';
 import '../features/auth/presentation/screens/forgot_password_otp_screen.dart';
 import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
