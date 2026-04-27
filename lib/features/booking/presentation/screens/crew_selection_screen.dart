@@ -12,6 +12,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
 import 'package:beige/features/booking/presentation/providers/booking_providers.dart';
 import 'package:beige/shared/widgets/loading.dart' show AppLoader;
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
   final int specialtyId;
@@ -205,7 +206,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     final requiredByRole = crewState.requiredByRole;
     final showLocationCard = nearbyCreators.isEmpty;
 
-    return Scaffold(
+    return AppScaffold(
+        hasAppBar: true,
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
@@ -1391,99 +1393,102 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //     ),
         //   ),
         // )
-        bottomNavigationBar: ClipRect(
-          
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              color: Colors.transparent,
-              padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-            
-                  /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
-                  if (showLocationCard)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: GestureDetector(
-                        onTap: () {
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: ClipRect(
+
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                color: Colors.transparent,
+                padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+
+                    /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
+                    if (showLocationCard)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: GestureDetector(
+                          onTap: () {
+                            context.pushNamed(
+                             RouteNames.reviewConfirm,
+                             pathParameters: {'bookingId': widget.bookingId.toString()},
+                           );
+                          },
+                          child: const Text(
+                            "Complete your Shoot",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white70,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    /// 🔥 MAIN BUTTON
+                    SizedBox(
+                      height: 55,
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+
+                          /// 🔴 IF NO DATA → SALES FLOW
+                          if (showLocationCard) {
+                            showSalesDialog(context);
+                            return;
+                          }
+
+                          /// 🟢 NORMAL FLOW
+                          for (final userId in addedCrewUserIds) {
+
+                            final matches = crewMatches
+                                .where((e) => (e['crew_member_id'] ?? e['user']?['id']) == userId)
+                                .toList();
+
+                            if (matches.isEmpty) continue;
+
+                            final roleId =
+                                int.tryParse(matches.first['role_id'].toString()) ?? 0;
+
+                            await _addHolds(
+                              creativeUserId: userId,
+                              roleId: roleId,
+                            );
+                          }
+
                           context.pushNamed(
                            RouteNames.reviewConfirm,
                            pathParameters: {'bookingId': widget.bookingId.toString()},
                          );
                         },
-                        child: const Text(
-                          "Complete your Shoot",
-                          style: TextStyle(
+
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+
+                        child: Text(
+                          showLocationCard
+                              ? "Contact With Sales"
+                              : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
+                          style: const TextStyle(
                             fontSize: 14,
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white70,
-                            decoration: TextDecoration.underline,
+                            fontFamily: "Unbounded",
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
                         ),
                       ),
                     ),
-            
-                  /// 🔥 MAIN BUTTON
-                  SizedBox(
-                    height: 55,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-            
-                        /// 🔴 IF NO DATA → SALES FLOW
-                        if (showLocationCard) {
-                          showSalesDialog(context);
-                          return;
-                        }
-            
-                        /// 🟢 NORMAL FLOW
-                        for (final userId in addedCrewUserIds) {
-            
-                          final matches = crewMatches
-                              .where((e) => (e['crew_member_id'] ?? e['user']?['id']) == userId)
-                              .toList();
-            
-                          if (matches.isEmpty) continue;
-            
-                          final roleId =
-                              int.tryParse(matches.first['role_id'].toString()) ?? 0;
-            
-                          await _addHolds(
-                            creativeUserId: userId,
-                            roleId: roleId,
-                          );
-                        }
-            
-                        context.pushNamed(
-                         RouteNames.reviewConfirm,
-                         pathParameters: {'bookingId': widget.bookingId.toString()},
-                       );
-                      },
-            
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-            
-                      child: Text(
-                        showLocationCard
-                            ? "Contact With Sales"
-                            : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontFamily: "Unbounded",
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

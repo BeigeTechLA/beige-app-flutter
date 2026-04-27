@@ -9,6 +9,7 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/crew_recommendation_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSizeMatchingScreen extends ConsumerStatefulWidget {
   final int specialtyId;
@@ -58,8 +59,8 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
     );
     final reasoning = List<String>.from(crewData['reasoning'] ?? []);
 
-    return Scaffold(
-
+    return AppScaffold(
+      hasAppBar: true,
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -104,8 +105,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
         ),
       ),
 
-      body: SafeArea(
-        child: Padding(padding:  EdgeInsets.all(20.0),
+      body: Padding(padding:  EdgeInsets.all(20.0),
           child: Column(
             children: [
 
@@ -643,78 +643,80 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // 🔹 Back Button
-            Expanded(
-              child: SizedBox(
-                height: 55,
-                child: OutlinedButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(
-                      color: Colors.white.withOpacity(0.3),
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // 🔹 Back Button
+              Expanded(
+                child: SizedBox(
+                  height: 55,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    "Back",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            // 🔸 Continue Button
-            Expanded(
-              child: SizedBox(
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.pushNamed(RouteNames.findingPerfect, extra: {
-                      'bookingId': widget.bookingId,
-                      'contentTypeId': widget.contentTypeId,
-                      'specialtyId': widget.specialtyId,
-                      'ShootTypeId': widget.ShootTypeId,
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child:  Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textHeading,
+                    child: const Text(
+                      "Back",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+
+              const SizedBox(width: 12),
+
+              // 🔸 Continue Button
+              Expanded(
+                child: SizedBox(
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.pushNamed(RouteNames.findingPerfect, extra: {
+                        'bookingId': widget.bookingId,
+                        'contentTypeId': widget.contentTypeId,
+                        'specialtyId': widget.specialtyId,
+                        'ShootTypeId': widget.ShootTypeId,
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child:  Text(
+                      "Continue",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textHeading,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+
         ),
-
-
       ),
     );
   }

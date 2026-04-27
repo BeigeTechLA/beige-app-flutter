@@ -9,6 +9,7 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class ShootTypeScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -98,8 +99,9 @@ String getContentTypeTitle(int contentTypeId) {
     final shootState = ref.watch(shootTypeNotifierProvider(widget.contentTypeId));
     final shootTypes = shootState.shootTypes;
 
-    return Scaffold(
-
+    return AppScaffold(
+      hasAppBar: true,
+      useSafeArea: true,
       appBar: AppBar(
 
         elevation: 0,
@@ -145,8 +147,7 @@ String getContentTypeTitle(int contentTypeId) {
         ),
       ),
 
-      body: SafeArea(
-        child: Padding(
+      body: Padding(
           padding:  EdgeInsets.all(18.0),
           child: Container(
 
@@ -350,58 +351,60 @@ String getContentTypeTitle(int contentTypeId) {
           ),
 
         ),
-      ),
       /// ✅ BOTTOM BAR (FIXED)
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child:  OutlinedButton(
-                onPressed: () => context.pop(widget.bookingId),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.grey),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Expanded(
+                child:  OutlinedButton(
+                  onPressed: () => context.pop(widget.bookingId),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.grey),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: selectedShootTypeId == null
-                    ? null
-                    : () {
-                  _selectShootType();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: selectedIndex == -1
-                      ? AppColors.goldGradientLight // disabled
-                      : AppColors.primary, // enabled
-                  foregroundColor: selectedIndex == -1
-                      ? Colors.grey.shade400
-                      : Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  "Continue",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
+                  child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: selectedShootTypeId == null
+                      ? null
+                      : () {
+                    _selectShootType();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedIndex == -1
+                        ? AppColors.goldGradientLight // disabled
+                        : AppColors.primary, // enabled
+                    foregroundColor: selectedIndex == -1
+                        ? Colors.grey.shade400
+                        : Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
 
-          ],
+            ],
+          ),
         ),
       ),
     );

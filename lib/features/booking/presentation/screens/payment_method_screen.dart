@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/features/payment/presentation/providers/payment_method_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class PaymentMethodScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -113,10 +114,9 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
     );
     final savedCards = paymentState.savedCards;
 
-    return Scaffold(backgroundColor: AppColors.background,
+    return AppScaffold(backgroundColor: AppColors.background,
 
-      body: SafeArea(
-        child: Padding(
+      body: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +292,6 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 

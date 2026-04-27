@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class PaymentSuccessScreen extends ConsumerWidget {
   final int bookingId;
@@ -28,7 +29,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
         context.goNamed(RouteNames.home);
         return false; // ❌ prevent default back
       },
-      child:Scaffold(
+      child:AppScaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(

@@ -14,6 +14,7 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/shared/widgets/loading.dart' show AppLoader;
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class ShootReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -259,9 +260,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       selectedIndex = 0;
     }
 
-    return Scaffold(
-
-
+    return AppScaffold(
+      hasAppBar: true,
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -911,45 +911,48 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         ],
 
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
 
-            // 🔸 Continue Button
-            Expanded(
-              child: SizedBox(
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _openStripeSheet,
+              // 🔸 Continue Button
+              Expanded(
+                child: SizedBox(
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _openStripeSheet,
 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isProcessing
-                        ? AppColors.surfaceVariant // 👈 disabled look
-                        : AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isProcessing
+                          ? AppColors.surfaceVariant // 👈 disabled look
+                          : AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    "Pay \$${NumberFormat('#,##0.00').format(
-                      (pricing?['total_amount'] ?? 0).toDouble(),
-                    )}",
+                    child: Text(
+                      "Pay \$${NumberFormat('#,##0.00').format(
+                        (pricing?['total_amount'] ?? 0).toDouble(),
+                      )}",
 
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textHeading,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textHeading,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+
+
         ),
-
-
       ),
     );
   }

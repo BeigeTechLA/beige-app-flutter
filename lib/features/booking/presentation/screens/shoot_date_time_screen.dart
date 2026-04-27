@@ -9,6 +9,7 @@
   import 'package:beige/shared/widgets/custom_input_field.dart';
   import 'package:beige/app/colors.dart';
   import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
   class ShootDateTimeScreen extends ConsumerStatefulWidget {
 
@@ -1230,7 +1231,8 @@
       final dtState = ref.watch(shootDateTimeNotifierProvider(widget.ShootTypeId));
       _syncEditTypesFromNotifier(dtState);
 
-      return Scaffold(
+      return AppScaffold(
+        hasAppBar: true,
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
@@ -1274,9 +1276,7 @@
           ),
         ),
 
-        body: SafeArea(
-
-          child: Stack(
+        body: Stack(
             children: [
               Padding(
                 padding:  EdgeInsets.all(20.0),
@@ -2368,64 +2368,66 @@
             ],
 
           ),
-        ),
 
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child:  OutlinedButton(
-                  onPressed: () => context.pop(),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.white,
-                    side: const BorderSide(color: AppColors.disabled),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child:  OutlinedButton(
+                    onPressed: () => context.pop(),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.white,
+                      side: const BorderSide(color: AppColors.disabled),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: isFormValid && !isSubmitting
-                      ? () {
-                    debugPrint("✅ Continue clicked");
-                    _ShootDate_Time(); // 🔥 API CALL
-                  }
-                      : null, // ❌ disabled when false
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isFormValid
-                        ? AppColors.primary   // ✅ active
-                        : AppColors.surface,       // ❌ disabled
-                    foregroundColor: isFormValid
-                        ? AppColors.black
-                        : AppColors.disabled,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: isFormValid ? 2 : 0,
-                  ),
-
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontFamily: "Unbounded",
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
+                    child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: isFormValid && !isSubmitting
+                        ? () {
+                      debugPrint("✅ Continue clicked");
+                      _ShootDate_Time(); // 🔥 API CALL
+                    }
+                        : null, // ❌ disabled when false
 
-              ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isFormValid
+                          ? AppColors.primary   // ✅ active
+                          : AppColors.surface,       // ❌ disabled
+                      foregroundColor: isFormValid
+                          ? AppColors.black
+                          : AppColors.disabled,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: isFormValid ? 2 : 0,
+                    ),
+
+                    child: const Text(
+                      "Continue",
+                      style: TextStyle(
+                        fontFamily: "Unbounded",
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+
+                ),
 
 
-            ],
+              ],
+            ),
           ),
         ),
       );

@@ -209,11 +209,22 @@ After each group commit:
 | Screens with custom scroll behavior | SafeArea wraps body, scroll views inside still work |
 | `_MainShell` in router.dart | Bottom nav shell is separate — not wrapped by AppScaffold |
 
+## Progress
+
+| Step | Status | Notes |
+|------|--------|-------|
+| Step 1: Create AppScaffold | ✅ DONE | `lib/shared/layouts/app_scaffold.dart` |
+| Group A: Auth Screens | ⬜ TODO | |
+| Group B: Home Screens | ⬜ TODO | |
+| Group C: Booking Screens | ✅ DONE | 9 files migrated, `flutter analyze` passes (0 errors) |
+| Group D: Shoot Screens | ⬜ TODO | |
+| Group E: Profile Screens | ⬜ TODO | |
+
 ## Definition of Done
 
-- [ ] `AppScaffold` created in `lib/shared/layouts/`
+- [x] `AppScaffold` created in `lib/shared/layouts/`
 - [ ] All 37 non-excluded screens use `AppScaffold`
 - [ ] Zero inline `SafeArea` widgets remain in screen files (except splash/onboarding)
-- [ ] `flutter analyze` passes with zero errors
+- [x] `flutter analyze` passes with zero errors
 - [ ] Visual verification on notched iOS device and Android device
 - [ ] No double-padding visible on any screen

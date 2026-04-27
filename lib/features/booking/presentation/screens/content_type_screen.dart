@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
@@ -111,8 +112,8 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final contentState = ref.watch(contentTypeNotifierProvider);
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
-    return Scaffold(
-
+    return AppScaffold(
+        hasAppBar: true,
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
@@ -165,8 +166,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
           children: [
 
             /// MAIN UI
-            SafeArea(
-              child: AbsorbPointer(
+            AbsorbPointer(
                 absorbing: isLoading, // 🔥 API call ke time click disable
                 child: Opacity(
                   opacity: isLoading ? 0.6 : 1.0, // 🔥 thoda blur/disable feel
@@ -311,7 +311,6 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               ),
 
 
-            ),
           ],
         ));
 

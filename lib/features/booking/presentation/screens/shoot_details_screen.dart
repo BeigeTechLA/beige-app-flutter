@@ -14,6 +14,7 @@ import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class ShootDetailsScreen extends ConsumerStatefulWidget {
   final int specialtyId;
@@ -401,8 +402,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 ''';
 
 
-    return Scaffold(
-
+    return AppScaffold(
+      hasAppBar: true,
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -445,7 +446,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           ],
         ),
       ),
-      body: SafeArea(child:Padding(padding:  EdgeInsets.all(16.0),
+      body: Padding(padding:  EdgeInsets.all(16.0),
       child: Column(
         children: [
       
@@ -1108,59 +1109,61 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       
         ],
       ),
-      
-      )
-      ) ,
 
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Expanded(
-              child:  OutlinedButton(
-                onPressed: () => context.pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.grey),
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isSubmitting ? null : _More_Details,
+      ),
 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  /* backgroundColor: selectedIndex == -1
-                      ? AppColors.goldGradientLight // disabled
-                      : AppColors.primary, // enabled
-                  foregroundColor: selectedIndex == -1
-                      ? Colors.grey.shade400
-                      : Colors.black,*/
-                  padding:  EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+      bottomNavigationBar: SafeArea(
+        bottom:true,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child:  OutlinedButton(
+                  onPressed: () => context.pop(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.grey),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  "Continue",
-                  style: TextStyle(
-                    fontFamily: "Unbounded",
-                    color: AppColors.textHeading,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
+                  child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isSubmitting ? null : _More_Details,
 
-          ],
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    /* backgroundColor: selectedIndex == -1
+                        ? AppColors.goldGradientLight // disabled
+                        : AppColors.primary, // enabled
+                    foregroundColor: selectedIndex == -1
+                        ? Colors.grey.shade400
+                        : Colors.black,*/
+                    padding:  EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                      fontFamily: "Unbounded",
+                      color: AppColors.textHeading,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
+          ),
         ),
       ),
     );
