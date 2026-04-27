@@ -12,7 +12,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_otp_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_otp_state.dart';
-import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ForgotPasswordOtpScreen extends ConsumerStatefulWidget {
   final String email;

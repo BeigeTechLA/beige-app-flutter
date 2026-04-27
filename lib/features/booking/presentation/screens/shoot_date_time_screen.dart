@@ -6,7 +6,7 @@
   import 'package:intl/intl.dart';
 
   import 'package:beige/app/route_names.dart';
-  import 'package:beige/Customtextfiled/CustomInputField.dart';
+  import 'package:beige/shared/widgets/custom_input_field.dart';
   import 'package:beige/app/colors.dart';
   import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 

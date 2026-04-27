@@ -8,10 +8,10 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
-import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
-import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});

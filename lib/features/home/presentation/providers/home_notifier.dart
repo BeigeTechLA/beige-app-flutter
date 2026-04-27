@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../Model/HomeModel.dart';
+import 'package:beige/features/home/data/models/home_model.dart';
 import 'home_providers.dart';
 
 enum HomeStatus { initial, loading, loaded, error }

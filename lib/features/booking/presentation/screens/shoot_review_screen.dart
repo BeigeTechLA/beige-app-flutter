@@ -1,4 +1,4 @@
-import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +8,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:beige/app/route_names.dart';
-import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
 import 'package:beige/service/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/utility/date_time_utils.dart';
-import 'package:beige/widgets/loding.dart' show AppLoader;
+import 'package:beige/shared/widgets/loading.dart' show AppLoader;
 
 class ShootReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;

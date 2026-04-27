@@ -15,7 +15,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:beige/app/route_names.dart';
-import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/service/google_config.dart';
 import 'package:beige/app/colors.dart';

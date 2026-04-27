@@ -11,7 +11,7 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
 import 'package:beige/features/booking/presentation/providers/booking_providers.dart';
-import 'package:beige/widgets/loding.dart' show AppLoader;
+import 'package:beige/shared/widgets/loading.dart' show AppLoader;
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
   final int specialtyId;

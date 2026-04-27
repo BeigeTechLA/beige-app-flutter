@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../app/colors.dart';
-import '../app/radii.dart';
-import '../app/spacing.dart';
-import '../app/text_styles.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 
 class TopMessage {
   static void show(BuildContext context, String message) {

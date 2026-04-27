@@ -11,7 +11,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/service/shared_service.dart';
-import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_otp_notifier.dart';
 
 class DeleteAccountOtpScreen extends ConsumerStatefulWidget {

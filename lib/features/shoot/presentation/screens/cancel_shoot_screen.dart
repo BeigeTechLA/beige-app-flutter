@@ -10,7 +10,7 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/shoot/presentation/providers/cancel_shoot_notifier.dart';
-import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class CancelShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
