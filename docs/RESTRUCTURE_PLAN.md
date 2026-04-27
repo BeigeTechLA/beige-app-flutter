@@ -347,7 +347,7 @@ flutter run --flavor dev -t lib/main_dev.dart
 | 5 | 7 | Shoot screens -> features/shoot/ | DONE — commit `78628ba` |
 | 6 | 2 | Splash + Onboarding -> features/ | DONE — commit `4fd9e49` |
 | 7 | 5 | Shared widgets + orphans | DONE — commit `0bfa605` |
-| 8 | ~8 | Delete dead legacy code | PENDING |
+| 8 | ~8 | Delete dead legacy code | DONE — commit `c402f40` |
 | **Total** | **~52** | **Zero legacy dirs remain** | |
 
 After completion, every Dart file in the project will be in one of: `app/`, `core/`, `features/`, `shared/`, or root entry points. No more directory confusion.
