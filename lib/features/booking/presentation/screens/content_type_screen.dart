@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/route_names.dart';
-import '../../app/colors.dart';
-import '../../features/booking/presentation/providers/content_type_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;

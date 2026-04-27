@@ -7,13 +7,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../app/route_names.dart';
-import '../../Customtextfiled/CustomInputField.dart';
-import '../../features/booking/presentation/providers/booking_review_notifier.dart';
-import '../../service/api_endpoints.dart';
-import '../../app/colors.dart';
-import '../../utility/date_time_utils.dart';
-import '../../widgets/loding.dart' show AppLoader;
+import 'package:beige/app/route_names.dart';
+import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
+import 'package:beige/service/api_endpoints.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/utility/date_time_utils.dart';
+import 'package:beige/widgets/loding.dart' show AppLoader;
 
 class ShootReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;

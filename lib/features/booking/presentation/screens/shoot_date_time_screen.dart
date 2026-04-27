@@ -5,10 +5,10 @@
   import 'package:go_router/go_router.dart';
   import 'package:intl/intl.dart';
 
-  import '../../app/route_names.dart';
-  import '../../Customtextfiled/CustomInputField.dart';
-  import '../../app/colors.dart';
-  import '../../features/booking/presentation/providers/shoot_date_time_notifier.dart';
+  import 'package:beige/app/route_names.dart';
+  import 'package:beige/Customtextfiled/CustomInputField.dart';
+  import 'package:beige/app/colors.dart';
+  import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 
   class ShootDateTimeScreen extends ConsumerStatefulWidget {
 

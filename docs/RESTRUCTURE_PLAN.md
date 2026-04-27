@@ -341,7 +341,7 @@ flutter run --flavor dev -t lib/main_dev.dart
 | Batch | Files | Action | Status |
 |-------|-------|--------|--------|
 | 1 | 6 | Auth screens -> features/auth/ | DONE — commit `0205466` |
-| 2 | 5 | Home screens -> features/home/ | PENDING |
+| 2 | 5 | Home screens -> features/home/ | DONE — commit `96ed864` |
 | 3 | 9 | Booking screens -> features/booking/ | PENDING |
 | 4 | 10 | Profile screens -> features/profile/ | PENDING |
 | 5 | 7 | Shoot screens -> features/shoot/ | PENDING |

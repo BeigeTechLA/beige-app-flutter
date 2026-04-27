@@ -4,9 +4,9 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/colors.dart';
-import '../../app/route_names.dart';
-import '../../features/payment/presentation/providers/payment_method_notifier.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/features/payment/presentation/providers/payment_method_notifier.dart';
 
 class PaymentMethodScreen extends ConsumerStatefulWidget {
   final int bookingId;

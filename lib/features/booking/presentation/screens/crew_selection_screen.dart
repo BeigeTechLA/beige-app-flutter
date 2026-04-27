@@ -6,12 +6,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../app/route_names.dart';
-import '../../core/network/api_endpoints.dart';
-import '../../app/colors.dart';
-import '../../features/booking/presentation/providers/crew_selection_notifier.dart';
-import '../../features/booking/presentation/providers/booking_providers.dart';
-import '../../widgets/loding.dart' show AppLoader;
+import 'package:beige/app/route_names.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
+import 'package:beige/features/booking/presentation/providers/booking_providers.dart';
+import 'package:beige/widgets/loding.dart' show AppLoader;
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
   final int specialtyId;

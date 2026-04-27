@@ -9,11 +9,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
-import '../../app/route_names.dart';
-import '../../Customtextfiled/CustomInputField.dart';
-import '../../service/google_config.dart';
-import '../../app/colors.dart';
-import '../../features/booking/presentation/providers/shoot_details_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/service/google_config.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
 
 class ShootDetailsScreen extends ConsumerStatefulWidget {
   final int specialtyId;
