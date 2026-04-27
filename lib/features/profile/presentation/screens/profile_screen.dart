@@ -5,11 +5,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart' show Lottie;
 
-import '../app/route_names.dart';
-import '../core/providers/auth_state_provider.dart';
-import '../service/shared_service.dart';
-import '../app/colors.dart';
-import '../features/profile/presentation/providers/profile_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/core/providers/auth_state_provider.dart';
+import 'package:beige/service/shared_service.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});

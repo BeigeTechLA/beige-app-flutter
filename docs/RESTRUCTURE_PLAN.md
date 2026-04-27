@@ -342,7 +342,7 @@ flutter run --flavor dev -t lib/main_dev.dart
 |-------|-------|--------|--------|
 | 1 | 6 | Auth screens -> features/auth/ | DONE — commit `0205466` |
 | 2 | 5 | Home screens -> features/home/ | DONE — commit `96ed864` |
-| 3 | 9 | Booking screens -> features/booking/ | PENDING |
+| 3 | 9 | Booking screens -> features/booking/ | DONE — commit `04a4a52` |
 | 4 | 10 | Profile screens -> features/profile/ | PENDING |
 | 5 | 7 | Shoot screens -> features/shoot/ | PENDING |
 | 6 | 2 | Splash + Onboarding -> features/ | PENDING |

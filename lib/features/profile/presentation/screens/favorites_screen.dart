@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/network/api_endpoints.dart';
-import '../app/colors.dart';
-import '../features/profile/presentation/providers/favourites_notifier.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/profile/presentation/providers/favourites_notifier.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});

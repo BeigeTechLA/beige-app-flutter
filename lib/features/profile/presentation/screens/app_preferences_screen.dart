@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../app/colors.dart';
-import '../app/route_names.dart';
-import '../app/text_styles.dart';
-import '../app/radii.dart';
-import '../app/assets.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/assets.dart';
 
 class AppPreferencesScreen extends ConsumerWidget {
   const AppPreferencesScreen({super.key});

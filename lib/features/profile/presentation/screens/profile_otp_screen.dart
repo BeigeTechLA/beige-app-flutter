@@ -5,12 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../app/route_names.dart';
-import '../app/colors.dart';
-import '../app/text_styles.dart';
-import '../widgets/TopMessage.dart';
-import '../features/auth/presentation/providers/forgot_password_otp_notifier.dart';
-import '../features/auth/presentation/providers/forgot_password_otp_state.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/widgets/TopMessage.dart';
+import 'package:beige/features/auth/presentation/providers/forgot_password_otp_notifier.dart';
+import 'package:beige/features/auth/presentation/providers/forgot_password_otp_state.dart';
 
 class ProfileOtpScreen extends ConsumerStatefulWidget {
   final String email;

@@ -14,12 +14,12 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../app/route_names.dart';
-import '../Customtextfiled/CustomInputField.dart';
-import '../core/network/api_endpoints.dart';
-import '../service/google_config.dart';
-import '../app/colors.dart';
-import '../features/profile/presentation/providers/edit_profile_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/service/google_config.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});

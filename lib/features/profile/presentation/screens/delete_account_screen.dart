@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../app/route_names.dart';
-import '../../app/colors.dart';
-import '../../app/text_styles.dart';
-import '../../app/radii.dart';
-import '../../features/profile/presentation/providers/delete_account_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/features/profile/presentation/providers/delete_account_notifier.dart';
 
 class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
