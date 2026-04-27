@@ -5,14 +5,14 @@ import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../app/route_names.dart';
-import '../Customtextfiled/CustomInputField.dart';
-import '../features/booking/presentation/providers/shoot_type_selection_notifier.dart';
-import '../app/colors.dart';
-import '../app/text_styles.dart';
-import '../app/spacing.dart';
-import '../app/radii.dart';
-import '../app/assets.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/Customtextfiled/CustomInputField.dart';
+import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/assets.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   final int bookingId;

@@ -4,11 +4,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../app/route_names.dart';
-import '../core/network/api_endpoints.dart';
-import '../app/colors.dart';
-import '../app/assets.dart';
-import '../features/shoot/presentation/providers/shoot_edit_review_notifier.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/app/assets.dart';
+import 'package:beige/features/shoot/presentation/providers/shoot_edit_review_notifier.dart';
 
 class ShootEditReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;

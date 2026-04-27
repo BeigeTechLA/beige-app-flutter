@@ -4,37 +4,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
-import '../app/route_names.dart';
-import '../core/network/api_endpoints.dart';
-import '../app/colors.dart';
-import '../features/shoot/presentation/providers/cancel_shoot_notifier.dart';
-import '../widgets/TopMessage.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/app/colors.dart';
+import 'package:beige/utility/date_time_utils.dart';
 
-class CancelShootScreen extends ConsumerStatefulWidget {
+class ManageShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
-
-  final String? projectName;
-  final String? eventDate;
-  final String? startTime;
-  final String? endTime;
-  final int? durationHours;
-  final String? location;
+  final String ? projectName;
+  final String ? eventDate;
+  final String ?startTime;
+  final String ?endTime;
+  final double ?durationHours;
+  final String ?location;
   final String? contentType;
-  final String? imageUrl;
+  final int shootTypeId;
+  final List<dynamic>? multiDays;
 
-  const CancelShootScreen({super.key, required this.bookingId, this.projectName, this.eventDate, this.startTime, this.endTime, this.durationHours, this.location, this.contentType, this.imageUrl});
+  final String ?imageUrl;
+  const ManageShootScreen({super.key,
+    required this.bookingId,
+     this.projectName,
+     this.eventDate,
+     this.startTime,
+     this.endTime,
+     this.durationHours,
+     this.location,
+     this.imageUrl,
+    this.contentType, required this.shootTypeId,
+    this.multiDays,
+  });
 
   @override
-  ConsumerState<CancelShootScreen> createState() => _CancelShootScreenState();
+  ConsumerState<ManageShootScreen> createState() => _ManageShootScreenState();
+
 }
 
-class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
-
-  void _showSnack(String message) {
-    TopMessage.show(context, message);
-  }
+class _ManageShootScreenState
+    extends ConsumerState<ManageShootScreen> {
 
   String _getFullImageUrl() {
     final url = widget.imageUrl ?? "";
@@ -43,31 +51,9 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
     return '${ApiEndpoints.imageUrl}$url';
   }
 
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "--";
-    final parsed = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsed);
-  }
-
-  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "--";
-    final parsed = DateTime.parse(date);
-    return DateFormat("dd MMM yyyy").format(parsed);
-  }
 
   @override
   Widget build(BuildContext context) {
-    final cancelState = ref.watch(cancelShootNotifierProvider);
-    final isCancelling = cancelState.status == CancelShootStatus.cancelling;
-
-    ref.listen<CancelShootState>(cancelShootNotifierProvider, (prev, next) {
-      if (next.status == CancelShootStatus.cancelled) {
-        _showAppointmentCancelledDialog(context);
-      } else if (next.status == CancelShootStatus.error) {
-        _showSnack(next.errorMessage ?? "Failed to cancel booking");
-      }
-    });
-
     return Scaffold(
       body: Stack(
         children: [
@@ -77,6 +63,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
+                /// 🔹 FULL IMAGE
                 _getFullImageUrl().isNotEmpty
                     ? Image.network(
                   _getFullImageUrl(),
@@ -84,27 +71,28 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                   errorBuilder: (_, __, ___) {
                     return SvgPicture.asset(
                       "assets/svg/imag_placeholder.svg",
-
                       fit: BoxFit.cover,
                     );
                   },
                 )
                     : SvgPicture.asset(
-        "assets/svg/imag_placeholder.svg",
+                  "assets/svg/imag_placeholder.svg",
+                  fit: BoxFit.cover,
+                ),
 
-        fit: BoxFit.cover,
-      ),
-
+                /// 🔹 BLUR EFFECT
                 BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  filter: ImageFilter.blur(
+                    sigmaX: 12, // 👈 horizontal blur
+                    sigmaY: 12, // 👈 vertical blur
+                  ),
                   child: Container(
-                    color: Colors.black.withValues(alpha:0.25),
+                    color: Colors.black.withValues(alpha:0.25), // 👈 dark tint
                   ),
                 ),
               ],
             ),
           ),
-
 
 
           /// 🔹 BOTTOM MANAGE BOOKING CARD
@@ -135,7 +123,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 14),
+                   SizedBox(height: 14),
 
                   /// 🔹 HEADER
                   Row(
@@ -145,7 +133,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Cancel Booking",
+                            "Manage Shoots",
                             style:  TextStyle(
                                 color: AppColors.white,
                                 fontSize: 16,
@@ -155,7 +143,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            "Are you sure you’d like to cancel \nthis appointment?.",
+                            "View, reschedule, or cancel your upcoming \nappointments.",
                             style:  TextStyle(
                                 color: AppColors.white70,
                                 fontSize: 14,
@@ -166,11 +154,11 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
+                        icon:  Icon(Icons.close, color: Colors.white),
                         onPressed: () {
                           context.pop();
                         },
-                      ),
+                      )
 
                     ],
                   ),
@@ -193,11 +181,24 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(14),
                               child: _getFullImageUrl().isNotEmpty
-                                  ? Image.network(
-                                _getFullImageUrl(),
+                                  ? Image(
+                                image: ResizeImage(
+                                  NetworkImage(_getFullImageUrl()),
+                                  width: 400,
+                                ),
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
+
+                                frameBuilder: (context, child, frame, wasLoaded) {
+                                  if (wasLoaded) return child;
+                                  return AnimatedOpacity(
+                                    opacity: frame == null ? 0 : 1,
+                                    duration: const Duration(milliseconds: 250),
+                                    child: child,
+                                  );
+                                },
+
                                 errorBuilder: (_, __, ___) {
                                   return SvgPicture.asset(
                                     "assets/svg/imag_placeholder.svg",
@@ -215,7 +216,9 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                               ),
                             ),
 
-                            const SizedBox(width: 14),
+
+
+                            SizedBox(width: 14),
 
                             Expanded(
                               child: Column(
@@ -231,24 +234,25 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                       fontFamily: "Outfit",
                                     ),
                                   ),
-
+                                  SizedBox(height: 2),
                                   Text(
-                                    widget.contentType ?? "",
+                                    widget.contentType ?? '',
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.white70,
+                                      fontSize: 12, color: AppColors.white70,
                                       fontFamily: "Outfit",
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
 
                                   SizedBox(height: 10),
+
                                 ],
                               ),
                             )
                           ],
                         ),
 
-                        SizedBox(height: 14),
+                         SizedBox(height: 14),
 
                         SizedBox(
                           height: 1,
@@ -282,60 +286,58 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                               color: Colors.white.withValues(alpha:0.9),
                             ),
                           ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                          child:Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
 
-                                /// 🔵 MULTI DAY
-                                if (widget.eventDate != null && widget.eventDate!.contains(",")) ...[
+                              /// 🔵 MULTI DAY (comma detect)
+                              if (widget.multiDays != null && widget.multiDays!.isNotEmpty) ...[
 
-                                  ...widget.eventDate!.split(",").map((date) {
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
+                                /// 🔵 REAL MULTI DAY
+                                ...widget.multiDays!.map((day) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
 
-                                        infoRowBlack(
-                                          "assets/svg/Frame.svg",
-                                          formatDate(date.trim()),
-                                        ),
+                                      infoRowBlack(
+                                        "assets/svg/Frame.svg",
+                                        DateTimeUtils.formatDate(day['date']),
+                                      ),
 
-                                        infoRowBlack(
-                                          "assets/svg/Group 2087328870.svg",
-                                          "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
-                                              "(${widget.durationHours ?? 0}h)",
-                                        ),
+                                      infoRowBlack(
+                                        "assets/svg/Group 2087328870.svg",
+                                        "${DateTimeUtils.formatTime(day['start_time'])} to ${DateTimeUtils.formatTime(day['end_time'])} "
+                                            "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())}))",
+                                      ),
 
-                                        const SizedBox(height: 10),
-                                      ],
-                                    );
-                                  }).toList(),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  );
+                                }).toList(),
 
-                                ] else ...[
+                              ] else ...[
 
-                                  /// 🟢 SINGLE DAY
-                                  infoRowBlack(
-                                    "assets/svg/Frame.svg",
-                                    formatDate(widget.eventDate),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  infoRowBlack(
-                                    "assets/svg/Group 2087328870.svg",
-                                    "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
-                                        "(${widget.durationHours ?? 0}h)",
-                                  ),
-                                ],
+                                /// 🟢 SINGLE DAY
+                                infoRowBlack(
+                                  "assets/svg/Frame.svg",
+                                    DateTimeUtils.formatDate(widget.eventDate)
+                                ),
 
                                 const SizedBox(height: 8),
-
-                                /// 📍 LOCATION
                                 infoRowBlack(
-                                  "assets/svg/location.svg",
-                                  widget.location ?? "",
+                                  "assets/svg/Group 2087328870.svg",
+                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
+                                      "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
                                 ),
                               ],
-                            )
+                              const SizedBox(height: 8),
+                              /// 📍 LOCATION
+                              infoRowBlack(
+                                "assets/svg/location.svg",
+                                widget.location ?? "Location not available",
+                              ),
+                            ],
+                          )
                         ),
 
                         const SizedBox(height: 20),
@@ -343,6 +345,55 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                         /// 🔹 ACTION BUTTONS
                         Row(
                           children: [
+                            // ✅ Back Button
+                            Expanded(
+                              child: SizedBox(
+                                height: 55,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.textHeading,
+                                    side: const BorderSide(
+                                      color: AppColors.white70,
+                                      width: 0.5,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    context.pushNamed(
+                                      RouteNames.cancelBooking,
+                                      pathParameters: {
+                                        'bookingId': widget.bookingId.toString()
+                                      },
+                                      extra: {
+                                        'projectName': widget.projectName,
+                                        'eventDate': widget.eventDate,
+                                        'startTime': widget.startTime,
+                                        'endTime': widget.endTime,
+                                        'durationHours': widget.durationHours?.toInt(),
+                                        'location': widget.location,
+                                        'contentType': widget.contentType,
+                                        'imageUrl': widget.imageUrl,
+                                      },
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontFamily: 'Unbounded',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // const SizedBox(width: 12),
+
+                            // ✅ Next Button
                             Expanded(
                               child: SizedBox(
                                 height: 55,
@@ -354,26 +405,22 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  onPressed: isCancelling
-                                      ? null
-                                      : () => ref.read(cancelShootNotifierProvider.notifier)
-                                          .cancelShoot(bookingId: widget.bookingId),
-
-                                  child: isCancelling
-                                      ?  CircularProgressIndicator(
-                                    color: AppColors.textHeading,
-                                    strokeWidth: 2,
-                                  )
-                                      : const Text(
-                                    "Yes, Cancel",
+                                  onPressed: () {
+                                    context.goNamed(
+                                      RouteNames.selectBookingType,
+                                      pathParameters: {'bookingId': widget.bookingId.toString()},
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Reschedule",//
                                     style: TextStyle(
                                       color: AppColors.textHeading,
-                                      fontFamily: 'Unbounded',
+                                      fontFamily: 'Unbounded',   // ← Add this
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
+                                      // Looks cleaner in Unbounded
                                     ),
                                   ),
-
 
                                 ),
                               ),
@@ -391,18 +438,24 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
       ),
     );
   }
-  Widget infoRowBlack(String iconPath,  String text) {
+  Widget infoRowBlack(String iconPath ,String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SvgPicture.asset(
-          iconPath,
-        ),
+  SvgPicture.asset(
+  iconPath,
+  height: 16,
+  width: 16,
+  colorFilter: const ColorFilter.mode(
+    Colors.black87,
+    BlendMode.srcIn,
+  ),
+  ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
-            style:  TextStyle(
+            style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.black,
                 fontFamily: "Outfit",
@@ -414,116 +467,5 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
       ],
     );
   }
-  void _showAppointmentCancelledDialog(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Schedule Updated",
-      barrierColor: Colors.black.withValues(alpha:0.35), // dark overlay
-      transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // 🔥 BLUR STRENGTH
-          child: Center(
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                margin: EdgeInsets.all(20),
-                // margin: const EdgeInsets.symmetric(horizontal: 24),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
 
-                    /// 🔹 ICON STACK
-
-                    Image.asset(
-                      "assets/images/Group 1171276698 (1).png",
-                      height: 64,
-                      width: 64,
-                      fit: BoxFit.contain,
-                    ),
-
-
-                    const SizedBox(height: 16),
-
-                    /// 🔹 TITLE
-                     Text(
-                      "Appointment Cancelled",
-                      style: TextStyle(
-                        fontFamily: "Unbounded",
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    /// 🔹 SUBTITLE
-                    const Text(
-                      "Your appointment is no longer\nscheduled",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.white70,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-
-                        // ✅ Next Button
-                        Expanded(
-                          child: SizedBox(
-                            height: 55,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side:  BorderSide(
-                                    color: AppColors.white70,width: 0.5 // 👈 border color
-                                  ),
-                                ),
-
-                              ),
-                              onPressed: () {
-                                context.goNamed(RouteNames.home);
-                              },
-                              child: const Text(
-                                "Explore",
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontFamily: 'Unbounded',   // ← Add this
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
-

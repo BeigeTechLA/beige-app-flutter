@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'app/colors.dart';
 import 'app/text_styles.dart';
 
-import 'my_shoot/my_shoots_screen.dart';
+import 'features/shoot/presentation/screens/my_shoots_screen.dart';
 import 'features/booking/presentation/screens/content_type_screen.dart';
 import 'features/home/presentation/screens/home_screen.dart';
 
