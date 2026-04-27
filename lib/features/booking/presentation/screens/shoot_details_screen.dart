@@ -351,6 +351,9 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Keep provider alive during async saveDetails call
+    ref.watch(shootDetailsNotifierProvider(widget.bookingId));
+
     String _darkMapStyle = '''
 [
   {

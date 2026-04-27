@@ -79,23 +79,15 @@
 
     int getTotalSelectedDurationInMinutes() {
       if (selectedIndex == 1) {
-        final start = convertStringToTime(startTimeStr);
-        final end = convertStringToTime(endTimeStr);
-
-        if (start == null || end == null) return 0;
-
-        return _calculateDurationInMinutes(start, end);
+        if (startTime == null || endTime == null) return 0;
+        return _calculateDurationInMinutes(startTime!, endTime!);
       }
 
       if (selectedDates.isEmpty) return 0;
 
       if (istimingsame) {
-        final start = convertStringToTime(startTimeStr);
-        final end = convertStringToTime(endTimeStr);
-
-        if (start == null || end == null) return 0;
-
-        return _calculateDurationInMinutes(start, end) * selectedDates.length;
+        if (startTime == null || endTime == null) return 0;
+        return _calculateDurationInMinutes(startTime!, endTime!) * selectedDates.length;
       }
 
       int totalMinutes = 0;
@@ -466,10 +458,10 @@
       final startMinutes = start.hour * 60 + start.minute;
       final endMinutes = end.hour * 60 + end.minute;
 
-      /// ✅ SAME DAY
+      /// SAME DAY
       if (endMinutes > startMinutes) return true;
 
-      /// ✅ NEXT DAY ALLOW
+      /// NEXT DAY ALLOW
       return true;
     }
     bool get isFormValid {
@@ -1127,6 +1119,112 @@
       controller.text = "$hour:$minute $period";
     }
 
+    Future<void> _selectTime(
+      BuildContext context,
+      TextEditingController? controller,
+      bool isStartTime,
+      DateTime? date,
+    ) async {
+      final now = DateTime.now();
+
+      bool isToday = false;
+      if (date != null) {
+        isToday = date.year == now.year &&
+            date.month == now.month &&
+            date.day == now.day;
+      } else {
+        isToday = isTodaySelected();
+      }
+
+      TimeOfDay initial;
+      if (isToday && isStartTime) {
+        final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
+        final minAllowed = roundedNow.add(const Duration(hours: 4));
+        initial = TimeOfDay.fromDateTime(minAllowed);
+      } else {
+        if (date != null) {
+          initial = isStartTime
+              ? (startTimes[date] ?? TimeOfDay.now())
+              : (endTimes[date] ?? TimeOfDay.now());
+        } else {
+          initial = isStartTime
+              ? (startTime ?? TimeOfDay.now())
+              : (endTime ?? TimeOfDay.now());
+        }
+      }
+
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: initial,
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              dialogBackgroundColor: const Color(0xFF121212),
+              colorScheme: const ColorScheme.dark(
+                primary: AppColors.primary,
+                onPrimary: Colors.white,
+                surface: Color(0xFF1E1E1E),
+                onSurface: Colors.white,
+              ),
+              timePickerTheme: const TimePickerThemeData(
+                backgroundColor: Color(0xFF121212),
+                dialBackgroundColor: Color(0xFF121212),
+                dialHandColor: Colors.white,
+                dialTextColor: Colors.grey,
+                hourMinuteColor: AppColors.primary,
+                hourMinuteTextColor: Colors.black,
+                dayPeriodColor: AppColors.primary,
+                dayPeriodTextColor: Colors.white,
+              ),
+            ),
+            child: child!,
+          );
+        },
+      );
+
+      if (picked == null || !mounted) return;
+
+      if (isToday) {
+        final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
+        final minAllowed = roundedNow.add(const Duration(hours: 4));
+        final baseDate = date ?? selectedDate!;
+        final pickedDT = DateTime(
+          baseDate.year, baseDate.month, baseDate.day,
+          picked.hour, picked.minute,
+        );
+        if (pickedDT.isBefore(minAllowed)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Select time after 4 hours")),
+          );
+          return;
+        }
+      }
+
+      setState(() {
+        if (date != null) {
+          if (isStartTime) {
+            startTimes[date] = picked;
+            endTimes[date] = null;
+          } else {
+            endTimes[date] = picked;
+          }
+        } else {
+          if (isStartTime) {
+            startTime = picked;
+            endTime = null;
+            endTimeController.clear();
+            if (controller != null) _updateTimeText(controller, picked);
+          } else {
+            if (startTime != null && !isEndTimeAfterStart(startTime!, picked)) {
+              return;
+            }
+            endTime = picked;
+            if (controller != null) _updateTimeText(controller, picked);
+          }
+        }
+      });
+    }
+
     @override
     Widget build(BuildContext context) {
       final dtState = ref.watch(shootDateTimeNotifierProvider(widget.ShootTypeId));
@@ -1254,6 +1352,12 @@
                       endTimeMap.clear();
                       isStartOpen = false;
                       isEndOpen = false;
+                      startTime = null;
+                      endTime = null;
+                      startTimeController.clear();
+                      endTimeController.clear();
+                      startTimes.clear();
+                      endTimes.clear();
                       });
                       },
                                     child: Container(
@@ -1345,6 +1449,12 @@
                                         endTimeMap.clear();
                                         isStartOpen = false;
                                         isEndOpen = false;
+                                        startTime = null;
+                                        endTime = null;
+                                        startTimeController.clear();
+                                        endTimeController.clear();
+                                        startTimes.clear();
+                                        endTimes.clear();
                                       });
                                     },
                                     child: Container(
@@ -1659,49 +1769,40 @@
                                                     ),
                                                   ),*/
 
-                                                  buildTimeDropdown(
-                                                    key: ValueKey("${date.toString()}_start"),
+                                                  CustomInputField(
                                                     title: "Start Time",
-                                                    selectedTime: startTimeMap[normalizeDate(date)],
-                                                    isStart: true,
-                                                    date: date,
-                                                    onSelect: (val) {
-                                                      final key = normalizeDate(date);
-
-                                                      setState(() {
-                                                        startTimeMap[key] = val;
-                                                        endTimeMap[key] = null;
-
-                                                        final dt = parseTime(val, key);
-
-                                                        startTimes[key] = TimeOfDay(
-                                                          hour: dt.hour,
-                                                          minute: dt.minute,
-                                                        );
-                                                      });
+                                                    controller: TextEditingController(
+                                                      text: startTimes[normalizeDate(date)]?.format(context) ?? "",
+                                                    ),
+                                                    readOnly: true,
+                                                    onTap: () {
+                                                      _selectTime(context, null, true, date);
                                                     },
+                                                    suffixIcon: Padding(
+                                                      padding: const EdgeInsets.all(12),
+                                                      child: SvgPicture.asset(
+                                                        "assets/svg/Group 2087328870.svg",
+                                                        color: AppColors.white,
+                                                      ),
+                                                    ),
                                                   ),
-                                                  SizedBox(height: 10,),
-                                                  buildTimeDropdown(
-                                                    key: ValueKey("${date.toString()}_end"),
+                                                  SizedBox(height: 30,),
+                                                  CustomInputField(
                                                     title: "End Time",
-                                                    selectedTime: endTimeMap[normalizeDate(date)],
-                                                    isStart: false,
-                                                    date: date,
-                                                    onSelect: (val) {
-                                                      final key = normalizeDate(date);
-
-                                                      setState(() {
-                                                        endTimeMap[key] = val;
-
-                                                        final dt = parseTime(val, key);
-
-                                                        endTimes[key] = TimeOfDay(
-                                                          hour: dt.hour,
-                                                          minute: dt.minute,
-                                                        );
-                                                      });
+                                                    controller: TextEditingController(
+                                                      text: endTimes[normalizeDate(date)]?.format(context) ?? "",
+                                                    ),
+                                                    readOnly: true,
+                                                    onTap: () {
+                                                      _selectTime(context, null, false, date);
                                                     },
+                                                    suffixIcon: Padding(
+                                                      padding: const EdgeInsets.all(12),
+                                                      child: SvgPicture.asset(
+                                                        "assets/svg/Group 2087328870.svg",
+                                                        color: AppColors.white,
+                                                      ),
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 16),
 
@@ -1790,42 +1891,54 @@
                                     ),
                                   ),
                                 ),*/
-      buildTimeDropdown(
-      title: "Start Time",
-      selectedTime: startTimeStr,
-      isStart: true,
-        onSelect: (val) {
-          setState(() {
-            startTimeStr = val;
-            endTimeStr = null;
+                                CustomInputField(
+                                  title: "Start Time",
+                                  controller: startTimeController,
+                                  readOnly: true,
+                                  onTap: () {
+                                    if (selectedDates.isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Please select date first")),
+                                      );
+                                      return;
+                                    }
+                                    _selectTime(context, startTimeController, true, null);
+                                  },
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: SvgPicture.asset(
+                                      "assets/svg/Group 2087328870.svg",
+                                      color: AppColors.white,
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
+                                ),
 
-            final dt = parseTime(val, selectedDate ?? DateTime.now());
+                                SizedBox(height: 30),
 
-            startTime = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-            );
-          });
-        },
-      ),
-                                SizedBox(height: 10,),
-      buildTimeDropdown(
-      title: "End Time",
-      selectedTime: endTimeStr,
-      isStart: false,
-        onSelect: (val) {
-          setState(() {
-            endTimeStr = val;
-
-            final dt = parseTime(val, selectedDate ?? DateTime.now());
-
-            endTime = TimeOfDay(
-              hour: dt.hour,
-              minute: dt.minute,
-            );
-          });
-        },
-
+                                CustomInputField(
+                                  title: "End Time",
+                                  controller: endTimeController,
+                                  readOnly: true,
+                                  onTap: () {
+                                    if (selectedDates.isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Please select date first")),
+                                      );
+                                      return;
+                                    }
+                                    _selectTime(context, endTimeController, false, null);
+                                  },
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: SvgPicture.asset(
+                                      "assets/svg/Group 2087328870.svg",
+                                      color: AppColors.white,
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 SizedBox(height: 12),
@@ -1883,8 +1996,8 @@
 
                                             /// 🔥 DYNAMIC TIME
                                             Text(
-      startTimeStr != null && endTimeStr != null
-      ? "$startTimeStr – $endTimeStr"
+      startTime != null && endTime != null
+      ? "${startTime!.format(context)} – ${endTime!.format(context)}"
           : "Select Time",
                                               style: TextStyle(
                                                 fontFamily: "Helvetica Neue",
@@ -1964,27 +2077,52 @@
                           SizedBox(height: 30,),
 
 
-                          buildTimeDropdown(
+                          CustomInputField(
                             title: "Start Time",
-                            selectedTime: startTimeStr,
-                            isStart: true,
-                            onSelect: (val) {
-                              setState(() {
-                                startTimeStr = val;
-                                endTimeStr = null; // reset end
-                              });
+                            controller: startTimeController,
+                            readOnly: true,
+                            onTap: () {
+                              if (selectedDate == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please select date first")),
+                                );
+                                return;
+                              }
+                              _selectTime(context, startTimeController, true, null);
                             },
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: SvgPicture.asset(
+                                "assets/svg/Group 2087328870.svg",
+                                color: AppColors.white,
+                                width: 20,
+                                height: 20,
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 10,),
-                          buildTimeDropdown(
+                          SizedBox(height: 30,),
+                          CustomInputField(
                             title: "End Time",
-                            selectedTime: endTimeStr,
-                            isStart: false,
-                            onSelect: (val) {
-                              setState(() {
-                                endTimeStr = val;
-                              });
+                            controller: endTimeController,
+                            readOnly: true,
+                            onTap: () {
+                              if (selectedDate == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please select date first")),
+                                );
+                                return;
+                              }
+                              _selectTime(context, endTimeController, false, null);
                             },
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: SvgPicture.asset(
+                                "assets/svg/Group 2087328870.svg",
+                                color: AppColors.white,
+                                width: 20,
+                                height: 20,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                         ],
