@@ -346,7 +346,7 @@ flutter run --flavor dev -t lib/main_dev.dart
 | 4 | 10 | Profile screens -> features/profile/ | DONE — commit `1db273a` |
 | 5 | 7 | Shoot screens -> features/shoot/ | DONE — commit `78628ba` |
 | 6 | 2 | Splash + Onboarding -> features/ | DONE — commit `4fd9e49` |
-| 7 | 5 | Shared widgets + orphans | PENDING |
+| 7 | 5 | Shared widgets + orphans | DONE — commit `0bfa605` |
 | 8 | ~8 | Delete dead legacy code | PENDING |
 | **Total** | **~52** | **Zero legacy dirs remain** | |
 

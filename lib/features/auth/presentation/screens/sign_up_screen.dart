@@ -23,7 +23,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/auth/presentation/providers/signup_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/signup_state.dart';
-import 'package:beige/service/google_config.dart';
+import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
 

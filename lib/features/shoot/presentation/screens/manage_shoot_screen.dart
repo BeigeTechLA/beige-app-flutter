@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
-import 'package:beige/utility/date_time_utils.dart';
+import 'package:beige/core/utils/date_time_utils.dart';
 
 class ManageShootScreen extends ConsumerStatefulWidget {
   final int bookingId;

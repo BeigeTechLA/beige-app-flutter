@@ -1,4 +1,4 @@
-import 'package:beige/utility/date_time_utils.dart';
+import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';

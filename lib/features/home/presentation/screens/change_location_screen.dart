@@ -12,7 +12,7 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
-import 'package:beige/service/google_config.dart';
+import 'package:beige/core/utils/google_config.dart';
 
 class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});

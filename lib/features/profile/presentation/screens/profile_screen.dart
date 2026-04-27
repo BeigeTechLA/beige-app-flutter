@@ -7,7 +7,7 @@ import 'package:lottie/lottie.dart' show Lottie;
 
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
-import 'package:beige/service/shared_service.dart';
+import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 
