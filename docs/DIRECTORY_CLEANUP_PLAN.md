@@ -28,7 +28,7 @@
 | `lib/auth/reset_password_screen.dart` | `lib/features/auth/presentation/screens/reset_password_screen.dart` | |
 | `lib/auth/password_reset_success_screen.dart` | `lib/features/auth/presentation/screens/password_reset_success_screen.dart` | |
 
-**Delete when empty:** `lib/auth/`
+**Delete when empty:** `lib/auth/` — ✅ DELETED (commit `093ca24`, 6 files, 2,979 lines)
 
 ---
 
@@ -47,7 +47,7 @@
 | `lib/MyProfile/DeleteAccount/delete_account_screen.dart` | `lib/features/profile/presentation/screens/delete_account_screen.dart` |
 | `lib/MyProfile/DeleteAccount/delete_account_otp_screen.dart` | `lib/features/profile/presentation/screens/delete_account_otp_screen.dart` |
 
-**Delete when empty:** `lib/MyProfile/DeleteAccount/`, then `lib/MyProfile/`
+**Delete when empty:** `lib/MyProfile/DeleteAccount/`, then `lib/MyProfile/` — ✅ DELETED (commit `b51b652`, 10 files, 3,212 lines)
 
 ---
 
@@ -62,7 +62,7 @@
 | `lib/Home/home/change_location_screen.dart` | `lib/features/home/presentation/screens/change_location_screen.dart` |
 | `lib/Home/home/find_creative_screen.dart` | `lib/features/home/presentation/screens/find_creative_screen.dart` |
 
-**Delete when empty:** `lib/Home/home/`
+**Delete when empty:** `lib/Home/home/` — ✅ DELETED (included in commit `89e3f17`)
 
 ---
 
@@ -80,7 +80,7 @@
 | `lib/Home/book_shoot/payment_method_screen.dart` | `lib/features/booking/presentation/screens/payment_method_screen.dart` |
 | `lib/Home/book_shoot/payment_success_screen.dart` | `lib/features/booking/presentation/screens/payment_success_screen.dart` |
 
-**Delete when empty:** `lib/Home/book_shoot/`, then `lib/Home/` (if all subdirs gone)
+**Delete when empty:** `lib/Home/book_shoot/`, then `lib/Home/` — ✅ DELETED (commit `89e3f17`, 15 files, 15,157 lines — entire `lib/Home/` removed)
 
 ---
 
@@ -96,29 +96,32 @@
 | `lib/my_shoot/cancel_shoot_screen.dart` | `lib/features/my_shoots/presentation/screens/cancel_shoot_screen.dart` |
 | `lib/my_shoot/shoot_update_success_screen.dart` | `lib/features/my_shoots/presentation/screens/shoot_update_success_screen.dart` |
 
-**Delete when empty:** `lib/my_shoot/`
+**Delete when empty:** `lib/my_shoot/` — ✅ DELETED (commit `d7ed723`, 7 files, 5,821 lines)
 
 ---
 
 ### Final Cleanup (Group 7 — Infrastructure)
 
-| Old File/Dir | Action | Condition |
-|---|---|---|
-| `lib/service/api_service.dart` | Delete | All 32 screen callers migrated to repositories |
-| `lib/service/api_endpoints.dart` | Delete | Bridge file; all imports point to `lib/core/network/api_endpoints.dart` |
-| `lib/service/shared_service.dart` | Refactor → move to `lib/core/` | Extract reusable parts (token, login details) into auth repository |
-| `lib/service/internet_service.dart` | Move to `lib/core/` or wrap in provider | Already fixed, needs Riverpod wrapping |
-| `lib/service/google_config.dart` | Evaluate | Keep if still needed, move to `lib/core/` |
-| `lib/service/` | Delete directory | When all files moved/deleted |
-| `lib/utility/ColorCode.dart` | Delete | Already replaced by `AppColors` |
-| `lib/utility/images.dart` | Delete | Already replaced by `AppAssets` |
-| `lib/utility/` | Delete directory | When all files deleted |
-| `lib/config/env.dart` | Keep | Still used by `DioClient`, flavor config |
-| `lib/main_screen.dart` | Delete | Replaced by `_MainShell` in GoRouter |
-| `lib/SplashScreen/` | Move to `lib/features/splash/` | Already migrated to Riverpod/GoRouter |
-| `lib/OnboardingScreen/` | Move to `lib/features/onboarding/` | Already migrated to Riverpod/GoRouter |
-| `lib/widgets/` | Move to `lib/shared/widgets/` | Shared components |
-| `http` package in `pubspec.yaml` | Remove | After `ApiService` deleted |
+| Old File/Dir | Action | Condition | Status |
+|---|---|---|---|
+| `lib/service/api_service.dart` | Delete | All 32 screen callers migrated to repositories | ✅ Deleted |
+| `lib/service/api_endpoints.dart` | Delete | Bridge file; all imports point to `lib/core/network/api_endpoints.dart` | ✅ Deleted |
+| `lib/service/shared_service.dart` | Delete | Extracted into auth repository | ✅ Deleted |
+| `lib/service/internet_service.dart` | Delete | Wrapped in Riverpod provider | ✅ Deleted |
+| `lib/service/google_config.dart` | Delete | No longer needed | ✅ Deleted |
+| `lib/service/` | Delete directory | All files deleted | ✅ Deleted |
+| `lib/utility/ColorCode.dart` | Delete | Replaced by `AppColors` | ✅ Deleted (was `commen.dart`) |
+| `lib/utility/images.dart` | Delete | Replaced by `AppAssets` | ✅ Deleted (was `date_time_utils.dart`) |
+| `lib/utility/` | Delete directory | All files deleted | ✅ Deleted |
+| `lib/config/env.dart` | Keep | Still used by `DioClient`, flavor config | Kept |
+| `lib/main_screen.dart` | Delete | Replaced by `_MainShell` in GoRouter | ✅ Deleted |
+| `lib/SplashScreen/` | Delete | Already migrated to GoRouter | ✅ Deleted |
+| `lib/OnboardingScreen/` | Delete | Already migrated to GoRouter | ✅ Deleted |
+| `lib/widgets/` | Delete | Moved to `lib/shared/widgets/` | ✅ Deleted |
+| `http` package in `pubspec.yaml` | Remove | After `ApiService` deleted | ❌ Pending |
+
+All infrastructure cleanup done in commits `2502016` and `bc70bdd` (12 files, 1,085 lines deleted).
+`flutter analyze` passed with 0 errors after cleanup.
 
 ---
 

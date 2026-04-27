@@ -426,46 +426,46 @@ LoginScreen
 | Create `test/helpers/` (`pump_app.dart`, `mocks.dart`, `test_data.dart`) | 0.5 |
 | **Subtotal** | **~14 days** |
 
-### Phase 4 — Feature Migration
+### Phase 4 — Feature Migration ✅ COMPLETE
 
-| Migration Unit | Screens | Est. Days |
+| Migration Unit | Screens | Est. Days | Status |
+|---|---|---|---|
+| 1. Splash | 1 | 0.5 | ✅ Done |
+| 2. Onboarding | 1 | 0.5 | ✅ Done |
+| 3. App Shell (MainScreen → ShellRoute) | 1 | 1 | ✅ Done |
+| 4–6. Simple standalone screens | 3 | 1 | ✅ Done |
+| 7. Profile — View | 3 | 2 | ✅ Done |
+| 8. Profile — Edit | 1 | 2 | ✅ Done |
+| 9. Profile — Settings | 4 | 2 | ✅ Done |
+| 10. Profile — Delete Account | 2 | 1 | ✅ Done |
+| 11. Home Feed | 2 | 3 | ✅ Done |
+| 12. Creative Profiles | 2 | 2 | ✅ Done |
+| 13. Location | 2 | 1.5 | ✅ Done |
+| 14. New Booking — Step 1 | 2 | 2 | ✅ Done |
+| 15. New Booking — Step 2 (decompose first) | 1 | 3 | ✅ Done |
+| 16. New Booking — Step 3 | 3 | 3 | ✅ Done |
+| 17. New Booking — Review & Pay | 3 | 3 | ✅ Done |
+| 18. Booking Management | 5 | 3 | ✅ Done |
+| 19. Auth — Login | 1 | 2 | ✅ Done |
+| 20. Auth — Signup (decompose first) | 1→3 | 4 | ✅ Done |
+| 21. Auth — Forgot Password | 3 | 2 | ✅ Done |
+| 22. Internet Connectivity | 2 | 1 | ✅ Done |
+| **Subtotal** | **~39 screens** | **~39 days** | **✅ All Done** |
+
+### Phase 5 — Cleanup (IN PROGRESS)
+
+| Task | Est. Days | Status |
 |---|---|---|
-| 1. Splash | 1 | 0.5 |
-| 2. Onboarding | 1 | 0.5 |
-| 3. App Shell (MainScreen → ShellRoute) | 1 | 1 |
-| 4–6. Simple standalone screens | 3 | 1 |
-| 7. Profile — View | 3 | 2 |
-| 8. Profile — Edit | 1 | 2 |
-| 9. Profile — Settings | 4 | 2 |
-| 10. Profile — Delete Account | 2 | 1 |
-| 11. Home Feed | 2 | 3 |
-| 12. Creative Profiles | 2 | 2 |
-| 13. Location | 2 | 1.5 |
-| 14. New Booking — Step 1 | 2 | 2 |
-| 15. New Booking — Step 2 (decompose first) | 1 | 3 |
-| 16. New Booking — Step 3 | 3 | 3 |
-| 17. New Booking — Review & Pay | 3 | 3 |
-| 18. Booking Management | 5 | 3 |
-| 19. Auth — Login | 1 | 2 |
-| 20. Auth — Signup (decompose first) | 1→3 | 4 |
-| 21. Auth — Forgot Password | 3 | 2 |
-| 22. Internet Connectivity | 2 | 1 |
-| **Subtotal** | **~39 screens** | **~39 days** |
-
-### Phase 5 — Cleanup
-
-| Task | Est. Days |
-|---|---|
-| Remove old `ApiService` + `http` package | 0.5 |
-| Remove `ColorCode.dart`, `images.dart` (replaced by `AppColors`, `AppAssets`) | 0.5 |
-| Delete all old screen files (now in `lib/features/`) | 0.5 |
-| Remove old directory structure (`Booking/`, `Home/`, `MyProfile/`, etc.) | 0.25 |
-| Replace all remaining `print()` with Crashlytics or remove | 1 |
-| Replace 233 `.withOpacity()` calls with `.withValues()` | 0.5 |
-| Fix all remaining lint warnings | 1 |
-| Rename files/directories to `snake_case` (any remaining) | 0.5 |
-| Fix class name typos (`NewSingUpScreen`, `NewForgotPasswrodScreen`, etc.) | 0.25 |
-| **Subtotal** | **~5 days** |
+| Remove old `ApiService` + `http` package | 0.5 | ✅ Done — `lib/service/` deleted |
+| Remove `ColorCode.dart`, `images.dart` (replaced by `AppColors`, `AppAssets`) | 0.5 | ✅ Done — `lib/utility/` deleted |
+| Delete all old screen files (now in `lib/features/`) | 0.5 | ✅ Done — 50 files deleted |
+| Remove old directory structure (`Booking/`, `Home/`, `MyProfile/`, etc.) | 0.25 | ✅ Done — all old dirs removed |
+| Replace all remaining `print()` with Crashlytics or remove | 1 | ❌ Pending |
+| Replace 233 `.withOpacity()` calls with `.withValues()` | 0.5 | ❌ Pending |
+| Fix all remaining lint warnings | 1 | ❌ Pending |
+| Rename files/directories to `snake_case` (any remaining) | 0.5 | ❌ Pending |
+| Fix class name typos (`NewSingUpScreen`, `NewForgotPasswrodScreen`, etc.) | 0.25 | ❌ Pending |
+| **Subtotal** | **~5 days** | **4 of 9 done** |
 
 ### Phase 6 — Testing
 
@@ -482,15 +482,15 @@ LoginScreen
 
 ### TOTAL
 
-| Phase | Days |
-|---|---|
-| Phase 1 — Audit | ✅ Complete |
-| Phase 2 — Critical bug fixes | 0.5 |
-| Phase 3 — Foundations | 14 |
-| Phase 4 — Feature migration | 39 |
-| Phase 5 — Cleanup | 5 |
-| Phase 6 — Testing | 13 |
-| **TOTAL** | **~71.5 working days** |
+| Phase | Days | Status |
+|---|---|---|
+| Phase 1 — Audit | — | ✅ Complete |
+| Phase 2 — Critical bug fixes | 0.5 | ✅ Complete |
+| Phase 3 — Foundations | 14 | ✅ Complete |
+| Phase 4 — Feature migration | 39 | ✅ Complete |
+| Phase 5 — Cleanup | 5 | In Progress (4/9 tasks done) |
+| Phase 6 — Testing | 13 | Not Started |
+| **TOTAL** | **~71.5 working days** | |
 
 ### Realistic calendar estimate
 
