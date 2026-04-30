@@ -205,7 +205,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                       ),
                     ),
                   );
-                }).toList(),
+                }),
 
 
 

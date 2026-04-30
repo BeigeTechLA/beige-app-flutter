@@ -495,7 +495,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     /// 🔥 MULTI DAY
                                     if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
                                       ...List.generate(booking!['booking_days'].length, (index) {
-                                        var day = booking!['booking_days'][index];
+                                        var day = booking['booking_days'][index];
 
                                         return Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,

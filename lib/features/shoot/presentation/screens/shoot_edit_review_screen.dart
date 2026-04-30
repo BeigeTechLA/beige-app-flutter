@@ -289,7 +289,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                                       /// ✅ MULTI DAY
                                       ...List.generate(booking!['booking_days'].length, (index) {
-                                        var day = booking!['booking_days'][index];
+                                        var day = booking['booking_days'][index];
 
                                         return Column(
                                           children: [
@@ -766,44 +766,6 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
     );
   }
 
-  Widget _buildCheckRow({
-    required String text,
-    required String iconPath,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 28,
-          width: 28,
-          decoration: const BoxDecoration(
-            color: Colors.black,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Image.asset(
-              iconPath,
-              height: 14,
-              width: 14,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              color: AppColors.black,
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              fontFamily: "Outfit",
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget builderPricingCard({
     required String title,

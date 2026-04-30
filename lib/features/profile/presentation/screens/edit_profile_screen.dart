@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +15,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
-import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';

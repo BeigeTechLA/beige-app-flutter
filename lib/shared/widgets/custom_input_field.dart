@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -91,7 +90,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
       ),
 
       decoration: InputDecoration(
-        labelText: "${widget.title}",
+        labelText: widget.title,
         floatingLabelBehavior: FloatingLabelBehavior.always,
 
 

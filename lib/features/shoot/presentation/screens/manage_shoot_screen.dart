@@ -313,7 +313,7 @@ class _ManageShootScreenState
                                       const SizedBox(height: 8),
                                     ],
                                   );
-                                }).toList(),
+                                }),
 
                               ] else ...[
 

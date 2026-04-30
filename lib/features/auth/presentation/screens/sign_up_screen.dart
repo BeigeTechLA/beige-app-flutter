@@ -40,7 +40,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool isProgrammaticChange = false;
   File? profileImage;
   final ImagePicker _picker = ImagePicker();
-  final FocusNode _locationFocus = FocusNode();
   bool showPassword = false;
   bool showConfirmPassword = false;
   bool savePassword = false;
@@ -683,7 +682,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       }
     });
 
-    String _darkMapStyle = '''
+    String darkMapStyle = '''
 [
   {
     "elementType": "geometry",
@@ -970,7 +969,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                                       onMapCreated: (controller) {
                                         mapController = controller;
-                                        controller.setMapStyle(_darkMapStyle);
+                                        controller.setMapStyle(darkMapStyle);
                                       },
 
                                       markers: {
@@ -1321,135 +1320,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   }
 
-  Widget _buildField(String title, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      cursorColor: AppColors.white,
-      style: const TextStyle(
-        color: AppColors.white,
-        fontFamily: AppTextStyles.fontFamilyBody,
-        fontSize: 15,
-        fontWeight: FontWeight.w400,
-      ),
-      decoration: InputDecoration(
-        labelText: "$title*",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-
-        labelStyle: const TextStyle(
-          fontFamily: AppTextStyles.fontFamilyBody,
-          fontWeight: FontWeight.w400,
-          fontSize: 15,
-          height: 1.0,
-          letterSpacing: 0,
-          color: AppColors.white70,
-        ),
-
-        floatingLabelStyle: const TextStyle(
-          fontFamily: AppTextStyles.fontFamilyBody,
-          fontWeight: FontWeight.w400,
-          fontSize: 15,
-          height: 1.0,
-          letterSpacing: 0,
-          color: AppColors.white70,
-        ),
-
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 15,
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(
-            color: AppColors.white70,
-            width: 0.5,
-          ),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(
-            color: AppColors.white70,
-            width: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-  Widget _buildPasswordField(
-      String title,
-      bool isVisible,
-      VoidCallback onToggle,
-      TextEditingController controller,
-      ) {
-    return TextField(
-      controller: controller,
-      obscureText: !isVisible,
-      cursorColor: AppColors.white70,
-      style:const TextStyle(
-        fontFamily: AppTextStyles.fontFamilyBody,
-        fontWeight: FontWeight.w400,
-        fontSize: 12,
-
-        color: AppColors.white70,
-      ),
-      decoration: InputDecoration(
-        labelText: "$title*",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-
-        labelStyle: const TextStyle(
-          fontFamily: AppTextStyles.fontFamilyBody,
-          fontWeight: FontWeight.w400,
-          fontSize: 15,
-          height: 1.0,
-          letterSpacing: 0,
-          color: AppColors.white70,
-        ),
-
-        floatingLabelStyle: const TextStyle(
-          fontFamily: AppTextStyles.fontFamilyBody,
-          fontWeight: FontWeight.w400,
-          fontSize: 15,
-          height: 1.0,
-          letterSpacing: 0,
-          color: AppColors.white70,
-        ),
-
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-
-        /// 👁️ EYE ICON
-        suffixIcon: IconButton(
-          onPressed: onToggle,
-          icon: Icon(
-            isVisible ? Icons.visibility : Icons.visibility_off,
-            color: AppColors.white,
-            size: 20,
-          ),
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.white70,
-            width: 0.5,
-          ),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.white70,
-            width: 0.5,
-          ),
-        ),
-
-
-      ),
-    );
-  }
 
   Widget _profilePictureCard() {
     return Container(

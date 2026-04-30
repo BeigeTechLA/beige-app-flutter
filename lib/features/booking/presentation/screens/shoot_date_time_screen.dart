@@ -838,8 +838,6 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
         builder: (context, child) {
           return Theme(
             data: ThemeData.dark().copyWith(
-              useMaterial3: true,
-              dialogBackgroundColor: AppColors.surfaceDark,
               colorScheme: const ColorScheme.dark(
                 primary: AppColors.primary,
                 onPrimary: AppColors.black,
@@ -879,7 +877,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
+              ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceDark),
             ),
             child: child!,
           );
@@ -941,14 +939,12 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
         builder: (context) {
           return Theme(
             data: ThemeData.dark().copyWith(
-              useMaterial3: true,
-              dialogBackgroundColor: AppColors.surfaceDark,
               colorScheme: const ColorScheme.dark(
                 primary: AppColors.primary,
                 onPrimary: AppColors.black,
                 surface: AppColors.surfaceDark,
                 onSurface: AppColors.white,
-              ),
+              ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceDark),
             ),
             child: Dialog(
               insetPadding:
@@ -1160,7 +1156,6 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
         builder: (context, child) {
           return Theme(
             data: ThemeData.dark().copyWith(
-              dialogBackgroundColor: const Color(0xFF121212),
               colorScheme: const ColorScheme.dark(
                 primary: AppColors.primary,
                 onPrimary: Colors.white,
@@ -1176,7 +1171,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                 hourMinuteTextColor: Colors.black,
                 dayPeriodColor: AppColors.primary,
                 dayPeriodTextColor: Colors.white,
-              ),
+              ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
             ),
             child: child!,
           );
@@ -2442,7 +2437,6 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
       DateTime today = DateTime.now();
 
       /// ✅ Current month calculation (IMPORTANT FIX)
-      DateTime firstDay = DateTime(today.year, today.month, 1);
       DateTime lastDay = DateTime(today.year, today.month + 1, 0);
       int totalDays = lastDay.day;
 
@@ -2652,7 +2646,6 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
 
                   String name = item['value'] ?? "";
 
-                  int count = videoCounts[id] ?? 0;
 
                   return Padding(
                     padding:
@@ -2978,7 +2971,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                     ),
                   ],
                 );
-              }).toList(),
+              }),
 
 
           ],
@@ -3144,7 +3137,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           color: AppColors.background, // background match
         child: Text(
-        "$title",
+        title,
         style: TextStyle(
         fontSize: 11,
           color: highlight

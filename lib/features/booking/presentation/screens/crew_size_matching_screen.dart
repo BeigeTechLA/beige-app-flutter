@@ -45,8 +45,6 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
   Widget build(BuildContext context) {
     final crewState = ref.watch(crewRecommendationNotifierProvider(widget.bookingId));
     final crewData = crewState.data;
-    final isLoading = crewState.status == CrewRecommendationStatus.loading;
-
     // Extract data from notifier state
     final shootName = (crewData['shoot_type'] as Map?)?['name'] as String? ?? "";
     final contentType = (crewData['shoot_type'] as Map?)?['content_type'] as String? ?? "";
@@ -54,10 +52,6 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
     final minCrew = (crewData['recommended_crew'] as Map?)?['min'] as int? ?? 0;
     final maxCrew = (crewData['recommended_crew'] as Map?)?['max'] as int? ?? 0;
     final defaultOutput = List<String>.from(crewData['default_output'] ?? []);
-    final roles = List<Map<String, dynamic>>.from(
-      (crewData['recommended_crew'] as Map?)?['roles'] ?? [],
-    );
-    final reasoning = List<String>.from(crewData['reasoning'] ?? []);
 
     return AppScaffold(
       hasAppBar: true,

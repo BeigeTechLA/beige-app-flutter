@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +40,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       initialPage: 1000,
       viewportFraction: 0.65);
 
-  late PageController _bookingController;
   late PageController _cardController;
   int _currentBookingIndex = 0;
   late AnimationController _bookingSwipeController;
@@ -488,10 +486,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _bookingController = PageController(
-      viewportFraction: 0.82, // 👈 right side card visible
-    );
-
     _cardController = PageController(
         initialPage: cardData.length * 50,
         viewportFraction: 0.88);
@@ -635,9 +629,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                           backgroundColor: Colors.transparent,
                                           child: ClipOval(
                                             child: homeData != null &&
-                                                homeData!.profileImageUrl.isNotEmpty
+                                                homeData.profileImageUrl.isNotEmpty
                                                 ? Image.network(
-                                              ApiEndpoints.imageUrl + homeData!.profileImageUrl,
+                                              ApiEndpoints.imageUrl + homeData.profileImageUrl,
                                               /* width: 40,
                                             height: 40,
                                             fit: BoxFit.cover,*/
@@ -936,11 +930,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                       children: [
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(20),
-                                          child: (homeData?.continueBooking?.imageUrl != null &&
-                                              homeData!.continueBooking!.imageUrl!.trim().isNotEmpty)
+                                          child: (homeData.continueBooking?.imageUrl != null &&
+                                              homeData.continueBooking!.imageUrl!.trim().isNotEmpty)
                                               ? CachedNetworkImage(
                                             imageUrl: ApiEndpoints.imageUrl +
-                                                homeData!.continueBooking!.imageUrl!,
+                                                homeData.continueBooking!.imageUrl!,
                                             height: 80,
                                             width: 80,
                                             fit: BoxFit.cover,
@@ -978,7 +972,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                          homeData!.continueBooking!.currentScreenLabel ?? "",
+                          homeData.continueBooking!.currentScreenLabel,
                           style: const TextStyle(
                             color: AppColors.black,
                             fontSize: 14,
@@ -989,7 +983,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                               const SizedBox(height: 4),
 
                                               Text(
-                          "Step ${homeData!.continueBooking!.currentScreenOrder} of ${homeData!.continueBooking!.totalSteps}",
+                          "Step ${homeData.continueBooking!.currentScreenOrder} of ${homeData.continueBooking!.totalSteps}",
                           style: const TextStyle(
                             color: AppColors.black70,
                             fontSize: 13,
@@ -1010,7 +1004,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     Row(
                                       children: List.generate(3, (index) {
                                         double progress =
-                                            homeData?.continueBooking?.progress ?? 0.0; // 0 to 1
+                                            homeData.continueBooking?.progress ?? 0.0; // 0 to 1
 
                                         double segmentProgress = (progress * 3) - index;
 
@@ -1044,7 +1038,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     /// 🔥 RESUME BUTTON
                                     GestureDetector(
                                       onTap: () {
-                                        handleResume(homeData!.continueBooking!);
+                                        handleResume(homeData.continueBooking!);
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -1841,7 +1835,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                               const SizedBox(width: 10),
 
                                               /// 🔥 ICON BUTTON (PERFECT CIRCLE)
-                                              Container(
+                                              SizedBox(
                                                 height: 38,
                                                 width: 38,
 
@@ -2856,7 +2850,7 @@ SizedBox(height: 10,),
                 const SizedBox(height: 12),
 
                 Text(
-                  booking.title ?? "-",
+                  booking.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -2960,7 +2954,7 @@ SizedBox(height: 10,),
                         ),
                         child: Center(
                           child: Text(
-                            booking.statusLabel ?? "",
+                            booking.statusLabel,
                             style: TextStyle(
                               color: statusColor,
                               fontSize: 13,
@@ -2982,77 +2976,6 @@ SizedBox(height: 10,),
                 ),*/
               ],
             ),
-        ],
-      ),
-    );
-  }
-  Widget _buildProjectCard(String title, String date, String files,
-      String img) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF222222), // 👈 Figma background
-        borderRadius: BorderRadius.circular(22),
-
-        // 👇 Gradient Border Trick
-        border: Border.all(
-          width: 0.5,
-          color: Colors.white.withOpacity(0.10), // fallback
-        ),
-
-        // 👇 Shadow for premium look (optional)
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-
-      // 👇 Gradient Border Overlay
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Image.asset(
-              img,
-              height: 80,
-              width: 80,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 15),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold)),
-                Text(date,
-                    style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 12)),
-                const SizedBox(height: 8),
-                Text(files,
-                    style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12)),
-              ],
-            ),
-          ),
-
-          Column(
-            children: [
-              _buildSmallCircleBtn("assets/svg/eyes1.svg"),
-              const SizedBox(height: 8),
-              _buildSmallCircleBtn("assets/svg/install.svg"),
-            ],
-          )
         ],
       ),
     );
@@ -3401,7 +3324,7 @@ SizedBox(height: 10,),
   }
   Widget _buildCreativeCard(int index, {bool isBackground = false}) {
     final item = homeData!.mainCreatives[index];
-    final String? imageUrl = item.profileImage;
+    final String imageUrl = item.profileImage;
 
     return Container(
       height: 400,
@@ -3409,7 +3332,7 @@ SizedBox(height: 10,),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.white36, width: 0.5),
         borderRadius: BorderRadius.circular(40),
-        image: (imageUrl != null && imageUrl.isNotEmpty)
+        image: (imageUrl.isNotEmpty)
             ? DecorationImage(
           image: NetworkImage(ApiEndpoints.imageUrl + imageUrl),
           fit: BoxFit.cover,
@@ -3422,7 +3345,7 @@ SizedBox(height: 10,),
           children: [
 
             /// ❌ Background cards me placeholder bhi nahi
-            if (!isBackground && (imageUrl == null || imageUrl.isEmpty))
+            if (!isBackground && (imageUrl.isEmpty))
               Center(
                 child: SvgPicture.asset(
                   "assets/svg/imag_placeholder.svg",
@@ -3689,7 +3612,6 @@ class BorderAnimationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double strokeWidth = 1.5;
     final Color mainColor = const Color(0xFFE8D1AB); // Beige theme color
     final double radiusValue = 45.0;
 

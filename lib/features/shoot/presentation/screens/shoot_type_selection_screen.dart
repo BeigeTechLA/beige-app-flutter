@@ -9,9 +9,6 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/app/spacing.dart';
-import 'package:beige/app/radii.dart';
 import 'package:beige/app/assets.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
@@ -102,7 +99,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
@@ -118,7 +114,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               hourMinuteTextColor: Colors.black,
               dayPeriodColor: AppColors.primary,
               dayPeriodTextColor: Colors.white,
-            ),
+            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
           ),
           child: child!,
         );
@@ -476,112 +472,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   }
 
 
-  Future<void> _ShootDate_Time() async {
-    if (!isFormValid) return;
-
-    setState(() => isSubmitting = true);
-
-    /// 🔥 EDIT RESET
-    if (!isEditNeeded) {
-      selectedEditTypeIds.clear();
-      selectedEditTypeNames.clear();
-    }
-
-    /// 🔥 BUILD EDIT ARRAYS
-    List<String> videoEditKeys = [];
-    List<String> photoEditKeys = [];
-
-    videoCounts.forEach((key, count) {
-      if (count > 0) {
-        String apiKey = editTypes[key]['key'];
-        for (int i = 0; i < count; i++) {
-          videoEditKeys.add(apiKey);
-        }
-      }
-    });
-
-    photoCounts.forEach((key, count) {
-      if (count > 0) {
-        String apiKey = photoEditTypes[key]['key'];
-        for (int i = 0; i < count; i++) {
-          photoEditKeys.add(apiKey);
-        }
-      }
-    });
-
-    Map<String, dynamic> payload = {};
-
-    /// ================= SINGLE DAY =================
-    if (selectedIndex == 1) {
-      payload = {
-        "booking_type": "single_day",
-        "time_zone": "Asia/Calcutta",
-        "event_date": _apiDateFormat(selectedDate!),
-
-        /// 🔥 FORMAT TIME (HH:mm:ss)
-        "start_time": _formatTime(startTime!),
-        "end_time": _formatTime(endTime!),
-
-        "edits_needed": isEditNeeded,
-        "video_edit_types": videoEditKeys,
-        "photo_edit_types": photoEditKeys,
-      };
-    }
-
-    /// ================= MULTIPLE DAY =================
-    if (selectedIndex == 2) {
-      List<Map<String, dynamic>> bookingDays = [];
-
-      if (istimingsame) {
-        for (var date in selectedDates) {
-          bookingDays.add({
-            "date": _apiDateFormat(date),
-            "start_time": startTimeController.text,
-            "end_time": endTimeController.text,
-          });
-        }
-      } else {
-        for (var date in selectedDates) {
-          bookingDays.add({
-            "date": _apiDateFormat(date),
-            "start_time": startTimes[date]?.format(context),
-            "end_time": endTimes[date]?.format(context),
-          });
-        }
-      }
-
-      payload = {
-        "booking_type": "multi_day",
-        "time_zone": "Asia/Calcutta",
-        "booking_days": bookingDays,
-        "edits_needed": isEditNeeded ? 1 : 0,
-        "video_edit_types": videoEditKeys,
-        "photo_edit_types": photoEditKeys,
-      };
-    }
-
-    final notifier = ref.read(
-      shootTypeSelectionNotifierProvider(widget.bookingId).notifier,
-    );
-
-    final success = await notifier.saveBookingTime(
-      bookingId: widget.bookingId,
-      data: payload,
-    );
-
-    if (success && mounted) {
-      context.pushNamed(
-        RouteNames.bookingReviewConfirm,
-        pathParameters: {'bookingId': widget.bookingId.toString()},
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to save booking time")),
-      );
-    }
-
-    if (mounted) setState(() => isSubmitting = false);
-  }
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
@@ -613,111 +503,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
 
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-      initialEntryMode: DatePickerEntryMode.calendarOnly,
-      helpText: '',
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            useMaterial3: true,
-            dialogBackgroundColor: const Color(0xFF121212),
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              onPrimary: Colors.black,
-              surface: Color(0xFF121212),
-              onSurface: Colors.white,
-            ),
-            datePickerTheme: DatePickerThemeData(
-              backgroundColor: const Color(0xFF121212),
-              dividerColor: Colors.white12,
-              headerHeadlineStyle: const TextStyle(
-                fontFamily: "Unbounded",
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-              headerHelpStyle: const TextStyle(fontSize: 0, height: 0),
-              headerBackgroundColor: Color(0xFF0E0E0E),
-              dayShape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-              ),
-              weekdayStyle: const TextStyle(
-                fontFamily: "Outfit",
-                fontSize: 13,
-                color: Colors.white70,
-              ),
-              dayStyle: const TextStyle(
-                fontFamily: "Outfit",
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                textStyle: const TextStyle(
-                  fontFamily: "Unbounded",
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        /// 🔥 SINGLE DAY MODE
-        if (selectedIndex == 1) {
-          selectedDate = picked;
-          dateController.text =
-          "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
-        }
-
-        /// 🔥 MULTIPLE DAY MODE
-        else {
-          bool exists = selectedDates.any((d) =>
-          d.year == picked.year &&
-              d.month == picked.month &&
-              d.day == picked.day);
-
-          if (exists) {
-            selectedDates.removeWhere((d) =>
-            d.year == picked.year &&
-                d.month == picked.month &&
-                d.day == picked.day);
-          } else {
-            selectedDates.add(picked);
-          }
-        }
-
-        /// 🔥 AUTO TIME LOGIC (ONLY SINGLE)
-        if (selectedIndex == 1) {
-          if (isTodaySelected()) {
-            DateTime nowPlus4 =
-            DateTime.now().add(const Duration(hours: 4));
-            startTime = TimeOfDay.fromDateTime(nowPlus4);
-            DateTime endDefault =
-            nowPlus4.add(const Duration(hours: 2));
-            endTime = TimeOfDay.fromDateTime(endDefault);
-          } else {
-            startTime = const TimeOfDay(hour: 9, minute: 0);
-            endTime = const TimeOfDay(hour: 17, minute: 0);
-          }
-
-          _updateTimeText(startTimeController, startTime!);
-          _updateTimeText(endTimeController, endTime!);
-        }
-      });
-    }
-  }
 
   Future<void> _selectDateMultiple(BuildContext context) async {
     List<DateTime> tempSelected = List.from(selectedDates);
@@ -727,14 +512,12 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
       builder: (context) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            useMaterial3: true,
-            dialogBackgroundColor: const Color(0xFF121212),
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.black,
               surface: Color(0xFF121212),
               onSurface: Colors.white,
-            ),
+            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
           ),
           child: Dialog(
             insetPadding:
@@ -833,127 +616,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
 
 
-  Future<void> _selectTime(
-      BuildContext context,
-      TextEditingController? controller,
-      bool isStartTime,
-      DateTime? date,
-      ) async {
-
-    final now = DateTime.now();
-
-    /// 🔥 CHECK TODAY
-    bool isToday = false;
-    if (date != null) {
-      isToday = date.year == now.year &&
-          date.month == now.month &&
-          date.day == now.day;
-    } else {
-      isToday = isTodaySelected();
-    }
-
-    /// 🔥 INITIAL TIME
-    TimeOfDay initial;
-
-    if (isToday && isStartTime) {
-      final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
-      final minAllowed = roundedNow.add(const Duration(hours: 4));
-      initial = TimeOfDay.fromDateTime(minAllowed);
-    } else {
-      if (date != null) {
-        initial = isStartTime
-            ? (startTimes[date] ?? TimeOfDay.now())
-            : (endTimes[date] ?? TimeOfDay.now());
-      } else {
-        initial = isStartTime
-            ? (startTime ?? TimeOfDay.now())
-            : (endTime ?? TimeOfDay.now());
-      }
-    }
-
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: initial,
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            dialogBackgroundColor: const Color(0xFF121212),
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
-            ),
-            timePickerTheme: const TimePickerThemeData(
-              backgroundColor: Color(0xFF121212),
-              dialBackgroundColor: Color(0xFF121212),
-              dialHandColor: Colors.white,
-              dialTextColor: Colors.grey,
-              hourMinuteColor: AppColors.primary,
-              hourMinuteTextColor: Colors.black,
-              dayPeriodColor: AppColors.primary,
-              dayPeriodTextColor: Colors.white,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked == null || !mounted) return;
-
-    /// 🔥 4 HOUR VALIDATION (MAIN FIX)
-    if (isToday) {
-      final roundedNow = DateTime(now.year, now.month, now.day, now.hour);
-      final minAllowed = roundedNow.add(const Duration(hours: 4));
-
-      final baseDate = date ?? selectedDate!;
-      final pickedDT = DateTime(
-        baseDate.year,
-        baseDate.month,
-        baseDate.day,
-        picked.hour,
-        picked.minute,
-      );
-
-      if (pickedDT.isBefore(minAllowed)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Select time after 4 hours")),
-        );
-        return;
-      }
-    }
-
-    setState(() {
-      if (date != null) {
-        /// 🔥 MULTIPLE
-        if (isStartTime) {
-          startTimes[date] = picked;
-        } else {
-          endTimes[date] = picked;
-        }
-      } else {
-        /// 🔥 SINGLE
-        if (isStartTime) {
-          startTime = picked;
-          _updateTimeText(startTimeController, picked);
-        } else {
-          if (startTime != null &&
-              !isEndTimeAfterStart(startTime!, picked)) {
-            /* ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("End time must be after Start time"),
-                ),
-              );*/
-            return;
-          }
-
-          endTime = picked;
-          _updateTimeText(endTimeController, picked);
-        }
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1791,7 +1453,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     DateTime today = DateTime.now();
 
     /// ✅ Current month calculation (IMPORTANT FIX)
-    DateTime firstDay = DateTime(today.year, today.month, 1);
     DateTime lastDay = DateTime(today.year, today.month + 1, 0);
     int totalDays = lastDay.day;
 
@@ -1864,10 +1525,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 final isSelected =
                 selectedDates.any((d) => isSameDate(d, date));
 
-                /// ✅ Disable past dates (optional but good)
-                final isPast = date.isBefore(
-                  DateTime(today.year, today.month, today.day),
-                );
 
                 return GestureDetector(
                 /*  onTap: isPast
@@ -2190,7 +1847,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                   ],
                 ),
               );
-            }).toList(),
+            }),
         ],
       ),
     );

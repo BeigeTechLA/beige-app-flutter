@@ -308,7 +308,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                         const SizedBox(height: 10),
                                       ],
                                     );
-                                  }).toList(),
+                                  }),
 
                                 ] else ...[
 

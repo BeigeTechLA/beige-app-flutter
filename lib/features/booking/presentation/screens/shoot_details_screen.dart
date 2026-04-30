@@ -355,7 +355,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     // Keep provider alive during async saveDetails call
     ref.watch(shootDetailsNotifierProvider(widget.bookingId));
 
-    String _darkMapStyle = '''
+    String darkMapStyle = '''
 [
   {
     "elementType": "geometry",
@@ -538,7 +538,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                       children: [
 
                         /// ICON BOX
-                        Container(
+                        SizedBox(
                           height: 40,
                           width: 40,
                          /* decoration: BoxDecoration(
@@ -597,7 +597,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                       children: [
 
                         /// ICON BOX
-                        Container(
+                        SizedBox(
                           height: 40,
                           width: 40,
                        /*   decoration: BoxDecoration(
@@ -983,7 +983,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                         onMapCreated: (controller) {
                           mapController = controller;
-                          controller.setMapStyle(_darkMapStyle);
+                          controller.setMapStyle(darkMapStyle);
                         },
 
                         markers: {

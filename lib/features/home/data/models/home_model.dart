@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
 
 class HomeModel {
   final String name;
