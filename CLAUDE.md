@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
+## Workflow Rules
+
+- **Always ask questions before writing a plan.** Before proposing or executing any plan, ask clarifying questions to understand scope, constraints, and preferences. Do not assume — confirm first, then plan.
+
 ## Commands
 
 ```bash
@@ -26,158 +30,106 @@ flutter analyze
 # Run tests
 flutter test
 
+# Run integration tests (navigation)
+flutter test integration_test/navigation_test.dart
+
 # Regenerate launcher icons
 flutter pub run flutter_launcher_icons:main
 ```
 
 ## What This App Is
 
-**Beige** is a Flutter app for booking photography/videography services. Users are either **Clients** (who book shoots) or **Creatives** (who offer services). The app has 27 screens, ~34,200 lines of Dart across 59 files.
+**Beige** is a Flutter app for booking photography/videography services. Users are either **Clients** (who book shoots) or **Creatives** (who offer services). The app has 39 screens, ~34,264 lines of Dart across 144 files.
 
-## Current Architecture (Pre-Migration)
+## Current Architecture (Post-Migration)
 
-The codebase is mid-migration from a legacy architecture to a clean architecture target. Read this section to understand what exists TODAY.
+Migration from legacy to clean architecture is **complete** (Phases 1-4 done, Phase 5 cleanup in progress). All 39 screens are migrated.
 
-### State Management
-- **No state management library.** 100% `StatefulWidget` + `setState()` across all 37 screen files.
-- `SharedPreferences` handles persistence (auth token, login state, user ID).
-- No DI — `ApiService()` is instantiated fresh inside each widget's methods.
-- 11 god widgets exceed 1,000 lines. Largest: `new_home_screen.dart` (3,838 lines).
+### Stack (Current)
+| Layer | Technology |
+|-------|-----------|
+| State management | `flutter_riverpod` — Notifier/AsyncNotifier with autoDispose |
+| Navigation | `go_router` with `StatefulShellRoute.indexedStack`, auth redirect |
+| HTTP client | `Dio` with interceptor chain (Auth → Retry → Error → Logging) |
+| Error handling | Sealed `AppException` hierarchy + `ExceptionHandler.guardAsync()` |
+| Firebase | `firebase_core` + `firebase_crashlytics` + `firebase_analytics` |
+| Design tokens | `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadii`, `AppShadows`, `AppDurations`, `AppTheme` |
+| Payment | Stripe via `flutter_stripe` |
+| Maps | `google_maps_flutter`, `geolocator`, `google_places_flutter` |
 
-### Navigation
-- Navigator 1.0 imperative only — 135 total calls (62 push, 11 pushReplacement, 8 pushAndRemoveUntil, 54 pop).
-- Zero named routes. Zero GoRouter usage.
-- `MainScreen` manages a 4-tab bottom nav using `switch(_selectedIndex)` — NOT `IndexedStack`, so every tab switch destroys and rebuilds the tab widget.
-- Auth guard: boot-time `SharedPreferences` check only — no runtime redirect on token expiry.
+### Entry Points & Flavors
+- `lib/main.dart` — shared `startApp(Environment)` function (Firebase init, Crashlytics, Stripe, ProviderScope)
+- `lib/main_dev.dart` → `startApp(Environment.dev)`
+- `lib/main_prod.dart` → `startApp(Environment.prod)`
+- `lib/config/env.dart` — `Env.init()` sets API URL, image URL, Stripe key per environment
+- Both flavors currently point to same API: `https://mobile.beige.app/api/`
+- Prod Stripe key is placeholder: `'PLACE_HOLDER_LIVE_STRIPE_KEY'`
 
-### Networking
-- **Primary HTTP client is the `http` package, NOT Dio.** Dio is declared in pubspec but only used in one `postMultipart()` method with a fresh `Dio()` instance per call (no interceptors, no base config).
-- `ApiService` (`lib/service/api_service.dart`) has 7 methods using `http`, all with inconsistent error handling.
-- `putData()` and `deleteData()` have NO try/catch — network errors crash the widget tree.
-- No interceptors, no retry logic, no typed exceptions, no repository layer.
-- Endpoints centralized in `lib/service/api_endpoints.dart` (good).
-
-### Styling
-- No design token files exist. `lib/app/` directory does not exist.
-- ~2,981 hardcoded style values across the codebase (311 inline Color(), 732 Colors.xxx, 568 TextStyle(), 458 EdgeInsets, 350 BorderRadius).
-- `Theme.of(context)` used exactly 2 times total (both `SliderTheme`).
-- `ColorCode.dart` exists with 50+ colors but uses non-semantic names (`k282828`, `bcakgroundcolor`).
-
-### Firebase
-- Completely absent. Zero Firebase packages, zero config files, zero crash reporting, zero analytics.
-- 89 try/catch blocks silently swallow errors via `print()`.
-- 119 `print()` statements including auth token logging in production.
-
-### Environment / Config
-- `lib/config/env.dart` — `Env.init(environment)` sets API URLs and Stripe key per environment.
-- `lib/main_dev.dart` → dev, `lib/main_prod.dart` → prod.
-- Both flavors currently point to the same API URL: `https://mobile.beige.app/api/`.
-- Prod Stripe key is placeholder: `'PLACE_HOLDER_LIVE_STRIPE_KEY'`.
-
-### Key Directories (Current)
-| Path | Purpose |
-|------|---------|
-| `auth/` | Login, signup, forgot password, OTP (6 files) |
-| `Home/` | Home screen + all booking flow screens (15 files) |
-| `Home/NewBookingFlow/` | Multi-step booking: shoot type → crew size → review/payment |
-| `Booking/` | Manage existing bookings, cancellation (7 files) |
-| `MyProfile/` | Profile view/edit, account deletion (10 files) |
-| `service/` | ApiService, endpoints, SharedService (5 files) |
-| `utility/` | ColorCode.dart, images.dart |
-| `widgets/` | Shared UI components |
-| `config/` | Env.dart |
-
-### Assets
-- Fonts: **Unbounded**, **Outfit**, **HelveticaNeue** (registered in pubspec). **InstrumentSans** referenced in code but NOT in pubspec (silent runtime bug).
-- SVGs, Lottie animations, and images under `assets/`.
-
-### Payment
-- Stripe via `flutter_stripe` — payment screens in `Home/NewBookingFlow/Book_Confirm/`.
-
-### Maps / Location
-- Google Maps (`google_maps_flutter`), geolocation (`geolocator`), place search (`google_places_flutter`).
-
-## Target Architecture
-
-The migration target is defined in three guide documents under `docs/guides/`:
-- `FLUTTER_BASE_GUIDELINES.md` — Architecture, Network, Firebase, Navigation
-- `FLUTTER_DESIGN_SYSTEM.md` — Typography, Colors, Spacing, Radii, Shadows, Themes
-- `FLUTTER_TESTING_GUIDELINES.md` — Unit, Widget, Integration, Golden tests
-
-Migration rules and patterns are in `MIGRATION_RULES.md` at the project root.
-
-### Target Stack
-| Layer | Current | Target |
-|-------|---------|--------|
-| State management | `setState` | `flutter_riverpod` (manual Notifier/AsyncNotifier) |
-| Navigation | `Navigator.push/pop` | `go_router` with `StatefulShellRoute.indexedStack` |
-| HTTP client | `http` package | `Dio` with interceptor chain |
-| Error handling | `Exception('string')` | Sealed `AppException` hierarchy |
-| Models | `Map<String, dynamic>` | `freezed` + `json_serializable` |
-| Firebase | absent | `firebase_core` + `firebase_crashlytics` + `firebase_analytics` |
-| Testing | 1 smoke test | `mocktail`, AAA pattern, 70%+ coverage |
-| Design tokens | 2,981 inline values | `AppColors`, `AppTextStyles`, `AppSpacing`, `AppRadii`, `AppShadows`, `AppDurations`, `AppTheme` |
-
-### Target Folder Structure
+### Folder Structure
 ```
 lib/
-├── main.dart / main_dev.dart / main_prod.dart    # Entry points (DO NOT modify flavor files)
-├── app/                                           # Design tokens, router, theme
-│   ├── colors.dart, text_styles.dart, spacing.dart, radii.dart, shadows.dart, durations.dart
-│   ├── theme.dart, router.dart, route_names.dart, assets.dart, app.dart
-│   └── flavor_config.dart
+├── main.dart / main_dev.dart / main_prod.dart
+├── app/                          # Design tokens, router, theme
+│   ├── colors.dart, text_styles.dart, spacing.dart, radii.dart
+│   ├── shadows.dart, durations.dart, assets.dart
+│   ├── theme.dart, router.dart, route_names.dart, app.dart
+├── config/
+│   └── env.dart                  # Environment config (dev/prod)
 ├── core/
-│   ├── network/          # DioClient, interceptors, exceptions, ExceptionHandler
-│   ├── firebase/         # FirebaseService, CrashlyticsService, AnalyticsService
-│   ├── providers/        # core_providers.dart (app-wide Riverpod providers)
-│   ├── utils/            # Validators, formatters
-│   └── extensions/       # Context, String, DateTime extensions
+│   ├── network/                  # DioClient, api_endpoints, api_response
+│   │   ├── exceptions/           # AppException, ClientException, ServerException, NetworkException, ExceptionHandler
+│   │   └── interceptors/         # auth, retry, error, logging
+│   ├── firebase/                 # FirebaseService, CrashlyticsService, AnalyticsService, events, observer
+│   ├── providers/                # sharedPreferencesProvider, dioClientProvider, authStateProvider
+│   └── utils/                    # date_time_utils, google_config, internet_helper, shared_service
 ├── features/
-│   └── [feature_name]/
-│       ├── data/         # Models (freezed), datasources, repository impls
-│       ├── domain/       # Entities, repository interfaces, usecases
-│       └── presentation/ # Screens (ConsumerWidget), widgets, providers
+│   ├── auth/                     # 6 screens — login, signup, forgot password, OTP, reset
+│   ├── booking/                  # 9 screens — shoot type, crew, date/time, details, review, payment
+│   ├── creative/                 # creative profile data/domain (no screens — used by home)
+│   ├── home/                     # 5 screens — home, find creative, creative profile, change location
+│   ├── onboarding/               # 1 screen
+│   ├── payment/                  # payment data/domain layer (screens in booking/)
+│   ├── profile/                  # 11 screens — profile, edit, favorites, history, delete, password, preferences
+│   ├── shoot/                    # 7 screens — my shoots, manage, cancel, edit review, summary, type selection
+│   └── splash/                   # 1 screen
 └── shared/
-    ├── widgets/          # Reusable components (2+ features)
-    └── layouts/          # Shell layouts, scaffolds
+    ├── layouts/                  # AppScaffold
+    └── widgets/                  # custom_input_field, loading, top_message
 ```
 
-## Known Bugs (from audits)
+### Feature Architecture Pattern
+Each feature follows clean architecture:
+```
+features/[name]/
+├── data/
+│   ├── datasources/    # Remote datasource — raw API calls via DioClient
+│   ├── models/         # Data models (where needed)
+│   └── repositories/   # Repository impl — wraps datasource with ExceptionHandler
+├── domain/
+│   ├── entities/       # Domain entities (where needed)
+│   └── repositories/   # Repository interface (abstract class)
+└── presentation/
+    ├── providers/      # Notifier + State classes, provider declarations
+    └── screens/        # ConsumerStatefulWidget / ConsumerWidget screens
+```
 
-These are confirmed bugs that should be fixed before or during migration:
+### Navigation
+- `lib/app/router.dart` — GoRouter with `routerProvider` (Riverpod)
+- `lib/app/route_names.dart` — `RouteNames` constants (lowercase_snake_case)
+- `StatefulShellRoute.indexedStack` for 4-tab bottom nav (Home, Book, My Shoots, Profile)
+- Auth guard via `redirect` — checks `authStateProvider`, redirects unauthenticated to login
+- `lib/core/providers/auth_state_provider.dart` — bool-based auth state
 
-1. **Broken internet detection** — `internet_service.dart:9,15` compares `List<ConnectivityResult>` to `ConnectivityResult` (always false). Offline state is never detected.
-2. **Auth token logged in production** — `api_service.dart:30`: `print('🔐 Sending token: $token')` runs on every API call in release builds.
-3. **Wrong S3 bucket** — `shared_service.dart` has `imageURL` pointing to `nextgengurukul` S3 bucket (different project). `ApiService.imageURL` has the correct URL.
-4. **Trailing space in endpoint** — `api_endpoints.dart:33`: `"auth/profile-photo "` has a trailing space causing 404.
-5. **No try/catch on putData/deleteData** — Network errors during profile update or booking cancellation crash the app.
-6. **57 async context violations** — `BuildContext` used after `await` without `mounted` check across 15+ files.
-7. **InstrumentSans font missing** — Referenced in 2 files but not registered in `pubspec.yaml`. Text silently falls back to system font.
-
-## Migration Status
-
-**Current phase: Phase 1 (Audit) — COMPLETE.**
-
-Phase 2 (Critical Bug Fixes) and Phase 3 (Foundations) have not started. See `MIGRATION_PLAN.md` for the full timeline and feature migration order.
-
-### Audit Reports
-All audit reports are in `docs/auditreports/`:
-- `PROJECT_AUDIT.md` — Baseline: Flutter 3.38.9, 59 files, 27 screens
-- `STATE_MANAGEMENT_AUDIT.md` — 100% setState, 11 god widgets, zero DI
-- `NAVIGATION_AUDIT.md` — 135 Navigator calls, full route graph
-- `STYLING_AUDIT.md` — ~2,981 hardcoded values, zero design tokens
-- `NETWORKING_AUDIT.md` — http primary, no interceptors, no typed exceptions
-- `FIREBASE_AUDIT.md` — 0/19 requirements met
-- `CODE_QUALITY_AND_TESTING_AUDIT.md` — 613 lint issues, 1 test, 0% coverage
-
-### Key Planning Documents
-| File | Purpose |
-|------|---------|
-| `MIGRATION_PLAN.md` | Timeline, feature order, risk register, blockers |
-| `MIGRATION_RULES.md` | Patterns, code templates, non-negotiable rules for migration |
-| `docs/guides/FLUTTER_BASE_GUIDELINES.md` | Target architecture reference |
-| `docs/guides/FLUTTER_DESIGN_SYSTEM.md` | Design token definitions |
-| `docs/guides/FLUTTER_TESTING_GUIDELINES.md` | Testing patterns and coverage targets |
+### Repositories
+| Repository | Feature | Methods |
+|-----------|---------|---------|
+| AuthRepository | auth | login, signup, forgotPassword, verifyOtp, resetPassword, socialLogin |
+| ProfileRepository | profile | getProfile, updateProfile, uploadPhoto, changePassword, deleteAccount, verifyDeleteOtp, getFavorites, removeFavorite, getBookingHistory |
+| HomeRepository | home | getHomeData, getRecommendedCreatives |
+| CreativeRepository | creative | getCreativeProfile |
+| BookingRepository | booking | 11 methods — shoot types, content types, crew matching, booking CRUD |
+| PaymentRepository | payment | createPaymentIntent, confirmPayment, getPaymentMethods, addPaymentMethod |
+| ShootRepository | shoot | getMyShoots, getShootSummary, cancelShoot, updateShoot |
 
 ## Rules
 
@@ -186,17 +138,10 @@ All audit reports are in `docs/auditreports/`:
 - Audit reports go in `docs/auditreports/`.
 - Architecture guides go in `docs/guides/`.
 
-### Migration Rules (Critical — read MIGRATION_RULES.md for full detail)
-- **Never rewrite, always migrate.** One feature at a time. Old and new code coexist.
-- **Never modify flavor configuration** (`main_dev.dart`, `main_prod.dart`, flavor configs) unless explicitly approved.
-- **The Shippable Rule:** After every migration step, `flutter analyze` (zero errors), `flutter build apk`, and `flutter run` must all pass.
-- **Max 5–8 files per commit.** If touching more, break into smaller steps.
-- **Phase order is strict:** Foundations (Phase 3) must be complete before any feature migration (Phase 4) begins.
-
 ### Coding Standards
 - Files and directories: `lowercase_snake_case`. Classes: `PascalCase`.
 - One widget per file.
-- Never use `print()` — use `debugPrint()` or logging through CrashlyticsService.
+- Never use `print()` — use `debugPrint()` or `CrashlyticsService.recordError()`.
 - Never commit commented-out code.
 - UI layer never imports from `data/` — only from `domain/`.
 - All colors via `AppColors` or `Theme.of(context).colorScheme` — no inline `Color(0xFF...)`.
@@ -216,7 +161,7 @@ All audit reports are in `docs/auditreports/`:
 
 ### Navigation Rules
 - Every route must have a `name` property (used for analytics screen tracking).
-- Never use `Navigator.push()` in migrated code — always `context.goNamed()` or `context.pushNamed()`.
+- Never use `Navigator.push()` — always `context.goNamed()` or `context.pushNamed()`.
 - Route names are `lowercase_snake_case` and defined in `RouteNames` constants.
 
 ### Network Rules
@@ -225,6 +170,8 @@ All audit reports are in `docs/auditreports/`:
 - Never return `dynamic` or `Map<String, dynamic>` from repositories — always typed models.
 - Never pre-check connectivity before API calls — let request fail and catch exception.
 - Interceptor order: Auth → Retry → Error → Logging (dev only).
+- DataSource returns raw Map, Repository wraps in ExceptionHandler and maps to entity.
+- `_assertNoError()` helper in repository checks Beige API `{error: true, message: "..."}` pattern.
 
 ### Testing Rules
 - Every new feature must include unit tests for business logic and at least one widget test per screen.
@@ -232,6 +179,30 @@ All audit reports are in `docs/auditreports/`:
 - Test file naming: `<source_file>_test.dart`.
 - Minimum 3 test cases per function: happy path, edge case, error case.
 - Never make real API calls in unit or widget tests.
+
+## Navigation Testing Tool
+
+Integration test suite lives in `integration_test/` folder.
+
+### Structure
+- `navigation_test.dart` — main runner
+- `helpers/navigation_helper.dart` — pumpAppWithAuth, verifyScreenLoaded, verifyAuthGuard, verifyDeepLink, verifyBackNav
+- `helpers/auth_helper.dart` — Riverpod overrides for auth bypass
+- `helpers/report_builder.dart` — writes navigation_report.md
+- `cases/route_load_test.dart` — route load tests
+- `cases/guard_test.dart` — auth guard redirect tests
+- `cases/deep_link_test.dart` — URI resolution tests
+- `cases/back_nav_test.dart` — back stack tests
+
+### Pending wiring (not done yet)
+1. `navigation_helper.dart` → replace `Placeholder` with actual App widget
+2. `auth_helper.dart` → uncomment authStateProvider overrides
+3. Routes with `state.extra` params need fake data added in `route_load_test.dart`
+
+### Run command
+```bash
+flutter test integration_test/navigation_test.dart
+```
 
 ### Commit Format
 ```
@@ -243,3 +214,61 @@ fix(network): add try/catch to putData and deleteData
 test(auth): add unit tests for login notifier
 chore(deps): add flutter_riverpod and go_router
 ```
+
+## Slash Commands
+
+Custom slash commands for repetitive feature development patterns. Located in `.claude/commands/`.
+
+| Command | Purpose |
+|---------|---------|
+| `/new-feature` | Scaffold complete feature module (datasource, repo interface, repo impl, providers) |
+| `/new-screen` | Add screen + notifier + state to existing feature, wire route |
+| `/new-endpoint` | Add API method across all 4 layers (endpoint, datasource, repo interface, repo impl) |
+| `/add-route` | Quick-add GoRoute + RouteNames constant |
+
+### Typical Workflow for New Feature
+
+```
+1. /new-feature          → scaffold module (data + domain + presentation dirs)
+2. /new-endpoint         → add API methods (repeat per endpoint)
+3. /new-screen           → add screens with notifiers (repeat per screen)
+4. /add-route            → add extra routes if needed beyond what /new-screen wires
+```
+
+### Usage Examples
+
+**Adding a "Notifications" feature from scratch:**
+```
+/new-feature             → input: notifications
+/new-endpoint            → input: notifications, getNotifications, GET, notifications/list, none, List<NotificationModel>
+/new-endpoint            → input: notifications, markAsRead, PUT, notifications/read, id:String, String
+/new-screen              → input: notifications, notification_list (data-fetch screen)
+/new-screen              → input: notifications, notification_detail (action-triggered screen)
+```
+
+**Adding a new screen to existing feature:**
+```
+/new-screen              → input: profile, change_email
+/new-endpoint            → input: profile, changeEmail, POST, auth/change-email, email:String, String
+```
+
+**Just adding a route for an existing screen:**
+```
+/add-route               → input: change_email, ChangeEmailScreen, ../features/profile/..., yes (auth), no (no extra params)
+```
+
+## Remaining Work
+
+### Phase 5 — Cleanup (IN PROGRESS)
+- [ ] Replace 111 `.withOpacity()` calls with `.withValues()` (deprecated API)
+- [ ] Replace 1 remaining `print()` with `debugPrint()` (`shoot_date_time_screen.dart`)
+- [ ] Fix 22 warnings from `flutter analyze` (unused vars, dead code, unused imports)
+- [ ] Fix 191 info-level lint issues
+- [ ] Clean up `docs/` planning files (many are now obsolete post-migration)
+
+### Phase 6 — Testing (NOT STARTED)
+- [ ] Wire up navigation integration tests (see pending wiring above)
+- [ ] Add unit tests for all Notifiers
+- [ ] Add widget tests for screens
+- [ ] Target: 70%+ coverage
+- [ ] Testing patterns in `docs/guides/FLUTTER_TESTING_GUIDELINES.md`
