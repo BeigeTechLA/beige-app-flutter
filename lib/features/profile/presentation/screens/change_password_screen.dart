@@ -12,6 +12,8 @@ import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
 
+import '../../../../app/assets.dart';
+
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   final String email;
 

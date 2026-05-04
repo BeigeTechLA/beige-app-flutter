@@ -9,6 +9,8 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_notifier.dart';
 
+import '../../../../app/assets.dart';
+
 class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
 

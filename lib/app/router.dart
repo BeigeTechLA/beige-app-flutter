@@ -45,6 +45,7 @@ import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/auth/presentation/screens/sign_up_screen.dart';
 import '../core/firebase/analytics_service.dart';
 import '../core/providers/auth_state_provider.dart';
+import 'assets.dart';
 import 'route_names.dart';
 
 /// Global navigator key — kept temporarily for ScaffoldMessenger compatibility.

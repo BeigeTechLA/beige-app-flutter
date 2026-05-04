@@ -382,7 +382,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         color:Color(0xffE8D1AB)
                                     ),
                                     child: SvgPicture.asset(
-                                      'assets/svg/Stars.svg',
+                                      AppAssets.ratings,
                                       width: 22,
                                       height: 22,
                                       fit: BoxFit.cover,

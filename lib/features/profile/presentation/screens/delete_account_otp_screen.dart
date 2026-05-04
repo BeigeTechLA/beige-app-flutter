@@ -14,6 +14,8 @@ import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_otp_notifier.dart';
 
+import '../../../../app/assets.dart';
+
 class DeleteAccountOtpScreen extends ConsumerStatefulWidget {
   const DeleteAccountOtpScreen({super.key});
 

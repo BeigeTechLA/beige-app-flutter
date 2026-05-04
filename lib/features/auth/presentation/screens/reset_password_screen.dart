@@ -13,6 +13,8 @@ import 'package:beige/features/auth/presentation/providers/reset_password_notifi
 import 'package:beige/features/auth/presentation/providers/reset_password_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
+import '../../../../app/assets.dart';
+
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   final String email;
   final String otp;

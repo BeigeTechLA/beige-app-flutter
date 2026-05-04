@@ -120,7 +120,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   final List<String> featuredImages = [
     AppAssets.creativeAlecH,
-    // "assets/images/Benson+F.png",
     AppAssets.creativeChristopherR,
     AppAssets.creativeCoreyB,
     AppAssets.creativeCorneliumM,
@@ -133,7 +132,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   ];
   final List<String> images = [
     AppAssets.creativeAlecH,
-    // "assets/images/Benson+F.png",
     AppAssets.creativeChristopherR,
     AppAssets.creativeCoreyB,
     AppAssets.creativeCorneliumM,

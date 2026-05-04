@@ -13,6 +13,8 @@ import 'package:beige/features/auth/presentation/providers/forgot_password_notif
 import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
+import '../../../../app/assets.dart';
+
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 

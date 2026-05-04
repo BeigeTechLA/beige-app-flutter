@@ -15,6 +15,8 @@ import 'package:beige/features/auth/presentation/providers/login_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/login_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
+import '../../../../app/assets.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 

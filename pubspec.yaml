@@ -122,7 +122,6 @@ flutter:
     - assets/home/
     - assets/svg/bottom_nav/
     - assets/mock_data/creatives/
-    - assets/mock_data/studios/
     - assets/mock_data/top_words/
 
 
@@ -189,5 +188,5 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/icons/app_icon.png
+  # image_path: assets/icons/app_icon.png  # TODO: add app_icon.png to assets/icons/ before running flutter_launcher_icons
   remove_alpha_ios: true

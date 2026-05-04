@@ -1,6 +1,5 @@
 
-## Objective
-laude # Asset Naming Cleanup Plan
+# Asset Naming Cleanup Plan
 
 Standardize all asset file/folder names to `lowercase_snake_case`. Remove spaces, special chars, Figma export names, hash names, and typos. Centralize all hardcoded paths to `AppAssets`.
 
@@ -558,7 +557,7 @@ exit 0
 - [x] 6. **Remove dead references + unused files** — Clean up remaining artifacts manually if needed.
 - [x] 7. **Install Pre-Commit Hook** — Run `chmod +x .git/hooks/pre-commit` to prevent future bad names.
 - [x] 8. **Final grep sweep** — Confirm zero remaining hardcoded paths
-- [ ] 9. **Full verification** — `flutter analyze` + manual screen walkthrough
+- [x] 9. **Full verification** — `flutter analyze` + manual screen walkthrough
 
 ## Stats
 

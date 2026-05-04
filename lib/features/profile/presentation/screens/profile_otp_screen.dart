@@ -12,6 +12,8 @@ import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_otp_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_otp_state.dart';
 
+import '../../../../app/assets.dart';
+
 class ProfileOtpScreen extends ConsumerStatefulWidget {
   final String email;
   const ProfileOtpScreen({super.key, required this.email});
