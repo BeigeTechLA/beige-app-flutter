@@ -85,7 +85,7 @@ class _ProfileNewPasswordScreenState
               InkWell(
                 onTap: () => context.pop(true),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                   width: 24,
                 ),
@@ -129,8 +129,8 @@ class _ProfileNewPasswordScreenState
                           },
                           icon: SvgPicture.asset(
                             showPassword
-                                ? "assets/svg/eyes1.svg"
-                                : "assets/svg/eyes2.svg",
+                                ? AppAssets.eyeOpen
+                                : AppAssets.eyeClosed,
                             height: 22,
                             colorFilter: const ColorFilter.mode(
                               Colors.white,
@@ -155,8 +155,8 @@ class _ProfileNewPasswordScreenState
                           },
                           icon: SvgPicture.asset(
                             showConfirmPassword
-                                ? "assets/svg/eyes1.svg"
-                                : "assets/svg/eyes2.svg",
+                                ? AppAssets.eyeOpen
+                                : AppAssets.eyeClosed,
                             height: 22,
                             colorFilter: const ColorFilter.mode(
                               Colors.white,
@@ -269,7 +269,7 @@ class _ProfileNewPasswordScreenState
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Lottie.asset(
-                        'assets/lottie/success_animation.json',
+                        AppAssets.lottieSuccess,
                         repeat: false,
                       ),
                       const SizedBox(height: 12),

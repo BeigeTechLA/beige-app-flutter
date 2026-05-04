@@ -11,6 +11,8 @@
   import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
+import '../../../../app/assets.dart';
+
   class ShootDateTimeScreen extends ConsumerStatefulWidget {
 
     final int ShootTypeId;
@@ -848,7 +850,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                 backgroundColor: AppColors.surfaceDark,
                 dividerColor: AppColors.dividerDark,
                 headerHeadlineStyle: const TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
                   color: AppColors.white,
@@ -859,12 +861,12 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                   RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
                 weekdayStyle: const TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontSize: 13,
                   color: AppColors.white70,
                 ),
                 dayStyle: const TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontSize: 14,
                   color: AppColors.white,
                 ),
@@ -873,7 +875,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   textStyle: const TextStyle(
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -966,7 +968,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                         child: const Text(
                           "Select Date",
                           style: TextStyle(
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
                             color: AppColors.white,
@@ -1240,7 +1242,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                 child: InkWell(
                   onTap: () => context.pop(true),
                   child: SvgPicture.asset(
-                    "assets/svg/back.svg",
+                    AppAssets.back,
                     height: 24,
                   ),
                 ),
@@ -1250,7 +1252,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                 style: TextStyle(
                   color: AppColors.white,
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -1262,7 +1264,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                   style: TextStyle(
                     color: AppColors.white,
                     fontSize: 14,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -1318,7 +1320,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                           textAlign: TextAlign.start,
                           "Select Booking Type",
                           style: TextStyle(
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -1372,7 +1374,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                           Text(
                                             "Single Day",
                                             style: TextStyle(
-                                              fontFamily: 'Outfit',
+                                              fontFamily: AppAssets.fontOutfit,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14,
                                               color: selectedIndex == 1
@@ -1470,7 +1472,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                           Text(
                                             "Multiple Days",
                                             style: TextStyle(
-                                              fontFamily: 'Outfit',
+                                              fontFamily: AppAssets.fontOutfit,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 14,
                                               color: selectedIndex == 2
@@ -1547,7 +1549,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   Text(
                                     "Select Date",
                                     style: TextStyle(
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -1579,7 +1581,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                     ),
                                     child: Text(
                                       "Total Days: ${selectedDates.length}",
-                                      style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
+                                      style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -1602,7 +1604,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                         scrollDirection: Axis.horizontal, // 👈 scroll enable
                                         child: Text(
                                             formatSelectedDates(selectedDates),
-                                            style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
+                                            style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500)
                                         ),
                                       ),
                                     ),
@@ -1613,7 +1615,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                               SizedBox(height: 18,),
                               Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
                                 color: AppColors.white,
-                                fontFamily:'Unbounded',
+                                fontFamily:AppAssets.fontUnbounded,
                                 fontSize: 14,
                               ),),
 
@@ -1740,7 +1742,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                     suffixIcon: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
-                                    "assets/svg/Group 2087328870.svg",
+                                    AppAssets.clock,
                                       color: AppColors.white,
                                     ),
                                     ),
@@ -1758,7 +1760,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                                     suffixIcon: Padding(
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
-                                                        "assets/svg/Group 2087328870.svg",
+                                                        AppAssets.clock,
                                                         color: AppColors.white,
                                                       ),
                                                     ),
@@ -1776,7 +1778,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                                     suffixIcon: Padding(
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
-                                                        "assets/svg/Group 2087328870.svg",
+                                                        AppAssets.clock,
                                                         color: AppColors.white,
                                                       ),
                                                     ),
@@ -1794,7 +1796,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                                     suffixIcon: Padding(
                                                       padding: const EdgeInsets.all(12),
                                                       child: SvgPicture.asset(
-                                                        "assets/svg/Group 2087328870.svg",
+                                                        AppAssets.clock,
                                                         color: AppColors.white,
                                                       ),
                                                     ),
@@ -1851,7 +1853,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   suffixIcon: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
+                                      AppAssets.clock,
                                       color: AppColors.white,
                                       width: 20,
                                       height: 20,
@@ -1879,7 +1881,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   suffixIcon: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
+                                      AppAssets.clock,
                                       color: AppColors.white,
                                       width: 20,
                                       height: 20,
@@ -1902,7 +1904,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   suffixIcon: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
+                                      AppAssets.clock,
                                       color: AppColors.white,
                                       width: 20,
                                       height: 20,
@@ -1928,7 +1930,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   suffixIcon: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: SvgPicture.asset(
-                                      "assets/svg/Group 2087328870.svg",
+                                      AppAssets.clock,
                                       color: AppColors.white,
                                       width: 20,
                                       height: 20,
@@ -1940,14 +1942,14 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
 
                                 Row(
                                   children: [
-                                    SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
+                                    SvgPicture.asset(AppAssets.checkmark, width: 24, height: 24),
                                     SizedBox(width: 6),
                                     Text(
                                       'Applied to ${selectedDates.length} selected dates',
                                       style: TextStyle(
                                         color: AppColors.textSecondary,
                                         fontSize: 14,
-                                        fontFamily: 'Outfit',
+                                        fontFamily: AppAssets.fontOutfit,
                                         fontWeight: FontWeight.w400,
                                         height: 1.36,
                                       ),
@@ -1967,7 +1969,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                   child: Row(
                                     children: [
                                       /// 📅 ICON
-                                      SvgPicture.asset("assets/svg/calendar-03.svg"),
+                                      SvgPicture.asset(AppAssets.calendar),
 
                                       const SizedBox(width: 13),
 
@@ -1983,7 +1985,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                                 color: AppColors.white,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
-                                                fontFamily: "Helvetica Neue"
+                                                fontFamily: AppAssets.fontHelveticaNeue
                                               ),
                                             ),
 
@@ -1995,7 +1997,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
       ? "${startTime!.format(context)} – ${endTime!.format(context)}"
           : "Select Time",
                                               style: TextStyle(
-                                                fontFamily: "Helvetica Neue",
+                                                fontFamily: AppAssets.fontHelveticaNeue,
 
 
                                                 color: AppColors.white70,
@@ -2012,7 +2014,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                         style: TextStyle(
                                           color: AppColors.primary,
                                           fontSize: 14,
-                                          fontFamily: "Helvetica Neue",
+                                          fontFamily: AppAssets.fontHelveticaNeue,
 
 
                                           fontWeight: FontWeight.w500,
@@ -2039,7 +2041,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                               Text(
                                 "Shoot Date & Time",
                                 style: TextStyle(
-                                  fontFamily: "Unbounded",
+                                  fontFamily: AppAssets.fontUnbounded,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -2059,7 +2061,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             suffixIcon: Padding(
                               padding: const EdgeInsets.all(12),
                               child: SvgPicture.asset(
-                                "assets/svg/calendar-03.svg",
+                                AppAssets.calendar,
                                 width: 20,
                                 height: 20,
                                 colorFilter: const ColorFilter.mode(
@@ -2088,7 +2090,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             suffixIcon: Padding(
                               padding: const EdgeInsets.all(12),
                               child: SvgPicture.asset(
-                                "assets/svg/Group 2087328870.svg",
+                                AppAssets.clock,
                                 color: AppColors.white,
                                 width: 20,
                                 height: 20,
@@ -2112,7 +2114,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             suffixIcon: Padding(
                               padding: const EdgeInsets.all(12),
                               child: SvgPicture.asset(
-                                "assets/svg/Group 2087328870.svg",
+                                AppAssets.clock,
                                 color: AppColors.white,
                                 width: 20,
                                 height: 20,
@@ -2133,7 +2135,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             Text(
                               "Edits Needed?",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -2200,7 +2202,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                             color: AppColors.white,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
                                       ],
@@ -2220,7 +2222,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                             style: const TextStyle(
                                               color: AppColors.white70,
                                               fontSize: 13,
-                                              fontFamily: "Outfit",
+                                              fontFamily: AppAssets.fontOutfit,
                                             ),
                                             softWrap: true,
                                           ),
@@ -2243,7 +2245,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                     ),
                                     style: const TextStyle(
                                       color: AppColors.white,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppAssets.fontOutfit,
                                       fontSize: 14,
                                     ),
                                     decoration: InputDecoration(
@@ -2309,7 +2311,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                             shape: BoxShape.circle,
                                           ),
                                           child:  Center(
-                                            child: Image.asset('assets/images/star.png'),
+                                            child: Image.asset(AppAssets.starIcon),
                                           ),
                                         ),
 
@@ -2321,7 +2323,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                             getFinalSummaryText(),
                                             style: TextStyle(
                                               fontSize: 12,
-                                              fontFamily: "Outfit",
+                                              fontFamily: AppAssets.fontOutfit,
                                               fontWeight: FontWeight.w600,
                                               color: AppColors.surfaceDeep,
 
@@ -2381,7 +2383,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                    child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -2411,7 +2413,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                     child: const Text(
                       "Continue",
                       style: TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                       ),
@@ -2480,13 +2482,13 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                       color: AppColors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
-                      fontFamily: 'Outfit',
+                      fontFamily: AppAssets.fontOutfit,
                     ),
                   ),
                   GestureDetector(
                     onTap: () => _selectDateMultiple(context),
                     child: SvgPicture.asset(
-                      'assets/svg/calendar-03.svg',
+                      AppAssets.calendar,
                       width: 24,
                       height: 24,
 
@@ -2550,7 +2552,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                           Text(
                             "${date.day}",
                             style: TextStyle(
-                              fontFamily: 'Outfit',
+                              fontFamily: AppAssets.fontOutfit,
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                               color: isSelected
@@ -2562,7 +2564,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             DateFormat('EEE').format(date),
                             style: TextStyle(
                               fontSize: 9,
-                              fontFamily: 'Outfit',
+                              fontFamily: AppAssets.fontOutfit,
                               fontWeight: FontWeight.w700,
                               color: isSelected
                                   ? AppColors.background
@@ -2701,7 +2703,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                                 style: TextStyle(
                                   color: AppColors.textHeading,
                                   fontSize: 13,
-                                  fontFamily: "Helvetica Neue",
+                                  fontFamily: AppAssets.fontHelveticaNeue,
                                   fontWeight: FontWeight.w600
 
                                 ),
@@ -2893,7 +2895,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                         children: [
                           /// 📸 ICON
                           Center(
-                            child: Image.asset("assets/Icons/emoji_photo.png",height: 15,),
+                            child: Image.asset(AppAssets.emojiPhoto,height: 15,),
                           ),
 
                           const SizedBox(width: 10),
@@ -2903,7 +2905,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                             child: Text(
                               "Includes ${getIncludedPhotoCount()} free photo edits",
                               style: const TextStyle(
-                                fontFamily: "Helvetica Neue",
+                                fontFamily: AppAssets.fontHelveticaNeue,
 
 
                                 color: AppColors.primary,
@@ -2954,7 +2956,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
                           Text(
                             "25 Added Extra",
                             style: const TextStyle(
-                              fontFamily: "Helvetica Neue",
+                              fontFamily: AppAssets.fontHelveticaNeue,
 
 
                               color: AppColors.primary,
@@ -3029,7 +3031,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
               style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 14,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -3056,7 +3058,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
           children: [
 
             /// 🔹 TITLE
-     /*       Text( title, style: TextStyle(color: AppColors.white,fontFamily: "Outfit",fontSize: 12)),
+     /*       Text( title, style: TextStyle(color: AppColors.white,fontFamily: AppAssets.fontOutfit,fontSize: 12)),
 
   SizedBox(height: 10,),*/
             /// 🔹 SELECT BOX
@@ -3143,7 +3145,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
           color: highlight
               ? AppColors.primary
               : AppColors.white60,
-          fontFamily: "Outfit",
+          fontFamily: AppAssets.fontOutfit,
         ),
         ),
         ))

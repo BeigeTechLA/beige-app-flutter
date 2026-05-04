@@ -58,7 +58,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                   colorFilter: const ColorFilter.mode(
                     AppColors.white,

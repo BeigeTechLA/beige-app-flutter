@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,7 +43,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       bottomRight: Radius.circular(28),
                     ),
                     child: Image.asset(
-                      "assets/images/profile.png",
+                      AppAssets.profilePlaceholder,
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -53,7 +54,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: InkWell(
                     onTap: () => context.pop(),
                     child: SvgPicture.asset(
-                      "assets/svg/back.svg",
+                      AppAssets.back,
                       colorFilter: const ColorFilter.mode(
                         AppColors.black,
                         BlendMode.srcIn,
@@ -72,7 +73,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       style: TextStyle(
                         color: AppColors.textHeading,
                         fontSize: 16,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -98,7 +99,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               child: profileImageUrl == null
                                   ? Center(
                                       child: SvgPicture.asset(
-                                        "assets/svg/persone.svg",
+                                        AppAssets.person,
                                         width: 96,
                                         height: 96,
                                       ),
@@ -118,7 +119,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                             width: 96,
                                             height: 96,
                                             child: Lottie.asset(
-                                              "assets/lottie/loading_spinner.json",
+                                              AppAssets.lottieSpinner,
                                               fit: BoxFit.contain,
                                             ),
                                           ),
@@ -128,7 +129,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           (context, error, stackTrace) {
                                         return Center(
                                           child: SvgPicture.asset(
-                                            "assets/svg/persone.svg",
+                                            AppAssets.person,
                                             width: 96,
                                             height: 96,
                                           ),
@@ -150,7 +151,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Text(
               myProfile?['name'] ?? 'USER',
               style: const TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
@@ -161,7 +162,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               "${myProfile?['email'] ?? ''}",
               style: const TextStyle(
                 color: AppColors.white60,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
@@ -188,7 +189,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   "Edit Profile",
                   style: TextStyle(
                     fontSize: 10,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     color: AppColors.textHeading,
                     fontWeight: FontWeight.w500,
                   ),
@@ -223,7 +224,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   "My Account",
                   style: TextStyle(
                     color: AppColors.white,
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -239,13 +240,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Column(
               children: [
                 _menuRow(
-                  "assets/svg/my_profile/Favourites.svg",
+                  AppAssets.profileFavourites,
                   "Favourites",
                   onTap: () => context.pushNamed(RouteNames.favourites),
                 ),
                 _divider(),
                 _menuRow(
-                  "assets/svg/my_profile/BookingHistory.svg",
+                  AppAssets.profileBookingHistory,
                   "Booking History",
                   onTap: () => context.pushNamed(RouteNames.bookingHistory),
                 ),
@@ -265,7 +266,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   "Legal",
                   style: TextStyle(
                     color: AppColors.white,
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -282,7 +283,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Column(
               children: [
                 _menuRow(
-                  "assets/svg/my_profile/Terms & Condition.svg",
+                  AppAssets.profileTerms,
                   "Terms & Condition",
                   onTap: () async {
                     final uri =
@@ -294,7 +295,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 _divider(),
                 _menuRow(
-                  "assets/svg/my_profile/Privacy Policy.svg",
+                  AppAssets.profilePrivacy,
                   "Privacy Policy",
                   onTap: () async {
                     final uri =
@@ -319,7 +320,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   "Settings",
                   style: TextStyle(
                     color: AppColors.white,
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -336,13 +337,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Column(
               children: [
                 _menuRow(
-                  "assets/svg/my_profile/App_Preferences.svg",
+                  AppAssets.profilePreferences,
                   "App Preferences",
                   onTap: () => context.pushNamed(RouteNames.appPreferences),
                 ),
                 _divider(),
                 _menuRow(
-                  "assets/svg/my_profile/Logout.svg",
+                  AppAssets.profileLogout,
                   "Logout",
                   onTap: _showLogoutBottomSheet,
                 ),
@@ -386,14 +387,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   color: AppColors.white,
                   fontSize: 14,
                 ),
               ),
             ),
             SvgPicture.asset(
-              "assets/svg/my_profile/layer1.svg",
+              AppAssets.chevronRight,
               height: 15,
               width: 20,
               colorFilter: const ColorFilter.mode(
@@ -443,7 +444,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -453,7 +454,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 style: TextStyle(
                   color: Colors.white60,
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
               const SizedBox(height: 14),
@@ -477,7 +478,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                         ),
                       ),
                     ),
@@ -506,7 +507,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textHeading,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                         ),
                       ),
                     ),

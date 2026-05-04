@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +29,7 @@ class ShootHistoryScreen extends ConsumerWidget {
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                   colorFilter: const ColorFilter.mode(
                     AppColors.white,
@@ -44,7 +45,7 @@ class ShootHistoryScreen extends ConsumerWidget {
               child: Text(
                 "Booking History",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,
@@ -67,7 +68,7 @@ class ShootHistoryScreen extends ConsumerWidget {
                             "No bookings found",
                             style: TextStyle(
                               color: Colors.white70,
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                             ),
                           ),
                         )
@@ -107,7 +108,7 @@ class ShootHistoryScreen extends ConsumerWidget {
                                                   error, stackTrace) {
                                                 return Center(
                                                   child: SvgPicture.asset(
-                                                    "assets/svg/imag_placeholder.svg",
+                                                    AppAssets.imagePlaceholder,
                                                     width: 120,
                                                     height: 120,
                                                     fit: BoxFit.contain,
@@ -117,7 +118,7 @@ class ShootHistoryScreen extends ConsumerWidget {
                                             )
                                           : Center(
                                               child: SvgPicture.asset(
-                                                "assets/svg/imag_placeholder.svg",
+                                                AppAssets.imagePlaceholder,
                                                 width: 120,
                                                 height: 120,
                                                 fit: BoxFit.contain,
@@ -161,7 +162,7 @@ class ShootHistoryScreen extends ConsumerWidget {
                                               style: const TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.white,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                                 fontWeight:
                                                     FontWeight.w600,
                                               ),
@@ -171,7 +172,7 @@ class ShootHistoryScreen extends ConsumerWidget {
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.white70,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],

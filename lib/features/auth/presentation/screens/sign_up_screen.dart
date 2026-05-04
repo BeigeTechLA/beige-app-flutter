@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -268,7 +269,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       children: [
                         /// 🔹 LEFT IMAGE ICON
                         Image.asset(
-                          "assets/images/Image.png", // 👈 your image
+                          AppAssets.roleSelection, // 👈 your image
 
                           height: 20,
                           width: 20,
@@ -309,7 +310,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         /// 🔹 RIGHT IMAGE ICON
                         /// 🔹 LEFT IMAGE ICON
                         Image.asset(
-                          "assets/images/Image.png", // 👈 your image
+                          AppAssets.roleSelection, // 👈 your image
 
                           height: 24,
                           width: 24,
@@ -745,7 +746,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       /// 🖼️ BACKGROUND IMAGE
                       Positioned.fill(
                         child: Image.asset(
-                          "assets/images/Rectangle_574057023.png",
+                          AppAssets.authBackground,
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -760,7 +761,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               context.pop();
                             },
                             child: SvgPicture.asset(
-                              "assets/svg/back.svg",
+                              AppAssets.back,
                               height: 24,
                             ),
                           )
@@ -891,7 +892,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                     suffixIcon: Padding(//
                                       padding: const EdgeInsets.all(13),
                                       child: SvgPicture.asset(
-                                        "assets/svg/LocationPin.svg",
+                                        AppAssets.locationPin,
                                         width: 24,
                                         height: 24,
                                         color: AppColors.white,//
@@ -1024,8 +1025,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 },
                                 icon: SvgPicture.asset(
                                   showPassword
-                                      ? "assets/svg/eyes1.svg"
-                                      : "assets/svg/eyes2.svg",
+                                      ? AppAssets.eyeOpen
+                                      : AppAssets.eyeClosed,
                                   height: 22,
                                   colorFilter: const ColorFilter.mode(
                                     Colors.white,
@@ -1055,8 +1056,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 },
                                 icon: SvgPicture.asset(
                                   showConfirmPassword
-                                      ? "assets/svg/eyes1.svg"
-                                      : "assets/svg/eyes2.svg",
+                                      ? AppAssets.eyeOpen
+                                      : AppAssets.eyeClosed,
                                   height: 22,
                                   colorFilter: const ColorFilter.mode(
                                     Colors.white,
@@ -1256,7 +1257,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               const Text(
                                 "Tell Us About Yourself & Add Details",
                                 style: TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.white70,
@@ -1371,7 +1372,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     : null,
                 child: profileImage == null
                     ? SvgPicture.asset(
-                  "assets/svg/persone.svg",
+                  AppAssets.person,
 
                 )
                     : null,
@@ -1409,7 +1410,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               fontSize: 12,        // 🔹 thoda bada (image jaisa)
                               fontWeight: FontWeight.w500, // 🔹 bold
                               color: Colors.black,
-                              fontFamily: "Outfit"
+                              fontFamily: AppAssets.fontOutfit
                           ),
                         ),
                       ],
@@ -1459,7 +1460,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               ),
               child:  Center(
                 child: SvgPicture.asset(
-                  "assets/svg/persone.svg",
+                  AppAssets.person,
 
                 ),
               ),
@@ -1530,7 +1531,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     const Text(
                       "Name: ",
                       style: TextStyle(
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -1539,7 +1540,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     Text(
                       name.isEmpty ? "Your Name" : name,
                       style: const TextStyle(
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -1556,7 +1557,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     const Text(
                       "Email ID: ",
                       style: TextStyle(
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         fontSize: 12,
                         color: Colors.black54,
                       ),
@@ -1566,7 +1567,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         email.isEmpty ? "Your Email" : email,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontFamily: "Outfit",
+                          fontFamily: AppAssets.fontOutfit,
                           fontSize: 12,
                           color: Colors.black54,
                         ),

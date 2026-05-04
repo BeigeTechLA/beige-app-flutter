@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +69,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                 ),
               ),
@@ -79,7 +80,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                 color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
               ),
             ),
             // 🔹 Step Text (Right)
@@ -88,7 +89,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
               child: Text(
                 "2/3",
                 style: TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   color: AppColors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -154,7 +155,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                   Text(
                     "Crew Size & Matching",
                     style: TextStyle(
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -195,7 +196,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: SvgPicture.asset(
-                                        "assets/svg/Group_2087329363.svg",
+                                        AppAssets.info,
 
                                       ),
                                     ),
@@ -203,7 +204,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                     Expanded(
                                       child: Text(
                                         "Recommended Crew Size for \nYour Project",
-                                        style: TextStyle(color: AppColors.textHeading, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: "Outfit"),
+                                        style: TextStyle(color: AppColors.textHeading, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: AppAssets.fontOutfit),
                                       ),
                                     ),
                                   ],
@@ -231,7 +232,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         debugPrint("⏳ IMAGE LOADING → $url");
                                         return Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/loading_spinner.json",
+                                            AppAssets.lottieSpinner,
                                             width: 120,
                                             height: 120,
                                           ),
@@ -252,7 +253,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         debugPrint("❌ IMAGE FAILED → $url");
                                         return Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/loading_spinner.json",
+                                            AppAssets.lottieSpinner,
                                             width: 120,
                                             height: 120,
                                           ),
@@ -278,7 +279,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                           color: AppColors.white,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          fontFamily: "Outfit",
+                                          fontFamily: AppAssets.fontOutfit,
                                         ),
                                       ),
                                     ),
@@ -291,7 +292,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         color: AppColors.primary,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        fontFamily: "Outfit",
+                                        fontFamily: AppAssets.fontOutfit,
                                       ),
                                     ),
                                   ],
@@ -321,7 +322,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                               color: Colors.white.withOpacity(0.70),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              fontFamily: "Outfit",
+                                              fontFamily: AppAssets.fontOutfit,
                                             ),
                                           ),
                                         ],
@@ -335,7 +336,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                               color: AppColors.white,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              fontFamily: "Outfit",
+                                              fontFamily: AppAssets.fontOutfit,
                                             ),
                                           ),
                                         ],
@@ -355,7 +356,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                             Text(
                               "How would you like to proceed?",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -395,7 +396,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                   Expanded(
                                     child: Text(
                                       "AI Matchmaker",
-                                      style: TextStyle(color: AppColors.primary, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: "Outfit"),//
+                                      style: TextStyle(color: AppColors.primary, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: AppAssets.fontOutfit),//
                                     ),
                                   ),
                                 ],
@@ -415,7 +416,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                     color: AppColors.white,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
-                                    fontFamily: "Outfit",
+                                    fontFamily: AppAssets.fontOutfit,
                                   ),
                                 ),
                               ),
@@ -452,7 +453,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                             Text(
                               "How AI Matching Works",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -471,7 +472,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                               color: AppColors.white70,
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                             ),
                           ),
                         ),
@@ -510,7 +511,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: Color(0xffE8D1AB),
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w500,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                             TextSpan(
@@ -520,7 +521,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -557,7 +558,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: Color(0xffE8D1AB),
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w500,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                             TextSpan(
@@ -567,7 +568,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -604,7 +605,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: Color(0xffE8D1AB),
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w500,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                             TextSpan(
@@ -614,7 +615,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                                 color: AppColors.white70,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -663,7 +664,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                       "Back",
                       style: TextStyle(
                         fontSize: 13,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -698,7 +699,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                       "Continue",
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textHeading,
                       ),
@@ -720,7 +721,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SvgPicture.asset(
-          "assets/svg/true.svg", // ✔️ icon image
+          AppAssets.checkmark, // ✔️ icon image
           height: 24,
           width: 24,
         ),
@@ -732,7 +733,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
               color: AppColors.white70,
               fontSize: 12,
               fontWeight: FontWeight.w400,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
             ),
           ),
         ),

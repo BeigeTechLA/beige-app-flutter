@@ -2,6 +2,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -54,7 +55,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       "My Shoots",
                       style: TextStyle(
                         color: AppColors.white,
-                        fontFamily: 'Unbounded',
+                        fontFamily: AppAssets.fontUnbounded,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -104,7 +105,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 child: Text(
                                   "Upcoming",
                                   style: TextStyle(
-                                    fontFamily: "Outfit",
+                                    fontFamily: AppAssets.fontOutfit,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: isUpcomingSelected
@@ -137,7 +138,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 child: Text(
                                   "Completed",
                                   style: TextStyle(
-                                    fontFamily: "Outfit",
+                                    fontFamily: AppAssets.fontOutfit,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: !isUpcomingSelected
@@ -170,13 +171,13 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       children: [
                         /// 🔹 IMAGE
                         Image.asset(
-                          "assets/new_home/upcoming_nodata_imge.png",
+                          AppAssets.upcomingNoData,
                           height: 150,
                           fit: BoxFit.contain,
                         ),
                         Text("No Booking Found",
                             style:
-                            TextStyle(color: AppColors.primary,fontFamily: "Unbounded",fontSize: 16,fontWeight: FontWeight.w500)
+                            TextStyle(color: AppColors.primary,fontFamily: AppAssets.fontUnbounded,fontSize: 16,fontWeight: FontWeight.w500)
                         ),
 
                         Text(
@@ -184,7 +185,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColors.white70,
-                            fontFamily: "Outfit",
+                            fontFamily: AppAssets.fontOutfit,
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
                           ),
@@ -206,7 +207,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       ? const Center(
                     child: Text("No Completed Shoots",
                         style:
-                        TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                        TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
                         )),
                   )
                       : ListView.builder(
@@ -305,7 +306,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
 
   Widget upcomingBookingCard(Map shoot) {
-    final String fallbackImage = "assets/svg/imag_placeholder.svg";
+    final String fallbackImage = AppAssets.imagePlaceholder;
 
     // 1. profile image
     final String profileImageRaw = shoot['creative']?['profile_image_url'] ?? '';
@@ -378,7 +379,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
   }
 // ================= COMPLETED CARD =================
   Widget completedBookingCard(Map shoot) {
-    final String fallbackImage = "assets/svg/imag_placeholder.svg";
+    final String fallbackImage = AppAssets.imagePlaceholder;
 
     // 1. profile image
     final String profileImageRaw = shoot['creative']?['profile_image_url'] ?? '';
@@ -440,7 +441,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
               Positioned.fill(
                 child: (imagePath.isEmpty)
                     ? SvgPicture.asset(
-                  "assets/svg/imag_placeholder.svg",
+                  AppAssets.imagePlaceholder,
                   fit: BoxFit.cover,
                 )
                     : Image.network(
@@ -448,7 +449,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
+                      AppAssets.imagePlaceholder,
                       fit: BoxFit.cover,
                     );
                   },
@@ -495,7 +496,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     title ?? "",
     style: const TextStyle(
     color: Colors.white,
-    fontFamily: "Outfit"
+    fontFamily: AppAssets.fontOutfit
       ,
     fontSize: 12,
     fontWeight: FontWeight.w600,
@@ -521,7 +522,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     style: const TextStyle(
     color:AppColors.textHeading,
     fontSize: 14,
-      fontFamily: "Outfit"
+      fontFamily: AppAssets.fontOutfit
       ,
     fontWeight: FontWeight.w600,
     ),
@@ -535,7 +536,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     InkWell(
     onTap: onEditTap,
     child:SvgPicture.asset(
-    "assets/svg/home_view_profile.svg",
+    AppAssets.homeViewProfile,
     height: 45,
     ),
     ),
@@ -598,7 +599,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                         const Text(
                           "Filter By",
                           style: TextStyle(
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.white,
@@ -638,7 +639,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       const Text(
                         "Sort By Payment",
                         style: TextStyle(
-                          fontFamily: "Outfit",
+                          fontFamily: AppAssets.fontOutfit,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -673,7 +674,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                               child: const Text(
                                 "Clear All",
                                 style: TextStyle(
-                                  fontFamily: "Unbounded",
+                                  fontFamily: AppAssets.fontUnbounded,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.white,
@@ -697,7 +698,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                               child: const Text(
                                   "Apply",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: AppColors.black,
@@ -783,7 +784,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             Text(
               title,
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 15,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withValues(alpha:0.8),

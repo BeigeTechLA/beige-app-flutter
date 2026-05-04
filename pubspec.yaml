@@ -113,15 +113,17 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/Splash/
-    - assets/Onboding/
-    - assets/Icons/
+    - assets/splash/
+    - assets/onboarding/
+    - assets/icons/
     - assets/lottie/
     - assets/svg/
-    - assets/svg/my_profile/
-    - assets/new_home/
-    - assets/svg/new_bottom_image/
-    - assets/new_home/Topwrods/
+    - assets/svg/profile/
+    - assets/home/
+    - assets/svg/bottom_nav/
+    - assets/mock_data/creatives/
+    - assets/mock_data/studios/
+    - assets/mock_data/top_words/
 
 
 
@@ -187,5 +189,5 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/Icons/app_icon.png
+  image_path: assets/icons/app_icon.png
   remove_alpha_ios: true

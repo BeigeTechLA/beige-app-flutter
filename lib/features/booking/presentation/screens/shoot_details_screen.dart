@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -209,13 +210,13 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   String getContentTypeIcon(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
-        return "assets/svg/video.svg";   // Videography
+        return AppAssets.video;   // Videography
       case 2:
-        return "assets/svg/Photo.svg";   // Photography
+        return AppAssets.photo;   // Photography
       case 3:
-        return "assets/svg/video_photo.svg"; // Both
+        return AppAssets.video; // Both
       default:
-        return "assets/svg/default.svg";
+        return AppAssets.photo;
     }
   }
 */
@@ -416,7 +417,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                 ),
               ),
@@ -426,7 +427,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: 14,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -438,7 +439,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 style: TextStyle(
                   color: AppColors.white,
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -503,7 +504,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               Text(
                 "More Details",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -547,7 +548,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           ),*/
                           child: Center(
                             child: SvgPicture.asset(
-                              "assets/svg/video.svg",
+                              AppAssets.video,
                             ),
                           ),
                         ),
@@ -606,7 +607,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           ),*/
                           child: Center(
                             child: SvgPicture.asset(
-                              "assets/svg/Photo.svg",
+                              AppAssets.photo,
                               // height: 20,
                             ),
                           ),
@@ -654,7 +655,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   "Would you like to Add Additional creatives?",
                   style: TextStyle(
                     color: Colors.white,
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -772,7 +773,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 //
                 //   textStyle: const TextStyle(
                 //     color: AppColors.white,
-                //     fontFamily: "Outfit",
+                //     fontFamily: AppAssets.fontOutfit,
                 //   ),
                 //
                 //   inputDecoration: InputDecoration(
@@ -781,7 +782,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 //
                 //     labelStyle: const TextStyle(
                 //       color: AppColors.white70,
-                //       fontFamily: "Outfit",
+                //       fontFamily: AppAssets.fontOutfit,
                 //     ),
                 //
                 //     hintText: "Search or select location",
@@ -868,7 +869,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                           textStyle: const TextStyle(
                             color: AppColors.white,
-                            fontFamily: "Outfit",
+                            fontFamily: AppAssets.fontOutfit,
                             fontSize: 14,
                           ),
 
@@ -890,7 +891,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                                 width: 16,   // 👈 control size here
                                 height: 16,
                                 child: SvgPicture.asset(
-                                  "assets/svg/LocationPin.svg",
+                                  AppAssets.locationPin,
                                   fit: BoxFit.none,
                                 ),
                               ),
@@ -1129,7 +1130,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                  child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1153,7 +1154,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   child: const Text(
                     "Continue",
                     style: TextStyle(
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                       color: AppColors.textHeading,
                       fontWeight: FontWeight.w500,
                       fontSize: 14,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +40,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                   colorFilter: const ColorFilter.mode(
                     AppColors.white,
@@ -56,7 +57,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               child: Text(
                 " Favourites",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,
@@ -107,7 +108,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                                               fit: BoxFit.fill,
                                             )
                                           : SvgPicture.asset(
-                                              "assets/svg/imag_placeholder.svg",
+                                              AppAssets.imagePlaceholder,
                                               width: double.infinity,
                                               height: 220,
                                               fit: BoxFit.cover,
@@ -132,7 +133,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                                             }
                                           },
                                           child: SvgPicture.asset(
-                                            "assets/svg/Heart_COLOR.svg",
+                                            AppAssets.heartFilled,
                                             height: 22,
                                             width: 22,
                                           ),
@@ -180,7 +181,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                     message,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),

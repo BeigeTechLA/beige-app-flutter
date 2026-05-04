@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,12 +23,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   bool _precacheDone = false; // ✅ double call rokne ke liye
 
   final List<String> centerImages = [
-    "assets/Splash/Property_1.png",
-    "assets/Splash/Property_2.png",
-    "assets/Splash/Property_3.png",
-    "assets/Splash/Property_4.png",
-    "assets/Splash/Propety_5.png",
-    "assets/Splash/Property_6.png",
+    AppAssets.splash1,
+    AppAssets.splash2,
+    AppAssets.splash3,
+    AppAssets.splash4,
+    AppAssets.splash5,
+    AppAssets.splash6,
   ];
 
   @override

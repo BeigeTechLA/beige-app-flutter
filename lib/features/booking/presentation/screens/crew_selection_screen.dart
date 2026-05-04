@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -223,7 +224,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     context.pop();
                   },
                   child:SvgPicture.asset(
-                    "assets/svg/back.svg",
+                    AppAssets.back,
                     height: 24,
                   ),
                 ),
@@ -233,7 +234,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 style: TextStyle(
                   color: AppColors.white,
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -245,7 +246,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   style: TextStyle(
                     color: AppColors.white,
                     fontSize: 14,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -313,7 +314,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                       Text(
                         "Select Your Dream Team",
                         style: TextStyle(
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppColors.white,
@@ -329,7 +330,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           );
                         },
                         child: SvgPicture.asset(
-                          "assets/svg/Filter.svg",
+                          AppAssets.filter,
                           height: 24,
                         ),
                       ),
@@ -378,7 +379,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                 fit: BoxFit.cover,
                               )
                                   : Image.asset(
-                                "assets/images/Rectangle 34661070.png",
+                                AppAssets.creativeCardBg,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -443,8 +444,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     },
                                     child: Image.asset(
                                       isFavourite
-                                          ? "assets/Icons/Heart_Angl_COLOR.png"
-                                          : "assets/images/Heart Angle.png",
+                                          ? AppAssets.heartAngleFilled
+                                          : AppAssets.heartAngle,
                                       height: 22,
                                       width: 22,
                                     ),
@@ -617,7 +618,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             isAdded ? "Remove" : "Add to Crew",
                                             style: TextStyle(
                                               fontSize: 12,
-                                              fontFamily: "Outfit",
+                                              fontFamily: AppAssets.fontOutfit,
                                               fontWeight: FontWeight.w600,
                                               color: isAdded ? Colors.red : Colors.black,
                                             ),
@@ -637,7 +638,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                           });
                                         },
                                         child: Image.asset(
-                                          "assets/images/Group 2087328980.png",
+                                          AppAssets.navigateArrow,
                                           height: 32,
                                         ),
                                       ),
@@ -679,7 +680,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                                 ClipOval(
                                   child: Image.asset(
-                                    "assets/Icons/sale.png",
+                                    AppAssets.saleIcon,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
@@ -690,7 +691,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   "Our creators around \nyour location are booked ",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -732,7 +733,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             child: Text(
                               "  Browse Other Creative Partners",//
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.white,
@@ -777,11 +778,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                       fit: BoxFit.cover,
                                       alignment: Alignment.topCenter, // 🔥 important
                                       errorBuilder: (context, error, stackTrace) {
-                                        return SvgPicture.asset('assets/svg/imag_placeholder.svg',fit: BoxFit.contain, height: 25,);
+                                        return SvgPicture.asset(AppAssets.imagePlaceholder,fit: BoxFit.contain, height: 25,);
                                       },
                                     )
                                         : Image.asset(
-                                      "assets/images/Rectangle 34661070.png",
+                                      AppAssets.creativeCardBg,
                                       fit: BoxFit.contain,
                                       height: 25,
                                     ),
@@ -839,8 +840,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                       },
                                       child: SvgPicture.asset(
                                         isFavourite
-                                            ? "assets/svg/Heart_COLOR.svg"
-                                            : "assets/svg/Heart.svg",
+                                            ? AppAssets.heartFilled
+                                            : AppAssets.heart,
                                         height: 22,
                                         width: 22,
                                       ),
@@ -879,7 +880,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               item['name'] ?? '',
                                               style: const TextStyle(
                                                 fontSize: 14,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.white,
                                               ),
@@ -888,7 +889,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               item['role_name'] ?? '',
                                               style: const TextStyle(
                                                 fontSize: 11,
-                                                fontFamily: "Outfit",
+                                                fontFamily: AppAssets.fontOutfit,
                                                 color: Colors.white70,
                                               ),
                                             ),
@@ -997,7 +998,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                     isAdded ? "Remove" : "Add to Crew",
                                                     style: TextStyle(
                                                       fontSize: 12,
-                                                      fontFamily: 'Outfit',
+                                                      fontFamily: AppAssets.fontOutfit,
 
                                                       fontWeight: FontWeight.w600,
                                                       color: isAdded
@@ -1019,7 +1020,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                 });
                                               },
                                               child: SvgPicture.asset(
-                                                "assets/svg/home_view_profile.svg",
+                                                AppAssets.homeViewProfile,
                                                 color: Colors.white,
                                                 height: 36,
                                               ),
@@ -1106,7 +1107,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         "${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                       fontWeight: FontWeight.w600,
                       color: isRoleWiseSelectionComplete
                           ? AppColors.textHeading
@@ -1157,7 +1158,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //                         style: const TextStyle(
         //                           fontSize: 12,
         //                           color: Colors.white,
-        //                           fontFamily: "Outfit",
+        //                           fontFamily: AppAssets.fontOutfit,
         //                         ),
         //                       ),
         //                     ],
@@ -1180,7 +1181,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //                     children: [
         //
         //                       SvgPicture.asset(
-        //                         "assets/svg/CameraMinimalistic.svg",
+        //                         AppAssets.camera,
         //                         height: 16,
         //                         color: Colors.white,
         //                       ),
@@ -1194,7 +1195,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //                         style: const TextStyle(
         //                           fontSize: 12,
         //                           color: Colors.white,
-        //                           fontFamily: "Outfit",
+        //                           fontFamily: AppAssets.fontOutfit,
         //                         ),
         //                       ),
         //                     ],
@@ -1309,7 +1310,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //                 "Complete your Shoot",
         //                 style: TextStyle(
         //                   fontSize: 14,
-        //                   fontFamily: "Outfit",
+        //                   fontFamily: AppAssets.fontOutfit,
         //                   fontWeight: FontWeight.w400,
         //                   color: AppColors.white70,
         //                   decoration: TextDecoration.underline,
@@ -1382,7 +1383,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         //                   : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
         //               style: const TextStyle(
         //                 fontSize: 14,
-        //                 fontFamily: "Unbounded",
+        //                 fontFamily: AppAssets.fontUnbounded,
         //                 fontWeight: FontWeight.w600,
         //                 color: Colors.black,
         //               ),
@@ -1421,7 +1422,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             "Complete your Shoot",
                             style: TextStyle(
                               fontSize: 14,
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                               fontWeight: FontWeight.w400,
                               color: Colors.white70,
                               decoration: TextDecoration.underline,
@@ -1480,7 +1481,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
                           style: const TextStyle(
                             fontSize: 14,
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
@@ -1553,7 +1554,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             const Text(
                               "Filter By",
                               style: TextStyle(
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white,
@@ -1583,7 +1584,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               const Text(
                                 "Sort By",
                                 style: TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
@@ -1606,7 +1607,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                         Text(
                                           options[index],
                                           style: TextStyle(
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                             color: AppColors.white70,
@@ -1671,7 +1672,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               const Text(
                                 "Price Range",
                                 style: TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: AppColors.white,
@@ -1696,7 +1697,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     style: const TextStyle(
                                       color: AppColors.white70,
                                       fontSize: 11,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -1706,7 +1707,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     style: const TextStyle(
                                       color: AppColors.white70,
                                       fontSize: 11,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -1741,7 +1742,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   child: const Text(
                                     "Clear All",
                                     style: TextStyle(
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: AppColors.white,
@@ -1769,7 +1770,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   child: const Text(
                                       "Apply",
                                       style: TextStyle(
-                                        fontFamily: "Unbounded",
+                                        fontFamily: AppAssets.fontUnbounded,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         color: AppColors.black,
@@ -1817,7 +1818,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     message,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1885,7 +1886,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                     ),
                   ),
 
@@ -1898,7 +1899,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       height: 1.4,
                     ),
                   ),
@@ -1908,7 +1909,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 14,
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1934,7 +1935,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               "Go Back & Select",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontFamily: "Outfit",
+                                fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -1964,7 +1965,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               "Yes, Continue",
                               style: TextStyle(
                                 color: Colors.black,
-                                fontFamily: "Outfit",
+                                fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -2003,7 +2004,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                   child: Lottie.asset(
 
-                    "assets/lottie/success_animation.json",
+                    AppAssets.lottieSuccess,
                     height: 150,
                     fit: BoxFit.cover,
                   ),
@@ -2018,7 +2019,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   style: TextStyle(
                     color: Color(0xFFD6C29C),
                     fontSize: 16, // 🔽 reduce
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -2032,7 +2033,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 12, // 🔽 reduce
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                   ),
                 ),
 
@@ -2057,7 +2058,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                       style: TextStyle(
                         color: Color(0xFF1D1D1B),
                         fontSize: 13,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

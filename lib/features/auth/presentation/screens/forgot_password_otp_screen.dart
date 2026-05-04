@@ -126,7 +126,7 @@ class _ForgotPasswordOtpScreenState
                 children: [
                   Positioned.fill(
                     child: Image.asset(
-                      "assets/images/Rectangle_574057023.png",
+                      AppAssets.authBackground,
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -136,7 +136,7 @@ class _ForgotPasswordOtpScreenState
                     child: InkWell(
                       onTap: () => context.pop(),
                       child: SvgPicture.asset(
-                        "assets/svg/back.svg",
+                        AppAssets.back,
                         height: 24,
                         colorFilter: const ColorFilter.mode(
                           AppColors.white,

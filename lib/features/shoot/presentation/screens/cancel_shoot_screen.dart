@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -83,14 +84,14 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
                     return SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
+                      AppAssets.imagePlaceholder,
 
                       fit: BoxFit.cover,
                     );
                   },
                 )
                     : SvgPicture.asset(
-        "assets/svg/imag_placeholder.svg",
+        AppAssets.imagePlaceholder,
 
         fit: BoxFit.cover,
       ),
@@ -149,7 +150,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                             style:  TextStyle(
                                 color: AppColors.white,
                                 fontSize: 16,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontWeight: FontWeight.w500
                             ),
                           ),
@@ -159,7 +160,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                             style:  TextStyle(
                                 color: AppColors.white70,
                                 fontSize: 14,
-                                fontFamily: "Outfit",
+                                fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w400
                             ),
                           ),
@@ -200,7 +201,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) {
                                   return SvgPicture.asset(
-                                    "assets/svg/imag_placeholder.svg",
+                                    AppAssets.imagePlaceholder,
                                     height: 144,
                                     width: 126,
                                     fit: BoxFit.cover,
@@ -208,7 +209,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                 },
                               )
                                   : SvgPicture.asset(
-                                "assets/svg/imag_placeholder.svg",
+                                AppAssets.imagePlaceholder,
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
@@ -228,7 +229,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppAssets.fontOutfit,
                                     ),
                                   ),
 
@@ -237,7 +238,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.white70,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppAssets.fontOutfit,
                                     ),
                                   ),
 
@@ -295,12 +296,12 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                       children: [
 
                                         infoRowBlack(
-                                          "assets/svg/Frame.svg",
+                                          AppAssets.calendarDate,
                                           formatDate(date.trim()),
                                         ),
 
                                         infoRowBlack(
-                                          "assets/svg/Group 2087328870.svg",
+                                          AppAssets.clock,
                                           "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
                                               "(${widget.durationHours ?? 0}h)",
                                         ),
@@ -314,14 +315,14 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
 
                                   /// 🟢 SINGLE DAY
                                   infoRowBlack(
-                                    "assets/svg/Frame.svg",
+                                    AppAssets.calendarDate,
                                     formatDate(widget.eventDate),
                                   ),
 
                                   const SizedBox(height: 8),
 
                                   infoRowBlack(
-                                    "assets/svg/Group 2087328870.svg",
+                                    AppAssets.clock,
                                     "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
                                         "(${widget.durationHours ?? 0}h)",
                                   ),
@@ -331,7 +332,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
 
                                 /// 📍 LOCATION
                                 infoRowBlack(
-                                  "assets/svg/location.svg",
+                                  AppAssets.location,
                                   widget.location ?? "",
                                 ),
                               ],
@@ -368,7 +369,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                     "Yes, Cancel",
                                     style: TextStyle(
                                       color: AppColors.textHeading,
-                                      fontFamily: 'Unbounded',
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -405,7 +406,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
             style:  TextStyle(
                 fontSize: 12,
                 color: AppColors.black,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w400
 
             ),
@@ -442,7 +443,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                     /// 🔹 ICON STACK
 
                     Image.asset(
-                      "assets/images/Group 1171276698 (1).png",
+                      AppAssets.bookingConfirmed,
                       height: 64,
                       width: 64,
                       fit: BoxFit.contain,
@@ -455,7 +456,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                      Text(
                       "Appointment Cancelled",
                       style: TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primary,
@@ -469,7 +470,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                       "Your appointment is no longer\nscheduled",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: AppColors.white70,
@@ -504,7 +505,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                 "Explore",
                                 style: TextStyle(
                                   color: AppColors.white,
-                                  fontFamily: 'Unbounded',   // ← Add this
+                                  fontFamily: AppAssets.fontUnbounded,   // ← Add this
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),

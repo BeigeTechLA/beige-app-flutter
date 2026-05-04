@@ -152,7 +152,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                     Text(
                       "Review & Cdonfirm",
                       style: TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.white,
@@ -191,7 +191,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) {
                                         return SvgPicture.asset(
-                                          "assets/svg/imag_placeholder.svg",
+                                          AppAssets.imagePlaceholder,
                                           height: 144,
                                           width: 126,
                                           fit: BoxFit.cover,
@@ -199,7 +199,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                       },
                                     )
                                         : SvgPicture.asset(
-                                      "assets/svg/imag_placeholder.svg",
+                                      AppAssets.imagePlaceholder,
                                       height: 144,
                                       width: 126,
                                       fit: BoxFit.cover,
@@ -220,7 +220,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                             color: Colors.white,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
                                         SizedBox(height: 2),
@@ -228,7 +228,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           booking?['shoot_type_name'] ?? '',
                                           style: TextStyle(
                                             fontSize: 12, color: AppColors.white70,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
@@ -240,7 +240,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: AppColors.primary,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w700,
                                           ),
                                         ),
@@ -294,13 +294,13 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                         return Column(
                                           children: [
                                             infoRowBlack(
-                                              "assets/svg/Group 2087328870.svg",
+                                              AppAssets.clock,
                                               "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
                                                   " (${day['duration_hours']}h)",
                                             ),
                                             const SizedBox(height: 8),
                                             infoRowBlack(
-                                              "assets/svg/Frame.svg",
+                                              AppAssets.calendarDate,
                                               formatDate(day['date']),
                                             ),
                                             const SizedBox(height: 8),
@@ -312,13 +312,13 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                                       /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
                                       infoRowBlack(
-                                        "assets/svg/Group 2087328870.svg",
+                                        AppAssets.clock,
                                         "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
                                             " (${booking?['duration_hours']}h)",
                                       ),
                                       const SizedBox(height: 8),
                                       infoRowBlack(
-                                        "assets/svg/Frame.svg",
+                                        AppAssets.calendarDate,
                                         formatDate(booking?['event_date']),
                                       ),
                                     ],
@@ -326,7 +326,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                     /// 📍 LOCATION (COMMON)
                                     const SizedBox(height: 8),
                                     infoRowBlack(
-                                      "assets/svg/location.svg",
+                                      AppAssets.location,
                                       booking?['event_location'] ?? "",
                                     ),
                                   ],
@@ -369,7 +369,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: AppColors.white,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -397,7 +397,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           style: TextStyle(
                                             color: AppColors.white,
                                             fontSize: 12,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
@@ -423,7 +423,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                                   style: const TextStyle(
                                                     color: AppColors.primary,
                                                     fontSize: 12,
-                                                    fontFamily: "Outfit",
+                                                    fontFamily: AppAssets.fontOutfit,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -445,7 +445,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           style: TextStyle(
                                             color: AppColors.white,
                                             fontSize: 12,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
@@ -472,7 +472,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                                   style: const TextStyle(
                                                     color: AppColors.primary,
                                                     fontSize: 12,
-                                                    fontFamily: "Outfit",
+                                                    fontFamily: AppAssets.fontOutfit,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -543,7 +543,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   child: const Text(
                     "Update Schedule",
                     style: TextStyle(
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textHeading,
@@ -596,7 +596,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.black,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -668,7 +668,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                 style:  TextStyle(
                     color: Colors.white,
                     fontSize: 14,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontWeight: FontWeight.w400
                 ),
               ),
@@ -793,7 +793,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
               Text(
@@ -802,7 +802,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
             ],

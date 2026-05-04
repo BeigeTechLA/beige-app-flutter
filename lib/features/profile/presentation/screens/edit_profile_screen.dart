@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -214,7 +215,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           bottomRight: Radius.circular(28),
                         ),
                         child: Image.asset(
-                          "assets/images/profile.png",
+                          AppAssets.profilePlaceholder,
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -227,7 +228,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: InkWell(
                         onTap: () => context.pop(true),
                         child: SvgPicture.asset(
-                          "assets/svg/back.svg",
+                          AppAssets.back,
                           colorFilter: const ColorFilter.mode(
                             AppColors.black,
                             BlendMode.srcIn,
@@ -248,7 +249,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           style: TextStyle(
                             color: AppColors.textHeading,
                             fontSize: 16,
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -276,7 +277,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 backgroundImage: getProfileImage(),
                                 child: getProfileImage() == null
                                     ? SvgPicture.asset(
-                                        "assets/svg/persone.svg",
+                                        AppAssets.person,
                                         fit: BoxFit.cover,
                                       )
                                     : null,
@@ -312,7 +313,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 Text(
                   myProfile?['name'] ?? '',
                   style: const TextStyle(
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -323,7 +324,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   "${myProfile?['email'] ?? ''}",
                   style: const TextStyle(
                     color: AppColors.white60,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
@@ -383,7 +384,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       isLatLngRequired: true,
                       textStyle: const TextStyle(
                         color: AppColors.white,
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         fontSize: 14,
                       ),
                       inputDecoration: const InputDecoration(
@@ -505,7 +506,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         height: 15,
                         width: 15,
                         child: SvgPicture.asset(
-                          "assets/svg/my_profile/edit.svg",
+                          AppAssets.profileEdit,
                           fit: BoxFit.none,
                         ),
                       ),
@@ -543,7 +544,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             child: const Text(
               "Update Profile",
               style: TextStyle(
-                fontFamily: "Unbounded",
+                fontFamily: AppAssets.fontUnbounded,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textHeading,
                 fontSize: 14,
@@ -594,7 +595,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
-                          fontFamily: "Outfit",
+                          fontFamily: AppAssets.fontOutfit,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -674,7 +675,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: Row(
                       children: [
                         SvgPicture.asset(
-                          "assets/svg/crop_image.svg",
+                          AppAssets.cropImage,
                           height: 20,
                           width: 20,
                         ),
@@ -708,7 +709,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                         const SizedBox(width: 10),
                         SvgPicture.asset(
-                          "assets/svg/crop_image.svg",
+                          AppAssets.cropImage,
                           height: 26,
                           width: 26,
                         ),
@@ -753,7 +754,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

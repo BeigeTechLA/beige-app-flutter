@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -70,13 +71,13 @@ class _ManageShootScreenState
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) {
                     return SvgPicture.asset(
-                      "assets/svg/imag_placeholder.svg",
+                      AppAssets.imagePlaceholder,
                       fit: BoxFit.cover,
                     );
                   },
                 )
                     : SvgPicture.asset(
-                  "assets/svg/imag_placeholder.svg",
+                  AppAssets.imagePlaceholder,
                   fit: BoxFit.cover,
                 ),
 
@@ -137,7 +138,7 @@ class _ManageShootScreenState
                             style:  TextStyle(
                                 color: AppColors.white,
                                 fontSize: 16,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 fontWeight: FontWeight.w500
                             ),
                           ),
@@ -147,7 +148,7 @@ class _ManageShootScreenState
                             style:  TextStyle(
                                 color: AppColors.white70,
                                 fontSize: 14,
-                                fontFamily: "Outfit",
+                                fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w400
                             ),
                           ),
@@ -201,7 +202,7 @@ class _ManageShootScreenState
 
                                 errorBuilder: (_, __, ___) {
                                   return SvgPicture.asset(
-                                    "assets/svg/imag_placeholder.svg",
+                                    AppAssets.imagePlaceholder,
                                     height: 144,
                                     width: 126,
                                     fit: BoxFit.cover,
@@ -209,7 +210,7 @@ class _ManageShootScreenState
                                 },
                               )
                                   : SvgPicture.asset(
-                                "assets/svg/imag_placeholder.svg",
+                                AppAssets.imagePlaceholder,
                                 height: 144,
                                 width: 126,
                                 fit: BoxFit.cover,
@@ -231,7 +232,7 @@ class _ManageShootScreenState
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppAssets.fontOutfit,
                                     ),
                                   ),
                                   SizedBox(height: 2),
@@ -239,7 +240,7 @@ class _ManageShootScreenState
                                     widget.contentType ?? '',
                                     style: TextStyle(
                                       fontSize: 12, color: AppColors.white70,
-                                      fontFamily: "Outfit",
+                                      fontFamily: AppAssets.fontOutfit,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -300,12 +301,12 @@ class _ManageShootScreenState
                                     children: [
 
                                       infoRowBlack(
-                                        "assets/svg/Frame.svg",
+                                        AppAssets.calendarDate,
                                         DateTimeUtils.formatDate(day['date']),
                                       ),
 
                                       infoRowBlack(
-                                        "assets/svg/Group 2087328870.svg",
+                                        AppAssets.clock,
                                         "${DateTimeUtils.formatTime(day['start_time'])} to ${DateTimeUtils.formatTime(day['end_time'])} "
                                             "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())}))",
                                       ),
@@ -319,13 +320,13 @@ class _ManageShootScreenState
 
                                 /// 🟢 SINGLE DAY
                                 infoRowBlack(
-                                  "assets/svg/Frame.svg",
+                                  AppAssets.calendarDate,
                                     DateTimeUtils.formatDate(widget.eventDate)
                                 ),
 
                                 const SizedBox(height: 8),
                                 infoRowBlack(
-                                  "assets/svg/Group 2087328870.svg",
+                                  AppAssets.clock,
                                   "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
                                       "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
                                 ),
@@ -333,7 +334,7 @@ class _ManageShootScreenState
                               const SizedBox(height: 8),
                               /// 📍 LOCATION
                               infoRowBlack(
-                                "assets/svg/location.svg",
+                                AppAssets.location,
                                 widget.location ?? "Location not available",
                               ),
                             ],
@@ -382,7 +383,7 @@ class _ManageShootScreenState
                                     "Cancel",
                                     style: TextStyle(
                                       color: AppColors.white,
-                                      fontFamily: 'Unbounded',
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -415,7 +416,7 @@ class _ManageShootScreenState
                                     "Reschedule",//
                                     style: TextStyle(
                                       color: AppColors.textHeading,
-                                      fontFamily: 'Unbounded',   // ← Add this
+                                      fontFamily: AppAssets.fontUnbounded,   // ← Add this
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       // Looks cleaner in Unbounded
@@ -458,7 +459,7 @@ class _ManageShootScreenState
             style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.black,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w400
 
             ),

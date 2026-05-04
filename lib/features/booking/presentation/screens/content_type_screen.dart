@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -126,7 +127,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                     ? InkWell(
                   onTap: () => context.pop(),
                   child: SvgPicture.asset(
-                    "assets/svg/back.svg",
+                    AppAssets.back,
                     height: 24,
                   ),
                 )
@@ -139,7 +140,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                   style: TextStyle(
                     color: AppColors.white,
                     fontSize: 16,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -153,7 +154,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                   style: TextStyle(
                     color: AppColors.white,
                     fontSize: 16,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -214,7 +215,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                           child: Text(
                             "Content Type",
                             style: TextStyle(
-                              fontFamily: "Unbounded",
+                              fontFamily: AppAssets.fontUnbounded,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
@@ -227,7 +228,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                         /// SELECT ALL
                         _buildOption(
                           title: "Select All",
-                          activeImage:"assets/new_home/selectall.png",
+                          activeImage:AppAssets.selectAll,
                           value: isSelectAll,
                           onTap: () => _handleSelection(3),
                         ),
@@ -235,7 +236,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                         /// VIDEOGRAPHY
                         _buildOption(
                           title: "Videography",
-                          activeImage:"assets/new_home/Videography.png",
+                          activeImage:AppAssets.serviceVideography,
 
                           value: selectedContentTypeIds.contains(1),
                           onTap: () => _handleSelection(1),
@@ -244,7 +245,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                         /// PHOTOGRAPHY
                         _buildOption(
                           title: "Photography",
-                          activeImage:"assets/new_home/photography.png",
+                          activeImage:AppAssets.servicePhotography,
                           value: selectedContentTypeIds.contains(2),
                           onTap: () => _handleSelection(2),
                         ),
@@ -253,7 +254,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                           title: "Studios (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage:"assets/new_home/stuido_new.png",
+                          activeImage:AppAssets.serviceStudio,
                           onTap: null,
                         ),
 
@@ -262,7 +263,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                           title: "Editing Only (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage:"assets/new_home/edit_new.png",
+                          activeImage:AppAssets.serviceEditing,
                           onTap: null,
                         ),
 
@@ -271,7 +272,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                           title: "Livestreaming (Coming Soon)",
                           value: false,
                           isDisabled: true,
-                          activeImage:"assets/new_home/Livestream_new.png",
+                          activeImage:AppAssets.serviceLivestream,
                           onTap: null,
                         ),
 
@@ -296,7 +297,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                               style: TextStyle(
                                 color: AppColors.backgroundOpacity70,
                                 fontSize: 12,
-                                fontFamily: 'Outfit',
+                                fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -363,7 +364,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               child: Text(
                 title,
                 style: TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: isDisabled

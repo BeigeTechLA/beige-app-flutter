@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -91,7 +92,7 @@ class _RecommendedCreativeDetailScreenState
                       width: double.infinity,
                       fit: BoxFit.fill,
                       errorBuilder: (_, __, ___) => SvgPicture.asset(
-                        "assets/svg/imag_placeholder.svg",
+                        AppAssets.imagePlaceholder,
                         height: 360,
                         width: double.infinity,
                         fit: BoxFit.fill,
@@ -123,7 +124,7 @@ class _RecommendedCreativeDetailScreenState
                           InkWell(
                             onTap: () => context.pop(),
                             child: SvgPicture.asset(
-                              "assets/svg/back.svg",
+                              AppAssets.back,
                               height: 24,
                             ),
                           ),
@@ -143,7 +144,7 @@ class _RecommendedCreativeDetailScreenState
                               Text(
                                 creative?['name'] ?? "",
                                 style: const TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -153,7 +154,7 @@ class _RecommendedCreativeDetailScreenState
                               Text(
                                 creative?['primary_title'] ?? "",
                                 style: const TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 14,
                                   color: AppColors.white70,
                                 ),
@@ -220,7 +221,7 @@ class _RecommendedCreativeDetailScreenState
                       child: portfolio.isEmpty
                           ? Center(
                               child: SvgPicture.asset(
-                                "assets/svg/imag_placeholder.svg",
+                                AppAssets.imagePlaceholder,
                               ),
                             )
                           : PageView.builder(
@@ -270,7 +271,7 @@ class _RecommendedCreativeDetailScreenState
                                                 errorBuilder:
                                                     (_, __, ___) =>
                                                         SvgPicture.asset(
-                                                  "assets/svg/imag_placeholder.svg",
+                                                  AppAssets.imagePlaceholder,
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -306,7 +307,7 @@ class _RecommendedCreativeDetailScreenState
                         const Text(
                           "Weekly Availability",
                           style: TextStyle(
-                            fontFamily: "Outfit",
+                            fontFamily: AppAssets.fontOutfit,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -408,7 +409,7 @@ class _RecommendedCreativeDetailScreenState
                   Text(
                     value,
                     style: const TextStyle(
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
@@ -418,7 +419,7 @@ class _RecommendedCreativeDetailScreenState
                   Text(
                     title,
                     style: TextStyle(
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -439,7 +440,7 @@ class _RecommendedCreativeDetailScreenState
       child: Text(
         text,
         style: const TextStyle(
-          fontFamily: "Unbounded",
+          fontFamily: AppAssets.fontUnbounded,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -454,7 +455,7 @@ class _RecommendedCreativeDetailScreenState
       child: Text(
         text,
         style: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppAssets.fontOutfit,
           fontSize: 13,
           fontWeight: FontWeight.w400,
           color: AppColors.white70,
@@ -481,7 +482,7 @@ class _RecommendedCreativeDetailScreenState
             child: Text(
               day,
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: isActive ? const Color(0xFF2ED47A) : Colors.white,
@@ -491,7 +492,7 @@ class _RecommendedCreativeDetailScreenState
           Text(
             time,
             style: TextStyle(
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: isActive

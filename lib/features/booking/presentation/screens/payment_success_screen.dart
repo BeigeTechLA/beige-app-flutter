@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
@@ -38,7 +39,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
 
               /// 🎉 LOTTIE
               Lottie.asset(
-                "assets/lottie/success_animation.json",
+                AppAssets.lottieSuccess,
                 height: 180,
               ),
 
@@ -49,7 +50,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                 "Paid Successfully",
                 style: TextStyle(
                   color: AppColors.primary,
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
@@ -63,7 +64,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.white70,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
@@ -89,7 +90,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
               child: const Text(
                 "View Summary",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   color: Colors.black,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,

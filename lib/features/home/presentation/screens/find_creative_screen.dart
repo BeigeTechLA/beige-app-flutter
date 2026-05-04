@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -112,7 +113,7 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
               "Finding The Perfect Creator\nFor You...",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontFamily: "Unbounded",
+                fontFamily: AppAssets.fontUnbounded,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: AppColors.primary,

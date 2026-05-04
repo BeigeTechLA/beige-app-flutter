@@ -1,5 +1,6 @@
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +36,7 @@ class _ShootSummaryScreenState
   }
 
   String _getFinalImage(Map<String, dynamic>? bookingData) {
-    final String fallback = "assets/svg/imag_placeholder.svg";
+    final String fallback = AppAssets.imagePlaceholder;
 
     final String profileImage =
         bookingData?['creative']?['profile_image_url'] ?? '';
@@ -105,7 +106,7 @@ class _ShootSummaryScreenState
                             color: Colors.black12,
                             child: Center(
                               child: SvgPicture.asset(
-                                "assets/svg/imag_placeholder.svg",
+                                AppAssets.imagePlaceholder,
                                 height: 80,
                               ),
                             ),
@@ -149,7 +150,7 @@ class _ShootSummaryScreenState
                       child: InkWell(
                         onTap: () => context.pop(),
                         child: SvgPicture.asset(
-                          "assets/svg/back.svg",
+                          AppAssets.back,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
                             Colors.white,
@@ -172,7 +173,7 @@ class _ShootSummaryScreenState
                           Text(
                             bookingData?['creative']?['name'] ?? "",
                             style: const TextStyle(
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -185,7 +186,7 @@ class _ShootSummaryScreenState
                           Text(
                             bookingData?['event']?['type'] ?? "",
                             style: const TextStyle(
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                               fontSize: 13,
                               color: Colors.white70,
                             ),
@@ -197,7 +198,7 @@ class _ShootSummaryScreenState
                           Text(
                             widget.contentType ?? "",
                             style: const TextStyle(
-                              fontFamily: "Outfit",
+                              fontFamily: AppAssets.fontOutfit,
                               fontSize: 13,
                               color: Colors.white70,
                             ),
@@ -228,12 +229,12 @@ class _ShootSummaryScreenState
                     children: [
 
                       infoRow(
-                        "assets/svg/Frame.svg",
+                        AppAssets.calendarDate,
                       DateTimeUtils.formatDate(day['date']),
                       ),
 
                       infoRow(
-                        "assets/svg/Group 2087328870.svg",
+                        AppAssets.clock,
                         "${DateTimeUtils.formatTime(day['start_time'])} - "
                             "${DateTimeUtils.formatTime(day['end_time'])} "
                             "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
@@ -249,13 +250,13 @@ class _ShootSummaryScreenState
             /// ✅ SINGLE DAY
             if (event?['event_date'] != null)
             infoRow(
-            "assets/svg/Frame.svg",
+            AppAssets.calendarDate,
               DateTimeUtils.formatDate(event?['event_date']),
           ),
 
           if (event?['start_time'] != null && event?['end_time'] != null)
             infoRow(
-              "assets/svg/Group 2087328870.svg",
+              AppAssets.clock,
               "${DateTimeUtils.formatTime(event?['start_time'])} - "
                   "${DateTimeUtils.formatTime(event?['end_time'])} "
                   "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
@@ -265,7 +266,7 @@ class _ShootSummaryScreenState
           /// 📍 LOCATION
           if ((event?['location'] ?? "").isNotEmpty)
     infoRow(
-      "assets/svg/location.svg",
+      AppAssets.location,
       event?['location'],
     ),
 
@@ -289,7 +290,7 @@ class _ShootSummaryScreenState
     Text(
     event?['name'] ?? "",
     style: const TextStyle(
-    fontFamily: "Outfit",
+    fontFamily: AppAssets.fontOutfit,
     fontSize: 14,
     fontWeight: FontWeight.w500,
     color: Colors.white,
@@ -414,7 +415,7 @@ class _ShootSummaryScreenState
             Text(
               "Manage Shoot",
               style: TextStyle(
-                fontFamily: "Unbounded",
+                fontFamily: AppAssets.fontUnbounded,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textHeading,
                 fontSize: 14,
@@ -445,7 +446,7 @@ class _ShootSummaryScreenState
               text,
               style: const TextStyle(
 
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w500,
                 color: AppColors.white70,                fontSize: 12,
               ),
@@ -505,7 +506,7 @@ class _ShootSummaryScreenState
             Text(
               title,
               style: const TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: Colors.white,
@@ -515,7 +516,7 @@ class _ShootSummaryScreenState
             Text(
               value,
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withValues(alpha:0.6),
@@ -572,7 +573,7 @@ class _ShootSummaryScreenState
                           "Project Timeline",
                           style: TextStyle(
                             fontSize: 16,
-                            fontFamily: "Unbounded",
+                            fontFamily: AppAssets.fontUnbounded,
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),
@@ -653,7 +654,7 @@ class _ShootSummaryScreenState
               ),
               child: Center(
                 child: Image.asset(
-                  "assets/Icons/user_chec_time_linek.png",
+                  AppAssets.userCheckTimeline,
                 ),
               ),
             ),
@@ -699,7 +700,7 @@ class _ShootSummaryScreenState
                         title,
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: "Outfit",
+                          fontFamily: AppAssets.fontOutfit,
                           fontWeight: FontWeight.w500,
                           color: isActive
                               ? AppColors.primary
@@ -711,7 +712,7 @@ class _ShootSummaryScreenState
                       time,
                       style: const TextStyle(
                         fontSize: 10,
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                         color: Colors.white,
                       ),
                     ),
@@ -722,7 +723,7 @@ class _ShootSummaryScreenState
                   subtitle,
                   style: const TextStyle(
                     fontSize: 9,
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     color: AppColors.white70,
                   ),
                 ),

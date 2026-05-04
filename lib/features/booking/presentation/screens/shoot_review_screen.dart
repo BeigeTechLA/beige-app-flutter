@@ -1,5 +1,6 @@
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -274,7 +275,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                 ),
                 ),
@@ -283,7 +284,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             Text(
               "Book & Confirm",
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -295,7 +296,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               child: Text(
                 "3/3",
                 style: TextStyle(
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   color: AppColors.white,
                   fontSize: 14,
 
@@ -362,7 +363,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                     Text(
                       "Review & Confirm",
                       style: TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: AppColors.white,
@@ -404,14 +405,14 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                         alignment: Alignment.center, // 🔥 center focus
                                         errorBuilder: (_, __, ___) {
                                           return SvgPicture.asset(
-                                            "assets/svg/imag_placeholder.svg",
+                                            AppAssets.imagePlaceholder,
 
                                             alignment: Alignment.center,
                                           );
                                         },
                                       )
                                           : SvgPicture.asset(
-                                        "assets/svg/imag_placeholder.svg",
+                                        AppAssets.imagePlaceholder,
                                         fit: BoxFit.cover,
                                         alignment: Alignment.center,
                                       ),
@@ -432,7 +433,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           style: const TextStyle(
                                             fontSize: 12,
                                             color: AppColors.primary,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -443,7 +444,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
                                             color: Colors.white,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
 
@@ -501,7 +502,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             infoRowBlack(
-                                              "assets/svg/Group 2087328870.svg",
+                                              AppAssets.clock,
                                               "${DateTimeUtils.formatTime(day['start_time'])} to "
                                                   "${DateTimeUtils.formatTime(day['end_time'])} "
                                                   "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
@@ -509,7 +510,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                             const SizedBox(height: 6),
 
                                             infoRowBlack(
-                                              "assets/svg/Frame.svg",
+                                              AppAssets.calendarDate,
                                               DateTimeUtils.formatDate(day['date']),
                                             ),
 
@@ -522,7 +523,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     /// 🔥 SINGLE DAY
                                     else ...[
                                       infoRowBlack(
-                                        "assets/svg/Group 2087328870.svg",
+                                        AppAssets.clock,
                                         "${DateTimeUtils.formatTime(booking?['start_time'])} to "
                                             "${DateTimeUtils.formatTime(booking?['end_time'])} "
                                             "(${DateTimeUtils.formatDuration((booking?['duration_hours'] ?? 0).toDouble())})",
@@ -530,7 +531,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                       const SizedBox(height: 6),
 
                                       infoRowBlack(
-                                        "assets/svg/Frame.svg",
+                                        AppAssets.calendarDate,
                                         DateTimeUtils.formatDate(booking?['event_date']),
                                       ),
                                     ],
@@ -538,7 +539,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     /// 📍 LOCATION
                                     const SizedBox(height: 10),
                                     infoRowBlack(
-                                      "assets/svg/location.svg",
+                                      AppAssets.location,
                                       booking?['event_location'] ?? "",
                                     ),
                                   ],
@@ -584,7 +585,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: AppColors.white,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -612,7 +613,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           style: TextStyle(
                                             color: AppColors.white,
                                             fontSize: 12,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
@@ -638,7 +639,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                   style: const TextStyle(
                                                     color: AppColors.primary,
                                                     fontSize: 12,
-                                                    fontFamily: "Outfit",
+                                                    fontFamily: AppAssets.fontOutfit,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -660,7 +661,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           style: TextStyle(
                                             color: AppColors.white,
                                             fontSize: 12,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
@@ -687,7 +688,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                   style: const TextStyle(
                                                     color: AppColors.primary,
                                                     fontSize: 12,
-                                                    fontFamily: "Outfit",
+                                                    fontFamily: AppAssets.fontOutfit,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -732,7 +733,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: AppColors.white,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w500
                                   ),),
                               ],
@@ -787,7 +788,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: AppColors.white,
-                                      fontFamily: "Unbounded",
+                                      fontFamily: AppAssets.fontUnbounded,
                                       fontWeight: FontWeight.w500),
                                 ),
                                 const SizedBox(height: 14),
@@ -808,7 +809,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                             color: AppColors.textHeading,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
                                       ),
@@ -816,22 +817,22 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                       _buildCheckRow(
                                         text: "Unlimited Usage Rights",
-                                        iconPath: "assets/svg/Unlimited_Usage_Rights.svg",
+                                        iconPath: AppAssets.unlimitedUsage,
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "All Raw Content",
-                                        iconPath: "assets/svg/All_Raw_Content.svg",
+                                        iconPath: AppAssets.allRawContent,
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "Include Edited Deliverable",
-                                        iconPath: "assets/svg/Include_Edited_Deliverable .svg",
+                                        iconPath: AppAssets.includeEdited,
                                       ),
                                       const SizedBox(height: 12),
                                       _buildCheckRow(
                                         text: "Up to 2 Sets of Revisions",
-                                        iconPath: "assets/svg/Up_to _Sets _Revisions.svg",
+                                        iconPath: AppAssets.revisions,
                                       ),
                                     ],
                                   ),
@@ -873,7 +874,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: AppColors.primary,
-                                          fontFamily: "Outfit",
+                                          fontFamily: AppAssets.fontOutfit,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -882,7 +883,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                         style: const TextStyle(
                                           fontSize: 18,
                                           color: AppColors.white,
-                                          fontFamily: "Outfit",
+                                          fontFamily: AppAssets.fontOutfit,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -940,7 +941,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textHeading,
                       ),
@@ -977,7 +978,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.black,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -1031,7 +1032,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                 style: TextStyle(
                   color: isDisabled ? Colors.grey : Colors.white,
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -1154,7 +1155,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                 color: AppColors.black,
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
               ),
             ),
           ),
@@ -1190,7 +1191,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
               Text(
@@ -1199,7 +1200,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
             ],
@@ -1217,7 +1218,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
                       fontSize: 12,
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                     ),
                   ),
                 );

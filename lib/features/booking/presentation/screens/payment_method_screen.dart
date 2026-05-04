@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -127,14 +128,14 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                   context.pop();
                 },
 
-                child: SvgPicture.asset("assets/svg/back.svg", height: 24),
+                child: SvgPicture.asset(AppAssets.back, height: 24),
               ),
 
               const SizedBox(height: 14),
               Text(
                 "Payment Method",
                 style: TextStyle(
-                  fontFamily: "Unbounded",
+                  fontFamily: AppAssets.fontUnbounded,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
 
@@ -146,7 +147,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
               const Text(
                 "Manage your saved payment options for\nfaster and secure checkouts.",
                 style: TextStyle(
-                    fontFamily: "Outfit",
+                    fontFamily: AppAssets.fontOutfit,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.white70
@@ -160,7 +161,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                 const Text(
                   "Saved Card",
                   style: TextStyle(
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.white,
@@ -187,7 +188,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
                       child: Row(
                         children: [
                           Image.asset(
-                            "assets/Icons/stripe.png",
+                            AppAssets.stripeIcon,
                             height: 28,
                           ),
                           const SizedBox(width: 12),
@@ -213,7 +214,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
               Text(
                 "Card",
                 style: TextStyle(
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: AppColors.white
@@ -287,7 +288,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
 
               _paymentTile(
                 title: "Stripe",
-                icon: "assets/Icons/stripe.png",
+                icon: AppAssets.stripeIcon,
               ),
             ],
           ),

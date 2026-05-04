@@ -79,7 +79,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       InkWell(
                         onTap: () => context.pop(true),
                         child: SvgPicture.asset(
-                          "assets/svg/back.svg",
+                          AppAssets.back,
                           height: 24,
                         ),
                       ),

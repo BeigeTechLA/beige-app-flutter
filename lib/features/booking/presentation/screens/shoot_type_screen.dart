@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -115,7 +116,7 @@ String getContentTypeTitle(int contentTypeId) {
               child: InkWell(
                 onTap: () => context.pop(widget.bookingId),
                 child: SvgPicture.asset(
-                  "assets/svg/back.svg",
+                  AppAssets.back,
                   height: 24,
                 ),
               ),
@@ -125,7 +126,7 @@ String getContentTypeTitle(int contentTypeId) {
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: 14,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -136,7 +137,7 @@ String getContentTypeTitle(int contentTypeId) {
                 "1/3",
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: "Outfit",
+                  fontFamily: AppAssets.fontOutfit,
                   color: AppColors.white,
                   fontWeight: FontWeight.w400,
 
@@ -191,7 +192,7 @@ String getContentTypeTitle(int contentTypeId) {
                     Text(
                       getContentTypeTitle(widget.contentTypeId),
                       style:  TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         fontSize: 16,
                         color: AppColors.white,
                         fontWeight: FontWeight.w500,
@@ -252,7 +253,7 @@ String getContentTypeTitle(int contentTypeId) {
                                         fit: BoxFit.cover,
                                         placeholder: (context, url) => Center(
                                           child: Lottie.asset(
-                                            "assets/lottie/loading_spinner.json",
+                                            AppAssets.lottieSpinner,
                                             width: 60,
                                             height: 60,
                                           ),
@@ -279,7 +280,7 @@ String getContentTypeTitle(int contentTypeId) {
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.white,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
 
@@ -291,7 +292,7 @@ String getContentTypeTitle(int contentTypeId) {
                                           style: TextStyle(
                                             fontSize: 12,
                                             color: AppColors.white70,
-                                            fontFamily: "Outfit",
+                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
 
@@ -369,7 +370,7 @@ String getContentTypeTitle(int contentTypeId) {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                  child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
                 ),
               ),
               const SizedBox(width: 12),
@@ -395,7 +396,7 @@ String getContentTypeTitle(int contentTypeId) {
                   child: const Text(
                     "Continue",
                     style: TextStyle(
-                      fontFamily: "Unbounded",
+                      fontFamily: AppAssets.fontUnbounded,
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
                     ),

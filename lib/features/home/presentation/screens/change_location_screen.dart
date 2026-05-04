@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -198,7 +199,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
 
               textStyle: const TextStyle(
                 color: AppColors.white70,
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 14,
               ),
 
@@ -216,7 +217,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(12),
                   child: SvgPicture.asset(
-                    "assets/svg/serch.svg",
+                    AppAssets.search,
                     colorFilter: const ColorFilter.mode(
                       Colors.white,
                       BlendMode.srcIn,
@@ -355,7 +356,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(14),
                             child: SvgPicture.asset(
-                              "assets/svg/zoom+.svg",
+                              AppAssets.zoomIn,
                               colorFilter: const ColorFilter.mode(
                                 Colors.black,
                                 BlendMode.srcIn,
@@ -380,7 +381,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(14),
                             child: SvgPicture.asset(
-                              "assets/svg/zoom-.svg",
+                              AppAssets.zoomOut,
                               colorFilter: const ColorFilter.mode(
                                 Colors.black,
                                 BlendMode.srcIn,
@@ -441,7 +442,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                         color: Colors.white,
                         decoration: TextDecoration.underline,
                         fontSize: 14,
-                        fontFamily: "Outfit",
+                        fontFamily: AppAssets.fontOutfit,
                       ),
                     ),
                   ),
@@ -469,7 +470,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                         "Save",
                         style: TextStyle(
                           color: Colors.black,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),

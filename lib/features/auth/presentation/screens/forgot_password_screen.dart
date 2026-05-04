@@ -87,7 +87,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     children: [
                       Positioned.fill(
                         child: Image.asset(
-                          "assets/images/Rectangle_574057023.png",
+                          AppAssets.authBackground,
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -97,7 +97,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         child: InkWell(
                           onTap: () => context.pop(),
                           child: SvgPicture.asset(
-                            "assets/svg/back.svg",
+                            AppAssets.back,
                             height: 24,
                           ),
                         ),

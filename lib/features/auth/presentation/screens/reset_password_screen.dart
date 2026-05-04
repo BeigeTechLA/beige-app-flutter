@@ -99,7 +99,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 children: [
                   Positioned.fill(
                     child: Image.asset(
-                      "assets/images/Rectangle_574057023.png",
+                      AppAssets.authBackground,
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -109,7 +109,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     child: InkWell(
                       onTap: () => context.pop(),
                       child: SvgPicture.asset(
-                        "assets/svg/back.svg",
+                        AppAssets.back,
                         height: 24,
                         colorFilter: const ColorFilter.mode(
                           AppColors.white,
@@ -181,8 +181,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                         },
                         icon: SvgPicture.asset(
                           showNewPassword
-                              ? "assets/svg/eyes1.svg"
-                              : "assets/svg/eyes2.svg",
+                              ? AppAssets.eyeOpen
+                              : AppAssets.eyeClosed,
                           height: 22,
                           colorFilter: const ColorFilter.mode(
                             AppColors.white,
@@ -205,8 +205,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                         },
                         icon: SvgPicture.asset(
                           showConfirmPassword
-                              ? "assets/svg/eyes1.svg"
-                              : "assets/svg/eyes2.svg",
+                              ? AppAssets.eyeOpen
+                              : AppAssets.eyeClosed,
                           height: 22,
                           colorFilter: const ColorFilter.mode(
                             AppColors.white,

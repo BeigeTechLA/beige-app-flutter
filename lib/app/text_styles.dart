@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app/assets.dart';
 
 /// Centralized text style tokens for the Beige app.
 ///
@@ -12,8 +13,8 @@ class AppTextStyles {
   AppTextStyles._(); // Prevent instantiation
 
   // ━━━ Font Family Constants ━━━
-  static const String fontFamilyDisplay = 'Unbounded';
-  static const String fontFamilyBody = 'Outfit';
+  static const String fontFamilyDisplay = AppAssets.fontUnbounded;
+  static const String fontFamilyBody = AppAssets.fontOutfit;
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // DISPLAY — Unbounded (Hero sections, splash, onboarding)

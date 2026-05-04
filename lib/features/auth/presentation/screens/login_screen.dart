@@ -121,7 +121,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   Positioned.fill(
                     child: Image.asset(
-                      "assets/images/Rectangle_574057023.png",
+                      AppAssets.authBackground,
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -205,8 +205,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           },
                           icon: SvgPicture.asset(
                             showConfirmPassword
-                                ? "assets/svg/eyes1.svg"
-                                : "assets/svg/eyes2.svg",
+                                ? AppAssets.eyeOpen
+                                : AppAssets.eyeClosed,
                             height: 22,
                             colorFilter: const ColorFilter.mode(
                               AppColors.white,

@@ -524,32 +524,32 @@ class _MainShell extends StatelessWidget {
               BottomNavigationBarItem(
                 icon: _buildIcon(
                   navigationShell.currentIndex == 0
-                      ? "assets/svg/new_bottom_image/active_Home.svg"
-                      : "assets/svg/new_bottom_image/in_active_Home.svg",
+                      ? AppAssets.activeHome
+                      : AppAssets.inactiveHome,
                 ),
                 label: "Home",
               ),
               BottomNavigationBarItem(
                 icon: _buildIcon(
                   navigationShell.currentIndex == 1
-                      ? "assets/svg/new_bottom_image/active_Book a Shoot.svg"
-                      : "assets/svg/new_bottom_image/in_active_Book_Shoot.svg",
+                      ? AppAssets.activeBookShoot
+                      : AppAssets.inactiveBookShoot,
                 ),
                 label: "Book Shoot",
               ),
               BottomNavigationBarItem(
                 icon: _buildIcon(
                   navigationShell.currentIndex == 2
-                      ? "assets/svg/new_bottom_image/active_My Shoots.svg"
-                      : "assets/svg/new_bottom_image/in_active_My Shoots.svg",
+                      ? AppAssets.activeMyShoot
+                      : AppAssets.inactiveMyShoot,
                 ),
                 label: "My Shoots",
               ),
               BottomNavigationBarItem(
                 icon: _buildIcon(
                   navigationShell.currentIndex == 3
-                      ? "assets/svg/new_bottom_image/active_Messages.svg"
-                      : "assets/svg/new_bottom_image/in_active_Messages.svg",
+                      ? AppAssets.activeMessages
+                      : AppAssets.inactiveMessages,
                 ),
                 label: "Messages",
               ),

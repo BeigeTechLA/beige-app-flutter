@@ -20,13 +20,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> pages = [
     {
-      "image": "assets/Onboding/img_1.webp",
+      "image": AppAssets.onboarding2,
       "title": "Book Your Dream\nShoot",
       "description":
       "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
-      "image": "assets/Onboding/img.webp",
+      "image": AppAssets.onboarding1,
       "title": "Find Video & Photo\nWork",
       "description":
       "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",

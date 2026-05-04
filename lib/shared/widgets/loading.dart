@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../app/assets.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:beige/app/colors.dart';
@@ -13,7 +14,7 @@ class AppLoader extends StatelessWidget {
         color: AppColors.background,
         child: Center(
           child: Lottie.asset(
-            'assets/lottie/loader.json',
+            AppAssets.lottieLoader,
             height: 70,
             width: 70,
           ),

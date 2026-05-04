@@ -1,6 +1,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -76,20 +77,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   final List<Map<String, String>> cardData = [
     {
-      "bg": "assets/new_home/Group 2087329746.png",
-      "image": "assets/new_home/home_book1.png",
+      "bg": AppAssets.homeCardBg,
+      "image": AppAssets.homeBook1,
       "title": "Find Your Perfect Creator\nAnywhere, Anytime.",
       "button": "Book a Shoot",
     },
     {
-      "bg": "assets/new_home/homebackground_new.png",
-      "image": "assets/new_home/home_book_2.png",
+      "bg": AppAssets.homeBackground,
+      "image": AppAssets.homeBook2,
       "title": "Trusted by Leading\nBrands.",
       "button": " Explore Creatives",
     },
     {
-      "bg": "assets/new_home/homebackground_new.png",
-      "image": "assets/new_home/home_book3.png",
+      "bg": AppAssets.homeBackground,
+      "image": AppAssets.homeBook3,
       "title": "Instant Pricing &\nIntelligent Matchmaking.",
       "button": "Find Your Creative",
     },
@@ -97,8 +98,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
   final List<Map<String, String>> Your_Bookings = [
     {
-      "bg": "assets/new_home/Group 2087329746.png",
-      "image": "assets/new_home/home_book1.png",
+      "bg": AppAssets.homeCardBg,
+      "image": AppAssets.homeBook1,
       "title": "Find Your Perfect Creator\nAnywhere, Anytime.",
       "button": "Book a Shoot",
     },
@@ -118,31 +119,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   ];
 
   final List<String> featuredImages = [
-    "assets/images/Alec+H.png",
+    AppAssets.creativeAlecH,
     // "assets/images/Benson+F.png",
-    "assets/images/Christopher+R.png",
-    "assets/images/Corey+B.png",
-    "assets/images/Cornelius+M. (1).png",
-    "assets/images/Daniel+A.png",
-    "assets/images/Daniel+C.png",
-    "assets/images/Gary+Ahmed.png",
+    AppAssets.creativeChristopherR,
+    AppAssets.creativeCoreyB,
+    AppAssets.creativeCorneliumM,
+    AppAssets.creativeDanielA,
+    AppAssets.creativeDanielC,
+    AppAssets.creativeGaryAhmed,
   /*  "assets/images/Jesse+S.png",*/
-    "assets/images/Mikey+D (1).jpg",
-    "assets/images/Nathan+Grant.png"
+    AppAssets.creativeMikeyD,
+    AppAssets.creativeNathanGrant
   ];
   final List<String> images = [
-    "assets/images/Alec+H.png",
+    AppAssets.creativeAlecH,
     // "assets/images/Benson+F.png",
-    "assets/images/Christopher+R.png",
-    "assets/images/Corey+B.png",
-    "assets/images/Cornelius+M. (1).png",
-    "assets/images/Daniel+A.png",
-    "assets/images/Daniel+C.png",
+    AppAssets.creativeChristopherR,
+    AppAssets.creativeCoreyB,
+    AppAssets.creativeCorneliumM,
+    AppAssets.creativeDanielA,
+    AppAssets.creativeDanielC,
 
   ];
   final List<Map<String, String>> studioList = [
     {
-      "image": "assets/new_home/4ce6dbc682ece0f18c3f89046020d5e78a3fcf13.png",
+      "image": AppAssets.studioBeige,
       // Apni studio images dalein
       "name": "Beige Media",
       "desc": "(Modern Resort Villa with Jacuzzi)",
@@ -151,7 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       "rating": "4.5 (120)"
     },
     {
-      "image": "assets/new_home/77443dc57b82c5fe2896ea6b85cab505f8682dff.png",
+      "image": AppAssets.studioCreativeZone,
       "name": "Creative Zone",
       "desc": "(Professional Photo Studio & Lights)",
       "location": "Santa Ana, Illinois,",
@@ -159,7 +160,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
       "rating": "4.8 (95)"
     },
     {
-      "image": "assets/new_home/baab5672af97f5f157ca09ab0e02230f6e29b353.png",
+      "image": AppAssets.studioBeigeAlt,
       // Apni studio images dalein
       "name": "Beige Media",
       "desc": "(Modern Resort Villa with Jacuzzi)",
@@ -179,15 +180,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   final List<String> words = ["Influencers", "Streamers", "Actors", "Models", "Personalities"];
 
   final List<String> Topwords = [
-    "assets/new_home/Topwrods/Justin Beiber.webp",
-    "assets/new_home/Topwrods/Cedric The Entertainer.webp",
-    "assets/new_home/Topwrods/Wiz Khalifa.webp",
-    "assets/new_home/Topwrods/Pressa.webp",
-    "assets/new_home/Topwrods/Tyga.webp",
-    "assets/new_home/Topwrods/CentralCee.webp",
-    "assets/new_home/Topwrods/Chief Keef.webp",
-    "assets/new_home/Topwrods/Swae Lee.webp",
-    "assets/new_home/Topwrods/Natasha Graziano.jpg"
+    AppAssets.topJustinBieber,
+    AppAssets.topCedric,
+    AppAssets.topWizKhalifa,
+    AppAssets.topPressa,
+    AppAssets.topTyga,
+    AppAssets.topCentralCee,
+    AppAssets.topChiefKeef,
+    AppAssets.topSwaeLee,
+    AppAssets.topNatashaGraziano
   ];
 
   final List<String> Topinstagram = [
@@ -545,7 +546,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                           // ✅ IMAGE ADDED HERE
                           image: DecorationImage(
-                            image: AssetImage("assets/images/mappp.png"),
+                            image: AssetImage(AppAssets.mapImage),
                             // opacity: 0.2, // Subtle look ke liye opacity kam rakhi hai
                             fit: BoxFit.contain,
                             alignment: Alignment(0, 0.7),
@@ -569,7 +570,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                           color: Colors.white,
                                           fontSize: 22,
-                                          fontFamily: "Outfit",
+                                          fontFamily: AppAssets.fontOutfit,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -593,7 +594,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     style: TextStyle(
                                                         color: Colors.white.withOpacity(0.6),
                                                         fontSize: 15,
-                                                        fontFamily: "Outfit"))),
+                                                        fontFamily: AppAssets.fontOutfit))),
                                             const Icon(Icons.expand_more,
                                                 color: Colors.white, size: 20),
                                           ],
@@ -616,7 +617,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                                        child:SvgPicture.asset("assets/svg/notification.1.svg")
+                                        child:SvgPicture.asset(AppAssets.notification)
                                       ),
                                       GestureDetector(
                                         onTap: () async {
@@ -637,7 +638,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             fit: BoxFit.cover,*/
                                             )
                                                 : SvgPicture.asset(
-                                              "assets/svg/persone.svg",
+                                              AppAssets.person,
                                               /* width: 40,
                                             height: 40,
                                             fit: BoxFit.cover,*/
@@ -696,7 +697,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                 style: TextStyle(
                                   color: _textColors[index], // DYNAMIC COLOR
                                   fontSize: 15,
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -835,13 +836,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: AppColors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 height: 1.2,
                               ),
 
                             ),
                            /* SvgPicture.asset(
-                              "assets/svg/my_profile/layer1.svg",
+                              AppAssets.chevronRight,
                             ),*/
                           ],
                         ),
@@ -855,11 +856,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         padding: const EdgeInsets.only(left: 10),
                         child: Row(
                           children: [
-                            _buildServiceCard(0, "Photo", "assets/new_home/photography.png"),
-                            _buildServiceCard(1, "Video", "assets/new_home/Videography.png"),
-                            _buildServiceCard(2, "Editing", "assets/new_home/edit_new.png"),
-                            _buildServiceCard(3, "Livestream", "assets/new_home/Livestream_new.png"),
-                            _buildServiceCard(4, "Studio", "assets/new_home/stuido_new.png"),
+                            _buildServiceCard(0, "Photo", AppAssets.servicePhotography),
+                            _buildServiceCard(1, "Video", AppAssets.serviceVideography),
+                            _buildServiceCard(2, "Editing", AppAssets.serviceEditing),
+                            _buildServiceCard(3, "Livestream", AppAssets.serviceLivestream),
+                            _buildServiceCard(4, "Studio", AppAssets.serviceStudio),
                           ],
                         ),
                       ),
@@ -903,7 +904,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   style: TextStyle(color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                     height: 1.2,
                                   ),
 
@@ -950,14 +951,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                             /// ❌ Error
                                             errorWidget: (context, url, error) => SvgPicture.asset(
-                                              "assets/svg/imag_placeholder.svg",
+                                              AppAssets.imagePlaceholder,
                                               height: 80,
                                               width: 80,
                                               fit: BoxFit.cover,
                                             ),
                                           )
                                               : SvgPicture.asset(
-                                            "assets/svg/imag_placeholder.svg",
+                                            AppAssets.imagePlaceholder,
                                             height: 80,
                                             width: 80,
                                             fit: BoxFit.cover,
@@ -1056,7 +1057,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             color: AppColors.primary,
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
-                                            fontFamily: "Unbounded",
+                                            fontFamily: AppAssets.fontUnbounded,
                                           ),
                                         ),
                                         const SizedBox(width: 10),
@@ -1106,7 +1107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: AppColors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 height: 1.2,
                               ),
 
@@ -1297,7 +1298,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     color: Color(0x29000000),
                                     fontSize: 35,
                                     fontWeight: FontWeight.w500, // Extra Bold look
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                   ),),
                               ),
 
@@ -1456,11 +1457,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                               ),
                             ),
                             /*SvgPicture.asset(
-                              "assets/svg/my_profile/layer1.svg",
+                              AppAssets.chevronRight,
                             ),*/
                           ],
                         ),
@@ -1686,7 +1687,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 height: 1.2,
                               ),)
 
@@ -1703,7 +1704,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           child: Text(
                             "No Data Found",
                               style:
-                              TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                              TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
                               )
                           ),
                         ),
@@ -1741,12 +1742,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             return Center(
                                               child: Container(
 
-                                                child: Center(child: SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.cover,)),
+                                                child: Center(child: SvgPicture.asset(AppAssets.imagePlaceholder, fit: BoxFit.cover,)),
                                               ),
                                             );
                                           },
                                         )
-                                            : SvgPicture.asset("assets/svg/imag_placeholder.svg", fit: BoxFit.cover),
+                                            : SvgPicture.asset(AppAssets.imagePlaceholder, fit: BoxFit.cover),
                                       ),
                                     ),
 
@@ -1784,7 +1785,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             style: const TextStyle(
                                               color: AppColors.white,
                                               fontSize: 12,
-                                              fontFamily: "Helvetica Neue",
+                                              fontFamily: AppAssets.fontHelveticaNeue,
                                               fontWeight: FontWeight.w500,
                                             ),
                                           ),
@@ -1793,7 +1794,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             style: const TextStyle(
                                               color: Colors.white70,
                                               fontSize: 10,
-                                              fontFamily: "Helvetica Neue",
+                                              fontFamily: AppAssets.fontHelveticaNeue,
                                               fontWeight: FontWeight.w400,
 
                                             ),
@@ -1823,7 +1824,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                       "View Profile",
                                                       style: TextStyle(
                                                         color: AppColors.black,
-                                                        fontFamily: 'Helvetica Neue',
+                                                        fontFamily: AppAssets.fontHelveticaNeue,
                                                         fontSize: 12,
                                                         fontWeight: FontWeight.w700,
                                                       ),
@@ -1841,7 +1842,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                                 child: Center(
                                                   child: SvgPicture.asset(
-                                                    "assets/svg/home_view_profile.svg",
+                                                    AppAssets.homeViewProfile,
                                                     height: 36,
                                                     color: Colors.white,
                                                   ),
@@ -1889,7 +1890,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   style: TextStyle(color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                     height: 1.2,
                                   ),
                                 ),
@@ -1917,7 +1918,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(30),
                                           child: Image.asset(
-                                            "assets/new_home/RebookYourShoots_img.webp",
+                                            AppAssets.rebookShoots,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -1973,7 +1974,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                         color: Colors.white,
                                                         fontSize: 16,
                                                         fontWeight: FontWeight.bold,
-                                                        fontFamily: "Outfit",
+                                                        fontFamily: AppAssets.fontOutfit,
                                                       ),
                                                     ),
                                                     Text(
@@ -1981,7 +1982,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                       style: TextStyle(
                                                         color: Colors.white60,
                                                         fontSize: 12,
-                                                        fontFamily: "Outfit",
+                                                        fontFamily: AppAssets.fontOutfit,
                                                       ),
                                                     ),
                                                   ],
@@ -2011,7 +2012,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                         color: AppColors.black,
                                                         fontSize: 12,
                                                         fontWeight: FontWeight.w700,
-                                                        fontFamily: "Helvetica Neue",
+                                                        fontFamily: AppAssets.fontHelveticaNeue,
                                                       ),
                                                     ),
                                                   ),
@@ -2019,7 +2020,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                 const SizedBox(width: 12),
                                                 // Circular Arrow Button
                                                 SvgPicture.asset(
-                                                  "assets/svg/home_view_profile.svg",
+                                                  AppAssets.homeViewProfile,
 
                                                 ),
                                               ],
@@ -2066,7 +2067,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: "Unbounded"),
+                                  fontFamily: AppAssets.fontUnbounded),
                             ),
                             const SizedBox(height: 15),
 
@@ -2076,7 +2077,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               children: [
                                 _buildProjectCard(
                                     "Private Event", "Mar 10, 2025", "136 Files",
-                                    "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
+                                    AppAssets.studioBeige),
 
                               ],
                             ),
@@ -2086,7 +2087,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                             // Card 2
                             _buildProjectCard(
                                 "Wedding Photography", "Feb 15, 2025", "150 Files",
-                                "assets/new_home/e5843d2072dc20c350afa27e2260f0c1bb588db3.png"),
+                                AppAssets.studioBeige),
                           ],
                         ),
                       ),
@@ -2120,7 +2121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 height: 1.2,
                               ),
                             ),
@@ -2150,22 +2151,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   Column(
                                     children: [
                                       _buildItem(
-                                        "assets/svg/AI_Matchmaking.svg",
+                                        AppAssets.aiMatchmaking,
                                         "AI Matchmaking",
                                         "The right creative. Every time.",
                                       ),
                                       _buildItem(
-                                        "assets/svg/AI Matchmaking-1.svg",
+                                        AppAssets.aiMatchmakingAlt,
                                         "Pre-Production",
                                         "Zero back-and-forth. Full clarity.",
                                       ),
                                       _buildItem(
-                                        "assets/svg/Production.svg",
+                                        AppAssets.production,
                                         "Production",
                                         "Show up. Shoot. Done.",
                                       ),
                                       _buildItem(
-                                        "assets/svg/AI-Powered Post-Production.svg",
+                                        AppAssets.aiPostProduction,
                                         "AI-Powered Post-Production",
                                         "Edited, optimized, and ready to ship.",
                                       ),
@@ -2245,7 +2246,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     color: AppColors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                   ),
                                 ),
 
@@ -2284,7 +2285,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                           color: AppColors.white,
                                                           fontSize: 16,
                                                           fontWeight: FontWeight.w500,
-                                                          fontFamily: "Unbounded",
+                                                          fontFamily: AppAssets.fontUnbounded,
                                                           height: 1.0,
                                                         ),
                                                       ),
@@ -2301,7 +2302,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                           color: AppColors.white,
                                                           fontSize: 16,
                                                           fontWeight: FontWeight.w500,
-                                                          fontFamily: "Unbounded",
+                                                          fontFamily: AppAssets.fontUnbounded,
                                                           height: 1.0,
                                                         ),
                                                       ),
@@ -2346,7 +2347,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                           color: AppColors.white,
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
-                                          fontFamily: "Unbounded",
+                                          fontFamily: AppAssets.fontUnbounded,
                                           height: 1.0,
                                         ),),
                                     );
@@ -2435,7 +2436,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                           color: Colors.white,
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.w600,
-                                                          fontFamily: "Outfit",
+                                                          fontFamily: AppAssets.fontOutfit,
                                                         ),
                                                       ),
 
@@ -2453,7 +2454,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                               onTap: () => openLink(Topinstagram[realIndex]),
                                                               child: Row(
                                                                 children: [
-                                                                  SvgPicture.asset("assets/svg/Instagram.svg"),
+                                                                  SvgPicture.asset(AppAssets.instagram),
                                                                   const SizedBox(width: 4),
                                                                   Text(
                                                                     instaFollowers[realIndex],
@@ -2479,7 +2480,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                               onTap: () => openLink(Topyoutube[realIndex]),
                                                               child: Row(
                                                                 children: [
-                                                                  SvgPicture.asset("assets/svg/Youtube.svg"),
+                                                                  SvgPicture.asset(AppAssets.youtube),
                                                                   const SizedBox(width: 4),
                                                                   Text(
                                                                     youtubeFollowers[realIndex],
@@ -2504,7 +2505,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                               onTap: () => openLink(Toptiktok[realIndex]),
                                                               child: Row(
                                                                 children: [
-                                                                  SvgPicture.asset("assets/svg/Tiktok.svg"),
+                                                                  SvgPicture.asset(AppAssets.tiktok),
                                                                   const SizedBox(width: 4),
                                                                   Text(
                                                                     tiktokFollowers[realIndex],
@@ -2570,7 +2571,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               style: TextStyle(color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "Unbounded",
+                                fontFamily: AppAssets.fontUnbounded,
                                 height: 1.2,
                               ),
                             ),
@@ -2614,7 +2615,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
             child: ClipRRect(
               borderRadius: BorderRadius.circular(22),
               child: Image.asset(
-                "assets/new_home/Group 2087329746.png", // 👈 BG IMAGE
+                AppAssets.homeCardBg, // 👈 BG IMAGE
                 fit: BoxFit.cover,
               ),
             ),
@@ -2652,7 +2653,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
-                    fontFamily: "Helvetica Neue",
+                    fontFamily: AppAssets.fontHelveticaNeue,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -2662,7 +2663,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 Text(
                   "Book Your First Shoot To\nGet Started.",
                   style: TextStyle(
-                    fontFamily: "Helvetica Neue",
+                    fontFamily: AppAssets.fontHelveticaNeue,
                     fontWeight: FontWeight.w400,
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 12,
@@ -2685,7 +2686,7 @@ SizedBox(height: 10,),
                     child: const Text(
                       "Book a Shoot",
                       style: TextStyle(
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                         color: AppColors.black,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -2703,7 +2704,7 @@ SizedBox(height: 10,),
             bottom: 6,
             // 👈 niche se thoda cut
             child: Image.asset(
-              "assets/new_home/Your-Bookings.png",
+              AppAssets.yourBookings,
               height: 170, // 👈 bigger = premium look
               fit: BoxFit.cover,
             ),
@@ -2767,7 +2768,7 @@ SizedBox(height: 10,),
                       color: AppColors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      fontFamily: "Helvetica Neue",
+                      fontFamily: AppAssets.fontHelveticaNeue,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -2793,7 +2794,7 @@ SizedBox(height: 10,),
                         data["button"]!,
                         style: TextStyle(
                           color: AppColors.textHeading,
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontWeight: FontWeight.w600,
                           fontSize: 11,
                         ),
@@ -2855,7 +2856,7 @@ SizedBox(height: 10,),
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AppColors.white,
-                    fontFamily: "Helvetica Neue",
+                    fontFamily: AppAssets.fontHelveticaNeue,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
@@ -2884,7 +2885,7 @@ SizedBox(height: 10,),
                 Row(
                   children: [
                     SvgPicture.asset(
-                      "assets/svg/Frame.svg",
+                      AppAssets.calendarDate,
                       color: AppColors.white,
                     ),
                     const SizedBox(width: 6),
@@ -2902,7 +2903,7 @@ SizedBox(height: 10,),
                 Row(
                   children: [
                     SvgPicture.asset(
-                      "assets/svg/Group 2087328870.svg",
+                      AppAssets.clock,
                       color: AppColors.white,
 
                     ),
@@ -2970,7 +2971,7 @@ SizedBox(height: 10,),
 
                 /// 🔹 ICON BUTTON
           /*      SvgPicture.asset(
-                  "assets/svg/home_view_profile.svg",
+                  AppAssets.homeViewProfile,
                   height: 36,
                   color: Colors.white,
                 ),*/
@@ -3086,7 +3087,7 @@ SizedBox(height: 10,),
                               ? const Color(0xFFE8D1AB)
                               : Colors.white.withOpacity(0.6),
                           fontSize: 10,
-                          fontFamily: "Outfit",
+                          fontFamily: AppAssets.fontOutfit,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.w400,
@@ -3167,7 +3168,7 @@ SizedBox(height: 10,),
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.white,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -3191,7 +3192,7 @@ SizedBox(height: 10,),
             Text(
               "No Creatives Found",
                 style:
-                TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: "Unbounded",fontWeight: FontWeight.w500,
+                TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
                 )
             ),
           ],
@@ -3348,7 +3349,7 @@ SizedBox(height: 10,),
             if (!isBackground && (imageUrl.isEmpty))
               Center(
                 child: SvgPicture.asset(
-                  "assets/svg/imag_placeholder.svg",
+                  AppAssets.imagePlaceholder,
                   height: 80,
                   width: 80,
                 ),
@@ -3384,7 +3385,7 @@ SizedBox(height: 10,),
                         color: AppColors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        fontFamily: "Unbounded",
+                        fontFamily: AppAssets.fontUnbounded,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -3472,7 +3473,7 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: AppColors.black,
-                  fontFamily: "Helvetica Neue",
+                  fontFamily: AppAssets.fontHelveticaNeue,
                 ),
               ),
               const SizedBox(height: 5),
@@ -3481,7 +3482,7 @@ Widget _buildItem(String imagePath, String title, String subtitle) {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
-                  fontFamily: "Helvetica Neue",
+                  fontFamily: AppAssets.fontHelveticaNeue,
                   color: AppColors.backgroundOpacity70,
                 ),
               ),

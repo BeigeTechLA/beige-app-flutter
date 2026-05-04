@@ -539,7 +539,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                       child: const Text(
                         "Select Date",
                         style: TextStyle(
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
@@ -691,7 +691,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                         textAlign: TextAlign.start,
                         "Select Booking Type",
                         style: TextStyle(
-                          fontFamily: "Unbounded",
+                          fontFamily: AppAssets.fontUnbounded,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -756,7 +756,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                         Text(
                                           "Single Day",
                                           style: TextStyle(
-                                            fontFamily: 'Outfit',
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w500,
                                             fontSize: 14,
                                             color: isSingleLocked
@@ -854,7 +854,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                         Text(
                                           "Multiple Days",
                                           style: TextStyle(
-                                            fontFamily: 'Outfit',
+                                            fontFamily: AppAssets.fontOutfit,
                                             fontWeight: FontWeight.w500,
                                             fontSize: 14,
                                             color: isMultiLocked
@@ -919,7 +919,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     Text(
                                       "Select Date",
                                       style: TextStyle(
-                                        fontFamily: "Unbounded",
+                                        fontFamily: AppAssets.fontUnbounded,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -951,7 +951,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       ),
                                       child: Text(
                                         "Total Days: ${selectedDates.length}",
-                                        style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500),
+                                        style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
@@ -974,7 +974,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                           scrollDirection: Axis.horizontal, // 👈 scroll enable
                                           child: Text(
                                               formatSelectedDates(selectedDates),
-                                              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: "Helvetica Neue",fontWeight: FontWeight.w500)
+                                              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500)
                                           ),
                                         ),
                                       ),
@@ -985,7 +985,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 SizedBox(height: 12,),
                                 Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
                                   color: Colors.white,
-                                  fontFamily:'Unbounded',
+                                  fontFamily:AppAssets.fontUnbounded,
                                   fontSize: 14,
                                 ),),
 
@@ -1097,7 +1097,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       suffixIcon: Padding(
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
-                                                          "assets/svg/Group 2087328870.svg",
+                                                          AppAssets.clock,
                                                           color: AppColors.white,
                                                         ),
                                                       ),
@@ -1116,7 +1116,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       suffixIcon: Padding(
                                                         padding: const EdgeInsets.all(12),
                                                         child: SvgPicture.asset(
-                                                          "assets/svg/Group 2087328870.svg",
+                                                          AppAssets.clock,
                                                           color: AppColors.white,
                                                         ),
                                                       ),
@@ -1175,7 +1175,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
-                                        "assets/svg/Group 2087328870.svg",
+                                        AppAssets.clock,
                                         color: AppColors.white,
                                         width: 20,
                                         height: 20,
@@ -1204,7 +1204,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     suffixIcon: Padding(
                                       padding: const EdgeInsets.all(12),
                                       child: SvgPicture.asset(
-                                        "assets/svg/Group 2087328870.svg",
+                                        AppAssets.clock,
                                         color: AppColors.white,
                                         width: 20,
                                         height: 20,
@@ -1216,14 +1216,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                                   Row(
                                     children: [
-                                      SvgPicture.asset('assets/svg/true.svg', width: 24, height: 24),
+                                      SvgPicture.asset(AppAssets.checkmark, width: 24, height: 24),
                                       SizedBox(width: 6),
                                       Text(
                                         'Applied to ${selectedDates.length} selected dates',
                                         style: TextStyle(
                                           color: const Color(0xFFA9A9A9),
                                           fontSize: 14,
-                                          fontFamily: 'Outfit',
+                                          fontFamily: AppAssets.fontOutfit,
                                           fontWeight: FontWeight.w400,
                                           height: 1.36,
                                         ),
@@ -1245,7 +1245,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 Text(
                                   "Shoot Date & Time",
                                   style: TextStyle(
-                                    fontFamily: "Unbounded",
+                                    fontFamily: AppAssets.fontUnbounded,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -1265,7 +1265,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
-                                  "assets/svg/calendar-03.svg",
+                                  AppAssets.calendar,
                                   width: 20,
                                   height: 20,
                                   colorFilter: const ColorFilter.mode(
@@ -1308,7 +1308,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
-                                  "assets/svg/Group 2087328870.svg",
+                                  AppAssets.clock,
                                   width: 20,
                                   height: 20,
                                   color: AppColors.white,
@@ -1336,7 +1336,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: SvgPicture.asset(
-                                  "assets/svg/Group 2087328870.svg",
+                                  AppAssets.clock,
                                   width: 20,
                                   height: 20,
                                   color: AppColors.white,
@@ -1392,7 +1392,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child:  Text("Back",style: TextStyle(fontFamily: "Unbounded",fontWeight: FontWeight.w500,fontSize: 14),),
+                child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
               ),
             ),*/
             const SizedBox(width: 12),
@@ -1428,7 +1428,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 child: const Text(
                   "Next",
                   style: TextStyle(
-                    fontFamily: "Unbounded",
+                    fontFamily: AppAssets.fontUnbounded,
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
@@ -1496,7 +1496,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Outfit',
+                    fontFamily: AppAssets.fontOutfit,
                   ),
                 ),
                 GestureDetector(
@@ -1564,7 +1564,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                         Text(
                           "${date.day}",
                           style: TextStyle(
-                            fontFamily: 'Outfit',
+                            fontFamily: AppAssets.fontOutfit,
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                             color: isSelected
@@ -1576,7 +1576,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           DateFormat('EEE').format(date),
                           style: TextStyle(
                             fontSize: 9,
-                            fontFamily: 'Outfit',
+                            fontFamily: AppAssets.fontOutfit,
                             fontWeight: FontWeight.w700,
                             color: isSelected
                                 ? const Color(0xff1D1D1B)
@@ -1699,7 +1699,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             Text(count.toString().padLeft(2, '0'),style: TextStyle(
                               color: AppColors.textHeading,
                               fontSize: 11.17,
-                              fontFamily: 'Helvetica Neue',
+                              fontFamily: AppAssets.fontHelveticaNeue,
                               fontWeight: FontWeight.w500,
                             ),),
 
@@ -1825,7 +1825,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                           Text(count.toString().padLeft(2, '0'),style: TextStyle(  color: AppColors.textHeading,
                             fontSize: 11.17,
-                            fontFamily: 'Helvetica Neue',
+                            fontFamily: AppAssets.fontHelveticaNeue,
                             fontWeight: FontWeight.w500,
                           ),),
 
@@ -1877,13 +1877,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             labelStyle: TextStyle(
               color: AppColors.white70,
               fontSize: 12,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
             ),
 
             suffixIcon:  Padding(
               padding: const EdgeInsets.all(12),
               child: SvgPicture.asset(
-                "assets/svg/Group 2087328870.svg",
+                AppAssets.clock,
                 width: 20,
                 height: 20,
                 colorFilter: const ColorFilter.mode(
@@ -1964,7 +1964,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             style: const TextStyle(
               color: AppColors.white,
               fontSize: 14,
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontWeight: FontWeight.w400,
             ),
           ),

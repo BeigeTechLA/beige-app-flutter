@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -85,7 +86,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                       width: double.infinity,
                       fit: BoxFit.fill,
                       errorBuilder: (_, __, ___) => SvgPicture.asset(
-                        "assets/svg/imag_placeholder.svg",
+                        AppAssets.imagePlaceholder,
                         height: 360,
                         width: double.infinity,
                         fit: BoxFit.fill,
@@ -115,7 +116,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                           InkWell(
                             onTap: () => context.pop(),
                             child: SvgPicture.asset(
-                              "assets/svg/back.svg",
+                              AppAssets.back,
                               height: 24,
                             ),
                           ),
@@ -135,7 +136,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                               Text(
                                 creative?['name'] ?? "",
                                 style: const TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -145,7 +146,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                               Text(
                                 creative?['primary_title'] ?? "",
                                 style: const TextStyle(
-                                  fontFamily: "Outfit",
+                                  fontFamily: AppAssets.fontOutfit,
                                   fontSize: 14,
                                   color: AppColors.white70,
                                 ),
@@ -197,7 +198,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                       child: portfolio.isEmpty
                           ? Center(
                               child: SvgPicture.asset(
-                                  "assets/svg/imag_placeholder.svg"),
+                                  AppAssets.imagePlaceholder),
                             )
                           : PageView.builder(
                               controller: _portfolioController,
@@ -275,7 +276,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) =>
                                             SvgPicture.asset(
-                                          "assets/svg/imag_placeholder.svg",
+                                          AppAssets.imagePlaceholder,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -300,7 +301,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                         const Text(
                           "Weekly Availability",
                           style: TextStyle(
-                            fontFamily: "Outfit",
+                            fontFamily: AppAssets.fontOutfit,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -419,7 +420,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
@@ -429,7 +430,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontFamily: "Outfit",
+                      fontFamily: AppAssets.fontOutfit,
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: Colors.white.withValues(alpha: 0.7),
@@ -450,7 +451,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
       child: Text(
         text,
         style: const TextStyle(
-          fontFamily: "Unbounded",
+          fontFamily: AppAssets.fontUnbounded,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -465,7 +466,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
       child: Text(
         text,
         style: const TextStyle(
-          fontFamily: "Outfit",
+          fontFamily: AppAssets.fontOutfit,
           fontSize: 13,
           fontWeight: FontWeight.w400,
           color: AppColors.white70,
@@ -492,7 +493,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
             child: Text(
               day,
               style: TextStyle(
-                fontFamily: "Outfit",
+                fontFamily: AppAssets.fontOutfit,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: isActive ? const Color(0xFF2ED47A) : Colors.white,
@@ -502,7 +503,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
           Text(
             time,
             style: TextStyle(
-              fontFamily: "Outfit",
+              fontFamily: AppAssets.fontOutfit,
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: isActive
