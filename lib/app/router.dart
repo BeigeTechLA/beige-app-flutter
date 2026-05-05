@@ -513,7 +513,7 @@ class _MainShell extends StatelessWidget {
           child: BottomNavigationBar(
             currentIndex: navigationShell.currentIndex,
             elevation: 0,
-            backgroundColor: Colors.transparent,
+         //   backgroundColor: Colors.transparent,
             type: BottomNavigationBarType.fixed,
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.white70,
