@@ -9,15 +9,13 @@ class AppLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned.fill( // 🔥 full screen cover
-      child: Container(
-        color: AppColors.background,
-        child: Center(
-          child: Lottie.asset(
-            AppAssets.lottieLoader,
-            height: 70,
-            width: 70,
-          ),
+    return Container(
+      color: AppColors.background,
+      child: Center(
+        child: Lottie.asset(
+          AppAssets.lottieLoader,
+          height: 70,
+          width: 70,
         ),
       ),
     );

@@ -631,15 +631,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                 homeData.profileImageUrl.isNotEmpty
                                                 ? Image.network(
                                               ApiEndpoints.imageUrl + homeData.profileImageUrl,
-                                              /* width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,*/
+                                              width: 40,
+                                              height: 40,
+                                              fit: BoxFit.cover,
                                             )
                                                 : SvgPicture.asset(
                                               AppAssets.person,
-                                              /* width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,*/
+                                              width: 40,
+                                              height: 40,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
