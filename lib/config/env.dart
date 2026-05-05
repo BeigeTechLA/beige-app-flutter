@@ -11,11 +11,11 @@ class Env {
     switch (environment) {
       case Environment.dev:
         apiUrl = 'https://mobile.beige.app/api/';
-        imageUrl = 'https://d2jhn32fsulyac.cloudfront.net/';
+        imageUrl = 'https://d1pgtgqp0jru64.cloudfront.net/';
         stripePublishableKey =
             'pk_test_51S5czd54hnPNgHXUq7sunp8uvTDW4ln6aw8Y3bP249JZmx4xuvoIED4mZTuNIkAFcOoCApICfgv9dM4VbbleJo7L00GqNEkj3I';
       case Environment.prod:
-        apiUrl = 'https://mobile.beige.app/api/';
+        apiUrl = 'https://mobile.prod.beige.app/api/';
         imageUrl = 'https://d2jhn32fsulyac.cloudfront.net/';
         stripePublishableKey = 'PLACE_HOLDER_LIVE_STRIPE_KEY';
     }
