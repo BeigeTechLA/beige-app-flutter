@@ -657,11 +657,11 @@ Update status: `Not started` → `In progress` → `Done`
 | T1.3 | Add useMaterial3 + missing component themes | 1 | Done |
 | T1.4 | Update design system guide spacing scale | 1 (doc) | Done |
 | **Phase 2 — Shared Widgets** | | | |
-| T2.1 | Create AppButton | 1 | Not started |
-| T2.2 | Create AppTextField | 1 | Not started |
-| T2.3 | Create AppCard | 1 | Not started |
-| T2.4 | Create AppAvatar + AppEmptyState + AppErrorState | 3 | Not started |
-| T2.5 | Create ScaleClampedText | 1 | Not started |
+| T2.1 | Create AppButton | 1 | Done |
+| T2.2 | Create AppTextField | 1 | Done |
+| T2.3 | Create AppCard | 1 | Done |
+| T2.4 | Create AppAvatar + AppEmptyState + AppErrorState | 3 | Done |
+| T2.5 | Create ScaleClampedText | 1 | Done |
 | **Phase 3 — Tier 1 (home, date_time, type_selection)** | | | |
 | T3.1 | home_screen: Colors + Color(0xFF) | 1 | Not started |
 | T3.2 | home_screen: TextStyle + fontSize | 1 | Not started |
