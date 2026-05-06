@@ -71,6 +71,7 @@ class AppAssets {
   static const String includeEdited = '$_svg/include_edited_deliverable.svg';
   static const String revisions = '$_svg/up_to_sets_revisions.svg';
   static const String production = '$_svg/production.svg';
+  static const String calndermark = '$_svg/calendar_mark.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Social

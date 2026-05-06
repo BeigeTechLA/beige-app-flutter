@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
@@ -1502,7 +1501,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 GestureDetector(
                   onTap: () => _selectDateMultiple(context),
                   child: SvgPicture.asset(
-                    'assets/svg/Calendar_Mark-2.svg',
+                    AppAssets.calndermark,
                     width: 24,
                     height: 24,
                   ),

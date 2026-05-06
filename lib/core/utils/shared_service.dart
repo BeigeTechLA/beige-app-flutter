@@ -1,9 +1,9 @@
+    import 'package:beige/config/env.dart';
     import 'package:flutter/foundation.dart';
     import 'package:shared_preferences/shared_preferences.dart';
 
     class SharedService {
-      static String imageURL =
-          "https://d2jhn32fsulyac.cloudfront.net/";
+      static String imageURL = Env.imageUrl;
 
       /// Save user login details from API response
       static Future<void> setLoginDetails(Map<String, dynamic> response) async {

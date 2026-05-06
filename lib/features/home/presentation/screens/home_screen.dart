@@ -126,7 +126,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     AppAssets.creativeDanielA,
     AppAssets.creativeDanielC,
     AppAssets.creativeGaryAhmed,
-  /*  "assets/images/Jesse+S.png",*/
     AppAssets.creativeMikeyD,
     AppAssets.creativeNathanGrant
   ];
