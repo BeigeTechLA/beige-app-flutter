@@ -715,3 +715,61 @@ git revert HEAD~3..HEAD   # Revert last 3 tasks
 # Check which files a task changed:
 git show --name-only HEAD
 ```
+
+---
+
+## Changelog
+
+### Phase 1 — Token Infrastructure *(commit: `6d31b2e`)*
+
+**T1.1 — Fix inline values in `shadows.dart` + `radii.dart`**
+- `shadows.dart`: added `import 'colors.dart'`; `Color(0x11000000)` → `AppColors.shadow` in `soft` getter
+- `radii.dart`: `Radius.circular(20)` → `Radius.circular(AppRadii.huge)` in `topHuge`; `Radius.circular(14)` → `Radius.circular(AppRadii.xl)` in `topXl`
+
+**T1.2 — Delete `AppColors` legacy section**
+- Removed 11 unused tokens: `grey`, `greyWhite`, `hintText`, `wine`, `teal`, `tealLight`, `tealDark`, `orange`, `lightBlack`, `lightGrey`, `mediumGrey`
+- Zero usages confirmed across all 144 files before deletion
+
+**T1.3 — Add `useMaterial3` + component themes to `AppTheme.dark()`**
+- Added `useMaterial3: true`
+- Added `chipTheme` — `surfaceVariant` bg, gold selected, `fullAll` radius, token-based label styles
+- Added `switchTheme` — gold thumb/track when selected, `WidgetStateProperty` resolver
+- Added `checkboxTheme` — gold fill when selected, `xsAll` radius, token border
+- Added `radioTheme` — gold fill when selected, muted when unselected
+
+**T1.4 — Update design system guide spacing scale** *(local only — `docs/guides/` is gitignored)*
+- Updated Part 4 (AppSpacing) code block: corrected scale values (`xs=6`, `sm=8`, `smd=10`, `md=12`, `mld=14`, `base=16`, `lg=18`, `xl=20`…), screen padding names (`screenH`/`screenV`)
+- Updated Part 4.2 (AppRadii) code block: full token scale including `mld`, `huge`, `massive`, `round`, `roundLg`; documented `topHuge`/`topXl` const usage
+
+---
+
+### Phase 2 — Shared Widgets *(commit: `614e021`)*
+
+**T2.1 — `AppButton`** (`lib/shared/widgets/app_button.dart`)
+| Axis | Options |
+|---|---|
+| Variants | `primary` (gold), `secondary` (surface), `outline` (gold border), `text` (no bg), `destructive` (error red) |
+| Sizes | `sm` (36h), `md` (48h), `lg` (56h) |
+| Props | `label`, `onPressed`, `variant`, `size`, `icon`, `isLoading`, `fullWidth` |
+
+**T2.2 — `AppTextField`** (`lib/shared/widgets/app_text_field.dart`)
+- Props: `label`, `hint`, `errorText`, `controller`, `focusNode`, `keyboardType`, `obscureText`, `prefixIcon`, `suffix`, `validator`, `maxLines`, `maxLength`, `onChanged`, `enabled`, `autofocus`, `textInputAction`, `onFieldSubmitted`
+- Does NOT delete `custom_input_field.dart` — screens still reference it (migration in T8.1)
+
+**T2.3 — `AppCard`** (`lib/shared/widgets/app_card.dart`)
+| Variant | Appearance |
+|---|---|
+| `flat` | `surface` background, no border |
+| `outlined` | transparent bg, `borderLight` border |
+| `elevated` | `surface` bg, elevation 4, shadow |
+- Props: `child`, `variant`, `padding`, `onTap`, `backgroundColor`
+
+**T2.4 — `AppAvatar` + `AppEmptyState` + `AppErrorState`**
+- `AppAvatar`: sizes `xs(24)` / `sm(32)` / `md(40)` / `lg(56)` / `xl(72)`, `NetworkImage` with initials fallback, optional `onTap`
+- `AppEmptyState`: optional icon + title + description + action button
+- `AppErrorState`: error icon + title + description + "Try again" retry button
+
+**T2.5 — `ScaleClampedText`** (`lib/shared/widgets/scale_clamped_text.dart`)
+- Wraps child in `MediaQuery` override clamping `textScaler` to `maxScaleFactor` (default `1.2`)
+- Use on: bottom nav labels, button text, chips, tab labels, badges
+- Never use on: body text, list items, dialog content, scrollable areas
