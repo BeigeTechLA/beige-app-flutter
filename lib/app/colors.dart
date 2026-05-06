@@ -172,20 +172,4 @@ class AppColors {
 
   static const Color mapBlue = Color(0xFF1A73E8);
   static const Color mapGrey = Color(0xFF757575);
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // MISC LEGACY (from ColorCode.dart — used in existing screens)
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  static const Color grey = Color(0xFF9B97B5);
-  static const Color greyWhite = Color(0xFFF1F2F5);
-  static const Color hintText = Color(0xFF9995B4);
-  static const Color wine = Color(0xFF5A0760);
-  static const Color teal = Color(0xFF008080);
-  static const Color tealLight = Color(0xFF2DBB9A);
-  static const Color tealDark = Color(0xFF1FAF8A);
-  static const Color orange = Color(0xFFFF9800);
-  static const Color lightBlack = Color(0xFF333333);
-  static const Color lightGrey = Color(0xFFDDDDDD);
-  static const Color mediumGrey = Color(0xFF737373);
 }

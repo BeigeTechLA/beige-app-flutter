@@ -23,6 +23,7 @@ class AppTheme {
 
   static ThemeData dark() {
     return ThemeData(
+      useMaterial3: true,
       brightness: Brightness.dark,
 
       // ━━━ SCAFFOLD ━━━
@@ -185,6 +186,57 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
         behavior: SnackBarBehavior.floating,
         insetPadding: const EdgeInsets.all(AppSpacing.base),
+      ),
+
+      // ━━━ CHIP ━━━
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceVariant,
+        selectedColor: AppColors.primary.withValues(alpha: 0.2),
+        disabledColor: AppColors.disabled,
+        labelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
+        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimary),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.chipPaddingH,
+          vertical: AppSpacing.chipPaddingV,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.fullAll),
+        side: const BorderSide(color: AppColors.border),
+        elevation: 0,
+        pressElevation: 0,
+      ),
+
+      // ━━━ SWITCH ━━━
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.primary;
+          return AppColors.textTertiary;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primary.withValues(alpha: 0.3);
+          }
+          return AppColors.surfaceVariant;
+        }),
+        trackOutlineColor: WidgetStateProperty.all(AppColors.transparent),
+      ),
+
+      // ━━━ CHECKBOX ━━━
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.primary;
+          return AppColors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(AppColors.onPrimary),
+        side: const BorderSide(color: AppColors.border, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.xsAll),
+      ),
+
+      // ━━━ RADIO ━━━
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.primary;
+          return AppColors.textTertiary;
+        }),
       ),
 
       // ━━━ TEXT THEME ━━━

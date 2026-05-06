@@ -70,13 +70,13 @@ class AppRadii {
 
   /// Top-only rounding for bottom sheets — 20px
   static const BorderRadius topHuge = BorderRadius.only(
-    topLeft: Radius.circular(20),
-    topRight: Radius.circular(20),
+    topLeft: Radius.circular(AppRadii.huge),
+    topRight: Radius.circular(AppRadii.huge),
   );
 
   /// Top-only rounding — 14px
   static const BorderRadius topXl = BorderRadius.only(
-    topLeft: Radius.circular(14),
-    topRight: Radius.circular(14),
+    topLeft: Radius.circular(AppRadii.xl),
+    topRight: Radius.circular(AppRadii.xl),
   );
 }

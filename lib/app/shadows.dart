@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'colors.dart';
 
 /// Centralized shadow tokens for the Beige app.
 ///
@@ -70,7 +71,7 @@ class AppShadows {
   /// Soft drop shadow
   static List<BoxShadow> get soft => [
         const BoxShadow(
-          color: Color(0x11000000),
+          color: AppColors.shadow,
           blurRadius: 8,
           offset: Offset(0, 2),
         ),

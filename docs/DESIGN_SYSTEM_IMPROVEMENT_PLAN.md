@@ -652,10 +652,10 @@ Update status: `Not started` → `In progress` → `Done`
 | Task | Description | Files | Status |
 |---|---|---|---|
 | **Phase 1 — Token Infrastructure** | | | |
-| T1.1 | Fix AppShadows + AppRadii inline values | 2 | Not started |
-| T1.2 | Delete AppColors legacy section | 1 | Not started |
-| T1.3 | Add useMaterial3 + missing component themes | 1 | Not started |
-| T1.4 | Update design system guide spacing scale | 1 (doc) | Not started |
+| T1.1 | Fix AppShadows + AppRadii inline values | 2 | Done |
+| T1.2 | Delete AppColors legacy section | 1 | Done |
+| T1.3 | Add useMaterial3 + missing component themes | 1 | Done |
+| T1.4 | Update design system guide spacing scale | 1 (doc) | Done |
 | **Phase 2 — Shared Widgets** | | | |
 | T2.1 | Create AppButton | 1 | Not started |
 | T2.2 | Create AppTextField | 1 | Not started |
