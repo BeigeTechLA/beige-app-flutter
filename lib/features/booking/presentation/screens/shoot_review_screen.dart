@@ -13,6 +13,9 @@ import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/shared/widgets/loading.dart' show AppLoader;
 import 'package:beige/shared/layouts/app_scaffold.dart';
@@ -283,24 +286,14 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             ),
             Text(
               "Book & Confirm",
-              style: TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
             ),
             // 🔹 Step Text (Right)
             Align(
               alignment: Alignment.centerRight,
               child: Text(
                 "3/3",
-                style: TextStyle(
-                  fontFamily: AppAssets.fontOutfit,
-                  color: AppColors.white,
-                  fontSize: 14,
-
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
               ),
             ),
           ],
@@ -310,7 +303,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       body:  Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: AppSpacing.cardInsets,
             child: Column(
               children: [
 
@@ -362,12 +355,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   children: [
                     Text(
                       "Review & Confirm",
-                      style: TextStyle(
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.white,
-                      ),
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                     ),
 
 
@@ -380,7 +368,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: AppSpacing.cardInsets,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
                             borderRadius: BorderRadius.circular(18),
@@ -393,11 +381,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               Row(
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                     child: Container(
                                       height: 144,
                                       width: 126,
-                                      color: Colors.black12, // optional bg
+                                      color: AppColors.black12, // optional bg
                                       child: creativeImage.isNotEmpty
                                           ? Image.network(
                                         "${ApiEndpoints.imageUrl}$creativeImage",
@@ -430,12 +418,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                         const SizedBox(height: 6),
                                         Text(
                                           "Content Type: $creativeRole",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.primary,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
@@ -443,7 +426,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w700,
-                                            color: Colors.white,
+                                            color: AppColors.white,
                                             fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
@@ -471,7 +454,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                             Container(
                                               width: 6,
                                               height: 1,
-                                              color: Colors.white30,
+                                              color: AppColors.white30,
                                             ),
                                       ),
                                     );
@@ -487,8 +470,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: Colors.white.withOpacity(0.9)),
+                                  borderRadius: AppRadii.xlAll,
+                                  border: Border.all(color: AppColors.white.withValues(alpha: 0.9)),
                                 ),
                                 child: Column(
                                   children: [
@@ -557,9 +540,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.09), // left
-                                  Colors.white.withOpacity(0.09), // center
-                                  Colors.white.withOpacity(0.09), // right
+                                  AppColors.white.withValues(alpha: 0.09), // left
+                                  AppColors.white.withValues(alpha: 0.09), // center
+                                  AppColors.white.withValues(alpha: 0.09), // right
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -582,12 +565,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 children: [
                                   Text(
                                     "Editing Services",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.white,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
                                   ),
                                 ],
                               ),
@@ -597,8 +575,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF282828),
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: AppColors.surfaceVariant,
+                                  borderRadius: AppRadii.xlAll,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -606,16 +584,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                     /// ================= VIDEO EDITS =================
                                     if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
-                                      const Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8),
                                         child: Text(
                                           "Video Edits:",
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 12,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
                                         ),
                                       ),
 
@@ -632,16 +605,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
-                                                  borderRadius: BorderRadius.circular(4),
+                                                  borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}",
-                                                  style: const TextStyle(
-                                                    color: AppColors.primary,
-                                                    fontSize: 12,
-                                                    fontFamily: AppAssets.fontOutfit,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
                                                 ),
                                               ),
                                             );
@@ -654,16 +622,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                     /// ================= PHOTO EDITS =================
                                     if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-                                      const Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 8),
                                         child: Text(
                                           "Photo Edits:",
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 12,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
                                         ),
                                       ),
 
@@ -680,17 +643,12 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
-                                                  borderRadius: BorderRadius.circular(4),
+                                                  borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}"
                                                       "${item['note'] != null ? ' (${item['note']})' : ''}",
-                                                  style: const TextStyle(
-                                                    color: AppColors.primary,
-                                                    fontSize: 12,
-                                                    fontFamily: AppAssets.fontOutfit,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
                                                 ),
                                               ),
                                             );
@@ -710,9 +668,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.white.withOpacity(0.09), // left
-                                        Colors.white.withOpacity(0.09), // center
-                                        Colors.white.withOpacity(0.09), // right
+                                        AppColors.white.withValues(alpha: 0.09), // left
+                                        AppColors.white.withValues(alpha: 0.09), // center
+                                        AppColors.white.withValues(alpha: 0.09), // right
                                       ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
@@ -729,13 +687,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               children: [
                                 Text(
                                   "Contact Information",
-
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.white,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.w500
-                                  ),),
+                                  style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
+                                ),
                               ],
                             ),
                             SizedBox(height: 14),
@@ -785,32 +738,23 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               children: [
                                 Text(
                                   "Pricing Summary",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.white,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.w500),
+                                  style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
                                 ),
                                 const SizedBox(height: 14),
                                 Container(
                                   // padding: const EdgeInsets.all(15),
                                   decoration: BoxDecoration(
                                     color: AppColors.accent,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: AppRadii.lgAll,
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(left: 10,bottom: 10,top: 10),
-                                        child: const Text(
+                                        child: Text(
                                           "Package Offer",
-                                          style: TextStyle(
-                                            color: AppColors.textHeading,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: AppAssets.fontOutfit,
-                                          ),
+                                          style: AppTextStyles.buttonMedium.copyWith(color: AppColors.textHeading),
                                         ),
                                       ),
                                       const Divider(color: AppColors.black),
@@ -869,14 +813,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text(
+                                      Text(
                                         "Total Amount",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.primary,
-                                          fontFamily: AppAssets.fontOutfit,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                        style: AppTextStyles.buttonLarge.copyWith(color: AppColors.primary),
                                       ),
                                       Text(
                                         "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
@@ -915,7 +854,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       bottomNavigationBar: SafeArea(
         bottom: true,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardInsets,
           child: Row(
             children: [
 
@@ -931,7 +870,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                           ? AppColors.surfaceVariant // 👈 disabled look
                           : AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                     ),
                     child: Text(
@@ -939,12 +878,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                         (pricing?['total_amount'] ?? 0).toDouble(),
                       )}",
 
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textHeading,
-                      ),
+                      style: AppTextStyles.buttonMedium.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
                     ),
                   ),
                 ),
@@ -967,7 +901,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
           svgIcon,
           height: 16,
           width: 16,
-          color: Colors.black87,
+          color: AppColors.black87,
         ),
 
         const SizedBox(width: 8),
@@ -975,12 +909,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.black,
-              fontFamily: AppAssets.fontOutfit,
-              fontWeight: FontWeight.w400,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
           ),
 
         ),
@@ -998,7 +927,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     final bool isSelected = selectedIndex == value;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: AppRadii.xlAll,
       onTap: isDisabled
           ? () {
         // ScaffoldMessenger.of(context).showSnackBar(
@@ -1021,20 +950,15 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isDisabled ? Colors.grey.shade800 : const Color(0xFF282828),
-          borderRadius: BorderRadius.circular(14),
+          color: isDisabled ? AppColors.greyShade800 : AppColors.surfaceVariant,
+          borderRadius: AppRadii.xlAll,
         ),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  color: isDisabled ? Colors.grey : Colors.white,
-                  fontSize: 14,
-                  fontFamily: AppAssets.fontOutfit,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: isDisabled ? AppColors.neutralGrey : AppColors.white),
               ),
             ),
 
@@ -1048,8 +972,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFE8D1AB),
-                    Color(0xFFD4A14D),
+                    AppColors.primary,
+                    AppColors.primaryDark,
                   ],
                 )
                     : null,
@@ -1065,7 +989,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   height: 10,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                 ),
               )
@@ -1090,7 +1014,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         height: 30,
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadii.hugeAll,
 
           /// 🔥 GRADIENT WHEN ON
           gradient: value
@@ -1098,14 +1022,14 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE8D1AB),
-              Color(0xFFD4A14D),
+              AppColors.primary,
+              AppColors.primaryDark,
             ],
           )
               : null,
 
           /// OFF COLOR
-          color: value ? null : Colors.white.withOpacity(0.25),
+          color: value ? null : AppColors.white.withValues(alpha: 0.25),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 250),
@@ -1115,7 +1039,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             width: 24,
             height: 24,
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
           ),
@@ -1172,11 +1096,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.cardInsets,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white10),
+        color: AppColors.surfaceInput,
+        borderRadius: AppRadii.xlAll,
+        border: Border.all(color: AppColors.white10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1188,7 +1112,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               Text(
                 title,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   fontFamily: AppAssets.fontOutfit,
@@ -1197,7 +1121,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               Text(
                 "\$${NumberFormat('#,##0.00').format(amount)}",
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   fontFamily: AppAssets.fontOutfit,
@@ -1215,11 +1139,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
                     sub,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
-                      fontFamily: AppAssets.fontOutfit,
-                    ),
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.white.withValues(alpha: 0.6)),
                   ),
                 );
               }).toList(),

@@ -47,6 +47,9 @@ class AppColors {
   /// Icon/circle backgrounds
   static const Color iconBackground = Color(0xFF171717);
 
+  /// Input/card dark background
+  static const Color surfaceInput = Color(0xFF1A1A1A);
+
   /// Dark gradient stop — used in gradient backgrounds
   static const Color surfaceGradientDark = Color(0xFF121212);
 
@@ -121,13 +124,17 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color white70 = Color(0xB2FFFFFF);
   static const Color white60 = Color(0x99FFFFFF);
+  static const Color white38 = Color(0x61FFFFFF);
   static const Color white36 = Color(0x5CFFFFFF);
   static const Color white30 = Color(0x4DFFFFFF);
   static const Color white24 = Color(0x3DFFFFFF);
   static const Color white15 = Color(0x26FFFFFF);
+  static const Color white10 = Color(0x1AFFFFFF);
 
   // — Black opacities —
   static const Color black = Color(0xFF000000);
+  static const Color black87 = Color(0xDD000000);
+  static const Color black54 = Color(0x8A000000);
   static const Color black70 = Color(0xB2000000);
   static const Color black26 = Color(0x42000000);
   static const Color black16 = Color(0x29000000);
@@ -143,6 +150,9 @@ class AppColors {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GRADIENT COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Light gold parchment — crew card selected highlight
+  static const Color goldParchment = Color(0xFFD6C29C);
 
   /// Gold gradient — light end
   static const Color goldGradientLight = Color(0xFFE8D1AB);
@@ -174,6 +184,14 @@ class AppColors {
   static const Color shimmerBase = Color(0xFF2A2A2A);
   static const Color shimmerHighlight = Color(0xFF3A3A38);
   static const Color transparent = Color(0x00000000);
+
+  // — Material-compatible —
+  /// Amber — star ratings, warnings
+  static const Color amber = Color(0xFFFFC107);
+  /// Grey 200 — light platform UI (image picker, sheets)
+  static const Color greyShade200 = Color(0xFFEEEEEE);
+  /// Grey 800 — dark platform UI (image picker, sheets)
+  static const Color greyShade800 = Color(0xFF424242);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // STATUS COLORS (booking flow)

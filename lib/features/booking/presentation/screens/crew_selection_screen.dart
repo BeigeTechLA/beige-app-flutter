@@ -10,6 +10,9 @@ import 'package:lottie/lottie.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
 import 'package:beige/features/booking/presentation/providers/booking_providers.dart';
 import 'package:beige/shared/widgets/loading.dart' show AppLoader;
@@ -231,12 +234,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               ),
               Text(
                 "More Details",
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 14,
-                  fontFamily: AppAssets.fontOutfit,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
               ),
               // 🔹 Step Text (Right)
               Align(
@@ -313,12 +311,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     children: [
                       Text(
                         "Select Your Dream Team",
-                        style: TextStyle(
-                          fontFamily: AppAssets.fontUnbounded,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.white,
-                        ),
+                        style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                       ),
                       InkWell(
                         onTap: () {
@@ -363,7 +356,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                       child: Container(
                         height: 237,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppRadii.hugeAll,
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
@@ -392,8 +385,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
                                     colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.75),
+                                      AppColors.transparent,
+                                      AppColors.black.withValues(alpha: 0.75),
                                     ],
                                   ),
                                 ),
@@ -412,12 +405,12 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     children: const [
                                       CircleAvatar(
                                         radius: 4,
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: AppColors.success,
                                       ),
                                       SizedBox(width: 6),
                                       Text("Active",
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 12)),
+                                              color: AppColors.white, fontSize: 12)),
                                     ],
                                   ),
                                   GestureDetector(
@@ -471,12 +464,12 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                       Row(
                                         children: [
                                           const Icon(Icons.star,
-                                              color: Colors.amber, size: 14),
+                                              color: AppColors.amber, size: 14),
                                           const SizedBox(width: 4),
                                           Text(
                                             "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
                                             style: const TextStyle(
-                                                color: Colors.white, fontSize: 12),
+                                                color: AppColors.white, fontSize: 12),
                                           ),
                                         ],
                                       ),
@@ -486,14 +479,14 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                         ),
                                       ),
                                       Text(
                                         item['role_name'] ?? '',
                                         style: const TextStyle(
                                           fontSize: 11,
-                                          color: Colors.white70,
+                                          color: AppColors.white70,
                                         ),
                                       ),
                                     ],
@@ -611,8 +604,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                           decoration: BoxDecoration(
                                             color: isAdded ? AppColors.errorLight : AppColors.primary,
-                                            borderRadius: BorderRadius.circular(30),
-                                            border: isAdded ? Border.all(color: Colors.red) : null,
+                                            borderRadius: AppRadii.roundAll,
+                                            border: isAdded ? Border.all(color: AppColors.error) : null,
                                           ),
                                           child: Text(
                                             isAdded ? "Remove" : "Add to Crew",
@@ -620,7 +613,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               fontSize: 12,
                                               fontFamily: AppAssets.fontOutfit,
                                               fontWeight: FontWeight.w600,
-                                              color: isAdded ? Colors.red : Colors.black,
+                                              color: isAdded ? AppColors.error : AppColors.black,
                                             ),
                                           ),
                                         ),
@@ -672,8 +665,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             margin: const EdgeInsets.only(bottom: 16),
                             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E1E),
-                              borderRadius: BorderRadius.circular(20),
+                              color: AppColors.background,
+                              borderRadius: AppRadii.hugeAll,
                             ),
                             child: Column(
                               children: [
@@ -694,7 +687,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     fontFamily: AppAssets.fontUnbounded,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
 
@@ -706,7 +699,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
-                                    color: Colors.white60,
+                                    color: AppColors.white60,
                                   ),
                                 ),
 
@@ -732,12 +725,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Text(
                               "  Browse Other Creative Partners",//
-                              style: TextStyle(
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.white,
-                              ),
+                              style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
                             ),
                           ),
 
@@ -764,7 +752,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             child: Container(
                               height: 237,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: AppRadii.hugeAll,
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: Stack(
@@ -796,8 +784,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                           begin: Alignment.topCenter,
                                           end: Alignment.bottomCenter,
                                           colors: [
-                                            Colors.transparent,
-                                            Colors.black.withOpacity(0.75),
+                                            AppColors.transparent,
+                                            AppColors.black.withValues(alpha: 0.75),
                                           ],
                                         ),
                                       ),
@@ -810,9 +798,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           end: Alignment.bottomCenter,
                           stops: const [0.5, 0.75, 1],
                           colors: [
-                          Colors.transparent,
-                          const Color(0xFF090909).withOpacity(0.6),
-                          const Color(0xFF090909),
+                          AppColors.transparent,
+                          AppColors.surfaceDeep.withValues(alpha: 0.6),
+                          AppColors.surfaceDeep,
                           ],
                           ),
                           ),),
@@ -864,12 +852,12 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                          /*   Row(
                                               children: [
                                                 const Icon(Icons.star,
-                                                    color: Colors.amber, size: 14),
+                                                    color: AppColors.amber, size: 14),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   "${item['average_rating'] ?? '0'} (${item['total_reviews'] ?? 0})",
                                                   style: const TextStyle(
-                                                    color: Colors.white,
+                                                    color: AppColors.white,
                                                     fontSize: 12,
                                                   ),
                                                 ),
@@ -878,19 +866,14 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             const SizedBox(height: 6),
                                             Text(
                                               item['name'] ?? '',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: AppAssets.fontOutfit,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white,
-                                              ),
+                                              style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
                                             ),
                                             Text(
                                               item['role_name'] ?? '',
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 fontFamily: AppAssets.fontOutfit,
-                                                color: Colors.white70,
+                                                color: AppColors.white70,
                                               ),
                                             ),
                                           ],
@@ -989,22 +972,14 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                     color: isAdded
                                                         ? AppColors.errorLight
                                                         : AppColors.primary,
-                                                    borderRadius: BorderRadius.circular(30),
+                                                    borderRadius: AppRadii.roundAll,
                                                     border: isAdded
-                                                        ? Border.all(color: Colors.red)
+                                                        ? Border.all(color: AppColors.error)
                                                         : null,
                                                   ),
                                                   child: Text(
                                                     isAdded ? "Remove" : "Add to Crew",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      fontFamily: AppAssets.fontOutfit,
-
-                                                      fontWeight: FontWeight.w600,
-                                                      color: isAdded
-                                                          ? Colors.red
-                                                          : Colors.black,
-                                                    ),
+                                                    style: AppTextStyles.buttonSmall.copyWith(color: isAdded ? AppColors.error : AppColors.black),
                                                   ),
                                                 ),
                                               ),
@@ -1021,7 +996,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               },
                                               child: SvgPicture.asset(
                                                 AppAssets.homeViewProfile,
-                                                color: Colors.white,
+                                                color: AppColors.white,
                                                 height: 36,
                                               ),
                                             ),
@@ -1055,7 +1030,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
-                color: Colors.transparent,
+                color: AppColors.transparent,
                 padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1072,15 +1047,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                              pathParameters: {'bookingId': widget.bookingId.toString()},
                            );
                           },
-                          child: const Text(
+                          child: Text(
                             "Complete your Shoot",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: AppAssets.fontOutfit,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white70,
-                              decoration: TextDecoration.underline,
-                            ),
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70, decoration: TextDecoration.underline),
                           ),
                         ),
                       ),
@@ -1125,7 +1094,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadii.lgAll,
                           ),
                         ),
 
@@ -1133,12 +1102,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           showLocationCard
                               ? "Contact With Sales"
                               : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: AppAssets.fontUnbounded,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
+                          style: AppTextStyles.buttonMedium.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.black),
                         ),
                       ),
                     ),
@@ -1163,17 +1127,17 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.6),
+      barrierColor: AppColors.black.withValues(alpha: 0.6),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return Align(
               alignment: Alignment.bottomCenter,
               child: Material(
-                color: Colors.transparent,
+                color: AppColors.transparent,
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.cardInsets,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceVariant,
                     borderRadius: const BorderRadius.only(
@@ -1196,7 +1160,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             margin: const EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
                               color: AppColors.white70,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: AppRadii.hugeAll,
                             ),
                           ),
                         ),
@@ -1207,29 +1171,24 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           children: [
                             const Text(
                               "Filter By",
-                              style: TextStyle(
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                             ),
                             InkWell(
                               onTap: () => context.pop(),
-                              child: const Icon(Icons.close, color: Colors.white),
+                              child: const Icon(Icons.close, color: AppColors.white),
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 12),
-                        Divider(color: Colors.white.withOpacity(0.15)),
+                        Divider(color: AppColors.white.withValues(alpha: 0.15)),
                         const SizedBox(height: 16),
 
                         /// 🔹 SORT CARD (FIXED)
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E1E1E),
+                            color: AppColors.background,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Column(
@@ -1241,7 +1200,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   fontFamily: AppAssets.fontOutfit,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -1279,13 +1238,13 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                               colors: [
-                                                Color(0xFFE8D1AB), // light shade
-                                                Color(0xFFD4A14D), // dark shade
+                                                AppColors.primary, // light shade
+                                                AppColors.primaryDark, // dark shade
                                               ],
                                             )
                                                 : null,
                                             border: Border.all(
-                                              color: Colors.white38,
+                                              color: AppColors.white38,
                                             ),
                                           ),
                                           child: selectedIndex == index
@@ -1296,7 +1255,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                               decoration:
                                               const BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                color: Colors.black,
+                                                color: AppColors.black,
                                               ),
                                             ),
                                           )
@@ -1317,7 +1276,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         /*    Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            // color: const Color(0xFF1E1E1E),
+                            // color: AppColors.background,
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Column(
@@ -1337,7 +1296,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                 min: 100,
                                 max: 15000,
                                 activeColor: AppColors.primary,
-                                inactiveColor: Colors.white24,
+                                inactiveColor: AppColors.white24,
                                 onChanged: (values) {
                                   setState(() => priceRange = values);
                                 },
@@ -1380,7 +1339,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                               child: Container(
                                 height: 55,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: AppRadii.xlAll,
                                   border:
                                   Border.all(color: AppColors.white60
                                   ),
@@ -1395,12 +1354,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   },
                                   child: const Text(
                                     "Clear All",
-                                    style: TextStyle(
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.white,
-                                    ),
+                                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
                                   ),
                                 ),
                               ),
@@ -1411,7 +1365,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                 height: 55,
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: AppRadii.xlAll,
                                 ),
                                 child: TextButton(
                                   onPressed: () {
@@ -1423,12 +1377,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                   },
                                   child: const Text(
                                       "Apply",
-                                      style: TextStyle(
-                                        fontFamily: AppAssets.fontUnbounded,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppColors.black,
-                                      )
+                                      style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.black)
                                   ),
                                 ),
                               ),
@@ -1456,12 +1405,12 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         left: 16,
         right: 16,
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.background,
+              borderRadius: AppRadii.lgAll,
             ),
             child: Row(
               children: [
@@ -1471,7 +1420,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   child: Text(
                     message,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontFamily: AppAssets.fontOutfit,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -1480,7 +1429,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 ),
                 GestureDetector(
                   onTap: () => overlayEntry.remove(),
-                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                  child: const Icon(Icons.close, color: AppColors.white, size: 18),
                 ),
               ],
             ),
@@ -1499,18 +1448,18 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(0.7),
+      barrierColor: AppColors.black.withValues(alpha: 0.7),
       builder: (context) {
         return Center(
           child: Container(
             width: 380,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1521,7 +1470,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     height: 60,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF2A2A2A),
+                      color: AppColors.surfaceVariant,
                     ),
                     child: const Icon(
                       Icons.error_outline,
@@ -1537,7 +1486,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     "No Crew Selected?",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       fontFamily: AppAssets.fontUnbounded,
@@ -1547,25 +1496,15 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   const SizedBox(height: 12),
 
                   /// 🔹 DESCRIPTION
-                  const Text(
+                  Text(
                     "You are choosing to continue without adding any team members.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      fontFamily: AppAssets.fontOutfit,
-                      height: 1.4,
-                    ),
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70, height: 1.4),
                   ),
                   Text(
                     "Beige's team will create the best talent for you based on your needs.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 14,
-                      fontFamily: AppAssets.fontOutfit,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.buttonMedium.copyWith(color: AppColors.primary),
                   ),
                   const SizedBox(height: 28),
 
@@ -1578,8 +1517,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white24),
+                            borderRadius: AppRadii.lgAll,
+                            border: Border.all(color: AppColors.white24),
                           ),
                           child: TextButton(
                             onPressed: () {
@@ -1588,7 +1527,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             child: const Text(
                               "Go Back & Select",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -1605,7 +1544,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           height: 50,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadii.lgAll,
                           ),
                           child: TextButton(
                             onPressed: () {
@@ -1618,7 +1557,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             child: const Text(
                               "Yes, Continue",
                               style: TextStyle(
-                                color: Colors.black,
+                                color: AppColors.black,
                                 fontFamily: AppAssets.fontOutfit,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1642,9 +1581,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: const Color(0xFF1E1E1E),
+          backgroundColor: AppColors.background,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadii.hugeAll,
           ),
 
           child: Padding(
@@ -1667,28 +1606,19 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 const SizedBox(height: 12),
 
                 /// 🔹 TITLE
-                const Text(
+                Text(
                   "Request Received",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFD6C29C),
-                    fontSize: 16, // 🔽 reduce
-                    fontFamily: AppAssets.fontUnbounded,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.goldParchment),
                 ),
 
                 const SizedBox(height: 8),
 
                 /// 🔹 DESCRIPTION
-                const Text(
+                Text(
                   "Our Sales team will shortly reach out to you to finalize your creative requirements.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12, // 🔽 reduce
-                    fontFamily: AppAssets.fontOutfit,
-                  ),
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
                 ),
 
                 const SizedBox(height: 16),
@@ -1699,7 +1629,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   height: 45, // 🔽 reduce
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD6C29C),
+                      backgroundColor: AppColors.goldParchment,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1710,7 +1640,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     child: const Text(
                       "Got It",
                       style: TextStyle(
-                        color: Color(0xFF1D1D1B),
+                        color: AppColors.background,
                         fontSize: 13,
                         fontFamily: AppAssets.fontUnbounded,
                         fontWeight: FontWeight.w600,

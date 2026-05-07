@@ -673,14 +673,14 @@ Update status: `Not started` → `In progress` → `Done`
 | T3.8 | shoot_type_selection_screen: TextStyle + fontSize | 1 | Done |
 | T3.9 | shoot_type_selection_screen: EdgeInsets + BorderRadius | 1 | Done |
 | **Phase 4 — Tier 2 (crew, review, signup, details)** | | | |
-| T4.1 | crew_selection_screen: Colors + withOpacity | 1 | Not started |
-| T4.2 | crew_selection_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Not started |
-| T4.3 | shoot_review_screen: Colors + withOpacity | 1 | Not started |
-| T4.4 | shoot_review_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Not started |
-| T4.5 | sign_up_screen: Colors + withOpacity | 1 | Not started |
-| T4.6 | sign_up_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Not started |
-| T4.7 | shoot_details_screen: Colors | 1 | Not started |
-| T4.8 | shoot_details_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Not started |
+| T4.1 | crew_selection_screen: Colors + withOpacity | 1 | Done |
+| T4.2 | crew_selection_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Done |
+| T4.3 | shoot_review_screen: Colors + withOpacity | 1 | Done |
+| T4.4 | shoot_review_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Done |
+| T4.5 | sign_up_screen: Colors + withOpacity | 1 | Done |
+| T4.6 | sign_up_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Done |
+| T4.7 | shoot_details_screen: Colors | 1 | Done |
+| T4.8 | shoot_details_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Done |
 | **Phase 5 — Tier 3 (edit_review, crew_size, my_shoots, summary, profile)** | | | |
 | T5.1 | shoot_edit_review_screen: all types | 1 | Not started |
 | T5.2 | crew_size_matching_screen: all types | 1 | Not started |

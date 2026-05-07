@@ -150,7 +150,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 color: AppColors.surface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.cardInsets,
               child: Column(
                 children: [
 
@@ -181,7 +181,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                       InkWell(
                         onTap: () => context.pop(),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: AppRadii.hugeAll,
                         child:  Padding(
                           padding: EdgeInsets.all(6),
                           child: Icon(
@@ -273,7 +273,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                           height: 20,
                           width: 20,
-                          /*  color: Colors.white.withOpacity(0.7), */// optional
+                          /*  color: AppColors.white.withOpacity(0.7), */// optional
                         ),
 
                         const SizedBox(width: 10),
@@ -314,7 +314,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                           height: 24,
                           width: 24,
-                          /*  color: Colors.white.withOpacity(0.7), */// optional
+                          /*  color: AppColors.white.withOpacity(0.7), */// optional
                         ),
                       ],
                     ),
@@ -350,14 +350,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                         context.pop();
                       },
-                      child:  Text(
+                      child: Text(
                         "Save",
-                        style: TextStyle(
-                          color: AppColors.textHeading,
-                          fontSize: 14,
-                          fontFamily: AppTextStyles.fontFamilyDisplay,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
                       ),
                     ),
                   ),
@@ -789,11 +784,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Text(
                               "Join Beige to book talented photographers\nand videographers for your projects.",
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: AppTextStyles.fontFamilyBody,
-                                fontSize: 14,
-                                color: AppColors.white70,
-                              ),
+                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70),
                             ),
 
                           ],
@@ -867,11 +858,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
 
 
-                                  textStyle: const TextStyle(
-                                    color: AppColors.white,
-                                    fontFamily: AppTextStyles.fontFamilyBody,
-                                    fontSize: 14,
-                                  ),
+                                  textStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
 
                                   inputDecoration: InputDecoration(
 
@@ -1029,7 +1016,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       : AppAssets.eyeClosed,
                                   height: 22,
                                   colorFilter: const ColorFilter.mode(
-                                    Colors.white,
+                                    AppColors.white,
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -1060,7 +1047,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       : AppAssets.eyeClosed,
                                   height: 22,
                                   colorFilter: const ColorFilter.mode(
-                                    Colors.white,
+                                    AppColors.white,
                                     BlendMode.srcIn,
                                   ),
                                 ),
@@ -1224,14 +1211,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           height: 50,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppRadii.lgAll,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
+                              color: AppColors.white.withValues(alpha: 0.12),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.35),
+                                color: AppColors.black.withValues(alpha: 0.35),
                                 blurRadius: 16,
                                 offset: const Offset(0, 8),
                               ),
@@ -1244,7 +1231,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 height: 28,
                                 width: 28,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.08),
+                                  color: AppColors.white.withValues(alpha: 0.08),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -1297,7 +1284,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       child: const Text(
                         "Login",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
@@ -1324,9 +1311,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Widget _profilePictureCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: AppSpacing.cardInsets,
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
             color: AppColors.borderLight
@@ -1351,11 +1338,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           /// SUB TITLE
           Text(
             "Add photo to build connection and trust",
-            style: TextStyle(
-                fontSize: 12,
-                fontFamily: AppTextStyles.fontFamilyBody,
-                color: AppColors.white70
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
           ),
 
           const SizedBox(height: 16),
@@ -1366,7 +1349,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               /// 👤 PROFILE IMAGE
               CircleAvatar(
                 radius: 26,
-                backgroundColor: Colors.grey.shade800,
+                backgroundColor: AppColors.greyShade800,
                 backgroundImage: profileImage != null
                     ? FileImage(profileImage!)
                     : null,
@@ -1383,12 +1366,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               Expanded(
                 child: InkWell(
                   onTap: _pickImage,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: AppRadii.roundAll,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 10),
                     decoration: BoxDecoration(
                       color: AppColors.white,
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: AppRadii.roundAll,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1398,20 +1381,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               ? Icons.camera_alt_outlined   // image nahi hai
                               : Icons.refresh,              // image hai → re-upload
                           size: 18,
-                          color: Colors.black,
+                          color: AppColors.black,
                         ),
-                        // Icon(Icons.camera_alt_outlined, size: 18, color: Colors.black),
+                        // Icon(Icons.camera_alt_outlined, size: 18, color: AppColors.black),
                         SizedBox(width: 8),
                         Text(
                           profileImage == null
                               ? "Upload Profile Picture"
                               : "ReUpload Profile Picture",
-                          style:  TextStyle(
-                              fontSize: 12,        // 🔹 thoda bada (image jaisa)
-                              fontWeight: FontWeight.w500, // 🔹 bold
-                              color: Colors.black,
-                              fontFamily: AppAssets.fontOutfit
-                          ),
+                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.black),
                         ),
                       ],
                     ),
@@ -1440,9 +1418,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         margin: EdgeInsets.symmetric(horizontal: 22),//
         height: 60,
         decoration: BoxDecoration(
-          color: Color(0xff1D1D1B),//
-          border: Border.all(color: Colors.white.withValues(alpha: 0.10),width: 0.50),
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.background,//
+          border: Border.all(color: AppColors.white.withValues(alpha: 0.10),width: 0.50),
+          borderRadius: AppRadii.lgAll,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1454,7 +1432,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 shape: BoxShape.circle,
                 color: AppColors.backgroundOpacity70,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.06),
+                  color: AppColors.white.withValues(alpha: 0.06),
                   width: 1,
                 ),
               ),
@@ -1469,12 +1447,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             const SizedBox(width: 10),
 
             Text(
-              "Tell Us About Yourself & Add Details",//
-              style: TextStyle(
-                fontFamily: AppTextStyles.fontFamilyBody,
-                fontSize: 12,
-                color: AppColors.disabled,
-              ),
+              "Tell Us About Yourself & Add Details",
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.disabled),
             ),
           ],
         ),
@@ -1487,11 +1461,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       margin: EdgeInsets.symmetric(horizontal: 22),//
 
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: AppColors.white,
+        borderRadius: AppRadii.xlAll,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+            color: AppColors.black.withValues(alpha: 0.25),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -1503,7 +1477,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           /// 🔵 PROFILE IMAGE OR ICON
           CircleAvatar(
             radius: 24,
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: AppColors.greyShade200,
             backgroundImage: profileImage != null
                 ? FileImage(profileImage!)
                 : null,
@@ -1511,7 +1485,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ? const Icon(
               Icons.person,
               size: 26,
-              color: Colors.grey,
+              color: AppColors.neutralGrey,
             )
                 : null,
           ),
@@ -1534,7 +1508,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         fontFamily: AppAssets.fontOutfit,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: AppColors.black87,
                       ),
                     ),
                     Text(
@@ -1543,7 +1517,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         fontFamily: AppAssets.fontOutfit,
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: AppColors.black,
                       ),
                     ),
                   ],
@@ -1556,11 +1530,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   children: [
                     const Text(
                       "Email ID: ",
-                      style: TextStyle(
-                        fontFamily: AppAssets.fontOutfit,
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.black54),
                     ),
                     Expanded(
                       child: Text(
@@ -1569,7 +1539,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         style: const TextStyle(
                           fontFamily: AppAssets.fontOutfit,
                           fontSize: 12,
-                          color: Colors.black54,
+                          color: AppColors.black54,
                         ),
                       ),
                     ),
@@ -1596,7 +1566,7 @@ class CircleHolePainter extends CustomPainter {
     /// dark overlay
     canvas.drawRect(
       Offset.zero & size,
-      Paint()..color = Colors.black.withOpacity(0.6),
+      Paint()..color = AppColors.black.withValues(alpha: 0.6),
     );
 
     /// clear circle
@@ -1616,7 +1586,7 @@ class CircleHolePainter extends CustomPainter {
       center,
       radius,
       Paint()
-        ..color = Colors.white
+        ..color = AppColors.white
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3,
     );

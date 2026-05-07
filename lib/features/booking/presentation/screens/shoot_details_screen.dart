@@ -14,6 +14,9 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
@@ -424,12 +427,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
             ),
             Text(
               "More Details",
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 14,
-                fontFamily: AppAssets.fontOutfit,
-                fontWeight: FontWeight.w400,
-              ),
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
             ),
             // 🔹 Step Text (Right)
             Align(
@@ -447,7 +445,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           ],
         ),
       ),
-      body: Padding(padding:  EdgeInsets.all(16.0),
+      body: Padding(padding:  AppSpacing.cardInsets,
       child: Column(
         children: [
       
@@ -532,8 +530,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2B2B2B),
-                      borderRadius: BorderRadius.circular(14),
+                      color: AppColors.surfaceVariant,
+                      borderRadius: AppRadii.xlAll,
                     ),
                     child: Row(
                       children: [
@@ -543,7 +541,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           height: 40,
                           width: 40,
                          /* decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: AppColors.black,
                             borderRadius: BorderRadius.circular(10),
                           ),*/
                           child: Center(
@@ -560,7 +558,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           child: Text(
                             "Videographer X${includedVideoQty + additionalVideoQty}",
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 14,
                             ),
                           ),
@@ -570,7 +568,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadii.hugeAll,
                             border: Border.all(color: AppColors.primary),
                           ),
                           child: const Text(
@@ -591,8 +589,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2B2B2B),
-                      borderRadius: BorderRadius.circular(14),
+                      color: AppColors.surfaceVariant,
+                      borderRadius: AppRadii.xlAll,
                     ),
                     child: Row(
                       children: [
@@ -602,7 +600,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           height: 40,
                           width: 40,
                        /*   decoration: BoxDecoration(
-                            color: Colors.black,
+                            color: AppColors.black,
                             borderRadius: BorderRadius.circular(10),
                           ),*/
                           child: Center(
@@ -620,7 +618,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           child: Text(
                             "Photographer X${includedPhotoQty + additionalPhotoQty}",
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.white,
                               fontSize: 14,
                             ),
                           ),
@@ -630,7 +628,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadii.hugeAll,
                             border: Border.all(color: AppColors.primary),
                           ),
                           child: const Text(
@@ -653,12 +651,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 /// 🔹 QUESTION
                 Text(
                   "Would you like to Add Additional creatives?",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: AppAssets.fontUnbounded,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                 ),
 
                 const SizedBox(height: 12),
@@ -679,8 +672,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2B2B2B),
-                      borderRadius: BorderRadius.circular(14),
+                      color: AppColors.surfaceVariant,
+                      borderRadius: AppRadii.xlAll,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -744,7 +737,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                     /// ⭐ 0.5px BORDER + OPACITY COLOR
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
@@ -752,7 +745,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     ),
 
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
@@ -801,7 +794,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 //     ),
                 //
                 //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(12),
+                //       borderRadius: AppRadii.lgAll,
                 //       borderSide: const BorderSide(
                 //         color: AppColors.white70,
                 //         width: 0.5,
@@ -809,7 +802,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 //     ),
                 //
                 //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(12),
+                //       borderRadius: AppRadii.lgAll,
                 //       borderSide: const BorderSide(
                 //         color: AppColors.primary,
                 //         width: 1,
@@ -852,8 +845,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     /// 🔹 LOCATION FIELD
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.transparent,
+                          borderRadius: AppRadii.lgAll,
                           border: Border.all(
                             color: AppColors.borderGold,
                             width: 0.5,
@@ -867,11 +860,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           debounceTime: 600,
                           isLatLngRequired: true,
 
-                          textStyle: const TextStyle(
-                            color: AppColors.white,
-                            fontFamily: AppAssets.fontOutfit,
-                            fontSize: 14,
-                          ),
+                          textStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
 
                           inputDecoration:  InputDecoration(
                             border: InputBorder.none,
@@ -941,7 +930,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                         child: Text(
                           locationError!,
                           style: const TextStyle(
-                            color: Colors.red,
+                            color: AppColors.error,
                             fontSize: 12,
                           ),
                         ),
@@ -1025,7 +1014,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                     /// ⭐ 0.5px BORDER + OPACITY COLOR
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
@@ -1033,7 +1022,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     ),
 
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
@@ -1073,7 +1062,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                     /// ⭐ 0.5px BORDER + OPACITY COLOR
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                       // 🔥 exact 0.5px
@@ -1081,7 +1070,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     ),
 
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                       borderSide: const BorderSide(
                         color: AppColors.white70, // #1D1D1B99 (60% opacity)
                         width: 0.5,                          // focus border thicker
@@ -1116,21 +1105,21 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       bottomNavigationBar: SafeArea(
         bottom:true,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: AppSpacing.cardInsets,
           child: Row(
             children: [
               Expanded(
                 child:  OutlinedButton(
                   onPressed: () => context.pop(),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.grey),
+                    foregroundColor: AppColors.white,
+                    side: const BorderSide(color: AppColors.neutralGrey),
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                     ),
                   ),
-                  child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
+                  child: Text("Back", style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1144,21 +1133,16 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                         ? AppColors.goldGradientLight // disabled
                         : AppColors.primary, // enabled
                     foregroundColor: selectedIndex == -1
-                        ? Colors.grey.shade400
-                        : Colors.black,*/
+                        ? AppColors.neutralGrey.shade400
+                        : AppColors.black,*/
                     padding:  EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: AppRadii.lgAll,
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Continue",
-                    style: TextStyle(
-                      fontFamily: AppAssets.fontUnbounded,
-                      color: AppColors.textHeading,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
+                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
                   ),
                 ),
               ),
@@ -1184,7 +1168,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           }
         });
       },
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: AppRadii.roundAll,
       child: Row(
         children: [
           Container(
@@ -1195,8 +1179,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               gradient: isSelected
                   ? const LinearGradient(
                 colors: [
-                  Color(0xFFE8D1AB),
-                  Color(0xFFD4A14D),
+                  AppColors.primary,
+                  AppColors.primaryDark,
                 ],
               )
                   : null,
@@ -1209,7 +1193,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 ? const Center(
               child: CircleAvatar(
                 radius: 4,
-                backgroundColor: Colors.black,
+                backgroundColor: AppColors.black,
               ),
             )
                 : null,
@@ -1218,7 +1202,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           Text(
             title,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.white,
               fontSize: 14,
             ),
           ),
@@ -1242,7 +1226,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: const TextStyle(color: AppColors.white, fontSize: 14),
             ),
           ),
           Container(
@@ -1255,7 +1239,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               children: [
                 InkWell(
                   onTap: onRemove,
-                  child: const Icon(Icons.remove, size: 18, color: Colors.black),
+                  child: const Icon(Icons.remove, size: 18, color: AppColors.black),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1263,13 +1247,13 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     value.toString().padLeft(2, '0'),
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: AppColors.black,
                     ),
                   ),
                 ),
                 InkWell(
                   onTap: onAdd,
-                  child: const Icon(Icons.add, size: 18, color: Colors.black),
+                  child: const Icon(Icons.add, size: 18, color: AppColors.black),
                 ),
               ],
             ),
