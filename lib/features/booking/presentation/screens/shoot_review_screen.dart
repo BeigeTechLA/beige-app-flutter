@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:beige/app/route_names.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
@@ -29,7 +29,6 @@ class ShootReviewScreen extends ConsumerStatefulWidget {
 }
 
 class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -74,15 +73,18 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   }
 
   double getShootAmount(Map<String, dynamic>? pricing) {
-    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0).toDouble();
+    return (pricing?['pricing_sections']?['shoot_cost']?['amount'] ?? 0)
+        .toDouble();
   }
 
   double getEditingAmount(Map<String, dynamic>? pricing) {
-    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0).toDouble();
+    return (pricing?['pricing_sections']?['editing_services']?['amount'] ?? 0)
+        .toDouble();
   }
 
   double getAdditionalCrewAmount(Map<String, dynamic>? pricing) {
-    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0).toDouble();
+    return (pricing?['pricing_sections']?['additional_crew']?['amount'] ?? 0)
+        .toDouble();
   }
 
   Future<void> _openStripeSheet() async {
@@ -194,14 +196,15 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) setState(() => isProcessing = false);
     }
   }
+
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -222,10 +225,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       case 2:
         return ["Photo Shoot Type"];
       case 3:
-        return [
-          "Video Shoot Type",
-          "Photo Shoot Type",
-        ];
+        return ["Video Shoot Type", "Photo Shoot Type"];
       default:
         return ["Shoot Type"];
     }
@@ -241,7 +241,6 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         return "1";
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -272,17 +271,12 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: () => context.pop(),
-                child: SvgPicture.asset(
-                  AppAssets.back,
-                  height: 24,
-                ),
-                ),
-
+                child: SvgPicture.asset(AppAssets.back, height: 24),
+              ),
             ),
             Text(
               "Book & Confirm",
@@ -293,20 +287,21 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               alignment: Alignment.centerRight,
               child: Text(
                 "3/3",
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.white,
+                ),
               ),
             ),
           ],
         ),
       ),
 
-      body:  Stack(
+      body: Stack(
         children: [
           Padding(
             padding: AppSpacing.cardInsets,
             child: Column(
               children: [
-
                 Row(
                   children: List.generate(3, (index) {
                     double fillWidth = 0;
@@ -327,42 +322,42 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                         height: 5,
                         decoration: BoxDecoration(
                           color: AppColors.textSecondary, // grey background
-                          borderRadius: BorderRadius.circular(64),
+                          borderRadius: AppRadii.enormousAll,
                         ),
                         child: fillWidth > 0
                             ? Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            height: 5,
-                            width: fillWidth == double.infinity
-                                ? null
-                                : fillWidth,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(64),
-                            ),
-                          ),
-                        )
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  height: 5,
+                                  width: fillWidth == double.infinity
+                                      ? null
+                                      : fillWidth,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: AppRadii.enormousAll,
+                                  ),
+                                ),
+                              )
                             : const SizedBox(),
                       ),
                     );
                   }),
                 ),
 
-                SizedBox(height: 24),
+                AppSpacing.verticalXxl,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Review & Confirm",
-                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: AppColors.white,
+                      ),
                     ),
-
-
                   ],
                 ),
 
-                SizedBox(height: 10),
+                AppSpacing.verticalSmd,
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
@@ -371,12 +366,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                           padding: AppSpacing.cardInsets,
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: AppRadii.xxxlAll,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
                               /// 🔹 TOP PROFILE ROW
                               Row(
                                 children: [
@@ -388,55 +382,56 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                       color: AppColors.black12, // optional bg
                                       child: creativeImage.isNotEmpty
                                           ? Image.network(
-                                        "${ApiEndpoints.imageUrl}$creativeImage",
-                                        fit: BoxFit.cover, // 🔥 proper crop
-                                        alignment: Alignment.center, // 🔥 center focus
-                                        errorBuilder: (_, __, ___) {
-                                          return SvgPicture.asset(
-                                            AppAssets.imagePlaceholder,
+                                              "${ApiEndpoints.imageUrl}$creativeImage",
+                                              fit: BoxFit
+                                                  .cover, // 🔥 proper crop
+                                              alignment: Alignment
+                                                  .center, // 🔥 center focus
+                                              errorBuilder: (_, __, ___) {
+                                                return SvgPicture.asset(
+                                                  AppAssets.imagePlaceholder,
 
-                                            alignment: Alignment.center,
-                                          );
-                                        },
-                                      )
+                                                  alignment: Alignment.center,
+                                                );
+                                              },
+                                            )
                                           : SvgPicture.asset(
-                                        AppAssets.imagePlaceholder,
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.center,
-                                      ),
+                                              AppAssets.imagePlaceholder,
+                                              fit: BoxFit.cover,
+                                              alignment: Alignment.center,
+                                            ),
                                     ),
                                   ),
-
 
                                   SizedBox(width: 14),
 
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-
                                         const SizedBox(height: 6),
                                         Text(
                                           "Content Type: $creativeRole",
-                                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
+                                          style: AppTextStyles.labelMedium
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                              ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
                                           creativeName,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.white,
-                                            fontFamily: AppAssets.fontOutfit,
-                                          ),
+                                          style: AppTextStyles.labelLarge
+                                              .copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.white,
+                                              ),
                                         ),
-
 
                                         const SizedBox(height: 10),
                                       ],
                                     ),
                                   ),
-
                                 ],
                               ),
 
@@ -447,75 +442,89 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
                                     return Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: List.generate(
                                         (constraints.maxWidth / 14).floor(),
-                                            (index) =>
-                                            Container(
-                                              width: 6,
-                                              height: 1,
-                                              color: AppColors.white30,
-                                            ),
+                                        (index) => Container(
+                                          width: 6,
+                                          height: 1,
+                                          color: AppColors.white30,
+                                        ),
                                       ),
                                     );
                                   },
                                 ),
                               ),
 
-
                               const SizedBox(height: 12),
 
                               /// ⬜ WHITE INFO BOX
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.white,
                                   borderRadius: AppRadii.xlAll,
-                                  border: Border.all(color: AppColors.white.withValues(alpha: 0.9)),
+                                  border: Border.all(
+                                    color: AppColors.white.withValues(
+                                      alpha: 0.9,
+                                    ),
+                                  ),
                                 ),
                                 child: Column(
                                   children: [
-
                                     /// 🔥 MULTI DAY
-                                    if ((booking?['booking_days'] ?? []).isNotEmpty) ...[
-                                      ...List.generate(booking!['booking_days'].length, (index) {
-                                        var day = booking['booking_days'][index];
+                                    if ((booking?['booking_days'] ?? [])
+                                        .isNotEmpty) ...[
+                                      ...List.generate(
+                                        booking!['booking_days'].length,
+                                        (index) {
+                                          var day =
+                                              booking['booking_days'][index];
 
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            infoRowBlack(
-                                              AppAssets.clock,
-                                              "${DateTimeUtils.formatTime(day['start_time'])} to "
-                                                  "${DateTimeUtils.formatTime(day['end_time'])} "
-                                                  "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
-                                            ),
-                                            const SizedBox(height: 6),
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              infoRowBlack(
+                                                AppAssets.clock,
+                                                "${DateTimeUtils.formatTime(day['start_time'])} to "
+                                                "${DateTimeUtils.formatTime(day['end_time'])} "
+                                                "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
+                                              ),
+                                              const SizedBox(height: 6),
 
-                                            infoRowBlack(
-                                              AppAssets.calendarDate,
-                                              DateTimeUtils.formatDate(day['date']),
-                                            ),
+                                              infoRowBlack(
+                                                AppAssets.calendarDate,
+                                                DateTimeUtils.formatDate(
+                                                  day['date'],
+                                                ),
+                                              ),
 
-                                            const SizedBox(height: 10),
-                                          ],
-                                        );
-                                      }),
+                                              const SizedBox(height: 10),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ]
-
                                     /// 🔥 SINGLE DAY
                                     else ...[
                                       infoRowBlack(
                                         AppAssets.clock,
                                         "${DateTimeUtils.formatTime(booking?['start_time'])} to "
-                                            "${DateTimeUtils.formatTime(booking?['end_time'])} "
-                                            "(${DateTimeUtils.formatDuration((booking?['duration_hours'] ?? 0).toDouble())})",
+                                        "${DateTimeUtils.formatTime(booking?['end_time'])} "
+                                        "(${DateTimeUtils.formatDuration((booking?['duration_hours'] ?? 0).toDouble())})",
                                       ),
                                       const SizedBox(height: 6),
 
                                       infoRowBlack(
                                         AppAssets.calendarDate,
-                                        DateTimeUtils.formatDate(booking?['event_date']),
+                                        DateTimeUtils.formatDate(
+                                          booking?['event_date'],
+                                        ),
                                       ),
                                     ],
 
@@ -527,22 +536,31 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     ),
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
                         SizedBox(height: 10),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
                           child: Container(
                             height: 1,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  AppColors.white.withValues(alpha: 0.09), // left
-                                  AppColors.white.withValues(alpha: 0.09), // center
-                                  AppColors.white.withValues(alpha: 0.09), // right
+                                  AppColors.white.withValues(
+                                    alpha: 0.09,
+                                  ), // left
+                                  AppColors.white.withValues(
+                                    alpha: 0.09,
+                                  ), // center
+                                  AppColors.white.withValues(
+                                    alpha: 0.09,
+                                  ), // right
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -552,20 +570,23 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                         ),
                         SizedBox(height: 30),
 
-
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
-                            if ((booking?['video_edit_types'] ?? []).isNotEmpty ||
-                                (booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-
+                            if ((booking?['video_edit_types'] ?? [])
+                                    .isNotEmpty ||
+                                (booking?['photo_edit_types'] ?? [])
+                                    .isNotEmpty) ...[
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Editing Services",
-                                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
+                                    style: AppTextStyles.labelLarge.copyWith(
+                                      fontFamily: AppAssets.fontUnbounded,
+                                      color: AppColors.white,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -573,7 +594,10 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               SizedBox(height: 10),
 
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.surfaceVariant,
                                   borderRadius: AppRadii.xlAll,
@@ -581,35 +605,51 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-
                                     /// ================= VIDEO EDITS =================
-                                    if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
+                                    if ((booking?['video_edit_types'] ?? [])
+                                        .isNotEmpty) ...[
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.only(
+                                          bottom: 8,
+                                        ),
                                         child: Text(
                                           "Video Edits:",
-                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(color: AppColors.white),
                                         ),
                                       ),
 
                                       Column(
                                         children: List.generate(
-                                          booking?['video_edit_types'].length ?? 0,
-                                              (index) {
-                                            final item = booking?['video_edit_types'][index];
+                                          booking?['video_edit_types'].length ??
+                                              0,
+                                          (index) {
+                                            final item =
+                                                booking?['video_edit_types'][index];
 
                                             return Align(
                                               alignment: Alignment.centerLeft,
                                               child: Container(
-                                                margin: const EdgeInsets.only(bottom: 8),
-                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                margin: const EdgeInsets.only(
+                                                  bottom: 8,
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8,
+                                                    ),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
                                                   borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}",
-                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
+                                                  style: AppTextStyles
+                                                      .labelMedium
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors.primary,
+                                                      ),
                                                 ),
                                               ),
                                             );
@@ -621,56 +661,82 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     ],
 
                                     /// ================= PHOTO EDITS =================
-                                    if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+                                    if ((booking?['photo_edit_types'] ?? [])
+                                        .isNotEmpty) ...[
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.only(
+                                          bottom: 8,
+                                        ),
                                         child: Text(
                                           "Photo Edits:",
-                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(color: AppColors.white),
                                         ),
                                       ),
 
                                       Column(
                                         children: List.generate(
-                                          booking?['photo_edit_types'].length ?? 0,
-                                              (index) {
-                                            final item = booking?['photo_edit_types'][index];
+                                          booking?['photo_edit_types'].length ??
+                                              0,
+                                          (index) {
+                                            final item =
+                                                booking?['photo_edit_types'][index];
 
                                             return Align(
                                               alignment: Alignment.centerLeft,
                                               child: Container(
-                                                margin: const EdgeInsets.only(bottom: 8),
-                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                margin: const EdgeInsets.only(
+                                                  bottom: 8,
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8,
+                                                    ),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
                                                   borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}"
-                                                      "${item['note'] != null ? ' (${item['note']})' : ''}",
-                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
+                                                  "${item['note'] != null ? ' (${item['note']})' : ''}",
+                                                  style: AppTextStyles
+                                                      .labelMedium
+                                                      .copyWith(
+                                                        color:
+                                                            AppColors.primary,
+                                                      ),
                                                 ),
                                               ),
                                             );
                                           },
                                         ),
                                       ),
-                                    ]
+                                    ],
                                   ],
                                 ),
                               ),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 10,
+                                ),
                                 child: Container(
                                   height: 1,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        AppColors.white.withValues(alpha: 0.09), // left
-                                        AppColors.white.withValues(alpha: 0.09), // center
-                                        AppColors.white.withValues(alpha: 0.09), // right
+                                        AppColors.white.withValues(
+                                          alpha: 0.09,
+                                        ), // left
+                                        AppColors.white.withValues(
+                                          alpha: 0.09,
+                                        ), // center
+                                        AppColors.white.withValues(
+                                          alpha: 0.09,
+                                        ), // right
                                       ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
@@ -680,45 +746,50 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               ),
                             ],
 
-
-
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "Contact Information",
-                                  style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    fontFamily: AppAssets.fontUnbounded,
+                                    color: AppColors.white,
+                                  ),
                                 ),
                               ],
                             ),
                             SizedBox(height: 14),
                             // _buildField("Full Name*", nameController),
-                            CustomInputField(
-                              title: "Full Name",
+                            AppTextField(
+                              label: "Full Name",
                               controller: nameController,
                             ),
                             const SizedBox(height: 15),
 
-                            CustomInputField(
-                              title: "Email ID",
+                            AppTextField(
+                              label: "Email ID",
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                             ),
 
                             const SizedBox(height: 15),
-                            CustomInputField(
-                              title: "Phone Number",
+                            AppTextField(
+                              label: "Phone Number",
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               textInputAction: TextInputAction.done,
 
                               onFieldSubmitted: (_) {
-                                FocusScope.of(context).unfocus(); // ✅ Done button
+                                FocusScope.of(
+                                  context,
+                                ).unfocus(); // ✅ Done button
                               },
 
                               onChanged: (value) {
                                 if (value.length == 10) {
-                                  FocusScope.of(context).unfocus(); // ✅ Auto close after 10 digit
+                                  FocusScope.of(
+                                    context,
+                                  ).unfocus(); // ✅ Auto close after 10 digit
                                 }
                               },
 
@@ -726,11 +797,14 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(10),
                               ],
-                            ),            const SizedBox(height: 15),
+                            ),
+                            const SizedBox(height: AppSpacing.base),
 
                             Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Divider(color: AppColors.dividerDark,),
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: const Divider(
+                                color: AppColors.dividerDark,
+                              ),
                             ),
 
                             Column(
@@ -738,23 +812,33 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                               children: [
                                 Text(
                                   "Pricing Summary",
-                                  style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    fontFamily: AppAssets.fontUnbounded,
+                                    color: AppColors.white,
+                                  ),
                                 ),
                                 const SizedBox(height: 14),
                                 Container(
-                                  // padding: const EdgeInsets.all(15),
                                   decoration: BoxDecoration(
                                     color: AppColors.accent,
                                     borderRadius: AppRadii.lgAll,
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 10,bottom: 10,top: 10),
+                                        padding: const EdgeInsets.only(
+                                          left: 10,
+                                          bottom: 10,
+                                          top: 10,
+                                        ),
                                         child: Text(
                                           "Package Offer",
-                                          style: AppTextStyles.buttonMedium.copyWith(color: AppColors.textHeading),
+                                          style: AppTextStyles.buttonMedium
+                                              .copyWith(
+                                                color: AppColors.textHeading,
+                                              ),
                                         ),
                                       ),
                                       const Divider(color: AppColors.black),
@@ -797,11 +881,15 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 ),
 
                                 // --- ADDITIONAL CREW CARD ---
-                                if (getAdditionalCrewSubtitles(crewSummary).isNotEmpty)
+                                if (getAdditionalCrewSubtitles(
+                                  crewSummary,
+                                ).isNotEmpty)
                                   builderPricingCard(
                                     title: "Additional Crew",
                                     amount: getAdditionalCrewAmount(pricing),
-                                    subtitles: getAdditionalCrewSubtitles(crewSummary), // 🔥 YE ADD KAR
+                                    subtitles: getAdditionalCrewSubtitles(
+                                      crewSummary,
+                                    ), // 🔥 YE ADD KAR
                                   ),
 
                                 const SizedBox(height: 10),
@@ -809,47 +897,42 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                 /// 🔹 TOTAL
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Total Amount",
-                                        style: AppTextStyles.buttonLarge.copyWith(color: AppColors.primary),
+                                        style: AppTextStyles.buttonLarge
+                                            .copyWith(color: AppColors.primary),
                                       ),
                                       Text(
                                         "\$${NumberFormat('#,##0.00').format(pricing?['total_amount'] ?? 0)}",
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          color: AppColors.white,
-                                          fontFamily: AppAssets.fontOutfit,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: AppTextStyles.titleMedium
+                                            .copyWith(
+                                              color: AppColors.white,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
                                     ],
                                   ),
                                 ),
-
                               ],
-                            )
-
-
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
                 ),
-
-
-
               ],
             ),
           ),
-          if (isLoading)
-            const AppLoader()
+          if (isLoading) const AppLoader(),
         ],
-
       ),
       bottomNavigationBar: SafeArea(
         bottom: true,
@@ -857,7 +940,6 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
           padding: AppSpacing.cardInsets,
           child: Row(
             children: [
-
               // 🔸 Continue Button
               Expanded(
                 child: SizedBox(
@@ -867,41 +949,44 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isProcessing
-                          ? AppColors.surfaceVariant // 👈 disabled look
+                          ? AppColors
+                                .surfaceVariant // 👈 disabled look
                           : AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: AppRadii.lgAll,
                       ),
                     ),
                     child: Text(
-                      "Pay \$${NumberFormat('#,##0.00').format(
-                        (pricing?['total_amount'] ?? 0).toDouble(),
-                      )}",
+                      "Pay \$${NumberFormat('#,##0.00').format((pricing?['total_amount'] ?? 0).toDouble())}",
 
-                      style: AppTextStyles.buttonMedium.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
+                      style: AppTextStyles.buttonMedium.copyWith(
+                        fontFamily: AppAssets.fontUnbounded,
+                        color: AppColors.textHeading,
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
           ),
-
-
         ),
       ),
     );
   }
+
   Widget infoRowBlack(String svgIcon, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         /// SVG ICON
         SvgPicture.asset(
           svgIcon,
           height: 16,
           width: 16,
-          color: AppColors.black87,
+          colorFilter: const ColorFilter.mode(
+            AppColors.black87,
+            BlendMode.srcIn,
+          ),
         ),
 
         const SizedBox(width: 8),
@@ -911,13 +996,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             text,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
           ),
-
         ),
         const SizedBox(height: 8),
       ],
     );
   }
-
 
   Widget paymentRadioTile({
     required String title,
@@ -930,22 +1013,23 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       borderRadius: AppRadii.xlAll,
       onTap: isDisabled
           ? () {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(
-        //     content: Text("Please add a card first"),
-        //   ),
-        // );
-        TopMessage.show(context,'Please add a card first');
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(
+              //     content: Text("Please add a card first"),
+              //   ),
+              // );
+              TopMessage.show(context, 'Please add a card first');
 
-        context.pushNamed(RouteNames.paymentMethod, extra: {
-          'bookingId': widget.bookingId,
-        });
-      }
+              context.pushNamed(
+                RouteNames.paymentMethod,
+                extra: {'bookingId': widget.bookingId},
+              );
+            }
           : () {
-        setState(() {
-          selectedIndex = value;
-        });
-      },
+              setState(() {
+                selectedIndex = value;
+              });
+            },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -958,7 +1042,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             Expanded(
               child: Text(
                 title,
-                style: AppTextStyles.bodyMedium.copyWith(color: isDisabled ? AppColors.neutralGrey : AppColors.white),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isDisabled ? AppColors.neutralGrey : AppColors.white,
+                ),
               ),
             ),
 
@@ -969,30 +1055,24 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                 shape: BoxShape.circle,
                 gradient: isSelected && !isDisabled
                     ? const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.primary,
-                    AppColors.primaryDark,
-                  ],
-                )
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [AppColors.primary, AppColors.primaryDark],
+                      )
                     : null,
-                border: Border.all(
-                  color: AppColors.white70,
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.white70, width: 1),
               ),
               child: isSelected && !isDisabled
                   ? Center(
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.black,
-                  ),
-                ),
-              )
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.black,
+                        ),
+                      ),
+                    )
                   : null,
             ),
           ],
@@ -1000,7 +1080,6 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       ),
     );
   }
-
 
   Widget gradientSwitch({
     required bool value,
@@ -1012,20 +1091,17 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         duration: const Duration(milliseconds: 250),
         width: 52,
         height: 30,
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.all(AppSpacing.xxxs),
         decoration: BoxDecoration(
           borderRadius: AppRadii.hugeAll,
 
           /// 🔥 GRADIENT WHEN ON
           gradient: value
               ? const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
-            ],
-          )
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                )
               : null,
 
           /// OFF COLOR
@@ -1033,8 +1109,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 250),
-          alignment:
-          value ? Alignment.centerRight : Alignment.centerLeft,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             width: 24,
             height: 24,
@@ -1048,38 +1123,21 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     );
   }
 
-
-
-
-
-  Widget _buildCheckRow({
-    required String text,
-    required String iconPath,
-  }) {
+  Widget _buildCheckRow({required String text, required String iconPath}) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10,bottom: 4,),
+      padding: const EdgeInsets.only(left: 10, bottom: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(
-            child: SvgPicture.asset(
-              iconPath,
-              height:32,
-              width: 32,
-            ),
-          ),
+          Center(child: SvgPicture.asset(iconPath, height: 32, width: 32)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
               textAlign: TextAlign.start,
-              style:
-              const TextStyle(
-
+              style: AppTextStyles.bodyCompact.copyWith(
                 color: AppColors.black,
-                fontSize: 13,
                 fontWeight: FontWeight.w400,
-                fontFamily: AppAssets.fontOutfit,
               ),
             ),
           ),
@@ -1105,26 +1163,21 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.white,
-                  fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
               Text(
                 "\$${NumberFormat('#,##0.00').format(amount)}",
-                style: const TextStyle(
+                style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.white,
-                  fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  fontFamily: AppAssets.fontOutfit,
                 ),
               ),
             ],
@@ -1139,16 +1192,16 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
                     sub,
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.white.withValues(alpha: 0.6)),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.white.withValues(alpha: 0.6),
+                    ),
                   ),
                 );
               }).toList(),
-            )
+            ),
           ],
         ],
       ),
     );
   }
-
-
 }

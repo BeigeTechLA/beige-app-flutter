@@ -5,7 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class PaymentSuccessScreen extends ConsumerWidget {
@@ -24,49 +27,43 @@ class PaymentSuccessScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return WillPopScope(
-      onWillPop: () async {
-        /// 🔥 BACK PRESS → GO TO HOME
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
         context.goNamed(RouteNames.home);
-        return false; // ❌ prevent default back
       },
-      child:AppScaffold(
+      child: AppScaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: AppSpacing.insetsHXl,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               /// 🎉 LOTTIE
-              Lottie.asset(
-                AppAssets.lottieSuccess,
-                height: 180,
-              ),
+              Lottie.asset(AppAssets.lottieSuccess, height: 180),
 
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               /// ✅ TITLE
-              const Text(
+              Text(
                 "Paid Successfully",
-                style: TextStyle(
+                style: AppTextStyles.titleMedium.copyWith(
                   color: AppColors.primary,
                   fontFamily: AppAssets.fontUnbounded,
-                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),
 
-              const SizedBox(height: 10),
+              AppSpacing.verticalSmd,
 
               /// ℹ SUBTITLE
               Text(
                 "Your payment was successful & your booking is now confirmed.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white70,
                   fontFamily: AppAssets.fontOutfit,
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
                 ),
               ),
             ],
@@ -75,7 +72,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
 
         /// 🔥 BUTTON AT BOTTOM
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           child: GestureDetector(
             onTap: () {
               context.goNamed(RouteNames.home);
@@ -83,16 +80,15 @@ class PaymentSuccessScreen extends ConsumerWidget {
             child: Container(
               height: 55,
               decoration: BoxDecoration(
-                color: const Color(0xFFE6C79C),
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.goldSuccessCta,
+                borderRadius: AppRadii.xlAll,
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 "View Summary",
-                style: TextStyle(
+                style: AppTextStyles.labelLarge.copyWith(
                   fontFamily: AppAssets.fontUnbounded,
-                  color: Colors.black,
-                  fontSize: 15,
+                  color: AppColors.black,
                   fontWeight: FontWeight.w500,
                 ),
               ),

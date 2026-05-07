@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/text_styles.dart';
+import '../../../../app/spacing.dart';
+import '../../../../app/radii.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/core/network/api_endpoints.dart';
-import 'package:beige/app/colors.dart';
 import 'package:beige/features/profile/presentation/providers/favourites_notifier.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -36,7 +39,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           children: [
             /// BACK BUTTON
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.base),
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
@@ -49,17 +52,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            AppSpacing.verticalSmd,
 
             /// TITLE
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
               child: Text(
                 " Favourites",
-                style: TextStyle(
-                  fontFamily: AppAssets.fontUnbounded,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.white,
                 ),
               ),
@@ -69,15 +69,17 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : favourites.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             "No Favourite Data",
-                            style: TextStyle(color: Colors.grey),
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         )
                       : ListView.builder(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.smd),
                           itemCount: favourites.length,
                           itemBuilder: (context, index) {
                             final item = favourites[index];
@@ -86,9 +88,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 10),
+                                  vertical: AppSpacing.smd),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: AppRadii.hugeAll,
                                 child: SizedBox(
                                   height: 220,
                                   child: Stack(
@@ -116,8 +118,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
                                       /// REMOVE BUTTON
                                       Positioned(
-                                        top: 10,
-                                        right: 10,
+                                        top: AppSpacing.smd,
+                                        right: AppSpacing.smd,
                                         child: GestureDetector(
                                           onTap: () {
                                             if (creatorId != null) {
@@ -159,30 +161,28 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     overlayEntry = OverlayEntry(
       builder: (_) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
+        top: MediaQuery.of(context).padding.top + AppSpacing.smd,
+        left: AppSpacing.base,
+        right: AppSpacing.base,
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.base, vertical: AppSpacing.md),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(12),
+              color: AppColors.surfaceStats,
+              borderRadius: AppRadii.lgAll,
             ),
             child: Row(
               children: [
                 const Icon(Icons.favorite,
                     color: AppColors.primary, size: 18),
-                const SizedBox(width: 10),
+                AppSpacing.gapHSmd,
                 Expanded(
                   child: Text(
                     message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontFamily: AppAssets.fontOutfit,
-                      fontSize: 13,
+                    style: AppTextStyles.bodyCompact.copyWith(
+                      color: AppColors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -190,7 +190,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 GestureDetector(
                   onTap: () => overlayEntry.remove(),
                   child: const Icon(Icons.close,
-                      color: Colors.white, size: 18),
+                      color: AppColors.white, size: 18),
                 ),
               ],
             ),

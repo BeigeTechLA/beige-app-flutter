@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -1073,8 +1073,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                                                     /// Start Time
 
-                                                    CustomInputField(
-                                                      title: "Start Time",
+                                                    AppTextField(
+                                                      label: "Start Time",
                                                       controller: TextEditingController(
                                                         text: startTimes[date]?.format(context) ?? "",
                                                       ),
@@ -1083,7 +1083,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                         _selectTime(context, null, true, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
-                                                      suffixIcon: Padding(
+                                                      suffix: Padding(
                                                         padding: const EdgeInsets.all(AppSpacing.md),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
@@ -1092,8 +1092,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       ),
                                                     ),
                                                     SizedBox(height: 30,),
-                                                    CustomInputField(
-                                                      title: "End Time",
+                                                    AppTextField(
+                                                      label: "End Time",
                                                       controller: TextEditingController(
                                                         text: endTimes[date]?.format(context) ?? "",
                                                       ),
@@ -1102,7 +1102,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                         _selectTime(context, null, false, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
-                                                      suffixIcon: Padding(
+                                                      suffix: Padding(
                                                         padding: const EdgeInsets.all(AppSpacing.md),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
@@ -1146,8 +1146,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                   SizedBox(height: 22),
 
                                   /// ✅ START TIME
-                                  CustomInputField(
-                                    title: "Start Time",
+                                  AppTextField(
+                                    label: "Start Time",
                                     controller: startTimeController,
                                     readOnly: true,
                                     /* onTap: () {
@@ -1161,7 +1161,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       _selectTime(context, startTimeController, true, null); // ✅ FIX
                                     },*/
                                     onTap: null,
-                                    suffixIcon: Padding(
+                                    suffix: Padding(
                                       padding: const EdgeInsets.all(AppSpacing.md),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
@@ -1175,8 +1175,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                   SizedBox(height: 30),
 
                                   /// ✅ END TIME
-                                  CustomInputField(
-                                    title: "End Time",
+                                  AppTextField(
+                                    label: "End Time",
                                     controller: endTimeController,
                                     readOnly: true,
                                     /* onTap: () {
@@ -1190,7 +1190,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       _selectTime(context, endTimeController, false, null); // ✅ FIX
                                     },*/
                                     onTap: null,
-                                    suffixIcon: Padding(
+                                    suffix: Padding(
                                       padding: const EdgeInsets.all(AppSpacing.md),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
@@ -1243,12 +1243,12 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
 
 
-                            CustomInputField(
-                              title: "Select Date",
+                            AppTextField(
+                              label: "Select Date",
                               controller: dateController,
                               readOnly: true,
                               onTap: null,
-                              suffixIcon: Padding(
+                              suffix: Padding(
                                 padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.calendar,
@@ -1276,8 +1276,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           _selectTime(context, startTimeController, true);
                         },
                                         ),*/
-                            CustomInputField(
-                              title: "Start Time",
+                            AppTextField(
+                              label: "Start Time",
                               controller: startTimeController,
                               readOnly: true,
                               /*   onTap: () {
@@ -1291,7 +1291,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 // _selectTime(context, startTimeController, true, null); // ✅ FIX
                               },*/
                               onTap: null,
-                              suffixIcon: Padding(
+                              suffix: Padding(
                                 padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.clock,
@@ -1304,8 +1304,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                             SizedBox(height: 30),
 
-                            CustomInputField(
-                              title: "End Time",
+                            AppTextField(
+                              label: "End Time",
                               controller: endTimeController,
                               readOnly: true,
                               /* onTap: () {
@@ -1319,7 +1319,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 _selectTime(context, endTimeController, false, null); // ✅ FIX
                               },*/
                               onTap: null,
-                              suffixIcon: Padding(
+                              suffix: Padding(
                                 padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.clock,

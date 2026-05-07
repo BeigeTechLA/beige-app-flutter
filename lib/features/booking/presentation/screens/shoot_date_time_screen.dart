@@ -6,7 +6,7 @@
   import 'package:intl/intl.dart';
 
   import 'package:beige/app/route_names.dart';
-  import 'package:beige/shared/widgets/custom_input_field.dart';
+  import 'package:beige/shared/widgets/app_text_field.dart';
   import 'package:beige/app/colors.dart';
   import 'package:beige/app/radii.dart';
   import 'package:beige/app/spacing.dart';
@@ -1706,44 +1706,8 @@ import '../../../../app/assets.dart';
 
                                                   /// Start Time
 
-                                                    /*  CustomInputField(
-                                    title: "Start Time",
-                                    controller: TextEditingController(
-                                    text: startTimes[date]?.format(context) ?? "",
-                                    ),
-                                    readOnly: true,
-                                    onTap: () {
-                                    _selectTime(context, null, true, date); // ✅ FIX
-                                    },
-                                    suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.md),
-                                    child: SvgPicture.asset(
-                                    AppAssets.clock,
-                                      color: AppColors.white,
-                                    ),
-                                    ),
-                                    ),
-                                                  SizedBox(height: 30,),
-                                                  CustomInputField(
-                                                    title: "End Time",
-                                                    controller: TextEditingController(
-                                                      text: endTimes[date]?.format(context) ?? "",
-                                                    ),
-                                                    readOnly: true,
-                                                    onTap: () {
-                                                      _selectTime(context, null, false, date); // ✅ FIX
-                                                    },
-                                                    suffixIcon: Padding(
-                                                      padding: const EdgeInsets.all(AppSpacing.md),
-                                                      child: SvgPicture.asset(
-                                                        AppAssets.clock,
-                                                        color: AppColors.white,
-                                                      ),
-                                                    ),
-                                                  ),*/
-
-                                                  CustomInputField(
-                                                    title: "Start Time",
+                                                  AppTextField(
+                                                    label: "Start Time",
                                                     controller: TextEditingController(
                                                       text: startTimes[normalizeDate(date)]?.format(context) ?? "",
                                                     ),
@@ -1751,7 +1715,7 @@ import '../../../../app/assets.dart';
                                                     onTap: () {
                                                       _selectTime(context, null, true, date);
                                                     },
-                                                    suffixIcon: Padding(
+                                                    suffix: Padding(
                                                       padding: const EdgeInsets.all(AppSpacing.md),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
@@ -1760,8 +1724,8 @@ import '../../../../app/assets.dart';
                                                     ),
                                                   ),
                                                   SizedBox(height: 30,),
-                                                  CustomInputField(
-                                                    title: "End Time",
+                                                  AppTextField(
+                                                    label: "End Time",
                                                     controller: TextEditingController(
                                                       text: endTimes[normalizeDate(date)]?.format(context) ?? "",
                                                     ),
@@ -1769,7 +1733,7 @@ import '../../../../app/assets.dart';
                                                     onTap: () {
                                                       _selectTime(context, null, false, date);
                                                     },
-                                                    suffixIcon: Padding(
+                                                    suffix: Padding(
                                                       padding: const EdgeInsets.all(AppSpacing.md),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
@@ -1811,61 +1775,8 @@ import '../../../../app/assets.dart';
                               if (istimingsame == true) ...[
                                 SizedBox(height: 22),
 
-                          /*      /// ✅ START TIME
-                                CustomInputField(
-                                  title: "Start Time",
-                                  controller: startTimeController,
-                                  readOnly: true,
-                                  onTap: () {
-                                    if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select date first")),
-                                      );
-                                      return;
-                                    }
-
-                                    _selectTime(context, startTimeController, true, null); // ✅ FIX
-                                  },
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.md),
-                                    child: SvgPicture.asset(
-                                      AppAssets.clock,
-                                      color: AppColors.white,
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),
-
-                                SizedBox(height: 30),
-
-                                /// ✅ END TIME
-                                CustomInputField(
-                                  title: "End Time",
-                                  controller: endTimeController,
-                                  readOnly: true,
-                                  onTap: () {
-                                    if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Please select date first")),
-                                      );
-                                      return;
-                                    }
-
-                                    _selectTime(context, endTimeController, false, null); // ✅ FIX
-                                  },
-                                  suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.md),
-                                    child: SvgPicture.asset(
-                                      AppAssets.clock,
-                                      color: AppColors.white,
-                                      width: 20,
-                                      height: 20,
-                                    ),
-                                  ),
-                                ),*/
-                                CustomInputField(
-                                  title: "Start Time",
+                                AppTextField(
+                                  label: "Start Time",
                                   controller: startTimeController,
                                   readOnly: true,
                                   onTap: () {
@@ -1877,7 +1788,7 @@ import '../../../../app/assets.dart';
                                     }
                                     _selectTime(context, startTimeController, true, null);
                                   },
-                                  suffixIcon: Padding(
+                                  suffix: Padding(
                                     padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
@@ -1890,8 +1801,8 @@ import '../../../../app/assets.dart';
 
                                 SizedBox(height: 30),
 
-                                CustomInputField(
-                                  title: "End Time",
+                                AppTextField(
+                                  label: "End Time",
                                   controller: endTimeController,
                                   readOnly: true,
                                   onTap: () {
@@ -1903,7 +1814,7 @@ import '../../../../app/assets.dart';
                                     }
                                     _selectTime(context, endTimeController, false, null);
                                   },
-                                  suffixIcon: Padding(
+                                  suffix: Padding(
                                     padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
@@ -2023,12 +1934,12 @@ import '../../../../app/assets.dart';
 
 
 
-                          CustomInputField(
-                            title: "Select Date",
+                          AppTextField(
+                            label: "Select Date",
                             controller: dateController,
                             readOnly: true,
                             onTap: () => _selectDate(context),
-                            suffixIcon: Padding(
+                            suffix: Padding(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.calendar,
@@ -2044,8 +1955,8 @@ import '../../../../app/assets.dart';
                           SizedBox(height: 30,),
 
 
-                          CustomInputField(
-                            title: "Start Time",
+                          AppTextField(
+                            label: "Start Time",
                             controller: startTimeController,
                             readOnly: true,
                             onTap: () {
@@ -2057,7 +1968,7 @@ import '../../../../app/assets.dart';
                               }
                               _selectTime(context, startTimeController, true, null);
                             },
-                            suffixIcon: Padding(
+                            suffix: Padding(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,
@@ -2068,8 +1979,8 @@ import '../../../../app/assets.dart';
                             ),
                           ),
                           SizedBox(height: 30,),
-                          CustomInputField(
-                            title: "End Time",
+                          AppTextField(
+                            label: "End Time",
                             controller: endTimeController,
                             readOnly: true,
                             onTap: () {
@@ -2081,7 +1992,7 @@ import '../../../../app/assets.dart';
                               }
                               _selectTime(context, endTimeController, false, null);
                             },
-                            suffixIcon: Padding(
+                            suffix: Padding(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,

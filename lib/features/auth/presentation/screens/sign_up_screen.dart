@@ -21,7 +21,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/signup_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/signup_state.dart';
 import 'package:beige/core/utils/google_config.dart';
@@ -824,16 +824,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             _buildField("Email ID", emailController),
                             const SizedBox(height: 16),*/
 
-                            CustomInputField(
-                              title: "Name*",
+                            AppTextField(
+                              label: "Name*",
                               controller: nameController,
                               keyboardType: TextInputType.name,
                             ),
 
                             const SizedBox(height: 16),
 
-                            CustomInputField(
-                              title: "Email ID*",
+                            AppTextField(
+                              label: "Email ID*",
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                               // autofillHints: const [AutofillHints.email],
@@ -994,17 +994,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             ),*/
 
 
-                            CustomInputField(
-                              title: "Create Password*",
+                            AppTextField(
+                              label: "Create Password*",
                               controller: passwordController,
-                              isPassword: true,
-                              isVisible: showPassword,
-                              onToggle: () {
-                                setState(() {
-                                  showPassword = !showPassword;
-                                });
-                              },
-                              suffixIcon: IconButton(
+                              obscureText: !showPassword,
+                              suffix: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     showPassword = !showPassword;   // ✅ correct variable
@@ -1025,17 +1019,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                             const SizedBox(height: 16),
 
-                            CustomInputField(
-                              title: "Confirm Password*",
+                            AppTextField(
+                              label: "Confirm Password*",
                               controller: confirmPasswordController,
-                              isPassword: true,
-                              isVisible: showConfirmPassword,
-                              onToggle: () {
-                                setState(() {
-                                  showConfirmPassword = !showConfirmPassword;
-                                });
-                              },
-                              suffixIcon: IconButton(
+                              obscureText: !showConfirmPassword,
+                              suffix: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     showConfirmPassword = !showConfirmPassword;  // ✅ correct

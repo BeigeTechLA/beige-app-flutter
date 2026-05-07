@@ -32,8 +32,10 @@ class _ForgotPasswordOtpScreenState
   bool isOtpFilled = false;
 
   List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
-  List<TextEditingController> controllers =
-      List.generate(6, (index) => TextEditingController());
+  List<TextEditingController> controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
 
   String get enteredOtp => controllers.map((c) => c.text).join();
 
@@ -78,10 +80,9 @@ class _ForgotPasswordOtpScreenState
       TopMessage.show(context, "Please enter complete OTP");
       return;
     }
-    ref.read(forgotPasswordOtpNotifierProvider.notifier).verifyOtp(
-          email: widget.email,
-          otp: enteredOtp,
-        );
+    ref
+        .read(forgotPasswordOtpNotifierProvider.notifier)
+        .verifyOtp(email: widget.email, otp: enteredOtp);
   }
 
   void _handleResend() {
@@ -151,12 +152,11 @@ class _ForgotPasswordOtpScreenState
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Text(
                           "Enter OTP code",
-                          style: TextStyle(
+                          style: AppTextStyles.titleSmall.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
-                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.white,
                           ),
@@ -165,9 +165,8 @@ class _ForgotPasswordOtpScreenState
                         Text(
                           "Enter 6 digit OTP sent to your\nregistered email ID.",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: AppTextStyles.bodyMedium.copyWith(
                             fontFamily: AppTextStyles.fontFamilyBody,
-                            fontSize: 14,
                             color: AppColors.white70,
                           ),
                         ),
@@ -187,7 +186,7 @@ class _ForgotPasswordOtpScreenState
                 margin: AppSpacing.authCardMargin,
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: AppRadii.massiveAll,
                   border: Border.all(
                     color: AppColors.white.withValues(alpha: 0.06),
                     width: 1,
@@ -203,17 +202,15 @@ class _ForgotPasswordOtpScreenState
                       children: List.generate(6, (index) {
                         return Expanded(
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             child: Container(
                               height: 50,
                               decoration: BoxDecoration(
                                 borderRadius: AppRadii.lgAll,
                                 border: Border.all(
-                                  color: (focusNodes[index].hasFocus ||
-                                          controllers[index]
-                                              .text
-                                              .isNotEmpty)
+                                  color:
+                                      (focusNodes[index].hasFocus ||
+                                          controllers[index].text.isNotEmpty)
                                       ? AppColors.borderGold
                                       : AppColors.white60,
                                   width: 0.5,
@@ -225,10 +222,7 @@ class _ForgotPasswordOtpScreenState
                                 textAlign: TextAlign.center,
                                 keyboardType: TextInputType.number,
                                 maxLength: 1,
-                                style: const TextStyle(
-                                  fontSize: 19,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: AppTextStyles.otpDigit,
                                 decoration: const InputDecoration(
                                   counterText: "",
                                   border: InputBorder.none,
@@ -236,7 +230,8 @@ class _ForgotPasswordOtpScreenState
                                 onChanged: (value) {
                                   setState(() {
                                     isOtpFilled = controllers.every(
-                                        (c) => c.text.trim().isNotEmpty);
+                                      (c) => c.text.trim().isNotEmpty,
+                                    );
                                   });
                                   if (value.isNotEmpty && index < 5) {
                                     FocusScope.of(context).nextFocus();
@@ -262,8 +257,7 @@ class _ForgotPasswordOtpScreenState
                           seconds == 0
                               ? "00:00"
                               : "00:${seconds.toString().padLeft(2, '0')}",
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: AppTextStyles.buttonLarge.copyWith(
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,
                           ),
@@ -277,11 +271,10 @@ class _ForgotPasswordOtpScreenState
                     Wrap(
                       alignment: WrapAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           "Didn't received the code?",
-                          style: TextStyle(
-                            color: Color(0xFFD5D5D5),
-                            fontSize: 14,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textLightNeutral,
                             fontFamily: AppTextStyles.fontFamilyBody,
                             fontWeight: FontWeight.w400,
                             height: 1.60,
@@ -289,11 +282,10 @@ class _ForgotPasswordOtpScreenState
                         ),
                         InkWell(
                           onTap: seconds == 0 ? _handleResend : null,
-                          child: const Text(
+                          child: Text(
                             " Resend the Code",
-                            style: TextStyle(
+                            style: AppTextStyles.linkMedium.copyWith(
                               color: AppColors.primary,
-                              fontSize: 15,
                               fontFamily: AppTextStyles.fontFamilyBody,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
@@ -310,8 +302,9 @@ class _ForgotPasswordOtpScreenState
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed:
-                            (isOtpFilled && !isLoading) ? _handleVerify : null,
+                        onPressed: (isOtpFilled && !isLoading)
+                            ? _handleVerify
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isOtpFilled
                               ? AppColors.primary
@@ -322,13 +315,12 @@ class _ForgotPasswordOtpScreenState
                         ),
                         child: Text(
                           isOtpFilled ? "Submit" : "Continue",
-                          style: TextStyle(
+                          style: AppTextStyles.bodyCompact.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
-                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: isOtpFilled
                                 ? AppColors.textHeading
-                                : Colors.black38,
+                                : AppColors.black38,
                           ),
                         ),
                       ),

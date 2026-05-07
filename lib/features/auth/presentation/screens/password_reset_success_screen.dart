@@ -13,11 +13,12 @@ class PasswordResetSuccessScreen extends ConsumerStatefulWidget {
   const PasswordResetSuccessScreen({super.key});
 
   @override
-  ConsumerState<PasswordResetSuccessScreen> createState() => _PasswordResetSuccessScreenState();
+  ConsumerState<PasswordResetSuccessScreen> createState() =>
+      _PasswordResetSuccessScreenState();
 }
 
-class _PasswordResetSuccessScreenState extends ConsumerState<PasswordResetSuccessScreen> {
-
+class _PasswordResetSuccessScreenState
+    extends ConsumerState<PasswordResetSuccessScreen> {
   @override
   void initState() {
     super.initState();
@@ -38,7 +39,6 @@ class _PasswordResetSuccessScreenState extends ConsumerState<PasswordResetSucces
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-
             /// ✅ SUCCESS LOTTIE
             Transform.translate(
               offset: Offset(0, 20),
@@ -49,12 +49,10 @@ class _PasswordResetSuccessScreenState extends ConsumerState<PasswordResetSucces
               ),
             ),
 
-
-            const Text(
+            Text(
               "You're All Set",
-              style: TextStyle(
+              style: AppTextStyles.titleMedium.copyWith(
                 color: AppColors.primary,
-                fontSize: 18,
                 fontWeight: FontWeight.w500,
                 fontFamily: AppTextStyles.fontFamilyDisplay,
               ),
@@ -62,12 +60,11 @@ class _PasswordResetSuccessScreenState extends ConsumerState<PasswordResetSucces
 
             const SizedBox(height: AppSpacing.sm),
 
-            const Text(
+            Text(
               "Congratulations! Your password has been\nchanged successfully",
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.white70,
-                fontSize: 14,
                 fontFamily: AppTextStyles.fontFamilyBody,
               ),
             ),

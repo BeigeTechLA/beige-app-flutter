@@ -49,6 +49,9 @@ class AppRadii {
   /// 22 — Compact portfolio cards
   static const double portfolioCompact = 22;
 
+  /// 22 — Auth card containers
+  static const double authCard = 22;
+
   /// 24 — Extra large floating elements
   static const double massive = 24;
 
@@ -95,7 +98,9 @@ class AppRadii {
   static final BorderRadius portfolioCompactAll = BorderRadius.circular(
     portfolioCompact,
   );
+  static final BorderRadius authCardAll = BorderRadius.circular(authCard);
   static final BorderRadius portfolioAll = BorderRadius.circular(portfolio);
+  static final BorderRadius massiveAll = BorderRadius.circular(massive);
   static final BorderRadius roundAll = BorderRadius.circular(round);
   static final BorderRadius pillSmAll = BorderRadius.circular(pillSm);
   static final BorderRadius pillAll = BorderRadius.circular(pill);
@@ -124,5 +129,11 @@ class AppRadii {
   static const BorderRadius bottomHeader = BorderRadius.only(
     bottomLeft: Radius.circular(AppRadii.header),
     bottomRight: Radius.circular(AppRadii.header),
+  );
+
+  /// Bottom-only rounding — 40px
+  static const BorderRadius bottomPillSm = BorderRadius.only(
+    bottomLeft: Radius.circular(AppRadii.pillSm),
+    bottomRight: Radius.circular(AppRadii.pillSm),
   );
 }

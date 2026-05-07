@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_otp_notifier.dart';
@@ -28,8 +30,10 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
   bool isOtpFilled = false;
 
   List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
-  List<TextEditingController> controllers =
-      List.generate(6, (index) => TextEditingController());
+  List<TextEditingController> controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
 
   String get enteredOtp => controllers.map((c) => c.text).join();
 
@@ -72,16 +76,17 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
   @override
   Widget build(BuildContext context) {
     final otpState = ref.watch(forgotPasswordOtpNotifierProvider);
-    final isLoading =
-        otpState.verifyStatus == OtpVerifyStatus.loading;
+    final isLoading = otpState.verifyStatus == OtpVerifyStatus.loading;
 
-    ref.listen<ForgotPasswordOtpState>(forgotPasswordOtpNotifierProvider,
-        (prev, next) {
+    ref.listen<ForgotPasswordOtpState>(forgotPasswordOtpNotifierProvider, (
+      prev,
+      next,
+    ) {
       if (next.verifyStatus == OtpVerifyStatus.success) {
-        context.pushNamed(RouteNames.profileNewPassword, extra: {
-          'otp': enteredOtp,
-          'email': widget.email,
-        });
+        context.pushNamed(
+          RouteNames.profileNewPassword,
+          extra: {'otp': enteredOtp, 'email': widget.email},
+        );
       } else if (next.verifyStatus == OtpVerifyStatus.error &&
           next.errorMessage != null) {
         TopMessage.show(context, next.errorMessage!);
@@ -110,31 +115,26 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                     children: [
                       InkWell(
                         onTap: () => context.pop(),
-                        child: SvgPicture.asset(
-                          AppAssets.back,
-                          height: 24,
-                        ),
+                        child: SvgPicture.asset(AppAssets.back, height: 24),
                       ),
-                      const SizedBox(height: 10),
+                      AppSpacing.verticalSmd,
                       Text(
                         "Enter OTP code",
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: AppTextStyles.titleLarge.copyWith(
                           fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontWeight: FontWeight.bold,
                           color: AppColors.white,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      const Text(
+                      AppSpacing.verticalXs,
+                      Text(
                         "Enter 6 digit OTP sent to your registered email ID\nreset your password.",
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: AppTextStyles.bodySmall.copyWith(
                           fontFamily: AppTextStyles.fontFamilyBody,
                           color: AppColors.white60,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      AppSpacing.verticalXl,
 
                       /// OTP BOXES
                       Row(
@@ -142,17 +142,17 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                         children: List.generate(6, (index) {
                           return Expanded(
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
                               child: Container(
                                 height: 60,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: AppRadii.lgAll,
                                   border: Border.all(
-                                    color: (focusNodes[index].hasFocus ||
-                                            controllers[index]
-                                                .text
-                                                .isNotEmpty)
+                                    color:
+                                        (focusNodes[index].hasFocus ||
+                                            controllers[index].text.isNotEmpty)
                                         ? AppColors.borderGold
                                         : AppColors.white60,
                                     width: 0.5,
@@ -164,10 +164,7 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                                   textAlign: TextAlign.center,
                                   keyboardType: TextInputType.number,
                                   maxLength: 1,
-                                  style: const TextStyle(
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: AppTextStyles.otpDigit,
                                   decoration: const InputDecoration(
                                     counterText: "",
                                     border: InputBorder.none,
@@ -175,14 +172,14 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                                   onChanged: (value) {
                                     setState(() {
                                       isOtpFilled = controllers.every(
-                                          (c) => c.text.trim().isNotEmpty);
+                                        (c) => c.text.trim().isNotEmpty,
+                                      );
                                     });
                                     if (value.isNotEmpty && index < 5) {
                                       FocusScope.of(context).nextFocus();
                                     }
                                     if (value.isEmpty && index > 0) {
-                                      FocusScope.of(context)
-                                          .previousFocus();
+                                      FocusScope.of(context).previousFocus();
                                     }
                                   },
                                 ),
@@ -192,15 +189,14 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                         }),
                       ),
 
-                      const SizedBox(height: 10),
+                      AppSpacing.verticalSmd,
                       Row(
                         children: [
                           Text(
                             seconds == 0
                                 ? "00:00"
                                 : "00:${seconds.toString().padLeft(2, '0')}",
-                            style: TextStyle(
-                              fontSize: 16,
+                            style: AppTextStyles.buttonLarge.copyWith(
                               fontWeight: FontWeight.w600,
                               fontFamily: AppTextStyles.fontFamilyBody,
                               color: AppColors.white60,
@@ -212,22 +208,20 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   InkWell(
                     onTap: seconds == 0
                         ? () => ref
-                            .read(
-                                forgotPasswordOtpNotifierProvider.notifier)
-                            .resendOtp(email: widget.email)
+                              .read(forgotPasswordOtpNotifierProvider.notifier)
+                              .resendOtp(email: widget.email)
                         : null,
                     child: Text(
                       "Resend OTP",
-                      style: TextStyle(
+                      style: AppTextStyles.linkMedium.copyWith(
                         color: AppColors.white,
-                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                       ),
@@ -235,38 +229,34 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
               SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
                   onPressed: (isOtpFilled && !isLoading)
                       ? () => ref
-                          .read(
-                              forgotPasswordOtpNotifierProvider.notifier)
-                          .verifyOtp(email: widget.email, otp: enteredOtp)
+                            .read(forgotPasswordOtpNotifierProvider.notifier)
+                            .verifyOtp(email: widget.email, otp: enteredOtp)
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOtpFilled
                         ? AppColors.primary
                         : AppColors.goldOpacity40,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
                   ),
                   child: Text(
                     "Verify OTP",
-                    style: TextStyle(
-                      fontSize: 18,
+                    style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.w600,
                       color: isOtpFilled
                           ? AppColors.textHeading
-                          : Colors.black38,
+                          : AppColors.black38,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
             ],
           ),
         ),

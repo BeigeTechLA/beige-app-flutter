@@ -5,8 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_notifier.dart';
 
 import '../../../../app/assets.dart';
@@ -34,8 +35,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final deleteState = ref.watch(deleteAccountNotifierProvider);
     final isLoading = deleteState.status == DeleteAccountStatus.loading;
 
-    ref.listen<DeleteAccountState>(deleteAccountNotifierProvider,
-        (prev, next) {
+    ref.listen<DeleteAccountState>(deleteAccountNotifierProvider, (prev, next) {
       if (next.status == DeleteAccountStatus.success) {
         context.pushNamed(RouteNames.deleteAccountOtp);
       } else if (next.status == DeleteAccountStatus.error &&
@@ -52,7 +52,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.base),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,32 +68,29 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              AppSpacing.verticalBase,
 
               /// TITLE
               Text(
                 "Delete Account",
-                style: TextStyle(
+                style: AppTextStyles.titleSmall.copyWith(
                   fontFamily: AppTextStyles.fontFamilyDisplay,
-                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
               Text(
                 "This action will permanently delete your account and all associated data. If you need help or have questions, please contact us at support@beige.com",
-                style: TextStyle(
-                  fontSize: 14,
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white70,
                   height: 1.5,
                   fontWeight: FontWeight.w400,
-                  fontFamily: AppTextStyles.fontFamilyBody,
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceVariant,
                   borderRadius: AppRadii.lgAll,
@@ -104,11 +101,9 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                       children: [
                         Text(
                           "Why do you wish to leave Beige?",
-                          style: TextStyle(
-                            fontSize: 14,
+                          style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.white,
                             fontWeight: FontWeight.w500,
-                            fontFamily: AppTextStyles.fontFamilyBody,
                           ),
                         ),
                       ],
@@ -116,10 +111,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     const SizedBox(height: 8),
                     Text(
                       "Please let us know the reason for deleting your account.",
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.white70,
-                        fontFamily: AppTextStyles.fontFamilyBody,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -132,7 +125,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: SizedBox(
           height: 52,
           child: ElevatedButton(
@@ -155,15 +148,12 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadii.xlAll,
-              ),
+              shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
             ),
-            child: const Text(
+            child: Text(
               "Continue",
-              style: TextStyle(
+              style: AppTextStyles.labelLarge.copyWith(
                 fontFamily: AppTextStyles.fontFamilyDisplay,
-                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textHeading,
               ),
@@ -190,8 +180,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color:
-                      isSelected ? AppColors.primary : AppColors.white70,
+                  color: isSelected ? AppColors.primary : AppColors.white70,
                 ),
               ),
               child: isSelected
@@ -207,13 +196,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     )
                   : null,
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSpacing.mld),
             Expanded(
               child: Text(
                 reason,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontFamily: AppTextStyles.fontFamilyBody,
+                style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.w400,
                   color: AppColors.white70,
                 ),

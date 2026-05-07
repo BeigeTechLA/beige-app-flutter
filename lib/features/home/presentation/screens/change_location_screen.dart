@@ -12,8 +12,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
 import 'package:beige/app/colors.dart';
-import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/utils/google_config.dart';
+import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
 
 class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});
@@ -93,7 +96,8 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
         // 🔥 use Set to remove duplicates
         final addressParts = <String>{
           if (p.street != null && p.street!.isNotEmpty) p.street!,
-          if (p.subLocality != null && p.subLocality!.isNotEmpty) p.subLocality!,
+          if (p.subLocality != null && p.subLocality!.isNotEmpty)
+            p.subLocality!,
           if (p.locality != null && p.locality!.isNotEmpty) p.locality!,
           if (p.administrativeArea != null && p.administrativeArea!.isNotEmpty)
             p.administrativeArea!,
@@ -128,9 +132,9 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
     if (!mounted) return;
 
     result.fold(
-      (error) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message)),
-      ),
+      (error) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message))),
       (_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Location updated successfully")),
@@ -154,33 +158,26 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
-
           // ================= SEARCH (PLACES AUTOCOMPLETE) =================
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(
-              top: 70,   // 👈 status bar spacing
+              top: 70, // 👈 status bar spacing
               bottom: 20,
               left: 16,
               right: 16,
             ),
-            decoration:  BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
-              border: Border.all(color: Colors.transparent),
+              border: Border.all(color: AppColors.transparent),
 
               /// ❌ REMOVE SHADOW
               boxShadow: const [],
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
-
-              ),
+              borderRadius: AppRadii.bottomPillSm,
             ),
 
             child: GooglePlaceAutoCompleteTextField(
@@ -193,33 +190,33 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
               /// ✅ MAIN FIX HERE
               boxDecoration: BoxDecoration(
                 color: AppColors.textHeading,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.transparent),
+                borderRadius: AppRadii.lgAll,
+                border: Border.all(color: AppColors.transparent),
               ),
 
-              textStyle: const TextStyle(
+              textStyle: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.white70,
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 14,
               ),
 
               inputDecoration: InputDecoration(
                 hintText: "Search location",
-                hintStyle: TextStyle(color: AppColors.white70,),
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.white70,
+                ),
 
                 filled: true,
-                fillColor: Colors.transparent, // ⚠️ important
+                fillColor: AppColors.transparent,
 
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
 
                 prefixIcon: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   child: SvgPicture.asset(
                     AppAssets.search,
                     colorFilter: const ColorFilter.mode(
-                      Colors.white,
+                      AppColors.white,
                       BlendMode.srcIn,
                     ),
                     height: 20,
@@ -228,20 +225,20 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                 ),
                 suffixIcon: searchController.text.isNotEmpty
                     ? GestureDetector(
-                  onTap: () {
-                    searchController.clear();
-                    searchFocusNode.unfocus();
-                    setState(() {});
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Icon(
-                      Icons.close,
-                      color: AppColors.white70,
-                      size: 20,
-                    ),
-                  ),
-                )
+                        onTap: () {
+                          searchController.clear();
+                          searchFocusNode.unfocus();
+                          setState(() {});
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Icon(
+                            Icons.close,
+                            color: AppColors.white70,
+                            size: 20,
+                          ),
+                        ),
+                      )
                     : null,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
@@ -249,7 +246,6 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
               isCrossBtnShown: false,
               getPlaceDetailWithLatLng: (prediction) async {
                 if (prediction.lat != null && prediction.lng != null) {
-
                   final latLng = LatLng(
                     double.parse(prediction.lat!),
                     double.parse(prediction.lng!),
@@ -287,58 +283,57 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
             ),
           ),
 
-
           // ================= MAP =================
           Expanded(
             child: Stack(
               children: [
-
                 /// ================= MAP =================
                 selectedLatLng == null
                     ? const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                )
+                        child: CircularProgressIndicator(
+                          color: AppColors.white,
+                        ),
+                      )
                     : GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: selectedLatLng!,
-                    zoom: 15,
-                  ),
-                  onMapCreated: (controller) {
-                    mapController = controller;
-                    _mapController.complete(controller);
-                    controller.setMapStyle(_darkMapStyle);
-                  },
-                  zoomControlsEnabled: false,   // ❗ ANDROID zoom +/- remove
-              // Android zoom buttons
-                  mapToolbarEnabled: false,       // 🔥 IMPORTANT (iOS fix)
-                  myLocationButtonEnabled: false,
-                  compassEnabled: false,
-                  indoorViewEnabled: false,
+                        style: _darkMapStyle,
+                        initialCameraPosition: CameraPosition(
+                          target: selectedLatLng!,
+                          zoom: 15,
+                        ),
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          _mapController.complete(controller);
+                        },
+                        zoomControlsEnabled: false, // ❗ ANDROID zoom +/- remove
+                        // Android zoom buttons
+                        mapToolbarEnabled: false, // 🔥 IMPORTANT (iOS fix)
+                        myLocationButtonEnabled: false,
+                        compassEnabled: false,
+                        indoorViewEnabled: false,
 
-                  /// gestures (keep ON)
-                  zoomGesturesEnabled: true,
-                  scrollGesturesEnabled: true,
-                  tiltGesturesEnabled: true,
-                  rotateGesturesEnabled: true,
-                  onTap: (latLng) async {
-                    setState(() => selectedLatLng = latLng);
-                    await _getAddressFromLatLng(latLng);
-                  },
-                  markers: {
-                    Marker(
-                      markerId: const MarkerId("selected"),
-                      position: selectedLatLng!,
-                    ),
-                  },
+                        /// gestures (keep ON)
+                        zoomGesturesEnabled: true,
+                        scrollGesturesEnabled: true,
+                        tiltGesturesEnabled: true,
+                        rotateGesturesEnabled: true,
+                        onTap: (latLng) async {
+                          setState(() => selectedLatLng = latLng);
+                          await _getAddressFromLatLng(latLng);
+                        },
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("selected"),
+                            position: selectedLatLng!,
+                          ),
+                        },
 
-
-                  // scrollGesturesEnabled: true,
-                ),
+                        // scrollGesturesEnabled: true,
+                      ),
 
                 /// ================= ZOOM BUTTONS =================
                 Positioned(
-                  right: 16,
-                  bottom: 20,
+                  right: AppSpacing.base,
+                  bottom: AppSpacing.xl,
                   child: Column(
                     children: [
                       GestureDetector(
@@ -350,22 +345,22 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                           height: 55,
                           width: 55,
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             shape: BoxShape.circle,
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(AppSpacing.mld),
                             child: SvgPicture.asset(
                               AppAssets.zoomIn,
                               colorFilter: const ColorFilter.mode(
-                                Colors.black,
+                                AppColors.black,
                                 BlendMode.srcIn,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      AppSpacing.verticalBase,
                       GestureDetector(
                         onTap: () async {
                           final controller = await _mapController.future;
@@ -375,15 +370,15 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                           height: 55,
                           width: 55,
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             shape: BoxShape.circle,
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.all(AppSpacing.mld),
                             child: SvgPicture.asset(
                               AppAssets.zoomOut,
                               colorFilter: const ColorFilter.mode(
-                                Colors.black,
+                                AppColors.black,
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -401,12 +396,11 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
       bottomNavigationBar: ClipRRect(
         child: Stack(
           children: [
-
             /// 🔥 BACKGROUND BLUR (MAIN)
             BackdropFilter(
               filter: ImageFilter.blur(
-                sigmaX: 40,  // 👈 side blur
-                sigmaY: 60,  // 👈 MORE vertical blur (bottom heavy 🔥)
+                sigmaX: 40, // 👈 side blur
+                sigmaY: 60, // 👈 MORE vertical blur (bottom heavy 🔥)
               ),
             ),
 
@@ -418,9 +412,9 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.4),
-                    Colors.black.withValues(alpha: 0.7),
+                    AppColors.transparent,
+                    AppColors.black.withValues(alpha: 0.4),
+                    AppColors.black.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -431,47 +425,43 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
                   /// LOCATION TEXT
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: AppSpacing.insetsHXl,
                     child: Text(
                       selectedAddress,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.white,
                         decoration: TextDecoration.underline,
-                        fontSize: 14,
-                        fontFamily: AppAssets.fontOutfit,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
 
                   /// SAVE BUTTON
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: AppSpacing.insetsHXl,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         minimumSize: const Size(double.infinity, 52),
                         elevation: 10,
-                        shadowColor: Colors.black.withValues(alpha: 0.6),
+                        shadowColor: AppColors.black.withValues(alpha: 0.6),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: AppRadii.xxxlAll,
                         ),
                       ),
                       onPressed: () async {
                         if (selectedLatLng == null) return;
                         await _changeLocationApi();
                       },
-                      child: const Text(
+                      child: Text(
                         "Save",
-                        style: TextStyle(
-                          color: Colors.black,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.black,
                           fontFamily: AppAssets.fontUnbounded,
-                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

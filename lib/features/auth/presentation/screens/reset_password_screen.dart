@@ -8,7 +8,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/reset_password_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/reset_password_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
@@ -18,8 +18,11 @@ import '../../../../app/assets.dart';
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   final String email;
   final String otp;
-  const ResetPasswordScreen(
-      {super.key, required this.email, required this.otp});
+  const ResetPasswordScreen({
+    super.key,
+    required this.email,
+    required this.otp,
+  });
 
   @override
   ConsumerState<ResetPasswordScreen> createState() =>
@@ -37,7 +40,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
   void _checkPassword() {
     setState(() {
-      isPasswordFilled = newPasswordController.text.isNotEmpty &&
+      isPasswordFilled =
+          newPasswordController.text.isNotEmpty &&
           confirmPasswordController.text.isNotEmpty;
     });
   }
@@ -60,7 +64,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       return;
     }
 
-    ref.read(resetPasswordNotifierProvider.notifier).resetPassword(
+    ref
+        .read(resetPasswordNotifierProvider.notifier)
+        .resetPassword(
           email: widget.email,
           otp: widget.otp,
           newPassword: newPasswordController.text.trim(),
@@ -125,12 +131,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           'Secure your Account',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: AppTextStyles.titleSmall.copyWith(
                             color: AppColors.white,
-                            fontSize: 16,
                             fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.w500,
                           ),
@@ -139,9 +144,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                         Text(
                           'You\'re almost done! Set a new password\nto secure your account.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.white.withValues(alpha: 0.60),
-                            fontSize: 14,
                             fontFamily: AppTextStyles.fontFamilyBody,
                             fontWeight: FontWeight.w400,
                             height: 1.29,
@@ -159,11 +163,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               offset: const Offset(0, -70),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 25, 20, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xl,
+                  AppSpacing.authCardTop,
+                  AppSpacing.xl,
+                  AppSpacing.xl,
+                ),
                 margin: AppSpacing.authCardMargin,
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: AppRadii.authCardAll,
                   border: Border.all(
                     color: AppColors.white.withValues(alpha: 0.10),
                     width: 0.50,
@@ -171,13 +180,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 ),
                 child: Column(
                   children: [
-                    CustomInputField(
-                      title: "New Password*",
+                    AppTextField(
+                      label: "New Password*",
                       controller: newPasswordController,
-                      isPassword: true,
-                      isVisible: showNewPassword,
+                      obscureText: !showNewPassword,
                       onChanged: (value) => _checkPassword(),
-                      suffixIcon: IconButton(
+                      suffix: IconButton(
                         onPressed: () {
                           setState(() => showNewPassword = !showNewPassword);
                         },
@@ -194,16 +202,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       ),
                     ),
                     const SizedBox(height: 25),
-                    CustomInputField(
-                      title: "Confirm Password*",
+                    AppTextField(
+                      label: "Confirm Password*",
                       controller: confirmPasswordController,
-                      isPassword: true,
-                      isVisible: showConfirmPassword,
+                      obscureText: !showConfirmPassword,
                       onChanged: (value) => _checkPassword(),
-                      suffixIcon: IconButton(
+                      suffix: IconButton(
                         onPressed: () {
                           setState(
-                              () => showConfirmPassword = !showConfirmPassword);
+                            () => showConfirmPassword = !showConfirmPassword,
+                          );
                         },
                         icon: SvgPicture.asset(
                           showConfirmPassword
@@ -222,8 +230,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed:
-                            isPasswordFilled && !isLoading ? _handleSubmit : null,
+                        onPressed: isPasswordFilled && !isLoading
+                            ? _handleSubmit
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isPasswordFilled
                               ? AppColors.primary
@@ -234,9 +243,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                         ),
                         child: Text(
                           "Save New Password",
-                          style: TextStyle(
+                          style: AppTextStyles.bodyCompact.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
-                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: isPasswordFilled
                                 ? AppColors.textHeading

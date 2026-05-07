@@ -11,7 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 
 import 'package:beige/app/route_names.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -1036,12 +1036,11 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: 20),*/
-                CustomInputField(
-                  title: "Additional Details",
+                AppTextField(
+                  label: "Additional Details",
                   controller: additionalDetailsController,
                   keyboardType: TextInputType.multiline,
                   maxLines: 5,
-
                 ),
                 /*TextField(
 
@@ -1084,11 +1083,10 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   ),
                 ),*/
                 SizedBox(height: 20),
-                CustomInputField(
-                  title: "Supporting Links",
+                AppTextField(
+                  label: "Supporting Links",
                   controller: referenceLinksController,
                   keyboardType: TextInputType.url,
-
                 ),
               ],
             ),

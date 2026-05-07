@@ -10,7 +10,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/login_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/login_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
@@ -61,11 +61,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    ref.read(loginNotifierProvider.notifier).login(
-          email: email,
-          password: password,
-          savePassword: savePassword,
-        );
+    ref
+        .read(loginNotifierProvider.notifier)
+        .login(email: email, password: password, savePassword: savePassword);
   }
 
   Future<void> _loadSavedCredentials() async {
@@ -132,11 +130,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
+                        Text(
                           "Welcome Back",
-                          style: TextStyle(
+                          style: AppTextStyles.titleSmall.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
-                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: AppColors.white,
                           ),
@@ -145,9 +142,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Text(
                           'Enter your details to access your account. Continue\nmanaging your bookings and profile.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.white.withValues(alpha: 0.60),
-                            fontSize: 14,
                             fontFamily: AppTextStyles.fontFamilyBody,
                             fontWeight: FontWeight.w400,
                             height: 1.29,
@@ -169,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 margin: AppSpacing.authCardMargin,
                 decoration: BoxDecoration(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: AppRadii.authCardAll,
                   border: Border.all(
                     color: AppColors.white.withValues(alpha: 0.06),
                     width: 1,
@@ -178,8 +174,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: AutofillGroup(
                   child: Column(
                     children: [
-                      CustomInputField(
-                        title: "Email ID*",
+                      AppTextField(
+                        label: "Email ID*",
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         autofillHints: const [
@@ -188,18 +184,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ],
                       ),
                       SizedBox(height: AppSpacing.xl),
-                      CustomInputField(
-                        title: "Password*",
+                      AppTextField(
+                        label: "Password*",
                         controller: passwordController,
-                        isPassword: true,
-                        isVisible: showConfirmPassword,
+                        obscureText: !showConfirmPassword,
                         autofillHints: const [AutofillHints.password],
-                        onToggle: () {
-                          setState(() {
-                            showConfirmPassword = !showConfirmPassword;
-                          });
-                        },
-                        suffixIcon: IconButton(
+                        suffix: IconButton(
                           onPressed: () {
                             setState(() {
                               showConfirmPassword = !showConfirmPassword;
@@ -224,13 +214,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onPressed: () {
                               context.pushNamed(RouteNames.forgotPassword);
                             },
-                            child: const Text(
+                            child: Text(
                               "Forgot Password?",
-                              style: TextStyle(
+                              style: AppTextStyles.labelMedium.copyWith(
                                 fontFamily: AppTextStyles.fontFamilyBody,
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
                                 decoration: TextDecoration.underline,
                                 decorationThickness: 1.8,
                                 decorationColor: AppColors.primary,
@@ -260,9 +249,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                           child: Text(
                             "Login",
-                            style: TextStyle(
+                            style: AppTextStyles.bodyCompact.copyWith(
                               fontFamily: AppTextStyles.fontFamilyDisplay,
-                              fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: isFormValid
                                   ? AppColors.textHeading
@@ -285,21 +273,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               "Don't have an account? ",
-              style: TextStyle(
+              style: AppTextStyles.linkMedium.copyWith(
                 color: AppColors.white60,
-                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             ),
             InkWell(
               onTap: () => context.pushNamed(RouteNames.signup),
-              child: const Text(
+              child: Text(
                 "Sign Up",
-                style: TextStyle(
+                style: AppTextStyles.linkMedium.copyWith(
                   color: AppColors.white,
-                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   decoration: TextDecoration.underline,
                 ),

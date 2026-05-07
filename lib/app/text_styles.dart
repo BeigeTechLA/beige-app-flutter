@@ -100,6 +100,20 @@ class AppTextStyles {
     height: 1.38,
   );
 
+  static const TextStyle linkMedium = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    height: 1.33,
+  );
+
+  static const TextStyle otpDigit = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 19,
+    fontWeight: FontWeight.bold,
+    height: 1.26,
+  );
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // LABEL — Outfit (Buttons, tabs, chips, input labels)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

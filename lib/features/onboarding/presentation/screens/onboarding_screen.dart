@@ -115,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       color: _currentPage == index
                           ? AppColors.white
                           : AppColors.white60,
-                      borderRadius: BorderRadius.circular(AppRadii.xs),
+                      borderRadius: AppRadii.xsAll,
                     ),
                   ),
                 ),
@@ -136,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadii.lg),
+                        borderRadius: AppRadii.lgAll,
                       ),
                       elevation: 0,
                     ),

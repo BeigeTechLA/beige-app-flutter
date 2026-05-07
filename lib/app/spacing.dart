@@ -89,6 +89,7 @@ class AppSpacing {
 
   static const double cardPadding = 16;
   static const double cardGap = 12;
+  static const double authCardTop = 25;
   static const double listItemVertical = 12;
   static const double inputVertical = 14;
   static const double inputHorizontal = 18;

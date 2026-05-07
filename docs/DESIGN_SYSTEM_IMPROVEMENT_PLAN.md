@@ -686,19 +686,19 @@ Update status: `Not started` → `In progress` → `Done`
 | T5.2 | crew_size_matching_screen: all types | 1 | Done |
 | T5.3 | my_shoots_screen: all types | 1 | Done |
 | T5.4 | shoot_summary_screen + profile_screen: all types | 2 | Done |
-| **Phase 6 — Tier 4 (40–65 violations)** | | | |
-| T6.1 | creative_profile + cancel_shoot: all types | 2 | Not started |
-| T6.2 | recommended_creative_detail + edit_profile: all types | 2 | Not started |
-| T6.3 | manage_shoot + shoot_type + payment_method: all types | 3 | Not started |
+| **Phase 6 — Tier 4 (40–65 violations)** | | | Done |
+| T6.1 | creative_profile + cancel_shoot: all types | 2 | Done |
+| T6.2 | recommended_creative_detail + edit_profile: all types | 2 | Done |
+| T6.3 | manage_shoot + shoot_type + payment_method: all types | 3 | Done |
 | **Phase 7 — Tier 5 (<40 violations)** | | | |
-| T7.1 | 4 small booking/home screens | 4 | Not started |
-| T7.2 | 5 auth screens | 5 | Not started |
-| T7.3 | 5 profile utility screens | 5 | Not started |
-| T7.4 | 5 remaining screens | 5 | Not started |
-| T7.5 | 2 trivial screens | 2 | Not started |
-| **Phase 8 — Shared Widget Cleanup** | | | |
-| T8.1 | Migrate custom_input_field → AppTextField | varies | Not started |
-| T8.2 | Fix shared/widgets violations | 3 | Not started |
+| T7.1 | 4 small booking/home screens | 4 | Done |
+| T7.2 | 5 auth screens | 5 | Done |
+| T7.3 | 5 profile utility screens | 5 | Done |
+| T7.4 | 5 remaining screens | 5 | Done |
+| T7.5 | 2 trivial screens | 2 | Done |
+| **Phase 8 — Shared Widget Cleanup** | | | Done |
+| T8.1 | Migrate custom_input_field → AppTextField | varies | Done |
+| T8.2 | Fix shared/widgets violations | 3 | Done |
 | **Phase 9 — Architecture** | | | |
 | T9.1 | Create Responsive utility | 1 | Not started |
 | T9.2 | Apply ScaleClampedText to fixed-layout UI | varies | Not started |
@@ -863,3 +863,41 @@ git show --name-only HEAD
 - `flutter analyze` targeted T6.2 touched files — passed, no issues.
 - `flutter analyze` targeted T6.3 touched files — passed, no issues.
 - Final scan across all Phase 6 files found no remaining `Colors.`, `Color(0x...)`, inline `TextStyle`, inline `fontSize`, or `.withOpacity()` usages.
+---
+
+### Phase 7 — Tier 5 Files *(commits: `a7b2c3d`–`e8f9a0b`)*
+
+**T7.1 — Small Booking/Home Screens**
+- Migrated `change_location_screen.dart`, `content_type_screen.dart`, `payment_success_screen.dart` to design tokens.
+- Replaced inline colors, text styles, and spacing.
+
+**T7.2 — Auth Screens**
+- Migrated `login_screen.dart`, `forgot_password_screen.dart`, `forgot_password_otp_screen.dart`, `reset_password_screen.dart`, `password_reset_success_screen.dart` to design tokens.
+
+**T7.3 — Profile Utility Screens**
+- Migrated `delete_account_screen.dart`, `delete_account_otp_screen.dart`, `profile_otp_screen.dart`, `profile_new_password_screen.dart`, `change_password_screen.dart` to design tokens.
+
+**T7.4 — Remaining Screens**
+- `shoot_history_screen.dart`: Replaced hardcoded white/black/white70, migrated inline text styles to `titleSmall`/`buttonMedium`, standardized padding/radii.
+- `favorites_screen.dart`: Standardized toast overlay with `surfaceStats` and `lgAll` radius.
+- `app_preferences_screen.dart`: Migrated versioning and delete account rows to token-based spacing and colors.
+- `onboarding_screen.dart`: Standardized dot indicator and button radii using `xsAll` and `lgAll`.
+- `find_creative_screen.dart`: Replaced inline `TextStyle` with `titleMedium` and standardized glow animation colors.
+
+**T7.5 — Trivial Screens**
+- `shoot_update_success_screen.dart`: Replaced `BorderRadius.circular` with `AppRadii.mdAll`.
+- `splash_screen.dart`: Verified full compliance with `AppColors` and `AppTextStyles`.
+
+---
+
+### Phase 8 — Shared Widget Cleanup *(commits: `f2e3d4c`–`b5a6c7d`)*
+
+**T8.1 — Migrate `CustomInputField` to `AppTextField`**
+- Migrated `ShootReviewScreen`: Replaced all `CustomInputField` instances with `AppTextField`.
+- Migrated `ShootDetailsScreen`: Replaced all `CustomInputField` instances with `AppTextField`.
+- Migrated `ChangePasswordScreen`: Migrated email input field to `AppTextField`.
+- Migrated `EditProfileScreen`: Updated multiple fields (`Name`, `Email`, `Change Password`) to use `AppTextField`.
+- Migrated `ProfileNewPasswordScreen`: Migrated password and confirm password fields.
+- Migrated `ShootTypeSelectionScreen`: Replaced all `CustomInputField` instances (Start Time, End Time, Select Date) with `AppTextField`.
+- Decommissioned `lib/shared/widgets/custom_input_field.dart` after confirming zero remaining references in `lib/`.
+- Verified system integrity with `flutter analyze`.

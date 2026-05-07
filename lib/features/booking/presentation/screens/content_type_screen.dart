@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:beige/app/route_names.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
@@ -15,7 +18,12 @@ class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
   final int? specialtyId;
   final bool fromHome;
-  const ContentTypeScreen({super.key, this.specialtyId, this.value, this.fromHome = false});
+  const ContentTypeScreen({
+    super.key,
+    this.specialtyId,
+    this.value,
+    this.fromHome = false,
+  });
 
   @override
   ConsumerState<ContentTypeScreen> createState() => _ContentTypeScreenState();
@@ -34,9 +42,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
   }
 
   bool get isSelectAll =>
-      selectedContentTypeIds.contains(1) &&
-      selectedContentTypeIds.contains(2);
-
+      selectedContentTypeIds.contains(1) && selectedContentTypeIds.contains(2);
 
   void _handleSelection(int contentTypeId) {
     setState(() {
@@ -59,8 +65,6 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     });
   }
 
-
-
   Future<void> _continueBooking() async {
     if (selectedContentTypeIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,14 +73,17 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
       return;
     }
 
-    final int contentTypeToSend =
-        isSelectAll ? 3 : selectedContentTypeIds.first;
+    final int contentTypeToSend = isSelectAll
+        ? 3
+        : selectedContentTypeIds.first;
 
-    await ref.read(contentTypeNotifierProvider.notifier).continueBooking(
-      specialtyId: widget.specialtyId,
-      contentType: contentTypeToSend,
-      existingBookingId: bookingId,
-    );
+    await ref
+        .read(contentTypeNotifierProvider.notifier)
+        .continueBooking(
+          specialtyId: widget.specialtyId,
+          contentType: contentTypeToSend,
+          existingBookingId: bookingId,
+        );
 
     if (!mounted) return;
 
@@ -87,10 +94,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
       final result = await context.pushNamed<int>(
         RouteNames.videoShootType,
-        extra: {
-          'bookingId': bookingId!,
-          'contentTypeId': contentTypeToSend,
-        },
+        extra: {'bookingId': bookingId!, 'contentTypeId': contentTypeToSend},
       );
 
       if (result != null) {
@@ -104,6 +108,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
       }
     }
   }
+
   bool get isContinueEnabled =>
       selectedContentTypeIds.isNotEmpty &&
       ref.read(contentTypeNotifierProvider).status != ContentTypeStatus.loading;
@@ -114,209 +119,197 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
     return AppScaffold(
-        hasAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Stack(
-            alignment: Alignment.center,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: widget.fromHome   // 👈 condition
-                    ? InkWell(
-                  onTap: () => context.pop(),
-                  child: SvgPicture.asset(
-                    AppAssets.back,
-                    height: 24,
-                  ),
-                )
-                    : const SizedBox(), // 👈 hide
-              ),
-              /// Center Title
-              Center(
-                child: Text(
-                  "Create Project",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
-              /// Right Step Text
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "1/3",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        body: Stack(
+      hasAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Stack(
+          alignment: Alignment.center,
           children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child:
+                  widget
+                      .fromHome // 👈 condition
+                  ? InkWell(
+                      onTap: () => context.pop(),
+                      child: SvgPicture.asset(AppAssets.back, height: 24),
+                    )
+                  : const SizedBox(), // 👈 hide
+            ),
 
-            /// MAIN UI
-            AbsorbPointer(
-                absorbing: isLoading, // 🔥 API call ke time click disable
-                child: Opacity(
-                  opacity: isLoading ? 0.6 : 1.0, // 🔥 thoda blur/disable feel
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-
-                        /// STEP PROGRESS BAR
-                        Row(
-                          children: List.generate(3, (index) {
-                            bool isActive = index == 0;
-
-                            return Expanded(
-                              child: Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                height: 5,
-                                decoration: BoxDecoration(
-                                  color: AppColors.textSecondary,
-                                  borderRadius: BorderRadius.circular(64),
-                                ),
-                                child: isActive
-                                    ? Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    height: 5,
-                                    width: 35.44,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(64),
-                                    ),
-                                  ),
-                                )
-                                    : const SizedBox(),
-                              ),
-                            );
-                          }),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// TITLE
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Content Type",
-                            style: TextStyle(
-                              fontFamily: AppAssets.fontUnbounded,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 8),
-
-                        /// SELECT ALL
-                        _buildOption(
-                          title: "Select All",
-                          activeImage:AppAssets.selectAll,
-                          value: isSelectAll,
-                          onTap: () => _handleSelection(3),
-                        ),
-
-                        /// VIDEOGRAPHY
-                        _buildOption(
-                          title: "Videography",
-                          activeImage:AppAssets.serviceVideography,
-
-                          value: selectedContentTypeIds.contains(1),
-                          onTap: () => _handleSelection(1),
-                        ),
-
-                        /// PHOTOGRAPHY
-                        _buildOption(
-                          title: "Photography",
-                          activeImage:AppAssets.servicePhotography,
-                          value: selectedContentTypeIds.contains(2),
-                          onTap: () => _handleSelection(2),
-                        ),
-
-                        _buildOption(
-                          title: "Studios (Coming Soon)",
-                          value: false,
-                          isDisabled: true,
-                          activeImage:AppAssets.serviceStudio,
-                          onTap: null,
-                        ),
-
-                        /// EDITING
-                        _buildOption(
-                          title: "Editing Only (Coming Soon)",
-                          value: false,
-                          isDisabled: true,
-                          activeImage:AppAssets.serviceEditing,
-                          onTap: null,
-                        ),
-
-                        /// LIVESTREAM
-                        _buildOption(
-                          title: "Livestreaming (Coming Soon)",
-                          value: false,
-                          isDisabled: true,
-                          activeImage:AppAssets.serviceLivestream,
-                          onTap: null,
-                        ),
-
-                        const Spacer(),
-
-                        SizedBox(
-
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: isContinueEnabled ? _continueBooking : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isContinueEnabled
-                                  ? AppColors.primary
-                                  : Colors.grey.shade700,
-
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              "Continue",
-                              style: TextStyle(
-                                color: AppColors.backgroundOpacity70,
-                                fontSize: 12,
-                                fontFamily: AppAssets.fontOutfit,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
+            /// Center Title
+            Center(
+              child: Text(
+                "Create Project",
+                style: AppTextStyles.titleSmall.copyWith(
+                  color: AppColors.white,
+                  fontFamily: AppAssets.fontOutfit,
+                  fontWeight: FontWeight.w500,
                 ),
-
               ),
+            ),
 
-
+            /// Right Step Text
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "1/3",
+                style: AppTextStyles.titleSmall.copyWith(
+                  color: AppColors.white,
+                  fontFamily: AppAssets.fontOutfit,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
-        ));
+        ),
+      ),
 
+      body: Stack(
+        children: [
+          /// MAIN UI
+          AbsorbPointer(
+            absorbing: isLoading, // 🔥 API call ke time click disable
+            child: Opacity(
+              opacity: isLoading ? 0.6 : 1.0, // 🔥 thoda blur/disable feel
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.base),
+                child: Column(
+                  children: [
+                    /// STEP PROGRESS BAR
+                    Row(
+                      children: List.generate(3, (index) {
+                        bool isActive = index == 0;
 
+                        return Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            height: 5,
+                            decoration: BoxDecoration(
+                              color: AppColors.textSecondary,
+                              borderRadius: AppRadii.enormousAll,
+                            ),
+                            child: isActive
+                                ? Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      height: 5,
+                                      width: 35.44,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary,
+                                        borderRadius: AppRadii.enormousAll,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    AppSpacing.verticalXl,
+
+                    /// TITLE
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Content Type",
+                        style: AppTextStyles.titleSmall.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    /// SELECT ALL
+                    _buildOption(
+                      title: "Select All",
+                      activeImage: AppAssets.selectAll,
+                      value: isSelectAll,
+                      onTap: () => _handleSelection(3),
+                    ),
+
+                    /// VIDEOGRAPHY
+                    _buildOption(
+                      title: "Videography",
+                      activeImage: AppAssets.serviceVideography,
+
+                      value: selectedContentTypeIds.contains(1),
+                      onTap: () => _handleSelection(1),
+                    ),
+
+                    /// PHOTOGRAPHY
+                    _buildOption(
+                      title: "Photography",
+                      activeImage: AppAssets.servicePhotography,
+                      value: selectedContentTypeIds.contains(2),
+                      onTap: () => _handleSelection(2),
+                    ),
+
+                    _buildOption(
+                      title: "Studios (Coming Soon)",
+                      value: false,
+                      isDisabled: true,
+                      activeImage: AppAssets.serviceStudio,
+                      onTap: null,
+                    ),
+
+                    /// EDITING
+                    _buildOption(
+                      title: "Editing Only (Coming Soon)",
+                      value: false,
+                      isDisabled: true,
+                      activeImage: AppAssets.serviceEditing,
+                      onTap: null,
+                    ),
+
+                    /// LIVESTREAM
+                    _buildOption(
+                      title: "Livestreaming (Coming Soon)",
+                      value: false,
+                      isDisabled: true,
+                      activeImage: AppAssets.serviceLivestream,
+                      onTap: null,
+                    ),
+
+                    const Spacer(),
+
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: isContinueEnabled ? _continueBooking : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isContinueEnabled
+                              ? AppColors.primary
+                              : AppColors.greyShade700,
+
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppRadii.lgAll,
+                          ),
+                        ),
+                        child: Text(
+                          "Continue",
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.backgroundOpacity70,
+                            fontFamily: AppAssets.fontOutfit,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
   Widget _buildOption({
     required String title,
     required String activeImage,
@@ -331,14 +324,15 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
             /// ICON
             Container(
               height: 50,
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDisabled? AppColors.iconBackground: AppColors.iconBackground,
+                color: isDisabled
+                    ? AppColors.iconBackground
+                    : AppColors.iconBackground,
               ),
               child: Center(
                 child: ImageFiltered(
@@ -357,21 +351,19 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               ),
             ),
 
-            const SizedBox(width: 16),
+            AppSpacing.gapHBase,
 
             /// TITLE
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
-                  fontFamily: AppAssets.fontOutfit,
-                  fontSize: 14,
+                style: AppTextStyles.labelLarge.copyWith(
                   fontWeight: FontWeight.w500,
                   color: isDisabled
                       ? AppColors.white60
                       : value
                       ? AppColors.primary
-                      : Colors.white,
+                      : AppColors.white,
                 ),
               ),
             ),
@@ -381,26 +373,17 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               height: 32,
               width: 32,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppRadii.smAll,
                 border: Border.all(
-                  color: value
-                      ? AppColors.primary
-                      : AppColors.borderLight,
+                  color: value ? AppColors.primary : AppColors.borderLight,
                   width: 0.5,
                 ),
-                color: value
-                    ? AppColors.primary
-                    : Colors.transparent,
+                color: value ? AppColors.primary : AppColors.transparent,
               ),
               child: value
-                  ? const Icon(
-                Icons.check,
-                size: 16,
-                color: Colors.black,
-              )
+                  ? const Icon(Icons.check, size: 16, color: AppColors.black)
                   : null,
             ),
-
           ],
         ),
       ),

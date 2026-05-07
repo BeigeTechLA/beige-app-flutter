@@ -21,7 +21,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -346,10 +346,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 children: [
-                  CustomInputField(title: "Name*", controller: nameController),
+                  AppTextField(label: "Name*", controller: nameController),
                   AppSpacing.verticalXl,
-                  CustomInputField(
-                    title: "Email ID*",
+                  AppTextField(
+                    label: "Email ID*",
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
@@ -466,11 +466,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                   ),
                   AppSpacing.verticalXl,
-                  CustomInputField(
-                    title: "Change Password*",
+                  AppTextField(
+                    label: "Change Password*",
                     controller: TextEditingController(text: "********"),
                     readOnly: true,
-                    suffixIcon: GestureDetector(
+                    suffix: GestureDetector(
                       onTap: () async {
                         await context.pushNamed(
                           RouteNames.changePassword,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../app/colors.dart';
 import '../../app/radii.dart';
@@ -25,6 +26,10 @@ class AppTextField extends StatelessWidget {
     this.autofocus = false,
     this.textInputAction,
     this.onFieldSubmitted,
+    this.autofillHints,
+    this.inputFormatters,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final String? label;
@@ -44,6 +49,10 @@ class AppTextField extends StatelessWidget {
   final bool autofocus;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
+  final Iterable<String>? autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +69,11 @@ class AppTextField extends StatelessWidget {
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted,
       validator: validator,
+      autofillHints: autofillHints,
+      inputFormatters: inputFormatters,
+      readOnly: readOnly,
+      onTap: onTap,
+
       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
       decoration: InputDecoration(
         labelText: label,

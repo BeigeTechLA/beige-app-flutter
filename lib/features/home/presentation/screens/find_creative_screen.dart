@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../app/assets.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/text_styles.dart';
+import '../../../../app/spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 
 class FindCreativeScreen extends ConsumerStatefulWidget {
@@ -78,7 +79,7 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
                       colors: [
                         AppColors.white
                             .withValues(alpha: 0.35 * _controller.value),
-                        Colors.transparent,
+                        AppColors.transparent,
                       ],
                     ),
                   ),
@@ -106,16 +107,13 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
 
             /// 🔤 TEXT
-            const Text(
+            Text(
               "Finding The Perfect Creator\nFor You...",
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: AppAssets.fontUnbounded,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+              style: AppTextStyles.titleMedium.copyWith(
                 color: AppColors.primary,
               ),
             ),

@@ -93,6 +93,9 @@ class AppColors {
   /// Muted text/icon — neutral grey
   static const Color textMuted = Color(0xFF939393);
 
+  /// Light neutral text used in auth helper copy
+  static const Color textLightNeutral = Color(0xFFD5D5D5);
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SEMANTIC COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -148,6 +151,7 @@ class AppColors {
   static const Color black = Color(0xFF000000);
   static const Color black87 = Color(0xDD000000);
   static const Color black54 = Color(0x8A000000);
+  static const Color black38 = Color(0x61000000);
   static const Color black70 = Color(0xB2000000);
   static const Color black26 = Color(0x42000000);
   static const Color black16 = Color(0x29000000);
@@ -169,6 +173,9 @@ class AppColors {
 
   /// Pale gold CTA surface
   static const Color goldCta = Color(0xFFE7C89E);
+
+  /// Payment success CTA surface
+  static const Color goldSuccessCta = Color(0xFFE6C79C);
 
   /// Light payment accent
   static const Color paymentAccent = Color(0xFFFFE6A5);
@@ -213,6 +220,9 @@ class AppColors {
 
   /// Grey 400 — disabled foregrounds
   static const Color greyShade400 = Color(0xFFBDBDBD);
+
+  /// Grey 700 — disabled controls
+  static const Color greyShade700 = Color(0xFF616161);
 
   /// Grey 800 — dark platform UI (image picker, sheets)
   static const Color greyShade800 = Color(0xFF424242);

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/text_styles.dart';
+import '../../../../app/spacing.dart';
+import '../../../../app/radii.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/core/network/api_endpoints.dart';
-import 'package:beige/app/colors.dart';
 import 'package:beige/features/profile/presentation/providers/booking_history_notifier.dart';
 
 class ShootHistoryScreen extends ConsumerWidget {
@@ -25,7 +28,7 @@ class ShootHistoryScreen extends ConsumerWidget {
           children: [
             /// BACK
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.base),
               child: InkWell(
                 onTap: () => context.pop(),
                 child: SvgPicture.asset(
@@ -40,20 +43,17 @@ class ShootHistoryScreen extends ConsumerWidget {
             ),
 
             /// TITLE
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
               child: Text(
                 "Booking History",
-                style: TextStyle(
-                  fontFamily: AppAssets.fontUnbounded,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.white,
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            AppSpacing.verticalXl,
 
             Expanded(
               child: isLoading
@@ -63,18 +63,17 @@ class ShootHistoryScreen extends ConsumerWidget {
                       ),
                     )
                   : bookings.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             "No bookings found",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontFamily: AppAssets.fontOutfit,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.white70,
                             ),
                           ),
                         )
                       : ListView.builder(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.base),
                           itemCount: bookings.length,
                           itemBuilder: (context, index) {
                             final booking = bookings[index];
@@ -88,9 +87,9 @@ class ShootHistoryScreen extends ConsumerWidget {
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 10),
+                                  vertical: AppSpacing.smd),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: AppRadii.hugeAll,
                                 child: SizedBox(
                                   height: 220,
                                   child: Stack(
@@ -138,8 +137,8 @@ class ShootHistoryScreen extends ConsumerWidget {
                                               end:
                                                   Alignment.bottomCenter,
                                               colors: [
-                                                Colors.transparent,
-                                                Colors.black
+                                                AppColors.transparent,
+                                                AppColors.black
                                                     .withValues(alpha: 0.85),
                                               ],
                                             ),
@@ -149,30 +148,24 @@ class ShootHistoryScreen extends ConsumerWidget {
 
                                       /// DETAILS
                                       Positioned(
-                                        bottom: 20,
-                                        left: 16,
-                                        right: 16,
+                                        bottom: AppSpacing.xl,
+                                        left: AppSpacing.base,
+                                        right: AppSpacing.base,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            const SizedBox(height: 6),
+                                            AppSpacing.verticalXs,
                                             Text(
                                               name,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                                fontFamily: AppAssets.fontOutfit,
-                                                fontWeight:
-                                                    FontWeight.w600,
+                                              style: AppTextStyles.buttonMedium.copyWith(
+                                                color: AppColors.white,
                                               ),
                                             ),
                                             Text(
                                               role,
-                                              style: const TextStyle(
-                                                fontSize: 11,
+                                              style: AppTextStyles.labelSmall.copyWith(
                                                 color: AppColors.white70,
-                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],

@@ -8,8 +8,9 @@ import 'package:go_router/go_router.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
 import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_otp_notifier.dart';
@@ -31,8 +32,10 @@ class _DeleteAccountOtpScreenState
   bool isOtpFilled = false;
 
   List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
-  List<TextEditingController> controllers =
-      List.generate(6, (index) => TextEditingController());
+  List<TextEditingController> controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
 
   String get enteredOtp => controllers.map((c) => c.text).join();
 
@@ -75,11 +78,12 @@ class _DeleteAccountOtpScreenState
   @override
   Widget build(BuildContext context) {
     final otpState = ref.watch(deleteAccountOtpNotifierProvider);
-    final isLoading =
-        otpState.confirmStatus == DeleteOtpStatus.loading;
+    final isLoading = otpState.confirmStatus == DeleteOtpStatus.loading;
 
-    ref.listen<DeleteAccountOtpState>(deleteAccountOtpNotifierProvider,
-        (prev, next) {
+    ref.listen<DeleteAccountOtpState>(deleteAccountOtpNotifierProvider, (
+      prev,
+      next,
+    ) {
       /// CONFIRM SUCCESS → logout + login
       if (next.confirmStatus == DeleteOtpStatus.success) {
         _handleAccountDeleted();
@@ -102,7 +106,7 @@ class _DeleteAccountOtpScreenState
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.base),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,30 +122,27 @@ class _DeleteAccountOtpScreenState
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              AppSpacing.verticalBase,
 
               /// TITLE
               Text(
                 "Delete Account",
-                style: TextStyle(
+                style: AppTextStyles.titleSmall.copyWith(
                   fontFamily: AppTextStyles.fontFamilyDisplay,
-                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
               Text(
                 "Please note this is permanent and can't be undone. To confirm deleting your account, please enter your Email ID below.",
-                style: TextStyle(
-                  fontSize: 14,
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white70,
                   height: 1.5,
                   fontWeight: FontWeight.w400,
-                  fontFamily: AppTextStyles.fontFamilyBody,
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               /// OTP BOXES
               Row(
@@ -149,17 +150,15 @@ class _DeleteAccountOtpScreenState
                 children: List.generate(6, (index) {
                   return Expanded(
                     child: Padding(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Container(
                         height: 60,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadii.lgAll,
                           border: Border.all(
-                            color: (focusNodes[index].hasFocus ||
-                                    controllers[index]
-                                        .text
-                                        .isNotEmpty)
+                            color:
+                                (focusNodes[index].hasFocus ||
+                                    controllers[index].text.isNotEmpty)
                                 ? AppColors.primary
                                 : AppColors.white60,
                             width: 1.5,
@@ -171,10 +170,7 @@ class _DeleteAccountOtpScreenState
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           maxLength: 1,
-                          style: const TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: AppTextStyles.otpDigit,
                           decoration: const InputDecoration(
                             counterText: "",
                             border: InputBorder.none,
@@ -182,7 +178,8 @@ class _DeleteAccountOtpScreenState
                           onChanged: (value) {
                             setState(() {
                               isOtpFilled = controllers.every(
-                                  (c) => c.text.trim().isNotEmpty);
+                                (c) => c.text.trim().isNotEmpty,
+                              );
                             });
                             if (value.isNotEmpty && index < 5) {
                               FocusScope.of(context).nextFocus();
@@ -198,20 +195,19 @@ class _DeleteAccountOtpScreenState
                 }),
               ),
 
-              const SizedBox(height: 10),
+              AppSpacing.verticalSmd,
               Row(
                 children: [
                   Text(
                     "00:${seconds.toString().padLeft(2, '0')}",
-                    style: TextStyle(
-                      fontSize: 16,
+                    style: AppTextStyles.buttonLarge.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppColors.white60,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               /// RESEND OTP
               Row(
@@ -220,15 +216,13 @@ class _DeleteAccountOtpScreenState
                   InkWell(
                     onTap: seconds == 0
                         ? () => ref
-                            .read(deleteAccountOtpNotifierProvider
-                                .notifier)
-                            .resendOtp()
+                              .read(deleteAccountOtpNotifierProvider.notifier)
+                              .resendOtp()
                         : null,
                     child: Text(
                       "Resend OTP",
-                      style: TextStyle(
+                      style: AppTextStyles.linkMedium.copyWith(
                         color: AppColors.white60,
-                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5,
@@ -237,7 +231,7 @@ class _DeleteAccountOtpScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               /// CONFIRM BUTTON
               SizedBox(
@@ -246,26 +240,22 @@ class _DeleteAccountOtpScreenState
                 child: ElevatedButton(
                   onPressed: (isOtpFilled && !isLoading)
                       ? () => ref
-                          .read(deleteAccountOtpNotifierProvider
-                              .notifier)
-                          .confirmDelete(enteredOtp)
+                            .read(deleteAccountOtpNotifierProvider.notifier)
+                            .confirmDelete(enteredOtp)
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isOtpFilled
                         ? AppColors.primary
                         : AppColors.goldOpacity40,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadii.xlAll,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
                   ),
                   child: Text(
                     "Continue",
-                    style: TextStyle(
-                      fontSize: 18,
+                    style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.w600,
                       color: isOtpFilled
                           ? AppColors.textHeading
-                          : Colors.black38,
+                          : AppColors.black38,
                     ),
                   ),
                 ),

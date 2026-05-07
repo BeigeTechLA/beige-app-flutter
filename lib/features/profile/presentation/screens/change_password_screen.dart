@@ -4,10 +4,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/route_names.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/app/colors.dart';
-import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
@@ -43,9 +44,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   }
 
   bool isValidEmail(String email) {
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$',
-    );
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$');
     return emailRegex.hasMatch(email);
   }
 
@@ -54,12 +53,15 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final fpState = ref.watch(forgotPasswordNotifierProvider);
     final isLoading = fpState.status == ForgotPasswordStatus.loading;
 
-    ref.listen<ForgotPasswordState>(forgotPasswordNotifierProvider,
-        (prev, next) {
+    ref.listen<ForgotPasswordState>(forgotPasswordNotifierProvider, (
+      prev,
+      next,
+    ) {
       if (next.status == ForgotPasswordStatus.success) {
-        context.pushNamed(RouteNames.profileOtp, extra: {
-          'email': emailController.text.trim(),
-        });
+        context.pushNamed(
+          RouteNames.profileOtp,
+          extra: {'email': emailController.text.trim()},
+        );
       } else if (next.status == ForgotPasswordStatus.error &&
           next.errorMessage != null) {
         TopMessage.show(context, next.errorMessage!);
@@ -80,22 +82,18 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     children: [
                       InkWell(
                         onTap: () => context.pop(true),
-                        child: SvgPicture.asset(
-                          AppAssets.back,
-                          height: 24,
-                        ),
+                        child: SvgPicture.asset(AppAssets.back, height: 24),
                       ),
-                      const SizedBox(height: 20),
+                      AppSpacing.verticalXl,
                       Text(
                         "Change your Password",
-                        style: TextStyle(
-                          fontSize: 16,
+                        style: AppTextStyles.titleSmall.copyWith(
                           fontFamily: AppTextStyles.fontFamilyDisplay,
                           fontWeight: FontWeight.w500,
                           color: AppColors.white,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      AppSpacing.verticalXs,
                       LayoutBuilder(
                         builder: (context, constraints) {
                           return Text(
@@ -103,8 +101,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                             textAlign: TextAlign.left,
                             softWrap: true,
                             maxLines: 3,
-                            style: TextStyle(
-                              fontSize: 13,
+                            style: AppTextStyles.bodyCompact.copyWith(
                               fontFamily: AppTextStyles.fontFamilyBody,
                               fontWeight: FontWeight.w400,
                               color: AppColors.white60,
@@ -112,10 +109,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 25),
-                      CustomInputField(
+                      const SizedBox(height: AppSpacing.authCardTop),
+                      AppTextField(
                         readOnly: true,
-                        title: "Email ID*",
+                        label: "Email ID*",
                         controller: emailController,
                         onChanged: (value) {
                           setState(() {
@@ -127,7 +124,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               /// SEND OTP BUTTON
               SizedBox(
@@ -139,13 +136,14 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                       : () {
                           final email = emailController.text.trim();
                           if (email.isEmpty) {
-                            TopMessage.show(
-                                context, "Please enter your email");
+                            TopMessage.show(context, "Please enter your email");
                             return;
                           }
                           if (!isValidEmail(email)) {
-                            TopMessage.show(context,
-                                "Please enter a valid email address");
+                            TopMessage.show(
+                              context,
+                              "Please enter a valid email address",
+                            );
                             return;
                           }
                           ref
@@ -156,14 +154,11 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     backgroundColor: isEmailFilled
                         ? AppColors.primary
                         : AppColors.goldGradientLight,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadii.xlAll,
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
                   ),
                   child: Text(
                     "Send OTP",
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: AppTextStyles.labelLarge.copyWith(
                       fontFamily: AppTextStyles.fontFamilyDisplay,
                       color: isEmailFilled
                           ? AppColors.textHeading
@@ -173,7 +168,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
             ],
           ),
         ),

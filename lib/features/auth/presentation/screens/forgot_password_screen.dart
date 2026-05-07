@@ -8,7 +8,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
+import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/forgot_password_state.dart';
 import 'package:beige/shared/widgets/top_message.dart';
@@ -98,22 +98,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         left: 16,
                         child: InkWell(
                           onTap: () => context.pop(),
-                          child: SvgPicture.asset(
-                            AppAssets.back,
-                            height: 24,
-                          ),
+                          child: SvgPicture.asset(AppAssets.back, height: 24),
                         ),
                       ),
                       Align(
                         alignment: Alignment.center,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Text(
                               "Forgot Password",
-                              style: TextStyle(
+                              style: AppTextStyles.titleSmall.copyWith(
                                 fontFamily: AppTextStyles.fontFamilyDisplay,
-                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.white,
                               ),
@@ -122,9 +118,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             Text(
                               "Enter your registered email to receive a reset link.\n We'll help you get back into your account quickly.",
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: AppTextStyles.bodyMedium.copyWith(
                                 fontFamily: AppTextStyles.fontFamilyBody,
-                                fontSize: 14,
                                 color: AppColors.white70,
                               ),
                             ),
@@ -144,7 +139,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     margin: AppSpacing.authCardMargin,
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: AppRadii.massiveAll,
                       border: Border.all(
                         color: AppColors.white.withValues(alpha: 0.06),
                         width: 1,
@@ -153,8 +148,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     child: Column(
                       children: [
                         const SizedBox(height: 12),
-                        CustomInputField(
-                          title: "Email ID*",
+                        AppTextField(
+                          label: "Email ID*",
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           autofillHints: const [AutofillHints.email],
@@ -167,8 +162,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed:
-                                (!isFormValid || isLoading) ? null : _handleSubmit,
+                            onPressed: (!isFormValid || isLoading)
+                                ? null
+                                : _handleSubmit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isFormValid
                                   ? AppColors.primary
@@ -179,9 +175,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             ),
                             child: Text(
                               "Send OTP",
-                              style: TextStyle(
+                              style: AppTextStyles.bodyCompact.copyWith(
                                 fontFamily: AppTextStyles.fontFamilyDisplay,
-                                fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: isFormValid
                                     ? AppColors.textHeading
@@ -206,21 +201,19 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "I Remember my Password. ",
-                style: TextStyle(
+                style: AppTextStyles.linkMedium.copyWith(
                   color: AppColors.white60,
-                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               InkWell(
                 onTap: () => context.goNamed(RouteNames.login),
-                child: const Text(
+                child: Text(
                   "Login",
-                  style: TextStyle(
+                  style: AppTextStyles.linkMedium.copyWith(
                     color: AppColors.white,
-                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     decoration: TextDecoration.underline,
                   ),

@@ -72,7 +72,7 @@ class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScr
             height: 55,
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppRadii.md),
+              borderRadius: AppRadii.mdAll,
             ),
             alignment: Alignment.center,
             child: Text(

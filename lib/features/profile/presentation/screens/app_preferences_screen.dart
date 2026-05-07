@@ -7,6 +7,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
 import 'package:beige/app/assets.dart';
 
 class AppPreferencesScreen extends ConsumerWidget {
@@ -17,7 +18,7 @@ class AppPreferencesScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.base),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -35,25 +36,22 @@ class AppPreferencesScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              AppSpacing.verticalBase,
 
               /// TITLE
               Text(
                 "App Preferences",
-                style: TextStyle(
-                  fontFamily: AppTextStyles.fontFamilyDisplay,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.white,
                 ),
               ),
 
-              const SizedBox(height: 20),
+              AppSpacing.verticalXl,
 
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
 
                   /// DELETE ACCOUNT
                   InkWell(
@@ -61,7 +59,7 @@ class AppPreferencesScreen extends ConsumerWidget {
                       context.pushNamed(RouteNames.deleteAccount);
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(AppSpacing.xl),
                       decoration: BoxDecoration(
                         borderRadius: AppRadii.mdAll,
                         color: AppColors.surfaceVariant,
@@ -80,29 +78,27 @@ class AppPreferencesScreen extends ConsumerWidget {
                                   BlendMode.srcIn,
                                 ),
                               ),
-                              const SizedBox(width: 15),
+                              SizedBox(width: AppSpacing.mld + 1),
                               Text(
                                 "Delete Account",
-                                style: TextStyle(
+                                style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.white,
-                                  fontSize: 14,
-                                  fontFamily: AppTextStyles.fontFamilyBody,
                                 ),
                               ),
                             ],
                           ),
                           const Icon(Icons.arrow_forward_ios,
-                              size: 14, color: Colors.white54),
+                              size: 14, color: AppColors.white54),
                         ],
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
 
                   /// APP VERSION
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       borderRadius: AppRadii.mdAll,
                       color: AppColors.surfaceVariant,
@@ -118,19 +114,18 @@ class AppPreferencesScreen extends ConsumerWidget {
                             BlendMode.srcIn,
                           ),
                         ),
-                        const SizedBox(width: 15),
-                        const Text(
+                        SizedBox(width: AppSpacing.mld + 1),
+                        Text(
                           "App Version V1.0",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
+                          style: AppTextStyles.bodyCompact.copyWith(
+                            color: AppColors.white70,
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                 ],
               ),
             ],
