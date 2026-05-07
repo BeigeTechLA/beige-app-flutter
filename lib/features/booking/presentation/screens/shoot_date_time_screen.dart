@@ -8,6 +8,9 @@
   import 'package:beige/app/route_names.dart';
   import 'package:beige/shared/widgets/custom_input_field.dart';
   import 'package:beige/app/colors.dart';
+  import 'package:beige/app/radii.dart';
+  import 'package:beige/app/spacing.dart';
+  import 'package:beige/app/text_styles.dart';
   import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
@@ -284,7 +287,7 @@ import '../../../../app/assets.dart';
           minute,
         );
       } catch (e) {
-        print("PARSE ERROR: $e");
+        debugPrint("PARSE ERROR: $e");
         return date; // fallback
       }
     }
@@ -849,10 +852,8 @@ import '../../../../app/assets.dart';
               datePickerTheme: DatePickerThemeData(
                 backgroundColor: AppColors.surfaceDark,
                 dividerColor: AppColors.dividerDark,
-                headerHeadlineStyle: const TextStyle(
-                  fontFamily: AppAssets.fontUnbounded,
+                headerHeadlineStyle: AppTextStyles.titleMedium.copyWith(
                   fontSize: 20,
-                  fontWeight: FontWeight.w500,
                   color: AppColors.white,
                 ),
                 headerHelpStyle: const TextStyle(fontSize: 0, height: 0),
@@ -865,9 +866,7 @@ import '../../../../app/assets.dart';
                   fontSize: 13,
                   color: AppColors.white70,
                 ),
-                dayStyle: const TextStyle(
-                  fontFamily: AppAssets.fontOutfit,
-                  fontSize: 14,
+                dayStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white,
                 ),
               ),
@@ -950,9 +949,9 @@ import '../../../../app/assets.dart';
             ),
             child: Dialog(
               insetPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+              const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xxl),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadii.lgAll,
               ),
               child: StatefulBuilder(
                 builder: (context, setStateDialog) {
@@ -963,14 +962,12 @@ import '../../../../app/assets.dart';
                       /// HEADER
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppSpacing.base),
                         color: AppColors.surfaceDeep,
                         child: const Text(
                           "Select Date",
-                          style: TextStyle(
-                            fontFamily: AppAssets.fontUnbounded,
+                          style: AppTextStyles.titleMedium.copyWith(
                             fontSize: 20,
-                            fontWeight: FontWeight.w500,
                             color: AppColors.white,
                           ),
                         ),
@@ -1013,7 +1010,7 @@ import '../../../../app/assets.dart';
                               /// ❌ PAST DATE (VISIBLE BUT DISABLED)
                               if (isPast) {
                                 return Container(
-                                  margin: const EdgeInsets.all(4),
+                                  margin: const EdgeInsets.all(AppSpacing.xxs),
                                   child: Center(
                                     child: Text(
                                       "${date.day}",
@@ -1028,10 +1025,10 @@ import '../../../../app/assets.dart';
                               /// ✅ SELECTED (BOX STYLE)
                               if (isSelected == true) {
                                 return Container(
-                                  margin: const EdgeInsets.all(4),
+                                  margin: const EdgeInsets.all(AppSpacing.xxs),
                                   decoration: BoxDecoration(
                                     color: AppColors.primary,
-                                    borderRadius: BorderRadius.circular(6),
+                                    borderRadius: AppRadii.smAll,
                                   ),
                                   child: Center(
                                     child: Text(
@@ -1047,7 +1044,7 @@ import '../../../../app/assets.dart';
 
                               /// ✅ NORMAL DATE
                               return Container(
-                                margin: const EdgeInsets.all(4),
+                                margin: const EdgeInsets.all(AppSpacing.xxs),
                                 child: Center(
                                   child: Text(
                                     "${date.day}",
@@ -1160,20 +1157,20 @@ import '../../../../app/assets.dart';
             data: ThemeData.dark().copyWith(
               colorScheme: const ColorScheme.dark(
                 primary: AppColors.primary,
-                onPrimary: Colors.white,
-                surface: Color(0xFF1E1E1E),
-                onSurface: Colors.white,
+                onPrimary: AppColors.white,
+                surface: AppColors.background,
+                onSurface: AppColors.white,
               ),
               timePickerTheme: const TimePickerThemeData(
-                backgroundColor: Color(0xFF121212),
-                dialBackgroundColor: Color(0xFF121212),
-                dialHandColor: Colors.white,
-                dialTextColor: Colors.grey,
+                backgroundColor: AppColors.surfaceGradientDark,
+                dialBackgroundColor: AppColors.surfaceGradientDark,
+                dialHandColor: AppColors.white,
+                dialTextColor: AppColors.neutralGrey,
                 hourMinuteColor: AppColors.primary,
-                hourMinuteTextColor: Colors.black,
+                hourMinuteTextColor: AppColors.black,
                 dayPeriodColor: AppColors.primary,
-                dayPeriodTextColor: Colors.white,
-              ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
+                dayPeriodTextColor: AppColors.white,
+              ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceGradientDark),
             ),
             child: child!,
           );
@@ -1249,11 +1246,8 @@ import '../../../../app/assets.dart';
               ),
               Text(
                 "Create Project",
-                style: TextStyle(
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white,
-                  fontSize: 14,
-                  fontFamily: AppAssets.fontOutfit,
-                  fontWeight: FontWeight.w400,
                 ),
               ),
               // 🔹 Step Text (Right)
@@ -1261,11 +1255,8 @@ import '../../../../app/assets.dart';
                 alignment: Alignment.centerRight,
                 child: Text(
                   "1/3",
-                  style: TextStyle(
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.white,
-                    fontSize: 14,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ),
@@ -1276,7 +1267,7 @@ import '../../../../app/assets.dart';
         body: Stack(
             children: [
               Padding(
-                padding:  EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   children: [
 
@@ -1290,7 +1281,7 @@ import '../../../../app/assets.dart';
                             height: 5,
                             decoration: BoxDecoration(
                               color: AppColors.textSubtle, // grey background
-                              borderRadius: BorderRadius.circular(64),
+                              borderRadius: BorderRadius.circular(AppRadii.enormous),
                             ),
                             child: isActive
                                 ? Align(
@@ -1300,7 +1291,7 @@ import '../../../../app/assets.dart';
                                 width: 120, // 🔥 colored portion only
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(64),
+                                  borderRadius: BorderRadius.circular(AppRadii.enormous),
                                 ),
                               ),
                             )
@@ -1319,11 +1310,7 @@ import '../../../../app/assets.dart';
 
                           textAlign: TextAlign.start,
                           "Select Booking Type",
-                          style: TextStyle(
-                            fontFamily: AppAssets.fontUnbounded,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: AppTextStyles.titleSmall,
                         ),
                       ],
                     ),
@@ -1358,12 +1345,12 @@ import '../../../../app/assets.dart';
                       });
                       },
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
                                       decoration: BoxDecoration(
                                         color: selectedIndex == 1
                                             ? AppColors.primary
                                             : AppColors.transparent,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                         border: selectedIndex == 1
                                             ? null
                                             :Border.all(color: AppColors.white30),
@@ -1373,10 +1360,7 @@ import '../../../../app/assets.dart';
                                         children: [
                                           Text(
                                             "Single Day",
-                                            style: TextStyle(
-                                              fontFamily: AppAssets.fontOutfit,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
+                                            style: AppTextStyles.labelLarge.copyWith(
                                               color: selectedIndex == 1
                                                   ? AppColors.black
                                                   : AppColors.disabled,
@@ -1455,12 +1439,12 @@ import '../../../../app/assets.dart';
                                       });
                                     },
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
                                       decoration: BoxDecoration(
                                         color: selectedIndex == 2
                                             ? AppColors.primary
                                             : AppColors.transparent,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                         border: selectedIndex == 2
                                             ? null
                                             :Border.all(color: AppColors.white30),
@@ -1471,10 +1455,7 @@ import '../../../../app/assets.dart';
                                         children: [
                                           Text(
                                             "Multiple Days",
-                                            style: TextStyle(
-                                              fontFamily: AppAssets.fontOutfit,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
+                                            style: AppTextStyles.labelLarge.copyWith(
                                               color: selectedIndex == 2
                                                   ? AppColors.black
                                                   : AppColors.disabled,
@@ -1548,11 +1529,7 @@ import '../../../../app/assets.dart';
                                 children: [
                                   Text(
                                     "Select Date",
-                                    style: TextStyle(
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: AppTextStyles.titleSmall,
                                   ),
 
                                 ],
@@ -1574,10 +1551,10 @@ import '../../../../app/assets.dart';
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     decoration: BoxDecoration(
                                       color: AppColors.surfaceVariant,
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: AppRadii.lgAll,
                                     ),
                                     child: Text(
                                       "Total Days: ${selectedDates.length}",
@@ -1587,10 +1564,10 @@ import '../../../../app/assets.dart';
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(AppSpacing.md),
                                       decoration: BoxDecoration(
                                         color: AppColors.surfaceVariant,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                       ),
                                       child: selectedDates.isEmpty
                                           ? const Text(
@@ -1613,10 +1590,9 @@ import '../../../../app/assets.dart';
                               ),
 
                               SizedBox(height: 18,),
-                              Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
+                              Text('Are Timings Same For All\nSelected Dates?',style: AppTextStyles.labelLarge.copyWith(
                                 color: AppColors.white,
                                 fontFamily:AppAssets.fontUnbounded,
-                                fontSize: 14,
                               ),),
 
                               const SizedBox(height: 12),
@@ -1678,7 +1654,7 @@ import '../../../../app/assets.dart';
                                         Border.all(color: AppColors.dividerDark):
 
                                         Border.all(color:  AppColors.transparent),
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                       ),
                                       child: Column(
                                         children: [
@@ -1696,10 +1672,10 @@ import '../../../../app/assets.dart';
                                               });
                                             },
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.base),
                                               decoration: BoxDecoration(
                                                 color: AppColors.surface,
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius: AppRadii.lgAll,
                                               ),
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1722,7 +1698,7 @@ import '../../../../app/assets.dart';
                                           /// 🔥 BODY
                                           if (isOpen) ...[
                                             Padding(
-                                              padding: const EdgeInsets.all(16),
+                                              padding: const EdgeInsets.all(AppSpacing.base),
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -1740,7 +1716,7 @@ import '../../../../app/assets.dart';
                                     _selectTime(context, null, true, date); // ✅ FIX
                                     },
                                     suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                     AppAssets.clock,
                                       color: AppColors.white,
@@ -1758,7 +1734,7 @@ import '../../../../app/assets.dart';
                                                       _selectTime(context, null, false, date); // ✅ FIX
                                                     },
                                                     suffixIcon: Padding(
-                                                      padding: const EdgeInsets.all(12),
+                                                      padding: const EdgeInsets.all(AppSpacing.md),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
                                                         color: AppColors.white,
@@ -1776,7 +1752,7 @@ import '../../../../app/assets.dart';
                                                       _selectTime(context, null, true, date);
                                                     },
                                                     suffixIcon: Padding(
-                                                      padding: const EdgeInsets.all(12),
+                                                      padding: const EdgeInsets.all(AppSpacing.md),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
                                                         color: AppColors.white,
@@ -1794,7 +1770,7 @@ import '../../../../app/assets.dart';
                                                       _selectTime(context, null, false, date);
                                                     },
                                                     suffixIcon: Padding(
-                                                      padding: const EdgeInsets.all(12),
+                                                      padding: const EdgeInsets.all(AppSpacing.md),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
                                                         color: AppColors.white,
@@ -1809,7 +1785,7 @@ import '../../../../app/assets.dart';
                                                         horizontal: 14, vertical: 8),
                                                     decoration: BoxDecoration(
                                                       color: AppColors.primary,
-                                                      borderRadius: BorderRadius.circular(8),
+                                                      borderRadius: AppRadii.mdAll,
                                                     ),
                                                     child: Text(
                                                       getDurationText(date),
@@ -1851,7 +1827,7 @@ import '../../../../app/assets.dart';
                                     _selectTime(context, startTimeController, true, null); // ✅ FIX
                                   },
                                   suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
                                       color: AppColors.white,
@@ -1879,7 +1855,7 @@ import '../../../../app/assets.dart';
                                     _selectTime(context, endTimeController, false, null); // ✅ FIX
                                   },
                                   suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
                                       color: AppColors.white,
@@ -1902,7 +1878,7 @@ import '../../../../app/assets.dart';
                                     _selectTime(context, startTimeController, true, null);
                                   },
                                   suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
                                       color: AppColors.white,
@@ -1928,7 +1904,7 @@ import '../../../../app/assets.dart';
                                     _selectTime(context, endTimeController, false, null);
                                   },
                                   suffixIcon: Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(AppSpacing.md),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
                                       color: AppColors.white,
@@ -1946,10 +1922,8 @@ import '../../../../app/assets.dart';
                                     SizedBox(width: 6),
                                     Text(
                                       'Applied to ${selectedDates.length} selected dates',
-                                      style: TextStyle(
+                                      style: AppTextStyles.bodyMedium.copyWith(
                                         color: AppColors.textSecondary,
-                                        fontSize: 14,
-                                        fontFamily: AppAssets.fontOutfit,
                                         fontWeight: FontWeight.w400,
                                         height: 1.36,
                                       ),
@@ -1958,10 +1932,10 @@ import '../../../../app/assets.dart';
                                 ),
                                 SizedBox(height: 20),
                                 Container(
-                                  padding: const EdgeInsets.all(14),
+                                  padding: const EdgeInsets.all(AppSpacing.mld),
                                   decoration: BoxDecoration(
                                     color: AppColors.surfaceVariant,
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                     border: Border.all(
                                       color: AppColors.dividerDark,
                                     ),
@@ -2040,11 +2014,7 @@ import '../../../../app/assets.dart';
                             children: [
                               Text(
                                 "Shoot Date & Time",
-                                style: TextStyle(
-                                  fontFamily: AppAssets.fontUnbounded,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: AppTextStyles.titleSmall,
                               ),
                             ],
                           ),
@@ -2059,7 +2029,7 @@ import '../../../../app/assets.dart';
                             readOnly: true,
                             onTap: () => _selectDate(context),
                             suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.calendar,
                                 width: 20,
@@ -2088,7 +2058,7 @@ import '../../../../app/assets.dart';
                               _selectTime(context, startTimeController, true, null);
                             },
                             suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,
                                 color: AppColors.white,
@@ -2112,7 +2082,7 @@ import '../../../../app/assets.dart';
                               _selectTime(context, endTimeController, false, null);
                             },
                             suffixIcon: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,
                                 color: AppColors.white,
@@ -2134,11 +2104,7 @@ import '../../../../app/assets.dart';
                             /// 🔹 TITLE
                             Text(
                               "Edits Needed?",
-                              style: TextStyle(
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.titleSmall,
                             ),
 
                             const SizedBox(height: 12),
@@ -2180,10 +2146,10 @@ import '../../../../app/assets.dart';
 
                               /// 🔹 INFO CONTAINER
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.mld),
                                 decoration: BoxDecoration(
                                   color: AppColors.surface,
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: AppRadii.lgAll,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2198,11 +2164,8 @@ import '../../../../app/assets.dart';
                                         SizedBox(width: 8),
                                         Text(
                                           "Editing includes",
-                                          style: TextStyle(
+                                          style: AppTextStyles.labelLarge.copyWith(
                                             color: AppColors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: AppAssets.fontOutfit,
                                           ),
                                         ),
                                       ],
@@ -2243,10 +2206,8 @@ import '../../../../app/assets.dart';
                                     controller: TextEditingController(
                                       text: getEditTypeDisplayText(),
                                     ),
-                                    style: const TextStyle(
+                                    style: AppTextStyles.bodyMedium.copyWith(
                                       color: AppColors.white,
-                                      fontFamily: AppAssets.fontOutfit,
-                                      fontSize: 14,
                                     ),
                                     decoration: InputDecoration(
                                       labelText: getContentTypeTitle(widget.contentTypeId),
@@ -2257,14 +2218,14 @@ import '../../../../app/assets.dart';
                                         color: AppColors.white70,
                                       ),
                                       contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                                      const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
                                       enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                         borderSide:
                                         const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: AppRadii.lgAll,
                                         borderSide:
                                         const BorderSide(color: AppColors.white70, width: 0.5),
                                       ),
@@ -2290,7 +2251,7 @@ import '../../../../app/assets.dart';
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     decoration: BoxDecoration(
                                       color: AppColors.primary, // Beige/Cream color
-                                      borderRadius: BorderRadius.circular(12), // Fully rounded like the image
+                                      borderRadius: AppRadii.lgAll, // Fully rounded like the image
                                       boxShadow: [
                                         BoxShadow(
                                           color: AppColors.black10,
@@ -2305,7 +2266,7 @@ import '../../../../app/assets.dart';
                                         Container(
                                           width: 34,
                                           height: 34,
-                                          padding: EdgeInsets.all(8),
+                                          padding: EdgeInsets.all(AppSpacing.sm),
                                           decoration: const BoxDecoration(
                                             color: AppColors.black,
                                             shape: BoxShape.circle,
@@ -2321,12 +2282,8 @@ import '../../../../app/assets.dart';
                                         Expanded(
                                           child: Text(
                                             getFinalSummaryText(),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontFamily: AppAssets.fontOutfit,
-                                              fontWeight: FontWeight.w600,
+                                            style: AppTextStyles.buttonSmall.copyWith(
                                               color: AppColors.surfaceDeep,
-
                                             ),
                                           ),
                                         ),
@@ -2369,7 +2326,7 @@ import '../../../../app/assets.dart';
         bottomNavigationBar: SafeArea(
           bottom: true,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.base),
             child: Row(
               children: [
                 Expanded(
@@ -2378,12 +2335,12 @@ import '../../../../app/assets.dart';
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.white,
                       side: const BorderSide(color: AppColors.disabled),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                     ),
-                    child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
+                    child: Text("Back", style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -2403,19 +2360,17 @@ import '../../../../app/assets.dart';
                       foregroundColor: isFormValid
                           ? AppColors.black
                           : AppColors.disabled,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                       elevation: isFormValid ? 2 : 0,
                     ),
 
-                    child: const Text(
+                    child: Text(
                       "Continue",
-                      style: TextStyle(
+                      style: AppTextStyles.labelLarge.copyWith(
                         fontFamily: AppAssets.fontUnbounded,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -2465,7 +2420,7 @@ import '../../../../app/assets.dart';
       return Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppRadii.lgAll,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2537,14 +2492,14 @@ import '../../../../app/assets.dart';
                       (context as Element).markNeedsBuild();
                     },
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 9),
+                      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 19, vertical: 4),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.primary
                             : AppColors.overlay,
-                        borderRadius: BorderRadius.circular(38),
+                        borderRadius: BorderRadius.circular(AppRadii.roundLg),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -2587,10 +2542,10 @@ import '../../../../app/assets.dart';
 
     Widget VideoEdits(String title, List<dynamic> data) {
       return Container(
-        margin: EdgeInsets.symmetric(vertical: 17),
+        margin: EdgeInsets.symmetric(vertical: AppSpacing.lg),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.white30, width: 0.5),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadii.xlAll,
         ),
         child: Column(
           children: [
@@ -2608,10 +2563,10 @@ import '../../../../app/assets.dart';
                 });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadii.xlAll,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2651,7 +2606,7 @@ import '../../../../app/assets.dart';
 
                   return Padding(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                    const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
                     child: Row(
                       children: [
                         Expanded(
@@ -2665,7 +2620,7 @@ import '../../../../app/assets.dart';
                           height: 35,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: AppRadii.smAll,
                           ),
                           child: Row(
                             children: [
@@ -2747,10 +2702,10 @@ import '../../../../app/assets.dart';
     }
     Widget PhotoEdits(String title, List<dynamic> data) {
       return Container(
-        margin: const EdgeInsets.symmetric(vertical: 17),
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.white30, width: 0.5),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: AppRadii.xlAll,
         ),
         child: Column(
           children: [
@@ -2762,7 +2717,7 @@ import '../../../../app/assets.dart';
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.base),
                 decoration: const BoxDecoration(
                   color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
@@ -2800,7 +2755,7 @@ import '../../../../app/assets.dart';
                   children: [
                     Padding(
                       padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.mld),
                       child: Row(
                         children: [
                           /// TEXT
@@ -2827,7 +2782,7 @@ import '../../../../app/assets.dart';
                             height: 34,
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: AppRadii.mdAll,
                             ),
                             child: Row(
                               children: [
@@ -2885,11 +2840,11 @@ import '../../../../app/assets.dart';
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.all(AppSpacing.base),
+                      padding: const EdgeInsets.all(AppSpacing.mld),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: AppRadii.xlAll,
                       ),
                       child: Row(
                         children: [
@@ -2917,10 +2872,10 @@ import '../../../../app/assets.dart';
 
                           /// DURATION
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                             decoration: BoxDecoration(
                               color: AppColors.white,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: AppRadii.mdAll,
                             ),
                             child: Text(
                               getDurationSummaryLabel(),
@@ -2935,11 +2890,11 @@ import '../../../../app/assets.dart';
                     ),
                     /// 🔥 ADD THIS BELOW INCLUDE BOX
                    /* Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.smd),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.mld),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                       child: Row(
                         children: [
@@ -3028,11 +2983,8 @@ import '../../../../app/assets.dart';
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.white,
-                fontSize: 14,
-                fontFamily: AppAssets.fontOutfit,
-                fontWeight: FontWeight.w400,
               ),
             ),
           ],
@@ -3103,10 +3055,10 @@ import '../../../../app/assets.dart';
                 clipBehavior: Clip.none,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(14),
+                    padding: EdgeInsets.all(AppSpacing.mld),
                     decoration: BoxDecoration(
                       color: AppColors.background,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppRadii.mld),
                       border: Border.all(
                         color: highlight
                             ? AppColors.borderGold   // ✅ selected
@@ -3136,7 +3088,7 @@ import '../../../../app/assets.dart';
         left: 14,
         top: -10,
         child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxxs),
           color: AppColors.background, // background match
         child: Text(
         title,
@@ -3164,7 +3116,7 @@ import '../../../../app/assets.dart';
                 decoration: BoxDecoration(
                   color: AppColors.background,
                   border: Border.all(color: AppColors.white70,width: 0.5),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadii.lgAll,
                 ),
                 child: ListView.builder(
                   itemCount: list.length,
@@ -3197,13 +3149,13 @@ import '../../../../app/assets.dart';
                       },
 
                       child: Container(
-                        margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        margin: EdgeInsets.symmetric(vertical: AppSpacing.xxs, horizontal: AppSpacing.sm),
+                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.primary
                               : AppColors.transparent,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppRadii.mld),
                           border: Border.all(
                             color: isSelected
                                 ? AppColors.primary

@@ -52,6 +52,15 @@ class AppRadii {
   /// 38 — Large rounded (avatar-adjacent)
   static const double roundLg = 38;
 
+  /// 40 — Large pill / circular containers
+  static const double pillSm = 40;
+
+  /// 50 — Pill / circular elements
+  static const double pill = 50;
+
+  /// 64 — Very large circular elements
+  static const double enormous = 64;
+
   /// 999 — Pill / capsule shape
   static const double full = 999;
 
@@ -66,6 +75,8 @@ class AppRadii {
   static final BorderRadius xlAll = BorderRadius.circular(xl);
   static final BorderRadius hugeAll = BorderRadius.circular(huge);
   static final BorderRadius roundAll = BorderRadius.circular(round);
+  static final BorderRadius pillSmAll = BorderRadius.circular(pillSm);
+  static final BorderRadius pillAll = BorderRadius.circular(pill);
   static final BorderRadius fullAll = BorderRadius.circular(full);
 
   /// Top-only rounding for bottom sheets — 20px

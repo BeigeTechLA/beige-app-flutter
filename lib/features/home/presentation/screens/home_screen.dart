@@ -10,6 +10,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:beige/features/home/data/models/home_model.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
@@ -252,13 +255,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case "completed":
-        return Colors.green;   // ✅ Completed → GREEN
+        return AppColors.success;   // ✅ Completed → GREEN
       case "pending":
       case "draft":
       case "matching":
-        return Colors.red;     // 🔴 Sab pending type → RED
+        return AppColors.error;     // 🔴 Sab pending type → RED
       default:
-        return Colors.red;     // Default bhi pending maan lo
+        return AppColors.error;     // Default bhi pending maan lo
     }
   }
 
@@ -266,11 +269,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   Color getStatusColorFromLabel(String label) {
     switch (label.toLowerCase()) {
       case "completed":
-        return Colors.green;   // ✅ Green
+        return AppColors.success;   // ✅ Green
       case "pending":
-        return Colors.red;     // 🔴 Red
+        return AppColors.error;     // 🔴 Red
       default:
-        return Colors.red;
+        return AppColors.error;
     }
   }
   final PageController _pageController = PageController(
@@ -419,8 +422,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     return DateFormat("hh:mm a").format(parsed); // 👉 09:00 AM
   }
   final List<Color> _textColors = [
-    Colors.white.withOpacity(0.5),
-    const Color(0xFFE8D1AB),
+    AppColors.white.withValues(alpha: 0.5),
+    AppColors.primary,
     AppColors.white70
   ];
   Future<void> _continueBooking(int contentType) async {
@@ -536,10 +539,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       },
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 60, 20, 80),
+                        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 60, AppSpacing.xl, 80),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF1C1C1C),
-                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(AppRadii.pillSm)),
 
                           // ✅ IMAGE ADDED HERE
                           image: DecorationImage(
@@ -565,7 +568,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
 
-                                          color: Colors.white,
+                                          color: AppColors.white,
                                           fontSize: 22,
                                           fontFamily: AppAssets.fontOutfit,
                                           fontWeight: FontWeight.w500,
@@ -589,11 +592,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                                     overflow: TextOverflow.ellipsis,
                                                     style: TextStyle(
-                                                        color: Colors.white.withOpacity(0.6),
+                                                        color: AppColors.white.withValues(alpha: 0.6),
                                                         fontSize: 15,
                                                         fontFamily: AppAssets.fontOutfit))),
                                             const Icon(Icons.expand_more,
-                                                color: Colors.white, size: 20),
+                                                color: AppColors.white, size: 20),
                                           ],
                                         ),
                                       )
@@ -602,18 +605,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                 ),
                                 // Profile Pill
                                 Container(
-                                  padding: const EdgeInsets.all(4),
+                                  padding: const EdgeInsets.all(AppSpacing.xxs),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(50),
-                                    color: Color(0x0FE8E8E8),
+                                    borderRadius: AppRadii.pillAll,
+                                    color: AppColors.borderFaint,
                                     border: Border.all(
-                                        color: const Color(0xFFE8D1AB).withOpacity(0.3),
+                                        color: AppColors.primary.withValues(alpha: 0.3),
                                         width: 0.5),
                                   ),
                                   child: Row(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
                                         child:SvgPicture.asset(AppAssets.notification)
                                       ),
                                       GestureDetector(
@@ -624,7 +627,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                         child: CircleAvatar(
                                           radius: 20,
-                                          backgroundColor: Colors.transparent,
+                                          backgroundColor: AppColors.transparent,
                                           child: ClipOval(
                                             child: homeData != null &&
                                                 homeData.profileImageUrl.isNotEmpty
@@ -664,13 +667,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                             .width * 0.70,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF282828),
-                          borderRadius: BorderRadius.circular(30),
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.roundAll,
                           border: Border.all(
-                              color: const Color(0xFFE8D1AB).withOpacity(0.4),
+                              color: AppColors.primary.withValues(alpha: 0.4),
                               width: 0.5),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.4),
+                            BoxShadow(color: AppColors.black.withValues(alpha: 0.4),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8))
                           ],
@@ -708,16 +711,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 const SizedBox(height: 40),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                   child: Container(
                     height: 1,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color(0x17FFFFFF), // 9% approx
-                          Color(0x26FFFFFF), // 15% (main center)
-                          Color(0x17FFFFFF), // 9% approx
+                          AppColors.dividerGradientEdge, // 9% approx
+                          AppColors.white15, // 15% (main center)
+                          AppColors.dividerGradientEdge, // 9% approx
                         ],
                         /* begin: Alignment.centerLeft,
                               end: Alignment.centerRight,*/
@@ -751,16 +754,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         offset: const Offset(0, -7), //
                         child: Center(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1F1F1F),
+                              color: AppColors.background,
                               borderRadius: const BorderRadius.only(
                                 bottomLeft: Radius.circular(40),
                                 bottomRight: Radius.circular(40),
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
+                                  color: AppColors.black.withValues(alpha: 0.4),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 )
@@ -783,17 +786,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     duration: const Duration(milliseconds: 350),
                                     curve: Curves.easeInOut,
 
-                                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
 
                                     height: 2, // 🔥 thoda better thickness
                                     width: isActive ? 26 : 14, // 🔥 smooth pill effect
 
                                     decoration: BoxDecoration(
                                       color: isActive
-                                          ? const Color(0xFFE8D1AB)
-                                          : Colors.white.withOpacity(0.25),
+                                          ? AppColors.primary
+                                          : AppColors.white.withValues(alpha: 0.25),
 
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: AppRadii.hugeAll,
                                     ),
                                   ),
                                 );
@@ -804,16 +807,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 20),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Color(0x17FFFFFF), // 9% approx
-                                Color(0x26FFFFFF), // 15% (main center)
-                                Color(0x17FFFFFF), // 9% approx
+                                AppColors.dividerGradientEdge, // 9% approx
+                                AppColors.white15, // 15% (main center)
+                                AppColors.dividerGradientEdge, // 9% approx
                               ],
                              /* begin: Alignment.centerLeft,
                               end: Alignment.centerRight,*/
@@ -824,16 +827,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 20),
                       // --- 2. EXPLORE SERVICES SECTION ---
                       Padding(
-                        padding:  EdgeInsets.symmetric(horizontal: 20),
+                        padding:  AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               "Explore Services",
-                              style: TextStyle(color: AppColors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                              style: AppTextStyles.labelLarge.copyWith(
                                 fontFamily: AppAssets.fontUnbounded,
+                                color: AppColors.white,
                                 height: 1.2,
                               ),
 
@@ -850,7 +852,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       // Services Horizontal List
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.only(left: AppSpacing.smd),
                         child: Row(
                           children: [
                             _buildServiceCard(0, "Photo", AppAssets.servicePhotography),
@@ -863,16 +865,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white24,
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white24,
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -892,18 +894,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         children: [
 
                           Padding(
-                            padding:  EdgeInsets.symmetric(horizontal: 20),
+                            padding:  AppSpacing.insetsHXl,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "Continue Your Booking",
-                                  style: TextStyle(color: AppColors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: AppAssets.fontUnbounded,
-                                    height: 1.2,
-                                  ),
+                                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
 
 
                                 ),
@@ -914,11 +911,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                             // const SizedBox(height: 10),
                           Container(
-                          padding: const EdgeInsets.all(20),
-                                margin: const EdgeInsets.all(18),
+                          padding: const EdgeInsets.all(AppSpacing.xl),
+                                margin: const EdgeInsets.all(AppSpacing.lg),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE8D1AB),
-                                  borderRadius: BorderRadius.circular(22),
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(AppRadii.massive),
                                 ),
                                 child: Column(
                                   children: [
@@ -927,7 +924,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     Row(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: AppRadii.hugeAll,
                                           child: (homeData.continueBooking?.imageUrl != null &&
                                               homeData.continueBooking!.imageUrl!.trim().isNotEmpty)
                                               ? CachedNetworkImage(
@@ -1011,19 +1008,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                                         return Expanded(
                                           child: Container(
-                                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                                            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                                             height: 6,
                                             decoration: BoxDecoration(
-                                              color: const Color(0x33000000), // background (light)
-                                              borderRadius: BorderRadius.circular(10),
+                                              color: AppColors.black.withValues(alpha: 0.2), // background (light)
+                                              borderRadius: BorderRadius.circular(AppRadii.mld),
                                             ),
                                             child: FractionallySizedBox(
                                               alignment: Alignment.centerLeft,
                                               widthFactor: value, // 🔥 main logic
                                               child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black, // filled part
-                            borderRadius: BorderRadius.circular(10),
+                            color: AppColors.black, // filled part
+                            borderRadius: BorderRadius.circular(AppRadii.mld),
                           ),
                                               ),
                                             ),
@@ -1043,7 +1040,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                         height: 48,
                                         decoration: BoxDecoration(
                                           color: AppColors.textHeading, //
-                                          borderRadius: BorderRadius.circular(23),
+                                          borderRadius: BorderRadius.circular(AppRadii.massive),
                                         ),
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1068,16 +1065,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                 ),
                               ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                             child: Container(
                               height: 1,
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.white.withOpacity(0.09), // left
-                                    Colors.white24,
-                                    Colors.white.withOpacity(0.09), // right
+                                    AppColors.white.withValues(alpha: 0.09), // left
+                                    AppColors.white24,
+                                    AppColors.white.withValues(alpha: 0.09), // right
                                   ],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -1095,16 +1092,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 10),
                       Padding(
                         key: featuredKey,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               "Featured Creatives",
-                              style: TextStyle(color: AppColors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                              style: AppTextStyles.labelLarge.copyWith(
                                 fontFamily: AppAssets.fontUnbounded,
+                                color: AppColors.white,
                                 height: 1.2,
                               ),
 
@@ -1187,7 +1183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                             painter: BeveledTrayPainter(),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 12), // Bevel height jitna ya thoda zyada
+                            padding: const EdgeInsets.only(top: AppSpacing.md), // Bevel height jitna ya thoda zyada
 
                             child: AnimatedBuilder(
                               animation: _pageController,
@@ -1219,12 +1215,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                         shape: BoxShape.circle,
                                         // Active dot beige hai, baki dark grey
                                         color: isActive
-                                            ? const Color(0xFFE8D1AB)
-                                            : Colors.white.withOpacity(0.2),
+                                            ? AppColors.primary
+                                            : AppColors.white.withValues(alpha: 0.2),
                                         boxShadow: isActive ? [
                                           BoxShadow(
-                                            color: const Color(0xFFE8D1AB)
-                                                .withOpacity(0.4),
+                                            color: AppColors.primary.withValues(alpha: 0.4),
                                             blurRadius: 4,
                                           )
                                         ] : [],
@@ -1241,16 +1236,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 10),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white24,
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white24,
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -1269,7 +1264,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         },
                         child: Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.only(top: 20, bottom: 69, left: 15, right: 15),
+                          padding: const EdgeInsets.only(top: AppSpacing.xl, bottom: 69, left: AppSpacing.base, right: AppSpacing.base),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
@@ -1277,11 +1272,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               // Stops ko correct kiya hai smooth look ke liye
                               stops: const [0.0, 0.7],
                               colors: [
-                                const Color(0xFFE8D1AB),
-                                const Color(0xFF0D0D0D),
+                                AppColors.primary,
+                                AppColors.surfaceDark,
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(45),
+                            borderRadius: AppRadii.pillAll,
                           ),
                           child: Column(
                             children: [
@@ -1292,7 +1287,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   "Beige Studios",
 
                                   style: TextStyle(
-                                    color: Color(0x29000000),
+                                    color: AppColors.black16,
                                     fontSize: 35,
                                     fontWeight: FontWeight.w500, // Extra Bold look
                                     fontFamily: AppAssets.fontUnbounded,
@@ -1350,7 +1345,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               Text(
                                 studioList[_activeStudioIndex]['name']!,
                                 style: const TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold
                                 ),
@@ -1359,26 +1354,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                               // Agar address ya description hai to:
                               if(studioList[_activeStudioIndex]['desc'] != null)
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 5),
+                                  padding: const EdgeInsets.only(top: AppSpacing.xs),
                                   child: Text(
                                     studioList[_activeStudioIndex]['desc']!,
-                                    style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 13),
+                                    style: TextStyle(color: AppColors.white.withValues(alpha: 0.7), fontSize: 13),
                                   ),
                                 ),
 
                               const SizedBox(height: 25),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                                 child: Container(
                                   height: 1,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        Colors.white.withOpacity(0.09), // left
-                                        Colors.white24,
-                                        Colors.white.withOpacity(0.09), // right
+                                        AppColors.white.withValues(alpha: 0.09), // left
+                                        AppColors.white24,
+                                        AppColors.white.withValues(alpha: 0.09), // right
                                       ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
@@ -1395,8 +1390,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                   width: 60,
                                   height: 9,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10),
+                                    color: AppColors.white.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(AppRadii.mld),
                                   ),
                                   child: Stack(
                                     children: [
@@ -1409,8 +1404,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                           width: 60 / studioList.length,
                                           height: 9,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFE8D1AB),
-                                            borderRadius: BorderRadius.circular(10),
+                                            color: AppColors.primary,
+                                            borderRadius: BorderRadius.circular(AppRadii.mld),
                                           ),
                                         ),
                                       ),
@@ -1424,16 +1419,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 20),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white24,
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white24,
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -1444,14 +1439,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 20),
                       // --- YOUR BOOKINGS SECTION (STACK SWIPE UI) ---
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
                               "Your Bookings",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: AppAssets.fontUnbounded,
@@ -1656,16 +1651,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white.withValues(alpha: 0.09), // center
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -1675,18 +1670,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 20),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               "We Think You’ll Love These ",
-                              style: TextStyle(color: AppColors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: AppAssets.fontUnbounded,
-                                height: 1.2,
-                              ),)
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),)
 
 
                           ],
@@ -1701,8 +1691,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           child: Text(
                             "No Data Found",
                               style:
-                              TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
-                              )
+                              AppTextStyles.titleSmall.copyWith(color: AppColors.primary)
                           ),
                         ),
                       )
@@ -1717,20 +1706,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         final int userId = item["id"];
                         bool isFavourite = favouriteUsers.contains(userId);*/
                             return Padding(
-                              padding: const EdgeInsets.only(left: 12, right: 4),
+                              padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.xxs),
                               child: Container(
                                 width: 210,
                                 height: 280,
                                 clipBehavior: Clip.none, // Ensures child contents don't bleed out of corners
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(22),
+                                  borderRadius: BorderRadius.circular(AppRadii.massive),
                                 ),
                                 child: Stack(
                                   children: [
                                     /// 1. FULL BACKGROUND IMAGE
                                     Positioned.fill(
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(22),
+                                        borderRadius: BorderRadius.circular(AppRadii.massive),
                                         child: data.profileImage.isNotEmpty
                                             ? Image.network(
                                           ApiEndpoints.imageUrl + data.profileImage,
@@ -1752,14 +1741,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     Positioned.fill(
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(22),
+                                          borderRadius: BorderRadius.circular(AppRadii.massive),
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
                                             stops: const [0.4, 1.0], // Starts getting dark near the middle/bottom
                                             colors: [
-                                              Colors.transparent,
-                                              Colors.black
+                                              AppColors.transparent,
+                                              AppColors.black
                                             ],
                                           ),
                                         ),
@@ -1789,7 +1778,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                           Text(
                                             data.title ?? "Creative Professional",
                                             style: const TextStyle(
-                                              color: Colors.white70,
+                                              color: AppColors.white70,
                                               fontSize: 10,
                                               fontFamily: AppAssets.fontHelveticaNeue,
                                               fontWeight: FontWeight.w400,
@@ -1815,7 +1804,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     alignment: Alignment.center,
                                                     decoration: BoxDecoration(
                                                       color: AppColors.primary,
-                                                      borderRadius: BorderRadius.circular(40),
+                                                      borderRadius: AppRadii.pillSmAll,
                                                     ),
                                                     child: const Text(
                                                       "View Profile",
@@ -1841,7 +1830,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                   child: SvgPicture.asset(
                                                     AppAssets.homeViewProfile,
                                                     height: 36,
-                                                    color: Colors.white,
+                                                    color: AppColors.white,
                                                   ),
                                                 ),
                                               ),
@@ -1859,16 +1848,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white.withValues(alpha: 0.09), // center
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -1881,28 +1870,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const AppSpacing.insetsHXl,
                                 child: Text(
                                   "Rebook Your Shoots",
-                                  style: TextStyle(color: AppColors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: AppAssets.fontUnbounded,
-                                    height: 1.2,
-                                  ),
+                                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
                                 ),
                               ),
                               const SizedBox(height: 15),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 18),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                                 child: Container(
                                   height: 280,
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius: AppRadii.roundAll,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: AppColors.black.withValues(alpha: 0.3),
                                         blurRadius: 10,
                                         offset: const Offset(0, 5),
                                       )
@@ -1913,7 +1897,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                       // 1. MAIN BACKGROUND IMAGE
                                       Positioned.fill(
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius: AppRadii.roundAll,
                                           child: Image.asset(
                                             AppAssets.rebookShoots,
                                             fit: BoxFit.cover,
@@ -1925,14 +1909,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                       Positioned.fill(
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(30),
+                                            borderRadius: AppRadii.roundAll,
                                             gradient: LinearGradient(
                                               begin: Alignment.bottomCenter,
                                               end: Alignment.topCenter,
                                               colors: [
-                                                Colors.black.withOpacity(0.9),
-                                                Colors.black.withOpacity(0.4),
-                                                Colors.transparent,
+                                                AppColors.black.withValues(alpha: 0.9),
+                                                AppColors.black.withValues(alpha: 0.4),
+                                                AppColors.transparent,
                                               ],
                                             ),
                                           ),
@@ -1951,14 +1935,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                               children: [
                                                 // Dark Circular Icon Background
                                                 Container(
-                                                  padding: const EdgeInsets.all(10),
+                                                  padding: const EdgeInsets.all(AppSpacing.smd),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.white.withOpacity(
-                                                        0.12),
+                                                    color: AppColors.white.withValues(alpha: 0.12),
                                                     shape: BoxShape.circle,
                                                   ),
                                                   child: const Icon(Icons.music_note,
-                                                      color: Colors.white, size: 20),
+                                                      color: AppColors.white, size: 20),
                                                 ),
                                                 const SizedBox(width: 12),
                                                 Column(
@@ -1968,7 +1951,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     Text(
                                                       "Music Video",
                                                       style: TextStyle(
-                                                        color: Colors.white,
+                                                        color: AppColors.white,
                                                         fontSize: 16,
                                                         fontWeight: FontWeight.bold,
                                                         fontFamily: AppAssets.fontOutfit,
@@ -1976,10 +1959,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     ),
                                                     Text(
                                                       "March 18, 2026 • Las Vegas, USA",
-                                                      style: TextStyle(
-                                                        color: Colors.white60,
-                                                        fontSize: 12,
-                                                        fontFamily: AppAssets.fontOutfit,
+                                                      style: AppTextStyles.bodySmall.copyWith(
+                                                        color: AppColors.white60,
                                                       ),
                                                     ),
                                                   ],
@@ -2000,8 +1981,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     decoration: BoxDecoration(
                                                       color: AppColors.primary,
                                                       // Aapka beige color
-                                                      borderRadius: BorderRadius
-                                                          .circular(30),
+                                                      borderRadius: AppRadii.roundAll,
                                                     ),
                                                     child: const Text(
                                                       "Book Again",
@@ -2034,16 +2014,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           ),
                           const SizedBox(height: 10),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                             child: Container(
                               height: 1,
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.white.withOpacity(0.09), // left
-                                    Colors.white.withOpacity(0.09), // center
-                                    Colors.white.withOpacity(0.09), // right
+                                    AppColors.white.withValues(alpha: 0.09), // left
+                                    AppColors.white.withValues(alpha: 0.09), // center
+                                    AppColors.white.withValues(alpha: 0.09), // right
                                   ],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
@@ -2059,12 +2039,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "Recent Project",
-                              style: TextStyle(color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: AppAssets.fontUnbounded),
+                              style: AppTextStyles.titleSmall.copyWith(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 15),
 
@@ -2090,16 +2069,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 20),*/
                   /*    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white.withValues(alpha: 0.09), // center
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -2109,27 +2088,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 10),*/
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "How It Works",
-                              style: TextStyle(color: AppColors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: AppAssets.fontUnbounded,
-                                height: 1.2,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
                             ),
                             const SizedBox(height: 15),
 
                             /// 🔥 MAIN CARD
                             Container(
-                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE8D1AB), // updated beige color
-                                borderRadius: BorderRadius.circular(25),
+                                color: AppColors.primary, // updated beige color
+                                borderRadius: BorderRadius.circular(AppRadii.massive),
                               ),
                               child: Stack(
                                 children: [
@@ -2140,7 +2114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                     bottom: 20,
                                     child: Container(
                                       width: 1,
-                                      color: Colors.black26,
+                                      color: AppColors.black26,
                                     ),
                                   ),
 
@@ -2210,16 +2184,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white.withValues(alpha: 0.09), // center
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -2249,7 +2223,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
                        /*         Expanded(
                                   child: Container(
-                                    color: Colors.green,
+                                    color: AppColors.success,
                                     child: AnimatedBuilder(
                                       animation: _controller,
                                       builder: (context, child) {
@@ -2406,10 +2380,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                     height: 240,
                                                     width: 230,
                                                     decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(22),
+                                                      borderRadius: BorderRadius.circular(AppRadii.massive),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                          color: Colors.black.withOpacity(0.4),
+                                                          color: AppColors.black.withValues(alpha: 0.4),
                                                           blurRadius: 15,
                                                           offset: const Offset(0, 10),
                                                         ),
@@ -2430,7 +2404,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                         Topname[realIndex],
                                                         textAlign: TextAlign.center,
                                                         style: const TextStyle(
-                                                          color: Colors.white,
+                                                          color: AppColors.white,
                                                           fontSize: 14,
                                                           fontWeight: FontWeight.w600,
                                                           fontFamily: AppAssets.fontOutfit,
@@ -2456,7 +2430,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                                   Text(
                                                                     instaFollowers[realIndex],
                                                                     style: const TextStyle(
-                                                                      color: Colors.white,
+                                                                      color: AppColors.white,
                                                                       fontSize: 13,
                                                                       fontWeight: FontWeight.w500,
                                                                     ),
@@ -2482,7 +2456,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                                   Text(
                                                                     youtubeFollowers[realIndex],
                                                                     style: const TextStyle(
-                                                                      color: Colors.white,
+                                                                      color: AppColors.white,
                                                                       fontSize: 13,
                                                                       fontWeight: FontWeight.w500,
                                                                     ),
@@ -2507,7 +2481,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                                                   Text(
                                                                     tiktokFollowers[realIndex],
                                                                     style: const TextStyle(
-                                                                      color: Colors.white,
+                                                                      color: AppColors.white,
                                                                       fontSize: 13,
                                                                       fontWeight: FontWeight.w500,
                                                                     ),
@@ -2536,16 +2510,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 20),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.09), // left
-                                Colors.white.withOpacity(0.09), // center
-                                Colors.white.withOpacity(0.09), // right
+                                AppColors.white.withValues(alpha: 0.09), // left
+                                AppColors.white.withValues(alpha: 0.09), // center
+                                AppColors.white.withValues(alpha: 0.09), // right
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -2563,14 +2537,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "Top Creatives Near you",
-                              style: TextStyle(color: AppColors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: AppAssets.fontUnbounded,
-                                height: 1.2,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
                             ),
                             const SizedBox(height: 10),
                             // AB YE CALL KAREIN:
@@ -2598,10 +2567,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   Widget _buildEmptyBookingCard() {
     return Container(
       height: 180,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const AppSpacing.insetsHXl,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-         border: Border.all(color: Colors.white.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(AppRadii.massive),
+         border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -2610,7 +2579,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           /// 🔥 BACKGROUND IMAGE
           Positioned.fill(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(AppRadii.massive),
               child: Image.asset(
                 AppAssets.homeCardBg, // 👈 BG IMAGE
                 fit: BoxFit.cover,
@@ -2622,13 +2591,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: AppRadii.hugeAll,
                 gradient: LinearGradient(
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    Colors.black.withOpacity(0.7),
-                    Colors.black.withOpacity(0.2),
+                    AppColors.black.withValues(alpha: 0.7),
+                    AppColors.black.withValues(alpha: 0.2),
                   ],
                 ),
               ),
@@ -2648,7 +2617,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                 Text(
                   "No Shoots Yet",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 14,
                     fontFamily: AppAssets.fontHelveticaNeue,
                     fontWeight: FontWeight.w500,
@@ -2662,7 +2631,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                   style: TextStyle(
                     fontFamily: AppAssets.fontHelveticaNeue,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppColors.white.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                 ),
@@ -2677,8 +2646,8 @@ SizedBox(height: 10,),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 9),
                     decoration: BoxDecoration(
-                      color: Color(0xFFE8D1AB),
-                      borderRadius: BorderRadius.circular(6),
+                      color: AppColors.primary,
+                      borderRadius: AppRadii.smAll,
                     ),
                     child: const Text(
                       "Book a Shoot",
@@ -2712,21 +2681,21 @@ SizedBox(height: 10,),
   }
   Widget _buildCardbook(Map<String, String> data) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
 
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: AppRadii.roundAll,
 
         /// ✅ FIGMA BORDER
         border: Border.all(
-          color: Colors.white.withOpacity(0.05), // 🔥 5% white
+          color: AppColors.white.withValues(alpha: 0.05), // 🔥 5% white
           width: 0.5, // 🔥 exact figma
         ),
 
 
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(AppRadii.massive),
         child: Stack(
           children: [
 
@@ -2754,7 +2723,7 @@ SizedBox(height: 10,),
 
             /// TEXT
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16), // 🔥 increased
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.base), // 🔥 increased
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -2782,10 +2751,10 @@ SizedBox(height: 10,),
                       }
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), // 🔥 better button size
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.mld, vertical: AppSpacing.smd), // 🔥 better button size
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE8D1AB),
-                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.primary,
+                        borderRadius: AppRadii.mdAll,
                       ),
                       child: Text(
                         data["button"]!,
@@ -2811,19 +2780,19 @@ SizedBox(height: 10,),
 
     return Container(
       height: 360, // 🔥 fix height (important)
-      margin: const EdgeInsets.symmetric(horizontal: 36),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.huge),
+      padding: const EdgeInsets.all(AppSpacing.base),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withOpacity(0.08)),
+        color: AppColors.background,
+        borderRadius: AppRadii.roundAll,
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// 🔹 IMAGE
           ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadii.hugeAll,
             child: booking.imageUrl != null && booking.imageUrl!.isNotEmpty
                 ? Image.network(
               ApiEndpoints.imageUrl + booking.imageUrl!,
@@ -2834,7 +2803,7 @@ SizedBox(height: 10,),
                 : Container(
               height: 160,
               width: double.infinity,
-              color: const Color(0xFF2A2A2A),
+              color: AppColors.surfaceVariant,
             ),
           ),
 
@@ -2868,9 +2837,9 @@ SizedBox(height: 10,),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(0.05),
-                        Colors.white24,
-                        Colors.white.withOpacity(0.05),
+                        AppColors.white.withValues(alpha: 0.05),
+                        AppColors.white24,
+                        AppColors.white.withValues(alpha: 0.05),
                       ],
                     ),
                   ),
@@ -2889,7 +2858,7 @@ SizedBox(height: 10,),
                     Text(
                       formatDate(booking.eventDate),
 
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: AppColors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -2908,7 +2877,7 @@ SizedBox(height: 10,),
                     Text(
                       "${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}",
 
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: AppColors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -2919,9 +2888,9 @@ SizedBox(height: 10,),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(0.05),
-                        Colors.white24,
-                        Colors.white.withOpacity(0.05),
+                        AppColors.white.withValues(alpha: 0.05),
+                        AppColors.white24,
+                        AppColors.white.withValues(alpha: 0.05),
                       ],
                     ),
                   ),
@@ -2946,9 +2915,9 @@ SizedBox(height: 10,),
                       return Container(
                         height: 45,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(AppRadii.massive),
                           border: Border.all(color: statusColor),
-                          color: statusColor.withOpacity(0.15),
+                          color: statusColor.withValues(alpha: 0.15),
                         ),
                         child: Center(
                           child: Text(
@@ -2970,7 +2939,7 @@ SizedBox(height: 10,),
           /*      SvgPicture.asset(
                   AppAssets.homeViewProfile,
                   height: 36,
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),*/
               ],
             ),
@@ -2981,16 +2950,16 @@ SizedBox(height: 10,),
 
   Widget _buildSmallCircleBtn(String svgPath) {
     return Container(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: AppColors.white.withValues(alpha: 0.08),
         shape: BoxShape.circle,
       ),
       child: SvgPicture.asset(
         svgPath,
         height: 18,
         width: 18,
-        color: Colors.white, // optional (remove if original color chahiye)
+        color: AppColors.white, // optional (remove if original color chahiye)
       ),
     );
   }
@@ -3022,7 +2991,7 @@ SizedBox(height: 10,),
         }
       },
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
@@ -3030,9 +2999,9 @@ SizedBox(height: 10,),
               scale: isSelected ? 1.05 : 1.0,
               child: Container(
                 width: 90,
-                padding: const EdgeInsets.all(1.5),
+                padding: const EdgeInsets.all(AppSpacing.hairline),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadii.xxl),
 
                   /// ✅ ONE TIME ROTATION FIXED
                   gradient: isSelected
@@ -3041,11 +3010,11 @@ SizedBox(height: 10,),
                       _controller.value * 2 * 3.1416, // 🔥 FIXED
                     ),
                     colors: [
-                      Colors.transparent,
-                      const Color(0xFFE8D1AB).withOpacity(0.4),
-                      const Color(0xFFE8D1AB),
-                      const Color(0xFFE8D1AB).withOpacity(0.4),
-                      Colors.transparent,
+                      AppColors.transparent,
+                      AppColors.primary.withValues(alpha: 0.4),
+                      AppColors.primary,
+                      AppColors.primary.withValues(alpha: 0.4),
+                      AppColors.transparent,
                     ],
                   )
                       : null,
@@ -3053,15 +3022,15 @@ SizedBox(height: 10,),
                   border: isSelected
                       ? null
                       : Border.all(
-                    color: Colors.white.withOpacity(0.1),
+                    color: AppColors.white.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 12, horizontal: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1F1F1F),
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(AppRadii.xxl),
                   ),
 
                   child: Column(
@@ -3081,8 +3050,8 @@ SizedBox(height: 10,),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: isSelected
-                              ? const Color(0xFFE8D1AB)
-                              : Colors.white.withOpacity(0.6),
+                              ? AppColors.primary
+                              : AppColors.white.withValues(alpha: 0.6),
                           fontSize: 10,
                           fontFamily: AppAssets.fontOutfit,
                           fontWeight: isSelected
@@ -3109,13 +3078,13 @@ SizedBox(height: 10,),
       alignment: Alignment.topCenter,
       child: Container(
         // color: AppColors.warning,
-        // margin: const EdgeInsets.symmetric(horizontal: 10),
+        // margin: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
 
         child: Stack(
           children: [
             // Background Image
             ClipRRect(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: AppRadii.roundAll,
               child: Image.asset(data['image']!, fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity),
@@ -3131,7 +3100,7 @@ SizedBox(height: 10,),
     required String name,
   }) {
     return Container(
-      // margin: const EdgeInsets.symmetric(horizontal: 30),
+      // margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -3142,17 +3111,17 @@ SizedBox(height: 10,),
             height: 212,
             width: 190,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(26),
+              borderRadius: BorderRadius.circular(AppRadii.massive),
               /* boxShadow: [
                 BoxShadow(
-                  // color: Colors.black.withOpacity(0.45),
+                  // color: AppColors.black.withOpacity(0.45),
                   blurRadius: 12,
                   // offset: const Offset(0, 10),
                 ),
               ],*/
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(19),
+              borderRadius: AppRadii.hugeAll,
               child: Image.asset(
                 image,
                 fit: BoxFit.cover,
@@ -3189,8 +3158,7 @@ SizedBox(height: 10,),
             Text(
               "No Creatives Found",
                 style:
-                TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
-                )
+                AppTextStyles.titleSmall.copyWith(color: AppColors.primary)
             ),
           ],
         ),
@@ -3329,7 +3297,7 @@ SizedBox(height: 10,),
       width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.white36, width: 0.5),
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: AppRadii.pillSmAll,
         image: (imageUrl.isNotEmpty)
             ? DecorationImage(
           image: NetworkImage(ApiEndpoints.imageUrl + imageUrl),
@@ -3338,7 +3306,7 @@ SizedBox(height: 10,),
             : null,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: AppRadii.pillSmAll,
         child: Stack(
           children: [
 
@@ -3361,8 +3329,8 @@ SizedBox(height: 10,),
                     end: Alignment.bottomCenter,
                     stops: const [0.3, 0.9],
                     colors: [
-                      Colors.black.withOpacity(isBackground ? 0.4 : 0.1),
-                      Colors.black.withOpacity(isBackground ? 0.9 : 0.85),
+                      AppColors.black.withValues(alpha: isBackground ? 0.4 : 0.1),
+                      AppColors.black.withValues(alpha: isBackground ? 0.9 : 0.85),
                     ],
                   ),
                 ),
@@ -3372,7 +3340,7 @@ SizedBox(height: 10,),
             /// ❌ IMPORTANT: Background me text hide
             if (!isBackground)
               Padding(
-                padding: const EdgeInsets.all(25.0),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -3408,7 +3376,7 @@ SizedBox(height: 10,),
                             horizontal: 26, vertical: 8),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: AppRadii.pillAll,
                         ),
                         child: const Text(
                           "View Profile",
@@ -3432,7 +3400,7 @@ SizedBox(height: 10,),
 
 Widget _buildItem(String imagePath, String title, String subtitle) {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.base),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -3496,7 +3464,7 @@ Widget _sideDot() {
     height: 20,
     decoration: BoxDecoration(
       color: AppColors.background,
-      borderRadius: BorderRadius.circular(50),
+      borderRadius: AppRadii.pillAll,
     ),
   );
 }
@@ -3528,7 +3496,7 @@ class BeveledTrayPainter extends CustomPainter {
     // 1. Background Base Color (Dark Gradient)
     final paint = Paint()
       ..shader = const LinearGradient(
-        colors: [Color(0xFF1A1A1A), Color(0xFF121212)],
+        colors: [AppColors.background, AppColors.surfaceGradientDark],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, w, h));
@@ -3538,7 +3506,7 @@ class BeveledTrayPainter extends CustomPainter {
     // Left Wall Shadow
     final leftWallPaint = Paint()
       ..shader = LinearGradient(
-        colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+        colors: [AppColors.black.withValues(alpha: 0.6), AppColors.transparent],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ).createShader(Rect.fromLTWH(shoulderWidth, 0, slopeWidth, h));
@@ -3554,7 +3522,7 @@ class BeveledTrayPainter extends CustomPainter {
     // Right Wall Shadow
     final rightWallPaint = Paint()
       ..shader = LinearGradient(
-        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+        colors: [AppColors.transparent, AppColors.black.withValues(alpha: 0.6)],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ).createShader(Rect.fromLTWH(w - shoulderWidth - slopeWidth, 0, slopeWidth, h));
@@ -3570,7 +3538,7 @@ class BeveledTrayPainter extends CustomPainter {
     // 3. Inner Top Shadow (Sunken area ko gehra dikhane ke liye)
     final topInnerShadow = Paint()
       ..shader = LinearGradient(
-        colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+        colors: [AppColors.black.withValues(alpha: 0.4), AppColors.transparent],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, bevelHeight, w, 20));
@@ -3587,12 +3555,12 @@ class BeveledTrayPainter extends CustomPainter {
       ..strokeWidth = 0.8;
 
     // Top horizontal edges
-    highlightPaint.color = Colors.white.withOpacity(0.12);
+    highlightPaint.color = AppColors.white.withValues(alpha: 0.12);
     canvas.drawLine(Offset(0, 0), Offset(shoulderWidth, 0), highlightPaint);
     canvas.drawLine(Offset(w - shoulderWidth, 0), Offset(w, 0), highlightPaint);
 
     // Bottom "sunken" edge highlight
-    highlightPaint.color = Colors.white.withOpacity(0.05);
+    highlightPaint.color = AppColors.white.withValues(alpha: 0.05);
     canvas.drawLine(
         Offset(shoulderWidth + slopeWidth, bevelHeight),
         Offset(w - (shoulderWidth + slopeWidth), bevelHeight),
@@ -3610,7 +3578,7 @@ class BorderAnimationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Color mainColor = const Color(0xFFE8D1AB); // Beige theme color
+    final Color mainColor = AppColors.primary; // Beige theme color
     final double radiusValue = 45.0;
 
     // 1. DYNAMIC PATH (U-Shape: Side and Bottom)
@@ -3635,7 +3603,7 @@ class BorderAnimationPainter extends CustomPainter {
     canvas.drawPath(
       bottomPath,
       Paint()
-        ..color = mainColor.withOpacity(0.3)
+        ..color = mainColor.withValues(alpha: 0.3)
         ..strokeWidth = 1.0 // Patli fixed line
         ..style = PaintingStyle.stroke,
     );

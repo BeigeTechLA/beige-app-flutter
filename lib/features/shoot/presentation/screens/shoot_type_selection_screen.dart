@@ -8,6 +8,9 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/custom_input_field.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/assets.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
@@ -100,20 +103,20 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
+              onPrimary: AppColors.white,
+              surface: AppColors.background,
+              onSurface: AppColors.white,
             ),
             timePickerTheme: const TimePickerThemeData(
-              backgroundColor: Color(0xFF121212),
-              dialBackgroundColor: Color(0xFF121212),
-              dialHandColor: Colors.white,
-              dialTextColor: Colors.grey,
+              backgroundColor: AppColors.surfaceGradientDark,
+              dialBackgroundColor: AppColors.surfaceGradientDark,
+              dialHandColor: AppColors.white,
+              dialTextColor: AppColors.neutralGrey,
               hourMinuteColor: AppColors.primary,
-              hourMinuteTextColor: Colors.black,
+              hourMinuteTextColor: AppColors.black,
               dayPeriodColor: AppColors.primary,
-              dayPeriodTextColor: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
+              dayPeriodTextColor: AppColors.white,
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceGradientDark),
           ),
           child: child!,
         );
@@ -513,16 +516,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
-              onPrimary: Colors.black,
-              surface: Color(0xFF121212),
-              onSurface: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF121212)),
+              onPrimary: AppColors.black,
+              surface: AppColors.surfaceGradientDark,
+              onSurface: AppColors.white,
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceGradientDark),
           ),
           child: Dialog(
             insetPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+            const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xxl),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.lgAll,
             ),
             child: StatefulBuilder(
               builder: (context, setStateDialog) {
@@ -533,15 +536,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     /// HEADER
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      color: const Color(0xFF0E0E0E),
-                      child: const Text(
+                      padding: const EdgeInsets.all(AppSpacing.base),
+                      color: AppColors.surfaceDark,
+                      child: Text(
                         "Select Date",
-                        style: TextStyle(
-                          fontFamily: AppAssets.fontUnbounded,
+                        style: AppTextStyles.titleMedium.copyWith(
                           fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
@@ -554,7 +555,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           calendarType: CalendarDatePicker2Type.multi,
                           selectedDayHighlightColor: AppColors.primary,
                           selectedDayTextStyle: const TextStyle(
-                            color: Colors.black,
+                            color: AppColors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -640,17 +641,17 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
         leading: InkWell(
           onTap: () => context.pop(),
           child: Padding(
-            padding: const EdgeInsets.all(7),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: SvgPicture.asset(
               AppAssets.back,
               colorFilter: const ColorFilter.mode(
-                Colors.white,
+                AppColors.white,
                 BlendMode.srcIn,
               ),
             ),
           ),
         ),
-        actions: const [ Padding( padding: EdgeInsets.only(right: 16), child: Center( child: Text("1/2", style: TextStyle(color: Colors.white)), ), ) ],
+        actions: const [ Padding( padding: EdgeInsets.only(right: AppSpacing.base), child: Center( child: Text("1/2", style: TextStyle(color: AppColors.white)), ), ) ],
       ),
 
       body: SafeArea(
@@ -658,7 +659,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
         child: Stack(
           children: [
             Padding(
-              padding:  EdgeInsets.all(15),
+              padding:  EdgeInsets.all(AppSpacing.base),
               child: Column(
                 children: [
 
@@ -667,13 +668,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                       2,
                           (index) => Expanded(
                         child: Container(
-                          margin:  EdgeInsets.only(right: 6),
+                          margin:  EdgeInsets.only(right: AppSpacing.xs),
                           height: 5,
                           decoration: BoxDecoration(
                             color: index < 1
                                 ? AppColors.primary
                                 : AppColors.textSubtle,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(AppRadii.mld),
                           ),
                         ),
                       ),
@@ -689,11 +690,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                         textAlign: TextAlign.start,
                         "Select Booking Type",
-                        style: TextStyle(
-                          fontFamily: AppAssets.fontUnbounded,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.titleSmall,
                       ),
                     ],
                   ),
@@ -734,35 +731,32 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                   },*/
                                   onTap: null,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
                                     decoration: BoxDecoration(
                                       /// 🔥 COLOR FIX
                                       color: isSingleLocked
-                                          ? Colors.grey.withOpacity(0.3)
+                                          ? AppColors.neutralGrey.withValues(alpha: 0.3)
                                           : (selectedIndex == 1
-                                          ? const Color(0xFFE6D5B8)
-                                          : Colors.transparent),
+                                          ? AppColors.primary
+                                          : AppColors.transparent),
 
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: AppRadii.lgAll,
 
                                       border: selectedIndex == 1
                                           ? null
-                                          : Border.all(color: Colors.white.withOpacity(0.3)),
+                                          : Border.all(color: AppColors.white.withValues(alpha: 0.3)),
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Single Day",
-                                          style: TextStyle(
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
+                                          style: AppTextStyles.labelLarge.copyWith(
                                             color: isSingleLocked
-                                                ? Colors.grey
+                                                ? AppColors.neutralGrey
                                                 : (selectedIndex == 1
-                                                ? Colors.black
-                                                : Colors.grey),
+                                                ? AppColors.black
+                                                : AppColors.neutralGrey),
                                           ),
                                         ),
 
@@ -775,16 +769,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                             shape: BoxShape.circle,
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color(0xFF000000),
-                                                Color(0xFF363131),
+                                                AppColors.black,
+                                                AppColors.surfaceWarmLight,
                                               ],
                                             ),
-                                            border: Border.all(color: Colors.grey),
+                                            border: Border.all(color: AppColors.neutralGrey),
                                           ),
                                           child: const Center(
                                             child: CircleAvatar(
                                               radius: 3,
-                                              backgroundColor: Color(0xFFE6D5B8),
+                                              backgroundColor: AppColors.primary,
                                             ),
                                           ),
                                         )
@@ -794,7 +788,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: Colors.white.withOpacity(0.3),
+                                              color: AppColors.white.withValues(alpha: 0.3),
                                             ),
                                           ),
                                         ),
@@ -832,35 +826,32 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 19),
+                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
                                     decoration: BoxDecoration(
                                       /// 🔥 COLOR FIX
                                       color: isMultiLocked
-                                          ? Colors.grey.withOpacity(0.3)
+                                          ? AppColors.neutralGrey.withValues(alpha: 0.3)
                                           : (selectedIndex == 2
-                                          ? const Color(0xFFE6D5B8)
-                                          : Colors.transparent),
+                                          ? AppColors.primary
+                                          : AppColors.transparent),
 
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: AppRadii.lgAll,
 
                                       border: selectedIndex == 2
                                           ? null
-                                          : Border.all(color: Colors.white.withOpacity(0.3)),
+                                          : Border.all(color: AppColors.white.withValues(alpha: 0.3)),
                                     ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Multiple Days",
-                                          style: TextStyle(
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
+                                          style: AppTextStyles.labelLarge.copyWith(
                                             color: isMultiLocked
-                                                ? Colors.grey
+                                                ? AppColors.neutralGrey
                                                 : (selectedIndex == 2
-                                                ? Colors.black
-                                                : Colors.grey),
+                                                ? AppColors.black
+                                                : AppColors.neutralGrey),
                                           ),
                                         ),
 
@@ -873,16 +864,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                             shape: BoxShape.circle,
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color(0xFF000000),
-                                                Color(0xFF363131),
+                                                AppColors.black,
+                                                AppColors.surfaceWarmLight,
                                               ],
                                             ),
-                                            border: Border.all(color: Colors.grey),
+                                            border: Border.all(color: AppColors.neutralGrey),
                                           ),
                                           child: const Center(
                                             child: CircleAvatar(
                                               radius: 3,
-                                              backgroundColor: Color(0xFFE6D5B8),
+                                              backgroundColor: AppColors.primary,
                                             ),
                                           ),
                                         )
@@ -892,7 +883,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: Colors.white.withOpacity(0.3),
+                                              color: AppColors.white.withValues(alpha: 0.3),
                                             ),
                                           ),
                                         ),
@@ -943,29 +934,29 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(AppSpacing.md),
                                       decoration: BoxDecoration(
-                                        color: Color(0xff322F2A),
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: AppColors.surfaceWarm,
+                                        borderRadius: AppRadii.lgAll,
                                       ),
                                       child: Text(
                                         "Total Days: ${selectedDates.length}",
-                                        style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500),
+                                        style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Container(
-                                        padding: const EdgeInsets.all(12),
+                                        padding: const EdgeInsets.all(AppSpacing.md),
                                         decoration: BoxDecoration(
-                                          color: Color(0xff322F2A),
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: AppColors.surfaceWarm,
+                                          borderRadius: AppRadii.lgAll,
                                         ),
                                         child: selectedDates.isEmpty
                                             ? const Text(
                                           "No dates selected",
                                           style: TextStyle(
-                                            color: Color(0xFFE8D1AB),
+                                            color: AppColors.primary,
                                             fontSize: 12,
                                           ),
                                         )
@@ -973,7 +964,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                           scrollDirection: Axis.horizontal, // 👈 scroll enable
                                           child: Text(
                                               formatSelectedDates(selectedDates),
-                                              style: const TextStyle(color: Color(0xffE8D1AB), fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500)
+                                              style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500)
                                           ),
                                         ),
                                       ),
@@ -982,10 +973,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 ),
 
                                 SizedBox(height: 12,),
-                                Text('Are Timings Same For All\nSelected Dates?',style: TextStyle(
-                                  color: Colors.white,
+                                Text('Are Timings Same For All\nSelected Dates?',style: AppTextStyles.labelLarge.copyWith(
+                                  color: AppColors.white,
                                   fontFamily:AppAssets.fontUnbounded,
-                                  fontSize: 14,
                                 ),),
 
                                 const SizedBox(height: 12),
@@ -1029,14 +1019,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       final isOpen = expandedMap[date] ?? false;
 
                                       return Container(
-                                        margin: const EdgeInsets.only(bottom: 12),
+                                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
                                         decoration: BoxDecoration(
 
                                           border: isOpen?
-                                          Border.all(color: Colors.white.withOpacity(0.2)):
+                                          Border.all(color: AppColors.white.withValues(alpha: 0.2)):
 
-                                          Border.all(color:  Colors.transparent),
-                                          borderRadius: BorderRadius.circular(12),
+                                          Border.all(color:  AppColors.transparent),
+                                          borderRadius: AppRadii.lgAll,
                                         ),
                                         child: Column(
                                           children: [
@@ -1049,23 +1039,23 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.base),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xff282828),
-                                                  borderRadius: BorderRadius.circular(12),
+                                                  color: AppColors.surfaceVariant,
+                                                  borderRadius: AppRadii.lgAll,
                                                 ),
                                                 child: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Text(
                                                       DateFormat('MMMM dd, yyyy').format(date),
-                                                      style: const TextStyle(color: Colors.white),
+                                                      style: const TextStyle(color: AppColors.white),
                                                     ),
                                                     Icon(
                                                       isOpen
                                                           ? Icons.keyboard_arrow_up
                                                           : Icons.keyboard_arrow_down,
-                                                      color: Colors.white,
+                                                      color: AppColors.white,
                                                     )
                                                   ],
                                                 ),
@@ -1075,7 +1065,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                             /// 🔥 BODY
                                             if (isOpen) ...[
                                               Padding(
-                                                padding: const EdgeInsets.all(16),
+                                                padding: const EdgeInsets.all(AppSpacing.base),
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -1094,7 +1084,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       },*/
                                                       onTap: null,
                                                       suffixIcon: Padding(
-                                                        padding: const EdgeInsets.all(12),
+                                                        padding: const EdgeInsets.all(AppSpacing.md),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
                                                           color: AppColors.white,
@@ -1113,7 +1103,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       },*/
                                                       onTap: null,
                                                       suffixIcon: Padding(
-                                                        padding: const EdgeInsets.all(12),
+                                                        padding: const EdgeInsets.all(AppSpacing.md),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
                                                           color: AppColors.white,
@@ -1128,13 +1118,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                       padding: const EdgeInsets.symmetric(
                                                           horizontal: 14, vertical: 8),
                                                       decoration: BoxDecoration(
-                                                        color: const Color(0xffE8D1AB),
-                                                        borderRadius: BorderRadius.circular(8),
+                                                        color: AppColors.primary,
+                                                        borderRadius: AppRadii.mdAll,
                                                       ),
                                                       child: Text(
                                                         getDurationText(date),
                                                         style: const TextStyle(
-                                                          color: Colors.black,
+                                                          color: AppColors.black,
                                                           fontSize: 12,
                                                         ),
                                                       ),
@@ -1172,7 +1162,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     },*/
                                     onTap: null,
                                     suffixIcon: Padding(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(AppSpacing.md),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
                                         color: AppColors.white,
@@ -1201,7 +1191,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     },*/
                                     onTap: null,
                                     suffixIcon: Padding(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: const EdgeInsets.all(AppSpacing.md),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
                                         color: AppColors.white,
@@ -1219,11 +1209,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       SizedBox(width: 6),
                                       Text(
                                         'Applied to ${selectedDates.length} selected dates',
-                                        style: TextStyle(
-                                          color: const Color(0xFFA9A9A9),
-                                          fontSize: 14,
-                                          fontFamily: AppAssets.fontOutfit,
-                                          fontWeight: FontWeight.w400,
+                                        style: AppTextStyles.bodyMedium.copyWith(
+                                          color: AppColors.textSecondary,
                                           height: 1.36,
                                         ),
                                       ),
@@ -1262,7 +1249,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               readOnly: true,
                               onTap: null,
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.calendar,
                                   width: 20,
@@ -1305,7 +1292,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               },*/
                               onTap: null,
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.clock,
                                   width: 20,
@@ -1333,7 +1320,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               },*/
                               onTap: null,
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(AppSpacing.md),
                                 child: SvgPicture.asset(
                                   AppAssets.clock,
                                   width: 20,
@@ -1362,11 +1349,11 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             /*  if (isSubmitting)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.15), // optional dim
+                  color: AppColors.black.withValues(alpha: 0.15), // optional dim
                   child: const Center(
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -1377,18 +1364,18 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
       ),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(5, 10, 16, 15),
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.smd, AppSpacing.base, AppSpacing.base),
         child: Row(
           children: [
             /*   Expanded(
               child:  OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.grey),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  foregroundColor: AppColors.white,
+                  side: const BorderSide(color: AppColors.neutralGrey),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadii.lgAll,
                   ),
                 ),
                 child:  Text("Back",style: TextStyle(fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,fontSize: 14),),
@@ -1415,21 +1402,19 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                       ? AppColors.primary   // ✅ active
                       : AppColors.surfaceVariant,       // ❌ disabled
                   foregroundColor: isFormValid
-                      ? Colors.black
-                      : Colors.grey.shade500,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                      ? AppColors.black
+                      : AppColors.neutralGrey,
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppRadii.lgAll,
                   ),
                   elevation: isFormValid ? 2 : 0,
                 ),
 
                 child: const Text(
                   "Next",
-                  style: TextStyle(
+                  style: AppTextStyles.labelLarge.copyWith(
                     fontFamily: AppAssets.fontUnbounded,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -1477,22 +1462,22 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xff282828),
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.surfaceVariant,
+        borderRadius: AppRadii.lgAll,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// 🔥 Header
           Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
+            padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.md, top: AppSpacing.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   getHeaderMonth(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                     fontFamily: AppAssets.fontOutfit,
@@ -1548,14 +1533,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                   },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 9),
+                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 19, vertical: 4),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFFE8D1AB)
-                          : Colors.black.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(38),
+                          ? AppColors.primary
+                          : AppColors.black.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(AppRadii.roundLg),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1567,8 +1552,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
                             color: isSelected
-                                ? const Color(0xff222222)
-                                : const Color(0xff939393),
+                                ? AppColors.background
+                                : AppColors.textMuted,
                           ),
                         ),
                         Text(
@@ -1578,8 +1563,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             fontFamily: AppAssets.fontOutfit,
                             fontWeight: FontWeight.w700,
                             color: isSelected
-                                ? const Color(0xff1D1D1B)
-                                : Colors.white.withOpacity(0.6),
+                                ? AppColors.background
+                                : AppColors.white.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -1598,10 +1583,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
   Widget VideoEdits(String title, List<dynamic> data) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 17),
+      margin: EdgeInsets.symmetric(vertical: AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
-        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.3), width: 0.5),
+        borderRadius: AppRadii.xlAll,
       ),
       child: Column(
         children: [
@@ -1613,17 +1598,17 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               });
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
               decoration: BoxDecoration(
-                color: Color(0xff282828),
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.surfaceVariant,
+                borderRadius: AppRadii.xlAll,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(title,
                       style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w600)),
 
@@ -1631,7 +1616,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     turns: isVideoOpen ? 0.5 : 0,
                     duration: Duration(milliseconds: 300),
                     child: Icon(Icons.keyboard_arrow_down,
-                        color: Colors.white),
+                        color: AppColors.white),
                   ),
                 ],
               ),
@@ -1661,7 +1646,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     children: [
                       Expanded(
                         child: Text(name,
-                            style: TextStyle(color: Colors.white)),
+                            style: TextStyle(color: AppColors.white)),
                       ),
 
                       /// COUNTER
@@ -1669,8 +1654,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                         width: 75,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: Color(0xffE8D1AB),
-                          borderRadius: BorderRadius.circular(6),
+                          color: AppColors.primary,
+                          borderRadius: AppRadii.smAll,
                         ),
                         child: Row(
                           mainAxisAlignment:
@@ -1690,7 +1675,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               },
                               child: Padding(
                                 padding:
-                                EdgeInsets.symmetric(horizontal: 8),
+                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                                 child: Icon(Icons.remove, size: 10,color: AppColors.black,),
                               ),
                             ),
@@ -1715,7 +1700,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               },
                               child: Padding(
                                 padding:
-                                EdgeInsets.symmetric(horizontal: 8),
+                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                                 child: Icon(Icons.add, size: 10,color: AppColors.black,),
                               ),
                             ),
@@ -1736,10 +1721,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   }
   Widget PhotoEdits(String title, List<dynamic> data) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 17),
+      margin: EdgeInsets.symmetric(vertical: AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 0.5),
-        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.3), width: 0.5),
+        borderRadius: AppRadii.xlAll,
       ),
       child: Column(
         children: [
@@ -1751,25 +1736,22 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               });
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
               decoration: BoxDecoration(
-                color: Color(0xff282828),
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.surfaceVariant,
+                borderRadius: AppRadii.lgAll,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(title,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600)),
+                      style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white)),
 
                   Icon(
                     isPhotoOpen
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: Colors.white,
+                    color: AppColors.white,
                   )
                 ],
               ),
@@ -1788,20 +1770,20 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
               return Padding(
                 padding:
-                EdgeInsets.symmetric(horizontal: 15, vertical: 11),
+                EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(name,
-                          style: TextStyle(color: Colors.white)),
+                          style: TextStyle(color: AppColors.white)),
                     ),
 
                     Container(
                       width: 80,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: Color(0xFFE8D1AB),
-                        borderRadius: BorderRadius.circular(6),
+                        color: AppColors.primary,
+                        borderRadius: AppRadii.smAll,
                       ),
                       child: Row(
                         mainAxisAlignment:
@@ -1817,7 +1799,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             },
                             child: Padding(
                               padding:
-                              EdgeInsets.symmetric(horizontal: 8),
+                              EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                               child: Icon(Icons.remove, size: 10,color: AppColors.black,),
                             ),
                           ),
@@ -1836,7 +1818,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             },
                             child: Padding(
                                 padding:
-                                EdgeInsets.symmetric(horizontal: 8),
+                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                                 child: Icon(Icons.add, size: 10,color: AppColors.black,)
                             ),
                           ),
@@ -1873,14 +1855,12 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             labelText: label,
             floatingLabelBehavior: FloatingLabelBehavior.always,
 
-            labelStyle: TextStyle(
+            labelStyle: AppTextStyles.labelMedium.copyWith(
               color: AppColors.white70,
-              fontSize: 12,
-              fontFamily: AppAssets.fontOutfit,
             ),
 
             suffixIcon:  Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: SvgPicture.asset(
                 AppAssets.clock,
                 width: 20,
@@ -1893,16 +1873,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             ),
 
             contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
 
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.lgAll,
               borderSide:
               const BorderSide(color: AppColors.white70, width: 0.5),
             ),
 
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppRadii.lgAll,
               borderSide:
               const BorderSide(color: AppColors.white70, width: 0.5),
             ),
@@ -1921,7 +1901,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   }) {
     return InkWell(
       onTap: null,
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: AppRadii.roundAll,
       child: Row(
         children: [
           Container(
@@ -1934,8 +1914,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFFE8D1AB), // light gold
-                  Color(0xFFD4A14D), // dark gold
+                  AppColors.primary, // light gold
+                  AppColors.primaryDark, // dark gold
                 ],
               )
                   : null,
@@ -1951,7 +1931,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 width: 8,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black,
+                  color: AppColors.black,
                 ),
               ),
             )
@@ -1960,11 +1940,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
           const SizedBox(width: 8),
           Text(
             title,
-            style: const TextStyle(
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.white,
-              fontSize: 14,
-              fontFamily: AppAssets.fontOutfit,
-              fontWeight: FontWeight.w400,
             ),
           ),
         ],

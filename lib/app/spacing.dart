@@ -13,6 +13,9 @@ class AppSpacing {
   // BASE SPACING SCALE (4px grid)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+  /// 1.5px — Hair-thin borders/separators
+  static const double hairline = 1.5;
+
   /// 2px — Micro spacing (icon-label align)
   static const double xxxs = 2;
 

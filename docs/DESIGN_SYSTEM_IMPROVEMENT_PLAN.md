@@ -663,15 +663,15 @@ Update status: `Not started` → `In progress` → `Done`
 | T2.4 | Create AppAvatar + AppEmptyState + AppErrorState | 3 | Done |
 | T2.5 | Create ScaleClampedText | 1 | Done |
 | **Phase 3 — Tier 1 (home, date_time, type_selection)** | | | |
-| T3.1 | home_screen: Colors + Color(0xFF) | 1 | Not started |
-| T3.2 | home_screen: TextStyle + fontSize | 1 | Not started |
-| T3.3 | home_screen: EdgeInsets + BorderRadius + withOpacity | 1 | Not started |
-| T3.4 | shoot_date_time_screen: Colors + Color(0xFF) + print() fix | 1 | Not started |
-| T3.5 | shoot_date_time_screen: TextStyle + fontSize | 1 | Not started |
-| T3.6 | shoot_date_time_screen: EdgeInsets + BorderRadius + withOpacity | 1 | Not started |
-| T3.7 | shoot_type_selection_screen: Colors + Color(0xFF) + withOpacity | 1 | Not started |
-| T3.8 | shoot_type_selection_screen: TextStyle + fontSize | 1 | Not started |
-| T3.9 | shoot_type_selection_screen: EdgeInsets + BorderRadius | 1 | Not started |
+| T3.1 | home_screen: Colors + Color(0xFF) | 1 | Done |
+| T3.2 | home_screen: TextStyle + fontSize | 1 | Done |
+| T3.3 | home_screen: EdgeInsets + BorderRadius + withOpacity | 1 | Done |
+| T3.4 | shoot_date_time_screen: Colors + Color(0xFF) + print() fix | 1 | Done |
+| T3.5 | shoot_date_time_screen: TextStyle + fontSize | 1 | Done |
+| T3.6 | shoot_date_time_screen: EdgeInsets + BorderRadius + withOpacity | 1 | Done |
+| T3.7 | shoot_type_selection_screen: Colors + Color(0xFF) + withOpacity | 1 | Done |
+| T3.8 | shoot_type_selection_screen: TextStyle + fontSize | 1 | Done |
+| T3.9 | shoot_type_selection_screen: EdgeInsets + BorderRadius | 1 | Done |
 | **Phase 4 — Tier 2 (crew, review, signup, details)** | | | |
 | T4.1 | crew_selection_screen: Colors + withOpacity | 1 | Not started |
 | T4.2 | crew_selection_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Not started |
