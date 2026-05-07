@@ -8,6 +8,9 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/assets.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/features/shoot/presentation/providers/shoot_edit_review_notifier.dart';
 
 class ShootEditReviewScreen extends ConsumerStatefulWidget {
@@ -24,7 +27,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
   int selectedPayment = 0;
   int selectedIndex = 0;
 
-  final TextEditingController NotesController = TextEditingController();
+  final TextEditingController notesController = TextEditingController();
 
   String formatDate(String? date) {
     if (date == null || date.isEmpty) return "";
@@ -106,24 +109,24 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
         leading: InkWell(
           onTap: () => context.pop(),
           child: Padding(
-            padding: const EdgeInsets.all(7),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: SvgPicture.asset(
               AppAssets.back,
               colorFilter: const ColorFilter.mode(
-                Colors.white,
+                AppColors.white,
                 BlendMode.srcIn,
               ),
             ),
           ),
         ),
-        actions: const [ Padding( padding: EdgeInsets.only(right: 16), child: Center( child: Text("2/2", style: TextStyle(color: Colors.white)), ), ) ],
+        actions: [ Padding( padding: const EdgeInsets.only(right: AppSpacing.base), child: Center( child: Text("2/2", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white)), ), ) ],
       ),
 
 
       body: Stack(
         children: [
           Padding(
-            padding:  EdgeInsets.all(16),
+            padding:  const EdgeInsets.all(AppSpacing.base),
             child: Column(
               children: [
           
@@ -133,35 +136,30 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                     2,
                         (index) => Expanded(
                       child: Container(
-                        margin: const EdgeInsets.only(right: 6),
+                        margin: const EdgeInsets.only(right: AppSpacing.xs),
                         height: 5,
                         decoration: BoxDecoration(
                           color: index < 2
                               ? AppColors.primary
                               : AppColors.textSecondary,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppRadii.mld),
                         ),
                       ),
                     ),
                   ),
                 ),
           
-                SizedBox(height: 24),
+                SizedBox(height: AppSpacing.xxl),
                 Row(
                   children: [
                     Text(
                       "Review & Cdonfirm",
-                      style: TextStyle(
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.white,
-                      ),
+                      style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
-          
+                SizedBox(height: AppSpacing.xxl),
+
                 /// 📸 CREATOR CARD
                 Expanded(
                   child: SingleChildScrollView(
@@ -169,10 +167,10 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(AppSpacing.base),
                           decoration: BoxDecoration(
                             color: AppColors.surfaceVariant,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(AppRadii.xxxl),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +180,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                               Row(
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: AppRadii.xlAll,
                                     child: _getShootTypeImage(booking).isNotEmpty
                                         ? Image.network(
                                       _getShootTypeImage(booking),
@@ -206,43 +204,29 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                     ),
                                   ),
 
-                                  const SizedBox(width: 14),
+                                  const SizedBox(width: AppSpacing.mld),
 
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children:  [
 
-                                        SizedBox(height: 6),
+                                        SizedBox(height: AppSpacing.xs),
                                         Text(
                                           booking?['project_name'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
-                                            fontFamily: AppAssets.fontOutfit,
-                                          ),
+                                          style: AppTextStyles.labelLarge.copyWith(color: AppColors.white, fontWeight: FontWeight.w700),
                                         ),
-                                        SizedBox(height: 2),
+                                        SizedBox(height: AppSpacing.xxxs),
                                         Text(
                                           booking?['shoot_type_name'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 12, color: AppColors.white70,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
                                         ),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: AppSpacing.smd),
                                         Text(
 
                                           getContentTypeTitle(_getSafeContentType(booking)),
 
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: AppColors.primary,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                          style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
                                         ),
                                       ],
                                     ),
@@ -250,7 +234,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 14),
+                              const SizedBox(height: AppSpacing.mld),
 
                               SizedBox(
                                 height: 1,
@@ -263,7 +247,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             (index) => Container(
                                           width: 6,
                                           height: 1,
-                                          color: Colors.white30,
+                                          color: AppColors.white30,
                                         ),
                                       ),
                                     );
@@ -272,14 +256,14 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                               ),
 
 
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppSpacing.md),
 
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.mld, vertical: AppSpacing.md),
                                 decoration: BoxDecoration(
                                   color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: Colors.white.withValues(alpha:0.9)),
+                                  borderRadius: AppRadii.xlAll,
+                                  border: Border.all(color: AppColors.white.withValues(alpha: 0.9)),
                                 ),
                                 child: Column(
                                   children: [
@@ -298,12 +282,12 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                               "${formatTime(day['start_time'])} to ${formatTime(day['end_time'])}"
                                                   " (${day['duration_hours']}h)",
                                             ),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: AppSpacing.sm),
                                             infoRowBlack(
                                               AppAssets.calendarDate,
                                               formatDate(day['date']),
                                             ),
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: AppSpacing.sm),
                                           ],
                                         );
                                       }),
@@ -316,7 +300,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                         "${formatTime(booking?['start_time'])} to ${formatTime(booking?['end_time'])}"
                                             " (${booking?['duration_hours']}h)",
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: AppSpacing.sm),
                                       infoRowBlack(
                                         AppAssets.calendarDate,
                                         formatDate(booking?['event_date']),
@@ -324,7 +308,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                     ],
 
                                     /// 📍 LOCATION (COMMON)
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: AppSpacing.sm),
                                     infoRowBlack(
                                       AppAssets.location,
                                       booking?['event_location'] ?? "",
@@ -336,16 +320,16 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                           child: Container(
                             height: 1,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withValues(alpha:0.09), // left
-                                  Colors.white.withValues(alpha:0.09), // center
-                                  Colors.white.withValues(alpha:0.09), // right
+                                  AppColors.white.withValues(alpha: 0.09), // left
+                                  AppColors.white.withValues(alpha: 0.09), // center
+                                  AppColors.white.withValues(alpha: 0.09), // right
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -353,7 +337,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 28),
+                        SizedBox(height: AppSpacing.xxl),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -366,23 +350,18 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                 children: [
                                   Text(
                                     "Editing Services",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.white,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                                   ),
                                 ],
                               ),
 
-                              SizedBox(height: 10),
+                              SizedBox(height: AppSpacing.smd),
 
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.mld, vertical: AppSpacing.md),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF282828),
-                                  borderRadius: BorderRadius.circular(14),
+                                  color: AppColors.surfaceMid,
+                                  borderRadius: AppRadii.xlAll,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,16 +369,11 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                                     /// ================= VIDEO EDITS =================
                                     if ((booking?['video_edit_types'] ?? []).isNotEmpty) ...[
-                                      const Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                                         child: Text(
                                           "Video Edits:",
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 12,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
                                         ),
                                       ),
 
@@ -412,20 +386,15 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             return Align(
                                               alignment: Alignment.centerLeft,
                                               child: Container(
-                                                margin: const EdgeInsets.only(bottom: 8),
-                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
-                                                  borderRadius: BorderRadius.circular(4),
+                                                  borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}",
-                                                  style: const TextStyle(
-                                                    color: AppColors.primary,
-                                                    fontSize: 12,
-                                                    fontFamily: AppAssets.fontOutfit,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
                                                 ),
                                               ),
                                             );
@@ -433,21 +402,16 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                         ),
                                       ),
 
-                                      SizedBox(height: 12),
+                                      SizedBox(height: AppSpacing.md),
                                     ],
 
                                     /// ================= PHOTO EDITS =================
                                     if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
-                                      const Padding(
-                                        padding: EdgeInsets.only(bottom: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                                         child: Text(
                                           "Photo Edits:",
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 12,
-                                            fontFamily: AppAssets.fontOutfit,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white),
                                         ),
                                       ),
 
@@ -460,21 +424,16 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             return Align(
                                               alignment: Alignment.centerLeft,
                                               child: Container(
-                                                margin: const EdgeInsets.only(bottom: 8),
-                                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                                margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
                                                 decoration: BoxDecoration(
                                                   color: AppColors.goldLight20,
-                                                  borderRadius: BorderRadius.circular(4),
+                                                  borderRadius: AppRadii.xsAll,
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}"
                                                       "${item['note'] != null ? ' (${item['note']})' : ''}",
-                                                  style: const TextStyle(
-                                                    color: AppColors.primary,
-                                                    fontSize: 12,
-                                                    fontFamily: AppAssets.fontOutfit,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.primary),
                                                 ),
                                               ),
                                             );
@@ -493,7 +452,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
 
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xxxl),
                       ],
                     ),
                   ),
@@ -512,11 +471,11 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.base),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.4),
+              color: AppColors.black.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -537,17 +496,12 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                     backgroundColor: AppColors.primary,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppRadii.xlAll,
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Update Schedule",
-                    style: TextStyle(
-                      fontFamily: AppAssets.fontUnbounded,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textHeading,
-                    ),
+                    style: AppTextStyles.buttonMedium.copyWith(color: AppColors.textHeading),
                   ),
                 ),
               ),
@@ -560,14 +514,10 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
   }
   Widget sectionTitle(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Text(
         text,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
+        style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
       ),
     );
   }
@@ -583,26 +533,21 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
           height: 16,
           width: 16,
           colorFilter: const ColorFilter.mode(
-            Colors.black87,
+            AppColors.black87,
             BlendMode.srcIn,
           ),
         ),
 
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
 
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.black,
-              fontFamily: AppAssets.fontOutfit,
-              fontWeight: FontWeight.w400,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.black),
           ),
 
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
       ],
     );
   }
@@ -613,27 +558,21 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
   Widget priceRow(String title, String price,
       {bool isDiscount = false, bool isTotal = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: isTotal ? 15 : 13,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-              color: Colors.white70,
-            ),
+            style: isTotal
+                ? AppTextStyles.buttonMedium.copyWith(color: AppColors.white70)
+                : AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
           ),
           Text(
             price,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 13,
-              fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
-              color: isDiscount
-                  ? const Color(0xFF7ED957)
-                  : Colors.white,
-            ),
+            style: isTotal
+                ? AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w700, color: isDiscount ? AppColors.discountGreen : AppColors.white)
+                : AppTextStyles.labelMedium.copyWith(color: isDiscount ? AppColors.discountGreen : AppColors.white),
           ),
         ],
       ),
@@ -646,18 +585,18 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
     final bool isSelected = selectedIndex == value;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: AppRadii.xlAll,
       onTap: () {
         setState(() {
           selectedIndex = value;
         });
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding:  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
         decoration: BoxDecoration(
-          color:  Color(0xFF282828),
-          borderRadius: BorderRadius.circular(14),
+          color: AppColors.surfaceMid,
+          borderRadius: AppRadii.xlAll,
         ),
         child: Row(
           children: [
@@ -665,12 +604,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
             Expanded(
               child: Text(
                 title,
-                style:  TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontWeight: FontWeight.w400
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
               ),
             ),
 
@@ -687,8 +621,8 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFE8D1AB), // light shade
-                    Color(0xFFD4A14D),
+                    AppColors.primary, // light shade
+                    AppColors.primaryDark,
                   ],
                 )
                     : null,
@@ -708,7 +642,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   height: 10,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.black,
+                    color: AppColors.black,
                   ),
                 ),
               )
@@ -732,7 +666,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
         height: 30,
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadii.hugeAll,
 
           /// 🔥 GRADIENT WHEN ON
           gradient: value
@@ -740,14 +674,14 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE8D1AB),
-              Color(0xFFD4A14D),
+              AppColors.primary,
+              AppColors.primaryDark,
             ],
           )
               : null,
 
           /// OFF COLOR
-          color: value ? null : Colors.white.withValues(alpha:0.25),
+          color: value ? null : AppColors.white.withValues(alpha: 0.25),
         ),
         child: AnimatedAlign(
           duration: const Duration(milliseconds: 250),
@@ -757,7 +691,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
             width: 24,
             height: 24,
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
           ),
@@ -774,12 +708,12 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
   }) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.base),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1A1A), // Darker background for the cards
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white10),
+        color: AppColors.surfaceInput, // Darker background for the cards
+        borderRadius: AppRadii.xlAll,
+        border: Border.all(color: AppColors.white10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -789,21 +723,11 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppAssets.fontOutfit,
-                ),
+                style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w700, color: AppColors.white),
               ),
               Text(
                 "\$${NumberFormat('#,##0.00').format(amount)}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: AppAssets.fontOutfit,
-                ),
+                style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w700, color: AppColors.white),
               ),
             ],
           ),
