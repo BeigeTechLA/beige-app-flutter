@@ -9,6 +9,9 @@ import 'package:lottie/lottie.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/features/booking/presentation/providers/crew_recommendation_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
@@ -76,11 +79,8 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
             ),
             Text(
               "More Details",
-              style: TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                fontFamily: AppAssets.fontOutfit,
               ),
             ),
             // 🔹 Step Text (Right)
@@ -88,11 +88,8 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
               alignment: Alignment.centerRight,
               child: Text(
                 "2/3",
-                style: TextStyle(
-                  fontFamily: AppAssets.fontOutfit,
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
@@ -100,7 +97,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
         ),
       ),
 
-      body: Padding(padding:  EdgeInsets.all(20.0),
+      body: Padding(padding: EdgeInsets.all(AppSpacing.xl),
           child: Column(
             children: [
 
@@ -122,11 +119,11 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
                   return Expanded(
                     child: Container(
-                      margin: const EdgeInsets.only(right: 8),
+                      margin: const EdgeInsets.only(right: AppSpacing.sm),
                       height: 5,
                       decoration: BoxDecoration(
                         color: AppColors.textSecondary, // grey background
-                        borderRadius: BorderRadius.circular(64),
+                        borderRadius: BorderRadius.circular(AppRadii.enormous),
                       ),
                       child: fillWidth > 0
                           ? Align(
@@ -136,7 +133,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                           width: fillWidth == double.infinity ? null : fillWidth,
                           decoration: BoxDecoration(
                             color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(64),
+                            borderRadius: BorderRadius.circular(AppRadii.enormous),
                           ),
                         ),
                       )
@@ -146,24 +143,20 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                 }),
               ),
 
-              SizedBox(
-                height: 20,
+              const SizedBox(
+                height: AppSpacing.xl,
               ),
 
               Row(
                 children: [
                   Text(
                     "Crew Size & Matching",
-                    style: TextStyle(
-                      fontFamily: AppAssets.fontUnbounded,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: AppTextStyles.titleSmall,
                   ),
                 ],
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
 
               Container(
 
@@ -175,16 +168,16 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                         Container(
                           // padding: EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(12)),
-                              border: Border.all(color:Colors.white.withOpacity(0.30),width: 0.5)
+                              borderRadius: AppRadii.lgAll,
+                              border: Border.all(color: AppColors.white.withValues(alpha: 0.30), width: 0.5)
                           ),
                           child: Column(
                             children: [
                               Container(
-                                padding:  EdgeInsets.all(20),
+                                padding: EdgeInsets.all(AppSpacing.xl),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: AppRadii.lgAll,
                                 ),
                                 child: Row(
                                   children: [
@@ -192,19 +185,19 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                       height: 40,
                                       width: 40,
                                       decoration: BoxDecoration(
-                                        color: Colors.black,
-                                        borderRadius: BorderRadius.circular(10),
+                                        color: AppColors.black,
+                                        borderRadius: BorderRadius.circular(AppRadii.mld),
                                       ),
                                       child: SvgPicture.asset(
                                         AppAssets.info,
 
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: AppSpacing.md),
                                     Expanded(
                                       child: Text(
                                         "Recommended Crew Size for \nYour Project",
-                                        style: TextStyle(color: AppColors.textHeading, fontSize: 14,fontWeight: FontWeight.w500,fontFamily: AppAssets.fontOutfit),
+                                        style: AppTextStyles.labelLarge.copyWith(color: AppColors.textHeading),
                                       ),
                                     ),
                                   ],
@@ -213,11 +206,11 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
 
                               Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: const EdgeInsets.all(AppSpacing.md),
                                 child: Card(
                                   elevation: 4,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(AppRadii.xxl),
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: SizedBox(
@@ -267,50 +260,44 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
 
                               Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child:Row(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                child: Row(
                                   children: [
                                     Expanded(
                                       child: Text(
                                         "$shootName ($contentType)",
-                                        //  maxLines: 2,                    // ✅ allows wrapping
+                                        //  maxLines: 2,                    // allows wrapping
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: AppTextStyles.labelLarge.copyWith(
                                           color: AppColors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          fontFamily: AppAssets.fontOutfit,
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
 
                                     Text(
                                       "$minCrew - $maxCrew People",
-                                      style: const TextStyle(
+                                      style: AppTextStyles.labelLarge.copyWith(
                                         color: AppColors.primary,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: AppAssets.fontOutfit,
                                       ),
                                     ),
                                   ],
                                 ),
 
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: AppSpacing.smd),
                               if (defaultOutput.isNotEmpty) ...[
                                 // const SizedBox(height: 10),
 
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  child: Divider(color: AppColors.white.withOpacity(0.30)),
+                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                                  child: Divider(color: AppColors.white.withValues(alpha: 0.30)),
                                 ),
 
 
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -318,25 +305,19 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                         children: [
                                           Text(
                                             "Typical output:",
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(0.70),
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: AppAssets.fontOutfit,
+                                            style: AppTextStyles.labelLarge.copyWith(
+                                              color: AppColors.white70,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(height: AppSpacing.sm),
                                       Row(
                                         children: [
                                           Text(
                                             getDefaultOutputText(defaultOutput),
-                                            style: const TextStyle(
+                                            style: AppTextStyles.labelLarge.copyWith(
                                               color: AppColors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: AppAssets.fontOutfit,
                                             ),
                                           ),
                                         ],
@@ -350,25 +331,21 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                         Row(
                           children: [
                             Text(
                               "How would you like to proceed?",
-                              style: TextStyle(
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(fontSize: 14),
                             ),
                           ],
                         ),
 
-                        SizedBox(height: 10),
+                        const SizedBox(height: AppSpacing.smd),
                         Container(
-                          padding: EdgeInsets.all(9),
+                          padding: EdgeInsets.all(AppSpacing.sm),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                            borderRadius: AppRadii.hugeAll,
                             /*    border: Border.all(color: AppColors.primary)*/
                           ),
                           child: Column(
@@ -376,10 +353,10 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                               Row(
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.all(11),
-                                    decoration: BoxDecoration(
+                                    padding: EdgeInsets.all(AppSpacing.smd),
+                                    decoration: const BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color:Color(0xffE8D1AB)
+                                        color: AppColors.primary
                                     ),
                                     child: SvgPicture.asset(
                                       AppAssets.ratings,
@@ -387,16 +364,16 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                       height: 22,
                                       fit: BoxFit.cover,
                                       colorFilter: const ColorFilter.mode(
-                                        Color(0xff1D1D1B),
+                                        AppColors.onPrimary,
                                         BlendMode.srcIn,
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: AppSpacing.md),
                                   Expanded(
                                     child: Text(
                                       "AI Matchmaker",
-                                      style: TextStyle(color: AppColors.primary, fontSize: 16,fontWeight: FontWeight.w700,fontFamily: AppAssets.fontOutfit),//
+                                      style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.w700, color: AppColors.primary),
                                     ),
                                   ),
                                 ],
@@ -405,23 +382,20 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                               // Divider(color: AppColors.dividerDark,),
                               //
 
-                              SizedBox(height: 10),
+                              const SizedBox(height: AppSpacing.smd),
 
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   "Our AI will analyse your project and match you with the perfect crew size and specialists",
                                   textAlign: TextAlign.left,
-                                  style: TextStyle(
+                                  style: AppTextStyles.bodyMedium.copyWith(
                                     color: AppColors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: AppAssets.fontOutfit,
                                   ),
                                 ),
                               ),
 
-                              SizedBox(height: 10),
+                              const SizedBox(height: AppSpacing.smd),
 
                               Container(
                                 /*  decoration: BoxDecoration(
@@ -432,9 +406,9 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildCheckRow("Optimal team composition"),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: AppSpacing.smd),
                                     _buildCheckRow("Matched based on your budget"),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: AppSpacing.smd),
                                     _buildCheckRow("Industry best practices"),
                                   ],
                                 ),
@@ -445,38 +419,31 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                           ),
                         ),
 
-                        SizedBox(height: 20),
-                        Divider(color: AppColors.dividerDark,),
-                        SizedBox(height:15),
+                        const SizedBox(height: AppSpacing.xl),
+                        Divider(color: AppColors.dividerDark),
+                        const SizedBox(height: AppSpacing.mld),
                         Row(
                           children: [
                             Text(
                               "How AI Matching Works",
-                              style: TextStyle(
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.titleSmall.copyWith(fontSize: 14),
                             ),
                           ],
                         ),
 
 
-                        SizedBox(height:20),
+                        const SizedBox(height: AppSpacing.xl),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
                             "Our intelligent matching system considers multiple factors to build your ideal crew:",
                             textAlign: TextAlign.left,
-                            style: TextStyle(
+                            style: AppTextStyles.bodySmall.copyWith(
                               color: AppColors.white70,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: AppAssets.fontOutfit,
                             ),
                           ),
                         ),
-                        SizedBox(height:15),
+                        const SizedBox(height: AppSpacing.mld),
 
                         Container(
                           /*   decoration: BoxDecoration(
@@ -488,40 +455,34 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "•",
-                                      style: TextStyle(
-                                        color: Color(0xFFE6C48F),
-                                        fontSize: 16,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.primary,
                                         height: 1.4,
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: AppSpacing.xs),
                                     Expanded(
                                       child: RichText(
-                                        text: const TextSpan(
+                                        text: TextSpan(
                                           children: [
                                             TextSpan(
                                               text: "Shoot Type & Complexity: ",
-                                              style: TextStyle(
-                                                color: Color(0xffE8D1AB),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: AppAssets.fontOutfit,
+                                              style: AppTextStyles.labelSmall.copyWith(
+                                                color: AppColors.primary,
                                               ),
                                             ),
                                             TextSpan(
                                               text:
                                               "Different shoots require different team sizes",
-                                              style: TextStyle(
+                                              style: AppTextStyles.labelSmall.copyWith(
                                                 color: AppColors.white70,
-                                                fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -532,43 +493,37 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                 ),
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppSpacing.md),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "•",
-                                      style: TextStyle(
-                                        color: Color(0xFFE6C48F),
-                                        fontSize: 16,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.primary,
                                         height: 1.4,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Expanded(
                                       child: RichText(
-                                        text: const TextSpan(
+                                        text: TextSpan(
                                           children: [
                                             TextSpan(
                                               text: "Budget Range: ",
-                                              style: TextStyle(
-                                                color: Color(0xffE8D1AB),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: AppAssets.fontOutfit,
+                                              style: AppTextStyles.labelSmall.copyWith(
+                                                color: AppColors.primary,
                                               ),
                                             ),
                                             TextSpan(
                                               text:
                                               "We match crews that fit your budget tier",
-                                              style: TextStyle(
+                                              style: AppTextStyles.labelSmall.copyWith(
                                                 color: AppColors.white70,
-                                                fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -579,43 +534,37 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                 ),
                               ),
 
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppSpacing.md),
 
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "•",
-                                      style: TextStyle(
-                                        color: Color(0xFFE6C48F),
-                                        fontSize: 16,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.primary,
                                         height: 1.4,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Expanded(
                                       child: RichText(
-                                        text: const TextSpan(
+                                        text: TextSpan(
                                           children: [
                                             TextSpan(
                                               text: "Industry Standards: ",
-                                              style: TextStyle(
-                                                color: Color(0xffE8D1AB),
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w500,
-                                                fontFamily: AppAssets.fontOutfit,
+                                              style: AppTextStyles.labelSmall.copyWith(
+                                                color: AppColors.primary,
                                               ),
                                             ),
                                             TextSpan(
                                               text:
                                               "Based on thousands of successful projects",
-                                              style: TextStyle(
+                                              style: AppTextStyles.labelSmall.copyWith(
                                                 color: AppColors.white70,
-                                                fontSize: 11,
                                                 fontWeight: FontWeight.w400,
-                                                fontFamily: AppAssets.fontOutfit,
                                               ),
                                             ),
                                           ],
@@ -641,7 +590,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
       bottomNavigationBar: SafeArea(
         bottom: true,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.base),
           child: Row(
             children: [
               // 🔹 Back Button
@@ -654,28 +603,27 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: Colors.white.withOpacity(0.3),
+                        color: AppColors.white.withValues(alpha: 0.3),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Back",
-                      style: TextStyle(
+                      style: AppTextStyles.buttonSmall.copyWith(
+                        fontFamily: AppTextStyles.fontFamilyDisplay,
                         fontSize: 13,
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
 
-              // 🔸 Continue Button
+              // Continue Button
               Expanded(
                 child: SizedBox(
                   height: 55,
@@ -691,16 +639,14 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppRadii.lgAll,
                       ),
                       elevation: 0,
                     ),
-                    child:  Text(
+                    child: Text(
                       "Continue",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontWeight: FontWeight.w600,
+                      style: AppTextStyles.buttonMedium.copyWith(
+                        fontFamily: AppTextStyles.fontFamilyDisplay,
                         color: AppColors.textHeading,
                       ),
                     ),
@@ -725,15 +671,12 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
           height: 24,
           width: 24,
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.smd),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.white70,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              fontFamily: AppAssets.fontOutfit,
             ),
           ),
         ),
