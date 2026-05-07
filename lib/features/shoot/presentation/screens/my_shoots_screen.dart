@@ -14,6 +14,8 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
+import 'package:beige/shared/widgets/scale_clamped_text.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class MyShootsScreen extends ConsumerStatefulWidget {
   const MyShootsScreen({super.key});
@@ -54,10 +56,12 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "My Shoots",
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: AppColors.white,
+                    ScaleClampedText(
+                      child: Text(
+                        "My Shoots",
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: AppColors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -102,12 +106,14 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                   borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,
-                                child: Text(
-                                  "Upcoming",
-                                  style: AppTextStyles.buttonLarge.copyWith(
-                                    color: isUpcomingSelected
-                                        ? AppColors.black
-                                        : AppColors.white70,
+                                child: ScaleClampedText(
+                                  child: Text(
+                                    "Upcoming",
+                                    style: AppTextStyles.buttonLarge.copyWith(
+                                      color: isUpcomingSelected
+                                          ? AppColors.black
+                                          : AppColors.white70,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -132,12 +138,14 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                   borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,
-                                child: Text(
-                                  "Completed",
-                                  style: AppTextStyles.buttonLarge.copyWith(
-                                    color: !isUpcomingSelected
-                                        ? AppColors.black
-                                        : AppColors.white70,
+                                child: ScaleClampedText(
+                                  child: Text(
+                                    "Completed",
+                                    style: AppTextStyles.buttonLarge.copyWith(
+                                      color: !isUpcomingSelected
+                                          ? AppColors.black
+                                          : AppColors.white70,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -704,10 +712,12 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            hint,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.white.withValues(alpha:0.6),
+          ScaleClampedText(
+            child: Text(
+              hint,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.white.withValues(alpha:0.6),
+              ),
             ),
           ),
           const Icon(Icons.keyboard_arrow_down, color: AppColors.white),
@@ -753,10 +763,12 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
           children: [
 
             /// TEXT
-            Text(
-              title,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.white.withValues(alpha:0.8),
+            ScaleClampedText(
+              child: Text(
+                title,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.white.withValues(alpha:0.8),
+                ),
               ),
             ),
 

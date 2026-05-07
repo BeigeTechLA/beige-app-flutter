@@ -45,6 +45,7 @@ import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/auth/presentation/screens/sign_up_screen.dart';
 import '../core/firebase/analytics_service.dart';
 import '../core/providers/auth_state_provider.dart';
+import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
 import 'colors.dart';
 import 'route_names.dart';
@@ -512,53 +513,55 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 80, sigmaY: 70),
-          child: BottomNavigationBar(
-            currentIndex: navigationShell.currentIndex,
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppColors.white,
-            unselectedItemColor: AppColors.white70,
-            onTap: (index) => navigationShell.goBranch(
-              index,
-              initialLocation: index == navigationShell.currentIndex,
+      bottomNavigationBar: ScaleClampedText(
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 80, sigmaY: 70),
+            child: BottomNavigationBar(
+              currentIndex: navigationShell.currentIndex,
+              elevation: 0,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: AppColors.white,
+              unselectedItemColor: AppColors.white70,
+              onTap: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
+              items: [
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    navigationShell.currentIndex == 0
+                        ? AppAssets.activeHome
+                        : AppAssets.inactiveHome,
+                  ),
+                  label: "Home",
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    navigationShell.currentIndex == 1
+                        ? AppAssets.activeBookShoot
+                        : AppAssets.inactiveBookShoot,
+                  ),
+                  label: "Book Shoot",
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    navigationShell.currentIndex == 2
+                        ? AppAssets.activeMyShoot
+                        : AppAssets.inactiveMyShoot,
+                  ),
+                  label: "My Shoots",
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(
+                    navigationShell.currentIndex == 3
+                        ? AppAssets.activeMessages
+                        : AppAssets.inactiveMessages,
+                  ),
+                  label: "Messages",
+                ),
+              ],
             ),
-            items: [
-              BottomNavigationBarItem(
-                icon: _buildIcon(
-                  navigationShell.currentIndex == 0
-                      ? AppAssets.activeHome
-                      : AppAssets.inactiveHome,
-                ),
-                label: "Home",
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(
-                  navigationShell.currentIndex == 1
-                      ? AppAssets.activeBookShoot
-                      : AppAssets.inactiveBookShoot,
-                ),
-                label: "Book Shoot",
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(
-                  navigationShell.currentIndex == 2
-                      ? AppAssets.activeMyShoot
-                      : AppAssets.inactiveMyShoot,
-                ),
-                label: "My Shoots",
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(
-                  navigationShell.currentIndex == 3
-                      ? AppAssets.activeMessages
-                      : AppAssets.inactiveMessages,
-                ),
-                label: "Messages",
-              ),
-            ],
           ),
         ),
       ),

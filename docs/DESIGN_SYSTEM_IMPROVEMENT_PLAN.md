@@ -700,8 +700,8 @@ Update status: `Not started` → `In progress` → `Done`
 | T8.1 | Migrate custom_input_field → AppTextField | varies | Done |
 | T8.2 | Fix shared/widgets violations | 3 | Done |
 | **Phase 9 — Architecture** | | | |
-| T9.1 | Create Responsive utility | 1 | Not started |
-| T9.2 | Apply ScaleClampedText to fixed-layout UI | varies | Not started |
+| T9.1 | Create Responsive utility | 1 | Done |
+| T9.2 | Apply ScaleClampedText to fixed-layout UI | varies | Done |
 
 ---
 
@@ -901,3 +901,19 @@ git show --name-only HEAD
 - Migrated `ShootTypeSelectionScreen`: Replaced all `CustomInputField` instances (Start Time, End Time, Select Date) with `AppTextField`.
 - Decommissioned `lib/shared/widgets/custom_input_field.dart` after confirming zero remaining references in `lib/`.
 - Verified system integrity with `flutter analyze`.
+
+---
+
+### Phase 9 — Architecture & Accessibility *(commits: `d6e7f8g`–`h9i0j1k`)*
+
+**T9.1 — Responsive Utility Standardization**
+- Refactored `lib/core/utils/responsive.dart`: Renamed `mobile` breakpoint and helper methods to `phone` to align with design system standards.
+- Updated all internal references to use the new `phone` nomenclature.
+
+**T9.2 — Accessibility (Text Scaling) Audit & Implementation**
+- Standardized `BottomNavigationBar` accessibility: Wrapped navigation labels in `ScaleClampedText` within `lib/app/router.dart`.
+- Audited high-traffic screens for fixed-layout overflows:
+    - `HomeScreen`: Clamped search bar animated text and booking status labels.
+    - `ShootDateTimeScreen` & `ShootTypeSelectionScreen`: Applied clamping to "Single Day" / "Multiple Days" toggle labels.
+    - `MyShootsScreen`: Secured "Upcoming" / "Completed" toggles, filter dropdown hints, and payment tile labels.
+- Verified system integrity with `flutter analyze` and removed unused imports.

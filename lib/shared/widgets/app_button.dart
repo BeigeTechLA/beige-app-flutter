@@ -4,6 +4,7 @@ import '../../app/colors.dart';
 import '../../app/radii.dart';
 import '../../app/spacing.dart';
 import '../../app/text_styles.dart';
+import 'scale_clamped_text.dart';
 
 enum AppButtonVariant { primary, secondary, outline, text, destructive }
 
@@ -72,7 +73,9 @@ class AppButton extends StatelessWidget {
                 icon!,
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Text(label, style: _textStyle.copyWith(color: _foregroundColor)),
+              ScaleClampedText(
+                child: Text(label, style: _textStyle.copyWith(color: _foregroundColor)),
+              ),
             ],
           );
 

@@ -18,6 +18,7 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
 import 'package:beige/features/home/presentation/providers/home_providers.dart';
 import 'package:beige/shared/widgets/loading.dart';
+import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -689,16 +690,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                             return AnimatedSwitcher(
                               duration: const Duration(milliseconds: 800),
                               // Smooth Fade
-                              child: Text(
-                                _searchTexts[index],
-                                key: ValueKey<int>(index),
-                                // Key badalne par hi animation hoga
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: _textColors[index], // DYNAMIC COLOR
-                                  fontSize: 15,
-                                  fontFamily: AppAssets.fontOutfit,
-                                  fontWeight: FontWeight.w400,
+                              child: ScaleClampedText(
+                                child: Text(
+                                  _searchTexts[index],
+                                  key: ValueKey<int>(index),
+                                  // Key badalne par hi animation hoga
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: _textColors[index], // DYNAMIC COLOR
+                                    fontSize: 15,
+                                    fontFamily: AppAssets.fontOutfit,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
                               ),
                             );
@@ -2920,12 +2923,14 @@ SizedBox(height: 10,),
                           color: statusColor.withValues(alpha: 0.15),
                         ),
                         child: Center(
-                          child: Text(
-                            booking.statusLabel,
-                            style: TextStyle(
-                              color: statusColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
+                          child: ScaleClampedText(
+                            child: Text(
+                              booking.statusLabel,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),

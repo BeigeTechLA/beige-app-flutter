@@ -6,6 +6,8 @@
   import 'package:intl/intl.dart';
 
   import 'package:beige/app/route_names.dart';
+  import 'package:beige/shared/widgets/app_button.dart';
+  import 'package:beige/shared/widgets/scale_clamped_text.dart';
   import 'package:beige/shared/widgets/app_text_field.dart';
   import 'package:beige/app/colors.dart';
   import 'package:beige/app/radii.dart';
@@ -1358,12 +1360,14 @@ import '../../../../app/assets.dart';
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Single Day",
-                                            style: AppTextStyles.labelLarge.copyWith(
-                                              color: selectedIndex == 1
-                                                  ? AppColors.black
-                                                  : AppColors.disabled,
+                                          ScaleClampedText(
+                                            child: Text(
+                                              "Single Day",
+                                              style: AppTextStyles.labelLarge.copyWith(
+                                                color: selectedIndex == 1
+                                                    ? AppColors.black
+                                                    : AppColors.disabled,
+                                              ),
                                             ),
                                           ),
                                           selectedIndex==1?
@@ -1453,12 +1457,14 @@ import '../../../../app/assets.dart';
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "Multiple Days",
-                                            style: AppTextStyles.labelLarge.copyWith(
-                                              color: selectedIndex == 2
-                                                  ? AppColors.black
-                                                  : AppColors.disabled,
+                                          ScaleClampedText(
+                                            child: Text(
+                                              "Multiple Days",
+                                              style: AppTextStyles.labelLarge.copyWith(
+                                                color: selectedIndex == 2
+                                                    ? AppColors.black
+                                                    : AppColors.disabled,
+                                              ),
                                             ),
                                           ),
 

@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
+import 'package:beige/shared/widgets/scale_clamped_text.dart';
+import 'package:beige/shared/widgets/app_button.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -749,16 +751,18 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Single Day",
-                                          style: AppTextStyles.labelLarge.copyWith(
-                                            color: isSingleLocked
-                                                ? AppColors.neutralGrey
-                                                : (selectedIndex == 1
-                                                ? AppColors.black
-                                                : AppColors.neutralGrey),
+                                          ScaleClampedText(
+                                            child: Text(
+                                              "Single Day",
+                                              style: AppTextStyles.labelLarge.copyWith(
+                                                color: isSingleLocked
+                                                    ? AppColors.neutralGrey
+                                                    : (selectedIndex == 1
+                                                    ? AppColors.black
+                                                    : AppColors.neutralGrey),
+                                              ),
+                                            ),
                                           ),
-                                        ),
 
                                         /// RADIO
                                         selectedIndex == 1
@@ -844,14 +848,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Multiple Days",
-                                          style: AppTextStyles.labelLarge.copyWith(
-                                            color: isMultiLocked
-                                                ? AppColors.neutralGrey
-                                                : (selectedIndex == 2
-                                                ? AppColors.black
-                                                : AppColors.neutralGrey),
+                                        ScaleClampedText(
+                                          child: Text(
+                                            "Multiple Days",
+                                            style: AppTextStyles.labelLarge.copyWith(
+                                              color: isMultiLocked
+                                                  ? AppColors.neutralGrey
+                                                  : (selectedIndex == 2
+                                                  ? AppColors.black
+                                                  : AppColors.neutralGrey),
+                                            ),
                                           ),
                                         ),
 
