@@ -7,9 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:beige/app/route_names.dart';
-import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
 
 class MyShootsScreen extends ConsumerStatefulWidget {
@@ -41,11 +44,11 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: AppSpacing.massive),
 
                 /// HEADER
                 Row(
@@ -53,32 +56,29 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                   children: [
                     Text(
                       "My Shoots",
-                      style: TextStyle(
+                      style: AppTextStyles.titleSmall.copyWith(
                         color: AppColors.white,
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
 
-                SizedBox(height: 12),
+                SizedBox(height: AppSpacing.md),
 
 
                 /// TOGGLE
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadii.lgAll,
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), // 🔥 blur power
                     child: Container(
                       height: 55,
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(AppSpacing.xxs),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha:0.05), // 🔥 glass effect
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.white.withValues(alpha:0.05),
+                        borderRadius: AppRadii.lgAll,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha:0.1),
+                          color: AppColors.white.withValues(alpha:0.1),
                         ),
                       ),
                       child: Row(
@@ -97,20 +97,17 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
                                   color: isUpcomingSelected
-                                      ? const Color(0xFFE8D8BD)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
+                                      ? AppColors.primary
+                                      : AppColors.transparent,
+                                  borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Upcoming",
-                                  style: TextStyle(
-                                    fontFamily: AppAssets.fontOutfit,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                  style: AppTextStyles.buttonLarge.copyWith(
                                     color: isUpcomingSelected
-                                        ? Colors.black
-                                        : Colors.white70,
+                                        ? AppColors.black
+                                        : AppColors.white70,
                                   ),
                                 ),
                               ),
@@ -130,20 +127,17 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
                                   color: !isUpcomingSelected
-                                      ? const Color(0xFFE8D8BD)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
+                                      ? AppColors.primary
+                                      : AppColors.transparent,
+                                  borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,
                                 child: Text(
                                   "Completed",
-                                  style: TextStyle(
-                                    fontFamily: AppAssets.fontOutfit,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                  style: AppTextStyles.buttonLarge.copyWith(
                                     color: !isUpcomingSelected
-                                        ? Colors.black
-                                        : Colors.white70,
+                                        ? AppColors.black
+                                        : AppColors.white70,
                                   ),
                                 ),
                               ),
@@ -177,17 +171,14 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                         ),
                         Text("No Booking Found",
                             style:
-                            TextStyle(color: AppColors.primary,fontFamily: AppAssets.fontUnbounded,fontSize: 16,fontWeight: FontWeight.w500)
+                            AppTextStyles.titleSmall.copyWith(color: AppColors.primary)
                         ),
 
                         Text(
                           "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.white70,
-                            fontFamily: AppAssets.fontOutfit,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
                           ),
                         ),
 
@@ -204,10 +195,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       : isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : completedShoots.isEmpty
-                      ? const Center(
+                      ? Center(
                     child: Text("No Completed Shoots",
                         style:
-                        TextStyle(color: AppColors.primary,fontSize: 16,fontFamily: AppAssets.fontUnbounded,fontWeight: FontWeight.w500,
+                        AppTextStyles.titleSmall.copyWith(color: AppColors.primary,
                         )),
                   )
                       : ListView.builder(
@@ -225,7 +216,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             Center(
               child: Text(
                 shootsState.errorMessage ?? "Something went wrong",
-                style: const TextStyle(color: AppColors.white70, fontSize: 14),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70),
               ),
             ),
         ],
@@ -242,19 +233,18 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
       height: 45,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: AppRadii.roundAll,
         gradient: isSelected
             ? const LinearGradient(
-          colors: [Color(0xFFE8D1AB), Color(0xFFD4A14D)],
+          colors: [AppColors.primary, AppColors.primaryDark],
         )
             : null,
-        border: Border.all(color: Colors.white24),
+        border: Border.all(color: AppColors.white24),
       ),
       child: Text(
         title,
-        style: TextStyle(
-          color: isSelected ? Colors.black : Colors.white,
-          fontWeight: FontWeight.w600,
+        style: AppTextStyles.buttonMedium.copyWith(
+          color: isSelected ? AppColors.black : AppColors.white,
         ),
       ),
     );
@@ -431,10 +421,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     VoidCallback? onEditTap,
   }) {
     return Container(
-        margin: const EdgeInsets.only(bottom: 16,top: 20),
+        margin: const EdgeInsets.only(bottom: AppSpacing.base, top: AppSpacing.xl),
         height: 280,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadii.huge),
           child: Stack(
             children: [
           // ✅ IMAGE (NO BLUR)
@@ -460,20 +450,20 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     height: 280,
     width: double.infinity,
     decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(22),
+    borderRadius: BorderRadius.circular(AppRadii.huge),
     gradient: LinearGradient(
     colors: [
-    Colors.black,
-    Colors.transparent,
-    Colors.transparent,
-    Colors.transparent,
-    Colors.transparent,
-    Colors.transparent,
-    Colors.black,
-    Colors.black,
+    AppColors.black,
+    AppColors.transparent,
+    AppColors.transparent,
+    AppColors.transparent,
+    AppColors.transparent,
+    AppColors.transparent,
+    AppColors.black,
+    AppColors.black,
     ],
-    begin: AlignmentGeometry.topCenter,
-    end: AlignmentGeometry.bottomCenter,
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
     ),
     ),
     ),
@@ -483,26 +473,22 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     left: 0,
     right: 0,
     child: ClipRRect(
-    borderRadius: const BorderRadius.vertical(
-    bottom: Radius.circular(22),
+    borderRadius: BorderRadius.vertical(
+    bottom: Radius.circular(AppRadii.huge),
     ),
     child: Padding(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(AppSpacing.base),
     child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: [
     Text(
     title ?? "",
-    style: const TextStyle(
-    color: Colors.white,
-    fontFamily: AppAssets.fontOutfit
-      ,
-    fontSize: 12,
-    fontWeight: FontWeight.w600,
+    style: AppTextStyles.buttonSmall.copyWith(
+    color: AppColors.white,
     ),
     ),
-    const SizedBox(height: 14),
+    const SizedBox(height: AppSpacing.mld),
 
     Row(
     children: [
@@ -512,19 +498,15 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     child: ElevatedButton(
     onPressed: onButtonTap,
     style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFFE8C99A),
+    backgroundColor: AppColors.primary,
     shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(28),
+    borderRadius: BorderRadius.circular(AppRadii.round),
     ),
     ),
     child: Text(
     buttonText,
-    style: const TextStyle(
-    color:AppColors.textHeading,
-    fontSize: 14,
-      fontFamily: AppAssets.fontOutfit
-      ,
-    fontWeight: FontWeight.w600,
+    style: AppTextStyles.buttonMedium.copyWith(
+    color: AppColors.textHeading,
     ),
     ),
     ),
@@ -532,7 +514,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     ),
 
     if (showEditIcon) ...[
-    const SizedBox(width: 10),
+    const SizedBox(width: AppSpacing.smd),
     InkWell(
     onTap: onEditTap,
     child:SvgPicture.asset(
@@ -558,18 +540,18 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.base),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(28),
-                  topRight: Radius.circular(28),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppRadii.round),
+                  topRight: Radius.circular(AppRadii.round),
                 ),
               ),
               child: SafeArea(
@@ -585,10 +567,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       child: Container(
                         width: 35,
                         height: 5,
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
                         decoration: BoxDecoration(
                           color: AppColors.white70,
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppRadii.hugeAll,
                         ),
                       ),
                     ),
@@ -596,57 +578,52 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Filter By",
-                          style: TextStyle(
-                            fontFamily: AppAssets.fontUnbounded,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.white,
                           ),
                         ),
                         InkWell(
                           onTap: () => context.pop(),
-                          child: const Icon(Icons.close, color: Colors.white),
+                          child: const Icon(Icons.close, color: AppColors.white),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Divider(color: Colors.white.withValues(alpha:0.15)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
+                    Divider(color: AppColors.white.withValues(alpha:0.15)),
+                    const SizedBox(height: AppSpacing.base),
 
                     filterDropdown("Booking Type"),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     filterDropdown("Select Date"),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     filterDropdown("Select Status"),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSpacing.xl),
 
 
 
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.base),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(18),
+                    color: AppColors.surfaceInput,
+                    borderRadius: BorderRadius.circular(AppRadii.xxxl),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
                       /// 🔹 TITLE
-                      const Text(
+                      Text(
                         "Sort By Payment",
-                        style: TextStyle(
-                          fontFamily: AppAssets.fontOutfit,
-                          fontSize: 16,
+                        style: AppTextStyles.bodyLarge.copyWith(
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: AppColors.white,
                         ),
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppSpacing.mld),
 
                       /// 🔹 OPTIONS
                       _paymentTile("Paid", 0),
@@ -656,7 +633,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
 
                     Row(
                       children: [
@@ -664,43 +641,39 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                           child: Container(
                             height: 55,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: AppRadii.xlAll,
                               border:
                               Border.all(color: AppColors.white60
                               ),
                             ),
                             child: TextButton(
                               onPressed: () {},
-                              child: const Text(
+                              child: Text(
                                 "Clear All",
-                                style: TextStyle(
-                                  fontFamily: AppAssets.fontUnbounded,
+                                style: AppTextStyles.titleSmall.copyWith(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500,
                                   color: AppColors.white,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Container(
                             height: 55,
                             decoration: BoxDecoration(
                               color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: AppRadii.xlAll,
                             ),
                             child: TextButton(
                               onPressed: () {
                                 context.pop();
                               },
-                              child: const Text(
+                              child: Text(
                                   "Apply",
-                                  style: TextStyle(
-                                    fontFamily: AppAssets.fontUnbounded,
+                                  style: AppTextStyles.titleSmall.copyWith(
                                     fontSize: 14,
-                                    fontWeight: FontWeight.w500,
                                     color: AppColors.black,
                                   )
                               ),
@@ -723,22 +696,21 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
   Widget filterDropdown(String hint) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.mld),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white24),
-        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.white24),
+        borderRadius: AppRadii.xlAll,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             hint,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha:0.6),
-              fontSize: 14,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.white.withValues(alpha:0.6),
             ),
           ),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+          const Icon(Icons.keyboard_arrow_down, color: AppColors.white),
         ],
       ),
     );
@@ -746,10 +718,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
   Widget paymentRadio(String title, StateSetter setModalState) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F1F1F),
-        borderRadius: BorderRadius.circular(14),
+        color: AppColors.surfaceInput,
+        borderRadius: AppRadii.xlAll,
       ),
       child: RadioListTile<String>(
         value: title,
@@ -762,7 +734,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         activeColor: AppColors.primary,
         title: Text(
           title,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColors.white),
         ),
       ),
     );
@@ -775,7 +747,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         });
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.smd),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -783,11 +755,8 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             /// TEXT
             Text(
               title,
-              style: TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: Colors.white.withValues(alpha:0.8),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.white.withValues(alpha:0.8),
               ),
             ),
 
@@ -798,7 +767,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white38,
+                  color: AppColors.white38,
                   width: 1.2,
                 ),
               ),
@@ -809,7 +778,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                   height: 10,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
+                    color: AppColors.white,
                   ),
                 ),
               )
