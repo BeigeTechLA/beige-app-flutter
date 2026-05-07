@@ -44,6 +44,9 @@ class AppColors {
   /// Near-black for deep elements
   static const Color surfaceDeep = Color(0xFF0A0A0A);
 
+  /// Mid surface - distinct from surfaceVariant
+  static const Color surfaceMid = Color(0xFF282828);
+
   /// Icon/circle backgrounds
   static const Color iconBackground = Color(0xFF171717);
 
@@ -192,6 +195,8 @@ class AppColors {
   static const Color greyShade200 = Color(0xFFEEEEEE);
   /// Grey 800 — dark platform UI (image picker, sheets)
   static const Color greyShade800 = Color(0xFF424242);
+  /// Green - for discounts
+  static const Color discountGreen = Color(0xFF7ED957);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // STATUS COLORS (booking flow)

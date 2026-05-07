@@ -682,10 +682,10 @@ Update status: `Not started` → `In progress` → `Done`
 | T4.7 | shoot_details_screen: Colors | 1 | Done |
 | T4.8 | shoot_details_screen: TextStyle + EdgeInsets + BorderRadius | 1 | Done |
 | **Phase 5 — Tier 3 (edit_review, crew_size, my_shoots, summary, profile)** | | | |
-| T5.1 | shoot_edit_review_screen: all types | 1 | Not started |
-| T5.2 | crew_size_matching_screen: all types | 1 | Not started |
-| T5.3 | my_shoots_screen: all types | 1 | Not started |
-| T5.4 | shoot_summary_screen + profile_screen: all types | 2 | Not started |
+| T5.1 | shoot_edit_review_screen: all types | 1 | Done |
+| T5.2 | crew_size_matching_screen: all types | 1 | Done |
+| T5.3 | my_shoots_screen: all types | 1 | Done |
+| T5.4 | shoot_summary_screen + profile_screen: all types | 2 | Done |
 | **Phase 6 — Tier 4 (40–65 violations)** | | | |
 | T6.1 | creative_profile + cancel_shoot: all types | 2 | Not started |
 | T6.2 | recommended_creative_detail + edit_profile: all types | 2 | Not started |
