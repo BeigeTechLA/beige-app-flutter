@@ -10,6 +10,9 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
 import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -39,8 +42,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   height: 200,
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(28),
-                      bottomRight: Radius.circular(28),
+                      bottomLeft: Radius.circular(AppRadii.round),
+                      bottomRight: Radius.circular(AppRadii.round),
                     ),
                     child: Image.asset(
                       AppAssets.profilePlaceholder,
@@ -63,18 +66,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                   ),
                 ),
-                const Positioned(
+                Positioned(
                   top: 90,
                   left: 0,
                   right: 0,
                   child: Center(
                     child: Text(
                       "My Profile",
-                      style: TextStyle(
+                      style: AppTextStyles.titleSmall.copyWith(
                         color: AppColors.textHeading,
-                        fontSize: 16,
-                        fontFamily: AppAssets.fontUnbounded,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -87,14 +87,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     child: Stack(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(AppSpacing.xxs),
                           decoration: const BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.white,
                             shape: BoxShape.circle,
                           ),
                           child: CircleAvatar(
                             radius: 48,
-                            backgroundColor: Colors.grey.shade200,
+                            backgroundColor: AppColors.greyShade200,
                             child: ClipOval(
                               child: profileImageUrl == null
                                   ? Center(
@@ -150,25 +150,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             Text(
               myProfile?['name'] ?? 'USER',
-              style: const TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                color: Colors.white,
+              style: AppTextStyles.titleMedium.copyWith(
                 fontSize: 20,
-                fontWeight: FontWeight.w500,
+                color: AppColors.white,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
               "${myProfile?['email'] ?? ''}",
-              style: const TextStyle(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.white60,
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
               ),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSpacing.mld),
 
             InkWell(
               onTap: () async {
@@ -180,25 +175,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               },
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: AppSpacing.smd),
                 decoration: BoxDecoration(
                   color: AppColors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(AppRadii.massive),
                 ),
-                child: const Text(
+                child: Text(
                   "Edit Profile",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontFamily: AppAssets.fontOutfit,
-                    color: AppColors.textHeading,
+                  style: AppTextStyles.caption.copyWith(
                     fontWeight: FontWeight.w500,
+                    color: AppColors.textHeading,
                   ),
                 ),
               ),
             ),
 
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               child: Divider(color: AppColors.dividerDark),
             ),
 
@@ -213,20 +206,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _profileMenuCard() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
               children: [
                 Text(
                   "My Account",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontFamily: AppAssets.fontUnbounded,
+                  style: AppTextStyles.titleSmall.copyWith(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
                   ),
                 ),
               ],
@@ -234,8 +225,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.surfaceVariant,
+              borderRadius: AppRadii.hugeAll,
             ),
             child: Column(
               children: [
@@ -253,32 +244,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.smd),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Divider(color: AppColors.dividerDark),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
               children: [
                 Text(
                   "Legal",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontFamily: AppAssets.fontUnbounded,
+                  style: AppTextStyles.titleSmall.copyWith(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.smd),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.surfaceVariant,
+              borderRadius: AppRadii.hugeAll,
             ),
             child: Column(
               children: [
@@ -309,30 +298,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Divider(color: AppColors.dividerDark),
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
               children: [
                 Text(
                   "Settings",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontFamily: AppAssets.fontUnbounded,
+                  style: AppTextStyles.titleSmall.copyWith(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.white,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.smd),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.surfaceVariant,
+              borderRadius: AppRadii.hugeAll,
             ),
             child: Column(
               children: [
@@ -357,17 +344,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _menuRow(String iconPath, String title, {VoidCallback? onTap}) {
     return InkWell(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: AppRadii.hugeAll,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
         child: Row(
           children: [
             Container(
               height: 44,
               width: 44,
               decoration: const BoxDecoration(
-                color: Color(0xFF3A3A3A),
+                color: AppColors.shimmerHighlight,
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -382,14 +369,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.base),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  fontFamily: AppAssets.fontOutfit,
+                style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.white,
-                  fontSize: 14,
                 ),
               ),
             ),
@@ -410,22 +395,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _divider() {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(height: 1, color: Colors.white12),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.base),
+      child: Divider(height: 1, color: AppColors.dividerDark),
     );
   }
 
   void _showLogoutBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (_) {
         return Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            color: AppColors.surfaceInput,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.massive)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -433,33 +418,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Container(
                 height: 5,
                 width: 30,
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: const EdgeInsets.only(bottom: AppSpacing.base),
                 decoration: BoxDecoration(
                   color: AppColors.white70,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const Text(
+              Text(
                 "Logout",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontFamily: AppAssets.fontUnbounded,
+                style: AppTextStyles.titleSmall.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: AppColors.white,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              const SizedBox(height: AppSpacing.sm),
+              Text(
                 "Are you sure you want to log out?",
-                style: TextStyle(
-                  color: Colors.white60,
-                  fontSize: 14,
-                  fontFamily: AppAssets.fontOutfit,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.white60,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpacing.mld),
               Divider(height: 1, color: AppColors.dividerDark),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.smd),
               Row(
                 children: [
                   Expanded(
@@ -467,23 +448,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       onPressed: () => context.pop(),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.white60),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: AppRadii.xlAll,
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Cancel",
-                        style: TextStyle(
+                        style: AppTextStyles.titleSmall.copyWith(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                          fontFamily: AppAssets.fontUnbounded,
+                          color: AppColors.white,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -496,25 +475,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: AppRadii.xlAll,
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Yes, Logout",
-                        style: TextStyle(
+                        style: AppTextStyles.titleSmall.copyWith(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
                           color: AppColors.textHeading,
-                          fontFamily: AppAssets.fontUnbounded,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
             ],
           ),
         );

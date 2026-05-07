@@ -9,6 +9,9 @@ import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/features/shoot/presentation/providers/shoot_summary_notifier.dart';
 
 class ShootSummaryScreen extends ConsumerStatefulWidget {
@@ -103,7 +106,7 @@ class _ShootSummaryScreenState
                         height: double.infinity,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Colors.black12,
+                            color: AppColors.black12,
                             child: Center(
                               child: SvgPicture.asset(
                                 AppAssets.imagePlaceholder,
@@ -116,7 +119,7 @@ class _ShootSummaryScreenState
 
                       /// ✅ SVG PLACEHOLDER
                           : Container(
-                        color: Colors.black12,
+                        color: AppColors.black12,
                         child: Center(
                           child: SvgPicture.asset(
                             image,
@@ -135,9 +138,9 @@ class _ShootSummaryScreenState
                           end: Alignment.bottomCenter,
                           stops: const [0.0, 0.5, 1.0],
                           colors: [
-                            Colors.black.withValues(alpha:0.6),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha:0.95),
+                            AppColors.black.withValues(alpha:0.6),
+                            AppColors.transparent,
+                            AppColors.black.withValues(alpha:0.95),
                           ],
                         ),
                       ),
@@ -153,7 +156,7 @@ class _ShootSummaryScreenState
                           AppAssets.back,
                           height: 24,
                           colorFilter: const ColorFilter.mode(
-                            Colors.white,
+                            AppColors.white,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -172,35 +175,29 @@ class _ShootSummaryScreenState
                           /// NAME
                           Text(
                             bookingData?['creative']?['name'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: AppAssets.fontOutfit,
-                              fontSize: 18,
+                            style: AppTextStyles.titleMedium.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
 
-                          const SizedBox(height: 6),
+                          const SizedBox(height: AppSpacing.xs),
 
                           /// TYPE
                           Text(
                             bookingData?['event']?['type'] ?? "",
-                            style: const TextStyle(
-                              fontFamily: AppAssets.fontOutfit,
-                              fontSize: 13,
-                              color: Colors.white70,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.white70,
                             ),
                           ),
 
-                          const SizedBox(height: 2),
+                          const SizedBox(height: AppSpacing.xxxs),
 
                           /// CONTENT TYPE
                           Text(
                             widget.contentType ?? "",
-                            style: const TextStyle(
-                              fontFamily: AppAssets.fontOutfit,
-                              fontSize: 13,
-                              color: Colors.white70,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.white70,
                             ),
                           ),
                         ],
@@ -212,7 +209,7 @@ class _ShootSummaryScreenState
 
                 /// 🟢 MAIN CARD
                 Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -240,7 +237,7 @@ class _ShootSummaryScreenState
                             "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppSpacing.smd),
                     ],
                   );
                 }),
@@ -270,17 +267,17 @@ class _ShootSummaryScreenState
       event?['location'],
     ),
 
-    const SizedBox(height: 12),
+    const SizedBox(height: AppSpacing.md),
 
     /// 📄 DESCRIPTION CARD
     Container(
     width: double.infinity,
-    padding: const EdgeInsets.all(10),
+    padding: const EdgeInsets.all(AppSpacing.smd),
     decoration: BoxDecoration(
-    color: Colors.white.withValues(alpha:0.05),
-    borderRadius: BorderRadius.circular(20),
+    color: AppColors.white.withValues(alpha:0.05),
+    borderRadius: AppRadii.hugeAll,
     border: Border.all(
-    color: Colors.white.withValues(alpha:0.1),
+    color: AppColors.white.withValues(alpha:0.1),
     ),
     ),
     child: Column(
@@ -289,56 +286,49 @@ class _ShootSummaryScreenState
 
     Text(
     event?['name'] ?? "",
-    style: const TextStyle(
-    fontFamily: AppAssets.fontOutfit,
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: Colors.white,
+    style: AppTextStyles.labelLarge.copyWith(
+    color: AppColors.white,
     ),
     ),
 
-    const SizedBox(height: 6),
+    const SizedBox(height: AppSpacing.xs),
 
     Text(
     event?['type'] ?? "",
-    style: const TextStyle(
-    fontSize: 12,
-    color: Colors.white70,
+    style: AppTextStyles.bodySmall.copyWith(
+    color: AppColors.white70,
     ),
     ),
 
-    const SizedBox(height: 12),
+    const SizedBox(height: AppSpacing.md),
 
-    const Text(
+    Text(
     "Description",
-    style: TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: Colors.white,
+    style: AppTextStyles.labelLarge.copyWith(
+    color: AppColors.white,
     ),
     ),
 
-    const SizedBox(height: 6),
+    const SizedBox(height: AppSpacing.xs),
 
     Text(
     event?['description'] ?? "No description available",
-    style: const TextStyle(
-    fontSize: 12,
-    color: Colors.white70,
+    style: AppTextStyles.bodySmall.copyWith(
+    color: AppColors.white70,
     ),
     ),
     ],
     ),
     ),
 
-    const SizedBox(height: 20),
+    const SizedBox(height: AppSpacing.xl),
 
     /// 🔹 BUDGET + CREW
     Container(
-    padding: const EdgeInsets.all(12),
+    padding: const EdgeInsets.all(AppSpacing.md),
     decoration: BoxDecoration(
     color: AppColors.surfaceVariant,
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: AppRadii.hugeAll,
     ),
     child: Row(
     children: [
@@ -349,7 +339,7 @@ class _ShootSummaryScreenState
     value: _formatBudget(bookingData),
     ),
     ),
-    const SizedBox(width: 16),
+    const SizedBox(width: AppSpacing.base),
     Expanded(
     child: infoItem(
     icon: Icons.group,
@@ -377,7 +367,7 @@ class _ShootSummaryScreenState
       ),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(18.0),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: SizedBox(
           width: double.infinity,
           height: 55,
@@ -408,17 +398,15 @@ class _ShootSummaryScreenState
             style: ElevatedButton.styleFrom(
               backgroundColor:  AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppRadii.lgAll,
               ),
             ),
             child:
             Text(
               "Manage Shoot",
-              style: TextStyle(
-                fontFamily: AppAssets.fontUnbounded,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textHeading,
+              style: AppTextStyles.titleSmall.copyWith(
                 fontSize: 14,
+                color: AppColors.textHeading,
               ),
             ),
           ),
@@ -430,7 +418,7 @@ class _ShootSummaryScreenState
   /// 🔹 INFO ROW WIDGET
   Widget infoRow(String iconPath, String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         children: [
           SvgPicture.asset(
@@ -440,15 +428,12 @@ class _ShootSummaryScreenState
               BlendMode.srcIn,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-
-                fontFamily: AppAssets.fontOutfit,
-                fontWeight: FontWeight.w500,
-                color: AppColors.white70,                fontSize: 12,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.white70,
               ),
             ),
           ),
@@ -460,14 +445,14 @@ class _ShootSummaryScreenState
   /// 🔹 CHIP
   Widget chip(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smd, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.white10,
+        borderRadius: AppRadii.hugeAll,
       ),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white70, fontSize: 12),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
       ),
     );
 
@@ -492,12 +477,12 @@ class _ShootSummaryScreenState
                 AppColors.primary.withValues(alpha:0.6),
               ],
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadii.mld),
           ),
-          child: Icon(icon, color: Colors.black, size: 18),
+          child: Icon(icon, color: AppColors.black, size: 18),
         ),
 
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.smd),
 
         /// TEXT
         Column(
@@ -505,21 +490,15 @@ class _ShootSummaryScreenState
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.white,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
               value,
-              style: TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.white.withValues(alpha:0.6),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.white.withValues(alpha:0.6),
               ),
             ),
           ],
@@ -536,13 +515,13 @@ class _ShootSummaryScreenState
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setState) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.95,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppSpacing.smd),
               decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.vertical(
@@ -558,36 +537,33 @@ class _ShootSummaryScreenState
                       height: 5,
                       decoration: BoxDecoration(
                         color: AppColors.white70,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(AppRadii.xxxl),
                       ),
                     ),
                   ),
 
                   /// HEADER
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(AppSpacing.base),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Project Timeline",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: AppAssets.fontUnbounded,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.white,
                           ),
                         ),
                         InkWell(
                           onTap: () => context.pop(),
                           child:
-                          const Icon(Icons.close, color: Colors.white),
+                          const Icon(Icons.close, color: AppColors.white),
                         ),
                       ],
                     ),
                   ),
 
-                  const Divider(color: Colors.white12),
+                  const Divider(color: AppColors.dividerDark),
 
                   /// BODY
                   Expanded(
@@ -596,10 +572,10 @@ class _ShootSummaryScreenState
                       child: CircularProgressIndicator(),
                     )
                         : timelineData.isEmpty
-                        ? const Center(
+                        ? Center(
                       child: Text(
                         "No timeline available",
-                        style: TextStyle(color: Colors.white70),
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70),
                       ),
                     )
                         : ListView.builder(
@@ -649,8 +625,8 @@ class _ShootSummaryScreenState
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isActive
-                    ? const Color(0xFFEAD7B0)
-                    : const Color(0xFF1F1F1F),
+                    ? AppColors.primary
+                    : AppColors.surfaceInput,
               ),
               child: Center(
                 child: Image.asset(
@@ -658,7 +634,7 @@ class _ShootSummaryScreenState
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: AppSpacing.xxs),
             if (showLine)
               Column(
                 children: [
@@ -670,24 +646,24 @@ class _ShootSummaryScreenState
                         width: 1,
                         margin:
                         const EdgeInsets.symmetric(vertical: 1),
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: AppSpacing.xxs),
                   const Icon(Icons.keyboard_arrow_down,
-                      size: 14, color: Colors.white),
+                      size: 14, color: AppColors.white),
                 ],
               ),
           ],
         ),
 
-        const SizedBox(width: 14),
+        const SizedBox(width: AppSpacing.mld),
 
         /// TEXT
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.only(top: AppSpacing.xxs),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -698,10 +674,7 @@ class _ShootSummaryScreenState
                     Expanded(
                       child: Text(
                         title,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: AppAssets.fontOutfit,
-                          fontWeight: FontWeight.w500,
+                        style: AppTextStyles.labelMedium.copyWith(
                           color: isActive
                               ? AppColors.primary
                               : AppColors.white70,
@@ -710,24 +683,21 @@ class _ShootSummaryScreenState
                     ),
                     Text(
                       time,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontFamily: AppAssets.fontOutfit,
-                        color: Colors.white,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.white,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: AppTextStyles.caption.copyWith(
                     fontSize: 9,
-                    fontFamily: AppAssets.fontOutfit,
                     color: AppColors.white70,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.xl),
               ],
             ),
           ),
