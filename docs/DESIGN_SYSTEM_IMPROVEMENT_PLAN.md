@@ -773,3 +773,93 @@ git show --name-only HEAD
 - Wraps child in `MediaQuery` override clamping `textScaler` to `maxScaleFactor` (default `1.2`)
 - Use on: bottom nav labels, button text, chips, tab labels, badges
 - Never use on: body text, list items, dialog content, scrollable areas
+
+---
+
+### Phase 5 — Tier 3 Files *(commits: `71cdad1`–`4a1b1cb`)*
+
+**T5.1 — `shoot_edit_review_screen.dart`** *(commit: `71cdad1`)*
+- Replaced remaining magic `SizedBox` numbers (24→xxl, 14→mld, 12→md, 10→smd, 8→sm, 6→xs, 2→xxxs, 28→xxl, 32→xxxl) with `AppSpacing` tokens
+- Replaced `EdgeInsets.all(7)` → `AppSpacing.sm`, `EdgeInsets.only(bottom: 8)` → `AppSpacing.sm` (4 occurrences)
+- Replaced inline `TextStyle` in `priceRow` with `AppTextStyles.buttonMedium`/`bodySmall`/`bodyLarge`/`labelMedium`
+- Replaced `titleSmall.copyWith(fontSize: 14)` → `AppTextStyles.buttonMedium` in button and sectionTitle
+- Replaced `BorderRadius.circular(20)` → `AppRadii.hugeAll` in gradientSwitch
+
+**T5.2 — `crew_size_matching_screen.dart`** *(commit: `9dcce1a`)*
+- Added imports: `text_styles.dart`, `spacing.dart`, `radii.dart`
+- Replaced 15+ inline `TextStyle(...)` with `AppTextStyles` tokens (`bodyMedium`, `titleSmall`, `labelLarge`, `labelSmall`, `bodySmall`, `bodyLarge`, `buttonMedium`, `buttonSmall`)
+- Replaced `Colors.white`/`Colors.black` → `AppColors.white`/`AppColors.black`
+- Replaced `Color(0xffE8D1AB)` → `AppColors.primary`, `Color(0xff1D1D1B)` → `AppColors.onPrimary`, `Color(0xFFE6C48F)` → `AppColors.primary`
+- Replaced 3 `.withOpacity()` → `.withValues(alpha:)`
+- Replaced magic `EdgeInsets` with `AppSpacing` tokens (xl, md, sm, smd, base, xxs)
+- Replaced `BorderRadius.circular(64/12/10/16/20)` → `AppRadii` tokens
+- Removed `const` from `TextSpan` parents to allow `AppTextStyles` usage
+
+**T5.3 — `my_shoots_screen.dart`** *(commit: `7eadbf3`)*
+- Added imports: `text_styles.dart`, `spacing.dart`, `radii.dart`
+- Replaced all `Colors.xxx` (white, black, transparent, white70, white24, white38, white60) → `AppColors` equivalents
+- Replaced `Color(0xFFE8D8BD/E8C99A)` → `AppColors.primary`, `Color(0xFFD4A14D)` → `AppColors.primaryDark`, `Color(0xFF1E1E1E/1F1F1F)` → `AppColors.surfaceInput`
+- Replaced 13 inline `TextStyle` → `AppTextStyles` tokens (`titleSmall`, `buttonLarge`, `buttonSmall`, `buttonMedium`, `bodyMedium`, `bodyLarge`)
+- Replaced all magic `EdgeInsets` and `SizedBox` values → `AppSpacing` tokens
+- Replaced all `BorderRadius.circular(N)` → `AppRadii` tokens
+- Fixed `AlignmentGeometry.topCenter`/`bottomCenter` → `Alignment.topCenter`/`bottomCenter`
+
+**T5.4 — `shoot_summary_screen.dart` + `profile_screen.dart`** *(commit: `27d886f`)*
+
+*shoot_summary_screen.dart:*
+- Added imports: `text_styles.dart`, `spacing.dart`, `radii.dart`
+- Replaced all `Colors.xxx` (black12, black, transparent, white, white10, white70) → `AppColors`
+- Replaced `Color(0xFFEAD7B0)` → `AppColors.primary`, `Color(0xFF1F1F1F)` → `AppColors.surfaceInput`
+- Replaced all inline `TextStyle` → `AppTextStyles` tokens (`titleMedium`, `labelMedium`, `bodySmall`, `labelLarge`, `titleSmall`, `caption`, `bodyMedium`)
+- Replaced all magic `EdgeInsets`/`SizedBox` → `AppSpacing`, `BorderRadius.circular` → `AppRadii`
+
+*profile_screen.dart:*
+- Added imports: `text_styles.dart`, `spacing.dart`, `radii.dart`
+- Replaced `Colors.white`/`white12`/`white60`/`transparent`/`grey.shade200` → `AppColors` equivalents
+- Replaced `Color(0xFF2A2A2A)` → `AppColors.surfaceVariant`, `Color(0xFF3A3A3A)` → `AppColors.shimmerHighlight`, `Color(0xFF1E1E1E)` → `AppColors.surfaceInput`
+- Replaced all inline `TextStyle` → `AppTextStyles` tokens (`titleSmall`, `titleMedium`, `bodyMedium`, `caption`)
+- Replaced all magic `EdgeInsets`/`SizedBox` → `AppSpacing`, `BorderRadius.circular` → `AppRadii`
+- Replaced `Radius.circular(28)` → `Radius.circular(AppRadii.round)`
+
+**Token additions** *(commit: `4a1b1cb`)*
+- Added `AppColors.surfaceMid` (`0xFF282828`) — mid surface distinct from surfaceVariant
+- Added `AppColors.discountGreen` (`0xFF7ED957`) — green for discount pricing
+
+---
+
+### Phase 6 — Tier 4 Files *(completed: 2026-05-07)*
+
+**T6.1 — `creative_profile_screen.dart` + `cancel_shoot_screen.dart`**
+- Replaced inline `Colors.xxx`, `Color(0x...)`, `TextStyle`, `fontSize`, `EdgeInsets`, `BorderRadius`, and `.withOpacity()` usages with design tokens.
+- Reused existing exact tokens where available, including `AppColors.surfaceVariant`, `AppColors.primary`, `AppColors.black`, `AppColors.white`, `AppColors.white70`, and `AppColors.white30`.
+- Fixed the touched `Matrix4.scale(...)` deprecation in `creative_profile_screen.dart` by using `scaleByDouble(...)`.
+
+**T6.2 — `recommended_creative_detail_screen.dart` + `edit_profile_screen.dart`**
+- Applied the same profile/detail token replacements to `recommended_creative_detail_screen.dart` for parity with `creative_profile_screen.dart`.
+- Replaced edit profile inline styles, map/card radii, crop sheet colors, crop controls, and custom painter colors with tokens.
+- Fixed touched analyzer issues in `edit_profile_screen.dart`: replaced deprecated `setMapStyle(...)` with `GoogleMap.style`, changed `Matrix4.translate/scale` to `translateByDouble/scaleByDouble`, and used `context.mounted` after async work.
+
+**T6.3 — `manage_shoot_screen.dart` + `shoot_type_screen.dart` + `payment_method_screen.dart`**
+- Corrected implementation paths from the plan's shortened paths to:
+  - `lib/features/shoot/presentation/screens/manage_shoot_screen.dart`
+  - `lib/features/booking/presentation/screens/shoot_type_screen.dart`
+  - `lib/features/booking/presentation/screens/payment_method_screen.dart`
+- Replaced all direct inline colors, typography, spacing, radii, and opacity usage in the three files.
+- Removed an unnecessary wrapper `Container` in `shoot_type_screen.dart` surfaced by targeted analyzer.
+
+**Token additions**
+- Added `AppColors.online` (`0xFF2ED47A`) — exact online/active availability green.
+- Added `AppColors.goldCta` (`0xFFE7C89E`) — exact pale gold CTA surface.
+- Added `AppColors.paymentAccent` (`0xFFFFE6A5`) — exact payment highlight gold.
+- Added `AppColors.surfaceStats` (`0xFF1E1E1E`) — exact nested stats card surface.
+- Added `AppColors.surfaceCropSheet` (`0xFF1C1C1C`) — exact crop sheet surface.
+- Added `AppColors.white54` and `AppColors.greyShade400` for Material-equivalent exact values used by Phase 6 screens.
+- Added `AppRadii.statsInner`, `portfolioCompact`, `portfolio`, `header`, `sheet`, and related convenience radii.
+- Added `AppSpacing.fine`, `verticalXxxs`, and `gapHSmd` convenience spacing helpers.
+- Added `AppTextStyles.bodyCompact` for existing 13sp body copy.
+
+**Verification**
+- `flutter analyze` targeted T6.1 touched files — passed, no issues.
+- `flutter analyze` targeted T6.2 touched files — passed, no issues.
+- `flutter analyze` targeted T6.3 touched files — passed, no issues.
+- Final scan across all Phase 6 files found no remaining `Colors.`, `Color(0x...)`, inline `TextStyle`, inline `fontSize`, or `.withOpacity()` usages.

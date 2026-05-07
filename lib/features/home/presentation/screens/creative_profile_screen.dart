@@ -7,6 +7,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/creative/presentation/providers/creative_profile_notifier.dart';
 
@@ -99,34 +102,31 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            Colors.black.withValues(alpha: 0.5),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.85),
+                            AppColors.black.withValues(alpha: 0.5),
+                            AppColors.transparent,
+                            AppColors.black.withValues(alpha: 0.85),
                           ],
                         ),
                       ),
                     ),
                     Positioned(
                       top: 40,
-                      left: 16,
-                      right: 16,
+                      left: AppSpacing.base,
+                      right: AppSpacing.base,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
                             onTap: () => context.pop(),
-                            child: SvgPicture.asset(
-                              AppAssets.back,
-                              height: 24,
-                            ),
+                            child: SvgPicture.asset(AppAssets.back, height: 24),
                           ),
                         ],
                       ),
                     ),
                     Positioned(
-                      left: 16,
-                      bottom: 24,
-                      right: 16,
+                      left: AppSpacing.base,
+                      bottom: AppSpacing.xxl,
+                      right: AppSpacing.base,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -135,19 +135,15 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                             children: [
                               Text(
                                 creative?['name'] ?? "",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontOutfit,
-                                  fontSize: 16,
+                                style: AppTextStyles.bodyLarge.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              AppSpacing.verticalXs,
                               Text(
                                 creative?['primary_title'] ?? "",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontOutfit,
-                                  fontSize: 14,
+                                style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.white70,
                                 ),
                               ),
@@ -161,7 +157,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
                 /// INFO STATS
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: AppSpacing.insetsHBase,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     mainAxisSize: MainAxisSize.max,
@@ -180,13 +176,13 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.verticalXl,
                 _divider(),
 
                 /// ABOUT
                 _sectionTitle("About Creator"),
                 _sectionText(about?['bio'] ?? "No information available"),
-                const SizedBox(height: 20),
+                AppSpacing.verticalXl,
                 _divider(),
 
                 /// PORTFOLIO
@@ -198,7 +194,8 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                       child: portfolio.isEmpty
                           ? Center(
                               child: SvgPicture.asset(
-                                  AppAssets.imagePlaceholder),
+                                AppAssets.imagePlaceholder,
+                              ),
                             )
                           : PageView.builder(
                               controller: _portfolioController,
@@ -208,8 +205,9 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                                 final realIndex = index % portfolio.length;
                                 final item = portfolio[realIndex];
 
-                                final imageUrl =
-                                    _imageUrl(item["file_path"] ?? "");
+                                final imageUrl = _imageUrl(
+                                  item["file_path"] ?? "",
+                                );
 
                                 return AnimatedBuilder(
                                   animation: _portfolioController,
@@ -218,15 +216,15 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
                                     if (_portfolioController.hasClients &&
                                         _portfolioController
-                                            .position.haveDimensions) {
+                                            .position
+                                            .haveDimensions) {
                                       value =
                                           (_portfolioController.page ?? 0) -
-                                              index;
+                                          index;
                                     }
 
-                                    double scale =
-                                        (1 - (value.abs() * 0.2))
-                                            .clamp(0.8, 1.0);
+                                    double scale = (1 - (value.abs() * 0.2))
+                                        .clamp(0.8, 1.0);
                                     double angle = value * -0.5;
 
                                     return Transform(
@@ -236,16 +234,19 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                                       transform: Matrix4.identity()
                                         ..setEntry(3, 2, 0.001)
                                         ..rotateY(angle)
-                                        ..scale(scale),
+                                        ..scaleByDouble(scale, scale, scale, 1),
                                       child: Opacity(
-                                        opacity: (1 - value.abs())
-                                            .clamp(0.5, 1.0),
+                                        opacity: (1 - value.abs()).clamp(
+                                          0.5,
+                                          1.0,
+                                        ),
                                         child: Center(
                                           child: SizedBox(
                                             height: 240,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                                            width:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
                                                 0.7,
                                             child: child,
                                           ),
@@ -255,30 +256,30 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                                   },
                                   child: Container(
                                     margin: const EdgeInsets.symmetric(
-                                        horizontal: 6),
+                                      horizontal: AppSpacing.xs,
+                                    ),
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(25),
+                                      borderRadius: AppRadii.portfolioAll,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.4),
+                                          color: AppColors.black.withValues(
+                                            alpha: 0.4,
+                                          ),
                                           blurRadius: 10,
                                           offset: const Offset(0, 6),
                                         ),
                                       ],
                                     ),
                                     child: ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(25),
+                                      borderRadius: AppRadii.portfolioAll,
                                       child: Image.network(
                                         imageUrl,
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) =>
                                             SvgPicture.asset(
-                                          AppAssets.imagePlaceholder,
-                                          fit: BoxFit.cover,
-                                        ),
+                                              AppAssets.imagePlaceholder,
+                                              fit: BoxFit.cover,
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -286,38 +287,41 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                               },
                             ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: AppSpacing.lg),
                   ],
                 ),
                 _divider(),
 
                 /// WEEKLY AVAILABILITY
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.base,
+                    AppSpacing.xxl,
+                    AppSpacing.base,
+                    AppSpacing.sm,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (weeklyAvailability.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           "Weekly Availability",
-                          style: TextStyle(
+                          style: AppTextStyles.titleMedium.copyWith(
                             fontFamily: AppAssets.fontOutfit,
-                            fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: AppSpacing.mld),
                         Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(AppSpacing.mld),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
-                            borderRadius: BorderRadius.circular(20),
+                            color: AppColors.surfaceVariant,
+                            borderRadius: AppRadii.hugeAll,
                           ),
                           child: Column(
                             children: weekDaysOrder.map((day) {
-                              bool isActive =
-                                  weeklyAvailability.contains(day);
+                              bool isActive = weeklyAvailability.contains(day);
                               return _availabilityRow(
                                 day,
                                 isActive,
@@ -331,7 +335,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppSpacing.massive),
               ],
             ),
           ),
@@ -346,16 +350,19 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
   Widget _divider() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.smd,
+      ),
       child: Container(
         height: 1,
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.white.withValues(alpha: 0.09),
-              Colors.white.withValues(alpha: 0.09),
-              Colors.white.withValues(alpha: 0.09),
+              AppColors.white.withValues(alpha: 0.09),
+              AppColors.white.withValues(alpha: 0.09),
+              AppColors.white.withValues(alpha: 0.09),
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -374,23 +381,23 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
       width: 105,
       height: 120,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadii.lgAll,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFE8D1AB).withValues(alpha: 0.40),
-            const Color(0xFFE8D1AB).withValues(alpha: 0.04),
-            const Color(0xFFE8D1AB).withValues(alpha: 0.28),
+            AppColors.primary.withValues(alpha: 0.40),
+            AppColors.primary.withValues(alpha: 0.04),
+            AppColors.primary.withValues(alpha: 0.28),
           ],
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(0.6),
+        padding: const EdgeInsets.all(AppSpacing.fine),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(11.5),
+            color: AppColors.surfaceStats,
+            borderRadius: AppRadii.statsInnerAll,
           ),
           child: Stack(
             alignment: Alignment.topCenter,
@@ -401,39 +408,31 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                   width: 38,
                   height: 42,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE8D1AB),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(14),
+                      bottom: Radius.circular(AppRadii.xl),
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 20,
-                    color: Colors.black,
-                  ),
+                  child: Icon(icon, size: 20, color: AppColors.black),
                 ),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                   Text(
                     value,
-                    style: const TextStyle(
-                      fontFamily: AppAssets.fontOutfit,
-                      fontSize: 16,
+                    style: AppTextStyles.bodyLarge.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     title,
-                    style: TextStyle(
-                      fontFamily: AppAssets.fontOutfit,
-                      fontSize: 12,
+                    style: AppTextStyles.bodySmall.copyWith(
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: AppColors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -447,12 +446,16 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
   Widget _sectionTitle(String text) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.base,
+        AppSpacing.xxl,
+        AppSpacing.base,
+        AppSpacing.sm,
+      ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: AppTextStyles.labelLarge.copyWith(
           fontFamily: AppAssets.fontUnbounded,
-          fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
         ),
@@ -462,12 +465,10 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
   Widget _sectionText(String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: AppSpacing.insetsHBase,
       child: Text(
         text,
-        style: const TextStyle(
-          fontFamily: AppAssets.fontOutfit,
-          fontSize: 13,
+        style: AppTextStyles.bodyCompact.copyWith(
           fontWeight: FontWeight.w400,
           color: AppColors.white70,
         ),
@@ -477,38 +478,34 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
 
   Widget _availabilityRow(String day, bool isActive, String time) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
           Container(
             height: 8,
             width: 8,
             decoration: BoxDecoration(
-              color: isActive ? const Color(0xFF2ED47A) : Colors.grey,
+              color: isActive ? AppColors.online : AppColors.neutralGrey,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 12),
+          AppSpacing.gapHMd,
           Expanded(
             child: Text(
               day,
-              style: TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 14,
+              style: AppTextStyles.labelLarge.copyWith(
                 fontWeight: FontWeight.w500,
-                color: isActive ? const Color(0xFF2ED47A) : Colors.white,
+                color: isActive ? AppColors.online : AppColors.white,
               ),
             ),
           ),
           Text(
             time,
-            style: TextStyle(
-              fontFamily: AppAssets.fontOutfit,
-              fontSize: 14,
+            style: AppTextStyles.labelLarge.copyWith(
               fontWeight: FontWeight.w500,
               color: isActive
-                  ? const Color(0xFF2ED47A)
-                  : Colors.white.withValues(alpha: 0.6),
+                  ? AppColors.online
+                  : AppColors.white.withValues(alpha: 0.6),
             ),
           ),
         ],

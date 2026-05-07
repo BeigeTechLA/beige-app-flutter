@@ -14,18 +14,20 @@ import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:beige/app/route_names.dart';
-import 'package:beige/shared/widgets/custom_input_field.dart';
-import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
+import 'package:beige/shared/widgets/custom_input_field.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  ConsumerState<EditProfileScreen> createState() =>
-      _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
@@ -84,9 +86,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Marker(
           markerId: const MarkerId("selected_location"),
           position: latLng,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueRed,
-          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         ),
       };
     });
@@ -99,23 +99,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         final loc = locations.first;
         final latLng = LatLng(loc.latitude, loc.longitude);
         _updateMarker(latLng);
-        mapController?.animateCamera(
-          CameraUpdate.newLatLngZoom(latLng, 15),
-        );
+        mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 15));
         await getAddressFromLatLng(latLng);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location not found")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Location not found")));
     }
   }
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
         setState(() {
@@ -168,9 +168,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         context.pop(true);
       } else if (next.status == EditProfileStatus.error &&
           next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
       }
     });
 
@@ -204,16 +204,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     Container(
                       height: 248,
                       width: double.infinity,
-                      color: Colors.transparent,
+                      color: AppColors.transparent,
                     ),
                     SizedBox(
                       width: double.infinity,
                       height: 200,
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(28),
-                          bottomRight: Radius.circular(28),
-                        ),
+                        borderRadius: AppRadii.bottomHeader,
                         child: Image.asset(
                           AppAssets.profilePlaceholder,
                           fit: BoxFit.cover,
@@ -224,7 +221,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     /// BACK BUTTON
                     Positioned(
                       top: 90,
-                      left: 16,
+                      left: AppSpacing.base,
                       child: InkWell(
                         onTap: () => context.pop(true),
                         child: SvgPicture.asset(
@@ -239,17 +236,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
 
                     /// TITLE
-                    const Positioned(
+                    Positioned(
                       top: 90,
                       left: 0,
                       right: 0,
                       child: Center(
                         child: Text(
                           "Edit Profile",
-                          style: TextStyle(
+                          style: AppTextStyles.titleSmall.copyWith(
                             color: AppColors.textHeading,
-                            fontSize: 16,
-                            fontFamily: AppAssets.fontUnbounded,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -266,14 +261,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           alignment: Alignment.bottomRight,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.all(AppSpacing.xxs),
                               decoration: const BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.white,
                                 shape: BoxShape.circle,
                               ),
                               child: CircleAvatar(
                                 radius: 48,
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor: AppColors.greyShade200,
                                 backgroundImage: getProfileImage(),
                                 child: getProfileImage() == null
                                     ? SvgPicture.asset(
@@ -287,17 +282,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               behavior: HitTestBehavior.opaque,
                               onTap: _pickImage,
                               child: Container(
-                                padding: const EdgeInsets.all(6),
+                                padding: const EdgeInsets.all(AppSpacing.xs),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   shape: BoxShape.circle,
-                                  border:
-                                      Border.all(color: Colors.black12),
+                                  border: Border.all(color: AppColors.black12),
                                 ),
                                 child: const Icon(
                                   Icons.edit,
                                   size: 18,
-                                  color: Colors.black,
+                                  color: AppColors.black,
                                 ),
                               ),
                             ),
@@ -307,25 +301,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                AppSpacing.verticalSmd,
 
                 /// USER INFO
                 Text(
                   myProfile?['name'] ?? '',
-                  style: const TextStyle(
+                  style: AppTextStyles.titleLarge.copyWith(
                     fontFamily: AppAssets.fontOutfit,
-                    color: Colors.white,
-                    fontSize: 20,
+                    color: AppColors.white,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                AppSpacing.verticalXxs,
                 Text(
                   "${myProfile?['email'] ?? ''}",
-                  style: const TextStyle(
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.white60,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -350,31 +341,25 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSpacing.mld),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 children: [
-                  CustomInputField(
-                    title: "Name*",
-                    controller: nameController,
-                  ),
-                  const SizedBox(height: 20),
+                  CustomInputField(title: "Name*", controller: nameController),
+                  AppSpacing.verticalXl,
                   CustomInputField(
                     title: "Email ID*",
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
                   ),
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.white70,
-                        width: 0.8,
-                      ),
+                      color: AppColors.transparent,
+                      borderRadius: AppRadii.lgAll,
+                      border: Border.all(color: AppColors.white70, width: 0.8),
                     ),
                     child: GooglePlaceAutoCompleteTextField(
                       textEditingController: locationController,
@@ -382,23 +367,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       googleAPIKey: GoogleConfig.placesApiKey,
                       debounceTime: 600,
                       isLatLngRequired: true,
-                      textStyle: const TextStyle(
+                      textStyle: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.white,
-                        fontFamily: AppAssets.fontOutfit,
-                        fontSize: 14,
                       ),
-                      inputDecoration: const InputDecoration(
+                      inputDecoration: InputDecoration(
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         hintText: "location*",
-                        hintStyle: TextStyle(color: AppColors.white70),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
+                        hintStyle: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.white70,
                         ),
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.only(right: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.base,
+                          vertical: AppSpacing.mld,
+                        ),
+                        suffixIcon: const Padding(
+                          padding: EdgeInsets.only(right: AppSpacing.sm),
                           child: Icon(
                             Icons.location_on_outlined,
                             color: AppColors.white70,
@@ -412,15 +397,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         );
                         _updateMarker(latLng);
                         setState(() {
-                          selectedAddress =
-                              prediction.description ?? "";
+                          selectedAddress = prediction.description ?? "";
                         });
                         locationController.text = selectedAddress;
-                        locationController.selection =
-                            TextSelection.fromPosition(
-                          TextPosition(
-                              offset:
-                                  locationController.text.length),
+                        locationController
+                            .selection = TextSelection.fromPosition(
+                          TextPosition(offset: locationController.text.length),
                         );
                         locationFocusNode.unfocus();
                         mapController?.animateCamera(
@@ -428,28 +410,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         );
                       },
                       itemClick: (prediction) {
-                        locationController.text =
-                            prediction.description ?? "";
-                        locationController.selection =
-                            TextSelection.fromPosition(
-                          TextPosition(
-                              offset:
-                                  locationController.text.length),
+                        locationController.text = prediction.description ?? "";
+                        locationController
+                            .selection = TextSelection.fromPosition(
+                          TextPosition(offset: locationController.text.length),
                         );
                       },
                       isCrossBtnShown: true,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadii.xxlAll,
                     child: SizedBox(
                       height: 250,
                       child: currentLatLng == null
-                          ? const Center(
-                              child: CircularProgressIndicator(),
-                            )
+                          ? const Center(child: CircularProgressIndicator())
                           : GoogleMap(
+                              style: darkMapStyle,
                               initialCameraPosition: CameraPosition(
                                 target: currentLatLng!,
                                 zoom: 14,
@@ -459,48 +437,45 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               zoomControlsEnabled: true,
                               compassEnabled: true,
                               markers: markers,
-                              gestureRecognizers: <Factory<
-                                  OneSequenceGestureRecognizer>>{
-                                Factory<OneSequenceGestureRecognizer>(
-                                  () => EagerGestureRecognizer(),
-                                ),
-                              },
+                              gestureRecognizers:
+                                  <Factory<OneSequenceGestureRecognizer>>{
+                                    Factory<OneSequenceGestureRecognizer>(
+                                      () => EagerGestureRecognizer(),
+                                    ),
+                                  },
                               onMapCreated: (controller) {
                                 mapController = controller;
-                                controller.setMapStyle(darkMapStyle);
                                 if (currentLatLng != null) {
                                   mapController!.animateCamera(
                                     CameraUpdate.newLatLngZoom(
-                                        currentLatLng!, 14),
+                                      currentLatLng!,
+                                      14,
+                                    ),
                                   );
                                 }
                               },
                               onTap: (latLng) async {
                                 _updateMarker(latLng);
                                 await getAddressFromLatLng(latLng);
-                                locationController.text =
-                                    selectedAddress;
+                                locationController.text = selectedAddress;
                                 mapController?.animateCamera(
-                                  CameraUpdate.newLatLngZoom(
-                                      latLng, 14),
+                                  CameraUpdate.newLatLngZoom(latLng, 14),
                                 );
                               },
                             ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                   CustomInputField(
                     title: "Change Password*",
-                    controller:
-                        TextEditingController(text: "********"),
+                    controller: TextEditingController(text: "********"),
                     readOnly: true,
                     suffixIcon: GestureDetector(
                       onTap: () async {
                         await context.pushNamed(
-                            RouteNames.changePassword,
-                            extra: {
-                              'email': emailController.text,
-                            });
+                          RouteNames.changePassword,
+                          extra: {'email': emailController.text},
+                        );
                       },
                       child: SizedBox(
                         height: 15,
@@ -512,7 +487,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                 ],
               ),
             ),
@@ -520,7 +495,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: SizedBox(
           width: double.infinity,
           height: 55,
@@ -530,24 +505,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 : () {
                     ref
                         .read(editProfileNotifierProvider.notifier)
-                        .updateProfile(data: {
-                      "name": nameController.text.trim(),
-                      "location": locationController.text.trim(),
-                    });
+                        .updateProfile(
+                          data: {
+                            "name": nameController.text.trim(),
+                            "location": locationController.text.trim(),
+                          },
+                        );
                   },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
             ),
-            child: const Text(
+            child: Text(
               "Update Profile",
-              style: TextStyle(
+              style: AppTextStyles.labelLarge.copyWith(
                 fontFamily: AppAssets.fontUnbounded,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textHeading,
-                fontSize: 14,
               ),
             ),
           ),
@@ -563,18 +537,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (_) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.85,
               decoration: const BoxDecoration(
-                color: Color(0xFF1C1C1C),
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(30)),
+                color: AppColors.surfaceCropSheet,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(AppRadii.round),
+                ),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.base),
               child: Column(
                 children: [
                   Center(
@@ -583,38 +558,37 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       height: 5,
                       decoration: BoxDecoration(
                         color: AppColors.white70,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: AppRadii.xxxlAll,
                       ),
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         "Crop your Profile",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.white,
                           fontFamily: AppAssets.fontOutfit,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       InkWell(
                         onTap: () => context.pop(),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: AppRadii.hugeAll,
                         child: const Padding(
-                          padding: EdgeInsets.all(6),
+                          padding: EdgeInsets.all(AppSpacing.xs),
                           child: Icon(
                             Icons.close,
-                            color: Colors.white,
+                            color: AppColors.white,
                             size: 22,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Divider(color: AppColors.dividerDark),
+                  AppSpacing.verticalXl,
+                  const Divider(color: AppColors.dividerDark),
 
                   /// CIRCULAR PREVIEW
                   Expanded(
@@ -626,8 +600,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         },
                         onScaleUpdate: (details) {
                           setSheetState(() {
-                            cropScale = (startScale * details.scale)
-                                .clamp(1.0, 4.0);
+                            cropScale = (startScale * details.scale).clamp(
+                              1.0,
+                              4.0,
+                            );
                             cropOffset += details.focalPointDelta;
                           });
                         },
@@ -642,9 +618,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                   child: Transform(
                                     alignment: Alignment.center,
                                     transform: Matrix4.identity()
-                                      ..translate(
-                                          cropOffset.dx, cropOffset.dy)
-                                      ..scale(cropScale),
+                                      ..translateByDouble(
+                                        cropOffset.dx,
+                                        cropOffset.dy,
+                                        0,
+                                        1,
+                                      )
+                                      ..scaleByDouble(
+                                        cropScale,
+                                        cropScale,
+                                        cropScale,
+                                        1,
+                                      ),
                                     child: Image.file(
                                       imageFile,
                                       width: 340,
@@ -666,12 +651,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  AppSpacing.verticalBase,
 
                   /// ZOOM SLIDER
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 8),
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
                     child: Row(
                       children: [
                         SvgPicture.asset(
@@ -679,22 +666,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           height: 20,
                           width: 20,
                         ),
-                        const SizedBox(width: 10),
+                        AppSpacing.gapHSmd,
                         Expanded(
                           child: SliderTheme(
                             data: SliderTheme.of(context).copyWith(
                               trackHeight: 6,
-                              thumbShape:
-                                  const RoundSliderThumbShape(
+                              thumbShape: const RoundSliderThumbShape(
                                 enabledThumbRadius: 10,
                               ),
-                              overlayShape:
-                                  const RoundSliderOverlayShape(
+                              overlayShape: const RoundSliderOverlayShape(
                                 overlayRadius: 14,
                               ),
                               activeTrackColor: AppColors.primary,
-                              inactiveTrackColor:
-                                  Colors.white.withValues(alpha: 0.3),
+                              inactiveTrackColor: AppColors.white.withValues(
+                                alpha: 0.3,
+                              ),
                               thumbColor: AppColors.primary,
                             ),
                             child: Slider(
@@ -707,7 +693,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        AppSpacing.gapHSmd,
                         SvgPicture.asset(
                           AppAssets.cropImage,
                           height: 26,
@@ -716,7 +702,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  AppSpacing.verticalSmd,
 
                   /// SAVE BUTTON
                   SizedBox(
@@ -726,7 +712,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppRadii.lgAll,
                         ),
                         elevation: 0,
                       ),
@@ -747,13 +733,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         }
 
                         setSheetState(() => isSaving = false);
-                        if (mounted) context.pop();
+                        if (context.mounted) context.pop();
                       },
-                      child: const Text(
+                      child: Text(
                         "Save",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.black,
                           fontFamily: AppAssets.fontUnbounded,
                           fontWeight: FontWeight.w500,
                         ),
@@ -792,10 +777,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       final cropSize = (cropUI * ratio) / cropScale;
 
-      double dx =
-          (imgW / 2) - (cropSize / 2) - (cropOffset.dx * ratio);
-      double dy =
-          (imgH / 2) - (cropSize / 2) - (cropOffset.dy * ratio);
+      double dx = (imgW / 2) - (cropSize / 2) - (cropOffset.dx * ratio);
+      double dy = (imgH / 2) - (cropSize / 2) - (cropOffset.dy * ratio);
 
       dx = dx.clamp(0.0, imgW - cropSize);
       dy = dy.clamp(0.0, imgH - cropSize);
@@ -815,11 +798,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
 
       final pic = recorder.endRecording();
-      final cropped =
-          await pic.toImage(cropSize.toInt(), cropSize.toInt());
+      final cropped = await pic.toImage(cropSize.toInt(), cropSize.toInt());
 
-      final data =
-          await cropped.toByteData(format: ui.ImageByteFormat.png);
+      final data = await cropped.toByteData(format: ui.ImageByteFormat.png);
 
       final dir = await getTemporaryDirectory();
       final file = File(
@@ -838,24 +819,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 class CircleHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.saveLayer(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint(),
-    );
+    canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
 
     canvas.drawRect(
       Offset.zero & size,
-      Paint()..color = Colors.black.withValues(alpha: 0.6),
+      Paint()..color = AppColors.black.withValues(alpha: 0.6),
     );
 
     final center = Offset(size.width / 2, size.height / 2);
     const radius = 120.0;
 
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()..blendMode = BlendMode.clear,
-    );
+    canvas.drawCircle(center, radius, Paint()..blendMode = BlendMode.clear);
 
     canvas.restore();
 
@@ -863,7 +837,7 @@ class CircleHolePainter extends CustomPainter {
       center,
       radius,
       Paint()
-        ..color = Colors.white
+        ..color = AppColors.white
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3,
     );

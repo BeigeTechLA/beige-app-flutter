@@ -964,7 +964,7 @@ import '../../../../app/assets.dart';
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.base),
                         color: AppColors.surfaceDeep,
-                        child: const Text(
+                        child: Text(
                           "Select Date",
                           style: AppTextStyles.titleMedium.copyWith(
                             fontSize: 20,

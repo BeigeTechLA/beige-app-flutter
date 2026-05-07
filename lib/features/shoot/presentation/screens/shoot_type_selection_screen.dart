@@ -1411,7 +1411,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                   elevation: isFormValid ? 2 : 0,
                 ),
 
-                child: const Text(
+                child: Text(
                   "Next",
                   style: AppTextStyles.labelLarge.copyWith(
                     fontFamily: AppAssets.fontUnbounded,

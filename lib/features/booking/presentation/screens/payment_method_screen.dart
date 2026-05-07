@@ -6,7 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/payment/presentation/providers/payment_method_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
@@ -82,9 +85,9 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Payment Completed")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Payment Completed")));
       }
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) return;
@@ -96,17 +99,14 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     } finally {
       if (mounted) setState(() => isProcessing = false);
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,184 +115,171 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
     );
     final savedCards = paymentState.savedCards;
 
-    return AppScaffold(backgroundColor: AppColors.background,
-
+    return AppScaffold(
+      backgroundColor: AppColors.background,
       body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                context.pop();
+              },
 
-              InkWell(
-                onTap: () {
-                  context.pop();
-                },
+              child: SvgPicture.asset(AppAssets.back, height: 24),
+            ),
 
-                child: SvgPicture.asset(AppAssets.back, height: 24),
+            const SizedBox(height: AppSpacing.mld),
+            Text(
+              "Payment Method",
+              style: AppTextStyles.titleSmall.copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppColors.white,
               ),
+            ),
 
-              const SizedBox(height: 14),
+            Text(
+              "Manage your saved payment options for\nfaster and secure checkouts.",
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight: FontWeight.w400,
+                color: AppColors.white70,
+              ),
+            ),
+
+            AppSpacing.verticalXxl,
+
+            if (savedCards.isNotEmpty) ...[
               Text(
-                "Payment Method",
-                style: TextStyle(
+                "Saved Card",
+                style: AppTextStyles.labelLarge.copyWith(
                   fontFamily: AppAssets.fontUnbounded,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-
+                  fontWeight: FontWeight.w400,
                   color: AppColors.white,
                 ),
               ),
-
-
-              const Text(
-                "Manage your saved payment options for\nfaster and secure checkouts.",
-                style: TextStyle(
-                    fontFamily: AppAssets.fontOutfit,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.white70
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-
-              if (savedCards.isNotEmpty) ...[
-                const Text(
-                  "Saved Card",
-                  style: TextStyle(
-                    fontFamily: AppAssets.fontUnbounded,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.white,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              if (savedCards.isNotEmpty)
-                ...savedCards.map((card) {
-                  return InkWell(
-                    onTap: () {
-                      context.pushNamed(
-                        RouteNames.reviewConfirm,
-                        pathParameters: {'bookingId': widget.bookingId.toString()},
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            AppAssets.stripeIcon,
-                            height: 28,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              "Stripe",
-                              style: const TextStyle(color: Colors.white),
+              AppSpacing.verticalMd,
+            ],
+            if (savedCards.isNotEmpty)
+              ...savedCards.map((card) {
+                return InkWell(
+                  onTap: () {
+                    context.pushNamed(
+                      RouteNames.reviewConfirm,
+                      pathParameters: {
+                        'bookingId': widget.bookingId.toString(),
+                      },
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.base),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      borderRadius: AppRadii.xxlAll,
+                    ),
+                    child: Row(
+                      children: [
+                        Image.asset(AppAssets.stripeIcon, height: 28),
+                        AppSpacing.gapHMd,
+                        Expanded(
+                          child: Text(
+                            "Stripe",
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.white,
                             ),
                           ),
-                          const Icon(
-                            Icons.radio_button_checked,
-                            color: Color(0xFFFFE6A5),
-                          )
-                        ],
+                        ),
+                        const Icon(
+                          Icons.radio_button_checked,
+                          color: AppColors.paymentAccent,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+
+            /// ===== CARD SECTION =====
+            Text(
+              "Card",
+              style: AppTextStyles.labelLarge.copyWith(
+                fontFamily: AppAssets.fontUnbounded,
+                fontWeight: FontWeight.w400,
+                color: AppColors.white,
+              ),
+            ),
+            AppSpacing.verticalMd,
+
+            InkWell(
+              onTap: isProcessing ? null : _openStripeSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.base,
+                  vertical: AppSpacing.mld,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: AppRadii.xxlAll,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.black,
+                        borderRadius: AppRadii.mdAll,
+                      ),
+                      child: const Icon(
+                        Icons.credit_card,
+                        color: AppColors.white,
+                        size: 22,
                       ),
                     ),
-                  );
-                }),
-
-
-
-              /// ===== CARD SECTION =====
-              Text(
-                "Card",
-                style: TextStyle(
-                    fontFamily: AppAssets.fontUnbounded,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.white
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              InkWell(
-                onTap: isProcessing ? null : _openStripeSheet,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A2A2A),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.credit_card,
-                          color: Colors.white,
-                          size: 22,
+                    AppSpacing.gapHMd,
+                    Expanded(
+                      child: Text(
+                        "Add Credit or Debit Card",
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.white,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          "Add Credit or Debit Card",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
+                    ),
+                    Container(
+                      height: 32,
+                      width: 32,
+                      decoration: BoxDecoration(
+                        color: AppColors.paymentAccent,
+                        borderRadius: AppRadii.mdAll,
                       ),
-                      Container(
-                        height: 32,
-                        width: 32,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE6A5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          size: 20,
-                          color: Colors.black,
-                        ),
+                      child: const Icon(
+                        Icons.add,
+                        size: 20,
+                        color: AppColors.black,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
+            ),
 
-              const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.xxxl),
 
-              /// ===== RECOMMENDED =====
-              const Text(
-                "Recommended",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+            /// ===== RECOMMENDED =====
+            Text(
+              "Recommended",
+              style: AppTextStyles.labelLarge.copyWith(
+                fontWeight: FontWeight.w500,
+                color: AppColors.white,
               ),
-              const SizedBox(height: 12),
+            ),
+            AppSpacing.verticalMd,
 
-              _paymentTile(
-                title: "Stripe",
-                icon: AppAssets.stripeIcon,
-              ),
-            ],
-          ),
+            _paymentTile(title: "Stripe", icon: AppAssets.stripeIcon),
+          ],
         ),
+      ),
     );
   }
 
@@ -300,35 +287,32 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
   Widget _paymentTile({required String title, required String icon}) {
     return InkWell(
       onTap: isProcessing ? null : _openStripeSheet,
-
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.mld,
+        ),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A2A2A),
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.surfaceVariant,
+          borderRadius: AppRadii.xxlAll,
         ),
         child: Row(
           children: [
-            Image.asset(
-              icon,
-              height: 26,
-              width: 26,
-            ),
-            const SizedBox(width: 12),
+            Image.asset(icon, height: 26, width: 26),
+            AppSpacing.gapHMd,
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.white,
                 ),
               ),
             ),
             const Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: Colors.grey,
+              color: AppColors.neutralGrey,
             ),
           ],
         ),

@@ -767,9 +767,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         alignment: Alignment.center,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
 
-                            Text(
+                            const Text(
                               "Sign Up Now",
                               style: TextStyle(
                                 fontFamily: AppTextStyles.fontFamilyDisplay,
@@ -779,7 +779,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               ),
                             ),
 
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
 
                             Text(
                               "Join Beige to book talented photographers\nand videographers for your projects.",
@@ -1528,7 +1528,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 /// 🔹 EMAIL WITH LABEL
                 Row(
                   children: [
-                    const Text(
+                     Text(
                       "Email ID: ",
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.black54),
                     ),

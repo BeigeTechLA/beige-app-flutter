@@ -7,9 +7,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import 'package:beige/app/route_names.dart';
-import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/shoot/presentation/providers/cancel_shoot_notifier.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
@@ -25,14 +28,24 @@ class CancelShootScreen extends ConsumerStatefulWidget {
   final String? contentType;
   final String? imageUrl;
 
-  const CancelShootScreen({super.key, required this.bookingId, this.projectName, this.eventDate, this.startTime, this.endTime, this.durationHours, this.location, this.contentType, this.imageUrl});
+  const CancelShootScreen({
+    super.key,
+    required this.bookingId,
+    this.projectName,
+    this.eventDate,
+    this.startTime,
+    this.endTime,
+    this.durationHours,
+    this.location,
+    this.contentType,
+    this.imageUrl,
+  });
 
   @override
   ConsumerState<CancelShootScreen> createState() => _CancelShootScreenState();
 }
 
 class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
-
   void _showSnack(String message) {
     TopMessage.show(context, message);
   }
@@ -80,46 +93,40 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
               children: [
                 _getFullImageUrl().isNotEmpty
                     ? Image.network(
-                  _getFullImageUrl(),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return SvgPicture.asset(
-                      AppAssets.imagePlaceholder,
+                        _getFullImageUrl(),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) {
+                          return SvgPicture.asset(
+                            AppAssets.imagePlaceholder,
 
-                      fit: BoxFit.cover,
-                    );
-                  },
-                )
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      )
                     : SvgPicture.asset(
-        AppAssets.imagePlaceholder,
+                        AppAssets.imagePlaceholder,
 
-        fit: BoxFit.cover,
-      ),
+                        fit: BoxFit.cover,
+                      ),
 
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                   child: Container(
-                    color: Colors.black.withValues(alpha:0.25),
+                    color: AppColors.black.withValues(alpha: 0.25),
                   ),
                 ),
               ],
             ),
           ),
 
-
-
           /// 🔹 BOTTOM MANAGE BOOKING CARD
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-
-              padding: EdgeInsets.all(10),
-              // padding: EdgeInsets.only(right: 20,left: 20,top: 10,),
+              padding: const EdgeInsets.all(AppSpacing.smd),
               decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(32),
-                ),
+                borderRadius: AppRadii.topSheet,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -131,138 +138,129 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:AppColors.white70,
-                        borderRadius: BorderRadius.circular(18),
+                        color: AppColors.white70,
+                        borderRadius: AppRadii.xxxlAll,
                       ),
                     ),
                   ),
-                  SizedBox(height: 14),
+                  const SizedBox(height: AppSpacing.mld),
 
                   /// 🔹 HEADER
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:  [
+                    children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Cancel Booking",
-                            style:  TextStyle(
-                                color: AppColors.white,
-                                fontSize: 16,
-                                fontFamily: AppAssets.fontUnbounded,
-                                fontWeight: FontWeight.w500
+                            style: AppTextStyles.titleSmall.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          AppSpacing.verticalXxs,
                           Text(
                             "Are you sure you’d like to cancel \nthis appointment?.",
-                            style:  TextStyle(
-                                color: AppColors.white70,
-                                fontSize: 14,
-                                fontFamily: AppAssets.fontOutfit,
-                                fontWeight: FontWeight.w400
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.white70,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
+                        icon: const Icon(Icons.close, color: AppColors.white),
                         onPressed: () {
                           context.pop();
                         },
                       ),
-
                     ],
                   ),
 
-                  Divider(color: AppColors.dividerDark),
-                  SizedBox(height: 10),
+                  const Divider(color: AppColors.dividerDark),
+                  AppSpacing.verticalSmd,
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: AppColors.textHeading,
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: AppRadii.xxxlAll,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         /// 🔹 TOP PROFILE ROW
                         Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: AppRadii.xlAll,
                               child: _getFullImageUrl().isNotEmpty
                                   ? Image.network(
-                                _getFullImageUrl(),
-                                height: 144,
-                                width: 126,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) {
-                                  return SvgPicture.asset(
-                                    AppAssets.imagePlaceholder,
-                                    height: 144,
-                                    width: 126,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              )
+                                      _getFullImageUrl(),
+                                      height: 144,
+                                      width: 126,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) {
+                                        return SvgPicture.asset(
+                                          AppAssets.imagePlaceholder,
+                                          height: 144,
+                                          width: 126,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
                                   : SvgPicture.asset(
-                                AppAssets.imagePlaceholder,
-                                height: 144,
-                                width: 126,
-                                fit: BoxFit.cover,
-                              ),
+                                      AppAssets.imagePlaceholder,
+                                      height: 144,
+                                      width: 126,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
 
-                            const SizedBox(width: 14),
+                            const SizedBox(width: AppSpacing.mld),
 
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children:  [
-                                  SizedBox(height: 6),
+                                children: [
+                                  AppSpacing.verticalXs,
                                   Text(
                                     widget.projectName ?? "N/A",
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                    style: AppTextStyles.labelLarge.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      fontFamily: AppAssets.fontOutfit,
+                                      color: AppColors.white,
                                     ),
                                   ),
 
                                   Text(
                                     widget.contentType ?? "",
-                                    style: TextStyle(
-                                      fontSize: 12,
+                                    style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.white70,
-                                      fontFamily: AppAssets.fontOutfit,
                                     ),
                                   ),
 
-                                  SizedBox(height: 10),
+                                  AppSpacing.verticalSmd,
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
 
-                        SizedBox(height: 14),
+                        const SizedBox(height: AppSpacing.mld),
 
                         SizedBox(
                           height: 1,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               return Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: List.generate(
                                   (constraints.maxWidth / 14).floor(),
-                                      (index) => Container(
+                                  (index) => Container(
                                     width: 6,
                                     height: 1,
-                                    color: Colors.white30,
+                                    color: AppColors.white30,
                                   ),
                                 ),
                               );
@@ -270,73 +268,72 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                           ),
                         ),
 
-
                         const SizedBox(height: 12),
 
                         /// 🔹 DETAILS
                         Container(
-                          padding:  EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.mld,
+                            vertical: AppSpacing.md,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
+                            color: AppColors.white,
+                            borderRadius: AppRadii.xlAll,
                             border: Border.all(
-                              color: Colors.white.withValues(alpha:0.9),
+                              color: AppColors.white.withValues(alpha: 0.9),
                             ),
                           ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              /// 🔵 MULTI DAY
+                              if (widget.eventDate != null &&
+                                  widget.eventDate!.contains(",")) ...[
+                                ...widget.eventDate!.split(",").map((date) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      infoRowBlack(
+                                        AppAssets.calendarDate,
+                                        formatDate(date.trim()),
+                                      ),
 
-                                /// 🔵 MULTI DAY
-                                if (widget.eventDate != null && widget.eventDate!.contains(",")) ...[
-
-                                  ...widget.eventDate!.split(",").map((date) {
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-
-                                        infoRowBlack(
-                                          AppAssets.calendarDate,
-                                          formatDate(date.trim()),
-                                        ),
-
-                                        infoRowBlack(
-                                          AppAssets.clock,
-                                          "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
-                                              "(${widget.durationHours ?? 0}h)",
-                                        ),
-
-                                        const SizedBox(height: 10),
-                                      ],
-                                    );
-                                  }),
-
-                                ] else ...[
-
-                                  /// 🟢 SINGLE DAY
-                                  infoRowBlack(
-                                    AppAssets.calendarDate,
-                                    formatDate(widget.eventDate),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  infoRowBlack(
-                                    AppAssets.clock,
-                                    "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                      infoRowBlack(
+                                        AppAssets.clock,
+                                        "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
                                         "(${widget.durationHours ?? 0}h)",
-                                  ),
-                                ],
+                                      ),
+
+                                      const SizedBox(height: 10),
+                                    ],
+                                  );
+                                }),
+                              ] else ...[
+                                /// 🟢 SINGLE DAY
+                                infoRowBlack(
+                                  AppAssets.calendarDate,
+                                  formatDate(widget.eventDate),
+                                ),
 
                                 const SizedBox(height: 8),
 
-                                /// 📍 LOCATION
                                 infoRowBlack(
-                                  AppAssets.location,
-                                  widget.location ?? "",
+                                  AppAssets.clock,
+                                  "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                  "(${widget.durationHours ?? 0}h)",
                                 ),
                               ],
-                            )
+
+                              const SizedBox(height: 8),
+
+                              /// 📍 LOCATION
+                              infoRowBlack(
+                                AppAssets.location,
+                                widget.location ?? "",
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 20),
@@ -349,33 +346,38 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                 height: 55,
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFE7C89E),
-                                    foregroundColor: Colors.black,
+                                    backgroundColor: AppColors.goldCta,
+                                    foregroundColor: AppColors.black,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: AppRadii.lgAll,
                                     ),
                                   ),
                                   onPressed: isCancelling
                                       ? null
-                                      : () => ref.read(cancelShootNotifierProvider.notifier)
-                                          .cancelShoot(bookingId: widget.bookingId),
+                                      : () => ref
+                                            .read(
+                                              cancelShootNotifierProvider
+                                                  .notifier,
+                                            )
+                                            .cancelShoot(
+                                              bookingId: widget.bookingId,
+                                            ),
 
                                   child: isCancelling
-                                      ?  CircularProgressIndicator(
-                                    color: AppColors.textHeading,
-                                    strokeWidth: 2,
-                                  )
-                                      : const Text(
-                                    "Yes, Cancel",
-                                    style: TextStyle(
-                                      color: AppColors.textHeading,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-
-
+                                      ? const CircularProgressIndicator(
+                                          color: AppColors.textHeading,
+                                          strokeWidth: 2,
+                                        )
+                                      : Text(
+                                          "Yes, Cancel",
+                                          style: AppTextStyles.labelLarge
+                                              .copyWith(
+                                                color: AppColors.textHeading,
+                                                fontFamily:
+                                                    AppAssets.fontUnbounded,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                        ),
                                 ),
                               ),
                             ),
@@ -392,56 +394,50 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
       ),
     );
   }
-  Widget infoRowBlack(String iconPath,  String text) {
+
+  Widget infoRowBlack(String iconPath, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SvgPicture.asset(
-          iconPath,
-        ),
-        const SizedBox(width: 8),
+        SvgPicture.asset(iconPath),
+        AppSpacing.gapHSm,
         Expanded(
           child: Text(
             text,
-            style:  TextStyle(
-                fontSize: 12,
-                color: AppColors.black,
-                fontFamily: AppAssets.fontOutfit,
-                fontWeight: FontWeight.w400
-
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.black,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ),
       ],
     );
   }
+
   void _showAppointmentCancelledDialog(BuildContext context) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: "Schedule Updated",
-      barrierColor: Colors.black.withValues(alpha:0.35), // dark overlay
+      barrierColor: AppColors.black.withValues(alpha: 0.35),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (_, __, ___) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // 🔥 BLUR STRENGTH
           child: Center(
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: Container(
-                margin: EdgeInsets.all(20),
-                // margin: const EdgeInsets.symmetric(horizontal: 24),
-                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.all(AppSpacing.xl),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppRadii.hugeAll,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     /// 🔹 ICON STACK
-
                     Image.asset(
                       AppAssets.bookingConfirmed,
                       height: 64,
@@ -449,15 +445,13 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                       fit: BoxFit.contain,
                     ),
 
-
                     const SizedBox(height: 16),
 
                     /// 🔹 TITLE
-                     Text(
+                    Text(
                       "Appointment Cancelled",
-                      style: TextStyle(
+                      style: AppTextStyles.titleMedium.copyWith(
                         fontFamily: AppAssets.fontUnbounded,
-                        fontSize: 18,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primary,
                       ),
@@ -466,12 +460,10 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                     const SizedBox(height: 8),
 
                     /// 🔹 SUBTITLE
-                    const Text(
+                    Text(
                       "Your appointment is no longer\nscheduled",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: AppAssets.fontOutfit,
-                        fontSize: 14,
+                      style: AppTextStyles.bodyMedium.copyWith(
                         fontWeight: FontWeight.w400,
                         color: AppColors.white70,
                       ),
@@ -480,37 +472,34 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-
                         // ✅ Next Button
                         Expanded(
                           child: SizedBox(
                             height: 55,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
+                                backgroundColor: AppColors.transparent,
+                                shadowColor: AppColors.transparent,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side:  BorderSide(
-                                    color: AppColors.white70,width: 0.5 // 👈 border color
+                                  borderRadius: AppRadii.hugeAll,
+                                  side: const BorderSide(
+                                    color: AppColors.white70,
+                                    width: 0.5,
                                   ),
                                 ),
-
                               ),
                               onPressed: () {
                                 context.goNamed(RouteNames.home);
                               },
-                              child: const Text(
+                              child: Text(
                                 "Explore",
-                                style: TextStyle(
+                                style: AppTextStyles.labelLarge.copyWith(
                                   color: AppColors.white,
-                                  fontFamily: AppAssets.fontUnbounded,   // ← Add this
-                                  fontSize: 14,
+                                  fontFamily: AppAssets.fontUnbounded,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-
                             ),
                           ),
                         ),
@@ -527,4 +516,3 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
     );
   }
 }
-

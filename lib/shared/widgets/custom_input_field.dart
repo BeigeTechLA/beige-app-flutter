@@ -31,7 +31,12 @@ class CustomInputField extends StatefulWidget {
     this.isVisible = false,
     this.onToggle,
     this.keyboardType = TextInputType.text,
-    this.autofillHints, this.suffixIcon, this.onTap,  this.readOnly =false,   this.maxLines = 1, this.inputFormatters,
+    this.autofillHints,
+    this.suffixIcon,
+    this.onTap,
+    this.readOnly = false,
+    this.maxLines = 1,
+    this.inputFormatters,
     this.onChanged,
     this.textInputAction,
     this.onFieldSubmitted,
@@ -59,7 +64,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
   @override
   Widget build(BuildContext context) {
-
     bool isFocused = _focusNode.hasFocus;
     bool hasText = widget.controller.text.isNotEmpty;
 
@@ -72,8 +76,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
       onTap: widget.onTap,
       obscureText: widget.isPassword ? !widget.isVisible : false,
       keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction,        // ✅
-      onSubmitted: widget.onFieldSubmitted,           // ✅
+      textInputAction: widget.textInputAction, // ✅
+      onSubmitted: widget.onFieldSubmitted, // ✅
       cursorColor: AppColors.primary,
       autofillHints: widget.autofillHints,
       enableSuggestions: !widget.isPassword,
@@ -81,48 +85,28 @@ class _CustomInputFieldState extends State<CustomInputField> {
       onChanged: widget.onChanged,
       inputFormatters: widget.inputFormatters,
       maxLines: widget.maxLines,
-
-
-      style: const TextStyle(
-        color: AppColors.white,
-        fontFamily: AppTextStyles.fontFamilyBody,
-        fontSize: 15,
-      ),
-
+      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
       decoration: InputDecoration(
         labelText: widget.title,
         floatingLabelBehavior: FloatingLabelBehavior.always,
-
-
-        labelStyle: TextStyle(
-          fontSize: 14,
-          color: highlight
-              ? AppColors.primary
-              : AppColors.white60,
-          fontFamily: AppTextStyles.fontFamilyBody,
+        labelStyle: AppTextStyles.bodyMedium.copyWith(
+          color: highlight ? AppColors.primary : AppColors.white60,
         ),
-
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
-
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
           borderSide: BorderSide(
-            color: highlight
-                ? AppColors.borderGold
-                : AppColors.white30,
+            color: highlight ? AppColors.borderGold : AppColors.white30,
             width: 0.5,
           ),
         ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(
-            color: AppColors.borderGold,
-            width: 0.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.borderGold, width: 0.5),
         ),
-
         suffixIcon: widget.suffixIcon,
       ),
     );

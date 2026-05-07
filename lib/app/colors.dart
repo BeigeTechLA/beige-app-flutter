@@ -62,6 +62,12 @@ class AppColors {
   /// Warm dark surface — slightly lighter variant
   static const Color surfaceWarmLight = Color(0xFF363131);
 
+  /// Nested stats card dark surface
+  static const Color surfaceStats = Color(0xFF1E1E1E);
+
+  /// Profile crop sheet surface
+  static const Color surfaceCropSheet = Color(0xFF1C1C1C);
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TEXT COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -93,7 +99,10 @@ class AppColors {
 
   static const Color error = Color(0xFFFF0000);
   static const Color errorLight = Color(0xFFFFC9C9);
+  static const Color errorAccent = Color(0xFFF66E6E);
+  static const Color errorSurface = Color(0xFF100B03);
   static const Color success = Color(0xFF4CAF50);
+  static const Color online = Color(0xFF2ED47A);
   static const Color warning = Color(0xFFFFA000);
   static const Color info = Color(0xFF0066FF);
 
@@ -127,6 +136,7 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color white70 = Color(0xB2FFFFFF);
   static const Color white60 = Color(0x99FFFFFF);
+  static const Color white54 = Color(0x8AFFFFFF);
   static const Color white38 = Color(0x61FFFFFF);
   static const Color white36 = Color(0x5CFFFFFF);
   static const Color white30 = Color(0x4DFFFFFF);
@@ -156,6 +166,12 @@ class AppColors {
 
   /// Light gold parchment — crew card selected highlight
   static const Color goldParchment = Color(0xFFD6C29C);
+
+  /// Pale gold CTA surface
+  static const Color goldCta = Color(0xFFE7C89E);
+
+  /// Light payment accent
+  static const Color paymentAccent = Color(0xFFFFE6A5);
 
   /// Gold gradient — light end
   static const Color goldGradientLight = Color(0xFFE8D1AB);
@@ -191,10 +207,16 @@ class AppColors {
   // — Material-compatible —
   /// Amber — star ratings, warnings
   static const Color amber = Color(0xFFFFC107);
+
   /// Grey 200 — light platform UI (image picker, sheets)
   static const Color greyShade200 = Color(0xFFEEEEEE);
+
+  /// Grey 400 — disabled foregrounds
+  static const Color greyShade400 = Color(0xFFBDBDBD);
+
   /// Grey 800 — dark platform UI (image picker, sheets)
   static const Color greyShade800 = Color(0xFF424242);
+
   /// Green - for discounts
   static const Color discountGreen = Color(0xFF7ED957);
 

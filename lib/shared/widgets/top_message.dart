@@ -15,66 +15,48 @@ class TopMessage {
     overlayEntry = OverlayEntry(
       builder: (context) => Stack(
         children: [
-
-          /// 🔹 BLUR BACKGROUND
           Positioned.fill(
             child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 1,//
-                sigmaY: 1,
-
-              ),
-              child: Container(
-                color: AppColors.black.withValues(alpha: 0.8),
-              ),
+              filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+              child: Container(color: AppColors.black.withValues(alpha: 0.8)),
             ),
           ),
-
-          /// 🔹 TOP MESSAGE
           Positioned(
-            top: 110, // 🔥 thoda niche
-            left: 16,
-            right: 16,
+            top: 110,
+            left: AppSpacing.base,
+            right: AppSpacing.base,
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.base,
                   vertical: AppSpacing.mld,
                 ),
                 decoration: BoxDecoration(
-
-                  color: const Color(0xff100B03),
+                  color: AppColors.errorSurface,
                   borderRadius: AppRadii.xlAll,
-                  border: Border.all(color: const Color(0xffF66E6E)),
+                  border: Border.all(color: AppColors.errorAccent),
                 ),
                 child: Row(
                   children: [
-
                     const Icon(
                       Icons.do_not_disturb,
-                      color: Color(0xffF66E6E),
+                      color: AppColors.errorAccent,
                     ),
-
-                    const SizedBox(width: 10),
-
+                    AppSpacing.gapHSmd,
                     Expanded(
                       child: Text(
                         message,
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: const Color(0xffF66E6E),
+                          color: AppColors.errorAccent,
                         ),
                       ),
                     ),
-
                     GestureDetector(
                       onTap: () {
                         overlayEntry.remove();
                       },
-                      child: const Icon(
-                        Icons.close,
-                        color: AppColors.white,
-                      ),
+                      child: const Icon(Icons.close, color: AppColors.white),
                     ),
                   ],
                 ),

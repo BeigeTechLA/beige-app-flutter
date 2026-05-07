@@ -93,6 +93,13 @@ class AppTextStyles {
     height: 1.33,
   );
 
+  static const TextStyle bodyCompact = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    height: 1.38,
+  );
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // LABEL — Outfit (Buttons, tabs, chips, input labels)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

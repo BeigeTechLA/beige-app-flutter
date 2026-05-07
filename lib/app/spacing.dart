@@ -16,6 +16,9 @@ class AppSpacing {
   /// 1.5px — Hair-thin borders/separators
   static const double hairline = 1.5;
 
+  /// 0.6px — Fine inset for gradient borders
+  static const double fine = 0.6;
+
   /// 2px — Micro spacing (icon-label align)
   static const double xxxs = 2;
 
@@ -133,6 +136,7 @@ class AppSpacing {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const SizedBox verticalXxs = SizedBox(height: xxs);
+  static const SizedBox verticalXxxs = SizedBox(height: xxxs);
   static const SizedBox verticalXs = SizedBox(height: xs);
   static const SizedBox verticalSm = SizedBox(height: sm);
   static const SizedBox verticalSmd = SizedBox(height: smd);
@@ -145,6 +149,7 @@ class AppSpacing {
   static const SizedBox gapHXxs = SizedBox(width: xxs);
   static const SizedBox gapHXs = SizedBox(width: xs);
   static const SizedBox gapHSm = SizedBox(width: sm);
+  static const SizedBox gapHSmd = SizedBox(width: smd);
   static const SizedBox gapHMd = SizedBox(width: md);
   static const SizedBox gapHBase = SizedBox(width: base);
   static const SizedBox gapHXl = SizedBox(width: xl);

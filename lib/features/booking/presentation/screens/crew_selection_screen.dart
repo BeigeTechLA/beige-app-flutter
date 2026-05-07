@@ -1169,7 +1169,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                             Text(
                               "Filter By",
                               style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
                             ),
@@ -1352,7 +1352,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                       const RangeValues(100, 15000);
                                     });
                                   },
-                                  child: const Text(
+                                  child: Text(
                                     "Clear All",
                                     style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
                                   ),
@@ -1375,7 +1375,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                                     onApply(sortKey); // 🔥 YAHI MAIN LINE HAI
                                   },
-                                  child: const Text(
+                                  child: Text(
                                       "Apply",
                                       style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.black)
                                   ),

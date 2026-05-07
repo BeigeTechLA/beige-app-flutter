@@ -7,6 +7,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/colors.dart';
+import 'package:beige/app/radii.dart';
+import 'package:beige/app/spacing.dart';
+import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/creative/presentation/providers/creative_profile_notifier.dart';
 
@@ -106,35 +109,32 @@ class _RecommendedCreativeDetailScreenState
                           end: Alignment.bottomCenter,
                           stops: const [0.0, 0.4, 0.7, 1.0],
                           colors: [
-                            Colors.black.withValues(alpha: 0.4),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.6),
-                            Colors.black,
+                            AppColors.black.withValues(alpha: 0.4),
+                            AppColors.transparent,
+                            AppColors.black.withValues(alpha: 0.6),
+                            AppColors.black,
                           ],
                         ),
                       ),
                     ),
                     Positioned(
                       top: 40,
-                      left: 16,
-                      right: 16,
+                      left: AppSpacing.base,
+                      right: AppSpacing.base,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           InkWell(
                             onTap: () => context.pop(),
-                            child: SvgPicture.asset(
-                              AppAssets.back,
-                              height: 24,
-                            ),
+                            child: SvgPicture.asset(AppAssets.back, height: 24),
                           ),
                         ],
                       ),
                     ),
                     Positioned(
-                      left: 16,
-                      bottom: 24,
-                      right: 16,
+                      left: AppSpacing.base,
+                      bottom: AppSpacing.xxl,
+                      right: AppSpacing.base,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -143,19 +143,15 @@ class _RecommendedCreativeDetailScreenState
                             children: [
                               Text(
                                 creative?['name'] ?? "",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontOutfit,
-                                  fontSize: 16,
+                                style: AppTextStyles.bodyLarge.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              AppSpacing.verticalXs,
                               Text(
                                 creative?['primary_title'] ?? "",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontOutfit,
-                                  fontSize: 14,
+                                style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.white70,
                                 ),
                               ),
@@ -169,7 +165,7 @@ class _RecommendedCreativeDetailScreenState
 
                 /// INFO STATS
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: AppSpacing.insetsHBase,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -187,7 +183,7 @@ class _RecommendedCreativeDetailScreenState
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                AppSpacing.verticalXl,
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -201,7 +197,7 @@ class _RecommendedCreativeDetailScreenState
                 /// ABOUT
                 _sectionTitle("About Creator"),
                 _sectionText(about?['bio'] ?? "No information available"),
-                const SizedBox(height: 20),
+                AppSpacing.verticalXl,
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -232,25 +228,26 @@ class _RecommendedCreativeDetailScreenState
                                 final realIndex = index % portfolio.length;
                                 final item = portfolio[realIndex];
 
-                                final imageUrl =
-                                    _imageUrl(item["file_path"] ?? "");
+                                final imageUrl = _imageUrl(
+                                  item["file_path"] ?? "",
+                                );
 
                                 return AnimatedBuilder(
                                   animation: _portfolioController,
                                   builder: (context, child) {
                                     double value = 0;
                                     if (_portfolioController
-                                        .position.haveDimensions) {
-                                      value = index -
+                                        .position
+                                        .haveDimensions) {
+                                      value =
+                                          index -
                                           (_portfolioController.page ?? 0);
                                     }
 
-                                    double scale =
-                                        (1 - (value.abs() * 0.8))
-                                            .clamp(0.85, 1.0);
-                                    double opacity =
-                                        (1 - (value.abs() * 0.9))
-                                            .clamp(0.6, 1.0);
+                                    double scale = (1 - (value.abs() * 0.8))
+                                        .clamp(0.85, 1.0);
+                                    double opacity = (1 - (value.abs() * 0.9))
+                                        .clamp(0.6, 1.0);
 
                                     return Transform.scale(
                                       scale: scale,
@@ -260,20 +257,21 @@ class _RecommendedCreativeDetailScreenState
                                           child: Container(
                                             width: 176,
                                             height: 236,
-                                            margin: const EdgeInsets
-                                                .symmetric(horizontal: 4),
+                                            margin: const EdgeInsets.symmetric(
+                                              horizontal: AppSpacing.xxs,
+                                            ),
                                             child: ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(22),
+                                                  AppRadii.portfolioCompactAll,
                                               child: Image.network(
                                                 imageUrl,
                                                 fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (_, __, ___) =>
-                                                        SvgPicture.asset(
-                                                  AppAssets.imagePlaceholder,
-                                                  fit: BoxFit.cover,
-                                                ),
+                                                errorBuilder: (_, __, ___) =>
+                                                    SvgPicture.asset(
+                                                      AppAssets
+                                                          .imagePlaceholder,
+                                                      fit: BoxFit.cover,
+                                                    ),
                                               ),
                                             ),
                                           ),
@@ -299,31 +297,34 @@ class _RecommendedCreativeDetailScreenState
 
                 /// WEEKLY AVAILABILITY
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.base,
+                    AppSpacing.xxl,
+                    AppSpacing.base,
+                    AppSpacing.sm,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (weeklyAvailability.isNotEmpty) ...[
-                        const Text(
+                        Text(
                           "Weekly Availability",
-                          style: TextStyle(
+                          style: AppTextStyles.titleMedium.copyWith(
                             fontFamily: AppAssets.fontOutfit,
-                            fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.white,
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: AppSpacing.mld),
                         Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(AppSpacing.mld),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A2A),
-                            borderRadius: BorderRadius.circular(20),
+                            color: AppColors.surfaceVariant,
+                            borderRadius: AppRadii.hugeAll,
                           ),
                           child: Column(
                             children: weekDaysOrder.map((day) {
-                              bool isActive =
-                                  weeklyAvailability.contains(day);
+                              bool isActive = weeklyAvailability.contains(day);
                               return _availabilityRow(
                                 day,
                                 isActive,
@@ -333,15 +334,15 @@ class _RecommendedCreativeDetailScreenState
                           ),
                         ),
                         const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Divider(color: Colors.white10),
+                          padding: EdgeInsets.all(AppSpacing.sm),
+                          child: Divider(color: AppColors.white10),
                         ),
                       ],
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppSpacing.massive),
               ],
             ),
           ),
@@ -363,23 +364,23 @@ class _RecommendedCreativeDetailScreenState
       width: 105,
       height: 120,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppRadii.lgAll,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFE8D1AB).withValues(alpha: 0.40),
-            const Color(0xFFE8D1AB).withValues(alpha: 0.04),
-            const Color(0xFFE8D1AB).withValues(alpha: 0.28),
+            AppColors.primary.withValues(alpha: 0.40),
+            AppColors.primary.withValues(alpha: 0.04),
+            AppColors.primary.withValues(alpha: 0.28),
           ],
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(0.6),
+        padding: const EdgeInsets.all(AppSpacing.fine),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.circular(11.5),
+            color: AppColors.surfaceStats,
+            borderRadius: AppRadii.statsInnerAll,
           ),
           child: Stack(
             alignment: Alignment.topCenter,
@@ -390,39 +391,31 @@ class _RecommendedCreativeDetailScreenState
                   width: 38,
                   height: 42,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE8D1AB),
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(14),
+                      bottom: Radius.circular(AppRadii.xl),
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 20,
-                    color: Colors.black,
-                  ),
+                  child: Icon(icon, size: 20, color: AppColors.black),
                 ),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 20),
+                  AppSpacing.verticalXl,
                   Text(
                     value,
-                    style: const TextStyle(
-                      fontFamily: AppAssets.fontOutfit,
-                      fontSize: 16,
+                    style: AppTextStyles.bodyLarge.copyWith(
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     title,
-                    style: TextStyle(
-                      fontFamily: AppAssets.fontOutfit,
-                      fontSize: 12,
+                    style: AppTextStyles.bodySmall.copyWith(
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: AppColors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -436,12 +429,16 @@ class _RecommendedCreativeDetailScreenState
 
   Widget _sectionTitle(String text) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.base,
+        AppSpacing.xxl,
+        AppSpacing.base,
+        AppSpacing.sm,
+      ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: AppTextStyles.labelLarge.copyWith(
           fontFamily: AppAssets.fontUnbounded,
-          fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
         ),
@@ -451,12 +448,10 @@ class _RecommendedCreativeDetailScreenState
 
   Widget _sectionText(String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: AppSpacing.insetsHBase,
       child: Text(
         text,
-        style: const TextStyle(
-          fontFamily: AppAssets.fontOutfit,
-          fontSize: 13,
+        style: AppTextStyles.bodyCompact.copyWith(
           fontWeight: FontWeight.w400,
           color: AppColors.white70,
         ),
@@ -466,38 +461,34 @@ class _RecommendedCreativeDetailScreenState
 
   Widget _availabilityRow(String day, bool isActive, String time) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
           Container(
             height: 8,
             width: 8,
             decoration: BoxDecoration(
-              color: isActive ? const Color(0xFF2ED47A) : Colors.grey,
+              color: isActive ? AppColors.online : AppColors.neutralGrey,
               shape: BoxShape.circle,
             ),
           ),
-          const SizedBox(width: 12),
+          AppSpacing.gapHMd,
           Expanded(
             child: Text(
               day,
-              style: TextStyle(
-                fontFamily: AppAssets.fontOutfit,
-                fontSize: 14,
+              style: AppTextStyles.labelLarge.copyWith(
                 fontWeight: FontWeight.w500,
-                color: isActive ? const Color(0xFF2ED47A) : Colors.white,
+                color: isActive ? AppColors.online : AppColors.white,
               ),
             ),
           ),
           Text(
             time,
-            style: TextStyle(
-              fontFamily: AppAssets.fontOutfit,
-              fontSize: 14,
+            style: AppTextStyles.labelLarge.copyWith(
               fontWeight: FontWeight.w500,
               color: isActive
-                  ? const Color(0xFF2ED47A)
-                  : Colors.white.withValues(alpha: 0.6),
+                  ? AppColors.online
+                  : AppColors.white.withValues(alpha: 0.6),
             ),
           ),
         ],

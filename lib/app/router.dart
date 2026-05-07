@@ -46,6 +46,7 @@ import '../features/auth/presentation/screens/sign_up_screen.dart';
 import '../core/firebase/analytics_service.dart';
 import '../core/providers/auth_state_provider.dart';
 import 'assets.dart';
+import 'colors.dart';
 import 'route_names.dart';
 
 /// Global navigator key — kept temporarily for ScaffoldMessenger compatibility.
@@ -69,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   // Use a ValueNotifier to bridge Riverpod state to GoRouter's Listenable requirement.
   // We use ref.read here to get the INITIAL value without making this provider rebuild.
   final authNotifier = ValueNotifier<bool>(ref.read(authStateProvider));
-  
+
   // Update the notifier whenever the auth state provider changes.
   // This notifies GoRouter to re-run its redirect logic.
   ref.listen(authStateProvider, (_, next) {
@@ -91,8 +92,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isPublicRoute = _publicRoutes.contains(location);
 
       // Logged in and trying to access auth/splash/onboarding route → home
-      // We allow /splash for the initial animation, but if we are navigated to it 
-      // while logged in (or if we are already there and just logged in), 
+      // We allow /splash for the initial animation, but if we are navigated to it
+      // while logged in (or if we are already there and just logged in),
       // the redirect should eventually decide where to go.
       if (isLoggedIn) {
         // If logged in, don't stay on public routes (splash, onboarding, login, signup)
@@ -109,390 +110,394 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-    // ── Auth & Onboarding (outside shell) ──────────────────────────
-    GoRoute(
-      path: '/splash',
-      name: RouteNames.splash,
-      builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/onboarding',
-      name: RouteNames.onboarding,
-      builder: (context, state) => const OnboardingScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: RouteNames.login,
-      builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/signup',
-      name: RouteNames.signup,
-      builder: (context, state) => const SignUpScreen(),
-    ),
-    GoRoute(
-      path: '/forgot-password',
-      name: RouteNames.forgotPassword,
-      builder: (context, state) => const ForgotPasswordScreen(),
-    ),
-    GoRoute(
-      path: '/forgot-otp',
-      name: RouteNames.forgotOtp,
-      builder: (context, state) {
-        final email = state.extra as String? ?? '';
-        return ForgotPasswordOtpScreen(email: email);
-      },
-    ),
-    GoRoute(
-      path: '/reset-password',
-      name: RouteNames.resetPassword,
-      builder: (context, state) {
-        final data = state.extra as Map<String, String>? ?? {};
-        return ResetPasswordScreen(
-          email: data['email'] ?? '',
-          otp: data['otp'] ?? '',
-        );
-      },
-    ),
-    GoRoute(
-      path: '/password-success',
-      name: RouteNames.passwordSuccess,
-      builder: (context, state) => const PasswordResetSuccessScreen(),
-    ),
+      // ── Auth & Onboarding (outside shell) ──────────────────────────
+      GoRoute(
+        path: '/splash',
+        name: RouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: RouteNames.onboarding,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        name: RouteNames.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        name: RouteNames.signup,
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: RouteNames.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-otp',
+        name: RouteNames.forgotOtp,
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return ForgotPasswordOtpScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: '/reset-password',
+        name: RouteNames.resetPassword,
+        builder: (context, state) {
+          final data = state.extra as Map<String, String>? ?? {};
+          return ResetPasswordScreen(
+            email: data['email'] ?? '',
+            otp: data['otp'] ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/password-success',
+        name: RouteNames.passwordSuccess,
+        builder: (context, state) => const PasswordResetSuccessScreen(),
+      ),
 
-    // ── Main Shell (bottom nav with IndexedStack) ──────────────────
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return _MainShell(navigationShell: navigationShell);
-      },
-      branches: [
-        // Tab 0: Home
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/',
-              name: RouteNames.home,
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
-        // Tab 1: Book Shoot
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/book-shoot',
-              name: RouteNames.bookShoot,
-              builder: (context, state) => const ContentTypeScreen(fromHome: false),
-            ),
-          ],
-        ),
-        // Tab 2: My Shoots
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/my-shoots',
-              name: RouteNames.myShoots,
-              builder: (context, state) => const MyShootsScreen(),
-            ),
-          ],
-        ),
-        // Tab 3: Messages
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/messages',
-              name: RouteNames.messages,
-              builder: (context, state) => const Center(child: Text('Messages')),
-            ),
-          ],
-        ),
-      ],
-    ),
+      // ── Main Shell (bottom nav with IndexedStack) ──────────────────
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return _MainShell(navigationShell: navigationShell);
+        },
+        branches: [
+          // Tab 0: Home
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                name: RouteNames.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          // Tab 1: Book Shoot
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/book-shoot',
+                name: RouteNames.bookShoot,
+                builder: (context, state) =>
+                    const ContentTypeScreen(fromHome: false),
+              ),
+            ],
+          ),
+          // Tab 2: My Shoots
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my-shoots',
+                name: RouteNames.myShoots,
+                builder: (context, state) => const MyShootsScreen(),
+              ),
+            ],
+          ),
+          // Tab 3: Messages
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/messages',
+                name: RouteNames.messages,
+                builder: (context, state) =>
+                    const Center(child: Text('Messages')),
+              ),
+            ],
+          ),
+        ],
+      ),
 
-    // ── Home Sub-Screens (pushed on top, no bottom nav) ────────────
-    GoRoute(
-      path: '/view-profile/:id',
-      name: RouteNames.viewProfile,
-      builder: (context, state) {
-        final id = int.parse(state.pathParameters['id']!);
-        return CreativeProfileScreen(id: id);
-      },
-    ),
-    GoRoute(
-      path: '/recommended/:id',
-      name: RouteNames.recommendedDetails,
-      builder: (context, state) {
-        final id = int.parse(state.pathParameters['id']!);
-        final bookingId = int.parse(state.uri.queryParameters['bookingId'] ?? '0');
-        return RecommendedCreativeDetailScreen(id: id, bookingId: bookingId);
-      },
-    ),
-    GoRoute(
-      path: '/change-location',
-      name: RouteNames.changeLocation,
-      builder: (context, state) => const ChangeLocationScreen(),
-    ),
-    GoRoute(
-      path: '/finding-perfect',
-      name: RouteNames.findingPerfect,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return FindCreativeScreen(
-          bookingId: data['bookingId'] as int? ?? 0,
-          specialtyId: data['specialtyId'] as int? ?? 0,
-          ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/payment-method/:bookingId',
-      name: RouteNames.paymentMethod,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return PaymentMethodScreen(bookingId: bookingId);
-      },
-    ),
+      // ── Home Sub-Screens (pushed on top, no bottom nav) ────────────
+      GoRoute(
+        path: '/view-profile/:id',
+        name: RouteNames.viewProfile,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return CreativeProfileScreen(id: id);
+        },
+      ),
+      GoRoute(
+        path: '/recommended/:id',
+        name: RouteNames.recommendedDetails,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          final bookingId = int.parse(
+            state.uri.queryParameters['bookingId'] ?? '0',
+          );
+          return RecommendedCreativeDetailScreen(id: id, bookingId: bookingId);
+        },
+      ),
+      GoRoute(
+        path: '/change-location',
+        name: RouteNames.changeLocation,
+        builder: (context, state) => const ChangeLocationScreen(),
+      ),
+      GoRoute(
+        path: '/finding-perfect',
+        name: RouteNames.findingPerfect,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return FindCreativeScreen(
+            bookingId: data['bookingId'] as int? ?? 0,
+            specialtyId: data['specialtyId'] as int? ?? 0,
+            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/payment-method/:bookingId',
+        name: RouteNames.paymentMethod,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          return PaymentMethodScreen(bookingId: bookingId);
+        },
+      ),
 
-    // ── New Booking Flow ───────────────────────────────────────────
-    GoRoute(
-      path: '/content-type',
-      name: RouteNames.contentType,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>?;
-        return ContentTypeScreen(
-          fromHome: true,
-          specialtyId: data?['specialtyId'] as int?,
-          value: data?['value'] as int?,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/video-shoot-type',
-      name: RouteNames.videoShootType,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return ShootTypeScreen(
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-          bookingId: data['bookingId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/shoot-date-time',
-      name: RouteNames.shootDateTime,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return ShootDateTimeScreen(
-          ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-          bookingId: data['bookingId'] as int? ?? 0,
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/more-details',
-      name: RouteNames.moreDetails,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return ShootDetailsScreen(
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-          specialtyId: data['specialtyId'] as int? ?? 0,
-          ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-          bookingId: data['bookingId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/crew-size-matching',
-      name: RouteNames.crewSizeMatching,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return CrewSizeMatchingScreen(
-          specialtyId: data['specialtyId'] as int? ?? 0,
-          ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-          bookingId: data['bookingId'] as int? ?? 0,
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/select-dream-team',
-      name: RouteNames.selectDreamTeam,
-      builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return CrewSelectionScreen(
-          specialtyId: data['specialtyId'] as int? ?? 0,
-          ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-          bookingId: data['bookingId'] as int? ?? 0,
-          contentTypeId: data['contentTypeId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/review-confirm/:bookingId',
-      name: RouteNames.reviewConfirm,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return ShootReviewScreen(bookingId: bookingId);
-      },
-    ),
-    GoRoute(
-      path: '/payment-success/:bookingId',
-      name: RouteNames.paymentSuccess,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return PaymentSuccessScreen(
-          bookingId: bookingId,
-          fullName: data['fullName'] as String? ?? '',
-          phone: data['phone'] as String? ?? '',
-          paymentMethod: data['paymentMethod'] as String? ?? '',
-        );
-      },
-    ),
+      // ── New Booking Flow ───────────────────────────────────────────
+      GoRoute(
+        path: '/content-type',
+        name: RouteNames.contentType,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>?;
+          return ContentTypeScreen(
+            fromHome: true,
+            specialtyId: data?['specialtyId'] as int?,
+            value: data?['value'] as int?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/video-shoot-type',
+        name: RouteNames.videoShootType,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ShootTypeScreen(
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            bookingId: data['bookingId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/shoot-date-time',
+        name: RouteNames.shootDateTime,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ShootDateTimeScreen(
+            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
+            bookingId: data['bookingId'] as int? ?? 0,
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/more-details',
+        name: RouteNames.moreDetails,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ShootDetailsScreen(
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            specialtyId: data['specialtyId'] as int? ?? 0,
+            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
+            bookingId: data['bookingId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/crew-size-matching',
+        name: RouteNames.crewSizeMatching,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return CrewSizeMatchingScreen(
+            specialtyId: data['specialtyId'] as int? ?? 0,
+            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
+            bookingId: data['bookingId'] as int? ?? 0,
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/select-dream-team',
+        name: RouteNames.selectDreamTeam,
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return CrewSelectionScreen(
+            specialtyId: data['specialtyId'] as int? ?? 0,
+            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
+            bookingId: data['bookingId'] as int? ?? 0,
+            contentTypeId: data['contentTypeId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/review-confirm/:bookingId',
+        name: RouteNames.reviewConfirm,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          return ShootReviewScreen(bookingId: bookingId);
+        },
+      ),
+      GoRoute(
+        path: '/payment-success/:bookingId',
+        name: RouteNames.paymentSuccess,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return PaymentSuccessScreen(
+            bookingId: bookingId,
+            fullName: data['fullName'] as String? ?? '',
+            phone: data['phone'] as String? ?? '',
+            paymentMethod: data['paymentMethod'] as String? ?? '',
+          );
+        },
+      ),
 
-    // ── Booking Management ─────────────────────────────────────────
-    GoRoute(
-      path: '/booking-summary/:bookingId',
-      name: RouteNames.bookingEventSummary,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return ShootSummaryScreen(
-          bookingId: bookingId,
-          contentType: data['contentType'] as String?,
-          shootTypeId: data['shootTypeId'] as int? ?? 0,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/manage-booking/:bookingId',
-      name: RouteNames.manageBooking,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return ManageShootScreen(
-          bookingId: bookingId,
-          shootTypeId: data['shootTypeId'] as int? ?? 0,
-          projectName: data['projectName'] as String?,
-          eventDate: data['eventDate'] as String?,
-          startTime: data['startTime'] as String?,
-          endTime: data['endTime'] as String?,
-          // This safely handles nulls, ints, and doubles
-          durationHours:(data['durationHours'] as num?)?.toDouble(),
-          location: data['location'] as String?,
-          imageUrl: data['imageUrl'] as String?,
-          contentType: data['contentType'] as String?,
-          multiDays: data['multiDays'] as List<dynamic>?,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/booking-review-confirm/:bookingId',
-      name: RouteNames.bookingReviewConfirm,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return ShootEditReviewScreen(bookingId: bookingId);
-      },
-    ),
-    GoRoute(
-      path: '/cancel-booking/:bookingId',
-      name: RouteNames.cancelBooking,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        final data = state.extra as Map<String, dynamic>? ?? {};
-        return CancelShootScreen(
-          bookingId: bookingId,
-          projectName: data['projectName'] as String?,
-          eventDate: data['eventDate'] as String?,
-          startTime: data['startTime'] as String?,
-          endTime: data['endTime'] as String?,
-          durationHours: data['durationHours'] as int?,
-          location: data['location'] as String?,
-          contentType: data['contentType'] as String?,
-          imageUrl: data['imageUrl'] as String?,
-        );
-      },
-    ),
-    GoRoute(
-      path: '/select-booking-type/:bookingId',
-      name: RouteNames.selectBookingType,
-      builder: (context, state) {
-        final bookingId = int.parse(state.pathParameters['bookingId']!);
-        return ShootTypeSelectionScreen(bookingId: bookingId);
-      },
-    ),
-    GoRoute(
-      path: '/shoot-updated',
-      name: RouteNames.shootUpdated,
-      builder: (context, state) => const ShootUpdateSuccessScreen(),
-    ),
+      // ── Booking Management ─────────────────────────────────────────
+      GoRoute(
+        path: '/booking-summary/:bookingId',
+        name: RouteNames.bookingEventSummary,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ShootSummaryScreen(
+            bookingId: bookingId,
+            contentType: data['contentType'] as String?,
+            shootTypeId: data['shootTypeId'] as int? ?? 0,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/manage-booking/:bookingId',
+        name: RouteNames.manageBooking,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return ManageShootScreen(
+            bookingId: bookingId,
+            shootTypeId: data['shootTypeId'] as int? ?? 0,
+            projectName: data['projectName'] as String?,
+            eventDate: data['eventDate'] as String?,
+            startTime: data['startTime'] as String?,
+            endTime: data['endTime'] as String?,
+            // This safely handles nulls, ints, and doubles
+            durationHours: (data['durationHours'] as num?)?.toDouble(),
+            location: data['location'] as String?,
+            imageUrl: data['imageUrl'] as String?,
+            contentType: data['contentType'] as String?,
+            multiDays: data['multiDays'] as List<dynamic>?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/booking-review-confirm/:bookingId',
+        name: RouteNames.bookingReviewConfirm,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          return ShootEditReviewScreen(bookingId: bookingId);
+        },
+      ),
+      GoRoute(
+        path: '/cancel-booking/:bookingId',
+        name: RouteNames.cancelBooking,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return CancelShootScreen(
+            bookingId: bookingId,
+            projectName: data['projectName'] as String?,
+            eventDate: data['eventDate'] as String?,
+            startTime: data['startTime'] as String?,
+            endTime: data['endTime'] as String?,
+            durationHours: data['durationHours'] as int?,
+            location: data['location'] as String?,
+            contentType: data['contentType'] as String?,
+            imageUrl: data['imageUrl'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/select-booking-type/:bookingId',
+        name: RouteNames.selectBookingType,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          return ShootTypeSelectionScreen(bookingId: bookingId);
+        },
+      ),
+      GoRoute(
+        path: '/shoot-updated',
+        name: RouteNames.shootUpdated,
+        builder: (context, state) => const ShootUpdateSuccessScreen(),
+      ),
 
-    // ── Profile ────────────────────────────────────────────────────
-    GoRoute(
-      path: '/profile',
-      name: RouteNames.profile,
-      builder: (context, state) => const ProfileScreen(),
-    ),
-    GoRoute(
-      path: '/edit-profile',
-      name: RouteNames.editProfile,
-      builder: (context, state) => const EditProfileScreen(),
-    ),
-    GoRoute(
-      path: '/change-password',
-      name: RouteNames.changePassword,
-      builder: (context, state) {
-        final email = state.extra as String? ?? '';
-        return ChangePasswordScreen(email: email);
-      },
-    ),
-    GoRoute(
-      path: '/profile-otp',
-      name: RouteNames.profileOtp,
-      builder: (context, state) {
-        final email = state.extra as String? ?? '';
-        return ProfileOtpScreen(email: email);
-      },
-    ),
-    GoRoute(
-      path: '/profile-new-password',
-      name: RouteNames.profileNewPassword,
-      builder: (context, state) {
-        final data = state.extra as Map<String, String>? ?? {};
-        return ProfileNewPasswordScreen(
-          email: data['email'] ?? '',
-          otp: data['otp'] ?? '',
-        );
-      },
-    ),
-    GoRoute(
-      path: '/booking-history',
-      name: RouteNames.bookingHistory,
-      builder: (context, state) => const ShootHistoryScreen(),
-    ),
-    GoRoute(
-      path: '/favourites',
-      name: RouteNames.favourites,
-      builder: (context, state) => const FavoritesScreen(),
-    ),
-    GoRoute(
-      path: '/app-preferences',
-      name: RouteNames.appPreferences,
-      builder: (context, state) => const AppPreferencesScreen(),
-    ),
-    GoRoute(
-      path: '/delete-account',
-      name: RouteNames.deleteAccount,
-      builder: (context, state) => const DeleteAccountScreen(),
-    ),
-    GoRoute(
-      path: '/delete-account-otp',
-      name: RouteNames.deleteAccountOtp,
-      builder: (context, state) => const DeleteAccountOtpScreen(),
-    ),
-  ],
+      // ── Profile ────────────────────────────────────────────────────
+      GoRoute(
+        path: '/profile',
+        name: RouteNames.profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        name: RouteNames.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '/change-password',
+        name: RouteNames.changePassword,
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return ChangePasswordScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: '/profile-otp',
+        name: RouteNames.profileOtp,
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return ProfileOtpScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: '/profile-new-password',
+        name: RouteNames.profileNewPassword,
+        builder: (context, state) {
+          final data = state.extra as Map<String, String>? ?? {};
+          return ProfileNewPasswordScreen(
+            email: data['email'] ?? '',
+            otp: data['otp'] ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/booking-history',
+        name: RouteNames.bookingHistory,
+        builder: (context, state) => const ShootHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/favourites',
+        name: RouteNames.favourites,
+        builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        path: '/app-preferences',
+        name: RouteNames.appPreferences,
+        builder: (context, state) => const AppPreferencesScreen(),
+      ),
+      GoRoute(
+        path: '/delete-account',
+        name: RouteNames.deleteAccount,
+        builder: (context, state) => const DeleteAccountScreen(),
+      ),
+      GoRoute(
+        path: '/delete-account-otp',
+        name: RouteNames.deleteAccountOtp,
+        builder: (context, state) => const DeleteAccountOtpScreen(),
+      ),
+    ],
   );
 });
 
@@ -513,10 +518,9 @@ class _MainShell extends StatelessWidget {
           child: BottomNavigationBar(
             currentIndex: navigationShell.currentIndex,
             elevation: 0,
-         //   backgroundColor: Colors.transparent,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white70,
+            selectedItemColor: AppColors.white,
+            unselectedItemColor: AppColors.white70,
             onTap: (index) => navigationShell.goBranch(
               index,
               initialLocation: index == navigationShell.currentIndex,
@@ -560,12 +564,8 @@ class _MainShell extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildIcon(String path) {
-    return SvgPicture.asset(
-      path,
-      height: 26,
-      width: 26,
-      fit: BoxFit.cover,
-    );
+    return SvgPicture.asset(path, height: 26, width: 26, fit: BoxFit.cover);
   }
 }

@@ -1092,7 +1092,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 10),
                       Padding(
                         key: featuredKey,
-                        padding: const AppSpacing.insetsHXl,
+                        padding: AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1439,7 +1439,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 20),
                       // --- YOUR BOOKINGS SECTION (STACK SWIPE UI) ---
                       Padding(
-                        padding: const AppSpacing.insetsHXl,
+                        padding: AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1670,7 +1670,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       ),
                       const SizedBox(height: 20),
                       Padding(
-                        padding: const AppSpacing.insetsHXl,
+                        padding:  AppSpacing.insetsHXl,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -2567,7 +2567,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
   Widget _buildEmptyBookingCard() {
     return Container(
       height: 180,
-      margin: const AppSpacing.insetsHXl,
+      margin: AppSpacing.insetsHXl,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadii.massive),
          border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
