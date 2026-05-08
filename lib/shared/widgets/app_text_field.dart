@@ -6,7 +6,7 @@ import '../../app/radii.dart';
 import '../../app/spacing.dart';
 import '../../app/text_styles.dart';
 
-class AppTextField extends StatelessWidget {
+class AppTextField extends StatefulWidget {
   const AppTextField({
     super.key,
     this.label,
@@ -55,66 +55,109 @@ class AppTextField extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      maxLines: obscureText ? 1 : maxLines,
-      maxLength: maxLength,
-      onChanged: onChanged,
-      enabled: enabled,
-      autofocus: autofocus,
-      textInputAction: textInputAction,
-      onFieldSubmitted: onFieldSubmitted,
-      validator: validator,
-      autofillHints: autofillHints,
-      inputFormatters: inputFormatters,
-      readOnly: readOnly,
-      onTap: onTap,
+  State<AppTextField> createState() => _AppTextFieldState();
+}
 
-      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+class _AppTextFieldState extends State<AppTextField> {
+  late FocusNode _internalFocusNode;
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _internalFocusNode = FocusNode();
+    _effectiveFocusNode.addListener(_onFocusChange);
+    widget.controller?.addListener(_onTextChange);
+  }
+
+  @override
+  void didUpdateWidget(AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.focusNode != widget.focusNode) {
+      (oldWidget.focusNode ?? _internalFocusNode).removeListener(_onFocusChange);
+      _effectiveFocusNode.addListener(_onFocusChange);
+    }
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_onTextChange);
+      widget.controller?.addListener(_onTextChange);
+    }
+  }
+
+  @override
+  void dispose() {
+    _effectiveFocusNode.removeListener(_onFocusChange);
+    widget.controller?.removeListener(_onTextChange);
+    if (widget.focusNode == null) {
+      _internalFocusNode.dispose();
+    }
+    super.dispose();
+  }
+
+  void _onFocusChange() => setState(() {});
+  void _onTextChange() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isFocused = _effectiveFocusNode.hasFocus;
+    final bool hasText = widget.controller?.text.isNotEmpty ?? false;
+    final bool highlight = isFocused || hasText;
+
+    return TextFormField(
+      controller: widget.controller,
+      focusNode: _effectiveFocusNode,
+      keyboardType: widget.keyboardType,
+      obscureText: widget.obscureText,
+      maxLines: widget.obscureText ? 1 : widget.maxLines,
+      maxLength: widget.maxLength,
+      onChanged: widget.onChanged,
+      enabled: widget.enabled,
+      autofocus: widget.autofocus,
+      textInputAction: widget.textInputAction,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      validator: widget.validator,
+      autofillHints: widget.autofillHints,
+      inputFormatters: widget.inputFormatters,
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
+      cursorColor: AppColors.primary,
+      enableSuggestions: !widget.obscureText,
+      autocorrect: !widget.obscureText,
+      style: const TextStyle(
+        color: AppColors.white,
+        fontFamily: AppTextStyles.fontFamilyBody,
+        fontSize: 15,
+      ),
       decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        errorText: errorText,
-        prefixIcon: prefixIcon,
-        suffix: suffix,
-        filled: true,
-        fillColor: AppColors.surfaceVariant,
+        labelText: widget.label,
+        hintText: widget.hint,
+        errorText: widget.errorText,
+        prefixIcon: widget.prefixIcon,
+        suffixIcon: widget.suffix,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: TextStyle(
+          fontSize: 14,
+          color: highlight ? AppColors.primary : AppColors.white60,
+          fontFamily: AppTextStyles.fontFamilyBody,
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.lg,
-          vertical: AppSpacing.inputVertical,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(color: AppColors.border),
+          vertical: AppSpacing.lg,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: highlight ? AppColors.borderGold : AppColors.white30,
+            width: 0.5,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderSide: const BorderSide(
+            color: AppColors.borderGold,
+            width: 0.5,
+          ),
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.4)),
-        ),
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
-        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-        errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
-        counterStyle: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
       ),
     );
   }

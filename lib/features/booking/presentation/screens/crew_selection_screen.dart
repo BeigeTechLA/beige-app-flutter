@@ -1039,7 +1039,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                     /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
                     if (showLocationCard)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.only(bottom: 12,),
                         child: GestureDetector(
                           onTap: () {
                             context.pushNamed(

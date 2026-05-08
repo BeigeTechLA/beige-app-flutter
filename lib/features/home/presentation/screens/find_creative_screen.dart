@@ -42,7 +42,7 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
     /// ⏱ Auto navigate after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      context.goNamed(RouteNames.selectDreamTeam, extra: {
+      context.pushReplacementNamed(RouteNames.selectDreamTeam, extra: {
         'bookingId': widget.bookingId,
         'contentTypeId': widget.contentTypeId,
         'specialtyId': widget.specialtyId,

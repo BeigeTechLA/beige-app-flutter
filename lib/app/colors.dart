@@ -68,6 +68,8 @@ class AppColors {
   /// Profile crop sheet surface
   static const Color surfaceCropSheet = Color(0xFF1C1C1C);
 
+  /// Background
+  static const Color lightGoldenBg = Color(0xFFFEF5E5);
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TEXT COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -157,6 +159,7 @@ class AppColors {
   static const Color black16 = Color(0x29000000);
   static const Color black12 = Color(0x1F000000);
   static const Color black10 = Color(0x1A000000);
+  static const Color black36 = Color(0x5C000000);
 
   // — Brand opacities —
   static const Color backgroundOpacity70 = Color(0xB21D1D1B);

@@ -60,7 +60,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       if (next.status == ForgotPasswordStatus.success) {
         context.pushNamed(
           RouteNames.profileOtp,
-          extra: {'email': emailController.text.trim()},
+          extra: emailController.text.trim(),
         );
       } else if (next.status == ForgotPasswordStatus.error &&
           next.errorMessage != null) {

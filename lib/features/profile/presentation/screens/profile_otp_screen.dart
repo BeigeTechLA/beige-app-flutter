@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -147,6 +148,7 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                               ),
                               child: Container(
                                 height: 60,
+                                alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   borderRadius: AppRadii.lgAll,
                                   border: Border.all(
@@ -163,11 +165,18 @@ class _ProfileOtpScreenState extends ConsumerState<ProfileOtpScreen> {
                                   focusNode: focusNodes[index],
                                   textAlign: TextAlign.center,
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
                                   maxLength: 1,
                                   style: AppTextStyles.otpDigit,
                                   decoration: const InputDecoration(
                                     counterText: "",
+                                    filled: false,
                                     border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
                                   ),
                                   onChanged: (value) {
                                     setState(() {

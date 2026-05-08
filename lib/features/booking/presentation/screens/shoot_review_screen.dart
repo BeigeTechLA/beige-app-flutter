@@ -820,7 +820,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                 const SizedBox(height: 14),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: AppColors.accent,
+                                    color: AppColors.lightGoldenBg,
                                     borderRadius: AppRadii.lgAll,
                                   ),
                                   child: Column(
@@ -828,10 +828,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 10,
-                                          bottom: 10,
-                                          top: 10,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: AppSpacing.lg,
+                                          vertical: AppSpacing.lg,
                                         ),
                                         child: Text(
                                           "Package Offer",
@@ -841,27 +840,28 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                               ),
                                         ),
                                       ),
-                                      const Divider(color: AppColors.black),
-
+                                      Divider(color: AppColors.black36, height: 0.5),
+                                      const SizedBox(height: AppSpacing.md),
                                       _buildCheckRow(
                                         text: "Unlimited Usage Rights",
                                         iconPath: AppAssets.unlimitedUsage,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: AppSpacing.md),
                                       _buildCheckRow(
                                         text: "All Raw Content",
                                         iconPath: AppAssets.allRawContent,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: AppSpacing.md),
                                       _buildCheckRow(
                                         text: "Include Edited Deliverable",
                                         iconPath: AppAssets.includeEdited,
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: AppSpacing.md),
                                       _buildCheckRow(
                                         text: "Up to 2 Sets of Revisions",
                                         iconPath: AppAssets.revisions,
                                       ),
+                                      const SizedBox(height: AppSpacing.md),
                                     ],
                                   ),
                                 ),
@@ -1125,19 +1125,30 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
   Widget _buildCheckRow({required String text, required String iconPath}) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, bottom: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: SvgPicture.asset(iconPath, height: 32, width: 32)),
-          const SizedBox(width: 10),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(
+              color: AppColors.background,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                iconPath,
+                height: 16,
+                width: 16,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
               text,
-              textAlign: TextAlign.start,
-              style: AppTextStyles.bodyCompact.copyWith(
+              style: AppTextStyles.detailingText.copyWith(
                 color: AppColors.black,
-                fontWeight: FontWeight.w400,
               ),
             ),
           ),

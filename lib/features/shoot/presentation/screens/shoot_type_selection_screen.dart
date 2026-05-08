@@ -578,6 +578,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           onPressed: () => context.pop(),
                           child: const Text("Cancel"),
                         ),
+                        const SizedBox(width: AppSpacing.sm),
                         TextButton(
                           onPressed: () {
                             context.pop(tempSelected);

@@ -1084,6 +1084,7 @@ import '../../../../app/assets.dart';
                             onPressed: () => context.pop(),
                             child: const Text("Cancel"),
                           ),
+                          const SizedBox(width: AppSpacing.sm),
                           TextButton(
                             onPressed: () {
                               context.pop(tempSelected);
@@ -2374,7 +2375,7 @@ import '../../../../app/assets.dart';
 
             /// 🔥 Horizontal Month Dates
             SizedBox(
-              height: 58,
+              height: 64,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: allDates.length,
@@ -2410,13 +2411,13 @@ import '../../../../app/assets.dart';
                     },
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 19, vertical: 4),
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.primary
                             : AppColors.overlay,
-                        borderRadius: BorderRadius.circular(AppRadii.roundLg),
+                        shape: BoxShape.circle,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

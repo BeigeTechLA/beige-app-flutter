@@ -116,6 +116,9 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     final detailsState = ref.read(shootDetailsNotifierProvider(widget.bookingId));
 
     if (detailsState.status == ShootDetailsStatus.success) {
+      setState(() {
+        isSubmitting = false;
+      });
       context.pushNamed(RouteNames.crewSizeMatching, extra: {
         'bookingId': widget.bookingId,
         'contentTypeId': widget.contentTypeId,
@@ -230,11 +233,11 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     super.initState();
     _getCurrentLocation();
     locationFocusNode.addListener(() {
-      if (locationFocusNode.hasFocus) {
-        setState(() {
-          showMap = true; // 🔥 TextField click → map show
-        });
-      }
+      setState(() {
+        if (locationFocusNode.hasFocus) {
+          showMap = true;
+        }
+      });
     });
   }
 
@@ -843,17 +846,16 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   children: [
 
                     /// 🔹 LOCATION FIELD
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.transparent,
-                          borderRadius: AppRadii.lgAll,
-                          border: Border.all(
-                            color: AppColors.borderGold,
-                            width: 0.5,
+                      GooglePlaceAutoCompleteTextField(
+                          boxDecoration: BoxDecoration(
+                            borderRadius: AppRadii.lgAll,
+                            border: Border.all(
+                              color: (locationFocusNode.hasFocus || searchController.text.isNotEmpty)
+                                  ? AppColors.borderGold
+                                  : AppColors.white30,
+                              width: 0.5,
+                            ),
                           ),
-
-                        ),
-                        child: GooglePlaceAutoCompleteTextField(
                           textEditingController: searchController,
                           focusNode: locationFocusNode,
                           googleAPIKey: GoogleConfig.placesApiKey,
@@ -864,8 +866,20 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                           inputDecoration:  InputDecoration(
                             border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: AppRadii.lgAll,
+                              borderSide: BorderSide(
+                                color: (locationFocusNode.hasFocus || searchController.text.isNotEmpty) ? AppColors.borderGold : AppColors.white30,
+                                width: 0.5,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: AppRadii.lgAll,
+                              borderSide: const BorderSide(
+                                color: AppColors.borderGold,
+                                width: 0.5,
+                              ),
+                            ),
                             hintText: "Search or select location",
                             hintStyle: TextStyle(
                               color: AppColors.white70,
@@ -921,7 +935,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
                           isCrossBtnShown: true,
                         ),
-                      ),
 
                     /// 🔴 ERROR TEXT
                     if (locationError != null)

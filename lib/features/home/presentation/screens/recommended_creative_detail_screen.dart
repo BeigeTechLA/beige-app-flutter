@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,10 +70,7 @@ class _RecommendedCreativeDetailScreenState
     final about = state.about;
     final portfolio = state.portfolio;
 
-    final weeklyAvailabilityJson = state.weeklyAvailabilityJson;
-    final weeklyAvailability = weeklyAvailabilityJson != null
-        ? List<String>.from(jsonDecode(weeklyAvailabilityJson))
-        : <String>[];
+    final weeklyAvailability = state.weeklyAvailability;
 
     final isLoading = state.status == CreativeProfileStatus.loading;
 

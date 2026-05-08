@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'creative_providers.dart';
@@ -33,7 +35,13 @@ class CreativeProfileState {
   Map<String, dynamic>? get about => data?['about'];
   List get portfolio => (data?['portfolio_preview'] as List?) ?? [];
   List get team => (data?['team_preview'] as List?) ?? [];
-  String? get weeklyAvailabilityJson => data?['weekly_availability'];
+  List<String> get weeklyAvailability {
+    final raw = data?['weekly_availability'];
+    if (raw == null) return [];
+    if (raw is String) return List<String>.from(jsonDecode(raw));
+    if (raw is List) return List<String>.from(raw);
+    return [];
+  }
   Map<String, dynamic>? get reviews => data?['reviews'];
 }
 

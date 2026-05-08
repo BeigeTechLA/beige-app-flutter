@@ -378,6 +378,8 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                               ),
                             ),
 
+                            const SizedBox(width: AppSpacing.md),
+
                             Expanded(
                               child: SizedBox(
                                 height: 55,

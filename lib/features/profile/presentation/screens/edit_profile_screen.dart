@@ -372,8 +372,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                       inputDecoration: InputDecoration(
                         border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: AppRadii.lgAll,
+                          borderSide: BorderSide(
+                            color: (locationFocusNode.hasFocus || locationController.text.isNotEmpty) ? AppColors.borderGold : AppColors.white30,
+                            width: 0.5,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: AppRadii.lgAll,
+                          borderSide: const BorderSide(
+                            color: AppColors.borderGold,
+                            width: 0.5,
+                          ),
+                        ),
                         hintText: "location*",
                         hintStyle: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.white70,
@@ -474,7 +486,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       onTap: () async {
                         await context.pushNamed(
                           RouteNames.changePassword,
-                          extra: {'email': emailController.text},
+                          extra: emailController.text,
                         );
                       },
                       child: SizedBox(
