@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'booking_providers.dart';
 
 enum CrewSelectionStatus { initial, loading, loaded, error }
@@ -135,6 +137,11 @@ class CrewSelectionNotifier
         }
       },
     );
+
+    AnalyticsService.logEvent(AnalyticsEvents.bookingStepCrew, params: {
+      'booking_id': bookingId,
+      'crew_matches': crewMatches.length,
+    });
 
     state = state.copyWith(
       status: CrewSelectionStatus.loaded,

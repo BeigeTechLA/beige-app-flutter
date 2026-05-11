@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
+
 import 'auth_providers.dart';
 import 'signup_state.dart';
 
@@ -38,7 +41,10 @@ class SignupNotifier extends AutoDisposeNotifier<SignupState> {
         status: SignupStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(status: SignupStatus.success),
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.signUp, params: {'method': 'email'});
+        state = state.copyWith(status: SignupStatus.success);
+      },
     );
   }
 }

@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
-import 'package:beige/shared/widgets/app_button.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';

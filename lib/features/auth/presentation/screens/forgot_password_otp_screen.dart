@@ -129,13 +129,15 @@ class _ForgotPasswordOtpScreenState
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
-                      AppAssets.authBackground,
-                      fit: BoxFit.fill,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceMid,
+                        borderRadius: AppRadii.bottomHeader,
+                      ),
                     ),
                   ),
                   Positioned(
-                    top: 50,
+                    top: 70,
                     left: 16,
                     child: InkWell(
                       onTap: () => context.pop(),
@@ -180,7 +182,7 @@ class _ForgotPasswordOtpScreenState
 
             /// Form container
             Transform.translate(
-              offset: const Offset(0, -70),
+              offset: const Offset(0, -85),
               child: Container(
                 width: double.infinity,
                 padding: AppSpacing.authCardPadding,
@@ -315,9 +317,9 @@ class _ForgotPasswordOtpScreenState
                             ? _handleVerify
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isOtpFilled
-                              ? AppColors.primary
-                              : AppColors.goldGradientLight,
+                          backgroundColor: AppColors.primary,
+                          disabledBackgroundColor: AppColors.primary50,
+                          disabledForegroundColor: AppColors.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: AppRadii.xlAll,
                           ),
@@ -327,9 +329,7 @@ class _ForgotPasswordOtpScreenState
                           style: AppTextStyles.bodyCompact.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.w600,
-                            color: isOtpFilled
-                                ? AppColors.textHeading
-                                : AppColors.black38,
+
                           ),
                         ),
                       ),

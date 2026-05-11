@@ -106,13 +106,15 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
-                      AppAssets.authBackground,
-                      fit: BoxFit.fill,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceMid,
+                        borderRadius: AppRadii.bottomHeader,
+                      ),
                     ),
                   ),
                   Positioned(
-                    top: 50,
+                    top: 70,
                     left: 16,
                     child: InkWell(
                       onTap: () => context.pop(),
@@ -160,7 +162,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
             /// Form container
             Transform.translate(
-              offset: const Offset(0, -70),
+              offset: const Offset(0, -85),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(
@@ -234,9 +236,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                             ? _handleSubmit
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isPasswordFilled
-                              ? AppColors.primary
-                              : AppColors.goldGradientLight,
+                          backgroundColor: AppColors.primary,
+                          disabledBackgroundColor: AppColors.primary50,
+                          disabledForegroundColor: AppColors.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: AppRadii.xlAll,
                           ),
@@ -246,9 +248,6 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                           style: AppTextStyles.bodyCompact.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.w600,
-                            color: isPasswordFilled
-                                ? AppColors.textHeading
-                                : AppColors.surfaceVariant,
                           ),
                         ),
                       ),

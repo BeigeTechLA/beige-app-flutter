@@ -1,6 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
+import '../../../../core/firebase/crashlytics_service.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 
@@ -42,6 +45,11 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
 
         // Update auth state
         ref.read(authStateProvider.notifier).updateState(true);
+
+        // Analytics & Crashlytics
+        AnalyticsService.logEvent(AnalyticsEvents.login, params: {'method': 'email'});
+        AnalyticsService.setUserId(user.environmentId.toString());
+        CrashlyticsService.setUserContext(userId: user.environmentId, email: email);
 
         state = state.copyWith(status: LoginStatus.success, user: user);
       },

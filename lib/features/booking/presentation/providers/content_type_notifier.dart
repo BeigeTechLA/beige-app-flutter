@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import '../../../home/presentation/providers/home_providers.dart';
 import 'booking_providers.dart';
 
@@ -90,11 +92,22 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
         status: ContentTypeStatus.error,
         errorMessage: error.message,
       ),
-      (data) => state = state.copyWith(
-        status: ContentTypeStatus.success,
-        bookingId: data['data']?['booking_id'] as int?,
-        shootTypeIds: shootTypeIds,
-      ),
+      (data) {
+        final bookingId = data['data']?['booking_id'] as int?;
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStarted, params: {
+          if (bookingId != null) 'booking_id': bookingId,
+          'content_type': contentType,
+        });
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStepContent, params: {
+          if (bookingId != null) 'booking_id': bookingId,
+          'content_type': contentType,
+        });
+        state = state.copyWith(
+          status: ContentTypeStatus.success,
+          bookingId: bookingId,
+          shootTypeIds: shootTypeIds,
+        );
+      },
     );
   }
 }

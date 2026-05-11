@@ -56,18 +56,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Expanded(
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              return Padding(
-                                padding: EdgeInsets.only(
-                                  top: constraints.maxHeight * 0.05,
-                                  left: AppSpacing.md,
-                                  right: AppSpacing.md,
-                                ),
-                                child: Image.asset(
-                                  pages[index]['image']!,
-                                  width: double.infinity,
-                                  height: constraints.maxHeight * 0.6,
-                                  fit: BoxFit.contain,
-                                ),
+                              return Image.asset(
+                                pages[index]['image']!,
+                                width: double.infinity,
+                                height: constraints.maxHeight * 0.6,
+                                fit: BoxFit.contain,
                               );
                             },
                           ),

@@ -88,13 +88,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   child: Stack(
                     children: [
                       Positioned.fill(
-                        child: Image.asset(
-                          AppAssets.authBackground,
-                          fit: BoxFit.fill,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceMid,
+                            borderRadius: AppRadii.bottomHeader,
+                          ),
                         ),
                       ),
                       Positioned(
-                        top: 50,
+                        top: 70,
                         left: 16,
                         child: InkWell(
                           onTap: () => context.pop(),
@@ -132,7 +134,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                 /// Form container
                 Transform.translate(
-                  offset: const Offset(0, -70),
+                  offset: const Offset(0, -85),
                   child: Container(
                     width: double.infinity,
                     padding: AppSpacing.authCardPadding,
@@ -166,9 +168,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 ? null
                                 : _handleSubmit,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isFormValid
-                                  ? AppColors.primary
-                                  : AppColors.goldGradientLight,
+                              backgroundColor: AppColors.primary,
+                              disabledBackgroundColor: AppColors.primary50,
+                              disabledForegroundColor: AppColors.onPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: AppRadii.xlAll,
                               ),

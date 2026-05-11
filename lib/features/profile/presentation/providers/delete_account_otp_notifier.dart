@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'profile_providers.dart';
 
 enum DeleteOtpStatus { initial, loading, success, error }
@@ -44,9 +46,12 @@ class DeleteAccountOtpNotifier
         confirmStatus: DeleteOtpStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(
-        confirmStatus: DeleteOtpStatus.success,
-      ),
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.accountDeleted);
+        state = state.copyWith(
+          confirmStatus: DeleteOtpStatus.success,
+        );
+      },
     );
   }
 

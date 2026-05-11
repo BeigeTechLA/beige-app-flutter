@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
+
 import 'auth_providers.dart';
 import 'forgot_password_state.dart';
 
@@ -21,6 +24,7 @@ class ForgotPasswordNotifier extends AutoDisposeNotifier<ForgotPasswordState> {
         );
       },
       (message) {
+        AnalyticsService.logEvent(AnalyticsEvents.forgotPassword);
         state = state.copyWith(
           status: ForgotPasswordStatus.success,
           successMessage: message,

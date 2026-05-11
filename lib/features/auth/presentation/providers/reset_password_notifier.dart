@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
+
 import 'auth_providers.dart';
 import 'reset_password_state.dart';
 
@@ -28,7 +31,10 @@ class ResetPasswordNotifier extends AutoDisposeNotifier<ResetPasswordState> {
         status: ResetPasswordStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(status: ResetPasswordStatus.success),
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.passwordReset);
+        state = state.copyWith(status: ResetPasswordStatus.success);
+      },
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import '../../../../core/network/api_endpoints.dart';
 import 'profile_providers.dart';
 
@@ -52,10 +54,13 @@ class ProfileNotifier extends AutoDisposeNotifier<ProfileState> {
         status: ProfileStatus.error,
         errorMessage: error.message,
       ),
-      (profile) => state = state.copyWith(
-        status: ProfileStatus.loaded,
-        profile: profile,
-      ),
+      (profile) {
+        AnalyticsService.logEvent(AnalyticsEvents.profileViewed);
+        state = state.copyWith(
+          status: ProfileStatus.loaded,
+          profile: profile,
+        );
+      },
     );
   }
 }

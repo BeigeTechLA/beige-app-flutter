@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'booking_providers.dart';
 
 enum ShootDateTimeStatus { initial, loading, loaded, saving, success, error }
@@ -74,7 +76,12 @@ class ShootDateTimeNotifier
         status: ShootDateTimeStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(status: ShootDateTimeStatus.success),
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStepDateTime, params: {
+          'booking_id': bookingId,
+        });
+        state = state.copyWith(status: ShootDateTimeStatus.success);
+      },
     );
   }
 }

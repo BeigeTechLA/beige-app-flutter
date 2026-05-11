@@ -14,7 +14,6 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
-import 'package:beige/features/booking/presentation/providers/booking_providers.dart';
 import 'package:beige/shared/widgets/loading.dart' show AppLoader;
 import 'package:beige/shared/layouts/app_scaffold.dart';
 

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import '../../config/env.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
-import 'interceptors/logging_interceptor.dart';
 import 'interceptors/retry_interceptor.dart';
 
 class DioClient {

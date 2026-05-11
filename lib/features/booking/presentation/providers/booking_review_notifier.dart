@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import '../../../payment/presentation/providers/payment_providers.dart';
 import '../../../shoot/presentation/providers/shoot_providers.dart';
 
@@ -75,6 +77,10 @@ class BookingReviewNotifier
         List savedCards =
             data['payment_methods']?['saved_cards'] as List? ?? [];
 
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStepReview, params: {
+          'booking_id': bookingId,
+        });
+
         state = state.copyWith(
           status: BookingReviewStatus.loaded,
           booking: bookingData,
@@ -125,6 +131,9 @@ class BookingReviewNotifier
         return null;
       },
       (data) {
+        AnalyticsService.logEvent(AnalyticsEvents.paymentInitiated, params: {
+          'booking_id': bookingId,
+        });
         final paymentSheet = data['payment_sheet'] as Map<String, dynamic>?;
         return paymentSheet;
       },
@@ -144,10 +153,22 @@ class BookingReviewNotifier
 
     return result.fold(
       (error) {
+        AnalyticsService.logEvent(AnalyticsEvents.paymentFailed, params: {
+          'booking_id': bookingId,
+          'error': error.message,
+        });
         state = state.copyWith(errorMessage: error.message);
         return false;
       },
-      (_) => true,
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.paymentSuccess, params: {
+          'booking_id': bookingId,
+        });
+        AnalyticsService.logEvent(AnalyticsEvents.bookingCompleted, params: {
+          'booking_id': bookingId,
+        });
+        return true;
+      },
     );
   }
 }

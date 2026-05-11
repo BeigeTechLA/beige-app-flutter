@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'shoot_providers.dart';
 
 enum CancelShootStatus { initial, cancelling, cancelled, error }
@@ -46,6 +48,9 @@ class CancelShootNotifier extends AutoDisposeNotifier<CancelShootState> {
         errorMessage: error.message,
       ),
       (data) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingCancelled, params: {
+          'booking_id': bookingId,
+        });
         final message =
             (data['message'] as String?) ?? 'Shoot cancelled successfully';
         state = state.copyWith(

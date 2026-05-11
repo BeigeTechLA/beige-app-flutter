@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'profile_providers.dart';
 
 enum FavouritesStatus { initial, loading, loaded, error }
@@ -67,6 +69,9 @@ class FavouritesNotifier extends AutoDisposeNotifier<FavouritesState> {
         errorMessage: error.message,
       ),
       (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.favouriteRemoved, params: {
+          'creative_id': creativeId,
+        });
         final updated = List<dynamic>.from(state.favourites)..removeAt(index);
         state = state.copyWith(
           favourites: updated,

@@ -13,6 +13,9 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/core/firebase/analytics_events.dart';
+import 'package:beige/core/firebase/analytics_service.dart';
+import 'package:beige/core/firebase/crashlytics_service.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -466,6 +469,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
+                        AnalyticsService.logEvent(AnalyticsEvents.logout);
+                        CrashlyticsService.clearUserContext();
                         await SharedService.logout();
                         if (!mounted) return;
                         ref

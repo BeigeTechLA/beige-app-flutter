@@ -320,6 +320,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: isDisabled ? null : onTap,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

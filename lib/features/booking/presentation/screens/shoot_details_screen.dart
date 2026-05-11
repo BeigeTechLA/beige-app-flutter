@@ -680,7 +680,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                       borderRadius: AppRadii.xlAll,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
 
                         /// 📸 Photography (only if allowed)
@@ -1231,23 +1231,20 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     required VoidCallback onAdd,
     required VoidCallback onRemove,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(color: AppColors.white, fontSize: 14),
-            ),
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(color: AppColors.white, fontSize: 14),
           ),
-          AppQtyCounter(
-            value: value,
-            onIncrement: onAdd,
-            onDecrement: onRemove,
-          ),
-        ],
-      ),
+        ),
+        AppQtyCounter(
+          value: value,
+          onIncrement: onAdd,
+          onDecrement: onRemove,
+        ),
+      ],
     );
   }
 

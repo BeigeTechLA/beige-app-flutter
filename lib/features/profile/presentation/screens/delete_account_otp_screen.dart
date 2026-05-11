@@ -12,6 +12,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/firebase/crashlytics_service.dart';
 import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_otp_notifier.dart';
@@ -277,6 +278,7 @@ class _DeleteAccountOtpScreenState
   }
 
   Future<void> _handleAccountDeleted() async {
+    CrashlyticsService.clearUserContext();
     await SharedService.logout();
     if (!mounted) return;
     ref.read(authStateProvider.notifier).updateState(false);

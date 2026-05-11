@@ -738,11 +738,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   child: Stack(
                     children: [
 
-                      /// 🖼️ BACKGROUND IMAGE
+                      /// 🖼️ BACKGROUND
                       Positioned.fill(
-                        child: Image.asset(
-                          AppAssets.authBackground,
-                          fit: BoxFit.fill,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceMid,
+                            borderRadius: AppRadii.bottomHeader,
+                          ),
                         ),
                       ),
 
@@ -1160,9 +1162,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 onPressed: isFormValid ? _fetchSignup : null,
 
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFormValid
-                                      ? AppColors.primary
-                                      : AppColors.goldGradientLight,
+                                  backgroundColor: AppColors.primary,
+                                  disabledBackgroundColor: AppColors.primary50,
+                                  disabledForegroundColor: AppColors.onPrimary,
 
                                   shape: RoundedRectangleBorder(
                                     borderRadius: AppRadii.xlAll,

@@ -134,7 +134,6 @@ class AppAssets {
   // PNG — Images
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  static const String authBackground = '$images/auth_background.png';
   static const String roleSelection = '$images/role_selection.png';
   static const String creativeCardBg = '$images/creative_card_bg.png';
   static const String heartAngle = '$images/heart_angle.png';

@@ -120,9 +120,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
-                      AppAssets.authBackground,
-                      fit: BoxFit.fill,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceMid,
+                        borderRadius: AppRadii.bottomHeader,
+                      ),
                     ),
                   ),
                   Align(
@@ -158,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
             /// Form container
             Transform.translate(
-              offset: const Offset(0, -70),
+              offset: const Offset(0, -85),
               child: Container(
                 width: double.infinity,
                 padding: AppSpacing.authCardPadding,
@@ -167,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   color: AppColors.background,
                   borderRadius: AppRadii.authCardAll,
                   border: Border.all(
-                    color: AppColors.white.withValues(alpha: 0.06),
+                    color: AppColors.white10,
                     width: 1,
                   ),
                 ),
@@ -240,9 +242,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   TextInput.finishAutofillContext();
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isFormValid
-                                ? AppColors.primary
-                                : AppColors.goldGradientLight,
+                            backgroundColor: AppColors.primary,
+                            disabledBackgroundColor: AppColors.primary50,
+                            disabledForegroundColor: AppColors.onPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: AppRadii.xlAll,
                             ),
@@ -252,9 +254,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: AppTextStyles.bodyCompact.copyWith(
                               fontFamily: AppTextStyles.fontFamilyDisplay,
                               fontWeight: FontWeight.w600,
-                              color: isFormValid
-                                  ? AppColors.textHeading
-                                  : AppColors.surfaceVariant,
                             ),
                           ),
                         ),

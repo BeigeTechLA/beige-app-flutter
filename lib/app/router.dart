@@ -43,7 +43,7 @@ import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/password_reset_success_screen.dart';
 import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/auth/presentation/screens/sign_up_screen.dart';
-import '../core/firebase/analytics_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import '../core/providers/auth_state_provider.dart';
 import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
@@ -84,7 +84,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
-    observers: [AnalyticsService.observer],
+    observers: [
+      FirebaseAnalyticsObserver(
+        analytics: FirebaseAnalytics.instance,
+        nameExtractor: (settings) => settings.name ?? 'unknown',
+      ),
+    ],
     refreshListenable: authNotifier,
     redirect: (context, state) {
       final isLoggedIn = authNotifier.value;

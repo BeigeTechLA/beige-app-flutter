@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import '../../../../core/network/api_endpoints.dart';
 import 'profile_providers.dart';
 
@@ -83,10 +85,13 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
         status: EditProfileStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(
-        status: EditProfileStatus.saved,
-        successMessage: 'Profile updated successfully',
-      ),
+      (_) {
+        AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
+        state = state.copyWith(
+          status: EditProfileStatus.saved,
+          successMessage: 'Profile updated successfully',
+        );
+      },
     );
   }
 

@@ -7,7 +7,7 @@ class AnalyticsService {
       FirebaseAnalyticsObserver(analytics: _analytics);
 
   static Future<void> logEvent(String name, {Map<String, Object>? params}) async {
-    if (kDebugMode) return;  // No analytics noise in dev
+   if (kDebugMode) return;  // No analytics noise in dev
     await _analytics.logEvent(name: name, parameters: params);
   }
 

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'creative_providers.dart';
 
 enum CreativeProfileStatus { initial, loading, loaded, error }
@@ -62,10 +64,15 @@ class CreativeProfileNotifier
         status: CreativeProfileStatus.error,
         errorMessage: error.message,
       ),
-      (data) => state = state.copyWith(
-        status: CreativeProfileStatus.loaded,
-        data: data,
-      ),
+      (data) {
+        AnalyticsService.logEvent(AnalyticsEvents.creativeViewed, params: {
+          'creative_id': creativeId,
+        });
+        state = state.copyWith(
+          status: CreativeProfileStatus.loaded,
+          data: data,
+        );
+      },
     );
   }
 }

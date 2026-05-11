@@ -15,7 +15,6 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
-import 'package:beige/shared/widgets/loading.dart';
 
 class MyShootsScreen extends ConsumerStatefulWidget {
   const MyShootsScreen({super.key});

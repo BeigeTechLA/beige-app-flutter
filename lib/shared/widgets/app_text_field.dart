@@ -129,6 +129,8 @@ class _AppTextFieldState extends State<AppTextField> {
         fontSize: 15,
       ),
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.transparent,
         labelText: widget.label,
         hintText: widget.hint,
         errorText: widget.errorText,
