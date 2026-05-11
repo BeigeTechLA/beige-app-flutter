@@ -71,25 +71,28 @@ class PaymentSuccessScreen extends ConsumerWidget {
         ),
 
         /// 🔥 BUTTON AT BOTTOM
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: GestureDetector(
-            onTap: () {
-              context.goNamed(RouteNames.home);
-            },
-            child: Container(
-              height: 55,
-              decoration: BoxDecoration(
-                color: AppColors.goldSuccessCta,
-                borderRadius: AppRadii.xlAll,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                "View Summary",
-                style: AppTextStyles.labelLarge.copyWith(
-                  fontFamily: AppAssets.fontUnbounded,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w500,
+        bottomNavigationBar: SafeArea(
+          bottom: true,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: GestureDetector(
+              onTap: () {
+                context.goNamed(RouteNames.home);
+              },
+              child: Container(
+                height: 55,
+                decoration: BoxDecoration(
+                  color: AppColors.goldSuccessCta,
+                  borderRadius: AppRadii.xlAll,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "View Summary",
+                  style: AppTextStyles.labelLarge.copyWith(
+                    fontFamily: AppAssets.fontUnbounded,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),

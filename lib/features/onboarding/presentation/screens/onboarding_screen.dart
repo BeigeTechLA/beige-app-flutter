@@ -59,7 +59,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               return Image.asset(
                                 pages[index]['image']!,
                                 width: double.infinity,
-                                height: constraints.maxHeight * 0.6,
+                                height: constraints.maxHeight * 0.8,
                                 fit: BoxFit.contain,
                               );
                             },
@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Text(
                           pages[index]['title']!,
                           textAlign: TextAlign.center,
-                          style: AppTextStyles.titleMedium.copyWith(
+                          style: AppTextStyles.titleLarge.copyWith(
                             color: AppColors.white,
                             fontWeight: FontWeight.bold,
                           ),
