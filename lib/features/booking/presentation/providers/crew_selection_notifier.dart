@@ -56,8 +56,20 @@ class CrewSelectionState {
 
 class CrewSelectionNotifier
     extends AutoDisposeFamilyNotifier<CrewSelectionState, int> {
+  bool _stepCompleted = false;
+
   @override
   CrewSelectionState build(int bookingId) {
+    // --- Booking Analytics: Drop-off tracking for Step 6 ---
+    ref.onDispose(() {
+      if (!_stepCompleted) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
+          'booking_id': bookingId,
+          'last_step': 'crew_selection',
+          'step_number': 6,
+        });
+      }
+    });
     _fetchInitialData(bookingId);
     return const CrewSelectionState(status: CrewSelectionStatus.loading);
   }
@@ -138,9 +150,11 @@ class CrewSelectionNotifier
       },
     );
 
+    // --- Booking Analytics: Step 6 — Crew selection screen loaded ---
     AnalyticsService.logEvent(AnalyticsEvents.bookingStepCrew, params: {
       'booking_id': bookingId,
       'crew_matches': crewMatches.length,
+      'step_number': 6,
     });
 
     state = state.copyWith(
@@ -257,6 +271,10 @@ class CrewSelectionNotifier
         );
       },
     );
+  }
+
+  void markStepCompleted() {
+    _stepCompleted = true;
   }
 }
 

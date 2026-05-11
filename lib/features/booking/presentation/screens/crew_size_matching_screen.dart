@@ -629,6 +629,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
+                      ref.read(crewRecommendationNotifierProvider(widget.bookingId).notifier).markStepCompleted();
                       context.pushNamed(RouteNames.findingPerfect, extra: {
                         'bookingId': widget.bookingId,
                         'contentTypeId': widget.contentTypeId,

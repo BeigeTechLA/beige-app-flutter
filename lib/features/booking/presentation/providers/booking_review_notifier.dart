@@ -53,8 +53,20 @@ class BookingReviewState {
 
 class BookingReviewNotifier
     extends AutoDisposeFamilyNotifier<BookingReviewState, int> {
+  bool _stepCompleted = false;
+
   @override
   BookingReviewState build(int bookingId) {
+    // --- Booking Analytics: Drop-off tracking for Step 7 ---
+    ref.onDispose(() {
+      if (!_stepCompleted) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
+          'booking_id': bookingId,
+          'last_step': 'review',
+          'step_number': 7,
+        });
+      }
+    });
     _fetchSummary(bookingId);
     return const BookingReviewState(status: BookingReviewStatus.loading);
   }
@@ -77,8 +89,12 @@ class BookingReviewNotifier
         List savedCards =
             data['payment_methods']?['saved_cards'] as List? ?? [];
 
+        // --- Booking Analytics: Step 7 — Review screen loaded ---
+        final totalAmount = pricingData?['total_amount'] ?? 0;
         AnalyticsService.logEvent(AnalyticsEvents.bookingStepReview, params: {
           'booking_id': bookingId,
+          'total_amount': totalAmount,
+          'step_number': 7,
         });
 
         state = state.copyWith(
@@ -131,8 +147,10 @@ class BookingReviewNotifier
         return null;
       },
       (data) {
+        // --- Booking Analytics: Step 8 — Payment initiated ---
         AnalyticsService.logEvent(AnalyticsEvents.paymentInitiated, params: {
           'booking_id': bookingId,
+          'step_number': 8,
         });
         final paymentSheet = data['payment_sheet'] as Map<String, dynamic>?;
         return paymentSheet;
@@ -153,18 +171,34 @@ class BookingReviewNotifier
 
     return result.fold(
       (error) {
+        // --- Booking Analytics: Step 9 — Payment failed ---
         AnalyticsService.logEvent(AnalyticsEvents.paymentFailed, params: {
           'booking_id': bookingId,
           'error': error.message,
+          'step_number': 9,
         });
         state = state.copyWith(errorMessage: error.message);
         return false;
       },
       (_) {
+        _stepCompleted = true;
+        // --- Booking Analytics: Step 9 — Payment successful ---
         AnalyticsService.logEvent(AnalyticsEvents.paymentSuccess, params: {
           'booking_id': bookingId,
+          'amount': state.pricing?['total_amount'] ?? 0,
+          'currency': 'USD',
         });
+        // --- Booking Analytics: Step 9 — Booking completed ---
         AnalyticsService.logEvent(AnalyticsEvents.bookingCompleted, params: {
+          'booking_id': bookingId,
+          'total_amount': state.pricing?['total_amount'] ?? 0,
+          'step_number': 9,
+        });
+        // --- Booking Analytics: Step 9 — Purchase conversion event (Firebase standard) ---
+        AnalyticsService.logEvent(AnalyticsEvents.purchase, params: {
+          'transaction_id': bookingId.toString(),
+          'value': state.pricing?['total_amount'] ?? 0,
+          'currency': 'USD',
           'booking_id': bookingId,
         });
         return true;

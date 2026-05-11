@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'booking_providers.dart';
 
 enum CrewRecommendationStatus { initial, loading, loaded, error }
@@ -30,8 +32,20 @@ class CrewRecommendationState {
 
 class CrewRecommendationNotifier
     extends AutoDisposeFamilyNotifier<CrewRecommendationState, int> {
+  bool _stepCompleted = false;
+
   @override
   CrewRecommendationState build(int bookingId) {
+    // --- Booking Analytics: Drop-off tracking for Step 5 ---
+    ref.onDispose(() {
+      if (!_stepCompleted) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
+          'booking_id': bookingId,
+          'last_step': 'crew_size',
+          'step_number': 5,
+        });
+      }
+    });
     _fetchRecommendation(bookingId);
     return const CrewRecommendationState(
       status: CrewRecommendationStatus.loading,
@@ -47,11 +61,24 @@ class CrewRecommendationNotifier
         status: CrewRecommendationStatus.error,
         errorMessage: error.message,
       ),
-      (data) => state = state.copyWith(
-        status: CrewRecommendationStatus.loaded,
-        data: data,
-      ),
+      (data) {
+        // --- Booking Analytics: Step 5 — Crew size recommendation viewed ---
+        final crewSize = (data['crew_requirements'] as List?)?.length ?? 0;
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStepCrewSize, params: {
+          'booking_id': bookingId,
+          'recommended_crew_size': crewSize,
+          'step_number': 5,
+        });
+        state = state.copyWith(
+          status: CrewRecommendationStatus.loaded,
+          data: data,
+        );
+      },
     );
+  }
+
+  void markStepCompleted() {
+    _stepCompleted = true;
   }
 }
 

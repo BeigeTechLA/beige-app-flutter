@@ -28,8 +28,20 @@ class ShootDetailsState {
 
 class ShootDetailsNotifier
     extends AutoDisposeFamilyNotifier<ShootDetailsState, int> {
+  bool _stepCompleted = false;
+
   @override
   ShootDetailsState build(int bookingId) {
+    // --- Booking Analytics: Drop-off tracking for Step 4 ---
+    ref.onDispose(() {
+      if (!_stepCompleted) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
+          'booking_id': bookingId,
+          'last_step': 'details',
+          'step_number': 4,
+        });
+      }
+    });
     return const ShootDetailsState();
   }
 
@@ -51,8 +63,12 @@ class ShootDetailsNotifier
         errorMessage: error.message,
       ),
       (_) {
+        _stepCompleted = true;
+        // --- Booking Analytics: Step 4 — Shoot details saved ---
         AnalyticsService.logEvent(AnalyticsEvents.bookingStepDetails, params: {
           'booking_id': bookingId,
+          'location': payload['location']?.toString() ?? '',
+          'step_number': 4,
         });
         state = state.copyWith(status: ShootDetailsStatus.success);
       },

@@ -1041,6 +1041,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         padding: const EdgeInsets.only(bottom: 12,),
                         child: GestureDetector(
                           onTap: () {
+                            ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).markStepCompleted();
                             context.pushNamed(
                              RouteNames.reviewConfirm,
                              pathParameters: {'bookingId': widget.bookingId.toString()},
@@ -1084,6 +1085,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             );
                           }
 
+                          ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).markStepCompleted();
                           context.pushNamed(
                            RouteNames.reviewConfirm,
                            pathParameters: {'bookingId': widget.bookingId.toString()},

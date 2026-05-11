@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/firebase/analytics_events.dart';
+import '../../../../core/firebase/analytics_service.dart';
 import 'booking_providers.dart';
 
 enum ShootTypeStatus { initial, loading, loaded, saving, success, error }
@@ -36,8 +38,20 @@ class ShootTypeState {
 
 class ShootTypeNotifier
     extends AutoDisposeFamilyNotifier<ShootTypeState, int> {
+  bool _stepCompleted = false;
+
   @override
   ShootTypeState build(int contentTypeId) {
+    // --- Booking Analytics: Drop-off tracking for Step 2 ---
+    ref.onDispose(() {
+      if (!_stepCompleted && state.bookingId != null) {
+        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
+          'booking_id': state.bookingId!,
+          'last_step': 'shoot_type',
+          'step_number': 2,
+        });
+      }
+    });
     _fetchShootTypes(contentTypeId);
     return const ShootTypeState(status: ShootTypeStatus.loading);
   }
@@ -96,10 +110,19 @@ class ShootTypeNotifier
         status: ShootTypeStatus.error,
         errorMessage: error.message,
       ),
-      (data) => state = state.copyWith(
-        status: ShootTypeStatus.success,
-        bookingId: data['data']?['booking_id'] as int?,
-      ),
+      (data) {
+        _stepCompleted = true;
+        // --- Booking Analytics: Step 2 — Shoot type selected ---
+        AnalyticsService.logEvent(AnalyticsEvents.bookingStepShootType, params: {
+          'booking_id': bookingId,
+          'shoot_type': shootTypeName,
+          'step_number': 2,
+        });
+        state = state.copyWith(
+          status: ShootTypeStatus.success,
+          bookingId: data['data']?['booking_id'] as int?,
+        );
+      },
     );
   }
 
