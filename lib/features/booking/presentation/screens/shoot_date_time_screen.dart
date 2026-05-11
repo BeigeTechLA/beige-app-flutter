@@ -17,6 +17,7 @@
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 import '../../../../app/assets.dart';
+import 'package:beige/shared/widgets/app_qty_counter.dart';
 
   class ShootDateTimeScreen extends ConsumerStatefulWidget {
 
@@ -2533,78 +2534,32 @@ import '../../../../app/assets.dart';
                         ),
 
                         /// COUNTER
-                        Container(
-                          width: 90,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: AppRadii.smAll,
-                          ),
-                          child: Row(
-                            children: [
-
-                              /// ➖ MINUS
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      int current = videoCounts[id] ?? 0;
-
-                                      if (current > 0) {
-                                        current--;
-
-                                        if (current == 0) {
-                                          videoCounts.remove(id);
-                                          selectedEditTypeIds.remove(id);
-                                        } else {
-                                          videoCounts[id] = current;
-                                        }
-                                      }
-                                    });
-                                  },
-                                  child: Center(
-                                    child: const Icon(Icons.remove, size: 16, color: AppColors.black),
-                                  ),
-                                ),
-                              ),
-
-                              /// COUNT
-                              Text(
-                                (videoCounts[id] ?? 0)
-                                    .toString()
-                                    .padLeft(2, '0'),
-                                style: TextStyle(
-                                  color: AppColors.textHeading,
-                                  fontSize: 13,
-                                  fontFamily: AppAssets.fontHelveticaNeue,
-                                  fontWeight: FontWeight.w600
-
-                                ),
-                              ),
-
-                              /// ➕ PLUS
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      int current = videoCounts[id] ?? 0;
-                                      current++;
-
-                                      videoCounts[id] = current;
-
-                                      if (!selectedEditTypeIds.contains(id)) {
-                                        selectedEditTypeIds.add(id);
-                                      }
-                                    });
-                                  },
-                                  child: Center(
-                                    child: Icon(Icons.add,
-                                        size: 16, color: AppColors.black),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        AppQtyCounter(
+                          value: videoCounts[id] ?? 0,
+                          onDecrement: () {
+                            setState(() {
+                              int current = videoCounts[id] ?? 0;
+                              if (current > 0) {
+                                current--;
+                                if (current == 0) {
+                                  videoCounts.remove(id);
+                                  selectedEditTypeIds.remove(id);
+                                } else {
+                                  videoCounts[id] = current;
+                                }
+                              }
+                            });
+                          },
+                          onIncrement: () {
+                            setState(() {
+                              int current = videoCounts[id] ?? 0;
+                              current++;
+                              videoCounts[id] = current;
+                              if (!selectedEditTypeIds.contains(id)) {
+                                selectedEditTypeIds.add(id);
+                              }
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -2695,64 +2650,29 @@ import '../../../../app/assets.dart';
                           ),
 
                           /// COUNTER
-                          Container(
-                            width: 95,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: AppRadii.mdAll,
-                            ),
-                            child: Row(
-                              children: [
-                                /// MINUS
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        int current = photoCounts[id] ?? 0;
-
-                                        if (current > 0) {
-                                          current -= 25;
-
-                                          if (current <= 0) {
-                                            photoCounts.remove(id);
-                                          } else {
-                                            photoCounts[id] = current;
-                                          }
-                                        }
-                                      });
-                                    },
-                                    child: const Icon(Icons.remove,
-                                        size: 16, color: AppColors.black),
-                                  ),
-                                ),
-
-                                /// COUNT (🔥 SHOW 1,2,3)
-                                Text(
-                                  (count ~/ 25).toString(),
-                                  style: const TextStyle(
-                                    color: AppColors.black,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-
-                                /// PLUS
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        int current = photoCounts[id] ?? 0;
-                                        current += 25; // 🔥 ADD 25
-                                        photoCounts[id] = current;
-                                      });
-                                    },
-                                    child: const Icon(Icons.add,
-                                        size: 16, color: AppColors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          AppQtyCounter(
+                            value: count ~/ 25,
+                            formatValue: (v) => v.toString(),
+                            onDecrement: () {
+                              setState(() {
+                                int current = photoCounts[id] ?? 0;
+                                if (current > 0) {
+                                  current -= 25;
+                                  if (current <= 0) {
+                                    photoCounts.remove(id);
+                                  } else {
+                                    photoCounts[id] = current;
+                                  }
+                                }
+                              });
+                            },
+                            onIncrement: () {
+                              setState(() {
+                                int current = photoCounts[id] ?? 0;
+                                current += 25;
+                                photoCounts[id] = current;
+                              });
+                            },
                           ),
                         ],
                       ),

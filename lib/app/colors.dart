@@ -189,6 +189,18 @@ class AppColors {
   /// Gold gradient — dark end
   static const Color goldGradientDark = Color(0xFFD4A14D);
 
+  /// Gold gradient — cream end (counter bg light stop)
+  static const Color goldGradientCream = Color(0xFFFDEFD9);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // GRADIENT DEFINITIONS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Counter button gradient — #E8D1AB → #FDEFD9
+  static const LinearGradient counterGradient = LinearGradient(
+    colors: [goldGradientLight, goldGradientCream],
+  );
+
   /// Divider gradient — start/end (9% white)
   static const Color dividerGradientEdge = Color(0x17FFFFFF);
 

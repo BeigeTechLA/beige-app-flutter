@@ -19,6 +19,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/app_qty_counter.dart';
 
 class ShootDetailsScreen extends ConsumerStatefulWidget {
   final int specialtyId;
@@ -1240,34 +1241,10 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               style: const TextStyle(color: AppColors.white, fontSize: 14),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: onRemove,
-                  child: const Icon(Icons.remove, size: 18, color: AppColors.black),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    value.toString().padLeft(2, '0'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.black,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: onAdd,
-                  child: const Icon(Icons.add, size: 18, color: AppColors.black),
-                ),
-              ],
-            ),
+          AppQtyCounter(
+            value: value,
+            onIncrement: onAdd,
+            onDecrement: onRemove,
           ),
         ],
       ),

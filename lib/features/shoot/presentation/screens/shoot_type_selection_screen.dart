@@ -14,6 +14,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/assets.dart';
+import 'package:beige/shared/widgets/app_qty_counter.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -1657,62 +1658,26 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                       ),
 
                       /// COUNTER
-                      Container(
-                        width: 75,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: AppRadii.smAll,
-                        ),
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (count > 0) {
-                                    videoCounts[id] = count - 1;
-
-                                    if (videoCounts[id] == 0) {
-                                      selectedEditTypeIds.remove(id);
-                                    }
-                                  }
-                                });
-                              },
-                              child: Padding(
-                                padding:
-                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                                child: Icon(Icons.remove, size: 10,color: AppColors.black,),
-                              ),
-                            ),
-
-                            Text(count.toString().padLeft(2, '0'),style: TextStyle(
-                              color: AppColors.textHeading,
-                              fontSize: 11.17,
-                              fontFamily: AppAssets.fontHelveticaNeue,
-                              fontWeight: FontWeight.w500,
-                            ),),
-
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  videoCounts[id] = count + 1;
-
-                                  if (!selectedEditTypeIds
-                                      .contains(id)) {
-                                    selectedEditTypeIds.add(id);
-                                  }
-                                });
-                              },
-                              child: Padding(
-                                padding:
-                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                                child: Icon(Icons.add, size: 10,color: AppColors.black,),
-                              ),
-                            ),
-                          ],
-                        ),
+                      AppQtyCounter(
+                        value: count,
+                        onDecrement: () {
+                          setState(() {
+                            if (count > 0) {
+                              videoCounts[id] = count - 1;
+                              if (videoCounts[id] == 0) {
+                                selectedEditTypeIds.remove(id);
+                              }
+                            }
+                          });
+                        },
+                        onIncrement: () {
+                          setState(() {
+                            videoCounts[id] = count + 1;
+                            if (!selectedEditTypeIds.contains(id)) {
+                              selectedEditTypeIds.add(id);
+                            }
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -1785,52 +1750,20 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           style: TextStyle(color: AppColors.white)),
                     ),
 
-                    Container(
-                      width: 80,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: AppRadii.smAll,
-                      ),
-                      child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (count > 0) {
-                                  photoCounts[id] = count - 1;
-                                }
-                              });
-                            },
-                            child: Padding(
-                              padding:
-                              EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                              child: Icon(Icons.remove, size: 10,color: AppColors.black,),
-                            ),
-                          ),
-
-                          Text(count.toString().padLeft(2, '0'),style: TextStyle(  color: AppColors.textHeading,
-                            fontSize: 11.17,
-                            fontFamily: AppAssets.fontHelveticaNeue,
-                            fontWeight: FontWeight.w500,
-                          ),),
-
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                photoCounts[id] = count + 1;
-                              });
-                            },
-                            child: Padding(
-                                padding:
-                                EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                                child: Icon(Icons.add, size: 10,color: AppColors.black,)
-                            ),
-                          ),
-                        ],
-                      ),
+                    AppQtyCounter(
+                      value: count,
+                      onDecrement: () {
+                        setState(() {
+                          if (count > 0) {
+                            photoCounts[id] = count - 1;
+                          }
+                        });
+                      },
+                      onIncrement: () {
+                        setState(() {
+                          photoCounts[id] = count + 1;
+                        });
+                      },
                     ),
                   ],
                 ),
