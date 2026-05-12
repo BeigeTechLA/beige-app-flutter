@@ -10,8 +10,8 @@ class CrashlyticsService {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-  //  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
-    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+    // await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   }
 
   static Future<void> setUserContext({required int userId, required String email}) async {

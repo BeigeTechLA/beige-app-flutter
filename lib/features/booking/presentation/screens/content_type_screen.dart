@@ -331,9 +331,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDisabled
-                    ? AppColors.iconBackground
-                    : AppColors.iconBackground,
+                color: AppColors.iconBackground,
               ),
               child: Center(
                 child: ImageFiltered(
@@ -342,10 +340,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                       : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                   child: Opacity(
                     opacity: isDisabled ? 0.7 : 1,
-                    child: Image.asset(
-                      width: 30,
-                      height: 22,
-                      value ? activeImage : activeImage,
+                    child: Image.asset(activeImage,
                     ),
                   ),
                 ),

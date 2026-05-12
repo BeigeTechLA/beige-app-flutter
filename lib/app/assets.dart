@@ -175,6 +175,12 @@ class AppAssets {
   static const String studioCreativeZone = '$home/studio_creative_zone.png';
   static const String studioBeigeAlt = '$home/studio_beige_media_alt.png';
 
+  static const String homePhotography = '$home/home_photography.png';
+  static const String homeVideography = '$home/home_videography.png';
+  static const String homeEditing = '$home/home_editing.png';
+  static const String homeLivestream = '$home/home_livestream.png';
+  static const String homeStudio = '$home/home_studio.png';
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Mock Data — Creative Photos
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -49,6 +49,7 @@ import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
 import 'colors.dart';
 import 'route_names.dart';
+import 'text_styles.dart';
 
 /// Global navigator key — kept temporarily for ScaffoldMessenger compatibility.
 /// Will be removed in Batch 14 cleanup.
@@ -528,41 +529,41 @@ class _MainShell extends StatelessWidget {
               type: BottomNavigationBarType.fixed,
               selectedItemColor: AppColors.white,
               unselectedItemColor: AppColors.white70,
+              iconSize: _bottomNavIconSize,
+              selectedFontSize: _bottomNavLabelFontSize,
+              unselectedFontSize: _bottomNavLabelFontSize,
+              selectedLabelStyle: AppTextStyles.labelSmall,
+              unselectedLabelStyle: AppTextStyles.labelSmall,
               onTap: (index) => navigationShell.goBranch(
                 index,
                 initialLocation: index == navigationShell.currentIndex,
               ),
               items: [
                 BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    navigationShell.currentIndex == 0
-                        ? AppAssets.activeHome
-                        : AppAssets.inactiveHome,
-                  ),
+                  icon: _buildInactiveIcon(AppAssets.inactiveHome),
+                  activeIcon: _buildActiveIcon(AppAssets.activeHome),
                   label: "Home",
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    navigationShell.currentIndex == 1
-                        ? AppAssets.activeBookShoot
-                        : AppAssets.inactiveBookShoot,
+                  icon: _buildInactiveIcon(AppAssets.inactiveBookShoot),
+                  activeIcon: _buildActiveIcon(
+                    AppAssets.activeBookShoot,
+                    width: _bottomNavActiveBookShootArtWidth,
                   ),
                   label: "Book Shoot",
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    navigationShell.currentIndex == 2
-                        ? AppAssets.activeMyShoot
-                        : AppAssets.inactiveMyShoot,
+                  icon: _buildInactiveIcon(AppAssets.inactiveMyShoot),
+                  activeIcon: _buildActiveIcon(
+                    AppAssets.activeMyShoot,
+                    width: _bottomNavActiveMyShootsArtWidth,
+                    height: _bottomNavActiveMyShootsArtHeight,
                   ),
                   label: "My Shoots",
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(
-                    navigationShell.currentIndex == 3
-                        ? AppAssets.activeMessages
-                        : AppAssets.inactiveMessages,
-                  ),
+                  icon: _buildInactiveIcon(AppAssets.inactiveMessages),
+                  activeIcon: _buildActiveIcon(AppAssets.activeMessages),
                   label: "Messages",
                 ),
               ],
@@ -573,7 +574,50 @@ class _MainShell extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(String path) {
-    return SvgPicture.asset(path, height: 26, width: 26, fit: BoxFit.cover);
+  static const double _bottomNavIconSize = 26;
+  static const double _bottomNavActiveArtSize = 44;
+  static const double _bottomNavActiveBookShootArtWidth = 46;
+  static const double _bottomNavActiveMyShootsArtWidth = 50;
+  static const double _bottomNavActiveMyShootsArtHeight = 48;
+  static const double _bottomNavIconSlotWidth = 44;
+  static const double _bottomNavLabelFontSize = 10;
+
+  Widget _buildInactiveIcon(String path) {
+    return SizedBox(
+      width: _bottomNavIconSlotWidth,
+      height: _bottomNavIconSize,
+      child: Center(
+        child: SvgPicture.asset(
+          path,
+          height: _bottomNavIconSize,
+          width: _bottomNavIconSize,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveIcon(String path, {double? width, double? height}) {
+    return SizedBox(
+      width: _bottomNavIconSlotWidth,
+      height: _bottomNavIconSize,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // Active SVGs include glow/shadow padding, so render the exported
+          // canvas size while keeping the nav slot equal to inactive icons.
+          Transform.translate(
+            offset: const Offset(-4, 0),
+            child: SvgPicture.asset(
+              path,
+              width: width ?? _bottomNavActiveArtSize,
+              height: height ?? _bottomNavActiveArtSize,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
