@@ -858,11 +858,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                         padding: const EdgeInsets.only(left: AppSpacing.smd),
                         child: Row(
                           children: [
-                            _buildServiceCard(0, "Photo", AppAssets.servicePhotography),
-                            _buildServiceCard(1, "Video", AppAssets.serviceVideography),
-                            _buildServiceCard(2, "Editing", AppAssets.serviceEditing),
-                            _buildServiceCard(3, "Livestream", AppAssets.serviceLivestream),
-                            _buildServiceCard(4, "Studio", AppAssets.serviceStudio),
+                            _buildServiceCard(0, "Photo", AppAssets.homePhotography),
+                            _buildServiceCard(1, "Video", AppAssets.homeVideography),
+                            _buildServiceCard(2, "Editing", AppAssets.homeEditing),
+                            _buildServiceCard(3, "Livestream", AppAssets.homeLivestream),
+                            _buildServiceCard(4, "Studio", AppAssets.homeStudio),
                           ],
                         ),
                       ),
@@ -2970,6 +2970,14 @@ SizedBox(height: 10,),
   }
 
 
+  double _serviceCardSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // 4 full cards + 30% peek of 5th card
+    // each card total width = cardSize + (sm * 2) horizontal padding
+    // screenWidth - smd = 4.3 * (cardSize + sm * 2)
+    return (screenWidth - AppSpacing.smd) / 4.3 - (AppSpacing.sm * 2);
+  }
+
   Widget _buildServiceCard(
       int index, String title, String imagePath) {
     bool isSelected = selectedIndex == index;
@@ -3003,7 +3011,8 @@ SizedBox(height: 10,),
             return Transform.scale(
               scale: isSelected ? 1.05 : 1.0,
               child: Container(
-                width: 90,
+                width: _serviceCardSize(context),
+                height: _serviceCardSize(context),
                 padding: const EdgeInsets.all(AppSpacing.hairline),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppRadii.xxl),
@@ -3032,19 +3041,20 @@ SizedBox(height: 10,),
                 ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 12, horizontal: 8),
+                      vertical: 8, horizontal: 8),
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(AppRadii.xxl),
                   ),
 
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Image.asset(
                         imagePath,
-                        height: 30,
-                        width: 30,
+                        height: 26,
+                        width: 32,
                         fit: BoxFit.contain,
                       ),
 
@@ -3058,7 +3068,7 @@ SizedBox(height: 10,),
                               ? AppColors.primary
                               : AppColors.white.withValues(alpha: 0.6),
                           fontSize: 10,
-                          fontFamily: AppAssets.fontOutfit,
+                          fontFamily: AppAssets.fontHelveticaNeue,
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.w400,
