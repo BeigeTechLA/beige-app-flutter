@@ -518,57 +518,78 @@ class _MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: navigationShell,
       bottomNavigationBar: ScaleClampedText(
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 80, sigmaY: 70),
-            child: BottomNavigationBar(
-              currentIndex: navigationShell.currentIndex,
-              elevation: 0,
-              type: BottomNavigationBarType.fixed,
-              selectedItemColor: AppColors.white,
-              unselectedItemColor: AppColors.white70,
-              iconSize: _bottomNavIconSize,
-              selectedFontSize: _bottomNavLabelFontSize,
-              unselectedFontSize: _bottomNavLabelFontSize,
-              selectedLabelStyle: AppTextStyles.labelSmall,
-              unselectedLabelStyle: AppTextStyles.labelSmall,
-              onTap: (index) => navigationShell.goBranch(
-                index,
-                initialLocation: index == navigationShell.currentIndex,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top gradient fade — transparent to dark
+            Container(
+              height: 40,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.transparent,
+                    AppColors.background,
+                  ],
+                ),
               ),
-              items: [
-                BottomNavigationBarItem(
-                  icon: _buildInactiveIcon(AppAssets.inactiveHome),
-                  activeIcon: _buildActiveIcon(AppAssets.activeHome),
-                  label: "Home",
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildInactiveIcon(AppAssets.inactiveBookShoot),
-                  activeIcon: _buildActiveIcon(
-                    AppAssets.activeBookShoot,
-                    width: _bottomNavActiveBookShootArtWidth,
-                  ),
-                  label: "Book Shoot",
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildInactiveIcon(AppAssets.inactiveMyShoot),
-                  activeIcon: _buildActiveIcon(
-                    AppAssets.activeMyShoot,
-                    width: _bottomNavActiveMyShootsArtWidth,
-                    height: _bottomNavActiveMyShootsArtHeight,
-                  ),
-                  label: "My Shoots",
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildInactiveIcon(AppAssets.inactiveMessages),
-                  activeIcon: _buildActiveIcon(AppAssets.activeMessages),
-                  label: "Messages",
-                ),
-              ],
             ),
-          ),
+            ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 85, sigmaY: 75),
+                child: BottomNavigationBar(
+                  currentIndex: navigationShell.currentIndex,
+                  elevation: 0,
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: AppColors.background,
+                  selectedItemColor: AppColors.white,
+                  unselectedItemColor: AppColors.white70,
+                  iconSize: _bottomNavIconSize,
+                  selectedFontSize: _bottomNavLabelFontSize,
+                  unselectedFontSize: _bottomNavLabelFontSize,
+                  selectedLabelStyle: AppTextStyles.labelSmall,
+                  unselectedLabelStyle: AppTextStyles.labelSmall,
+                  onTap: (index) => navigationShell.goBranch(
+                    index,
+                    initialLocation: index == navigationShell.currentIndex,
+                  ),
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: _buildInactiveIcon(AppAssets.inactiveHome),
+                      activeIcon: _buildActiveIcon(AppAssets.activeHome),
+                      label: "  Home",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: _buildInactiveIcon(AppAssets.inactiveBookShoot),
+                      activeIcon: _buildActiveIcon(
+                        AppAssets.activeBookShoot,
+                        width: _bottomNavActiveBookShootArtWidth,
+                      ),
+                      label: " Book Shoot",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: _buildInactiveIcon(AppAssets.inactiveMyShoot),
+                      activeIcon: _buildActiveIcon(
+                        AppAssets.activeMyShoot,
+                        width: _bottomNavActiveMyShootsArtWidth,
+                        height: _bottomNavActiveMyShootsArtHeight,
+                      ),
+                      label: " My Shoots",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: _buildInactiveIcon(AppAssets.inactiveMessages),
+                      activeIcon: _buildActiveIcon(AppAssets.activeMessages),
+                      label: " Messages",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -583,40 +604,58 @@ class _MainShell extends StatelessWidget {
   static const double _bottomNavLabelFontSize = 10;
 
   Widget _buildInactiveIcon(String path) {
-    return SizedBox(
-      width: _bottomNavIconSlotWidth,
-      height: _bottomNavIconSize,
-      child: Center(
-        child: SvgPicture.asset(
-          path,
-          height: _bottomNavIconSize,
-          width: _bottomNavIconSize,
-          fit: BoxFit.contain,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: SizedBox(
+        width: _bottomNavIconSlotWidth,
+        height: _bottomNavIconSize,
+        child: Center(
+          child: SvgPicture.asset(
+            path,
+            height: _bottomNavIconSize,
+            width: _bottomNavIconSize,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildActiveIcon(String path, {double? width, double? height}) {
-    return SizedBox(
-      width: _bottomNavIconSlotWidth,
-      height: _bottomNavIconSize,
-      child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
-        children: [
-          // Active SVGs include glow/shadow padding, so render the exported
-          // canvas size while keeping the nav slot equal to inactive icons.
-          Transform.translate(
-            offset: const Offset(-4, 0),
-            child: SvgPicture.asset(
+    final artWidth = width ?? _bottomNavActiveArtSize;
+    final artHeight = height ?? _bottomNavActiveArtSize;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: SizedBox(
+        width: artWidth,
+        height: _bottomNavIconSize,
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            // Soft white glow behind active icon
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.white.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
+            SvgPicture.asset(
               path,
-              width: width ?? _bottomNavActiveArtSize,
-              height: height ?? _bottomNavActiveArtSize,
+              width: artWidth,
+              height: artHeight,
               fit: BoxFit.contain,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

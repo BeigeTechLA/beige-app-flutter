@@ -289,13 +289,17 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: AppRadii.lgAll,
                           ),
+                          minimumSize: const Size(0, 56),
+                          padding: AppSpacing.insetsHBase,
                         ),
                         child: Text(
                           "Continue",
-                          style: AppTextStyles.bodySmall.copyWith(
+                          maxLines: 1,
+                          softWrap: false,
+                          style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.backgroundOpacity70,
                             fontFamily: AppAssets.fontOutfit,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -340,8 +344,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                       : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
                   child: Opacity(
                     opacity: isDisabled ? 0.7 : 1,
-                    child: Image.asset(activeImage,
-                    ),
+                    child: Image.asset(activeImage),
                   ),
                 ),
               ),
