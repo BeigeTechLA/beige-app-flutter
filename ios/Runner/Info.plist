@@ -57,6 +57,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
-	<false/>
+	<true/>
 </dict>
 </plist>

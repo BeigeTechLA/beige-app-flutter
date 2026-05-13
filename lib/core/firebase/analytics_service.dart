@@ -18,4 +18,19 @@ class AnalyticsService {
   static Future<void> logScreenView(String screenName) async {
     await _analytics.logScreenView(screenName: screenName);
   }
+
+  static Future<void> logPurchase({
+    required String transactionId,
+    required double value,
+    required String currency,
+    Map<String, Object>? params,
+  }) async {
+    if (kDebugMode) return;
+    await _analytics.logPurchase(
+      transactionId: transactionId,
+      value: value,
+      currency: currency,
+      parameters: params,
+    );
+  }
 }

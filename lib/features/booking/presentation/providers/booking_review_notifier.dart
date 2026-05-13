@@ -195,12 +195,13 @@ class BookingReviewNotifier
           'step_number': 9,
         });
         // --- Booking Analytics: Step 9 — Purchase conversion event (Firebase standard) ---
-        AnalyticsService.logEvent(AnalyticsEvents.purchase, params: {
-          'transaction_id': bookingId.toString(),
-          'value': state.pricing?['total_amount'] ?? 0,
-          'currency': 'USD',
-          'booking_id': bookingId,
-        });
+        final totalAmount = (state.pricing?['total_amount'] ?? 0).toDouble();
+        AnalyticsService.logPurchase(
+          transactionId: bookingId.toString(),
+          value: totalAmount,
+          currency: 'USD',
+          params: {'booking_id': bookingId},
+        );
         return true;
       },
     );

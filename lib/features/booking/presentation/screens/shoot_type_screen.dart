@@ -32,6 +32,13 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
   int selectedIndex = -1;
   int? selectedShootTypeId;
   String? selectedShootTypeName;
+  bool _isPopping = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    _isPopping = true;
+    context.pop(widget.bookingId);
+  }
 
   Future<void> _selectShootType() async {
     if (selectedShootTypeId == null || selectedShootTypeName == null) {
@@ -130,7 +137,7 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => context.pop(widget.bookingId),
+                onTap: _handleBack,
                 child: SvgPicture.asset(AppAssets.back, height: 24),
               ),
             ), //
@@ -347,7 +354,7 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => context.pop(widget.bookingId),
+                  onPressed: _handleBack,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.white,
                     side: const BorderSide(color: AppColors.neutralGrey),

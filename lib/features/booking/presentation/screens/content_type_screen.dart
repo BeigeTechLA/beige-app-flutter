@@ -210,72 +210,77 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
                     AppSpacing.verticalXl,
 
-                    /// TITLE
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Content Type",
-                        style: AppTextStyles.titleSmall.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.white,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            /// TITLE
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Content Type",
+                                style: AppTextStyles.titleSmall.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            /// SELECT ALL
+                            _buildOption(
+                              title: "Select All",
+                              activeImage: AppAssets.selectAll,
+                              value: isSelectAll,
+                              onTap: () => _handleSelection(3),
+                            ),
+
+                            /// VIDEOGRAPHY
+                            _buildOption(
+                              title: "Videography",
+                              activeImage: AppAssets.serviceVideography,
+                              value: selectedContentTypeIds.contains(1),
+                              onTap: () => _handleSelection(1),
+                            ),
+
+                            /// PHOTOGRAPHY
+                            _buildOption(
+                              title: "Photography",
+                              activeImage: AppAssets.servicePhotography,
+                              value: selectedContentTypeIds.contains(2),
+                              onTap: () => _handleSelection(2),
+                            ),
+
+                            _buildOption(
+                              title: "Studios (Coming Soon)",
+                              value: false,
+                              isDisabled: true,
+                              activeImage: AppAssets.serviceStudio,
+                              onTap: null,
+                            ),
+
+                            /// EDITING
+                            _buildOption(
+                              title: "Editing Only (Coming Soon)",
+                              value: false,
+                              isDisabled: true,
+                              activeImage: AppAssets.serviceEditing,
+                              onTap: null,
+                            ),
+
+                            /// LIVESTREAM
+                            _buildOption(
+                              title: "Livestreaming (Coming Soon)",
+                              value: false,
+                              isDisabled: true,
+                              activeImage: AppAssets.serviceLivestream,
+                              onTap: null,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 8),
-
-                    /// SELECT ALL
-                    _buildOption(
-                      title: "Select All",
-                      activeImage: AppAssets.selectAll,
-                      value: isSelectAll,
-                      onTap: () => _handleSelection(3),
-                    ),
-
-                    /// VIDEOGRAPHY
-                    _buildOption(
-                      title: "Videography",
-                      activeImage: AppAssets.serviceVideography,
-
-                      value: selectedContentTypeIds.contains(1),
-                      onTap: () => _handleSelection(1),
-                    ),
-
-                    /// PHOTOGRAPHY
-                    _buildOption(
-                      title: "Photography",
-                      activeImage: AppAssets.servicePhotography,
-                      value: selectedContentTypeIds.contains(2),
-                      onTap: () => _handleSelection(2),
-                    ),
-
-                    _buildOption(
-                      title: "Studios (Coming Soon)",
-                      value: false,
-                      isDisabled: true,
-                      activeImage: AppAssets.serviceStudio,
-                      onTap: null,
-                    ),
-
-                    /// EDITING
-                    _buildOption(
-                      title: "Editing Only (Coming Soon)",
-                      value: false,
-                      isDisabled: true,
-                      activeImage: AppAssets.serviceEditing,
-                      onTap: null,
-                    ),
-
-                    /// LIVESTREAM
-                    _buildOption(
-                      title: "Livestreaming (Coming Soon)",
-                      value: false,
-                      isDisabled: true,
-                      activeImage: AppAssets.serviceLivestream,
-                      onTap: null,
-                    ),
-
-                    const Spacer(),
 
                     SizedBox(
                       height: 56,

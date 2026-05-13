@@ -3041,7 +3041,7 @@ SizedBox(height: 10,),
                 ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 8, horizontal: 8),
+                      vertical: AppSpacing.xs, horizontal: AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(AppRadii.xxl),
@@ -3049,29 +3049,38 @@ SizedBox(height: 10,),
 
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image.asset(
-                        imagePath,
-                        height: 26,
-                        width: 32,
-                        fit: BoxFit.contain,
+                      Flexible(
+                        child: Image.asset(
+                          imagePath,
+                          height: 24,
+                          width: 30,
+                          fit: BoxFit.contain,
+                        ),
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.xxs),
 
-                      Text(
-                        title,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.white.withValues(alpha: 0.6),
-                          fontSize: 10,
-                          fontFamily: AppAssets.fontHelveticaNeue,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.white.withValues(alpha: 0.6),
+                              fontSize: 11,
+                              height: 1.1,
+                              fontFamily: AppAssets.fontHelveticaNeue,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                          ),
                         ),
                       ),
                     ],
