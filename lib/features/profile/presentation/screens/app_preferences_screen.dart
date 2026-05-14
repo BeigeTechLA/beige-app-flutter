@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
@@ -12,6 +13,20 @@ import 'package:beige/app/assets.dart';
 
 class AppPreferencesScreen extends ConsumerWidget {
   const AppPreferencesScreen({super.key});
+
+  static final Future<PackageInfo> _packageInfoFuture =
+      PackageInfo.fromPlatform();
+
+  String _formatVersion(PackageInfo packageInfo) {
+    final version = packageInfo.version;
+    final buildNumber = packageInfo.buildNumber;
+
+    if (buildNumber.isEmpty) {
+      return version;
+    }
+
+    return '$version ($buildNumber)';
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,8 +102,11 @@ class AppPreferencesScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const Icon(Icons.arrow_forward_ios,
-                              size: 14, color: AppColors.white54),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14,
+                            color: AppColors.white54,
+                          ),
                         ],
                       ),
                     ),
@@ -115,11 +133,20 @@ class AppPreferencesScreen extends ConsumerWidget {
                           ),
                         ),
                         SizedBox(width: AppSpacing.mld + 1),
-                        Text(
-                          "App Version V1.0",
-                          style: AppTextStyles.bodyCompact.copyWith(
-                            color: AppColors.white70,
-                          ),
+                        FutureBuilder<PackageInfo>(
+                          future: _packageInfoFuture,
+                          builder: (context, snapshot) {
+                            final versionText = snapshot.hasData
+                                ? _formatVersion(snapshot.data!)
+                                : '--';
+
+                            return Text(
+                              "App Version $versionText",
+                              style: AppTextStyles.bodyCompact.copyWith(
+                                color: AppColors.white70,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

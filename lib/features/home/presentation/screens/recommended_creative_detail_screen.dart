@@ -29,6 +29,17 @@ class RecommendedCreativeDetailScreen extends ConsumerStatefulWidget {
 class _RecommendedCreativeDetailScreenState
     extends ConsumerState<RecommendedCreativeDetailScreen> {
   late PageController _portfolioController;
+  bool _isPopping = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
 
   final List<String> weekDaysOrder = const [
     "Sunday",
@@ -119,9 +130,16 @@ class _RecommendedCreativeDetailScreenState
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: () => context.pop(),
-                            child: SvgPicture.asset(AppAssets.back, height: 24),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _handleBack,
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.sm),
+                              child: SvgPicture.asset(
+                                AppAssets.back,
+                                height: 24,
+                              ),
+                            ),
                           ),
                         ],
                       ),
