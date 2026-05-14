@@ -70,6 +70,17 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
 
   bool isSubmitting = false;
+  bool _isPopping = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
 
   bool get isFormValid {
     return currentLatLng != null &&
@@ -77,6 +88,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   }
 
   Future<void> _More_Details() async {
+    if (isSubmitting) return;
 
     // 🔴 LOCATION VALIDATION
     if (currentLatLng == null || searchController.text.trim().isEmpty) {
@@ -422,7 +434,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => context.pop(),
+                onTap: _handleBack,
                 child: SvgPicture.asset(
                   AppAssets.back,
                   height: 24,
@@ -1122,7 +1134,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
             children: [
               Expanded(
                 child:  OutlinedButton(
-                  onPressed: () => context.pop(),
+                  onPressed: _handleBack,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.white,
                     side: const BorderSide(color: AppColors.neutralGrey),

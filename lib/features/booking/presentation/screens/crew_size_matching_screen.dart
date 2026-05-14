@@ -29,6 +29,38 @@ class CrewSizeMatchingScreen extends ConsumerStatefulWidget {
 class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen> {
 
   int currentStep = 1;
+  bool _isPopping = false;
+  bool _isNavigating = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
+
+  void _handleContinue() {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    ref
+        .read(crewRecommendationNotifierProvider(widget.bookingId).notifier)
+        .markStepCompleted();
+    context.pushNamed(
+      RouteNames.findingPerfect,
+      extra: {
+        'bookingId': widget.bookingId,
+        'contentTypeId': widget.contentTypeId,
+        'specialtyId': widget.specialtyId,
+        'ShootTypeId': widget.ShootTypeId,
+      },
+    );
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) _isNavigating = false;
+    });
+  }
 
   String getShootImage(String shootImageUrl) {
     if (shootImageUrl.isEmpty) return "";
@@ -70,7 +102,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => context.pop(),
+                onTap: _handleBack,
                 child: SvgPicture.asset(
                   AppAssets.back,
                   height: 24,
@@ -598,9 +630,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                 child: SizedBox(
                   height: 55,
                   child: OutlinedButton(
-                    onPressed: () {
-                      context.pop();
-                    },
+                    onPressed: _handleBack,
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
                         color: AppColors.white.withValues(alpha: 0.3),
@@ -628,15 +658,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                 child: SizedBox(
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {
-                      ref.read(crewRecommendationNotifierProvider(widget.bookingId).notifier).markStepCompleted();
-                      context.pushNamed(RouteNames.findingPerfect, extra: {
-                        'bookingId': widget.bookingId,
-                        'contentTypeId': widget.contentTypeId,
-                        'specialtyId': widget.specialtyId,
-                        'ShootTypeId': widget.ShootTypeId,
-                      });
-                    },
+                    onPressed: _handleContinue,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(

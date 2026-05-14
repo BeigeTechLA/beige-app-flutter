@@ -526,6 +526,18 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   bool isEditNeeded = false; // ✅ Default = No selected
 
   bool isSubmitting = false;
+  bool _isPopping = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
+
   bool isDateSelected() {
     return selectedDate != null;
   }
@@ -811,6 +823,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
   Future<void> _ShootDate_Time() async {
     if (!isFormValid) return;
+    if (isSubmitting) return;
 
     setState(() => isSubmitting = true);
 
@@ -1519,7 +1532,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => context.pop(true),
+                onTap: _handleBack,
                 child: SvgPicture.asset(AppAssets.back, height: 24),
               ),
             ),
@@ -2663,7 +2676,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => context.pop(),
+                  onPressed: _handleBack,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.white,
                     side: const BorderSide(color: AppColors.disabled),

@@ -41,6 +41,31 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   bool payFullAdvance = true;
   int selectedIndex = 0;
   bool isProcessing = false;
+  bool _isPopping = false;
+  bool _isNavigatingToPaymentMethod = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
+
+  void _goToPaymentMethod() {
+    if (_isNavigatingToPaymentMethod) return;
+    _isNavigatingToPaymentMethod = true;
+    TopMessage.show(context, 'Please add a card first');
+    context.pushNamed(
+      RouteNames.paymentMethod,
+      extra: {'bookingId': widget.bookingId},
+    );
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) _isNavigatingToPaymentMethod = false;
+    });
+  }
 
   String getRoleName(String roleId) {
     switch (roleId) {
@@ -274,7 +299,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () => context.pop(),
+                onTap: _handleBack,
                 child: SvgPicture.asset(AppAssets.back, height: 24),
               ),
             ),
@@ -1013,17 +1038,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       borderRadius: AppRadii.xlAll,
       onTap: isDisabled
           ? () {
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //   const SnackBar(
-              //     content: Text("Please add a card first"),
-              //   ),
-              // );
-              TopMessage.show(context, 'Please add a card first');
-
-              context.pushNamed(
-                RouteNames.paymentMethod,
-                extra: {'bookingId': widget.bookingId},
-              );
+              if (_isNavigatingToPaymentMethod) return;
+              _goToPaymentMethod();
             }
           : () {
               setState(() {

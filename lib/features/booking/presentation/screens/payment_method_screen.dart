@@ -24,6 +24,31 @@ class PaymentMethodScreen extends ConsumerStatefulWidget {
 
 class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
   bool isProcessing = false;
+  bool _isPopping = false;
+  bool _isNavigating = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
+
+  void _handleSavedCardTap() {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    context.pushNamed(
+      RouteNames.reviewConfirm,
+      pathParameters: {'bookingId': widget.bookingId.toString()},
+    );
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) _isNavigating = false;
+    });
+  }
+
   Future<void> _openStripeSheet() async {
     if (isProcessing) return;
 
@@ -123,10 +148,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              onTap: () {
-                context.pop();
-              },
-
+              onTap: _handleBack,
               child: SvgPicture.asset(AppAssets.back, height: 24),
             ),
 
@@ -163,14 +185,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
             if (savedCards.isNotEmpty)
               ...savedCards.map((card) {
                 return InkWell(
-                  onTap: () {
-                    context.pushNamed(
-                      RouteNames.reviewConfirm,
-                      pathParameters: {
-                        'bookingId': widget.bookingId.toString(),
-                      },
-                    );
-                  },
+                  onTap: _handleSavedCardTap,
                   child: Container(
                     margin: const EdgeInsets.only(bottom: AppSpacing.md),
                     padding: const EdgeInsets.all(AppSpacing.base),

@@ -33,14 +33,20 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
   int? selectedShootTypeId;
   String? selectedShootTypeName;
   bool _isPopping = false;
+  bool _isNavigating = false;
 
   void _handleBack() {
     if (_isPopping) return;
+    if (!context.canPop()) return;
     _isPopping = true;
-    context.pop(widget.bookingId);
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
   }
 
   Future<void> _selectShootType() async {
+    if (_isNavigating) return;
     if (selectedShootTypeId == null || selectedShootTypeName == null) {
       ScaffoldMessenger.of(
         context,
@@ -48,55 +54,72 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
       return;
     }
 
-    await ref
-        .read(shootTypeNotifierProvider(widget.contentTypeId).notifier)
-        .selectShootType(
-          bookingId: widget.bookingId,
-          contentTypeId: widget.contentTypeId,
-          shootTypeId: selectedShootTypeId!,
-          shootTypeName: selectedShootTypeName!,
-        );
+    _isNavigating = true;
 
-    if (!mounted) return;
+    try {
+      await ref
+          .read(shootTypeNotifierProvider(widget.contentTypeId).notifier)
+          .selectShootType(
+            bookingId: widget.bookingId,
+            contentTypeId: widget.contentTypeId,
+            shootTypeId: selectedShootTypeId!,
+            shootTypeName: selectedShootTypeName!,
+          );
 
-    final notifierState = ref.read(
-      shootTypeNotifierProvider(widget.contentTypeId),
-    );
+      if (!mounted) {
+        _isNavigating = false;
+        return;
+      }
 
-    if (notifierState.status == ShootTypeStatus.success) {
-      final bookingId = notifierState.bookingId ?? widget.bookingId;
-      final result = await context.pushNamed<Map>(
-        RouteNames.shootDateTime,
-        extra: {
-          'bookingId': bookingId,
-          'contentTypeId': widget.contentTypeId,
-          'ShootTypeId': selectedShootTypeId!,
-          'shootTypeName': selectedShootTypeName,
-        },
+      final notifierState = ref.read(
+        shootTypeNotifierProvider(widget.contentTypeId),
       );
 
-      if (result != null) {
-        setState(() {
-          selectedShootTypeId = result['id'] as int?;
-          selectedShootTypeName = result['name'] as String?;
-
-          final shootTypes = ref
-              .read(shootTypeNotifierProvider(widget.contentTypeId))
-              .shootTypes;
-          final index = shootTypes.indexWhere(
-            (e) => e['id'] == selectedShootTypeId,
-          );
-          if (index != -1) selectedIndex = index;
-        });
-      }
-    } else if (notifierState.status == ShootTypeStatus.error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(notifierState.errorMessage ?? "Something went wrong"),
-          ),
+      if (notifierState.status == ShootTypeStatus.success) {
+        final bookingId = notifierState.bookingId ?? widget.bookingId;
+        // Reset guard before navigation so terminal goNamed in payment flow
+        // doesn't leave this screen stuck-disabled on return.
+        _isNavigating = false;
+        final result = await context.pushNamed<Map>(
+          RouteNames.shootDateTime,
+          extra: {
+            'bookingId': bookingId,
+            'contentTypeId': widget.contentTypeId,
+            'ShootTypeId': selectedShootTypeId!,
+            'shootTypeName': selectedShootTypeName,
+          },
         );
+
+        if (!mounted) return;
+        if (result != null) {
+          setState(() {
+            selectedShootTypeId = result['id'] as int?;
+            selectedShootTypeName = result['name'] as String?;
+
+            final shootTypes = ref
+                .read(shootTypeNotifierProvider(widget.contentTypeId))
+                .shootTypes;
+            final index = shootTypes.indexWhere(
+              (e) => e['id'] == selectedShootTypeId,
+            );
+            if (index != -1) selectedIndex = index;
+          });
+        }
+      } else if (notifierState.status == ShootTypeStatus.error) {
+        _isNavigating = false;
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(notifierState.errorMessage ?? "Something went wrong"),
+            ),
+          );
+        }
+      } else {
+        _isNavigating = false;
       }
+    } catch (_) {
+      _isNavigating = false;
+      rethrow;
     }
   }
 

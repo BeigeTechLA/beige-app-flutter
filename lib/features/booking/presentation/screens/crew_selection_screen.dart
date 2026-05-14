@@ -29,6 +29,30 @@ class CrewSelectionScreen extends ConsumerStatefulWidget {
 }
 
 class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
+  bool _isPopping = false;
+  bool _isNavigating = false;
+
+  void _handleBack() {
+    if (_isPopping) return;
+    if (!context.canPop()) return;
+    _isPopping = true;
+    context.pop();
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isPopping = false;
+    });
+  }
+
+  void _goToReviewConfirm() {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    context.pushNamed(
+      RouteNames.reviewConfirm,
+      pathParameters: {'bookingId': widget.bookingId.toString()},
+    );
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) _isNavigating = false;
+    });
+  }
 
   int getRequired(int roleId) {
     final rr = ref.read(crewSelectionNotifierProvider(widget.bookingId)).requiredByRole;
@@ -222,9 +246,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: InkWell(
-                  onTap: () {
-                    context.pop();
-                  },
+                  onTap: _handleBack,
                   child:SvgPicture.asset(
                     AppAssets.back,
                     height: 24,
@@ -1549,11 +1571,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              context.pop();
-                              context.pushNamed(
-                               RouteNames.reviewConfirm,
-                               pathParameters: {'bookingId': widget.bookingId.toString()},
-                             );
+                              if (_isNavigating) return;
+                              Navigator.of(context).pop();
+                              _goToReviewConfirm();
                             },
                             child: const Text(
                               "Yes, Continue",
