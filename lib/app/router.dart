@@ -44,6 +44,8 @@ import '../features/auth/presentation/screens/password_reset_success_screen.dart
 import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import '../core/connectivity/connectivity_providers.dart';
+import '../core/connectivity/connectivity_status.dart';
 import '../core/providers/auth_state_provider.dart';
 import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
@@ -67,20 +69,35 @@ const _publicRoutes = {
   '/password-success',
 };
 
-/// GoRouter provider — uses [authStateProvider] for redirect logic.
+/// GoRouter provider — uses [authStateProvider] and [connectivityStatusProvider]
+/// for redirect logic.
 final routerProvider = Provider<GoRouter>((ref) {
-  // Use a ValueNotifier to bridge Riverpod state to GoRouter's Listenable requirement.
-  // We use ref.read here to get the INITIAL value without making this provider rebuild.
   final authNotifier = ValueNotifier<bool>(ref.read(authStateProvider));
+  final connNotifier = ValueNotifier<ConnectivityStatus>(
+    ref.read(connectivityStatusProvider),
+  );
 
-  // Update the notifier whenever the auth state provider changes.
-  // This notifies GoRouter to re-run its redirect logic.
   ref.listen(authStateProvider, (_, next) {
     authNotifier.value = next;
   });
 
-  // Clean up the notifier when the provider is disposed.
-  ref.onDispose(() => authNotifier.dispose());
+  ref.listen(connectivityStatusProvider, (_, next) {
+    connNotifier.value = next;
+  });
+
+  final refreshListenable = Listenable.merge([authNotifier, connNotifier]);
+
+  // Set of routes the user has already visited while online during this
+  // session. While offline, navigation is allowed only to these (plus public
+  // routes) so the user can still back-pop through already-loaded screens
+  // but cannot push forward into routes that would need a network fetch.
+  final visitedOnlineLocations = <String>{};
+  String? lastOnlineLocation;
+
+  ref.onDispose(() {
+    authNotifier.dispose();
+    connNotifier.dispose();
+  });
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -91,27 +108,35 @@ final routerProvider = Provider<GoRouter>((ref) {
         nameExtractor: (settings) => settings.name ?? 'unknown',
       ),
     ],
-    refreshListenable: authNotifier,
+    refreshListenable: refreshListenable,
     redirect: (context, state) {
       final isLoggedIn = authNotifier.value;
+      final connectivity = connNotifier.value;
       final location = state.matchedLocation;
 
       final isPublicRoute = _publicRoutes.contains(location);
 
-      // Logged in and trying to access auth/splash/onboarding route → home
-      // We allow /splash for the initial animation, but if we are navigated to it
-      // while logged in (or if we are already there and just logged in),
-      // the redirect should eventually decide where to go.
-      if (isLoggedIn) {
-        // If logged in, don't stay on public routes (splash, onboarding, login, signup)
-        if (isPublicRoute) {
-          return '/';
-        }
-      } else {
-        // Not logged in and trying to access protected route → login
-        if (!isPublicRoute) {
-          return '/login';
-        }
+      // Auth gate first — runs regardless of connectivity.
+      if (isLoggedIn && isPublicRoute) {
+        return '/';
+      }
+      if (!isLoggedIn && !isPublicRoute) {
+        return '/login';
+      }
+
+      // Offline gate — allow public routes + any route already visited while
+      // online (so back-nav still works). Block forward pushes into routes
+      // that have never loaded successfully this session. Unknown status
+      // (first frame) is treated as online so cold-start does not deadlock.
+      if (connectivity == ConnectivityStatus.offline &&
+          !isPublicRoute &&
+          !visitedOnlineLocations.contains(location)) {
+        return lastOnlineLocation;
+      }
+
+      if (connectivity != ConnectivityStatus.offline) {
+        visitedOnlineLocations.add(location);
+        lastOnlineLocation = location;
       }
 
       return null;

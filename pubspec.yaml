@@ -59,6 +59,7 @@ dependencies:
   flutter_svg: ^2.0.10
   url_launcher: ^6.2.5
   cupertino_icons: ^1.0.8
+  connectivity_plus: ^6.1.0
 
 dev_dependencies:
   integration_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../shared/widgets/connectivity_listener.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -26,6 +27,9 @@ class App extends ConsumerWidget {
       title: 'BEIGE',
       theme: AppTheme.dark(),
       routerConfig: goRouter,
+      builder: (context, child) {
+        return ConnectivityListener(child: child ?? const SizedBox.shrink());
+      },
     );
   }
 }
