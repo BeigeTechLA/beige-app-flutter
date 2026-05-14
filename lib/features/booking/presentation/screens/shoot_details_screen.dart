@@ -686,7 +686,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                 /// 🔹 ADDITIONAL SHOOTER CARD
                 if (loding)
                   Container(
-                    padding: const EdgeInsets.all(14),
+                   padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceVariant,
                       borderRadius: AppRadii.xlAll,
@@ -1243,20 +1243,23 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     required VoidCallback onAdd,
     required VoidCallback onRemove,
   }) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(color: AppColors.white, fontSize: 14),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(color: AppColors.white, fontSize: 14),
+            ),
           ),
-        ),
-        AppQtyCounter(
-          value: value,
-          onIncrement: onAdd,
-          onDecrement: onRemove,
-        ),
-      ],
+          AppQtyCounter(
+            value: value,
+            onIncrement: onAdd,
+            onDecrement: onRemove,
+          ),
+        ],
+      ),
     );
   }
 
