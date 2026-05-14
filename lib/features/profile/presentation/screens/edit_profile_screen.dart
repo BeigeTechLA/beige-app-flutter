@@ -355,81 +355,123 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     autofillHints: const [AutofillHints.email],
                   ),
                   AppSpacing.verticalXl,
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.transparent,
-                      borderRadius: AppRadii.lgAll,
-                      border: Border.all(color: AppColors.white70, width: 0.8),
-                    ),
-                    child: GooglePlaceAutoCompleteTextField(
-                      textEditingController: locationController,
-                      focusNode: locationFocusNode,
-                      googleAPIKey: GoogleConfig.placesApiKey,
-                      debounceTime: 600,
-                      isLatLngRequired: true,
-                      textStyle: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.white,
-                      ),
-                      inputDecoration: InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: AppRadii.lgAll,
-                          borderSide: BorderSide(
-                            color: (locationFocusNode.hasFocus || locationController.text.isNotEmpty) ? AppColors.borderGold : AppColors.white30,
-                            width: 0.5,
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      locationFocusNode,
+                      locationController,
+                    ]),
+                    builder: (context, _) {
+                      final bool locationHighlight =
+                          locationFocusNode.hasFocus ||
+                          locationController.text.isNotEmpty;
+
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconTheme(
+                            data: const IconThemeData(
+                              color: AppColors.white70,
+                              size: 20,
+                            ),
+                            child: GooglePlaceAutoCompleteTextField(
+                              boxDecoration: BoxDecoration(
+                                color: AppColors.transparent,
+                                borderRadius: AppRadii.lgAll,
+                                border: Border.all(
+                                  color: locationHighlight
+                                      ? AppColors.borderGold
+                                      : AppColors.white30,
+                                  width: 0.5,
+                                ),
+                              ),
+                              textEditingController: locationController,
+                              focusNode: locationFocusNode,
+                              googleAPIKey: GoogleConfig.placesApiKey,
+                              debounceTime: 600,
+                              isLatLngRequired: true,
+                              textStyle: const TextStyle(
+                                color: AppColors.white,
+                                fontFamily: AppTextStyles.fontFamilyBody,
+                                fontSize: 15,
+                              ),
+                              inputDecoration: const InputDecoration(
+                                filled: true,
+                                fillColor: AppColors.transparent,
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.lg,
+                                  vertical: AppSpacing.lg,
+                                ),
+                                suffixIcon: Padding(
+                                  padding: EdgeInsets.only(
+                                    right: AppSpacing.sm,
+                                  ),
+                                  child: Icon(
+                                    Icons.location_on_outlined,
+                                    color: AppColors.white,
+                                  ),
+                                ),
+                              ),
+                              getPlaceDetailWithLatLng: (prediction) async {
+                                final latLng = LatLng(
+                                  double.parse(prediction.lat!),
+                                  double.parse(prediction.lng!),
+                                );
+                                _updateMarker(latLng);
+                                setState(() {
+                                  selectedAddress =
+                                      prediction.description ?? "";
+                                });
+                                locationController.text = selectedAddress;
+                                locationController.selection =
+                                    TextSelection.fromPosition(
+                                      TextPosition(
+                                        offset: locationController.text.length,
+                                      ),
+                                    );
+                                locationFocusNode.unfocus();
+                                mapController?.animateCamera(
+                                  CameraUpdate.newLatLngZoom(latLng, 14),
+                                );
+                              },
+                              itemClick: (prediction) {
+                                locationController.text =
+                                    prediction.description ?? "";
+                                locationController.selection =
+                                    TextSelection.fromPosition(
+                                      TextPosition(
+                                        offset: locationController.text.length,
+                                      ),
+                                    );
+                              },
+                              isCrossBtnShown: true,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: AppRadii.lgAll,
-                          borderSide: const BorderSide(
-                            color: AppColors.borderGold,
-                            width: 0.5,
+                          Positioned(
+                            left: AppSpacing.md,
+                            top: -8,
+                            child: Container(
+                              color: AppColors.background,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xxs,
+                              ),
+                              child: Text(
+                                "Location*",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: locationHighlight
+                                      ? AppColors.primary
+                                      : AppColors.white60,
+                                  fontFamily: AppTextStyles.fontFamilyBody,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        hintText: "location*",
-                        hintStyle: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.white70,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.base,
-                          vertical: AppSpacing.mld,
-                        ),
-                        suffixIcon: const Padding(
-                          padding: EdgeInsets.only(right: AppSpacing.sm),
-                          child: Icon(
-                            Icons.location_on_outlined,
-                            color: AppColors.white70,
-                          ),
-                        ),
-                      ),
-                      getPlaceDetailWithLatLng: (prediction) async {
-                        final latLng = LatLng(
-                          double.parse(prediction.lat!),
-                          double.parse(prediction.lng!),
-                        );
-                        _updateMarker(latLng);
-                        setState(() {
-                          selectedAddress = prediction.description ?? "";
-                        });
-                        locationController.text = selectedAddress;
-                        locationController
-                            .selection = TextSelection.fromPosition(
-                          TextPosition(offset: locationController.text.length),
-                        );
-                        locationFocusNode.unfocus();
-                        mapController?.animateCamera(
-                          CameraUpdate.newLatLngZoom(latLng, 14),
-                        );
-                      },
-                      itemClick: (prediction) {
-                        locationController.text = prediction.description ?? "";
-                        locationController
-                            .selection = TextSelection.fromPosition(
-                          TextPosition(offset: locationController.text.length),
-                        );
-                      },
-                      isCrossBtnShown: true,
-                    ),
+                        ],
+                      );
+                    },
                   ),
                   AppSpacing.verticalXl,
                   ClipRRect(

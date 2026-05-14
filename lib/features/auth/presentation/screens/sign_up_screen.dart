@@ -28,7 +28,6 @@ import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
-
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
@@ -52,7 +51,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final FocusNode locationFocusNode = FocusNode();
   bool showMap = false;
   String selectedAddress = "Search or select location";
-  bool isMapOpen = false;          // 👈 map show / hide
+  bool isMapOpen = false; // 👈 map show / hide
   List<Location> searchResults = [];
   FocusNode locationFocus = FocusNode();
   bool _isPlusCode(String value) {
@@ -68,10 +67,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         savePassword; // ✅ checkbox must be checked
   }
 
-
-
   bool isLoading = false;
-
 
   bool isCropping = false;
   File? tempImage;
@@ -94,7 +90,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           isLocationSelected = false;
         });
       }
-    });//
+    }); //
 
     nameController.addListener(() => setState(() {}));
     emailController.addListener(() => setState(() {}));
@@ -120,7 +116,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
   }
 
-
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -131,7 +126,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     openCustomCropSheet(File(picked.path)); // ✅ IMPORTANT
   }
-
 
   void openCustomCropSheet(File imageFile) {
     Offset offset = Offset.zero;
@@ -153,14 +147,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               padding: AppSpacing.cardInsets,
               child: Column(
                 children: [
-
-
                   Center(
                     child: Container(
                       width: 35,
                       height: 5,
                       decoration: BoxDecoration(
-                        color:AppColors.white70,
+                        color: AppColors.white70,
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
@@ -182,7 +174,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       InkWell(
                         onTap: () => context.pop(),
                         borderRadius: AppRadii.hugeAll,
-                        child:  Padding(
+                        child: Padding(
                           padding: EdgeInsets.all(6),
                           child: Icon(
                             Icons.close,
@@ -194,22 +186,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ],
                   ),
 
-
                   SizedBox(height: 20),
 
-                  Divider(color: AppColors.dividerDark,),
+                  Divider(color: AppColors.dividerDark),
 
                   /// 🔥 CIRCULAR PREVIEW AREA
                   Expanded(
                     child: Center(
-                      child:GestureDetector(
+                      child: GestureDetector(
                         onScaleStart: (details) {
                           startScale = scale;
                           startOffset = offset;
                         },
                         onScaleUpdate: (details) {
                           setSheetState(() {
-                            scale = (startScale * details.scale).clamp(1.0, 4.0);
+                            scale = (startScale * details.scale).clamp(
+                              1.0,
+                              4.0,
+                            );
                             // offset = startOffset + details.focalPointDelta;
                             offset += details.focalPointDelta;
                           });
@@ -217,7 +211,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-
                             /// IMAGE (NOW CLIPPED)
                             ClipRect(
                               child: SizedBox(
@@ -250,21 +243,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           ],
                         ),
                       ),
-
-
                     ),
                   ),
-
-
-
-
-
 
                   const SizedBox(height: 16),
 
                   /// 🔥 ZOOM SLIDER
                   Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
                         /// 🔹 LEFT IMAGE ICON
@@ -273,7 +259,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                           height: 20,
                           width: 20,
-                          /*  color: AppColors.white.withOpacity(0.7), */// optional
+                          /*  color: AppColors.white.withOpacity(0.7), */
+                          // optional
                         ),
 
                         const SizedBox(width: 10),
@@ -302,7 +289,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               },
                             ),
                           ),
-
                         ),
 
                         const SizedBox(width: 10),
@@ -314,12 +300,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                           height: 24,
                           width: 24,
-                          /*  color: AppColors.white.withOpacity(0.7), */// optional
+                          /*  color: AppColors.white.withOpacity(0.7), */
+                          // optional
                         ),
                       ],
                     ),
                   ),
-
 
                   const SizedBox(height: 10),
 
@@ -352,7 +338,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       },
                       child: Text(
                         "Save",
-                        style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
+                        style: AppTextStyles.labelLarge.copyWith(
+                          fontFamily: AppAssets.fontUnbounded,
+                          color: AppColors.textHeading,
+                        ),
                       ),
                     ),
                   ),
@@ -365,11 +354,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     );
   }
 
-  Future<File?> _cropImage(
-      File imageFile,
-      double scale,
-      Offset offset,
-      ) async {
+  Future<File?> _cropImage(File imageFile, double scale, Offset offset) async {
     try {
       final bytes = await imageFile.readAsBytes();
       final codec = await ui.instantiateImageCodec(bytes);
@@ -416,11 +401,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       );
 
       final pic = recorder.endRecording();
-      final cropped =
-      await pic.toImage(cropSize.toInt(), cropSize.toInt());
+      final cropped = await pic.toImage(cropSize.toInt(), cropSize.toInt());
 
-      final data =
-      await cropped.toByteData(format: ui.ImageByteFormat.png);
+      final data = await cropped.toByteData(format: ui.ImageByteFormat.png);
 
       final dir = await getTemporaryDirectory();
       final file = File(
@@ -434,9 +417,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       return null;
     }
   }
-
-
-
 
   Future<void> searchLocation(String query) async {
     if (query.isEmpty) return;
@@ -454,8 +434,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks =
-      await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
 
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
@@ -475,7 +457,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -491,8 +472,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-
-      _showSnack('Location permission permanently denied. Enable from settings.');
+      _showSnack(
+        'Location permission permanently denied. Enable from settings.',
+      );
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(
       //     content: Text("Location permission permanently denied. Enable from settings."),
@@ -516,9 +498,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       currentLatLng = latLng;
     });
 
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(latLng, 14),
-    );
+    mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
 
     try {
       final placemarks = await placemarkFromCoordinates(
@@ -552,15 +532,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   Future<void> _fetchSignup() async {
-
     final name = nameController.text.trim();
     final email = emailController.text.trim();
     final location = locationController.text.trim();
@@ -624,22 +603,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       return;
     }
 
-    ref.read(signupNotifierProvider.notifier).signUp(
-      name: name,
-      email: email,
-      password: password,
-      confirmPassword: confirmPassword,
-      location: location,
-      latitude: selectedLat!,
-      longitude: selectedLng!,
-      profileImage: profileImage,
-    );
+    ref
+        .read(signupNotifierProvider.notifier)
+        .signUp(
+          name: name,
+          email: email,
+          password: password,
+          confirmPassword: confirmPassword,
+          location: location,
+          latitude: selectedLat!,
+          longitude: selectedLng!,
+          profileImage: profileImage,
+        );
   }
-
-
-
-
-
 
   void _showSnack(String message) {
     TopMessage.show(context, message);
@@ -656,13 +632,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     super.dispose();
   }
+
   bool isValidEmail(String email) {
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
     return emailRegex.hasMatch(email);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -731,13 +707,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           SingleChildScrollView(
             child: Column(
               children: [
-
                 /// 🔝 TOP IMAGE + TITLE SECTION
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.25,
                   child: Stack(
                     children: [
-
                       /// 🖼️ BACKGROUND
                       Positioned.fill(
                         child: DecoratedBox(
@@ -748,20 +722,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         ),
                       ),
 
-
                       /// 🔙 BACK BUTTON
                       Positioned(
-                          top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
-                          left: 16,
-                          child:InkWell(
-                            onTap: () {
-                              context.pop();
-                            },
-                            child: SvgPicture.asset(
-                              AppAssets.back,
-                              height: 24,
-                            ),
-                          )
+                        top: 50, // 🔥 yaha value adjust kar sakte ho (30–50)
+                        left: 16,
+                        child: InkWell(
+                          onTap: () {
+                            context.pop();
+                          },
+                          child: SvgPicture.asset(AppAssets.back, height: 24),
+                        ),
                       ),
 
                       /// 🏷️ TITLE + SUBTITLE (CENTER)
@@ -770,7 +740,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-
                             const Text(
                               "Sign Up Now",
                               style: TextStyle(
@@ -786,9 +755,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Text(
                               "Join Beige to book talented photographers\nand videographers for your projects.",
                               textAlign: TextAlign.center,
-                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70),
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.white70,
+                              ),
                             ),
-
                           ],
                         ),
                       ),
@@ -796,17 +766,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 30),
+
                 /// 📦 FORM CONTAINER (NICHE)
                 Transform.translate(
                   offset: const Offset(0, -40),
                   child: Stack(
                     clipBehavior: Clip.none,
                     children: [
-
                       /// 🧱 MAIN FORM CONTAINER
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(20, 36, 20, 20), // 👈 top extra
+                        padding: const EdgeInsets.fromLTRB(
+                          20,
+                          36,
+                          20,
+                          20,
+                        ), // 👈 top extra
                         margin: AppSpacing.authCardMargin,
                         decoration: BoxDecoration(
                           color: AppColors.background,
@@ -818,14 +793,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         ),
                         child: Column(
                           children: [
-
                             const SizedBox(height: 22),
 
                             /*    _buildField("Name", nameController),
                             const SizedBox(height: 16),
                             _buildField("Email ID", emailController),
                             const SizedBox(height: 16),*/
-
                             AppTextField(
                               label: "Name*",
                               controller: nameController,
@@ -844,90 +817,150 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-
                                 /// LABEL
 
-
                                 /// FIELD
-                                GooglePlaceAutoCompleteTextField(
-                                  textEditingController: locationController,
-                                  focusNode: locationFocus,
-                                  googleAPIKey: GoogleConfig.placesApiKey,
-                                  debounceTime: 600,
-                                  isLatLngRequired: true,
+                                AnimatedBuilder(
+                                  animation: Listenable.merge([
+                                    locationFocus,
+                                    locationController,
+                                  ]),
+                                  builder: (context, _) {
+                                    final bool locationHighlight =
+                                        locationFocus.hasFocus ||
+                                        locationController.text.isNotEmpty;
 
+                                    return Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        IconTheme(
+                                          data: const IconThemeData(
+                                            color: AppColors.white70,
+                                            size: 20,
+                                          ),
+                                          child: GooglePlaceAutoCompleteTextField(
+                                            boxDecoration: BoxDecoration(
+                                              color: AppColors.transparent,
+                                              borderRadius: AppRadii.lgAll,
+                                              border: Border.all(
+                                                color: locationHighlight
+                                                    ? AppColors.borderGold
+                                                    : AppColors.white30,
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            textEditingController:
+                                                locationController,
+                                            focusNode: locationFocus,
+                                            googleAPIKey:
+                                                GoogleConfig.placesApiKey,
+                                            debounceTime: 600,
+                                            isLatLngRequired: true,
+                                            textStyle: const TextStyle(
+                                              color: AppColors.white,
+                                              fontFamily:
+                                                  AppTextStyles.fontFamilyBody,
+                                              fontSize: 14,
+                                            ),
+                                            inputDecoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: AppColors.transparent,
+                                              border: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: AppSpacing.lg,
+                                                    vertical: AppSpacing.lg,
+                                                  ),
 
+                                              /// 📍 LOCATION SVG
+                                              suffixIcon: Padding(
+                                                padding: EdgeInsets.only(
+                                                  right: AppSpacing.sm,
+                                                ),
+                                                child: Icon(
+                                                  Icons.location_on_outlined,
+                                                  color: AppColors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            getPlaceDetailWithLatLng:
+                                                (prediction) async {
+                                                  final latLng = LatLng(
+                                                    double.parse(
+                                                      prediction.lat!,
+                                                    ),
+                                                    double.parse(
+                                                      prediction.lng!,
+                                                    ),
+                                                  );
 
+                                                  locationFocus.unfocus();
 
+                                                  await _updateLocationFromLatLng(
+                                                    latLng,
+                                                  );
 
-                                  textStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                                                  setState(() {
+                                                    currentLatLng = latLng;
+                                                    selectedLat =
+                                                        latLng.latitude;
+                                                    selectedLng =
+                                                        latLng.longitude;
+                                                    selectedAddress =
+                                                        prediction
+                                                            .description ??
+                                                        "";
+                                                    showMap = true;
+                                                    isLocationSelected = true;
+                                                  });
 
-                                  inputDecoration: InputDecoration(
+                                                  // 👇 YAHAA ADD KARO
+                                                  isProgrammaticChange = true;
 
+                                                  locationController.text =
+                                                      selectedAddress;
 
-                                    hintText: "Location*",
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.white70,
-                                    ),
-                                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                                    border: InputBorder.none,
-
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 18,
-                                    ),
-
-                                    /// 📍 LOCATION SVG
-                                    suffixIcon: Padding(//
-                                      padding: const EdgeInsets.all(13),
-                                      child: SvgPicture.asset(
-                                        AppAssets.locationPin,
-                                        width: 24,
-                                        height: 24,
-                                        color: AppColors.white,//
-                                      ),
-                                    ),
-                                  ),
-
-                                  getPlaceDetailWithLatLng: (prediction) async {
-                                    final latLng = LatLng(
-                                      double.parse(prediction.lat!),
-                                      double.parse(prediction.lng!),
+                                                  isProgrammaticChange = false;
+                                                },
+                                            itemClick: (prediction) {
+                                              locationController.text =
+                                                  prediction.description ?? "";
+                                            },
+                                            isCrossBtnShown:
+                                                !isLocationSelected,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: AppSpacing.md,
+                                          top: -8,
+                                          child: Container(
+                                            color: AppColors.background,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: AppSpacing.xxs,
+                                            ),
+                                            child: Text(
+                                              "Location*",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: locationHighlight
+                                                    ? AppColors.primary
+                                                    : AppColors.white60,
+                                                fontFamily: AppTextStyles
+                                                    .fontFamilyBody,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     );
-
-                                    locationFocus.unfocus();
-
-                                    await _updateLocationFromLatLng(latLng);
-
-                                    setState(() {
-                                      currentLatLng = latLng;
-                                      selectedLat = latLng.latitude;
-                                      selectedLng = latLng.longitude;
-                                      selectedAddress = prediction.description ?? "";
-                                      showMap = true;
-                                      isLocationSelected = true;
-                                    });
-
-                                    // 👇 YAHAA ADD KARO
-                                    isProgrammaticChange = true;
-
-                                    locationController.text = selectedAddress;
-
-                                    isProgrammaticChange = false;
                                   },
-                                  itemClick: (prediction) {
-                                    locationController.text = prediction.description ?? "";
-                                  },
-
-                                  isCrossBtnShown: !isLocationSelected,
-
                                 ),
-
                               ],
                             ),
 
-
-                            SizedBox(height:16),
+                            SizedBox(height: 16),
 
                             /// 🗺️ MAP WITH FIXED HEIGHT
                             if (showMap)
@@ -938,42 +971,58 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
                                     child: currentLatLng == null
-                                        ? const Center(child: CircularProgressIndicator())
-                                        :GoogleMap(
-                                      initialCameraPosition: CameraPosition(
-                                        target: currentLatLng!,
-                                        zoom: 14,
-                                      ),
+                                        ? const Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : GoogleMap(
+                                            initialCameraPosition:
+                                                CameraPosition(
+                                                  target: currentLatLng!,
+                                                  zoom: 14,
+                                                ),
 
-                                      myLocationEnabled: true,
-                                      myLocationButtonEnabled: true,
-                                      zoomControlsEnabled: true,
-                                      compassEnabled: false,
+                                            myLocationEnabled: true,
+                                            myLocationButtonEnabled: true,
+                                            zoomControlsEnabled: true,
+                                            compassEnabled: false,
 
-                                      // 🔥 IMPORTANT FIX (touch enable)
-                                      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                                        Factory<OneSequenceGestureRecognizer>(
-                                              () => EagerGestureRecognizer(),
-                                        ),
-                                      },
+                                            // 🔥 IMPORTANT FIX (touch enable)
+                                            gestureRecognizers:
+                                                <
+                                                  Factory<
+                                                    OneSequenceGestureRecognizer
+                                                  >
+                                                >{
+                                                  Factory<
+                                                    OneSequenceGestureRecognizer
+                                                  >(
+                                                    () =>
+                                                        EagerGestureRecognizer(),
+                                                  ),
+                                                },
 
-                                      onMapCreated: (controller) {
-                                        mapController = controller;
-                                        controller.setMapStyle(darkMapStyle);
-                                      },
+                                            onMapCreated: (controller) {
+                                              mapController = controller;
+                                              controller.setMapStyle(
+                                                darkMapStyle,
+                                              );
+                                            },
 
-                                      markers: {
-                                        Marker(
-                                          markerId: const MarkerId("selected"),
-                                          position: currentLatLng!,
-                                        ),
-                                      },
+                                            markers: {
+                                              Marker(
+                                                markerId: const MarkerId(
+                                                  "selected",
+                                                ),
+                                                position: currentLatLng!,
+                                              ),
+                                            },
 
-                                      onTap: (latLng) async {
-                                        await _updateLocationFromLatLng(latLng);
-                                      },
-                                    ),
-
+                                            onTap: (latLng) async {
+                                              await _updateLocationFromLatLng(
+                                                latLng,
+                                              );
+                                            },
+                                          ),
                                   ),
                                 ),
                               ),
@@ -994,8 +1043,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   () => setState(() => showConfirmPassword = !showConfirmPassword),
                               confirmPasswordController,
                             ),*/
-
-
                             AppTextField(
                               label: "Create Password*",
                               controller: passwordController,
@@ -1003,7 +1050,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               suffix: IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    showPassword = !showPassword;   // ✅ correct variable
+                                    showPassword =
+                                        !showPassword; // ✅ correct variable
                                   });
                                 },
                                 icon: SvgPicture.asset(
@@ -1028,7 +1076,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               suffix: IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    showConfirmPassword = !showConfirmPassword;  // ✅ correct
+                                    showConfirmPassword =
+                                        !showConfirmPassword; // ✅ correct
                                   });
                                 },
                                 icon: SvgPicture.asset(
@@ -1047,12 +1096,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             _profilePictureCard(),
                             const SizedBox(height: 20),
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start, // 🔥 important
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start, // 🔥 important
                               children: [
-
                                 /// CHECKBOX
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 3), // align with first text line
+                                  padding: const EdgeInsets.only(
+                                    top: 3,
+                                  ), // align with first text line
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -1073,10 +1124,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       ),
                                       child: savePassword
                                           ? const Icon(
-                                        Icons.check,
-                                        size: 14,
-                                        color: AppColors.black,
-                                      )
+                                              Icons.check,
+                                              size: 14,
+                                              color: AppColors.black,
+                                            )
                                           : null,
                                     ),
                                   ),
@@ -1095,7 +1146,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                             fontWeight: FontWeight.w400,
                                             color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: AppTextStyles.fontFamilyBody,
+                                            fontFamily:
+                                                AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                         TextSpan(
@@ -1104,13 +1156,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.white,
                                             fontSize: 13,
-                                            fontFamily: AppTextStyles.fontFamilyBody,
-                                            decoration: TextDecoration.underline,
+                                            fontFamily:
+                                                AppTextStyles.fontFamilyBody,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () async {
-                                              final uri = Uri.parse("https://beige.app/terms-and-conditions");
-                                              if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                                              final uri = Uri.parse(
+                                                "https://beige.app/terms-and-conditions",
+                                              );
+                                              if (await canLaunchUrl(uri))
+                                                launchUrl(
+                                                  uri,
+                                                  mode: LaunchMode
+                                                      .externalApplication,
+                                                );
                                             },
                                         ),
                                         const TextSpan(
@@ -1119,7 +1180,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                             fontWeight: FontWeight.w400,
                                             color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: AppTextStyles.fontFamilyBody,
+                                            fontFamily:
+                                                AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                         TextSpan(
@@ -1128,13 +1190,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                             fontWeight: FontWeight.w600,
                                             color: AppColors.white,
                                             fontSize: 13,
-                                            fontFamily: AppTextStyles.fontFamilyBody,
-                                            decoration: TextDecoration.underline,
+                                            fontFamily:
+                                                AppTextStyles.fontFamilyBody,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () async {
-                                              final uri = Uri.parse("https://beige.app/privacy-policy");
-                                              if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+                                              final uri = Uri.parse(
+                                                "https://beige.app/privacy-policy",
+                                              );
+                                              if (await canLaunchUrl(uri))
+                                                launchUrl(
+                                                  uri,
+                                                  mode: LaunchMode
+                                                      .externalApplication,
+                                                );
                                             },
                                         ),
                                         const TextSpan(
@@ -1143,7 +1214,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                             fontWeight: FontWeight.w400,
                                             color: AppColors.white70,
                                             fontSize: 13,
-                                            fontFamily: AppTextStyles.fontFamilyBody,
+                                            fontFamily:
+                                                AppTextStyles.fontFamilyBody,
                                           ),
                                         ),
                                       ],
@@ -1183,9 +1255,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   ),
                                 ),
                               ),
-                            )
-
-
+                            ),
                           ],
                         ),
                       ),
@@ -1252,7 +1322,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         right: 20,
                         child: ifUserDataCard(),
                       ),
-
                     ],
                   ),
                 ),
@@ -1287,17 +1356,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               ],
             ),
           ),
-          if (isLoggingIn)
-            const AppLoader(),
+          if (isLoggingIn) const AppLoader(),
         ],
-
       ),
-
-
     );
-
   }
-
 
   Widget _profilePictureCard() {
     return Container(
@@ -1305,9 +1368,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: AppColors.borderLight
-        ),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1344,10 +1405,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ? FileImage(profileImage!)
                     : null,
                 child: profileImage == null
-                    ? SvgPicture.asset(
-                  AppAssets.person,
-
-                )
+                    ? SvgPicture.asset(AppAssets.person)
                     : null,
               ),
 
@@ -1358,18 +1416,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   onTap: _pickImage,
                   borderRadius: AppRadii.roundAll,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: AppRadii.roundAll,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children:  [
+                      children: [
                         Icon(
                           profileImage == null
-                              ? Icons.camera_alt_outlined   // image nahi hai
-                              : Icons.refresh,              // image hai → re-upload
+                              ? Icons
+                                    .camera_alt_outlined // image nahi hai
+                              : Icons.refresh, // image hai → re-upload
                           size: 18,
                           color: AppColors.black,
                         ),
@@ -1379,24 +1441,21 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           profileImage == null
                               ? "Upload Profile Picture"
                               : "ReUpload Profile Picture",
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.black),
+                          style: AppTextStyles.labelMedium.copyWith(
+                            color: AppColors.black,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-
-
-
             ],
           ),
-
         ],
       ),
     );
   }
-
 
   Widget ifUserDataCard() {
     final name = nameController.text.trim();
@@ -1405,20 +1464,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     if (name.isEmpty && email.isEmpty && profileImage == null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        margin: EdgeInsets.symmetric(horizontal: 22),//
+        margin: EdgeInsets.symmetric(horizontal: 22), //
         height: 60,
         decoration: BoxDecoration(
-          color: AppColors.background,//
-          border: Border.all(color: AppColors.white.withValues(alpha: 0.10),width: 0.50),
+          color: AppColors.background, //
+          border: Border.all(
+            color: AppColors.white.withValues(alpha: 0.10),
+            width: 0.50,
+          ),
           borderRadius: AppRadii.lgAll,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children:  [
+          children: [
             Container(
               height: 33,
               width: 33,
-              decoration: BoxDecoration(//
+              decoration: BoxDecoration(
+                //
                 shape: BoxShape.circle,
                 color: AppColors.backgroundOpacity70,
                 border: Border.all(
@@ -1426,19 +1489,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   width: 1,
                 ),
               ),
-              child:  Center(
-                child: SvgPicture.asset(
-                  AppAssets.person,
-
-                ),
-              ),
+              child: Center(child: SvgPicture.asset(AppAssets.person)),
             ),
 
             const SizedBox(width: 10),
 
             Text(
               "Tell Us About Yourself & Add Details",
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.disabled),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.disabled,
+              ),
             ),
           ],
         ),
@@ -1448,7 +1508,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     // 🔥 Dynamic Card (jab data fill ho)
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      margin: EdgeInsets.symmetric(horizontal: 22),//
+      margin: EdgeInsets.symmetric(horizontal: 22), //
 
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -1463,7 +1523,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       ),
       child: Row(
         children: [
-
           /// 🔵 PROFILE IMAGE OR ICON
           CircleAvatar(
             radius: 24,
@@ -1473,10 +1532,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 : null,
             child: profileImage == null
                 ? const Icon(
-              Icons.person,
-              size: 26,
-              color: AppColors.neutralGrey,
-            )
+                    Icons.person,
+                    size: 26,
+                    color: AppColors.neutralGrey,
+                  )
                 : null,
           ),
 
@@ -1488,7 +1547,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 /// 🔹 NAME
                 Row(
                   children: [
@@ -1518,9 +1576,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 /// 🔹 EMAIL WITH LABEL
                 Row(
                   children: [
-                     Text(
+                    Text(
                       "Email ID: ",
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.black54),
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.black54,
+                      ),
                     ),
                     Expanded(
                       child: Text(
@@ -1542,16 +1602,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       ),
     );
   }
-
-
 }
+
 class CircleHolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.saveLayer(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint(),
-    );
+    canvas.saveLayer(Rect.fromLTWH(0, 0, size.width, size.height), Paint());
 
     /// dark overlay
     canvas.drawRect(
@@ -1563,11 +1619,7 @@ class CircleHolePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     const radius = 130.0;
 
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()..blendMode = BlendMode.clear,
-    );
+    canvas.drawCircle(center, radius, Paint()..blendMode = BlendMode.clear);
 
     canvas.restore();
 

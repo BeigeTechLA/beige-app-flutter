@@ -26,17 +26,21 @@ class ShootDetailsScreen extends ConsumerStatefulWidget {
   final int ShootTypeId;
   final int bookingId;
   final int contentTypeId;
-  const ShootDetailsScreen({super.key, required this.contentTypeId, required this.specialtyId, required this.ShootTypeId, required this.bookingId});
+  const ShootDetailsScreen({
+    super.key,
+    required this.contentTypeId,
+    required this.specialtyId,
+    required this.ShootTypeId,
+    required this.bookingId,
+  });
 
   @override
   ConsumerState<ShootDetailsScreen> createState() => _ShootDetailsScreenState();
 }
 
 class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
-
   int currentStep = 1;
-  bool loding   = false;
-
+  bool loding = false;
 
   String? locationError;
 
@@ -44,12 +48,12 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   int includedPhotoQty = 1;
   int includedVideoQty = 1;
 
-// Additional
+  // Additional
   final FocusNode locationFocusNode = FocusNode();
 
   bool addPhoto = false;
   bool addVideo = false;
-     // 🔒 FIXED (always 1)
+  // 🔒 FIXED (always 1)
 
   int additionalPhotoQty = 0;
   int additionalVideoQty = 0;
@@ -57,17 +61,16 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   String? selectedStudio;
   bool showMap = false;
 
-
   GoogleMapController? mapController;
   LatLng? currentLatLng;
 
   String selectedAddress = "Search or select location";
   TextEditingController searchController = TextEditingController();
   final TextEditingController additionalDetailsController =
-  TextEditingController();
+      TextEditingController();
 
-  final TextEditingController referenceLinksController = TextEditingController();
-
+  final TextEditingController referenceLinksController =
+      TextEditingController();
 
   bool isSubmitting = false;
   bool _isPopping = false;
@@ -83,8 +86,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   }
 
   bool get isFormValid {
-    return currentLatLng != null &&
-        searchController.text.isNotEmpty;
+    return currentLatLng != null && searchController.text.isNotEmpty;
   }
 
   Future<void> _More_Details() async {
@@ -126,24 +128,31 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
     if (!mounted) return;
 
-    final detailsState = ref.read(shootDetailsNotifierProvider(widget.bookingId));
+    final detailsState = ref.read(
+      shootDetailsNotifierProvider(widget.bookingId),
+    );
 
     if (detailsState.status == ShootDetailsStatus.success) {
       setState(() {
         isSubmitting = false;
       });
-      context.pushNamed(RouteNames.crewSizeMatching, extra: {
-        'bookingId': widget.bookingId,
-        'contentTypeId': widget.contentTypeId,
-        'specialtyId': widget.specialtyId,
-        'ShootTypeId': widget.ShootTypeId,
-      });
+      context.pushNamed(
+        RouteNames.crewSizeMatching,
+        extra: {
+          'bookingId': widget.bookingId,
+          'contentTypeId': widget.contentTypeId,
+          'specialtyId': widget.specialtyId,
+          'ShootTypeId': widget.ShootTypeId,
+        },
+      );
     } else if (detailsState.status == ShootDetailsStatus.error) {
       setState(() {
         isSubmitting = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(detailsState.errorMessage ?? "Error saving details")),
+        SnackBar(
+          content: Text(detailsState.errorMessage ?? "Error saving details"),
+        ),
       );
     } else {
       setState(() {
@@ -151,7 +160,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       });
     }
   }
-
 
   Map<String, int> _buildCrewRequirements() {
     final Map<String, int> crew = {};
@@ -198,7 +206,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     return parts.join("  |  ");
   }
 
-
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -225,7 +232,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     }
   }*/
 
-/*
+  /*
   String getContentTypeIcon(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -239,7 +246,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     }
   }
 */
-
 
   @override
   void initState() {
@@ -267,36 +273,37 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           currentLatLng = latLng;
         });
 
-        mapController?.animateCamera(
-          CameraUpdate.newLatLngZoom(latLng, 15),
-        );
+        mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 15));
 
         await getAddressFromLatLng(latLng);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Location not found")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Location not found")));
     }
   }
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks =
-      await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latLng.latitude,
+        latLng.longitude,
+      );
 
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
 
         setState(() {
           selectedAddress =
-          "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
+              "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}";
         });
       }
     } catch (e) {
       debugPrint("Reverse geocode error: $e");
     }
   }
+
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
@@ -314,7 +321,9 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Location permission permanently denied. Enable from settings."),
+          content: Text(
+            "Location permission permanently denied. Enable from settings.",
+          ),
         ),
       );
       await Geolocator.openAppSettings(); // 👈 Open app settings
@@ -330,15 +339,12 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     });
   }
 
-
   Future<void> _updateLocationFromLatLng(LatLng latLng) async {
     setState(() {
       currentLatLng = latLng;
     });
 
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(latLng, 14),
-    );
+    mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
 
     try {
       final placemarks = await placemarkFromCoordinates(
@@ -368,7 +374,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       debugPrint("Reverse geocode error: $e");
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +426,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 ]
 ''';
 
-
     return AppScaffold(
       hasAppBar: true,
       appBar: AppBar(
@@ -430,15 +434,11 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
                 onTap: _handleBack,
-                child: SvgPicture.asset(
-                  AppAssets.back,
-                  height: 24,
-                ),
+                child: SvgPicture.asset(AppAssets.back, height: 24),
               ),
             ),
             Text(
@@ -461,273 +461,268 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           ],
         ),
       ),
-      body: Padding(padding:  AppSpacing.cardInsets,
-      child: Column(
-        children: [
-      
-      
-      
-      Row(
-      children: List.generate(3, (index) {
-        double fillWidth = 0;
-      
-        if (index < currentStep) {
-          // ✅ Completed step (FULL)
-          fillWidth = double.infinity;
-        } else if (index == currentStep) {
-          // 🟡 Current step (HALF)
-          fillWidth = 35.44;
-        } else {
-          // ⭕ Upcoming step (EMPTY)
-          fillWidth = 0;
-        }
-      
-        return Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(right: 8),
-            height: 5,
-            decoration: BoxDecoration(
-              color: AppColors.textSecondary, // grey background
-              borderRadius: BorderRadius.circular(64),
+      body: Padding(
+        padding: AppSpacing.cardInsets,
+        child: Column(
+          children: [
+            Row(
+              children: List.generate(3, (index) {
+                double fillWidth = 0;
+
+                if (index < currentStep) {
+                  // ✅ Completed step (FULL)
+                  fillWidth = double.infinity;
+                } else if (index == currentStep) {
+                  // 🟡 Current step (HALF)
+                  fillWidth = 35.44;
+                } else {
+                  // ⭕ Upcoming step (EMPTY)
+                  fillWidth = 0;
+                }
+
+                return Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: AppColors.textSecondary, // grey background
+                      borderRadius: BorderRadius.circular(64),
+                    ),
+                    child: fillWidth > 0
+                        ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              height: 5,
+                              width: fillWidth == double.infinity
+                                  ? null
+                                  : fillWidth,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(64),
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                  ),
+                );
+              }),
             ),
-            child: fillWidth > 0
-                ? Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                height: 5,
-                width: fillWidth == double.infinity ? null : fillWidth,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(64),
-                ),
-              ),
-            )
-                : const SizedBox(),
-          ),
-        );
-      }),
-      ),
-      
-      
-          SizedBox(
-            height: 20,
-          ),
-      
-          Row(
-            children: [
-              Text(
-                "More Details",
-                style: TextStyle(
-                  fontFamily: AppAssets.fontUnbounded,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-      
-      
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+            SizedBox(height: 20),
+
+            Row(
               children: [
-
-
-
-                const SizedBox(height: 12),
-
-                /// 🔹 INCLUDED CARD
-                const SizedBox(height: 12),
-
-                /// 🎥 VIDEOGRAPHY CARD
-                if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      borderRadius: AppRadii.xlAll,
-                    ),
-                    child: Row(
-                      children: [
-
-                        /// ICON BOX
-                        SizedBox(
-                          height: 40,
-                          width: 40,
-                         /* decoration: BoxDecoration(
-                            color: AppColors.black,
-                            borderRadius: BorderRadius.circular(10),
-                          ),*/
-                          child: Center(
-                            child: SvgPicture.asset(
-                              AppAssets.video,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        /// TITLE
-                        Expanded(
-                          child: Text(
-                            "Videographer X${includedVideoQty + additionalVideoQty}",
-                            style: const TextStyle(
-                              color: AppColors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-
-                        /// INCLUDED BADGE
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: AppRadii.hugeAll,
-                            border: Border.all(color: AppColors.primary),
-                          ),
-                          child: const Text(
-                            "Included",
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                /// 📷 PHOTOGRAPHY CARD
-                if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      borderRadius: AppRadii.xlAll,
-                    ),
-                    child: Row(
-                      children: [
-
-                        /// ICON BOX
-                        SizedBox(
-                          height: 40,
-                          width: 40,
-                       /*   decoration: BoxDecoration(
-                            color: AppColors.black,
-                            borderRadius: BorderRadius.circular(10),
-                          ),*/
-                          child: Center(
-                            child: SvgPicture.asset(
-                              AppAssets.photo,
-                              // height: 20,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 12),
-
-                        /// TITLE
-                        Expanded(
-                          child: Text(
-                            "Photographer X${includedPhotoQty + additionalPhotoQty}",
-                            style: const TextStyle(
-                              color: AppColors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-
-                        /// INCLUDED BADGE
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            borderRadius: AppRadii.hugeAll,
-                            border: Border.all(color: AppColors.primary),
-                          ),
-                          child: const Text(
-                            "Included",
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-
-                const SizedBox(height: 24),
-
-
-
-                /// 🔹 QUESTION
                 Text(
-                  "Would you like to Add Additional creatives?",
-                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
+                  "More Details",
+                  style: TextStyle(
+                    fontFamily: AppAssets.fontUnbounded,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+              ],
+            ),
 
-                const SizedBox(height: 12),
-
-
-                Row(
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _radioOption("Yes", true),
-                    const SizedBox(width: 24),
-                    _radioOption("No", false),
-                  ],
-                ),
+                    const SizedBox(height: 12),
 
-                const SizedBox(height: 16),
+                    /// 🔹 INCLUDED CARD
+                    const SizedBox(height: 12),
 
-                /// 🔹 ADDITIONAL SHOOTER CARD
-                if (loding)
-                  Container(
-                   padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      borderRadius: AppRadii.xlAll,
+                    /// 🎥 VIDEOGRAPHY CARD
+                    if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.xlAll,
+                        ),
+                        child: Row(
+                          children: [
+                            /// ICON BOX
+                            SizedBox(
+                              height: 40,
+                              width: 40,
+                              /* decoration: BoxDecoration(
+                            color: AppColors.black,
+                            borderRadius: BorderRadius.circular(10),
+                          ),*/
+                              child: Center(
+                                child: SvgPicture.asset(AppAssets.video),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            /// TITLE
+                            Expanded(
+                              child: Text(
+                                "Videographer X${includedVideoQty + additionalVideoQty}",
+                                style: const TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+
+                            /// INCLUDED BADGE
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: AppRadii.hugeAll,
+                                border: Border.all(color: AppColors.primary),
+                              ),
+                              child: const Text(
+                                "Included",
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    /// 📷 PHOTOGRAPHY CARD
+                    if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.xlAll,
+                        ),
+                        child: Row(
+                          children: [
+                            /// ICON BOX
+                            SizedBox(
+                              height: 40,
+                              width: 40,
+                              /*   decoration: BoxDecoration(
+                            color: AppColors.black,
+                            borderRadius: BorderRadius.circular(10),
+                          ),*/
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  AppAssets.photo,
+                                  // height: 20,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            /// TITLE
+                            Expanded(
+                              child: Text(
+                                "Photographer X${includedPhotoQty + additionalPhotoQty}",
+                                style: const TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+
+                            /// INCLUDED BADGE
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: AppRadii.hugeAll,
+                                border: Border.all(color: AppColors.primary),
+                              ),
+                              child: const Text(
+                                "Included",
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 24),
+
+                    /// 🔹 QUESTION
+                    Text(
+                      "Would you like to Add Additional creatives?",
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: AppColors.white,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+
+                    const SizedBox(height: 12),
+
+                    Row(
                       children: [
-
-                        /// 📸 Photography (only if allowed)
-                        if (widget.contentTypeId == 2 || widget.contentTypeId == 3)
-                          _buildQtyRow(
-                            title: "Photography",
-                            value: additionalPhotoQty,
-                            onAdd: () => setState(() => additionalPhotoQty++),
-                            onRemove: () {
-                              if (additionalPhotoQty > 0) {
-                                setState(() => additionalPhotoQty--);
-                              }
-                            },
-                          ),
-
-                        /// 🎥 Videography (only if allowed)
-                        if (widget.contentTypeId == 1 || widget.contentTypeId == 3)
-                          _buildQtyRow(
-                            title: "Videography",
-                            value: additionalVideoQty,
-                            onAdd: () => setState(() => additionalVideoQty++),
-                            onRemove: () {
-                              if (additionalVideoQty > 0) {
-                                setState(() => additionalVideoQty--);
-                              }
-                            },
-                          ),
+                        _radioOption("Yes", true),
+                        const SizedBox(width: 24),
+                        _radioOption("No", false),
                       ],
                     ),
-                  ),
 
+                    const SizedBox(height: 16),
 
+                    /// 🔹 ADDITIONAL SHOOTER CARD
+                    if (loding)
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.xlAll,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            /// 📸 Photography (only if allowed)
+                            if (widget.contentTypeId == 2 ||
+                                widget.contentTypeId == 3)
+                              _buildQtyRow(
+                                title: "Photographer",
+                                value: additionalPhotoQty,
+                                onAdd: () =>
+                                    setState(() => additionalPhotoQty++),
+                                onRemove: () {
+                                  if (additionalPhotoQty > 0) {
+                                    setState(() => additionalPhotoQty--);
+                                  }
+                                },
+                              ),
 
-                SizedBox(height: 20),
-               /* TextField(
+                            /// 🎥 Videography (only if allowed)
+                            if (widget.contentTypeId == 1 ||
+                                widget.contentTypeId == 3)
+                              _buildQtyRow(
+                                title: "Videographer",
+                                value: additionalVideoQty,
+                                onAdd: () =>
+                                    setState(() => additionalVideoQty++),
+                                onRemove: () {
+                                  if (additionalVideoQty > 0) {
+                                    setState(() => additionalVideoQty--);
+                                  }
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+
+                    SizedBox(height: 20),
+
+                    /* TextField(
                   controller: searchController,
                   onSubmitted: (value) {
                     if (value.isNotEmpty) {
@@ -774,253 +769,306 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     ),
                   ),
                 ),*/
-                // GooglePlaceAutoCompleteTextField(
-                //   textEditingController: searchController,
-                //   googleAPIKey: GoogleConfig.placesApiKey,
-                //   debounceTime: 600,
-                //   isLatLngRequired: true,
-                //
-                //   textStyle: const TextStyle(
-                //     color: AppColors.white,
-                //     fontFamily: AppAssets.fontOutfit,
-                //   ),
-                //
-                //   inputDecoration: InputDecoration(
-                //     // labelText: "Select Location*",
-                //     floatingLabelBehavior: FloatingLabelBehavior.always,
-                //
-                //     labelStyle: const TextStyle(
-                //       color: AppColors.white70,
-                //       fontFamily: AppAssets.fontOutfit,
-                //     ),
-                //
-                //     hintText: "Search or select location",
-                //     hintStyle: const TextStyle(
-                //       color: AppColors.white70,
-                //     ),
-                //
-                //     suffixIcon: const Icon(
-                //       Icons.location_on_outlined,
-                //       color: AppColors.white70,
-                //     ),
-                //
-                //     contentPadding: const EdgeInsets.symmetric(
-                //       horizontal: 20,
-                //       vertical: 18,
-                //     ),
-                //
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: AppRadii.lgAll,
-                //       borderSide: const BorderSide(
-                //         color: AppColors.white70,
-                //         width: 0.5,
-                //       ),
-                //     ),
-                //
-                //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: AppRadii.lgAll,
-                //       borderSide: const BorderSide(
-                //         color: AppColors.primary,
-                //         width: 1,
-                //       ),
-                //     ),
-                //   ),
-                //
-                //   getPlaceDetailWithLatLng: (prediction) async {
-                //     final latLng = LatLng(
-                //       double.parse(prediction.lat!),
-                //       double.parse(prediction.lng!),
-                //     );
-                //
-                //     setState(() {
-                //       currentLatLng = latLng;
-                //       selectedAddress = prediction.description ?? "";
-                //       searchController.text = selectedAddress;
-                //     });
-                //
-                //     mapController?.animateCamera(
-                //       CameraUpdate.newLatLngZoom(latLng, 14),
-                //     );
-                //   },
-                //
-                //   itemClick: (prediction) {
-                //     searchController.text = prediction.description ?? "";
-                //     searchController.selection = TextSelection.fromPosition(
-                //       TextPosition(offset: searchController.text.length),
-                //     );
-                //   },
-                //
-                //   isCrossBtnShown: true,
-                // ),
+                    // GooglePlaceAutoCompleteTextField(
+                    //   textEditingController: searchController,
+                    //   googleAPIKey: GoogleConfig.placesApiKey,
+                    //   debounceTime: 600,
+                    //   isLatLngRequired: true,
+                    //
+                    //   textStyle: const TextStyle(
+                    //     color: AppColors.white,
+                    //     fontFamily: AppAssets.fontOutfit,
+                    //   ),
+                    //
+                    //   inputDecoration: InputDecoration(
+                    //     // labelText: "Select Location*",
+                    //     floatingLabelBehavior: FloatingLabelBehavior.always,
+                    //
+                    //     labelStyle: const TextStyle(
+                    //       color: AppColors.white70,
+                    //       fontFamily: AppAssets.fontOutfit,
+                    //     ),
+                    //
+                    //     hintText: "Search or select location",
+                    //     hintStyle: const TextStyle(
+                    //       color: AppColors.white70,
+                    //     ),
+                    //
+                    //     suffixIcon: const Icon(
+                    //       Icons.location_on_outlined,
+                    //       color: AppColors.white70,
+                    //     ),
+                    //
+                    //     contentPadding: const EdgeInsets.symmetric(
+                    //       horizontal: 20,
+                    //       vertical: 18,
+                    //     ),
+                    //
+                    //     enabledBorder: OutlineInputBorder(
+                    //       borderRadius: AppRadii.lgAll,
+                    //       borderSide: const BorderSide(
+                    //         color: AppColors.white70,
+                    //         width: 0.5,
+                    //       ),
+                    //     ),
+                    //
+                    //     focusedBorder: OutlineInputBorder(
+                    //       borderRadius: AppRadii.lgAll,
+                    //       borderSide: const BorderSide(
+                    //         color: AppColors.primary,
+                    //         width: 1,
+                    //       ),
+                    //     ),
+                    //   ),
+                    //
+                    //   getPlaceDetailWithLatLng: (prediction) async {
+                    //     final latLng = LatLng(
+                    //       double.parse(prediction.lat!),
+                    //       double.parse(prediction.lng!),
+                    //     );
+                    //
+                    //     setState(() {
+                    //       currentLatLng = latLng;
+                    //       selectedAddress = prediction.description ?? "";
+                    //       searchController.text = selectedAddress;
+                    //     });
+                    //
+                    //     mapController?.animateCamera(
+                    //       CameraUpdate.newLatLngZoom(latLng, 14),
+                    //     );
+                    //   },
+                    //
+                    //   itemClick: (prediction) {
+                    //     searchController.text = prediction.description ?? "";
+                    //     searchController.selection = TextSelection.fromPosition(
+                    //       TextPosition(offset: searchController.text.length),
+                    //     );
+                    //   },
+                    //
+                    //   isCrossBtnShown: true,
+                    // ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// 🔹 LOCATION FIELD
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
+                            locationFocusNode,
+                            searchController,
+                          ]),
+                          builder: (context, _) {
+                            final bool locationHighlight =
+                                locationFocusNode.hasFocus ||
+                                searchController.text.isNotEmpty;
 
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconTheme(
+                                  data: const IconThemeData(
+                                    color: AppColors.white70,
+                                    size: 20,
+                                  ),
+                                  child: GooglePlaceAutoCompleteTextField(
+                                    boxDecoration: BoxDecoration(
+                                      color: AppColors.transparent,
+                                      borderRadius: AppRadii.lgAll,
+                                      border: Border.all(
+                                        color: locationHighlight
+                                            ? AppColors.borderGold
+                                            : AppColors.white30,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    textEditingController: searchController,
+                                    focusNode: locationFocusNode,
+                                    googleAPIKey: GoogleConfig.placesApiKey,
+                                    debounceTime: 600,
+                                    isLatLngRequired: true,
+                                    textStyle: const TextStyle(
+                                      color: AppColors.white,
+                                      fontFamily: AppTextStyles.fontFamilyBody,
+                                      fontSize: 15,
+                                    ),
+                                    inputDecoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: AppColors.transparent,
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            horizontal: AppSpacing.lg,
+                                            vertical: AppSpacing.lg,
+                                          ),
+                                      suffixIcon: Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: AppSpacing.sm,
+                                        ),
+                                        child: SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: SvgPicture.asset(
+                                            AppAssets.locationPin,
+                                            colorFilter:
+                                                const ColorFilter.mode(
+                                                  AppColors.white,
+                                                  BlendMode.srcIn,
+                                                ),
+                                            fit: BoxFit.none,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    getPlaceDetailWithLatLng:
+                                        (prediction) async {
+                                          final latLng = LatLng(
+                                            double.parse(prediction.lat!),
+                                            double.parse(prediction.lng!),
+                                          );
 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                                          locationFocusNode.unfocus();
 
-                    /// 🔹 LOCATION FIELD
-                      GooglePlaceAutoCompleteTextField(
-                          boxDecoration: BoxDecoration(
-                            borderRadius: AppRadii.lgAll,
-                            border: Border.all(
-                              color: (locationFocusNode.hasFocus || searchController.text.isNotEmpty)
-                                  ? AppColors.borderGold
-                                  : AppColors.white30,
-                              width: 0.5,
-                            ),
-                          ),
-                          textEditingController: searchController,
-                          focusNode: locationFocusNode,
-                          googleAPIKey: GoogleConfig.placesApiKey,
-                          debounceTime: 600,
-                          isLatLngRequired: true,
+                                          await _updateLocationFromLatLng(
+                                            latLng,
+                                          );
 
-                          textStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+                                          setState(() {
+                                            currentLatLng = latLng;
+                                            selectedAddress =
+                                                prediction.description ?? "";
+                                            locationError =
+                                                null; // ✅ REMOVE ERROR HERE
+                                          });
 
-                          inputDecoration:  InputDecoration(
-                            border: InputBorder.none,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: AppRadii.lgAll,
-                              borderSide: BorderSide(
-                                color: (locationFocusNode.hasFocus || searchController.text.isNotEmpty) ? AppColors.borderGold : AppColors.white30,
-                                width: 0.5,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: AppRadii.lgAll,
-                              borderSide: const BorderSide(
-                                color: AppColors.borderGold,
-                                width: 0.5,
-                              ),
-                            ),
-                            hintText: "Search or select location",
-                            hintStyle: TextStyle(
-                              color: AppColors.white70,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: SizedBox(
-                                width: 16,   // 👈 control size here
-                                height: 16,
-                                child: SvgPicture.asset(
-                                  AppAssets.locationPin,
-                                  fit: BoxFit.none,
+                                          searchController.text =
+                                              selectedAddress;
+                                          searchController.selection =
+                                              TextSelection.fromPosition(
+                                                TextPosition(
+                                                  offset: searchController
+                                                      .text
+                                                      .length,
+                                                ),
+                                              );
+
+                                          mapController?.animateCamera(
+                                            CameraUpdate.newLatLngZoom(
+                                              latLng,
+                                              14,
+                                            ),
+                                          );
+                                        },
+                                    itemClick: (prediction) {
+                                      searchController.text =
+                                          prediction.description ?? "";
+                                      searchController.selection =
+                                          TextSelection.fromPosition(
+                                            TextPosition(
+                                              offset:
+                                                  searchController.text.length,
+                                            ),
+                                          );
+                                    },
+                                    isCrossBtnShown: true,
+                                  ),
                                 ),
+                                Positioned(
+                                  left: AppSpacing.md,
+                                  top: -8,
+                                  child: Container(
+                                    color: AppColors.background,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.xxs,
+                                    ),
+                                    child: Text(
+                                      "Select Location*",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: locationHighlight
+                                            ? AppColors.primary
+                                            : AppColors.white60,
+                                        fontFamily:
+                                            AppTextStyles.fontFamilyBody,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+
+                        /// 🔴 ERROR TEXT
+                        if (locationError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              locationError!,
+                              style: const TextStyle(
+                                color: AppColors.error,
+                                fontSize: 12,
                               ),
-                            ),),
-
-                          getPlaceDetailWithLatLng: (prediction) async {
-                            final latLng = LatLng(
-                              double.parse(prediction.lat!),
-                              double.parse(prediction.lng!),
-                            );
-
-                            locationFocusNode.unfocus();
-
-                            await _updateLocationFromLatLng(latLng);
-
-                            setState(() {
-                              currentLatLng = latLng;
-                              selectedAddress = prediction.description ?? "";
-                              locationError = null; // ✅ REMOVE ERROR HERE
-                            });
-
-                            searchController.text = selectedAddress;
-                            searchController.selection = TextSelection.fromPosition(
-                              TextPosition(offset: searchController.text.length),
-                            );
-
-                            mapController?.animateCamera(
-                              CameraUpdate.newLatLngZoom(latLng, 14),
-                            );
-                          },
-
-                          itemClick: (prediction) {
-                            searchController.text = prediction.description ?? "";
-                            searchController.selection = TextSelection.fromPosition(
-                              TextPosition(offset: searchController.text.length),
-                            );
-                          },
-
-                          isCrossBtnShown: true,
-                        ),
-
-                    /// 🔴 ERROR TEXT
-                    if (locationError != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          locationError!,
-                          style: const TextStyle(
-                            color: AppColors.error,
-                            fontSize: 12,
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
-                ),
-
-
-
-
-                SizedBox(height: 10),
-
-                /// 🗺️ MAP WITH FIXED HEIGHT
-                if (showMap)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: SizedBox(
-                    height: 350,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: currentLatLng == null
-                          ? const Center(child: CircularProgressIndicator())
-                          :GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: currentLatLng!,
-                          zoom: 14,
-                        ),
-
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: true,
-                        zoomControlsEnabled: true,
-                        compassEnabled: false,
-
-                        // 🔥 IMPORTANT FIX (touch enable)
-                        gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                          Factory<OneSequenceGestureRecognizer>(
-                                () => EagerGestureRecognizer(),
-                          ),
-                        },
-
-                        onMapCreated: (controller) {
-                          mapController = controller;
-                          controller.setMapStyle(darkMapStyle);
-                        },
-
-                        markers: {
-                          Marker(
-                            markerId: const MarkerId("selected"),
-                            position: currentLatLng!,
-                          ),
-                        },
-
-                        onTap: (latLng) async {
-                          await _updateLocationFromLatLng(latLng);
-                        },
-                      ),
-
+                      ],
                     ),
-                  ),
-                ),
 
+                    SizedBox(height: 10),
 
-                SizedBox(height: 20),
-                /*        TextField(
+                    /// 🗺️ MAP WITH FIXED HEIGHT
+                    if (showMap)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: SizedBox(
+                          height: 350,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: currentLatLng == null
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      target: currentLatLng!,
+                                      zoom: 14,
+                                    ),
+
+                                    myLocationEnabled: true,
+                                    myLocationButtonEnabled: true,
+                                    zoomControlsEnabled: true,
+                                    compassEnabled: false,
+
+                                    // 🔥 IMPORTANT FIX (touch enable)
+                                    gestureRecognizers:
+                                        <Factory<OneSequenceGestureRecognizer>>{
+                                          Factory<OneSequenceGestureRecognizer>(
+                                            () => EagerGestureRecognizer(),
+                                          ),
+                                        },
+
+                                    onMapCreated: (controller) {
+                                      mapController = controller;
+                                      controller.setMapStyle(darkMapStyle);
+                                    },
+
+                                    markers: {
+                                      Marker(
+                                        markerId: const MarkerId("selected"),
+                                        position: currentLatLng!,
+                                      ),
+                                    },
+
+                                    onTap: (latLng) async {
+                                      await _updateLocationFromLatLng(latLng);
+                                    },
+                                  ),
+                          ),
+                        ),
+                      ),
+
+                    SizedBox(height: 20),
+                    /*        TextField(
                   controller: additionalDetailsController,
                   maxLines: 5,
 
@@ -1062,13 +1110,13 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: 20),*/
-                AppTextField(
-                  label: "Additional Details",
-                  controller: additionalDetailsController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                ),
-                /*TextField(
+                    AppTextField(
+                      label: "Additional Details",
+                      controller: additionalDetailsController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 5,
+                    ),
+                    /*TextField(
 
                   controller: referenceLinksController,
                   decoration: InputDecoration(
@@ -1108,42 +1156,42 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     ),
                   ),
                 ),*/
-                SizedBox(height: 20),
-                AppTextField(
-                  label: "Supporting Links",
-                  controller: referenceLinksController,
-                  keyboardType: TextInputType.url,
+                    SizedBox(height: 20),
+                    AppTextField(
+                      label: "Supporting Links",
+                      controller: referenceLinksController,
+                      keyboardType: TextInputType.url,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            SizedBox(height: 20),
+          ],
         ),
-          SizedBox(height: 20),
-      
-      
-        ],
-      ),
-
       ),
 
       bottomNavigationBar: SafeArea(
-        bottom:true,
+        bottom: true,
         child: Padding(
           padding: AppSpacing.cardInsets,
           child: Row(
             children: [
               Expanded(
-                child:  OutlinedButton(
+                child: OutlinedButton(
                   onPressed: _handleBack,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.white,
                     side: const BorderSide(color: AppColors.neutralGrey),
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadii.lgAll,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
+                  ),
+                  child: Text(
+                    "Back",
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontFamily: AppAssets.fontUnbounded,
                     ),
                   ),
-                  child: Text("Back", style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1159,24 +1207,25 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     foregroundColor: selectedIndex == -1
                         ? AppColors.neutralGrey.shade400
                         : AppColors.black,*/
-                    padding:  EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadii.lgAll,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
                   ),
                   child: Text(
                     "Continue",
-                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.textHeading),
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontFamily: AppAssets.fontUnbounded,
+                      color: AppColors.textHeading,
+                    ),
                   ),
                 ),
               ),
-
             ],
           ),
         ),
       ),
     );
   }
+
   Widget _radioOption(String title, bool value) {
     final bool isSelected = loding == value;
 
@@ -1202,40 +1251,29 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
               shape: BoxShape.circle,
               gradient: isSelected
                   ? const LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.primaryDark,
-                ],
-              )
+                      colors: [AppColors.primary, AppColors.primaryDark],
+                    )
                   : null,
-              border: Border.all(
-                color: AppColors.white70,
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.white70, width: 1),
             ),
             child: isSelected
                 ? const Center(
-              child: CircleAvatar(
-                radius: 4,
-                backgroundColor: AppColors.black,
-              ),
-            )
+                    child: CircleAvatar(
+                      radius: 4,
+                      backgroundColor: AppColors.black,
+                    ),
+                  )
                 : null,
           ),
           const SizedBox(width: 8),
           Text(
             title,
-            style: const TextStyle(
-              color: AppColors.white,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: AppColors.white, fontSize: 14),
           ),
         ],
       ),
     );
   }
-
-
 
   Widget _buildQtyRow({
     required String title,
@@ -1262,5 +1300,4 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       ),
     );
   }
-
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/colors.dart';
@@ -8,15 +9,16 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 
 import '../../../../app/assets.dart';
+import '../../../../core/providers/guest_mode_provider.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
@@ -184,7 +186,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.only(top: AppSpacing.lg, right: AppSpacing.lg),
                 child: GestureDetector(
                   onTap: () {
-                    context.goNamed(RouteNames.login);
+                    ref.read(guestModeProvider.notifier).enter();
+                    context.goNamed(RouteNames.home);
                   },
                   child: Text(
                     "Skip",

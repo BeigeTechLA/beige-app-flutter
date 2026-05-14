@@ -40,8 +40,18 @@ class CreativeProfileState {
   List<String> get weeklyAvailability {
     final raw = data?['weekly_availability'];
     if (raw == null) return [];
-    if (raw is String) return List<String>.from(jsonDecode(raw));
     if (raw is List) return List<String>.from(raw);
+    if (raw is String) {
+      final trimmed = raw.trim();
+      if (trimmed.isEmpty) return [];
+      if (trimmed.startsWith('[')) {
+        try {
+          final decoded = jsonDecode(trimmed);
+          if (decoded is List) return List<String>.from(decoded);
+        } catch (_) {}
+      }
+      return [trimmed];
+    }
     return [];
   }
   Map<String, dynamic>? get reviews => data?['reviews'];

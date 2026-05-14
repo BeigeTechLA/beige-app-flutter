@@ -15,9 +15,11 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
 import 'package:beige/features/home/presentation/providers/home_providers.dart';
 import 'package:beige/shared/widgets/loading.dart';
+import 'package:beige/shared/widgets/login_dialog.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -511,8 +513,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
     super.dispose();
   }
 
+  /// Returns true if a guest user tapped — shows login dialog and aborts the
+  /// caller's navigation. Returns false for an authenticated user; caller
+  /// proceeds with its normal action.
+  bool _blockIfGuest() {
+    if (ref.read(guestModeProvider)) {
+      showLoginDialog(context);
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // When the guest flag flips to false (login success), refetch home data.
+    ref.listen<bool>(guestModeProvider, (prev, next) {
+      if (prev == true && next == false) {
+        ref.read(homeNotifierProvider.notifier).fetchHomeData();
+      }
+    });
+
+    final isGuest = ref.watch(guestModeProvider);
     final homeState = ref.watch(homeNotifierProvider);
     final homeData = homeState.homeData;
     final isLoading = homeState.status == HomeStatus.loading;
@@ -578,6 +599,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                       const SizedBox(height: 4),
                                       GestureDetector(
                                         onTap: () async {
+                                          if (_blockIfGuest()) return;
                                           final result = await context.pushNamed<Map<String, dynamic>>(RouteNames.changeLocation);
 
                                           if (result != null) {
@@ -589,14 +611,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                             Flexible(
                                                 child:
                                                 Text(
-                                                    homeData?.location ?? "Loading...",
+                                                 isGuest ? "": homeData?.location ?? "Loading...",
 
                                                     overflow: TextOverflow.ellipsis,
                                                     style: TextStyle(
                                                         color: AppColors.white.withValues(alpha: 0.6),
                                                         fontSize: 15,
                                                         fontFamily: AppAssets.fontOutfit))),
-                                            const Icon(Icons.expand_more,
+                                            isGuest ? SizedBox(): const Icon(Icons.expand_more,
                                                 color: AppColors.white, size: 20),
                                           ],
                                         ),
@@ -622,6 +644,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                                       ),
                                       GestureDetector(
                                         onTap: () async {
+                                          if (_blockIfGuest()) return;
                                           await context.pushNamed(RouteNames.profile);
                                           ref.read(homeNotifierProvider.notifier).fetchHomeData();
                                         },
@@ -1653,7 +1676,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
 
 
                       const SizedBox(height: 10),
-                      Padding(
+                      if (!isGuest) Padding(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
@@ -1671,23 +1694,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding:  AppSpacing.insetsHXl,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "We Think You’ll Love These ",
-                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),)
-
-
-                          ],
+                      if (!isGuest)  const SizedBox(height: 20),
+                      if (!isGuest)
+                        Padding(
+                          padding:  AppSpacing.insetsHXl,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "We Think You’ll Love These ",
+                                style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),)
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
+                      if (!isGuest) const SizedBox(height: 20),
 
-                      (homeData?.featuredCreatives ?? []).isEmpty
+                      if (!isGuest)
+                        (homeData?.featuredCreatives ?? []).isEmpty
                           ? SizedBox(
                         height: 200,
                         child: Center(
@@ -2533,25 +2556,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
                       const SizedBox(height: 20),
 
                       // --- Top Creatives Section ---
-                      Padding(
-                        key: topCreativeKey,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Top Creatives Near you",
-                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
-                            ),
-                            const SizedBox(height: 10),
-                            // AB YE CALL KAREIN:
-                            _buildTopCreativesStack(context),
+                      if (isGuest)
+                        const SizedBox(height: 50),
+                      if (!isGuest)
+                        Padding(
+                          key: topCreativeKey,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Top Creatives Near you",
+                                style: AppTextStyles.titleSmall.copyWith(color: AppColors.white, height: 1.2),
+                              ),
+                              const SizedBox(height: 10),
+                              // AB YE CALL KAREIN:
+                              _buildTopCreativesStack(context),
 
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-
+                      if (!isGuest)
+                        const SizedBox(height: 70),
                     ]
                 )
               ],
@@ -2643,6 +2670,7 @@ SizedBox(height: 10,),
                 /// 🔥 BUTTON
                 GestureDetector(
                   onTap: () {
+                    if (_blockIfGuest()) return;
                     context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
                   },
                   child: Container(
@@ -2746,6 +2774,7 @@ SizedBox(height: 10,),
                   GestureDetector(
                     onTap: () {
                       if (data["button"] == "Book a Shoot") {
+                        if (_blockIfGuest()) return;
                         context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
                       } else if (data["button"] == " Explore Creatives") {
                         scrollTo(featuredKey);
@@ -2984,6 +3013,8 @@ SizedBox(height: 10,),
 
     return GestureDetector(
       onTap: () {
+        if ((title == "Photo" || title == "Video") && _blockIfGuest()) return;
+
         setState(() {
           selectedIndex = index;
         });
@@ -3389,6 +3420,7 @@ SizedBox(height: 10,),
 
                     GestureDetector(
                       onTap: () {
+                        if (_blockIfGuest()) return;
                         context.pushNamed(
                           RouteNames.recommendedDetails,
                           pathParameters: {'id': item.id.toString()},

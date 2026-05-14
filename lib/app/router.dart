@@ -47,6 +47,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import '../core/connectivity/connectivity_providers.dart';
 import '../core/connectivity/connectivity_status.dart';
 import '../core/providers/auth_state_provider.dart';
+import '../core/providers/guest_mode_provider.dart';
+import '../shared/widgets/login_dialog.dart';
 import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
 import 'colors.dart';
@@ -69,10 +71,25 @@ const _publicRoutes = {
   '/password-success',
 };
 
+/// Routes a guest user may visit. Anything outside this set redirects to '/'.
+/// Public auth routes are included so guest can tap "Ok" in [showLoginDialog].
+const _guestAllowedRoutes = {
+  '/',
+  '/splash',
+  '/onboarding',
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/forgot-otp',
+  '/reset-password',
+  '/password-success',
+};
+
 /// GoRouter provider — uses [authStateProvider] and [connectivityStatusProvider]
 /// for redirect logic.
 final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ValueNotifier<bool>(ref.read(authStateProvider));
+  final guestNotifier = ValueNotifier<bool>(ref.read(guestModeProvider));
   final connNotifier = ValueNotifier<ConnectivityStatus>(
     ref.read(connectivityStatusProvider),
   );
@@ -81,11 +98,16 @@ final routerProvider = Provider<GoRouter>((ref) {
     authNotifier.value = next;
   });
 
+  ref.listen(guestModeProvider, (_, next) {
+    guestNotifier.value = next;
+  });
+
   ref.listen(connectivityStatusProvider, (_, next) {
     connNotifier.value = next;
   });
 
-  final refreshListenable = Listenable.merge([authNotifier, connNotifier]);
+  final refreshListenable =
+      Listenable.merge([authNotifier, guestNotifier, connNotifier]);
 
   // Set of routes the user has already visited while online during this
   // session. While offline, navigation is allowed only to these (plus public
@@ -96,6 +118,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   ref.onDispose(() {
     authNotifier.dispose();
+    guestNotifier.dispose();
     connNotifier.dispose();
   });
 
@@ -111,6 +134,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
     redirect: (context, state) {
       final isLoggedIn = authNotifier.value;
+      final isGuest = guestNotifier.value;
       final connectivity = connNotifier.value;
       final location = state.matchedLocation;
 
@@ -120,8 +144,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isLoggedIn && isPublicRoute) {
         return '/';
       }
-      if (!isLoggedIn && !isPublicRoute) {
+      if (!isLoggedIn && !isGuest && !isPublicRoute) {
         return '/login';
+      }
+      // Guest can only access the home shell + public auth routes.
+      if (!isLoggedIn &&
+          isGuest &&
+          !_guestAllowedRoutes.contains(location)) {
+        return '/';
       }
 
       // Offline gate — allow public routes + any route already visited while
@@ -535,13 +565,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 /// Shell widget for bottom navigation with IndexedStack.
 /// Replaces the destructive switch(_selectedIndex) in old MainScreen.
-class _MainShell extends StatelessWidget {
+class _MainShell extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   const _MainShell({required this.navigationShell});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       extendBody: true,
       body: navigationShell,
@@ -578,10 +608,17 @@ class _MainShell extends StatelessWidget {
                   unselectedFontSize: _bottomNavLabelFontSize,
                   selectedLabelStyle: AppTextStyles.labelSmall,
                   unselectedLabelStyle: AppTextStyles.labelSmall,
-                  onTap: (index) => navigationShell.goBranch(
-                    index,
-                    initialLocation: index == navigationShell.currentIndex,
-                  ),
+                  onTap: (index) {
+                    final isGuest = ref.read(guestModeProvider);
+                    if (isGuest && index != 0) {
+                      showLoginDialog(context);
+                      return;
+                    }
+                    navigationShell.goBranch(
+                      index,
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  },
                   items: [
                     BottomNavigationBarItem(
                       icon: _buildInactiveIcon(AppAssets.inactiveHome),

@@ -180,105 +180,119 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
               borderRadius: AppRadii.bottomPillSm,
             ),
 
-            child: GooglePlaceAutoCompleteTextField(
-              textEditingController: searchController,
-              focusNode: searchFocusNode,
-              googleAPIKey: GoogleConfig.placesApiKey,
-              debounceTime: 800,
-              isLatLngRequired: true,
+            child: AnimatedBuilder(
+              animation: Listenable.merge([searchFocusNode, searchController]),
+              builder: (context, _) {
+                final bool searchHighlight =
+                    searchFocusNode.hasFocus ||
+                    searchController.text.isNotEmpty;
 
-              /// ✅ MAIN FIX HERE
-              boxDecoration: BoxDecoration(
-                color: AppColors.textHeading,
-                borderRadius: AppRadii.lgAll,
-                border: Border.all(color: AppColors.transparent),
-              ),
-
-              textStyle: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.white70,
-              ),
-
-              inputDecoration: InputDecoration(
-                hintText: "Search location",
-                hintStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.white70,
-                ),
-
-                filled: true,
-                fillColor: AppColors.transparent,
-
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: SvgPicture.asset(
-                    AppAssets.search,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.white,
-                      BlendMode.srcIn,
+                return IconTheme(
+                  data: const IconThemeData(color: AppColors.white70, size: 20),
+                  child: GooglePlaceAutoCompleteTextField(
+                    textEditingController: searchController,
+                    focusNode: searchFocusNode,
+                    googleAPIKey: GoogleConfig.placesApiKey,
+                    debounceTime: 800,
+                    isLatLngRequired: true,
+                    boxDecoration: BoxDecoration(
+                      color: AppColors.transparent,
+                      borderRadius: AppRadii.lgAll,
+                      border: Border.all(
+                        color: searchHighlight
+                            ? AppColors.borderGold
+                            : AppColors.white30,
+                        width: 0.5,
+                      ),
                     ),
-                    height: 20,
-                    width: 20,
-                  ),
-                ),
-                suffixIcon: searchController.text.isNotEmpty
-                    ? GestureDetector(
-                        onTap: () {
-                          searchController.clear();
-                          searchFocusNode.unfocus();
-                          setState(() {});
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: Icon(
-                            Icons.close,
-                            color: AppColors.white70,
-                            size: 20,
+                    textStyle: const TextStyle(
+                      color: AppColors.white,
+                      fontFamily: AppTextStyles.fontFamilyBody,
+                      fontSize: 15,
+                    ),
+                    inputDecoration: InputDecoration(
+                      hintText: "Search location",
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.white70,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.transparent,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: SvgPicture.asset(
+                          AppAssets.search,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.white,
+                            BlendMode.srcIn,
                           ),
+                          height: 20,
+                          width: 20,
                         ),
-                      )
-                    : null,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
-              ),
+                      ),
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? GestureDetector(
+                              onTap: () {
+                                searchController.clear();
+                                searchFocusNode.unfocus();
+                                setState(() {});
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(AppSpacing.md),
+                                child: Icon(
+                                  Icons.close,
+                                  color: AppColors.white70,
+                                  size: 20,
+                                ),
+                              ),
+                            )
+                          : null,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.lg,
+                      ),
+                    ),
+                    isCrossBtnShown: false,
+                    getPlaceDetailWithLatLng: (prediction) async {
+                      if (prediction.lat != null && prediction.lng != null) {
+                        final latLng = LatLng(
+                          double.parse(prediction.lat!),
+                          double.parse(prediction.lng!),
+                        );
 
-              isCrossBtnShown: false,
-              getPlaceDetailWithLatLng: (prediction) async {
-                if (prediction.lat != null && prediction.lng != null) {
-                  final latLng = LatLng(
-                    double.parse(prediction.lat!),
-                    double.parse(prediction.lng!),
-                  );
+                        /// 🔥 FIRST: close keyboard
+                        searchFocusNode.unfocus();
 
-                  /// 🔥 FIRST: close keyboard
-                  searchFocusNode.unfocus();
+                        /// 🔥 SECOND: delay (important)
+                        await Future.delayed(const Duration(milliseconds: 200));
 
-                  /// 🔥 SECOND: delay (important)
-                  await Future.delayed(const Duration(milliseconds: 200));
+                        setState(() {
+                          selectedLatLng = latLng;
+                          selectedAddress = prediction.description ?? "";
+                          searchController.text = selectedAddress;
+                        });
 
-                  setState(() {
-                    selectedLatLng = latLng;
-                    selectedAddress = prediction.description ?? "";
-                    searchController.text = selectedAddress;
-                  });
+                        /// 🔥 move map
+                        mapController?.animateCamera(
+                          CameraUpdate.newLatLngZoom(latLng, 16),
+                        );
+                      }
+                    },
 
-                  /// 🔥 move map
-                  mapController?.animateCamera(
-                    CameraUpdate.newLatLngZoom(latLng, 16),
-                  );
-                }
-              },
+                    itemClick: (prediction) async {
+                      searchController.text = prediction.description ?? "";
 
-              itemClick: (prediction) async {
-                searchController.text = prediction.description ?? "";
+                      /// 🔥 important (cursor fix)
+                      searchController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: searchController.text.length),
+                      );
 
-                /// 🔥 important (cursor fix)
-                searchController.selection = TextSelection.fromPosition(
-                  TextPosition(offset: searchController.text.length),
+                      searchFocusNode.unfocus();
+                    },
+                  ),
                 );
-
-                searchFocusNode.unfocus();
               },
             ),
           ),

@@ -6,6 +6,7 @@ import '../../../../core/firebase/analytics_service.dart';
 import '../../../../core/firebase/crashlytics_service.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/providers/guest_mode_provider.dart';
 
 import 'auth_providers.dart';
 import 'login_state.dart';
@@ -43,8 +44,9 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
           await prefs.setString("password", password);
         }
 
-        // Update auth state
+        // Update auth state & clear guest flag.
         ref.read(authStateProvider.notifier).updateState(true);
+        ref.read(guestModeProvider.notifier).exit();
 
         // Analytics & Crashlytics
         AnalyticsService.logEvent(AnalyticsEvents.login, params: {'method': 'email'});
