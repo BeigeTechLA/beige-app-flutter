@@ -31,7 +31,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        context.goNamed(RouteNames.home);
+        context.goNamed(RouteNames.myShoots);
       },
       child: AppScaffold(
         body: Padding(
@@ -77,7 +77,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.xl),
             child: GestureDetector(
               onTap: () {
-                context.goNamed(RouteNames.home);
+                context.goNamed(RouteNames.myShoots);
               },
               child: Container(
                 height: 55,
