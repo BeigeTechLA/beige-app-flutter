@@ -157,55 +157,6 @@ class BookingReviewNotifier
       },
     );
   }
-
-  /// Confirm payment with backend. Returns true on success.
-  Future<bool> confirmPayment({
-    required int bookingId,
-    required String paymentIntentId,
-  }) async {
-    final repo = ref.read(paymentRepositoryProvider);
-    final result = await repo.confirmStripePayment(
-      bookingId: bookingId,
-      paymentIntentId: paymentIntentId,
-    );
-
-    return result.fold(
-      (error) {
-        // --- Booking Analytics: Step 9 — Payment failed ---
-        AnalyticsService.logEvent(AnalyticsEvents.paymentFailed, params: {
-          'booking_id': bookingId,
-          'error': error.message,
-          'step_number': 9,
-        });
-        state = state.copyWith(errorMessage: error.message);
-        return false;
-      },
-      (_) {
-        _stepCompleted = true;
-        // --- Booking Analytics: Step 9 — Payment successful ---
-        AnalyticsService.logEvent(AnalyticsEvents.paymentSuccess, params: {
-          'booking_id': bookingId,
-          'amount': state.pricing?['total_amount'] ?? 0,
-          'currency': 'USD',
-        });
-        // --- Booking Analytics: Step 9 — Booking completed ---
-        AnalyticsService.logEvent(AnalyticsEvents.bookingCompleted, params: {
-          'booking_id': bookingId,
-          'total_amount': state.pricing?['total_amount'] ?? 0,
-          'step_number': 9,
-        });
-        // --- Booking Analytics: Step 9 — Purchase conversion event (Firebase standard) ---
-        final totalAmount = (state.pricing?['total_amount'] ?? 0).toDouble();
-        AnalyticsService.logPurchase(
-          transactionId: bookingId.toString(),
-          value: totalAmount,
-          currency: 'USD',
-          params: {'booking_id': bookingId},
-        );
-        return true;
-      },
-    );
-  }
 }
 
 final bookingReviewNotifierProvider = NotifierProvider.autoDispose

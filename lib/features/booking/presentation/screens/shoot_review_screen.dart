@@ -182,24 +182,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       // 4. Present Stripe
       await Stripe.instance.presentPaymentSheet();
 
-      // 5. Confirm with backend
-      final paymentIntentId = clientSecret.split('_secret').first;
-
-      final confirmed = await notifier.confirmPayment(
-        bookingId: widget.bookingId,
-        paymentIntentId: paymentIntentId,
-      );
-
-      if (!confirmed) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Payment confirmation failed")),
-          );
-        }
-        return;
-      }
-
-      // 6. Navigate to success
+      // 5. Navigate to success
       if (mounted) {
         context.goNamed(
           RouteNames.paymentSuccess,
