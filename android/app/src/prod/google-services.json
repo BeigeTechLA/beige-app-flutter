@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "901444143218",
-    "project_id": "biege-app",
-    "storage_bucket": "biege-app.firebasestorage.app"
+    "project_number": "628292955928",
+    "project_id": "biege-app-live",
+    "storage_bucket": "biege-app-live.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:901444143218:android:4ec89e3b04622da3149aeb",
+        "mobilesdk_app_id": "1:628292955928:android:4d5a7ca1be34e6754d786d",
         "android_client_info": {
           "package_name": "com.app.beige"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD4Hkckj3TbjhhS9S5sf9RmTvvc82p7vdo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:901444143218:android:288993a14c036d48149aeb",
-        "android_client_info": {
-          "package_name": "com.app.beige.dev"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD4Hkckj3TbjhhS9S5sf9RmTvvc82p7vdo"
+          "current_key": "AIzaSyBxcOml39s0y3rNliQqkBJ5qcjeBLL6wFA"
         }
       ],
       "services": {
