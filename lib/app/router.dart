@@ -48,6 +48,8 @@ import '../core/connectivity/connectivity_providers.dart';
 import '../core/connectivity/connectivity_status.dart';
 import '../core/providers/auth_state_provider.dart';
 import '../core/providers/guest_mode_provider.dart';
+import '../core/restoration/draft_store.dart';
+import '../core/restoration/restoration_providers.dart';
 import '../shared/widgets/login_dialog.dart';
 import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
@@ -116,13 +118,61 @@ final routerProvider = Provider<GoRouter>((ref) {
   final visitedOnlineLocations = <String>{};
   String? lastOnlineLocation;
 
+  final restorationService = ref.read(routeRestorationServiceProvider);
+  final draftStore = ref.read(draftStoreProvider);
+
+  /// Reads route extra, falls back to [DraftStore.readBookingDraft], and
+  /// captures the live extra back into the draft for future cold-start
+  /// restores.
+  BookingDraft bookingDraftFor(GoRouterState state, String routeName) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final previous = draftStore.readBookingDraft() ?? const BookingDraft();
+    if (extra != null) {
+      final fresh = BookingDraft.fromRouteExtra(extra, currentRoute: routeName)
+          .mergeOver(previous);
+      // ignore: discarded_futures
+      draftStore.writeBookingDraft(fresh);
+      return fresh;
+    }
+    final hydrated = previous;
+    if (hydrated.currentRoute != routeName) {
+      // ignore: discarded_futures
+      draftStore.writeBookingDraft(BookingDraft(
+        contentTypeId: hydrated.contentTypeId,
+        specialtyId: hydrated.specialtyId,
+        shootTypeId: hydrated.shootTypeId,
+        bookingId: hydrated.bookingId,
+        value: hydrated.value,
+        currentRoute: routeName,
+      ));
+    }
+    return hydrated;
+  }
+
+  late final GoRouter router;
+
+  void persistOnChange() {
+    final matches = router.routerDelegate.currentConfiguration;
+    if (matches.isEmpty) return;
+    final fullPath = matches.fullPath.isNotEmpty
+        ? matches.fullPath
+        : matches.uri.path;
+    // ignore: discarded_futures
+    restorationService.persist(
+      matchedLocation: fullPath,
+      queryParameters: matches.uri.queryParameters,
+      pathParameters: matches.pathParameters,
+    );
+  }
+
   ref.onDispose(() {
+    router.routerDelegate.removeListener(persistOnChange);
     authNotifier.dispose();
     guestNotifier.dispose();
     connNotifier.dispose();
   });
 
-  return GoRouter(
+  router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     observers: [
@@ -303,12 +353,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/finding-perfect',
         name: RouteNames.findingPerfect,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/finding-perfect');
           return FindCreativeScreen(
-            bookingId: data['bookingId'] as int? ?? 0,
-            specialtyId: data['specialtyId'] as int? ?? 0,
-            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            bookingId: draft.bookingId ?? 0,
+            specialtyId: draft.specialtyId ?? 0,
+            ShootTypeId: draft.shootTypeId ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
           );
         },
       ),
@@ -326,11 +376,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/content-type',
         name: RouteNames.contentType,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>?;
+          final draft = bookingDraftFor(state, '/content-type');
           return ContentTypeScreen(
             fromHome: true,
-            specialtyId: data?['specialtyId'] as int?,
-            value: data?['value'] as int?,
+            specialtyId: draft.specialtyId,
+            value: draft.value,
           );
         },
       ),
@@ -338,10 +388,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/video-shoot-type',
         name: RouteNames.videoShootType,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/video-shoot-type');
           return ShootTypeScreen(
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
-            bookingId: data['bookingId'] as int? ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
+            bookingId: draft.bookingId ?? 0,
           );
         },
       ),
@@ -349,11 +399,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/shoot-date-time',
         name: RouteNames.shootDateTime,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/shoot-date-time');
           return ShootDateTimeScreen(
-            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-            bookingId: data['bookingId'] as int? ?? 0,
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            ShootTypeId: draft.shootTypeId ?? 0,
+            bookingId: draft.bookingId ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
           );
         },
       ),
@@ -361,12 +411,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/more-details',
         name: RouteNames.moreDetails,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/more-details');
           return ShootDetailsScreen(
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
-            specialtyId: data['specialtyId'] as int? ?? 0,
-            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-            bookingId: data['bookingId'] as int? ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
+            specialtyId: draft.specialtyId ?? 0,
+            ShootTypeId: draft.shootTypeId ?? 0,
+            bookingId: draft.bookingId ?? 0,
           );
         },
       ),
@@ -374,12 +424,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/crew-size-matching',
         name: RouteNames.crewSizeMatching,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/crew-size-matching');
           return CrewSizeMatchingScreen(
-            specialtyId: data['specialtyId'] as int? ?? 0,
-            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-            bookingId: data['bookingId'] as int? ?? 0,
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            specialtyId: draft.specialtyId ?? 0,
+            ShootTypeId: draft.shootTypeId ?? 0,
+            bookingId: draft.bookingId ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
           );
         },
       ),
@@ -387,12 +437,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/select-dream-team',
         name: RouteNames.selectDreamTeam,
         builder: (context, state) {
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final draft = bookingDraftFor(state, '/select-dream-team');
           return CrewSelectionScreen(
-            specialtyId: data['specialtyId'] as int? ?? 0,
-            ShootTypeId: data['ShootTypeId'] as int? ?? 0,
-            bookingId: data['bookingId'] as int? ?? 0,
-            contentTypeId: data['contentTypeId'] as int? ?? 0,
+            specialtyId: draft.specialtyId ?? 0,
+            ShootTypeId: draft.shootTypeId ?? 0,
+            bookingId: draft.bookingId ?? 0,
+            contentTypeId: draft.contentTypeId ?? 0,
           );
         },
       ),
@@ -438,20 +488,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.manageBooking,
         builder: (context, state) {
           final bookingId = int.parse(state.pathParameters['bookingId']!);
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final extra = state.extra as Map<String, dynamic>?;
+          ManageBookingDraft draft;
+          if (extra != null) {
+            draft = ManageBookingDraft.fromRouteExtra(bookingId, extra);
+            // ignore: discarded_futures
+            draftStore.writeManageBookingDraft(draft);
+          } else {
+            final stored = draftStore.readManageBookingDraft();
+            draft = (stored != null && stored.bookingId == bookingId)
+                ? stored
+                : ManageBookingDraft(bookingId: bookingId);
+          }
           return ManageShootScreen(
             bookingId: bookingId,
-            shootTypeId: data['shootTypeId'] as int? ?? 0,
-            projectName: data['projectName'] as String?,
-            eventDate: data['eventDate'] as String?,
-            startTime: data['startTime'] as String?,
-            endTime: data['endTime'] as String?,
-            // This safely handles nulls, ints, and doubles
-            durationHours: (data['durationHours'] as num?)?.toDouble(),
-            location: data['location'] as String?,
-            imageUrl: data['imageUrl'] as String?,
-            contentType: data['contentType'] as String?,
-            multiDays: data['multiDays'] as List<dynamic>?,
+            shootTypeId: draft.shootTypeId ?? 0,
+            projectName: draft.projectName,
+            eventDate: draft.eventDate,
+            startTime: draft.startTime,
+            endTime: draft.endTime,
+            durationHours: draft.durationHours,
+            location: draft.location,
+            imageUrl: draft.imageUrl,
+            contentType: draft.contentType,
+            multiDays: draft.multiDays,
           );
         },
       ),
@@ -468,17 +528,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.cancelBooking,
         builder: (context, state) {
           final bookingId = int.parse(state.pathParameters['bookingId']!);
-          final data = state.extra as Map<String, dynamic>? ?? {};
+          final extra = state.extra as Map<String, dynamic>?;
+          CancelBookingDraft draft;
+          if (extra != null) {
+            draft = CancelBookingDraft.fromRouteExtra(bookingId, extra);
+            // ignore: discarded_futures
+            draftStore.writeCancelBookingDraft(draft);
+          } else {
+            final stored = draftStore.readCancelBookingDraft();
+            draft = (stored != null && stored.bookingId == bookingId)
+                ? stored
+                : CancelBookingDraft(bookingId: bookingId);
+          }
           return CancelShootScreen(
             bookingId: bookingId,
-            projectName: data['projectName'] as String?,
-            eventDate: data['eventDate'] as String?,
-            startTime: data['startTime'] as String?,
-            endTime: data['endTime'] as String?,
-            durationHours: data['durationHours'] as int?,
-            location: data['location'] as String?,
-            contentType: data['contentType'] as String?,
-            imageUrl: data['imageUrl'] as String?,
+            projectName: draft.projectName,
+            eventDate: draft.eventDate,
+            startTime: draft.startTime,
+            endTime: draft.endTime,
+            durationHours: draft.durationHours,
+            location: draft.location,
+            contentType: draft.contentType,
+            imageUrl: draft.imageUrl,
           );
         },
       ),
@@ -561,6 +632,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  router.routerDelegate.addListener(persistOnChange);
+
+  return router;
 });
 
 /// Shell widget for bottom navigation with IndexedStack.
