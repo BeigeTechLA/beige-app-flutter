@@ -156,10 +156,10 @@ class BookingReviewNotifier
         return paymentSheet;
       },
     );
-  }
+  }}
 
   /// Confirm payment with backend. Returns true on success.
-  Future<bool> confirmPayment({
+/*  Future<bool> confirmPayment({
     required int bookingId,
     required String paymentIntentId,
   }) async {
@@ -206,7 +206,7 @@ class BookingReviewNotifier
       },
     );
   }
-}
+}*/
 
 final bookingReviewNotifierProvider = NotifierProvider.autoDispose
     .family<BookingReviewNotifier, BookingReviewState, int>(

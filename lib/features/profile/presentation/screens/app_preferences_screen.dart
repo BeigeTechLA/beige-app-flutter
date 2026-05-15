@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
@@ -10,6 +9,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/assets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppPreferencesScreen extends ConsumerWidget {
   const AppPreferencesScreen({super.key});

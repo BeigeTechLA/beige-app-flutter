@@ -182,7 +182,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       // 4. Present Stripe
       await Stripe.instance.presentPaymentSheet();
 
-      // 5. Confirm with backend
+    /*  // 5. Confirm with backend
       final paymentIntentId = clientSecret.split('_secret').first;
 
       final confirmed = await notifier.confirmPayment(
@@ -197,7 +197,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
           );
         }
         return;
-      }
+      }*/
 
       // 6. Navigate to success
       if (mounted) {
