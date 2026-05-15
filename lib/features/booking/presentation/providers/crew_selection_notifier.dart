@@ -85,29 +85,44 @@ class CrewSelectionNotifier
     final matchesResult = results[0];
     final holdsResult = results[1];
 
-    // Process matches
+    /// Process matches
     List<dynamic> crewMatches = [];
     List<dynamic> nearby = [];
     List<dynamic> other = [];
+
     Map<int, int> requiredCountByRole = {};
     Set<int> allowedRoleIds = {};
-
     final matchesFailed = matchesResult.fold(
-      (error) {
+          (error) {
         state = state.copyWith(
           status: CrewSelectionStatus.error,
           errorMessage: error.message,
         );
         return true;
       },
-      (data) {
-        crewMatches = data['items'] as List? ?? [];
+          (data) {
 
+        /// 🔥 MAIN ITEMS
+        final items = (data['items'] as List?) ?? [];
+
+        /// 🔥 FALLBACK RANDOM CREATORS
+        final randomCreators =
+            (data['random_creators'] as List?) ?? [];
+
+        /// 🔥 IF ITEMS EMPTY → USE RANDOM CREATORS
+        crewMatches =
+        items.isNotEmpty ? items : randomCreators;
+
+        /// 🔥 DISTANCE WISE FILTER
         for (var item in crewMatches) {
+
           double distance = 0;
+
           if (item['distance_km'] != null) {
-            distance = (item['distance_km'] as num).toDouble();
+            distance =
+                (item['distance_km'] as num?)?.toDouble() ?? 0;
           }
+
           if (distance > 0 && distance <= 100) {
             nearby.add(item);
           } else {
@@ -115,48 +130,88 @@ class CrewSelectionNotifier
           }
         }
 
-        final requirements = data['crew_requirements'] as List? ?? [];
-        allowedRoleIds = requirements.map<int>((e) => e['role_id'] as int).toSet();
+        /// ✅ REQUIREMENTS SAFE
+        final requirements =
+            (data['crew_requirements'] as List?) ?? [];
+
+        allowedRoleIds = requirements
+            .map<int>(
+              (e) => int.tryParse(
+            e['role_id'].toString(),
+          ) ??
+              0,
+        )
+            .where((id) => id != 0)
+            .toSet();
+
         requiredCountByRole = {
-          for (var r in requirements) r['role_id'] as int: r['required_count'] as int,
+          for (var r in requirements)
+            (int.tryParse(r['role_id'].toString()) ?? 0):
+            (int.tryParse(
+              r['required_count'].toString(),
+            ) ??
+                0),
         };
 
         return false;
       },
     );
-
     if (matchesFailed) return;
 
-    // Process holds
+    /// Process holds
     Set<int> addedCrewUserIds = {};
+
     Map<String, dynamic> requiredByRole = {};
     Map<String, dynamic> heldByRole = {};
 
     holdsResult.fold(
-      (error) {
-        // Non-critical — continue with empty holds
+          (error) {
+        /// Non-critical
       },
-      (data) {
-        final creatives = data['creatives'] as List? ?? [];
+          (data) {
+
+        /// ✅ SAFE CREATIVES
+        final creatives =
+            (data['creatives'] as List?) ?? [];
+
         addedCrewUserIds = creatives
-            .map<int>((e) => e['creative_user_id'] as int)
+            .map<int>(
+              (e) => int.tryParse(
+            e['creative_user_id'].toString(),
+          ) ??
+              0,
+        )
+            .where((id) => id != 0)
             .toSet();
 
-        final summary = data['summary'] as Map<String, dynamic>?;
+        /// ✅ SAFE SUMMARY
+        final summary =
+        data['summary'] as Map<String, dynamic>?;
+
         if (summary != null) {
-          requiredByRole = Map<String, dynamic>.from(summary['required_by_role'] ?? {});
-          heldByRole = Map<String, dynamic>.from(summary['held_by_role'] ?? {});
+
+          requiredByRole = Map<String, dynamic>.from(
+            summary['required_by_role'] ?? {},
+          );
+
+          heldByRole = Map<String, dynamic>.from(
+            summary['held_by_role'] ?? {},
+          );
         }
       },
     );
 
-    // --- Booking Analytics: Step 6 — Crew selection screen loaded ---
-    AnalyticsService.logEvent(AnalyticsEvents.bookingStepCrew, params: {
-      'booking_id': bookingId,
-      'crew_matches': crewMatches.length,
-      'step_number': 6,
-    });
+    /// Analytics
+    AnalyticsService.logEvent(
+      AnalyticsEvents.bookingStepCrew,
+      params: {
+        'booking_id': bookingId,
+        'crew_matches': crewMatches.length,
+        'step_number': 6,
+      },
+    );
 
+    /// ✅ FINAL STATE
     state = state.copyWith(
       status: CrewSelectionStatus.loaded,
       crewMatches: crewMatches,

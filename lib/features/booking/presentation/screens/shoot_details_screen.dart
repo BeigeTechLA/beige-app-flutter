@@ -121,6 +121,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           .where((e) => e.isNotEmpty)
           .toList(),
     };
+    print(" UPDATE BOOKING DETAILS API");
+    print(" PAYLOAD = $payload");
 
     await ref
         .read(shootDetailsNotifierProvider(widget.bookingId).notifier)
@@ -513,7 +515,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
             Row(
               children: [
                 Text(
-                  "More Details",
+                  "More Detailddddddds",
                   style: TextStyle(
                     fontFamily: AppAssets.fontUnbounded,
                     fontSize: 16,

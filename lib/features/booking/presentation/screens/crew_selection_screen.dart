@@ -231,7 +231,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     final addedCrewUserIds = crewState.addedCrewUserIds;
     final heldByRole = crewState.heldByRole;
     final requiredByRole = crewState.requiredByRole;
-    final showLocationCard = nearbyCreators.isEmpty;
+    final showLocationCard = crewMatches.isEmpty;
 
     return AppScaffold(
         hasAppBar: true,
