@@ -227,11 +227,28 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     final crewMatches = crewState.crewMatches;
     final nearbyCreators = crewState.nearbyCreators;
     final otherCreators = crewState.otherCreators;
-    final isLoading = crewState.status == CrewSelectionStatus.loading;
+
+    final isLoading =
+        crewState.status == CrewSelectionStatus.loading;
+
     final addedCrewUserIds = crewState.addedCrewUserIds;
     final heldByRole = crewState.heldByRole;
     final requiredByRole = crewState.requiredByRole;
-    final showLocationCard = crewMatches.isEmpty;
+
+    /// 🔥 CHECK LOCATION BASED CREATORS
+    final bool hasLocationCreators =
+        crewMatches.isNotEmpty;
+
+    /// 🔥 DISPLAY LIST
+    final List<dynamic> displayCreators =
+    hasLocationCreators
+        ? crewMatches
+        : otherCreators;
+
+    /// 🔥 SHOW BOOKED CARD
+    final bool showLocationCard =
+        !hasLocationCreators &&
+            otherCreators.isNotEmpty;
 
     return AppScaffold(
         hasAppBar: true,
@@ -423,7 +440,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           ),
 
                         /// TITLE
-                        if (showLocationCard && crewMatches.isNotEmpty)
+                        if (!hasLocationCreators &&
+                            otherCreators.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Text(
@@ -433,7 +451,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           ),
 
                         /// CREW LIST
-                        ...crewMatches.map((item) {
+                        ...displayCreators.map((item) {
 
                           /// ✅ SAFE ID (NO CRASH)
                           final int creativeUserId =
@@ -799,7 +817,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                           /// 🟢 NORMAL FLOW
                           for (final userId in addedCrewUserIds) {
 
-                            final matches = crewMatches
+                            final matches = displayCreators
                                 .where((e) => e['crew_member_id'] == userId)
                                 .toList();
 

@@ -110,10 +110,10 @@ class CrewSelectionNotifier
             (data['random_creators'] as List?) ?? [];
 
         /// 🔥 IF ITEMS EMPTY → USE RANDOM CREATORS
-        crewMatches =
-        items.isNotEmpty ? items : randomCreators;
+        crewMatches = items;
 
         /// 🔥 DISTANCE WISE FILTER
+        /// 🔥 LOCATION BASED CREATORS
         for (var item in crewMatches) {
 
           double distance = 0;
@@ -125,10 +125,11 @@ class CrewSelectionNotifier
 
           if (distance > 0 && distance <= 100) {
             nearby.add(item);
-          } else {
-            other.add(item);
           }
         }
+
+        /// 🔥 RANDOM FALLBACK CREATORS
+        other = randomCreators;
 
         /// ✅ REQUIREMENTS SAFE
         final requirements =
