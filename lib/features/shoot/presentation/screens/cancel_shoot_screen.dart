@@ -13,6 +13,7 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/features/shoot/presentation/providers/cancel_shoot_notifier.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
@@ -76,6 +77,8 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
 
     ref.listen<CancelShootState>(cancelShootNotifierProvider, (prev, next) {
       if (next.status == CancelShootStatus.cancelled) {
+        ref.read(draftStoreProvider).clearCancelBookingDraft();
+        ref.read(draftStoreProvider).clearManageBookingDraft();
         _showAppointmentCancelledDialog(context);
       } else if (next.status == CancelShootStatus.error) {
         _showSnack(next.errorMessage ?? "Failed to cancel booking");

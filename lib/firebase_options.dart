@@ -63,11 +63,11 @@ class DefaultFirebaseOptions {
         );
       case Environment.prod:
         return const FirebaseOptions(
-          apiKey: 'AIzaSyD4Hkckj3TbjhhS9S5sf9RmTvvc82p7vdo',
-          appId: '1:901444143218:android:4ec89e3b04622da3149aeb',
-          messagingSenderId: '901444143218',
-          projectId: 'biege-app',
-          storageBucket: 'biege-app.firebasestorage.app',
+          apiKey: 'AIzaSyBxcOml39s0y3rNliQqkBJ5qcjeBLL6wFA',
+          appId: '1:628292955928:android:4d5a7ca1be34e6754d786d',
+          messagingSenderId: '628292955928',
+          projectId: 'biege-app-live',
+          storageBucket: 'biege-app-live.firebasestorage.app',
         );
     }
   }
@@ -85,11 +85,11 @@ class DefaultFirebaseOptions {
         );
       case Environment.prod:
         return const FirebaseOptions(
-          apiKey: 'AIzaSyCB8Mw5LE37XYVZslZmTMn8q6ehHlk8mJ8',
-          appId: '1:901444143218:ios:bddcb10c0340a09c149aeb',
-          messagingSenderId: '901444143218',
-          projectId: 'biege-app',
-          storageBucket: 'biege-app.firebasestorage.app',
+          apiKey: 'AIzaSyA8pk8VuMI2yyBkjSj0fDXYsERMhPcTqQ8',
+          appId: '1:628292955928:ios:47f65bbb7644b4864d786d',
+          messagingSenderId: '628292955928',
+          projectId: 'biege-app-live',
+          storageBucket: 'biege-app-live.firebasestorage.app',
           iosBundleId: 'com.app.beige',
         );
     }

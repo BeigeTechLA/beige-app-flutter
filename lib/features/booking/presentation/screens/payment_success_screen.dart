@@ -9,9 +9,10 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
-class PaymentSuccessScreen extends ConsumerWidget {
+class PaymentSuccessScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final String fullName;
   final String phone;
@@ -26,7 +27,21 @@ class PaymentSuccessScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PaymentSuccessScreen> createState() =>
+      _PaymentSuccessScreenState();
+}
+
+class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Terminal state for the booking-creation wizard — purge the draft so a
+    // future cold-start cannot re-enter a completed flow.
+    ref.read(draftStoreProvider).clearBookingDraft();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {

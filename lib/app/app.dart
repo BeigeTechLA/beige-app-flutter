@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/restoration/restoration_providers.dart';
 import '../shared/widgets/connectivity_listener.dart';
 import 'router.dart';
 import 'theme.dart';
@@ -14,11 +15,28 @@ final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
 /// Root application widget.
 /// ProviderScope wraps this in main.dart (not here) so that
 /// SharedPreferences can be injected before the widget tree builds.
-class App extends ConsumerWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(appLifecycleObserverProvider).attach();
+  }
+
+  @override
+  void dispose() {
+    ref.read(appLifecycleObserverProvider).detach();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final goRouter = ref.watch(routerProvider);
 
     return MaterialApp.router(

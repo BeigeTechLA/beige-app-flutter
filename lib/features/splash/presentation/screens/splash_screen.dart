@@ -8,7 +8,12 @@ import 'package:go_router/go_router.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/firebase/analytics_service.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
+import 'package:beige/core/providers/guest_mode_provider.dart';
+import 'package:beige/core/restoration/restoration_keys.dart';
+import 'package:beige/core/restoration/restoration_providers.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -66,13 +71,52 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
         Future.delayed(const Duration(milliseconds: 600), () {
           if (!mounted) return;
-          
+
           final isLoggedIn = ref.read(authStateProvider);
-          if (isLoggedIn) {
-            context.goNamed(RouteNames.home);
-          } else {
+          if (!isLoggedIn) {
             context.goNamed(RouteNames.onboarding);
+            return;
           }
+
+          final isGuest = ref.read(guestModeProvider);
+          final service = ref.read(routeRestorationServiceProvider);
+          final restorer = ref.read(splashRestorerProvider);
+          final restored = service.readRestorable();
+
+          final shouldRestore = restorer.shouldRestore(
+            isEnabled: kRestorationEnabled,
+            isLoggedIn: isLoggedIn,
+            isGuest: isGuest,
+            hasDeepLink: _hasDeepLink(),
+            persistedRoute: restored?.location,
+          );
+
+          if (shouldRestore && restored != null) {
+            FirebaseCrashlytics.instance.log(
+              'restoration.applied:${restored.location}',
+            );
+            AnalyticsService.logEvent(
+              'app_restored',
+              params: {
+                'route': restored.location,
+                'age_seconds':
+                    ((DateTime.now().millisecondsSinceEpoch -
+                                restored.timestampMs) ~/
+                            1000)
+                        .toInt(),
+              },
+            );
+            context.go(restored.toUri());
+            return;
+          }
+
+          // Drop any drafts when we are not restoring — TTL expired or
+          // restoration skipped means the wizard state is stale.
+          // ignore: discarded_futures
+          ref.read(draftStoreProvider).clearAll();
+
+          FirebaseCrashlytics.instance.log('restoration.skipped');
+          context.goNamed(RouteNames.home);
         });
       }
     });
@@ -82,6 +126,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  /// True when the platform launched the app via a deep link / notification
+  /// intent. `defaultRouteName` is `/` (or empty) for a normal launch.
+  bool _hasDeepLink() {
+    final initial = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+    return initial.isNotEmpty && initial != '/' && initial != '/splash';
   }
 
   @override
