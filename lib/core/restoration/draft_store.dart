@@ -123,7 +123,6 @@ class DraftStore {
 class BookingDraft {
   const BookingDraft({
     this.contentTypeId,
-    this.specialtyId,
     this.shootTypeId,
     this.bookingId,
     this.value,
@@ -131,7 +130,6 @@ class BookingDraft {
   });
 
   final int? contentTypeId;
-  final int? specialtyId;
   final int? shootTypeId;
   final int? bookingId;
 
@@ -144,7 +142,6 @@ class BookingDraft {
 
   Map<String, dynamic> toJson() => {
         if (contentTypeId != null) 'contentTypeId': contentTypeId,
-        if (specialtyId != null) 'specialtyId': specialtyId,
         if (shootTypeId != null) 'shootTypeId': shootTypeId,
         if (bookingId != null) 'bookingId': bookingId,
         if (value != null) 'value': value,
@@ -153,7 +150,6 @@ class BookingDraft {
 
   factory BookingDraft.fromJson(Map<String, dynamic> json) => BookingDraft(
         contentTypeId: _asInt(json['contentTypeId']),
-        specialtyId: _asInt(json['specialtyId']),
         shootTypeId: _asInt(json['shootTypeId']),
         bookingId: _asInt(json['bookingId']),
         value: _asInt(json['value']),
@@ -170,7 +166,6 @@ class BookingDraft {
     final map = extra ?? const <String, dynamic>{};
     return BookingDraft(
       contentTypeId: _asInt(map['contentTypeId']),
-      specialtyId: _asInt(map['specialtyId']),
       shootTypeId: _asInt(map['shootTypeId'] ?? map['ShootTypeId']),
       bookingId: _asInt(map['bookingId']),
       value: _asInt(map['value']),
@@ -181,7 +176,6 @@ class BookingDraft {
   /// Re-emits as a route-extra map matching the keys current builders read.
   Map<String, dynamic> toRouteExtra() => {
         if (contentTypeId != null) 'contentTypeId': contentTypeId,
-        if (specialtyId != null) 'specialtyId': specialtyId,
         if (shootTypeId != null) 'ShootTypeId': shootTypeId,
         if (bookingId != null) 'bookingId': bookingId,
         if (value != null) 'value': value,
@@ -189,7 +183,6 @@ class BookingDraft {
 
   BookingDraft mergeOver(BookingDraft other) => BookingDraft(
         contentTypeId: contentTypeId ?? other.contentTypeId,
-        specialtyId: specialtyId ?? other.specialtyId,
         shootTypeId: shootTypeId ?? other.shootTypeId,
         bookingId: bookingId ?? other.bookingId,
         value: value ?? other.value,

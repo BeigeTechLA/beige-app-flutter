@@ -21,7 +21,6 @@ void main() {
     test('JSON round-trip preserves every field', () {
       const draft = BookingDraft(
         contentTypeId: 1,
-        specialtyId: 2,
         shootTypeId: 3,
         bookingId: 4,
         value: 5,
@@ -29,7 +28,6 @@ void main() {
       );
       final restored = BookingDraft.fromJson(draft.toJson());
       expect(restored.contentTypeId, 1);
-      expect(restored.specialtyId, 2);
       expect(restored.shootTypeId, 3);
       expect(restored.bookingId, 4);
       expect(restored.value, 5);
@@ -38,11 +36,11 @@ void main() {
 
     test('mergeOver fills nulls from other but does not overwrite values', () {
       const partial = BookingDraft(bookingId: 9);
-      const stored = BookingDraft(contentTypeId: 1, specialtyId: 2);
+      const stored = BookingDraft(contentTypeId: 1, shootTypeId: 2);
       final merged = partial.mergeOver(stored);
       expect(merged.bookingId, 9);
       expect(merged.contentTypeId, 1);
-      expect(merged.specialtyId, 2);
+      expect(merged.shootTypeId, 2);
     });
 
     test('parses int from String / num inputs defensively', () {

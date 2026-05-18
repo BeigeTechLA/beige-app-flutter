@@ -22,14 +22,12 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
 
 class ShootDetailsScreen extends ConsumerStatefulWidget {
-  final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
   final int contentTypeId;
   const ShootDetailsScreen({
     super.key,
     required this.contentTypeId,
-    required this.specialtyId,
     required this.ShootTypeId,
     required this.bookingId,
   });
@@ -143,7 +141,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
         extra: {
           'bookingId': widget.bookingId,
           'contentTypeId': widget.contentTypeId,
-          'specialtyId': widget.specialtyId,
           'ShootTypeId': widget.ShootTypeId,
         },
       );

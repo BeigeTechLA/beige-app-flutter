@@ -503,24 +503,34 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                     ),
             ),
 
+            // ✅ TOP GRADIENT — subtle darken at top
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.transparent,
+                      AppColors.black.withValues(alpha: 0.75),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // ✅ BOTTOM SHADOW GRADIENT — feathers card into surfaceDeep
             Container(
-              height: 280,
-              width: double.infinity,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppRadii.huge),
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.black,
-                    AppColors.transparent,
-                    AppColors.transparent,
-                    AppColors.transparent,
-                    AppColors.transparent,
-                    AppColors.transparent,
-                    AppColors.black,
-                    AppColors.black,
-                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
+                  stops: const [0.5, 0.75, 1],
+                  colors: [
+                    AppColors.transparent,
+                    AppColors.surfaceDeep.withValues(alpha: 0.6),
+                    AppColors.surfaceDeep,
+                  ],
                 ),
               ),
             ),

@@ -9,14 +9,12 @@ import 'package:beige/app/route_names.dart';
 
 class FindCreativeScreen extends ConsumerStatefulWidget {
   final int bookingId;
-  final int specialtyId;
   final int ShootTypeId;
   final int contentTypeId;
 
   const FindCreativeScreen({
     super.key,
     required this.bookingId,
-    required this.specialtyId,
     required this.ShootTypeId,
     required this.contentTypeId,
   });
@@ -45,7 +43,6 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
       context.pushReplacementNamed(RouteNames.selectDreamTeam, extra: {
         'bookingId': widget.bookingId,
         'contentTypeId': widget.contentTypeId,
-        'specialtyId': widget.specialtyId,
         'shootTypeId': widget.ShootTypeId,
       });
     });

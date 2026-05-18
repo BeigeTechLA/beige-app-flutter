@@ -139,7 +139,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ignore: discarded_futures
       draftStore.writeBookingDraft(BookingDraft(
         contentTypeId: hydrated.contentTypeId,
-        specialtyId: hydrated.specialtyId,
         shootTypeId: hydrated.shootTypeId,
         bookingId: hydrated.bookingId,
         value: hydrated.value,
@@ -356,7 +355,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final draft = bookingDraftFor(state, '/finding-perfect');
           return FindCreativeScreen(
             bookingId: draft.bookingId ?? 0,
-            specialtyId: draft.specialtyId ?? 0,
             ShootTypeId: draft.shootTypeId ?? 0,
             contentTypeId: draft.contentTypeId ?? 0,
           );
@@ -379,7 +377,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final draft = bookingDraftFor(state, '/content-type');
           return ContentTypeScreen(
             fromHome: true,
-            specialtyId: draft.specialtyId,
             value: draft.value,
           );
         },
@@ -414,7 +411,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final draft = bookingDraftFor(state, '/more-details');
           return ShootDetailsScreen(
             contentTypeId: draft.contentTypeId ?? 0,
-            specialtyId: draft.specialtyId ?? 0,
             ShootTypeId: draft.shootTypeId ?? 0,
             bookingId: draft.bookingId ?? 0,
           );
@@ -426,7 +422,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final draft = bookingDraftFor(state, '/crew-size-matching');
           return CrewSizeMatchingScreen(
-            specialtyId: draft.specialtyId ?? 0,
             ShootTypeId: draft.shootTypeId ?? 0,
             bookingId: draft.bookingId ?? 0,
             contentTypeId: draft.contentTypeId ?? 0,
@@ -439,7 +434,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final draft = bookingDraftFor(state, '/select-dream-team');
           return CrewSelectionScreen(
-            specialtyId: draft.specialtyId ?? 0,
             ShootTypeId: draft.shootTypeId ?? 0,
             bookingId: draft.bookingId ?? 0,
             contentTypeId: draft.contentTypeId ?? 0,

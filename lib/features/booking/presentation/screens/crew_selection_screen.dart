@@ -18,14 +18,20 @@ import 'package:beige/shared/widgets/loading.dart' show AppLoader;
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
-  final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
   final int contentTypeId;
-  const CrewSelectionScreen({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
+
+  const CrewSelectionScreen({
+    super.key,
+    required this.ShootTypeId,
+    required this.bookingId,
+    required this.contentTypeId,
+  });
 
   @override
-  ConsumerState<CrewSelectionScreen> createState() => _CrewSelectionScreenState();
+  ConsumerState<CrewSelectionScreen> createState() =>
+      _CrewSelectionScreenState();
 }
 
 class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
@@ -55,14 +61,19 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
   }
 
   int getRequired(int roleId) {
-    final rr = ref.read(crewSelectionNotifierProvider(widget.bookingId)).requiredByRole;
+    final rr = ref
+        .read(crewSelectionNotifierProvider(widget.bookingId))
+        .requiredByRole;
     return rr[roleId.toString()] ?? rr[roleId] ?? 0;
   }
 
   int getHeld(int roleId) {
-    final hr = ref.read(crewSelectionNotifierProvider(widget.bookingId)).heldByRole;
+    final hr = ref
+        .read(crewSelectionNotifierProvider(widget.bookingId))
+        .heldByRole;
     return hr[roleId.toString()] ?? hr[roleId] ?? 0;
   }
+
   int currentStep = 1;
   bool isAdded = false;
 
@@ -88,6 +99,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         return "nearest";
     }
   }
+
   int getRoleIdByContentType(int contentTypeId, String roleName) {
     final name = roleName.toLowerCase();
 
@@ -115,6 +127,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
     return 1; // default (kabhi 0 nahi)
   }
+
   @override
   void initState() {
     super.initState();
@@ -141,9 +154,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
         );
 
     if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to add hold")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to add hold")));
     }
 
     // Refresh holds to get updated summary
@@ -156,20 +169,15 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     return success;
   }
 
-  Future<bool> _removeHolds({
-    required int creativeUserId,
-  }) async {
+  Future<bool> _removeHolds({required int creativeUserId}) async {
     final success = await ref
         .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
-        .removeHold(
-          bookingId: widget.bookingId,
-          crewMemberId: creativeUserId,
-        );
+        .removeHold(bookingId: widget.bookingId, crewMemberId: creativeUserId);
 
     if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to remove hold")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to remove hold")));
     }
 
     if (success) {
@@ -184,10 +192,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
   Future<void> _filterCrew({required String sort}) async {
     await ref
         .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
-        .filterCrew(
-          bookingId: widget.bookingId,
-          sort: sort,
-        );
+        .filterCrew(bookingId: widget.bookingId, sort: sort);
   }
 
   int getRoleId(dynamic roleData) {
@@ -202,8 +207,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     int count = 0;
 
     for (final match in st.crewMatches) {
-      final int uid =
-          match['crew_member_id'] ?? 0;
+      final int uid = match['crew_member_id'] ?? 0;
 
       final roleData = match['role_id'];
       final List roles = roleData is List ? roleData : [roleData];
@@ -216,6 +220,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
     return count;
   }
+
   String _getImageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     return '${ApiEndpoints.imageUrl}$path';
@@ -223,354 +228,360 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final crewState = ref.watch(crewSelectionNotifierProvider(widget.bookingId));
+    final crewState = ref.watch(
+      crewSelectionNotifierProvider(widget.bookingId),
+    );
     final crewMatches = crewState.crewMatches;
     final nearbyCreators = crewState.nearbyCreators;
     final otherCreators = crewState.otherCreators;
 
-    final isLoading =
-        crewState.status == CrewSelectionStatus.loading;
+    final isLoading = crewState.status == CrewSelectionStatus.loading;
 
     final addedCrewUserIds = crewState.addedCrewUserIds;
     final heldByRole = crewState.heldByRole;
     final requiredByRole = crewState.requiredByRole;
 
     /// 🔥 CHECK LOCATION BASED CREATORS
-    final bool hasLocationCreators =
-        crewMatches.isNotEmpty;
+    final bool hasLocationCreators = crewMatches.isNotEmpty;
 
     /// 🔥 DISPLAY LIST
-    final List<dynamic> displayCreators =
-    hasLocationCreators
+    final List<dynamic> displayCreators = hasLocationCreators
         ? crewMatches
         : otherCreators;
 
     /// 🔥 SHOW BOOKED CARD
     final bool showLocationCard =
-        !hasLocationCreators &&
-            otherCreators.isNotEmpty;
+        !hasLocationCreators && otherCreators.isNotEmpty;
 
     return AppScaffold(
-        hasAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: _handleBack,
-                  child:SvgPicture.asset(
-                    AppAssets.back,
-                    height: 24,
-                  ),
-                ),
-              ),
-              Text(
-                "More Details",
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
-              ),
-              // 🔹 Step Text (Right)
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "2/3",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 14,
-                    fontFamily: AppAssets.fontOutfit,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: Stack(
+      hasAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 15,right: 15,bottom: 15),
-              child: Column(
-                children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: _handleBack,
+                child: SvgPicture.asset(AppAssets.back, height: 24),
+              ),
+            ),
+            Text(
+              "More Details",
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+            ),
+            // 🔹 Step Text (Right)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "2/3",
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14,
+                  fontFamily: AppAssets.fontOutfit,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+            child: Column(
+              children: [
+                Row(
+                  children: List.generate(3, (index) {
+                    double fillWidth = 0;
 
+                    if (index < currentStep) {
+                      // ✅ Completed step (FULL)
+                      fillWidth = double.infinity;
+                    } else if (index == currentStep) {
+                      // 🟡 Current step (HALF)
+                      fillWidth = 140.44;
+                    } else {
+                      fillWidth = 0;
+                    }
 
-
-                  Row(
-                    children: List.generate(3, (index) {
-                      double fillWidth = 0;
-
-                      if (index < currentStep) {
-                        // ✅ Completed step (FULL)
-                        fillWidth = double.infinity;
-                      } else if (index == currentStep) {
-                        // 🟡 Current step (HALF)
-                        fillWidth = 140.44;
-                      } else {
-
-                        fillWidth = 0;
-                      }
-
-                      return Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: AppColors.textSecondary, // grey background
-                            borderRadius: BorderRadius.circular(64),
-                          ),
-                          child: fillWidth > 0
-                              ? Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              height: 5,
-                              width: fillWidth == double.infinity ? null : fillWidth,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(64),
-                              ),
-                            ),
-                          )
-                              : const SizedBox(),
+                    return Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: AppColors.textSecondary, // grey background
+                          borderRadius: BorderRadius.circular(64),
                         ),
-                      );
-                    }),
-                  ),
+                        child: fillWidth > 0
+                            ? Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  height: 5,
+                                  width: fillWidth == double.infinity
+                                      ? null
+                                      : fillWidth,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(64),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
+                      ),
+                    );
+                  }),
+                ),
 
-                  SizedBox(
-                    height: 20,
-                  ),
+                SizedBox(height: 20),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Select Your Dream Team",
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _openFilterDialog(context, (sortKey) {
+                          _filterCrew(sort: sortKey);
+                        });
+                      },
+                      child: SvgPicture.asset(AppAssets.filter, height: 24),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
                     children: [
-                      Text(
-                        "Select Your Dream Team",
-                        style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          _openFilterDialog(
-                            context,
-                                (sortKey) {
-                              _filterCrew(sort: sortKey);
-                            },
-                          );
-                        },
-                        child: SvgPicture.asset(
-                          AppAssets.filter,
-                          height: 24,
+                      /// 🔥 LOCATION NOT FOUND CARD
+                      /// 🔥 LOCATION NOT FOUND CARD
+                      if (showLocationCard)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: AppRadii.hugeAll,
+                          ),
+                          child: Column(
+                            children: [
+                              ClipOval(
+                                child: Image.asset(
+                                  AppAssets.saleIcon,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const Text(
+                                "Our creators around \nyour location are booked ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: AppAssets.fontUnbounded,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.white,
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const Text(
+                                "Looks like no creators are available right now, but our sales expert can help you find a great match.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.white60,
+                                ),
+                              ),
+
+                              SizedBox(height: 10),
+
+                              Center(
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  child: Divider(
+                                    color: AppColors.dividerDark,
+                                    thickness: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 
+                      /// TITLE
+                      if (!hasLocationCreators && otherCreators.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "  Browse Other Creative Partners", //
+                            style: AppTextStyles.labelLarge.copyWith(
+                              fontFamily: AppAssets.fontUnbounded,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ),
 
+                      /// CREW LIST
+                      ...displayCreators.map((item) {
+                        /// ✅ SAFE ID (NO CRASH)
+                        final int creativeUserId = item['crew_member_id'] ?? 0;
 
-                    ],
-                  ),
+                        final int userId = creativeUserId;
 
-                  const SizedBox(height: 16),
+                        /// ✅ SAFE ROLE ID
+                        final roleData = item['role_id'];
+                        final int roleId = (roleData is List)
+                            ? int.tryParse(roleData.first.toString()) ?? 0
+                            : int.tryParse(roleData.toString()) ?? 0;
 
-                  Expanded(
-                    child: ListView(
-                      physics: const BouncingScrollPhysics(),
-                      children: [
+                        final bool isAdded = addedCrewUserIds.contains(
+                          creativeUserId,
+                        );
+                        final bool isFavourite = favouriteUsers.contains(
+                          creativeUserId,
+                        );
 
-                        /// 🔥 LOCATION NOT FOUND CARD
-                        /// 🔥 LOCATION NOT FOUND CARD
-                        if (showLocationCard)
-                          Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 16),
-                            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Container(
+                            height: 237,
                             decoration: BoxDecoration(
-                              color: AppColors.background,
                               borderRadius: AppRadii.hugeAll,
                             ),
-                            child: Column(
+                            clipBehavior: Clip.antiAlias,
+                            child: Stack(
                               children: [
+                                //
 
-                                ClipOval(
-                                  child: Image.asset(
-                                    AppAssets.saleIcon,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 10),
-
-                                const Text(
-                                  "Our creators around \nyour location are booked ",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: AppAssets.fontUnbounded,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.white,
-                                  ),
-                                ),
-
-                                const SizedBox(height: 10),
-
-                                const Text(
-                                  "Looks like no creators are available right now, but our sales expert can help you find a great match.",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: AppColors.white60,
-                                  ),
-                                ),
-
-                                SizedBox(height: 10),
-
-                                Center(
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width * 0.85,
-                                    child: Divider(
-                                      color: AppColors.dividerDark,
-                                      thickness: 1,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                        /// TITLE
-                        if (!hasLocationCreators &&
-                            otherCreators.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(
-                              "  Browse Other Creative Partners",//
-                              style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
-                            ),
-                          ),
-
-                        /// CREW LIST
-                        ...displayCreators.map((item) {
-
-                          /// ✅ SAFE ID (NO CRASH)
-                          final int creativeUserId =
-                              item['crew_member_id'] ?? 0;
-
-                          final int userId = creativeUserId;
-
-                          /// ✅ SAFE ROLE ID
-                          final roleData = item['role_id'];
-                          final int roleId = (roleData is List)
-                              ? int.tryParse(roleData.first.toString()) ?? 0
-                              : int.tryParse(roleData.toString()) ?? 0;
-
-                          final bool isAdded = addedCrewUserIds.contains(creativeUserId);
-                          final bool isFavourite = favouriteUsers.contains(creativeUserId);
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Container(
-                              height: 237,
-                              decoration: BoxDecoration(
-                                borderRadius: AppRadii.hugeAll,
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [//
-
-                                  /// 🔹 IMAGE
-                                  Positioned.fill(
-                                    child: item['profile_photo'] != null
-                                        ? Image.network(
-                                      _getImageUrl(item['profile_photo']),
-                                      fit: BoxFit.cover,
-                                      alignment: Alignment.topCenter, // 🔥 important
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return SvgPicture.asset(AppAssets.imagePlaceholder,fit: BoxFit.contain, height: 25,);
-                                      },
-                                    )
-                                        : Image.asset(
-                                      AppAssets.creativeCardBg,
-                                      fit: BoxFit.contain,
-                                      height: 25,
-                                    ),
-                                  ),
-
-                                  /// 🔹 GRADIENT
-                                  Positioned.fill(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            AppColors.transparent,
-                                            AppColors.black.withValues(alpha: 0.75),
-                                          ],
+                                /// 🔹 IMAGE
+                                Positioned.fill(
+                                  child: item['profile_photo'] != null
+                                      ? Image.network(
+                                          _getImageUrl(item['profile_photo']),
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.topCenter,
+                                          // 🔥 important
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return SvgPicture.asset(
+                                                  AppAssets.imagePlaceholder,
+                                                  fit: BoxFit.contain,
+                                                  height: 25,
+                                                );
+                                              },
+                                        )
+                                      : Image.asset(
+                                          AppAssets.creativeCardBg,
+                                          fit: BoxFit.contain,
+                                          height: 25,
                                         ),
+                                ),
+
+                                /// 🔹 GRADIENT
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          AppColors.transparent,
+                                          AppColors.black.withValues(
+                                            alpha: 0.75,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                      Container(
-                                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: const [0.5, 0.75, 1],
-                          colors: [
-                          AppColors.transparent,
-                          AppColors.surfaceDeep.withValues(alpha: 0.6),
-                          AppColors.surfaceDeep,
-                          ],
-                          ),
-                          ),),
-                                  /// 🔹 FAV ICON
-                                  Positioned(
-                                    top: 12,
-                                    right: 12,
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        if (isFavourite) {
-                                          setState(() {
-                                            favouriteUsers.remove(userId);
-                                          });
-
-                                          await _removeFavourite(userId);
-                                          _showFavouriteToast("Removed from Favourite");
-                                        } else {
-                                          setState(() {
-                                            favouriteUsers.add(userId);
-                                          });
-
-                                          await _addFavourite(userId);
-                                          _showFavouriteToast("Added to Favourite");
-                                        }
-                                      },
-                                      child: SvgPicture.asset(
-                                        isFavourite
-                                            ? AppAssets.heartFilled
-                                            : AppAssets.heart,
-                                        height: 22,
-                                        width: 22,
-                                      ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      stops: const [0.5, 0.75, 1],
+                                      colors: [
+                                        AppColors.transparent,
+                                        AppColors.surfaceDeep.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                        AppColors.surfaceDeep,
+                                      ],
                                     ),
                                   ),
+                                ),
 
-                                  /// 🔹 BOTTOM INFO
-                                  Positioned(
-                                    left: 14,
-                                    right: 14,
-                                    bottom: 14,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
+                                /// 🔹 FAV ICON
+                                Positioned(
+                                  top: 12,
+                                  right: 12,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      if (isFavourite) {
+                                        setState(() {
+                                          favouriteUsers.remove(userId);
+                                        });
 
-                                        /// LEFT INFO
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                         /*   Row(
+                                        await _removeFavourite(userId);
+                                        _showFavouriteToast(
+                                          "Removed from Favourite",
+                                        );
+                                      } else {
+                                        setState(() {
+                                          favouriteUsers.add(userId);
+                                        });
+
+                                        await _addFavourite(userId);
+                                        _showFavouriteToast(
+                                          "Added to Favourite",
+                                        );
+                                      }
+                                    },
+                                    child: SvgPicture.asset(
+                                      isFavourite
+                                          ? AppAssets.heartFilled
+                                          : AppAssets.heart,
+                                      height: 22,
+                                      width: 22,
+                                    ),
+                                  ),
+                                ),
+
+                                /// 🔹 BOTTOM INFO
+                                Positioned(
+                                  left: 14,
+                                  right: 14,
+                                  bottom: 14,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      /// LEFT INFO
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          /*   Row(
                                               children: [
                                                 const Icon(Icons.star,
                                                     color: AppColors.amber, size: 14),
@@ -584,293 +595,356 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                 ),
                                               ],
                                             ),*/
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              item['name'] ?? '',
-                                              style: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            item['name'] ?? '',
+                                            style: AppTextStyles.labelLarge
+                                                .copyWith(
+                                                  color: AppColors.white,
+                                                ),
+                                          ),
+                                          Text(
+                                            item['role_name'] ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontFamily: AppAssets.fontOutfit,
+                                              color: AppColors.white70,
                                             ),
-                                            Text(
-                                              item['role_name'] ?? '',
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontFamily: AppAssets.fontOutfit,
-                                                color: AppColors.white70,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
+                                      ),
 
-                                        /// RIGHT BUTTONS
-                                        Row(
-                                          children: [
+                                      /// RIGHT BUTTONS
+                                      Row(
+                                        children: [
+                                          /// 🔥 ADD / REMOVE BUTTON
+                                          /// 🔥 ADD / REMOVE BUTTON
+                                          if (!showLocationCard)
+                                            InkWell(
+                                              onTap: () async {
+                                                try {
+                                                  /// ✅ DIRECT ID
+                                                  final int creativeUserId =
+                                                      item['crew_member_id'] ??
+                                                      0;
 
-                                            /// 🔥 ADD / REMOVE BUTTON
-                                            /// 🔥 ADD / REMOVE BUTTON
-                                            if (!showLocationCard)
-                                              InkWell(
-                                                onTap: () async {
-                                                  try {
+                                                  final roleData =
+                                                      item['role_id'];
 
-                                                    /// ✅ DIRECT ID
-                                                    final int creativeUserId =
-                                                        item['crew_member_id'] ?? 0;
+                                                  /// ✅ SAFE ROLE ID
+                                                  final int roleId =
+                                                      (roleData is List)
+                                                      ? int.tryParse(
+                                                              roleData.first
+                                                                  .toString(),
+                                                            ) ??
+                                                            0
+                                                      : int.tryParse(
+                                                              roleData
+                                                                  .toString(),
+                                                            ) ??
+                                                            0;
 
-                                                    final roleData = item['role_id'];
+                                                  if (creativeUserId == 0)
+                                                    return;
 
-                                                    /// ✅ SAFE ROLE ID
-                                                    final int roleId = (roleData is List)
-                                                        ? int.tryParse(roleData.first.toString()) ?? 0
-                                                        : int.tryParse(roleData.toString()) ?? 0;
-
-                                                    if (creativeUserId == 0) return;
-
-                                                    /// 🔴 REMOVE
-                                                    if (addedCrewUserIds.contains(creativeUserId)) {
-
-                                                      setState(() {
-                                                        addedCrewUserIds.remove(creativeUserId);
-                                                      });
-
-                                                      final success = await _removeHolds(
-                                                        creativeUserId: creativeUserId,
-                                                      );
-
-                                                      if (success) {
-                                                        await ref
-                                                            .read(
-                                                          crewSelectionNotifierProvider(widget.bookingId)
-                                                              .notifier,
-                                                        )
-                                                            .refreshHolds(widget.bookingId);
-                                                      } else {
-                                                        setState(() {
-                                                          addedCrewUserIds.add(creativeUserId);
-                                                        });
-                                                      }
-
-                                                      return;
-                                                    }
-
-                                                    /// 🟢 ADD FLOW
-                                                    int selectedCount = getSelectedCountByRole(roleId);
-
-                                                    /// 🔥 MAIN FIX
-                                                    final int maxAllowed =
-                                                    (getRequired(roleId) ?? 0) == 0
-                                                        ? 10
-                                                        : getRequired(roleId)!;
-
-                                                    if (selectedCount >= maxAllowed) {
-
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            "You can add only $maxAllowed ${item['role_name']}",
-                                                          ),
-                                                        ),
-                                                      );
-
-                                                      return;
-                                                    }
-
-                                                    /// ✅ UI FIRST
+                                                  /// 🔴 REMOVE
+                                                  if (addedCrewUserIds.contains(
+                                                    creativeUserId,
+                                                  )) {
                                                     setState(() {
-                                                      addedCrewUserIds.add(creativeUserId);
+                                                      addedCrewUserIds.remove(
+                                                        creativeUserId,
+                                                      );
                                                     });
 
-                                                    final success = await _addHolds(
-                                                      creativeUserId: creativeUserId,
-                                                      roleId: roleId,
-                                                    );
+                                                    final success =
+                                                        await _removeHolds(
+                                                          creativeUserId:
+                                                              creativeUserId,
+                                                        );
 
                                                     if (success) {
-
                                                       await ref
                                                           .read(
-                                                        crewSelectionNotifierProvider(widget.bookingId)
-                                                            .notifier,
-                                                      )
-                                                          .refreshHolds(widget.bookingId);
-
+                                                            crewSelectionNotifierProvider(
+                                                              widget.bookingId,
+                                                            ).notifier,
+                                                          )
+                                                          .refreshHolds(
+                                                            widget.bookingId,
+                                                          );
                                                     } else {
-
                                                       setState(() {
-                                                        addedCrewUserIds.remove(creativeUserId);
+                                                        addedCrewUserIds.add(
+                                                          creativeUserId,
+                                                        );
                                                       });
-
                                                     }
 
-                                                  } catch (e) {
-                                                    debugPrint("ERROR: $e");
+                                                    return;
                                                   }
-                                                },
 
-                                                child: Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 14,
-                                                    vertical: 8,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: isAdded
-                                                        ? AppColors.errorLight
-                                                        : AppColors.primary,
-                                                    borderRadius: AppRadii.roundAll,
-                                                    border: isAdded
-                                                        ? Border.all(color: AppColors.error)
-                                                        : null,
-                                                  ),
-                                                  child: Text(
-                                                    isAdded ? "Remove" : "Add to Crew",
-                                                    style: AppTextStyles.buttonSmall.copyWith(
-                                                      color: isAdded
-                                                          ? AppColors.error
-                                                          : AppColors.black,
+                                                  /// 🟢 ADD FLOW
+                                                  int selectedCount =
+                                                      getSelectedCountByRole(
+                                                        roleId,
+                                                      );
+
+                                                  /// 🔥 MAIN FIX
+                                                  final int maxAllowed =
+                                                      (getRequired(roleId) ??
+                                                              0) ==
+                                                          0
+                                                      ? 10
+                                                      : getRequired(roleId)!;
+
+                                                  if (selectedCount >=
+                                                      maxAllowed) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "You can add only $maxAllowed ${item['role_name']}",
+                                                        ),
+                                                      ),
+                                                    );
+
+                                                    return;
+                                                  }
+
+                                                  /// ✅ UI FIRST
+                                                  setState(() {
+                                                    addedCrewUserIds.add(
+                                                      creativeUserId,
+                                                    );
+                                                  });
+
+                                                  final success =
+                                                      await _addHolds(
+                                                        creativeUserId:
+                                                            creativeUserId,
+                                                        roleId: roleId,
+                                                      );
+
+                                                  if (success) {
+                                                    await ref
+                                                        .read(
+                                                          crewSelectionNotifierProvider(
+                                                            widget.bookingId,
+                                                          ).notifier,
+                                                        )
+                                                        .refreshHolds(
+                                                          widget.bookingId,
+                                                        );
+                                                  } else {
+                                                    setState(() {
+                                                      addedCrewUserIds.remove(
+                                                        creativeUserId,
+                                                      );
+                                                    });
+                                                  }
+                                                } catch (e) {
+                                                  debugPrint("ERROR: $e");
+                                                }
+                                              },
+
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 14,
+                                                      vertical: 8,
                                                     ),
-                                                  ),
+                                                decoration: BoxDecoration(
+                                                  color: isAdded
+                                                      ? AppColors.errorLight
+                                                      : AppColors.primary,
+                                                  borderRadius:
+                                                      AppRadii.roundAll,
+                                                  border: isAdded
+                                                      ? Border.all(
+                                                          color:
+                                                              AppColors.error,
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Text(
+                                                  isAdded
+                                                      ? "Remove"
+                                                      : "Add to Crew",
+                                                  style: AppTextStyles
+                                                      .buttonSmall
+                                                      .copyWith(
+                                                        color: isAdded
+                                                            ? AppColors.error
+                                                            : AppColors.black,
+                                                      ),
                                                 ),
                                               ),
+                                            ),
 
-                                            if (!showLocationCard) const SizedBox(width: 8),
+                                          if (!showLocationCard)
+                                            const SizedBox(width: 8),
 
-                                            /// 🔹 DETAILS BUTTON
-                                            InkWell(
-                                              onTap: () {
-                                                context.pushNamed(RouteNames.recommendedDetails, extra: {
+                                          /// 🔹 DETAILS BUTTON
+                                          InkWell(
+                                            onTap: () {
+                                              context.pushNamed(
+                                                RouteNames.recommendedDetails,
+                                                extra: {
                                                   'id': item['crew_member_id'],
                                                   'bookingId': widget.bookingId,
-                                                });
-                                              },
-                                              child: SvgPicture.asset(
-                                                AppAssets.homeViewProfile,
-                                                color: AppColors.white,
-                                                height: 36,
-                                              ),
+                                                },
+                                              );
+                                            },
+                                            child: SvgPicture.asset(
+                                              AppAssets.homeViewProfile,
+                                              color: AppColors.white,
+                                              height: 36,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  )
-
-                ],
-              ),
-
-            ),
-            if (isLoading)
-              const AppLoader(),
-          ],
-        ),
-
-        bottomNavigationBar: SafeArea(
-          bottom: true,
-          child: ClipRect(
-
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                color: AppColors.transparent,
-                padding: const EdgeInsets.only(left: 10,right: 10,bottom: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-
-                    /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
-                    if (showLocationCard)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 12,),
-                        child: GestureDetector(
-                          onTap: () {
-                            ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).markStepCompleted();
-                            context.pushNamed(
-                             RouteNames.reviewConfirm,
-                             pathParameters: {'bookingId': widget.bookingId.toString()},
-                           );
-                          },
-                          child: Text(
-                            "Complete your Shoot",
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70, decoration: TextDecoration.underline),
                           ),
-                        ),
-                      ),
-
-                    /// 🔥 MAIN BUTTON
-                    SizedBox(
-                      height: 55,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-
-                          /// 🔴 IF NO DATA → SALES FLOW
-                          if (showLocationCard) {
-                            showSalesDialog(context);
-                            return;
-                          }
-
-                          /// 🟢 NORMAL FLOW
-                          for (final userId in addedCrewUserIds) {
-
-                            final matches = displayCreators
-                                .where((e) => e['crew_member_id'] == userId)
-                                .toList();
-
-                            if (matches.isEmpty) continue;
-
-                            final roleId =
-                                int.tryParse(matches.first['role_id'].toString()) ?? 0;
-
-                            await _addHolds(
-                              creativeUserId: userId,
-                              roleId: roleId,
-                            );
-                          }
-
-                          ref.read(crewSelectionNotifierProvider(widget.bookingId).notifier).markStepCompleted();
-                          context.pushNamed(
-                           RouteNames.reviewConfirm,
-                           pathParameters: {'bookingId': widget.bookingId.toString()},
-                         );
-                        },
-
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppRadii.lgAll,
-                          ),
-                        ),
-
-                        child: Text(
-                          showLocationCard
-                              ? "Contact With Sales"
-                              : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
-                          style: AppTextStyles.buttonMedium.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.black),
-                        ),
-                      ),
-                    ),
-                  ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ),
+              ],
+            ),
+          ),
+          if (isLoading) const AppLoader(),
+        ],
+      ),
+
+      bottomNavigationBar: SafeArea(
+        bottom: true,
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              color: AppColors.transparent,
+              padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
+                  if (showLocationCard)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: GestureDetector(
+                        onTap: () {
+                          ref
+                              .read(
+                                crewSelectionNotifierProvider(
+                                  widget.bookingId,
+                                ).notifier,
+                              )
+                              .markStepCompleted();
+                          context.pushNamed(
+                            RouteNames.reviewConfirm,
+                            pathParameters: {
+                              'bookingId': widget.bookingId.toString(),
+                            },
+                          );
+                        },
+                        child: Text(
+                          "Complete your Shoot",
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.white70,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  /// 🔥 MAIN BUTTON
+                  SizedBox(
+                    height: 55,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        /// 🔴 IF NO DATA → SALES FLOW
+                        if (showLocationCard) {
+                          showSalesDialog(context);
+                          return;
+                        }
+
+                        /// 🟢 NORMAL FLOW
+                        for (final userId in addedCrewUserIds) {
+                          final matches = displayCreators
+                              .where((e) => e['crew_member_id'] == userId)
+                              .toList();
+
+                          if (matches.isEmpty) continue;
+
+                          final roleId =
+                              int.tryParse(
+                                matches.first['role_id'].toString(),
+                              ) ??
+                              0;
+
+                          await _addHolds(
+                            creativeUserId: userId,
+                            roleId: roleId,
+                          );
+                        }
+
+                        ref
+                            .read(
+                              crewSelectionNotifierProvider(
+                                widget.bookingId,
+                              ).notifier,
+                            )
+                            .markStepCompleted();
+                        context.pushNamed(
+                          RouteNames.reviewConfirm,
+                          pathParameters: {
+                            'bookingId': widget.bookingId.toString(),
+                          },
+                        );
+                      },
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppRadii.lgAll,
+                        ),
+                      ),
+
+                      child: Text(
+                        showLocationCard
+                            ? "Contact With Sales"
+                            : "Continue with ${addedCrewUserIds.length.toString().padLeft(2, '0')} ${addedCrewUserIds.length == 1 ? "Member" : "Members"}",
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          fontFamily: AppAssets.fontUnbounded,
+                          color: AppColors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-
+      ),
     );
   }
 
   void _openFilterDialog(
-      BuildContext context,
-      Function(String sortKey) onApply,
-      ) {
+    BuildContext context,
+    Function(String sortKey) onApply,
+  ) {
     int selectedIndex = 1;
     RangeValues priceRange = const RangeValues(100, 15000);
-
 
     showDialog(
       context: context,
@@ -899,7 +973,6 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         /// TOP INDICATOR
                         Center(
                           child: Container(
@@ -917,13 +990,18 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                             Text(
+                            Text(
                               "Filter By",
-                              style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
+                              style: AppTextStyles.titleSmall.copyWith(
+                                color: AppColors.white,
+                              ),
                             ),
                             InkWell(
                               onTap: () => context.pop(),
-                              child: const Icon(Icons.close, color: AppColors.white),
+                              child: const Icon(
+                                Icons.close,
+                                color: AppColors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -959,11 +1037,12 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     setState(() => selectedIndex = index);
                                   },
                                   child: Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           options[index],
@@ -983,13 +1062,15 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             shape: BoxShape.circle,
                                             gradient: selectedIndex == index
                                                 ? const LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                AppColors.primary, // light shade
-                                                AppColors.primaryDark, // dark shade
-                                              ],
-                                            )
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: [
+                                                      AppColors.primary,
+                                                      // light shade
+                                                      AppColors.primaryDark,
+                                                      // dark shade
+                                                    ],
+                                                  )
                                                 : null,
                                             border: Border.all(
                                               color: AppColors.white38,
@@ -997,16 +1078,18 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                           ),
                                           child: selectedIndex == index
                                               ? Center(
-                                            child: Container(
-                                              width: 10,
-                                              height: 10,
-                                              decoration:
-                                              const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: AppColors.black,
-                                              ),
-                                            ),
-                                          )
+                                                  child: Container(
+                                                    width: 10,
+                                                    height: 10,
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color:
+                                                              AppColors.black,
+                                                        ),
+                                                  ),
+                                                )
                                               : null,
                                         ),
                                       ],
@@ -1077,7 +1160,6 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             ],
                           ),
                         ),*/
-
                         const SizedBox(height: 16),
 
                         /// BUTTONS
@@ -1088,21 +1170,24 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                 height: 55,
                                 decoration: BoxDecoration(
                                   borderRadius: AppRadii.xlAll,
-                                  border:
-                                  Border.all(color: AppColors.white60
-                                  ),
+                                  border: Border.all(color: AppColors.white60),
                                 ),
                                 child: TextButton(
                                   onPressed: () {
                                     setState(() {
                                       selectedIndex = 0;
-                                      priceRange =
-                                      const RangeValues(100, 15000);
+                                      priceRange = const RangeValues(
+                                        100,
+                                        15000,
+                                      );
                                     });
                                   },
                                   child: Text(
                                     "Clear All",
-                                    style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.white),
+                                    style: AppTextStyles.labelLarge.copyWith(
+                                      fontFamily: AppAssets.fontUnbounded,
+                                      color: AppColors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1124,8 +1209,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                     onApply(sortKey); // 🔥 YAHI MAIN LINE HAI
                                   },
                                   child: Text(
-                                      "Apply",
-                                      style: AppTextStyles.labelLarge.copyWith(fontFamily: AppAssets.fontUnbounded, color: AppColors.black)
+                                    "Apply",
+                                    style: AppTextStyles.labelLarge.copyWith(
+                                      fontFamily: AppAssets.fontUnbounded,
+                                      color: AppColors.black,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1143,6 +1231,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       },
     );
   }
+
   void _showFavouriteToast(String message) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
@@ -1177,7 +1266,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 ),
                 GestureDetector(
                   onTap: () => overlayEntry.remove(),
-                  child: const Icon(Icons.close, color: AppColors.white, size: 18),
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.white,
+                    size: 18,
+                  ),
                 ),
               ],
             ),
@@ -1192,6 +1285,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       overlayEntry.remove();
     });
   }
+
   void _showNoCrewPopup() {
     showDialog(
       context: context,
@@ -1211,7 +1305,6 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   /// 🔹 ICON
                   Container(
                     width: 60,
@@ -1247,19 +1340,23 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                   Text(
                     "You are choosing to continue without adding any team members.",
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70, height: 1.4),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.white70,
+                      height: 1.4,
+                    ),
                   ),
                   Text(
                     "Beige's team will create the best talent for you based on your needs.",
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.buttonMedium.copyWith(color: AppColors.primary),
+                    style: AppTextStyles.buttonMedium.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(height: 28),
 
                   /// 🔹 BUTTONS
                   Row(
                     children: [
-
                       /// Go Back Button
                       Expanded(
                         child: Container(
@@ -1321,6 +1418,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       },
     );
   }
+
   void showSalesDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -1328,21 +1426,16 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       builder: (context) {
         return Dialog(
           backgroundColor: AppColors.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadii.hugeAll,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.hugeAll),
 
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min, // 🔥 IMPORTANT
               children: [
-
                 /// 🔥 SMALL ICON / LOTTIE
                 SizedBox(
-
                   child: Lottie.asset(
-
                     AppAssets.lottieSuccess,
                     height: 150,
                     fit: BoxFit.cover,
@@ -1355,7 +1448,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 Text(
                   "Request Received",
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.titleSmall.copyWith(color: AppColors.goldParchment),
+                  style: AppTextStyles.titleSmall.copyWith(
+                    color: AppColors.goldParchment,
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -1364,7 +1459,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                 Text(
                   "Our Sales team will shortly reach out to you to finalize your creative requirements.",
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.white70,
+                  ),
                 ),
 
                 const SizedBox(height: 16),
@@ -1401,5 +1498,4 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       },
     );
   }
-
 }

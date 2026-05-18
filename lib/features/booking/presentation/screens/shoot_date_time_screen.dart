@@ -1000,7 +1000,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
           'bookingId': widget.bookingId,
           'contentTypeId': widget.contentTypeId,
           'ShootTypeId': widget.ShootTypeId,
-          'specialtyId': 22,
         },
       );
     } else if (dtState.status == ShootDateTimeStatus.error) {

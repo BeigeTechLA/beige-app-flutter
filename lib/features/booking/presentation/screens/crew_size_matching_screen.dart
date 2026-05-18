@@ -16,11 +16,10 @@ import 'package:beige/features/booking/presentation/providers/crew_recommendatio
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSizeMatchingScreen extends ConsumerStatefulWidget {
-  final int specialtyId;
   final int ShootTypeId;
   final int bookingId;
   final int contentTypeId;
-  const CrewSizeMatchingScreen({super.key, required this.specialtyId, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
+  const CrewSizeMatchingScreen({super.key, required this.ShootTypeId, required this.bookingId, required this.contentTypeId});
 
   @override
   ConsumerState<CrewSizeMatchingScreen> createState() => _CrewSizeMatchingScreenState();
@@ -53,7 +52,6 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
       extra: {
         'bookingId': widget.bookingId,
         'contentTypeId': widget.contentTypeId,
-        'specialtyId': widget.specialtyId,
         'ShootTypeId': widget.ShootTypeId,
       },
     );

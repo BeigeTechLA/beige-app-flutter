@@ -106,20 +106,6 @@ class BookingRemoteDataSource {
       '?sort=$sort&page=$page&limit=$limit',
 
     );
-
-    print("=================================");
-    print("📤 MATCHES API CALL");
-    // print("🌐 URL => $url");
-    print("🆔 bookingId => $bookingId");
-    print("📄 page => $page");
-    print("📌 limit => $limit");
-    print("🔃 sort => $sort");
-    print("=================================");
-    print("=================================");
-
-    print("✅ STATUS CODE => ${response.statusCode}");
-    print("✅ RESPONSE => ${response.data}");
-    print("=================================");
     return response.data as Map<String, dynamic>;
   }
 

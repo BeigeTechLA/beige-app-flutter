@@ -97,7 +97,6 @@ class ShootTypeNotifier
       'project_name': shootTypeName,
       'content_type': contentTypeId,
       'shoot_type_id': shootTypeId,
-      'specialty_id': 22,
     };
 
     final result = await repo.updateBooking(

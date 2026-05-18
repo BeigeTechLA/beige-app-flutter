@@ -193,7 +193,7 @@ GoRouter _buildTestRouter({
         name: RouteNames.contentType,
         builder: (_, state) {
           final data = state.extra as Map<String, dynamic>?;
-          return _TestScreen('ContentTypeScreen:${data?['specialtyId']}');
+          return _TestScreen('ContentTypeScreen:${data?['value']}');
         },
       ),
       GoRoute(
@@ -711,16 +711,16 @@ void main() {
       expect(find.text('ResetPasswordScreen:a@b.com'), findsOneWidget);
     });
 
-    testWidgets('content-type receives specialtyId via extra', (tester) async {
+    testWidgets('content-type receives value via extra', (tester) async {
       final router =
           _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
       router.goNamed(RouteNames.contentType,
-          extra: {'specialtyId': 5, 'value': 10});
+          extra: {'value': 10});
       await tester.pumpAndSettle();
 
-      expect(find.text('ContentTypeScreen:5'), findsOneWidget);
+      expect(find.text('ContentTypeScreen:10'), findsOneWidget);
     });
 
     testWidgets('video-shoot-type receives data via extra', (tester) async {
@@ -743,7 +743,6 @@ void main() {
 
       router.goNamed(RouteNames.findingPerfect, extra: {
         'bookingId': 42,
-        'specialtyId': 1,
         'ShootTypeId': 2,
         'contentTypeId': 3,
       });

@@ -16,11 +16,9 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
-  final int? specialtyId;
   final bool fromHome;
   const ContentTypeScreen({
     super.key,
-    this.specialtyId,
     this.value,
     this.fromHome = false,
   });
@@ -80,7 +78,6 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     await ref
         .read(contentTypeNotifierProvider.notifier)
         .continueBooking(
-          specialtyId: widget.specialtyId,
           contentType: contentTypeToSend,
           existingBookingId: bookingId,
         );

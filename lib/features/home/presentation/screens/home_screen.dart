@@ -356,7 +356,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
           'bookingId': bookingId,
           'contentTypeId': contentTypeId,
           'shootTypeId': shootTypeId,
-          'specialtyId': 22,
         });
         break;
 
@@ -364,7 +363,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         context.pushNamed(RouteNames.crewSizeMatching, extra: {
           'bookingId': bookingId,
           'contentTypeId': contentTypeId,
-          'specialtyId': 22,
           'shootTypeId': shootTypeId,
         });
         break;
@@ -373,7 +371,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         context.pushNamed(RouteNames.selectDreamTeam, extra: {
           'bookingId': bookingId,
           'contentTypeId': contentTypeId,
-          'specialtyId': 22,
           'shootTypeId': shootTypeId,
         });
         break;
@@ -382,7 +379,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with TickerProviderStat
         context.pushNamed(RouteNames.selectDreamTeam, extra: {
           'bookingId': bookingId,
           'contentTypeId': contentTypeId,
-          'specialtyId': 22,
           'shootTypeId': shootTypeId,
         });
         break;

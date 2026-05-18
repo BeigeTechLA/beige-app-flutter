@@ -55,7 +55,6 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
 
   /// Fetches shoot types then creates/continues a booking.
   Future<void> continueBooking({
-    required int? specialtyId,
     required int contentType,
     int? existingBookingId,
   }) async {
@@ -91,7 +90,6 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
     // Step 2: Create booking
     final body = <String, dynamic>{
       if (existingBookingId != null) 'booking_id': existingBookingId,
-      'specialty_id': specialtyId,
       'content_type': contentType,
       if (contentType != 3 && shootTypeIds.isNotEmpty)
         'shoot_type_id': shootTypeIds.first,
