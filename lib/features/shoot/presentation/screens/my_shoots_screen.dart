@@ -448,8 +448,6 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final String endTimeRaw = display['endTime'] ?? '';
     final double durationHrsRaw = (display['duration'] ?? 0).toDouble();
 
-    final String startTime = DateTimeUtils.formatTime(startTimeRaw);
-    final String endTime = DateTimeUtils.formatTime(endTimeRaw);
     final String cardStartTime = _formatCardTime(startTimeRaw);
     final String cardEndTime = _formatCardTime(endTimeRaw);
     final double durationHrs = durationHrsRaw > 0
@@ -493,8 +491,8 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             'projectName': projectName,
             'contentType': contentType,
             'eventDate': eventDate,
-            'startTime': startTime,
-            'endTime': endTime,
+            'startTime': startTimeRaw,
+            'endTime': endTimeRaw,
             'multiDays': shoot['multi_day']?['days'] ?? [],
             'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
             'location': shoot['location'] ?? '',

@@ -358,8 +358,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                         'eventDate': widget.eventDate,
                                         'startTime': widget.startTime,
                                         'endTime': widget.endTime,
-                                        'durationHours': widget.durationHours
-                                            ?.toInt(),
+                                        'durationHours': widget.durationHours,
                                         'location': widget.location,
                                         'contentType': widget.contentType,
                                         'imageUrl': widget.imageUrl,

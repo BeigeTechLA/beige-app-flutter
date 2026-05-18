@@ -17,6 +17,8 @@ import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/features/shoot/presentation/providers/cancel_shoot_notifier.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
+import '../../../../core/utils/date_time_utils.dart';
+
 class CancelShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
 
@@ -56,18 +58,6 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
     if (url.isEmpty) return "";
     if (url.startsWith("http")) return url;
     return '${ApiEndpoints.imageUrl}$url';
-  }
-
-  String formatTime(String? time) {
-    if (time == null || time.isEmpty) return "--";
-    final parsed = DateFormat("HH:mm:ss").parse(time);
-    return DateFormat("hh:mm a").format(parsed);
-  }
-
-  String formatDate(String? date) {
-    if (date == null || date.isEmpty) return "--";
-    final parsed = DateTime.parse(date);
-    return DateFormat("dd MMM yyyy").format(parsed);
   }
 
   @override
@@ -299,12 +289,12 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                     children: [
                                       infoRowBlack(
                                         AppAssets.calendarDate,
-                                        formatDate(date.trim()),
+                                        DateTimeUtils.formatDate(date.trim()),
                                       ),
 
                                       infoRowBlack(
                                         AppAssets.clock,
-                                        "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                        "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
                                         "(${widget.durationHours ?? 0}h)",
                                       ),
 
@@ -316,14 +306,14 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                 /// 🟢 SINGLE DAY
                                 infoRowBlack(
                                   AppAssets.calendarDate,
-                                  formatDate(widget.eventDate),
+                                  DateTimeUtils.formatDate(widget.eventDate),
                                 ),
 
                                 const SizedBox(height: 8),
 
                                 infoRowBlack(
                                   AppAssets.clock,
-                                  "${formatTime(widget.startTime)} to ${formatTime(widget.endTime)} "
+                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
                                   "(${widget.durationHours ?? 0}h)",
                                 ),
                               ],
