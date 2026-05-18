@@ -512,7 +512,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
             Row(
               children: [
                 Text(
-                  "More Detailddddddds",
+                  "More Details",
                   style: TextStyle(
                     fontFamily: AppAssets.fontUnbounded,
                     fontSize: 16,

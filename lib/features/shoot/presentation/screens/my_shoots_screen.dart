@@ -5,6 +5,7 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -14,6 +15,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
+import 'package:beige/shared/widgets/app_booking_card.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
 class MyShootsScreen extends ConsumerStatefulWidget {
@@ -220,6 +222,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 ),
                               )
                             : ListView.builder(
+                                padding: const EdgeInsets.only(
+                                  top: AppSpacing.mld,
+                                  bottom: AppSpacing.xxl,
+                                ),
                                 itemCount: upcomingShoots.length,
                                 itemBuilder: (context, index) {
                                   return upcomingBookingCard(
@@ -239,6 +245,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                           ),
                         )
                       : ListView.builder(
+                          padding: const EdgeInsets.only(
+                            top: AppSpacing.mld,
+                            bottom: AppSpacing.xxl,
+                          ),
                           itemCount: completedShoots.length,
                           itemBuilder: (context, index) {
                             return completedBookingCard(completedShoots[index]);
@@ -326,6 +336,90 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     };
   }
 
+  String _joinNonEmpty(Iterable<String?> values, String separator) {
+    return values
+        .map((value) => value?.trim() ?? '')
+        .where((value) => value.isNotEmpty && value != '--')
+        .join(separator);
+  }
+
+  String _bookingTitle({
+    required String creativeName,
+    required String projectName,
+    required String contentType,
+  }) {
+    final descriptor = projectName.trim().isNotEmpty
+        ? projectName
+        : contentType;
+    final title = _joinNonEmpty([creativeName, descriptor], ' - ');
+    return title.isEmpty ? 'Shoot Booking' : title;
+  }
+
+  String _creativeName(Map shoot) {
+    return shoot['creative']?['name'] ??
+        shoot['creator_name'] ??
+        shoot['creative_name'] ??
+        '';
+  }
+
+  String _formatCardDate(String value) {
+    final rawDates = value
+        .split(',')
+        .map((date) => date.trim())
+        .where((date) => date.isNotEmpty)
+        .toList();
+
+    if (rawDates.isEmpty) return '';
+
+    final parsedDates = rawDates
+        .map((date) => DateTime.tryParse(date))
+        .whereType<DateTime>()
+        .toList();
+
+    if (parsedDates.length != rawDates.length) return value;
+    if (parsedDates.length == 1) {
+      return DateFormat('MMM d, yyyy').format(parsedDates.first);
+    }
+
+    final first = parsedDates.first;
+    final last = parsedDates.last;
+
+    if (first.year == last.year && first.month == last.month) {
+      return '${DateFormat('MMM d').format(first)}–${last.day}, ${last.year}';
+    }
+
+    if (first.year == last.year) {
+      return '${DateFormat('MMM d').format(first)} – '
+          '${DateFormat('MMM d, yyyy').format(last)}';
+    }
+
+    return '${DateFormat('MMM d, yyyy').format(first)} – '
+        '${DateFormat('MMM d, yyyy').format(last)}';
+  }
+
+  String _formatCardTime(String value) {
+    final time = DateTimeUtils.formatTime(value);
+    if (time == '--') return '';
+    return time.startsWith('0') ? time.substring(1) : time;
+  }
+
+  String? _bookingSubtitle({
+    required String date,
+    required String startTime,
+    required String endTime,
+    required String duration,
+  }) {
+    final timeRange = _joinNonEmpty([startTime, endTime], ' – ');
+    final timeDetails = duration.trim().isEmpty
+        ? timeRange
+        : timeRange.isEmpty
+        ? duration
+        : '$timeRange ($duration)';
+    final subtitle = _joinNonEmpty([date, timeDetails], ' · ');
+
+    return subtitle.isEmpty ? null : subtitle;
+  }
+
   Widget upcomingBookingCard(Map shoot) {
     final String fallbackImage = AppAssets.imagePlaceholder;
 
@@ -356,6 +450,8 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
     final String startTime = DateTimeUtils.formatTime(startTimeRaw);
     final String endTime = DateTimeUtils.formatTime(endTimeRaw);
+    final String cardStartTime = _formatCardTime(startTimeRaw);
+    final String cardEndTime = _formatCardTime(endTimeRaw);
     final double durationHrs = durationHrsRaw > 0
         ? durationHrsRaw
         : _hoursBetween(startTimeRaw, endTimeRaw);
@@ -366,8 +462,22 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
     final String projectName = shoot['project_name'] ?? '';
     final String contentType = shoot['content_type'] ?? '';
+    final String creativeName = _creativeName(shoot);
 
-    return GestureDetector(
+    return AppBookingCard(
+      imagePath: finalImage,
+      title: _bookingTitle(
+        creativeName: creativeName,
+        projectName: projectName,
+        contentType: contentType,
+      ),
+      subtitle: _bookingSubtitle(
+        date: _formatCardDate(eventDate),
+        startTime: cardStartTime,
+        endTime: cardEndTime,
+        duration: durationText,
+      ),
+      actionLabel: "Manage Shoot",
       onTap: () {
         context.pushNamed(
           RouteNames.bookingEventSummary,
@@ -375,34 +485,25 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
           extra: {'contentType': contentType, 'shootTypeId': shootTypeId},
         );
       },
-      child: bookingCard(
-        imagePath: finalImage,
-        title: projectName,
-        date: eventDate,
-        time: "$startTime – $endTime",
-        duration: durationText,
-        contentType: contentType,
-        showEditIcon: true,
-        buttonText: "Manage Shoot",
-        onButtonTap: () {
-          context.pushNamed(
-            RouteNames.manageBooking,
-            pathParameters: {'bookingId': bookingId.toString()},
-            extra: {
-              'projectName': projectName,
-              'contentType': contentType,
-              'eventDate': eventDate,
-              'startTime': startTime,
-              'endTime': endTime,
-              'multiDays': shoot['multi_day']?['days'] ?? [],
-              'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
-              'location': shoot['location'] ?? '',
-              'imageUrl': finalImage,
-              'shootTypeId': shootTypeId,
-            },
-          );
-        },
-      ),
+      onActionTap: () {
+        context.pushNamed(
+          RouteNames.manageBooking,
+          pathParameters: {'bookingId': bookingId.toString()},
+          extra: {
+            'projectName': projectName,
+            'contentType': contentType,
+            'eventDate': eventDate,
+            'startTime': startTime,
+            'endTime': endTime,
+            'multiDays': shoot['multi_day']?['days'] ?? [],
+            'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
+            'location': shoot['location'] ?? '',
+            'imageUrl': finalImage,
+            'shootTypeId': shootTypeId,
+          },
+        );
+      },
+      trailingAction: SvgPicture.asset(AppAssets.homeViewProfile, height: 45),
     );
   }
 
@@ -434,229 +535,34 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final String startTimeRaw = shoot['start_time'] ?? '';
     final String endTimeRaw = shoot['end_time'] ?? '';
     final double durationHrsRaw = (shoot['duration_hours'] ?? 0).toDouble();
+    final String contentType = shoot['content_type'] ?? '';
+    final String creativeName = _creativeName(shoot);
 
-    final String startTime = DateTimeUtils.formatTime(startTimeRaw);
-    final String endTime = DateTimeUtils.formatTime(endTimeRaw);
+    final String cardStartTime = _formatCardTime(startTimeRaw);
+    final String cardEndTime = _formatCardTime(endTimeRaw);
     final double durationHrs = durationHrsRaw > 0
         ? durationHrsRaw
         : _hoursBetween(startTimeRaw, endTimeRaw);
     final String durationText = _durationText(durationHrs);
 
-    return bookingCard(
+    return AppBookingCard(
       imagePath: finalImage,
-      // ✅ IMPORTANT FIX
-      title: projectName,
-      date: eventDate,
-      time: "$startTime – $endTime",
-      duration: durationText,
-      buttonText: "Book Again",
-      showEditIcon: false,
-      isTransparent: true,
-      onButtonTap: () {
+      title: _bookingTitle(
+        creativeName: creativeName,
+        projectName: projectName,
+        contentType: contentType,
+      ),
+      subtitle: _bookingSubtitle(
+        date: _formatCardDate(eventDate),
+        startTime: cardStartTime,
+        endTime: cardEndTime,
+        duration: durationText,
+      ),
+      actionLabel: "Book Again",
+      actionStyle: AppBookingCardActionStyle.outline,
+      onActionTap: () {
         context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
       },
-    );
-  }
-
-  // ================= COMMON CARD =================
-  Widget bookingCard({
-    required String imagePath,
-    String? title,
-    String? date,
-    String? time,
-    String? duration,
-    int? hours,
-    String? location,
-    String? contentType,
-    required String buttonText,
-    required VoidCallback onButtonTap,
-    bool showEditIcon = false,
-    bool isTransparent = false,
-    VoidCallback? onEditTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: AppSpacing.base,
-        top: AppSpacing.xl,
-      ),
-      height: 280,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadii.huge),
-        child: Stack(
-          children: [
-            // ✅ IMAGE (NO BLUR)
-            Positioned.fill(
-              child: (imagePath.isEmpty)
-                  ? SvgPicture.asset(
-                      AppAssets.imagePlaceholder,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.network(
-                      imagePath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return SvgPicture.asset(
-                          AppAssets.imagePlaceholder,
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    ),
-            ),
-
-            // ✅ TOP GRADIENT — subtle darken at top
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.transparent,
-                      AppColors.black.withValues(alpha: 0.75),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // ✅ BOTTOM SHADOW GRADIENT — feathers card into surfaceDeep
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0.5, 0.75, 1],
-                  colors: [
-                    AppColors.transparent,
-                    AppColors.surfaceDeep.withValues(alpha: 0.6),
-                    AppColors.surfaceDeep,
-                  ],
-                ),
-              ),
-            ),
-            // ✅ BOTTOM BLUR (Glass Effect)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(AppRadii.huge),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 49.1, sigmaY: 49.1),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0x000A0A0A),
-                          Color(0xFF0A0A0A),
-                        ],
-                        stops: [0.0, 0.25],
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(AppSpacing.base),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          title ?? "",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.buttonSmall.copyWith(
-                            color: AppColors.white,
-                          ),
-                        ),
-                        // if ((date != null && date.isNotEmpty) ||
-                        //     (time != null && time.isNotEmpty) ||
-                        //     (duration != null && duration.isNotEmpty)) ...[
-                        //   const SizedBox(height: AppSpacing.xxs),
-                        //   Text(
-                        //     [
-                        //       if (date != null && date.isNotEmpty) date,
-                        //       if (time != null && time.isNotEmpty)
-                        //         (duration != null && duration.isNotEmpty)
-                        //             ? "$time ($duration)"
-                        //             : time,
-                        //     ].join(" • "),
-                        //     maxLines: 1,
-                        //     overflow: TextOverflow.ellipsis,
-                        //     style: AppTextStyles.bodySmall.copyWith(
-                        //       color: AppColors.white70,
-                        //     ),
-                        //   ),
-                        // ],
-                        const SizedBox(height: AppSpacing.sm),
-
-                        Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              height: 45,
-                              child: ElevatedButton(
-                                onPressed: onButtonTap,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isTransparent
-                                      ? AppColors.transparent
-                                      : AppColors.primary,
-                                  foregroundColor: AppColors.white,
-                                  elevation: isTransparent ? 0 : null,
-                                  shadowColor: isTransparent
-                                      ? AppColors.transparent
-                                      : null,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: AppSpacing.sm,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    side: isTransparent
-                                        ? BorderSide(color: AppColors.white60)
-                                        : BorderSide.none,
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadii.round,
-                                    ),
-                                  ),
-                                ),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    buttonText,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTextStyles.buttonMedium.copyWith(
-                                      color: isTransparent
-                                          ? AppColors.white
-                                          : AppColors.textHeading,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          if (showEditIcon) ...[
-                            const SizedBox(width: AppSpacing.smd),
-                            InkWell(
-                              onTap: onEditTap,
-                              child: SvgPicture.asset(
-                                AppAssets.homeViewProfile,
-                                height: 45,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

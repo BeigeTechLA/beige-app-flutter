@@ -57,13 +57,18 @@ class _ShootSummaryScreenState
   }
 
   String _formatBudget(Map<String, dynamic>? bookingData) {
-    final budgetString = bookingData?['event']?['budget'];
+    final dynamic raw = bookingData?['event']?['budget'];
 
-    if (budgetString == null || budgetString.isEmpty) {
-      return "\$/0";
+    double? budget;
+    if (raw is num) {
+      budget = raw.toDouble();
+    } else if (raw is String && raw.isNotEmpty) {
+      budget = double.tryParse(raw);
     }
 
-    final budget = double.tryParse(budgetString) ?? 0;
+    if (budget == null) {
+      return "\$0";
+    }
 
     return NumberFormat.currency(
       locale: 'en_US',
