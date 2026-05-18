@@ -43,7 +43,7 @@ When the user revisits a booking-wizard screen — via back nav, forward nav aft
 | Sensitive form drafts | None in booking flow — all values are non-sensitive. |
 | Doc location | `docs/BOOKING_PREFILL_PLAN.md` |
 
-## Known Payload Shape (live probe of booking 3711)
+## Known Payload Shape (live probe of booking 3742, 2026-05-17)
 
 Verified fields returned by `GET bookings/{id}/summary-details`:
 
@@ -51,50 +51,92 @@ Verified fields returned by `GET bookings/{id}/summary-details`:
 {
   "data": {
     "booking": {
-      "booking_id": 3711,
+      "booking_id": 3742,
+      "quote_id": 779,
       "content_type": "videographer",
       "shoot_type_id": 7,
+      "shoot_type": "corporate",
       "shoot_type_name": "Corporate Event",
-      "shoot_type_image_url": "...",
+      "shoot_type_image_url": "shoot-types/corporate-event.jpg",
       "project_name": "...",
       "description": "",
       "booking_type": "single_day",
       "selection_mode": { "is_single_day": true, "is_multi_day": false },
-      "event_date": "2026-05-15",
+      "event_date": "2026-05-17",
       "start_time": "19:45:00",
       "end_time": "23:45:00",
       "duration_hours": 4,
       "booking_days": [],
       "multi_day": null,
-      "event_location": "...",
+      "event_location": null,
+      "event_latitude": null,
+      "event_longitude": null,
+      "reference_links": [],
+      "additional_details": null,
+      "crew_requirements": { "videographer": 0, "photographer": 0 },
+      "edits_needed": 0,
+      "edit_types": [],
       "edit_type_ids": [],
       "video_edit_types": [],
       "photo_edit_types": []
     },
     "held_creatives": [],
     "crew_summary": {
-      "included_by_role": {...},
-      "extra_by_role": {...},
-      "total_required_by_role": {...},
-      "held_by_role": {...},
+      "included_by_role": { "1": 1, "2": 0 },
+      "extra_by_role": { "1": 0, "2": 0 },
+      "total_required_by_role": { "1": 1, "2": 0 },
+      "held_by_role": { "1": 0, "2": 0 },
       "held_total": 0,
       "can_confirm": false
     },
-    "payment": { "payment_method": 0, "payment_status": 1 },
+    "payment": {
+      "payment_id": null,
+      "status": "pending",
+      "payment_completed_at": null
+    },
     "payment_methods": { "saved_cards": [...], "recommended": [...] },
-    "contact": { "full_name": "", "email": "", "phone": "" },
+    "contact": { "full_name": "", "email": "...", "phone": "" },
+    "quote": {
+      "quote_id": 779,
+      "booking_id": 3742,
+      "pricing_mode": "general",
+      "shoot_hours": 4,
+      "subtotal": 1500,
+      "total": 1500,
+      "status": "pending",
+      "expires_at": "...",
+      "line_items": [ { "line_item_id": ..., "item_name": ..., "quantity": 1, "unit_price": 250, "line_total": 1000 } ]
+    },
     "pricing": { ... }
   }
 }
 ```
 
-**Missing fields (require Phase 2 fallback / Phase 3 backend extension):**
+### Backend Extension Status (2026-05-17 re-probe)
 
-- `additional_details` (free-text notes)
-- `reference_links` (string[])
-- `crew_requirements` (role × included × extra structure)
-- `event_latitude`, `event_longitude` (map pin)
-- `specialty_id`
+Phase 3 fields mostly **landed**. Updated status:
+
+| Field | Previously missing | Now | Notes |
+|---|---|---|---|
+| `additional_details` | ✅ | ✅ present | null when unset |
+| `reference_links` | ✅ | ✅ present | empty array when unset |
+| `crew_requirements` | ✅ | ⚠️ present but **shape differs from request** | Backend returns `{videographer: int, photographer: int}` (role-name keyed totals). Plan asked for `[{role_id, included_qty, extra_qty}]`. **No `extra_qty` split** — derive from `crew_summary.extra_by_role` instead. |
+| `event_latitude` / `event_longitude` | ✅ | ✅ present | null when unset |
+| `specialty_id` | ✅ | ❌ **STILL MISSING** | Need follow-up with backend. |
+
+### Bonus fields added beyond Phase 3 scope
+
+- `booking.quote_id` + top-level `quote{}` with `line_items[]` — useful for review screen.
+- `booking.edits_needed` (int), `booking.edit_types[]` (objects, alongside existing `edit_type_ids[]`).
+- `booking.shoot_type` (slug e.g. `"corporate"`) — alongside existing `shoot_type_id`/`shoot_type_name`.
+- `payment` shape **changed**: was `{payment_method: 0, payment_status: 1}`, now `{payment_id, status: "pending"|..., payment_completed_at}`. **Breaking** for any existing consumer.
+
+### Remaining gaps for Phase 2 local fallback
+
+- `specialty_id` only.
+- `crew_requirements` extra-qty split (derive from `crew_summary` instead of local draft — no draft needed).
+
+**Implication:** Phase 2 scope shrinks dramatically. Only `specialty_id` truly needs local fallback. `additional_details`, `reference_links`, `event_latitude`/`event_longitude`, `selectedAddress`, qty counters now all server-prefillable via Phase 1.
 
 ---
 
@@ -426,3 +468,4 @@ but never come back via GET.
 | Date | Change |
 |------|--------|
 | 2026-05-15 | Initial plan written. Three phases: server-side rehydration via `summary-details`, local `FormDraftMixin` fallback for free-text fields, backend ask for missing fields. Live response shape captured from booking 3711 probe. |
+| 2026-05-17 | Re-probed booking 3742. Backend shipped most Phase 3 fields: `additional_details`, `reference_links`, `crew_requirements`, `event_latitude`/`event_longitude` now present. `specialty_id` still missing. `crew_requirements` shape differs from request (object keyed by role name, no extra_qty split — use `crew_summary.extra_by_role`). Payment shape changed (breaking). Bonus fields: `quote_id`, `quote{}`, `edits_needed`, `edit_types[]`, `shoot_type` slug. Phase 2 scope shrinks: only `specialty_id` truly needs local fallback. |
