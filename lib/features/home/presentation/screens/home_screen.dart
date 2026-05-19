@@ -1129,14 +1129,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   ),
 
                                                   const SizedBox(height: 4),
-
                                                   Text(
-                                                    "Step ${homeData.continueBooking!.currentScreenOrder} of ${homeData.continueBooking!.totalSteps}",
+                                                    "Complete all steps for booking",
                                                     style: const TextStyle(
                                                       color: AppColors.black70,
                                                       fontSize: 13,
                                                     ),
                                                   ),
+                                                  // Text(
+                                                  //   "Step ${homeData.continueBooking!.currentScreenOrder} of ${homeData.continueBooking!.totalSteps}",
+                                                  //   style: const TextStyle(
+                                                  //     color: AppColors.black70,
+                                                  //     fontSize: 13,
+                                                  //   ),
+                                                  // ),
                                                 ],
                                               ),
                                             ),
