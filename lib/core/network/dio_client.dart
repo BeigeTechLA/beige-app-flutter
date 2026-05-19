@@ -12,6 +12,7 @@ class DioClient {
 
   DioClient({
     required Future<String?> Function() getToken,
+    Future<void> Function()? onUnauthorized,
     bool isDevelopment = false,
   }) {
     _dio = Dio(
@@ -29,7 +30,7 @@ class DioClient {
 
     // 🛡️ Setup Interceptor Chain
     _dio.interceptors.addAll([
-      AuthInterceptor(getToken: getToken),
+      AuthInterceptor(getToken: getToken, onUnauthorized: onUnauthorized),
       RetryInterceptor(dio: _dio),
       ErrorInterceptor(),
      // if (isDevelopment) LoggingInterceptor(),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../app/router.dart';
+import '../../app/navigator_key.dart';
 import '../../core/connectivity/connectivity_providers.dart';
 import '../../core/connectivity/connectivity_status.dart';
 import 'no_internet_dialog.dart';

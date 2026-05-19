@@ -321,6 +321,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                         zoomControlsEnabled: false, // ❗ ANDROID zoom +/- remove
                         // Android zoom buttons
                         mapToolbarEnabled: false, // 🔥 IMPORTANT (iOS fix)
+                        myLocationEnabled: true,
                         myLocationButtonEnabled: false,
                         compassEnabled: false,
                         indoorViewEnabled: false,
@@ -396,6 +397,31 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
                                 BlendMode.srcIn,
                               ),
                             ),
+                          ),
+                        ),
+                      ),
+                      AppSpacing.verticalBase,
+                      GestureDetector(
+                        onTap: () async {
+                          await _getCurrentLocation();
+                          if (selectedLatLng != null) {
+                            final controller = await _mapController.future;
+                            controller.animateCamera(
+                              CameraUpdate.newLatLngZoom(selectedLatLng!, 16),
+                            );
+                          }
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 55,
+                          decoration: const BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.my_location,
+                            color: AppColors.mapGrey,
+                            size: 28,
                           ),
                         ),
                       ),

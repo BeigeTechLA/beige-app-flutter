@@ -54,12 +54,9 @@ import '../shared/widgets/login_dialog.dart';
 import '../shared/widgets/scale_clamped_text.dart';
 import 'assets.dart';
 import 'colors.dart';
+import 'navigator_key.dart';
 import 'route_names.dart';
 import 'text_styles.dart';
-
-/// Global navigator key — kept temporarily for ScaffoldMessenger compatibility.
-/// Will be removed in Batch 14 cleanup.
-final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Routes that do not require authentication.
 const _publicRoutes = {

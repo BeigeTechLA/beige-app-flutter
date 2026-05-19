@@ -524,7 +524,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                               infoRowBlack(
                                                 AppAssets.calendarDate,
-                                                DateTimeUtils.formatDate(
+                                                DateTimeUtils.formatReadableDate(
                                                   day['date'],
                                                 ),
                                               ),
@@ -547,7 +547,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                       infoRowBlack(
                                         AppAssets.calendarDate,
-                                        DateTimeUtils.formatDate(
+                                        DateTimeUtils.formatReadableDate(
                                           booking?['event_date'],
                                         ),
                                       ),

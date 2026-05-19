@@ -2,43 +2,111 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateTimeUtils {
+  // ───────────────────────────────────────────────────────────────
+  // Format pattern constants (single source of truth).
+  // ───────────────────────────────────────────────────────────────
+
+  /// `19-05-2026`
+  static const String kDatePattern = "MM-dd-yyyy";
+
+  /// `May 19, 2026`
+  static const String kReadableDatePattern = "MMM d, yyyy";
+
+  /// `Tue, 19 May 2026`
+  static const String kWeekdayDatePattern = "EEE, dd MMM yyyy";
+
+  /// `Tue, 19 May • 09:00 AM`
+  static const String kTimelineDateTimePattern = "EEE, dd MMM • hh:mm a";
+
+  /// `May 19, 2026`
+  static const String kFullMonthDatePattern = "MMMM dd, yyyy";
+
+  /// `May 2026`
+  static const String kMonthYearPattern = "MMM yyyy";
+
+  /// `Tue`
+  static const String kWeekdayShortPattern = "EEE";
+
+  /// `09:00:00` — API/parse input.
+  static const String kTime24HmsPattern = "HH:mm:ss";
+
+  /// `09:00` — API/parse input.
+  static const String kTime24HmPattern = "HH:mm";
+
+  /// `09:00 AM`
+  static const String kTime12HourPattern = "hh:mm a";
+
+  /// `9:00 AM`
+  static const String kTime12HourShortPattern = "h:mm a";
+
+  /// `19` — day-of-month only.
+  static const String kDayOfMonthPattern = "d";
+
+  /// `May` — month only.
+  static const String kMonthShortPattern = "MMM";
+
+  /// `2026` — year only.
+  static const String kYearPattern = "yyyy";
+
+  /// `May 19` — month + day (range start).
+  static const String kMonthDayPattern = "MMM d";
+
+  /// `19-05-2026 09:00 AM`
+  static const String kDateTimePattern = "MM-dd-yyyy hh:mm a";
+
+  // ───────────────────────────────────────────────────────────────
+
   /// ✅ Format Date → dd-MM-yyyy
+  ///
+  /// Used in:
+  /// - home_screen.dart
+  /// - manage_shoot_screen.dart
+  /// - cancel_shoot_screen.dart
+  /// - shoot_summary_screen.dart
   static String formatDate(String? date, {String fallback = "--"}) {
     try {
       if (date == null || date.isEmpty) return fallback;
 
       final parsed = DateTime.parse(date);
-      return DateFormat("dd-MM-yyyy").format(parsed);
+      return DateFormat(kDatePattern).format(parsed);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date → May 19, 2026
+  ///
+  /// Used in: (available — no current call sites)
   static String formatReadableDate(String? date, {String fallback = "--"}) {
     try {
       if (date == null || date.isEmpty) return fallback;
 
       final parsed = DateTime.parse(date);
-      return DateFormat("MMM d, yyyy").format(parsed);
+      return DateFormat(kReadableDatePattern).format(parsed);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date → Tue, 19 May 2026
+  ///
+  /// Used in:
+  /// - shoot_edit_review_screen.dart
   static String formatWeekdayDate(String? date, {String fallback = "--"}) {
     try {
       if (date == null || date.isEmpty) return fallback;
 
       final parsed = DateTime.parse(date);
-      return DateFormat("EEE, dd MMM yyyy").format(parsed);
+      return DateFormat(kWeekdayDatePattern).format(parsed);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date Time → Tue, 19 May • 09:00 AM
+  ///
+  /// Used in:
+  /// - shoot_summary_screen.dart
   static String formatTimelineDateTime(
     String? isoTime, {
     String fallback = "--",
@@ -47,45 +115,66 @@ class DateTimeUtils {
       if (isoTime == null || isoTime.isEmpty) return fallback;
 
       final parsed = DateTime.parse(isoTime).toLocal();
-      return DateFormat("EEE, dd MMM • hh:mm a").format(parsed);
+      return DateFormat(kTimelineDateTimePattern).format(parsed);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date → May 19, 2026
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
+  /// - shoot_date_time_screen.dart
   static String formatFullMonthDate(DateTime? date, {String fallback = "--"}) {
     try {
       if (date == null) return fallback;
 
-      return DateFormat("MMMM dd, yyyy").format(date);
+      return DateFormat(kFullMonthDatePattern).format(date);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date → May 2026
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
+  /// - shoot_date_time_screen.dart
   static String formatMonthYear(DateTime? date, {String fallback = "--"}) {
     try {
       if (date == null) return fallback;
 
-      return DateFormat("MMM yyyy").format(date);
+      return DateFormat(kMonthYearPattern).format(date);
     } catch (_) {
       return fallback;
     }
   }
 
   /// ✅ Format Date → Tue
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
+  /// - shoot_date_time_screen.dart
   static String formatWeekdayShort(DateTime? date, {String fallback = "--"}) {
     try {
       if (date == null) return fallback;
 
-      return DateFormat("EEE").format(date);
+      return DateFormat(kWeekdayShortPattern).format(date);
     } catch (_) {
       return fallback;
     }
   }
 
+  /// ✅ Format Time → 09:00 AM
+  ///
+  /// Used in:
+  /// - home_screen.dart
+  /// - shoot_edit_review_screen.dart
+  /// - manage_shoot_screen.dart
+  /// - cancel_shoot_screen.dart
+  /// - shoot_review_screen.dart
+  /// - shoot_summary_screen.dart
   static String formatTime(String? time, {String fallback = "--"}) {
     try {
       if (time == null || time.isEmpty) return fallback;
@@ -94,23 +183,27 @@ class DateTimeUtils {
 
       /// 🔥 CASE 1: HH:mm:ss (normal API)
       if (time.contains(":") && time.length == 8) {
-        parsed = DateFormat("HH:mm:ss").parse(time);
+        parsed = DateFormat(kTime24HmsPattern).parse(time);
       }
       /// 🔥 CASE 2: HH:mm (sometimes API gives this)
       else if (time.contains(":") && time.length == 5) {
-        parsed = DateFormat("HH:mm").parse(time);
+        parsed = DateFormat(kTime24HmPattern).parse(time);
       }
       /// 🔥 CASE 3: already ISO format
       else {
         parsed = DateTime.parse(time);
       }
 
-      return DateFormat("hh:mm a").format(parsed);
+      return DateFormat(kTime12HourPattern).format(parsed);
     } catch (_) {
       return fallback;
     }
   }
 
+  /// ✅ Format Time without leading zero → 9:00 AM
+  ///
+  /// Used in:
+  /// - my_shoots_screen.dart
   static String formatTimeWithoutLeadingZero(
     String? time, {
     String fallback = "",
@@ -125,6 +218,11 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Format TimeOfDay (locale-aware) → 9:00 AM
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
+  /// - shoot_date_time_screen.dart
   static String formatTimeOfDay(
     BuildContext context,
     TimeOfDay? time, {
@@ -139,6 +237,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Format TimeOfDay short → 9:00 AM
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
   static String formatTimeOfDayShort(
     TimeOfDay? time, {
     String fallback = "--",
@@ -147,16 +249,22 @@ class DateTimeUtils {
       if (time == null) return fallback;
 
       return DateFormat(
-        "h:mm a",
+        kTime12HourShortPattern,
       ).format(DateTime(2000, 1, 1, time.hour, time.minute));
     } catch (_) {
       return fallback;
     }
   }
 
-  static String formatDuration(double? hours) {
+  /// ✅ Format Duration → 2h 30m
+  ///
+  /// Used in:
+  /// - manage_shoot_screen.dart
+  /// - shoot_review_screen.dart
+  /// - shoot_summary_screen.dart
+  static String formatDuration(double? hours, {String fallback = "--"}) {
     try {
-      if (hours == null || hours.isNaN || hours.isInfinite) return "--";
+      if (hours == null || hours.isNaN || hours.isInfinite) return fallback;
 
       int h = hours.floor();
       int m = ((hours - h) * 60).round();
@@ -170,10 +278,14 @@ class DateTimeUtils {
 
       return "${h}h ${m}m";
     } catch (_) {
-      return "--";
+      return fallback;
     }
   }
 
+  /// ✅ Format API date payload → 2026-05-19
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
   static String formatApiDate(DateTime? date, {String fallback = "--"}) {
     try {
       if (date == null) return fallback;
@@ -184,6 +296,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Format API time payload → 09:00:00
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
   static String formatApiTime(TimeOfDay? time, {String fallback = "--"}) {
     try {
       if (time == null) return fallback;
@@ -196,6 +312,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Format month + days summary → May 19 & 20, 2026
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
   static String formatMonthDaysWithCommaYear(
     List<DateTime> dates, {
     String fallback = "",
@@ -205,10 +325,12 @@ class DateTimeUtils {
 
       dates.sort();
 
-      final days = dates.map((date) => DateFormat("d").format(date)).toList();
+      final days = dates
+          .map((date) => DateFormat(kDayOfMonthPattern).format(date))
+          .toList();
       final lastDate = dates.last;
-      final month = DateFormat("MMM").format(lastDate);
-      final year = DateFormat("yyyy").format(lastDate);
+      final month = DateFormat(kMonthShortPattern).format(lastDate);
+      final year = DateFormat(kYearPattern).format(lastDate);
 
       return "$month ${_joinDays(days)}, $year";
     } catch (_) {
@@ -216,6 +338,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Selected-days label → Selected Days: 19 & 20 May 2026
+  ///
+  /// Used in:
+  /// - shoot_type_selection_screen.dart
   static String formatSelectedDaysWithLastMonthYear(
     List<DateTime> dates, {
     String fallback = "",
@@ -225,8 +351,10 @@ class DateTimeUtils {
 
       dates.sort();
 
-      final days = dates.map((date) => DateFormat("d").format(date)).toList();
-      final monthYear = DateFormat("MMM yyyy").format(dates.last);
+      final days = dates
+          .map((date) => DateFormat(kDayOfMonthPattern).format(date))
+          .toList();
+      final monthYear = DateFormat(kMonthYearPattern).format(dates.last);
 
       return "Selected Days: ${_joinDays(days)} $monthYear";
     } catch (_) {
@@ -234,6 +362,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Grouped selected-days label → Selected Days: 19 & 20 May 2026
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
   static String formatGroupedSelectedDaysLabel(
     List<DateTime> dates, {
     String fallback = "",
@@ -247,6 +379,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Grouped compact summary → May 2026 19 & 20
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
   static String formatGroupedMonthDays(
     List<DateTime> dates, {
     String fallback = "",
@@ -260,6 +396,10 @@ class DateTimeUtils {
     }
   }
 
+  /// ✅ Card single/range date → May 19, 2026 or May 19–21, 2026
+  ///
+  /// Used in:
+  /// - my_shoots_screen.dart
   static String formatCardDateRange(String? value, {String fallback = ""}) {
     try {
       if (value == null || value.isEmpty) return fallback;
@@ -279,29 +419,31 @@ class DateTimeUtils {
 
       if (parsedDates.length != rawDates.length) return value;
       if (parsedDates.length == 1) {
-        return DateFormat("MMM d, yyyy").format(parsedDates.first);
+        return DateFormat(kReadableDatePattern).format(parsedDates.first);
       }
 
       final first = parsedDates.first;
       final last = parsedDates.last;
 
       if (first.year == last.year && first.month == last.month) {
-        return "${DateFormat("MMM d").format(first)}–${last.day}, ${last.year}";
+        return "${DateFormat(kMonthDayPattern).format(first)}–${last.day}, ${last.year}";
       }
 
       if (first.year == last.year) {
-        return "${DateFormat("MMM d").format(first)} – "
-            "${DateFormat("MMM d, yyyy").format(last)}";
+        return "${DateFormat(kMonthDayPattern).format(first)} – "
+            "${DateFormat(kReadableDatePattern).format(last)}";
       }
 
-      return "${DateFormat("MMM d, yyyy").format(first)} – "
-          "${DateFormat("MMM d, yyyy").format(last)}";
+      return "${DateFormat(kReadableDatePattern).format(first)} – "
+          "${DateFormat(kReadableDatePattern).format(last)}";
     } catch (_) {
       return fallback;
     }
   }
 
-  /// ✅ Date + Time together
+  /// ✅ Date + Time together → 19-05-2026 09:00 AM
+  ///
+  /// Used in: (available — no current call sites)
   static String formatDateTime(
     String? date,
     String? time, {
@@ -311,7 +453,7 @@ class DateTimeUtils {
       if (date == null || time == null) return fallback;
 
       final dateParsed = DateTime.parse(date);
-      final timeParsed = DateFormat("HH:mm:ss").parse(time);
+      final timeParsed = DateFormat(kTime24HmsPattern).parse(time);
 
       final combined = DateTime(
         dateParsed.year,
@@ -321,7 +463,7 @@ class DateTimeUtils {
         timeParsed.minute,
       );
 
-      return DateFormat("dd-MM-yyyy hh:mm a").format(combined);
+      return DateFormat(kDateTimePattern).format(combined);
     } catch (_) {
       return fallback;
     }
@@ -336,7 +478,7 @@ class DateTimeUtils {
     final monthMap = <String, List<int>>{};
 
     for (final date in dates) {
-      final key = DateFormat("MMM yyyy").format(date);
+      final key = DateFormat(kMonthYearPattern).format(date);
       monthMap.putIfAbsent(key, () => []);
       monthMap[key]!.add(date.day);
     }

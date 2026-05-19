@@ -201,6 +201,14 @@ class AppColors {
     colors: [goldGradientLight, goldGradientCream],
   );
 
+  /// Gold horizontal gradient — CSS `linear-gradient(90deg, #E8D1AB 0%, #FDEFD9 100%)`
+  static const LinearGradient goldHorizontalGradient = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [goldGradientLight, goldGradientCream],
+    stops: [0.0, 1.0],
+  );
+
   /// Divider gradient — start/end (9% white)
   static const Color dividerGradientEdge = Color(0x17FFFFFF);
 
