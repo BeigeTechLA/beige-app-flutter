@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
+import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_selection_notifier.dart';
@@ -21,11 +21,12 @@ class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   const ShootTypeSelectionScreen({super.key, required this.bookingId});
 
   @override
-  ConsumerState<ShootTypeSelectionScreen> createState() => _ShootTypeSelectionScreenState();
+  ConsumerState<ShootTypeSelectionScreen> createState() =>
+      _ShootTypeSelectionScreenState();
 }
 
-class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScreen> {
-
+class _ShootTypeSelectionScreenState
+    extends ConsumerState<ShootTypeSelectionScreen> {
   Map<DateTime, bool> expandedMap = {};
   Map<DateTime, TimeOfDay?> startTimes = {};
   Map<DateTime, TimeOfDay?> endTimes = {};
@@ -70,6 +71,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
       return "Duration: ${minutes}m";
     }
   }
+
   Future<void> pickTime(DateTime date, bool isStart) async {
     final picked = await showTimePicker(
       context: context,
@@ -88,11 +90,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   }
 
   Future<void> selectShootTime(
-      BuildContext context,
-      TextEditingController controller,
-      bool isStartTime,
-      ) async {
-
+    BuildContext context,
+    TextEditingController controller,
+    bool isStartTime,
+  ) async {
     TimeOfDay initial = isStartTime
         ? (shootStartTime ?? TimeOfDay.now())
         : (shootEndTime ?? TimeOfDay.now());
@@ -118,7 +119,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               hourMinuteTextColor: AppColors.black,
               dayPeriodColor: AppColors.primary,
               dayPeriodTextColor: AppColors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceGradientDark),
+            ),
+            dialogTheme: DialogThemeData(
+              backgroundColor: AppColors.surfaceGradientDark,
+            ),
           ),
           child: child!,
         );
@@ -133,7 +137,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
           shootEndTime = picked;
         }
 
-        controller.text = picked.format(context);
+        controller.text = DateTimeUtils.formatTimeOfDay(context, picked);
       });
     }
   }
@@ -159,31 +163,24 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   List<dynamic> photoEditTypes = [];
   List<dynamic> editTypes = [];
 
-
-
-
-  int selectedIndex=1;
-  bool istimingsame=true;
+  int selectedIndex = 1;
+  bool istimingsame = true;
   bool isPhotoOpen = true; //      // API data
   bool isVideoOpen = true; //      // API data
 
-  List<int> selectedEditTypeIds = [];        // selected ids
+  List<int> selectedEditTypeIds = []; // selected ids
   List<String> selectedEditTypeNames = [];
-
 
   final TextEditingController dateController = TextEditingController();
   final TextEditingController startTimeController = TextEditingController();
   final TextEditingController endTimeController = TextEditingController();
-
-
-
 
   TimeOfDay? startTime;
   TimeOfDay? endTime;
 
   DateTime? selectedDate;
 
-  bool isEditNeeded = false;  // ✅ Default = No selected
+  bool isEditNeeded = false; // ✅ Default = No selected
 
   bool isSubmitting = false;
   bool isDateSelected() {
@@ -193,66 +190,21 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
   bool isLoading = true;
   bool _hasSynced = false;
 
-  String _apiDateFormat(DateTime date) {
-
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-
-  }
-
   String formatDatesAlt(List<DateTime> dates) {
-    if (dates.isEmpty) return "";
-
-    dates.sort();
-
-    final days = dates.map((e) => DateFormat('d').format(e)).toList();
-    final lastDate = dates.last;
-
-    String daysText = "";
-
-    if (days.length == 1) {
-      daysText = days.first;
-    } else if (days.length == 2) {
-      daysText = "${days[0]} & ${days[1]}";
-    } else {
-      daysText =
-      "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-    }
-
-    final month = DateFormat('MMM').format(lastDate);
-    final year = DateFormat('yyyy').format(lastDate);
-
-    return "$month $daysText, $year";
+    return DateTimeUtils.formatMonthDaysWithCommaYear(dates);
   }
+
   String formatSelectedDates(List<DateTime> dates) {
-    if (dates.isEmpty) return "";
-
-    dates.sort(); // important for correct order
-
-    final days = dates.map((e) => DateFormat('d').format(e)).toList();
-    final lastDate = dates.last;
-
-    String daysText = "";
-
-    if (days.length == 1) {
-      daysText = days.first;
-    } else if (days.length == 2) {
-      daysText = "${days[0]} & ${days[1]}";
-    } else {
-      daysText =
-      "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-    }
-
-    final monthYear = DateFormat('MMM yyyy').format(lastDate);
-
-    return "Selected Days: $daysText $monthYear";
+    return DateTimeUtils.formatSelectedDaysWithLastMonthYear(dates);
   }
+
   bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
     return endMinutes > startMinutes;
   }
-  bool get isFormValid {
 
+  bool get isFormValid {
     /// 🔥 SINGLE DAY
     if (selectedIndex == 1) {
       if (selectedDate == null) return false;
@@ -300,7 +252,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     return "25 edited photos per hour";
   }*/
 
-
   bool isMultiLocked = false;
 
   @override
@@ -316,7 +267,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     selectedEditTypeNames.clear();
   }
 
-
   String getContentTypeTitle(int contentTypeId) {
     switch (contentTypeId) {
       case 1:
@@ -330,8 +280,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     }
   }
 
-
-/*  String getEditTypeDisplayText() {
+  /*  String getEditTypeDisplayText() {
 
     /// 🔥 When nothing selected
     if (selectedEditTypeNames.isEmpty) {
@@ -360,7 +309,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     return "${selectedEditTypeNames.first} +${selectedEditTypeNames.length - 1}";
   }*/
 
-
   void _syncFromNotifier(Map<String, dynamic> data) {
     if (_hasSynced) return;
     _hasSynced = true;
@@ -388,19 +336,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
         if (data['start_time'] != null) {
           final s = data['start_time'].split(":");
-          startTime = TimeOfDay(
-            hour: int.parse(s[0]),
-            minute: int.parse(s[1]),
-          );
+          startTime = TimeOfDay(hour: int.parse(s[0]), minute: int.parse(s[1]));
           _updateTimeText(startTimeController, startTime!);
         }
 
         if (data['end_time'] != null) {
           final e = data['end_time'].split(":");
-          endTime = TimeOfDay(
-            hour: int.parse(e[0]),
-            minute: int.parse(e[1]),
-          );
+          endTime = TimeOfDay(hour: int.parse(e[0]), minute: int.parse(e[1]));
           _updateTimeText(endTimeController, endTime!);
         }
 
@@ -423,8 +365,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               .toList();
         }
 
-        istimingsame =
-            multiDay?['same_timings_for_all_selected_dates'] ?? true;
+        istimingsame = multiDay?['same_timings_for_all_selected_dates'] ?? true;
 
         if (istimingsame == true && multiDay?['shared_time'] != null) {
           final shared = multiDay['shared_time'];
@@ -440,10 +381,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
           if (shared['end_time'] != null) {
             final e = shared['end_time'].split(":");
-            endTime = TimeOfDay(
-              hour: int.parse(e[0]),
-              minute: int.parse(e[1]),
-            );
+            endTime = TimeOfDay(hour: int.parse(e[0]), minute: int.parse(e[1]));
             _updateTimeText(endTimeController, endTime!);
           }
         }
@@ -475,12 +413,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     });
   }
 
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return "$hour:$minute:00";
-  }
   TimeOfDay getMinAllowedTime() {
     final now = DateTime.now().add(const Duration(hours: 4));
     return TimeOfDay(hour: now.hour, minute: now.minute);
@@ -494,7 +426,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
         selectedDate!.day == now.day;
   }
 
-
   DateTime minDateTimeForToday() {
     return DateTime.now().add(const Duration(hours: 4));
   }
@@ -504,9 +435,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     final now = DateTime.now();
     return min.day != now.day;
   }
-
-
-
 
   Future<void> _selectDateMultiple(BuildContext context) async {
     List<DateTime> tempSelected = List.from(selectedDates);
@@ -521,20 +449,22 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               onPrimary: AppColors.black,
               surface: AppColors.surfaceGradientDark,
               onSurface: AppColors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceGradientDark),
+            ),
+            dialogTheme: DialogThemeData(
+              backgroundColor: AppColors.surfaceGradientDark,
+            ),
           ),
           child: Dialog(
-            insetPadding:
-            const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xxl),
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadii.lgAll,
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.xxl,
             ),
+            shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
             child: StatefulBuilder(
               builder: (context, setStateDialog) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     /// HEADER
                     Container(
                       width: double.infinity,
@@ -586,7 +516,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           child: const Text("OK"),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 );
               },
@@ -608,17 +538,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     }
   }
 
-
-
   void _updateTimeText(TextEditingController controller, TimeOfDay picked) {
-    final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod.toString().padLeft(2, '0');
+    final hour = picked.hourOfPeriod == 0
+        ? 12
+        : picked.hourOfPeriod.toString().padLeft(2, '0');
     final minute = picked.minute.toString().padLeft(2, '0');
     final period = picked.period == DayPeriod.am ? "AM" : "PM";
     controller.text = "$hour:$minute $period";
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -654,24 +581,29 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
             ),
           ),
         ),
-        actions: const [ Padding( padding: EdgeInsets.only(right: AppSpacing.base), child: Center( child: Text("1/2", style: TextStyle(color: AppColors.white)), ), ) ],
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: AppSpacing.base),
+            child: Center(
+              child: Text("1/2", style: TextStyle(color: AppColors.white)),
+            ),
+          ),
+        ],
       ),
 
       body: SafeArea(
-
         child: Stack(
           children: [
             Padding(
-              padding:  EdgeInsets.all(AppSpacing.base),
+              padding: EdgeInsets.all(AppSpacing.base),
               child: Column(
                 children: [
-
                   Row(
                     children: List.generate(
                       2,
-                          (index) => Expanded(
+                      (index) => Expanded(
                         child: Container(
-                          margin:  EdgeInsets.only(right: AppSpacing.xs),
+                          margin: EdgeInsets.only(right: AppSpacing.xs),
                           height: 5,
                           decoration: BoxDecoration(
                             color: index < 1
@@ -683,23 +615,20 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
 
                   Row(
                     children: [
                       Text(
-
                         textAlign: TextAlign.start,
                         "Select Booking Type",
                         style: AppTextStyles.titleSmall,
                       ),
                     ],
                   ),
-                  SizedBox(height: 12,),
-                  //////////////////////////////////////////////////////////////////////////
+                  SizedBox(height: 12),
 
+                  //////////////////////////////////////////////////////////////////////////
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -734,69 +663,88 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                   },*/
                                   onTap: null,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.base,
+                                      vertical: AppSpacing.lg,
+                                    ),
                                     decoration: BoxDecoration(
                                       /// 🔥 COLOR FIX
                                       color: isSingleLocked
-                                          ? AppColors.neutralGrey.withValues(alpha: 0.3)
+                                          ? AppColors.neutralGrey.withValues(
+                                              alpha: 0.3,
+                                            )
                                           : (selectedIndex == 1
-                                          ? AppColors.primary
-                                          : AppColors.transparent),
+                                                ? AppColors.primary
+                                                : AppColors.transparent),
 
                                       borderRadius: AppRadii.lgAll,
 
                                       border: selectedIndex == 1
                                           ? null
-                                          : Border.all(color: AppColors.white.withValues(alpha: 0.3)),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                          ScaleClampedText(
-                                            child: Text(
-                                              "Single Day",
-                                              style: AppTextStyles.labelLarge.copyWith(
-                                                color: isSingleLocked
-                                                    ? AppColors.neutralGrey
-                                                    : (selectedIndex == 1
-                                                    ? AppColors.black
-                                                    : AppColors.neutralGrey),
+                                          : Border.all(
+                                              color: AppColors.white.withValues(
+                                                alpha: 0.3,
                                               ),
                                             ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        ScaleClampedText(
+                                          child: Text(
+                                            "Single Day",
+                                            style: AppTextStyles.labelLarge
+                                                .copyWith(
+                                                  color: isSingleLocked
+                                                      ? AppColors.neutralGrey
+                                                      : (selectedIndex == 1
+                                                            ? AppColors.black
+                                                            : AppColors
+                                                                  .neutralGrey),
+                                                ),
                                           ),
+                                        ),
 
                                         /// RADIO
                                         selectedIndex == 1
                                             ? Container(
-                                          width: 22,
-                                          height: 22,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: const LinearGradient(
-                                              colors: [
-                                                AppColors.black,
-                                                AppColors.surfaceWarmLight,
-                                              ],
-                                            ),
-                                            border: Border.all(color: AppColors.neutralGrey),
-                                          ),
-                                          child: const Center(
-                                            child: CircleAvatar(
-                                              radius: 3,
-                                              backgroundColor: AppColors.primary,
-                                            ),
-                                          ),
-                                        )
+                                                width: 22,
+                                                height: 22,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          AppColors.black,
+                                                          AppColors
+                                                              .surfaceWarmLight,
+                                                        ],
+                                                      ),
+                                                  border: Border.all(
+                                                    color:
+                                                        AppColors.neutralGrey,
+                                                  ),
+                                                ),
+                                                child: const Center(
+                                                  child: CircleAvatar(
+                                                    radius: 3,
+                                                    backgroundColor:
+                                                        AppColors.primary,
+                                                  ),
+                                                ),
+                                              )
                                             : Container(
-                                          width: 22,
-                                          height: 22,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: AppColors.white.withValues(alpha: 0.3),
-                                            ),
-                                          ),
-                                        ),
+                                                width: 22,
+                                                height: 22,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: AppColors.white
+                                                        .withValues(alpha: 0.3),
+                                                  ),
+                                                ),
+                                              ),
                                       ],
                                     ),
                                   ),
@@ -810,8 +758,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 child: GestureDetector(
                                   onTap: () {
                                     if (isMultiLocked) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Multiple Day not allowed")),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "Multiple Day not allowed",
+                                          ),
+                                        ),
                                       );
                                       return;
                                     }
@@ -831,69 +785,88 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     });
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.base,
+                                      vertical: AppSpacing.lg,
+                                    ),
                                     decoration: BoxDecoration(
                                       /// 🔥 COLOR FIX
                                       color: isMultiLocked
-                                          ? AppColors.neutralGrey.withValues(alpha: 0.3)
+                                          ? AppColors.neutralGrey.withValues(
+                                              alpha: 0.3,
+                                            )
                                           : (selectedIndex == 2
-                                          ? AppColors.primary
-                                          : AppColors.transparent),
+                                                ? AppColors.primary
+                                                : AppColors.transparent),
 
                                       borderRadius: AppRadii.lgAll,
 
                                       border: selectedIndex == 2
                                           ? null
-                                          : Border.all(color: AppColors.white.withValues(alpha: 0.3)),
+                                          : Border.all(
+                                              color: AppColors.white.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                            ),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         ScaleClampedText(
                                           child: Text(
                                             "Multiple Days",
-                                            style: AppTextStyles.labelLarge.copyWith(
-                                              color: isMultiLocked
-                                                  ? AppColors.neutralGrey
-                                                  : (selectedIndex == 2
-                                                  ? AppColors.black
-                                                  : AppColors.neutralGrey),
-                                            ),
+                                            style: AppTextStyles.labelLarge
+                                                .copyWith(
+                                                  color: isMultiLocked
+                                                      ? AppColors.neutralGrey
+                                                      : (selectedIndex == 2
+                                                            ? AppColors.black
+                                                            : AppColors
+                                                                  .neutralGrey),
+                                                ),
                                           ),
                                         ),
 
                                         /// RADIO
                                         selectedIndex == 2
                                             ? Container(
-                                          width: 22,
-                                          height: 22,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: const LinearGradient(
-                                              colors: [
-                                                AppColors.black,
-                                                AppColors.surfaceWarmLight,
-                                              ],
-                                            ),
-                                            border: Border.all(color: AppColors.neutralGrey),
-                                          ),
-                                          child: const Center(
-                                            child: CircleAvatar(
-                                              radius: 3,
-                                              backgroundColor: AppColors.primary,
-                                            ),
-                                          ),
-                                        )
+                                                width: 22,
+                                                height: 22,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          AppColors.black,
+                                                          AppColors
+                                                              .surfaceWarmLight,
+                                                        ],
+                                                      ),
+                                                  border: Border.all(
+                                                    color:
+                                                        AppColors.neutralGrey,
+                                                  ),
+                                                ),
+                                                child: const Center(
+                                                  child: CircleAvatar(
+                                                    radius: 3,
+                                                    backgroundColor:
+                                                        AppColors.primary,
+                                                  ),
+                                                ),
+                                              )
                                             : Container(
-                                          width: 22,
-                                          height: 22,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: AppColors.white.withValues(alpha: 0.3),
-                                            ),
-                                          ),
-                                        ),
+                                                width: 22,
+                                                height: 22,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: AppColors.white
+                                                        .withValues(alpha: 0.3),
+                                                  ),
+                                                ),
+                                              ),
                                       ],
                                     ),
                                   ),
@@ -902,12 +875,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             ],
                           ),
 
+                          SizedBox(height: 50),
 
-                          SizedBox(
-                            height: 50,
-                          ),
-
-                          if (selectedIndex==2) ...[
+                          if (selectedIndex == 2) ...[
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -921,10 +891,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-
                                   ],
                                 ),
-                                SizedBox(height: 12,),
+                                SizedBox(height: 12),
                                 buildDateSelector(
                                   context: context,
                                   selectedDates: selectedDates,
@@ -935,55 +904,76 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                   },
                                 ),
 
-
-                                SizedBox(height: 12,),
+                                SizedBox(height: 12),
 
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(AppSpacing.md),
+                                      padding: const EdgeInsets.all(
+                                        AppSpacing.md,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: AppColors.surfaceWarm,
                                         borderRadius: AppRadii.lgAll,
                                       ),
                                       child: Text(
                                         "Total Days: ${selectedDates.length}",
-                                        style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                          color: AppColors.primary,
+                                          fontSize: 13,
+                                          fontFamily:
+                                              AppAssets.fontHelveticaNeue,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Container(
-                                        padding: const EdgeInsets.all(AppSpacing.md),
+                                        padding: const EdgeInsets.all(
+                                          AppSpacing.md,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: AppColors.surfaceWarm,
                                           borderRadius: AppRadii.lgAll,
                                         ),
                                         child: selectedDates.isEmpty
                                             ? const Text(
-                                          "No dates selected",
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontSize: 12,
-                                          ),
-                                        )
+                                                "No dates selected",
+                                                style: TextStyle(
+                                                  color: AppColors.primary,
+                                                  fontSize: 12,
+                                                ),
+                                              )
                                             : SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal, // 👈 scroll enable
-                                          child: Text(
-                                              formatSelectedDates(selectedDates),
-                                              style: const TextStyle(color: AppColors.primary, fontSize: 13,fontFamily: AppAssets.fontHelveticaNeue,fontWeight: FontWeight.w500)
-                                          ),
-                                        ),
+                                                scrollDirection: Axis
+                                                    .horizontal, // 👈 scroll enable
+                                                child: Text(
+                                                  formatSelectedDates(
+                                                    selectedDates,
+                                                  ),
+                                                  style: const TextStyle(
+                                                    color: AppColors.primary,
+                                                    fontSize: 13,
+                                                    fontFamily: AppAssets
+                                                        .fontHelveticaNeue,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ],
                                 ),
 
-                                SizedBox(height: 12,),
-                                Text('Are Timings Same For All\nSelected Dates?',style: AppTextStyles.labelLarge.copyWith(
-                                  color: AppColors.white,
-                                  fontFamily:AppAssets.fontUnbounded,
-                                ),),
+                                SizedBox(height: 12),
+                                Text(
+                                  'Are Timings Same For All\nSelected Dates?',
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    color: AppColors.white,
+                                    fontFamily: AppAssets.fontUnbounded,
+                                  ),
+                                ),
 
                                 const SizedBox(height: 12),
 
@@ -998,11 +988,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                           istimingsame = true;
                                         });
                                       },
-
                                     ),
                                     const SizedBox(width: 24),
                                     _buildOption(
-
                                       title: "No",
                                       isSelected: istimingsame == false,
                                       onTap: () {
@@ -1011,10 +999,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                                           // 🔥 CLEAR OLD DATA
                                           resetEditTypes();
-
                                         });
                                       },
-
                                     ),
                                   ],
                                 ),
@@ -1026,18 +1012,22 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                       final isOpen = expandedMap[date] ?? false;
 
                                       return Container(
-                                        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                                        margin: const EdgeInsets.only(
+                                          bottom: AppSpacing.md,
+                                        ),
                                         decoration: BoxDecoration(
-
-                                          border: isOpen?
-                                          Border.all(color: AppColors.white.withValues(alpha: 0.2)):
-
-                                          Border.all(color:  AppColors.transparent),
+                                          border: isOpen
+                                              ? Border.all(
+                                                  color: AppColors.white
+                                                      .withValues(alpha: 0.2),
+                                                )
+                                              : Border.all(
+                                                  color: AppColors.transparent,
+                                                ),
                                           borderRadius: AppRadii.lgAll,
                                         ),
                                         child: Column(
                                           children: [
-
                                             /// 🔥 HEADER (Dropdown)
                                             GestureDetector(
                                               onTap: () {
@@ -1046,24 +1036,38 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                                 });
                                               },
                                               child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.base),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal:
+                                                          AppSpacing.base,
+                                                      vertical: AppSpacing.base,
+                                                    ),
                                                 decoration: BoxDecoration(
-                                                  color: AppColors.surfaceVariant,
+                                                  color:
+                                                      AppColors.surfaceVariant,
                                                   borderRadius: AppRadii.lgAll,
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      DateFormat('MMMM dd, yyyy').format(date),
-                                                      style: const TextStyle(color: AppColors.white),
+                                                      DateTimeUtils.formatFullMonthDate(
+                                                        date,
+                                                      ),
+                                                      style: const TextStyle(
+                                                        color: AppColors.white,
+                                                      ),
                                                     ),
                                                     Icon(
                                                       isOpen
-                                                          ? Icons.keyboard_arrow_up
-                                                          : Icons.keyboard_arrow_down,
+                                                          ? Icons
+                                                                .keyboard_arrow_up
+                                                          : Icons
+                                                                .keyboard_arrow_down,
                                                       color: AppColors.white,
-                                                    )
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -1072,48 +1076,66 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                             /// 🔥 BODY
                                             if (isOpen) ...[
                                               Padding(
-                                                padding: const EdgeInsets.all(AppSpacing.base),
+                                                padding: const EdgeInsets.all(
+                                                  AppSpacing.base,
+                                                ),
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
 
                                                   children: [
-
                                                     /// Start Time
-
                                                     AppTextField(
                                                       label: "Start Time",
-                                                      controller: TextEditingController(
-                                                        text: startTimes[date]?.format(context) ?? "",
-                                                      ),
+                                                      controller:
+                                                          TextEditingController(
+                                                            text: DateTimeUtils.formatTimeOfDay(
+                                                              context,
+                                                              startTimes[date],
+                                                            ),
+                                                          ),
                                                       readOnly: true,
                                                       /*   onTap: () {
                                                         _selectTime(context, null, true, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
                                                       suffix: Padding(
-                                                        padding: const EdgeInsets.all(AppSpacing.md),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              AppSpacing.md,
+                                                            ),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
-                                                          color: AppColors.white,
+                                                          color:
+                                                              AppColors.white,
                                                         ),
                                                       ),
                                                     ),
-                                                    SizedBox(height: 30,),
+                                                    SizedBox(height: 30),
                                                     AppTextField(
                                                       label: "End Time",
-                                                      controller: TextEditingController(
-                                                        text: endTimes[date]?.format(context) ?? "",
-                                                      ),
+                                                      controller:
+                                                          TextEditingController(
+                                                            text:
+                                                                DateTimeUtils.formatTimeOfDay(
+                                                                  context,
+                                                                  endTimes[date],
+                                                                ),
+                                                          ),
                                                       readOnly: true,
                                                       /*  onTap: () {
                                                         _selectTime(context, null, false, date); // ✅ FIX
                                                       },*/
                                                       onTap: null,
                                                       suffix: Padding(
-                                                        padding: const EdgeInsets.all(AppSpacing.md),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              AppSpacing.md,
+                                                            ),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
-                                                          color: AppColors.white,
+                                                          color:
+                                                              AppColors.white,
                                                         ),
                                                       ),
                                                     ),
@@ -1122,32 +1144,36 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                                                     /// Duration
                                                     Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                          horizontal: 14, vertical: 8),
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 14,
+                                                            vertical: 8,
+                                                          ),
                                                       decoration: BoxDecoration(
-                                                        color: AppColors.primary,
-                                                        borderRadius: AppRadii.mdAll,
+                                                        color:
+                                                            AppColors.primary,
+                                                        borderRadius:
+                                                            AppRadii.mdAll,
                                                       ),
                                                       child: Text(
                                                         getDurationText(date),
                                                         style: const TextStyle(
-                                                          color: AppColors.black,
+                                                          color:
+                                                              AppColors.black,
                                                           fontSize: 12,
                                                         ),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
-                                              )
-                                            ]
+                                              ),
+                                            ],
                                           ],
                                         ),
                                       );
                                     }).toList(),
-                                  )
+                                  ),
                                 ],
-
-
 
                                 if (istimingsame == true) ...[
                                   SizedBox(height: 22),
@@ -1169,7 +1195,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     },*/
                                     onTap: null,
                                     suffix: Padding(
-                                      padding: const EdgeInsets.all(AppSpacing.md),
+                                      padding: const EdgeInsets.all(
+                                        AppSpacing.md,
+                                      ),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
                                         color: AppColors.white,
@@ -1198,7 +1226,9 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                     },*/
                                     onTap: null,
                                     suffix: Padding(
-                                      padding: const EdgeInsets.all(AppSpacing.md),
+                                      padding: const EdgeInsets.all(
+                                        AppSpacing.md,
+                                      ),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
                                         color: AppColors.white,
@@ -1212,27 +1242,28 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                                   Row(
                                     children: [
-                                      SvgPicture.asset(AppAssets.checkmark, width: 24, height: 24),
+                                      SvgPicture.asset(
+                                        AppAssets.checkmark,
+                                        width: 24,
+                                        height: 24,
+                                      ),
                                       SizedBox(width: 6),
                                       Text(
                                         'Applied to ${selectedDates.length} selected dates',
-                                        style: AppTextStyles.bodyMedium.copyWith(
-                                          color: AppColors.textSecondary,
-                                          height: 1.36,
-                                        ),
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(
+                                              color: AppColors.textSecondary,
+                                              height: 1.36,
+                                            ),
                                       ),
                                     ],
                                   ),
-                                ]
-
-
-
+                                ],
                               ],
                             ),
                           ],
 
-
-                          if (selectedIndex==1) ...[
+                          if (selectedIndex == 1) ...[
                             Row(
                               children: [
                                 Text(
@@ -1246,9 +1277,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                               ],
                             ),
 
-                            SizedBox(height: 30,),
-
-
+                            SizedBox(height: 30),
 
                             AppTextField(
                               label: "Select Date",
@@ -1268,7 +1297,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                                 ),
                               ),
                             ),
-                            SizedBox(height: 30,),
+                            SizedBox(height: 30),
                             /*   timeField(
                         controller: startTimeController,
                         label: "Start Time*",
@@ -1338,20 +1367,13 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                             ),
                           ],
 
-
-
-                          SizedBox(height: 30,),
-
-
-
-
+                          SizedBox(height: 30),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-
             ),
             /*  if (isSubmitting)
               Positioned.fill(
@@ -1366,12 +1388,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 ),
               ),*/
           ],
-
         ),
       ),
 
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.smd, AppSpacing.base, AppSpacing.base),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xs,
+          AppSpacing.smd,
+          AppSpacing.base,
+          AppSpacing.base,
+        ),
         child: Row(
           children: [
             /*   Expanded(
@@ -1406,15 +1432,14 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isFormValid
-                      ? AppColors.primary   // ✅ active
-                      : AppColors.surfaceVariant,       // ❌ disabled
+                      ? AppColors
+                            .primary // ✅ active
+                      : AppColors.surfaceVariant, // ❌ disabled
                   foregroundColor: isFormValid
                       ? AppColors.black
                       : AppColors.neutralGrey,
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppRadii.lgAll,
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
                   elevation: isFormValid ? 2 : 0,
                 ),
 
@@ -1425,22 +1450,19 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                   ),
                 ),
               ),
-
             ),
-
-
           ],
         ),
       ),
     );
   }
+
   /////////////////////////////////////////////////////////////////////////////////////
   Widget buildDateSelector({
     required BuildContext context,
     required List<DateTime> selectedDates,
     required Function(List<DateTime>) onChanged,
-  })
-  {
+  }) {
     DateTime today = DateTime.now();
 
     /// ✅ Current month calculation (IMPORTANT FIX)
@@ -1450,21 +1472,15 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     /// ✅ Only current month dates
     List<DateTime> allDates = List.generate(
       totalDays - today.day + 1,
-          (index) => DateTime(
-        today.year,
-        today.month,
-        today.day + index,
-      ),
+      (index) => DateTime(today.year, today.month, today.day + index),
     );
 
     bool isSameDate(DateTime a, DateTime b) {
-      return a.year == b.year &&
-          a.month == b.month &&
-          a.day == b.day;
+      return a.year == b.year && a.month == b.month && a.day == b.day;
     }
 
     String getHeaderMonth() {
-      return DateFormat('MMM yyyy').format(today);
+      return DateTimeUtils.formatMonthYear(today);
     }
 
     return Container(
@@ -1477,7 +1493,11 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
         children: [
           /// 🔥 Header
           Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.md, top: AppSpacing.md),
+            padding: const EdgeInsets.only(
+              left: AppSpacing.md,
+              right: AppSpacing.md,
+              top: AppSpacing.md,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1513,12 +1533,12 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               itemBuilder: (context, index) {
                 final date = allDates[index];
 
-                final isSelected =
-                selectedDates.any((d) => isSameDate(d, date));
-
+                final isSelected = selectedDates.any(
+                  (d) => isSameDate(d, date),
+                );
 
                 return GestureDetector(
-                /*  onTap: isPast
+                  /*  onTap: isPast
                       ? null
                       : () {
                     List<DateTime> updated =
@@ -1536,13 +1556,15 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                     /// 🔥 UI refresh
                     (context as Element).markNeedsBuild();
                   },*/
-                  onTap: () {
-
-                  },
+                  onTap: () {},
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.smd,
+                    ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 19, vertical: 4),
+                      horizontal: 19,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primary
@@ -1564,7 +1586,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
                           ),
                         ),
                         Text(
-                          DateFormat('EEE').format(date),
+                          DateTimeUtils.formatWeekdayShort(date),
                           style: TextStyle(
                             fontSize: 9,
                             fontFamily: AppAssets.fontOutfit,
@@ -1592,7 +1614,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     return Container(
       margin: EdgeInsets.symmetric(vertical: AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.3), width: 0.5),
+        border: Border.all(
+          color: AppColors.white.withValues(alpha: 0.3),
+          width: 0.5,
+        ),
         borderRadius: AppRadii.xlAll,
       ),
       child: Column(
@@ -1605,7 +1630,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               });
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.lg,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: AppRadii.xlAll,
@@ -1613,17 +1641,22 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title,
-                      style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
 
                   AnimatedRotation(
                     turns: isVideoOpen ? 0.5 : 0,
                     duration: Duration(milliseconds: 300),
-                    child: Icon(Icons.keyboard_arrow_down,
-                        color: AppColors.white),
+                    child: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColors.white,
+                    ),
                   ),
                 ],
               ),
@@ -1648,12 +1681,16 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 15, vertical: 11),
+                    horizontal: 15,
+                    vertical: 11,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(name,
-                            style: TextStyle(color: AppColors.white)),
+                        child: Text(
+                          name,
+                          style: TextStyle(color: AppColors.white),
+                        ),
                       ),
 
                       /// COUNTER
@@ -1690,11 +1727,15 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
       ),
     );
   }
+
   Widget PhotoEdits(String title, List<dynamic> data) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: AppSpacing.lg),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.3), width: 0.5),
+        border: Border.all(
+          color: AppColors.white.withValues(alpha: 0.3),
+          width: 0.5,
+        ),
         borderRadius: AppRadii.xlAll,
       ),
       child: Column(
@@ -1707,7 +1748,10 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               });
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.lg,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: AppRadii.lgAll,
@@ -1715,15 +1759,19 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(title,
-                      style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white)),
+                  Text(
+                    title,
+                    style: AppTextStyles.buttonLarge.copyWith(
+                      color: AppColors.white,
+                    ),
+                  ),
 
                   Icon(
                     isPhotoOpen
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     color: AppColors.white,
-                  )
+                  ),
                 ],
               ),
             ),
@@ -1740,13 +1788,17 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               int count = photoCounts[id] ?? 0;
 
               return Padding(
-                padding:
-                EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.base,
+                  vertical: AppSpacing.md,
+                ),
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(name,
-                          style: TextStyle(color: AppColors.white)),
+                      child: Text(
+                        name,
+                        style: TextStyle(color: AppColors.white),
+                      ),
                     ),
 
                     AppQtyCounter(
@@ -1773,7 +1825,6 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     );
   }
 
-
   Widget timeField({
     required TextEditingController controller,
     required String label,
@@ -1782,7 +1833,8 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AbsorbPointer( // 🔥 TextField touch disable
+      child: AbsorbPointer(
+        // 🔥 TextField touch disable
         child: TextField(
           controller: controller,
           readOnly: true,
@@ -1798,7 +1850,7 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               color: AppColors.white70,
             ),
 
-            suffixIcon:  Padding(
+            suffixIcon: Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: SvgPicture.asset(
                 AppAssets.clock,
@@ -1811,27 +1863,31 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               ),
             ),
 
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.lg,
+            ),
 
             enabledBorder: OutlineInputBorder(
               borderRadius: AppRadii.lgAll,
-              borderSide:
-              const BorderSide(color: AppColors.white70, width: 0.5),
+              borderSide: const BorderSide(
+                color: AppColors.white70,
+                width: 0.5,
+              ),
             ),
 
             focusedBorder: OutlineInputBorder(
               borderRadius: AppRadii.lgAll,
-              borderSide:
-              const BorderSide(color: AppColors.white70, width: 0.5),
+              borderSide: const BorderSide(
+                color: AppColors.white70,
+                width: 0.5,
+              ),
             ),
           ),
         ),
       ),
     );
   }
-
-
 
   Widget _buildOption({
     required String title,
@@ -1850,42 +1906,36 @@ class _ShootTypeSelectionScreenState extends ConsumerState<ShootTypeSelectionScr
               shape: BoxShape.circle,
               gradient: isSelected
                   ? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primary, // light gold
-                  AppColors.primaryDark, // dark gold
-                ],
-              )
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        AppColors.primary, // light gold
+                        AppColors.primaryDark, // dark gold
+                      ],
+                    )
                   : null,
-              border: Border.all(
-                color: AppColors.white70,
-                width: 1,
-              ),
+              border: Border.all(color: AppColors.white70, width: 1),
             ),
             child: isSelected
                 ? Center(
-              child: Container(
-                height: 8,
-                width: 8,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.black,
-                ),
-              ),
-            )
+                    child: Container(
+                      height: 8,
+                      width: 8,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  )
                 : const SizedBox(),
           ),
           const SizedBox(width: 8),
           Text(
             title,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.white,
-            ),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
           ),
         ],
       ),
     );
   }
-
 }

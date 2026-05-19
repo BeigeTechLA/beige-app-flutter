@@ -5,7 +5,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -362,47 +361,6 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         '';
   }
 
-  String _formatCardDate(String value) {
-    final rawDates = value
-        .split(',')
-        .map((date) => date.trim())
-        .where((date) => date.isNotEmpty)
-        .toList();
-
-    if (rawDates.isEmpty) return '';
-
-    final parsedDates = rawDates
-        .map((date) => DateTime.tryParse(date))
-        .whereType<DateTime>()
-        .toList();
-
-    if (parsedDates.length != rawDates.length) return value;
-    if (parsedDates.length == 1) {
-      return DateFormat('MMM d, yyyy').format(parsedDates.first);
-    }
-
-    final first = parsedDates.first;
-    final last = parsedDates.last;
-
-    if (first.year == last.year && first.month == last.month) {
-      return '${DateFormat('MMM d').format(first)}–${last.day}, ${last.year}';
-    }
-
-    if (first.year == last.year) {
-      return '${DateFormat('MMM d').format(first)} – '
-          '${DateFormat('MMM d, yyyy').format(last)}';
-    }
-
-    return '${DateFormat('MMM d, yyyy').format(first)} – '
-        '${DateFormat('MMM d, yyyy').format(last)}';
-  }
-
-  String _formatCardTime(String value) {
-    final time = DateTimeUtils.formatTime(value);
-    if (time == '--') return '';
-    return time.startsWith('0') ? time.substring(1) : time;
-  }
-
   String? _bookingSubtitle({
     required String date,
     required String startTime,
@@ -448,8 +406,12 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final String endTimeRaw = display['endTime'] ?? '';
     final double durationHrsRaw = (display['duration'] ?? 0).toDouble();
 
-    final String cardStartTime = _formatCardTime(startTimeRaw);
-    final String cardEndTime = _formatCardTime(endTimeRaw);
+    final String cardStartTime = DateTimeUtils.formatTimeWithoutLeadingZero(
+      startTimeRaw,
+    );
+    final String cardEndTime = DateTimeUtils.formatTimeWithoutLeadingZero(
+      endTimeRaw,
+    );
     final double durationHrs = durationHrsRaw > 0
         ? durationHrsRaw
         : _hoursBetween(startTimeRaw, endTimeRaw);
@@ -470,7 +432,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         contentType: contentType,
       ),
       subtitle: _bookingSubtitle(
-        date: _formatCardDate(eventDate),
+        date: DateTimeUtils.formatCardDateRange(eventDate),
         startTime: cardStartTime,
         endTime: cardEndTime,
         duration: durationText,
@@ -536,8 +498,12 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final String contentType = shoot['content_type'] ?? '';
     final String creativeName = _creativeName(shoot);
 
-    final String cardStartTime = _formatCardTime(startTimeRaw);
-    final String cardEndTime = _formatCardTime(endTimeRaw);
+    final String cardStartTime = DateTimeUtils.formatTimeWithoutLeadingZero(
+      startTimeRaw,
+    );
+    final String cardEndTime = DateTimeUtils.formatTimeWithoutLeadingZero(
+      endTimeRaw,
+    );
     final double durationHrs = durationHrsRaw > 0
         ? durationHrsRaw
         : _hoursBetween(startTimeRaw, endTimeRaw);
@@ -551,7 +517,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         contentType: contentType,
       ),
       subtitle: _bookingSubtitle(
-        date: _formatCardDate(eventDate),
+        date: DateTimeUtils.formatCardDateRange(eventDate),
         startTime: cardStartTime,
         endTime: cardEndTime,
         duration: durationText,

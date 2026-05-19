@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,11 +15,7 @@ import 'package:beige/shared/layouts/app_scaffold.dart';
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
   final bool fromHome;
-  const ContentTypeScreen({
-    super.key,
-    this.value,
-    this.fromHome = false,
-  });
+  const ContentTypeScreen({super.key, this.value, this.fromHome = false});
 
   @override
   ConsumerState<ContentTypeScreen> createState() => _ContentTypeScreenState();
@@ -340,14 +334,9 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                 color: AppColors.iconBackground,
               ),
               child: Center(
-                child: ImageFiltered(
-                  imageFilter: isDisabled
-                      ? ImageFilter.blur(sigmaX: 0.6, sigmaY: 0.6)
-                      : ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                  child: Opacity(
-                    opacity: isDisabled ? 0.7 : 1,
-                    child: Image.asset(activeImage),
-                  ),
+                child: Opacity(
+                  opacity: isDisabled ? 0.5 : 1,
+                  child: Image.asset(activeImage),
                 ),
               ),
             ),

@@ -5,7 +5,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';

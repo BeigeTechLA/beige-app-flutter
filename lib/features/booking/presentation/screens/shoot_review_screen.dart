@@ -182,7 +182,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       // 4. Present Stripe
       await Stripe.instance.presentPaymentSheet();
 
-    /*  // 5. Confirm with backend
+      /*  // 5. Confirm with backend
       final paymentIntentId = clientSecret.split('_secret').first;
 
       final confirmed = await notifier.confirmPayment(
@@ -865,7 +865,10 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                               ),
                                         ),
                                       ),
-                                      Divider(color: AppColors.black36, height: 0.5),
+                                      Divider(
+                                        color: AppColors.black36,
+                                        height: 0.5,
+                                      ),
                                       const SizedBox(height: AppSpacing.md),
                                       _buildCheckRow(
                                         text: "Unlimited Usage Rights",
@@ -1152,11 +1155,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: SvgPicture.asset(
-                iconPath,
-                height: 16,
-                width: 16,
-              ),
+              child: SvgPicture.asset(iconPath, height: 16, width: 16),
             ),
           ),
           const SizedBox(width: AppSpacing.md),

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:beige/app/route_names.dart';
+import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/app/colors.dart';
@@ -177,7 +177,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
       /// ✅ FINAL FORMAT (12 HOUR SAME AS SINGLE)
       final time = TimeOfDay.fromDateTime(current);
-      times.add(time.format(context));
+      times.add(DateTimeUtils.formatTimeOfDay(context, time));
 
       current = current.add(Duration(minutes: 15));
     }
@@ -220,9 +220,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }
 
   String _formatSlot(TimeOfDay time) {
-    return DateFormat(
-      'h:mm a',
-    ).format(DateTime(2000, 1, 1, time.hour, time.minute));
+    return DateTimeUtils.formatTimeOfDayShort(time);
   }
 
   bool _isSameTime(TimeOfDay a, TimeOfDay b) {
@@ -570,10 +568,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     return "Select Edits";
   }
 
-  String _apiDateFormat(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  }
-
   String getTotalDuration() {
     final totalMinutes = getTotalSelectedDurationInMinutes();
 
@@ -585,42 +579,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }
 
   String formatDatesAlt(List<DateTime> dates) {
-    if (dates.isEmpty) return "";
-
-    dates.sort();
-
-    Map<String, List<int>> monthMap = {};
-
-    for (var date in dates) {
-      String key = DateFormat('MMM yyyy').format(date);
-
-      if (!monthMap.containsKey(key)) {
-        monthMap[key] = [];
-      }
-
-      monthMap[key]!.add(date.day);
-    }
-
-    List<String> result = [];
-
-    monthMap.forEach((month, days) {
-      days.sort();
-
-      String daysText = "";
-
-      if (days.length == 1) {
-        daysText = "${days.first}";
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-            "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-      }
-
-      result.add("$month $daysText");
-    });
-
-    return result.join(", ");
+    return DateTimeUtils.formatGroupedMonthDays(dates);
   }
 
   String getDaysAndHours() {
@@ -636,42 +595,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }
 
   String formatSelectedDates(List<DateTime> dates) {
-    if (dates.isEmpty) return "";
-
-    dates.sort();
-
-    Map<String, List<int>> monthMap = {};
-
-    for (var date in dates) {
-      String key = DateFormat('MMM yyyy').format(date);
-
-      if (!monthMap.containsKey(key)) {
-        monthMap[key] = [];
-      }
-
-      monthMap[key]!.add(date.day);
-    }
-
-    List<String> result = [];
-
-    monthMap.forEach((month, days) {
-      days.sort();
-
-      String daysText = "";
-
-      if (days.length == 1) {
-        daysText = "${days.first}";
-      } else if (days.length == 2) {
-        daysText = "${days[0]} & ${days[1]}";
-      } else {
-        daysText =
-            "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
-      }
-
-      result.add("$daysText $month");
-    });
-
-    return "Selected Days: ${result.join(', ')}";
+    return DateTimeUtils.formatGroupedSelectedDaysLabel(dates);
   }
 
   DateTime normalizeDate(DateTime d) {
@@ -893,9 +817,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       payload = {
         "booking_type": "single_day",
         "time_zone": "Asia/Calcutta",
-        "event_date": _apiDateFormat(selectedDate!),
-        "start_time": _formatTime(startTime!),
-        "end_time": _formatTime(endTime!),
+        "event_date": DateTimeUtils.formatApiDate(selectedDate!),
+        "start_time": DateTimeUtils.formatApiTime(startTime!),
+        "end_time": DateTimeUtils.formatApiTime(endTime!),
         "edits_needed": isEditNeeded ? 1 : 0,
         "video_edit_types": videoEditKeys,
         "photo_edit_types": photoEditKeys,
@@ -934,9 +858,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
         for (var date in selectedDates) {
           bookingDays.add({
-            "date": _apiDateFormat(date),
-            "start_time": _formatTime(startTime!),
-            "end_time": _formatTime(endTime!),
+            "date": DateTimeUtils.formatApiDate(date),
+            "start_time": DateTimeUtils.formatApiTime(startTime!),
+            "end_time": DateTimeUtils.formatApiTime(endTime!),
           });
         }
       }
@@ -968,9 +892,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
           }
 
           bookingDays.add({
-            "date": _apiDateFormat(date),
-            "start_time": _formatTime(start), // ✅ FIXED
-            "end_time": _formatTime(end), // ✅ FIXED
+            "date": DateTimeUtils.formatApiDate(date),
+            "start_time": DateTimeUtils.formatApiTime(start), // ✅ FIXED
+            "end_time": DateTimeUtils.formatApiTime(end), // ✅ FIXED
           });
         }
       }
@@ -1009,12 +933,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     }
 
     setState(() => isSubmitting = false);
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return "$hour:$minute:00";
   }
 
   TimeOfDay getMinAllowedTime() {
@@ -2024,9 +1942,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                                         .spaceBetween,
                                                 children: [
                                                   Text(
-                                                    DateFormat(
-                                                      'MMMM dd, yyyy',
-                                                    ).format(date),
+                                                    DateTimeUtils.formatFullMonthDate(
+                                                      date,
+                                                    ),
                                                     style: const TextStyle(
                                                       color: AppColors.white,
                                                     ),
@@ -2298,7 +2216,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                             Text(
                                               startTime != null &&
                                                       endTime != null
-                                                  ? "${startTime!.format(context)} – ${endTime!.format(context)}"
+                                                  ? "${DateTimeUtils.formatTimeOfDay(context, startTime)} – ${DateTimeUtils.formatTimeOfDay(context, endTime)}"
                                                   : "Select Time",
                                               style: TextStyle(
                                                 fontFamily:
@@ -2755,7 +2673,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     }
 
     String getHeaderMonth() {
-      return DateFormat('MMM yyyy').format(today);
+      return DateTimeUtils.formatMonthYear(today);
     }
 
     return Container(
@@ -2855,7 +2773,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                           ),
                         ),
                         Text(
-                          DateFormat('EEE').format(date),
+                          DateTimeUtils.formatWeekdayShort(date),
                           style: TextStyle(
                             fontSize: 9,
                             fontFamily: AppAssets.fontOutfit,

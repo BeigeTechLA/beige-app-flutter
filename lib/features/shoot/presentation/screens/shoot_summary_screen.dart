@@ -18,24 +18,21 @@ class ShootSummaryScreen extends ConsumerStatefulWidget {
   final int bookingId;
   final String? contentType;
   final int shootTypeId;
-  const ShootSummaryScreen({super.key, required this.bookingId, this.contentType, required this.shootTypeId});
+  const ShootSummaryScreen({
+    super.key,
+    required this.bookingId,
+    this.contentType,
+    required this.shootTypeId,
+  });
 
   @override
-  ConsumerState<ShootSummaryScreen> createState() =>
-      _ShootSummaryScreenState();
+  ConsumerState<ShootSummaryScreen> createState() => _ShootSummaryScreenState();
 }
 
-class _ShootSummaryScreenState
-    extends ConsumerState<ShootSummaryScreen> {
-
+class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
   String _imageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     return '${ApiEndpoints.imageUrl}$path';
-  }
-
-  String formatTimelineTime(String isoTime) {
-    final date = DateTime.parse(isoTime).toLocal();
-    return DateFormat('EEE, dd MMM • hh:mm a').format(date);
   }
 
   String _getFinalImage(Map<String, dynamic>? bookingData) {
@@ -44,8 +41,7 @@ class _ShootSummaryScreenState
     final String profileImage =
         bookingData?['creative']?['profile_image_url'] ?? '';
 
-    final String eventImage =
-        bookingData?['event']?['image_url'] ?? '';
+    final String eventImage = bookingData?['event']?['image_url'] ?? '';
 
     if (profileImage.isNotEmpty) {
       return _imageUrl(profileImage);
@@ -79,7 +75,9 @@ class _ShootSummaryScreenState
 
   @override
   Widget build(BuildContext context) {
-    final summaryState = ref.watch(shootSummaryNotifierProvider(widget.bookingId));
+    final summaryState = ref.watch(
+      shootSummaryNotifierProvider(widget.bookingId),
+    );
     final bookingData = summaryState.shootDetails;
     final loading = summaryState.status == ShootSummaryStatus.loading;
 
@@ -95,43 +93,37 @@ class _ShootSummaryScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Stack(
                   children: [
-
                     /// 🔥 IMAGE
                     SizedBox(
                       height: 280,
                       width: double.infinity,
                       child: image.startsWith("http")
                           ? Image.network(
-                        image,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: AppColors.black12,
-                            child: Center(
-                              child: SvgPicture.asset(
-                                AppAssets.imagePlaceholder,
-                                height: 80,
+                              image,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: AppColors.black12,
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      AppAssets.imagePlaceholder,
+                                      height: 80,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          /// ✅ SVG PLACEHOLDER
+                          : Container(
+                              color: AppColors.black12,
+                              child: Center(
+                                child: SvgPicture.asset(image, height: 80),
                               ),
                             ),
-                          );
-                        },
-                      )
-
-                      /// ✅ SVG PLACEHOLDER
-                          : Container(
-                        color: AppColors.black12,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            image,
-                            height: 80,
-                          ),
-                        ),
-                      ),
                     ),
 
                     /// 🔥 DARK GRADIENT (FIGMA STYLE)
@@ -143,9 +135,9 @@ class _ShootSummaryScreenState
                           end: Alignment.bottomCenter,
                           stops: const [0.0, 0.5, 1.0],
                           colors: [
-                            AppColors.black.withValues(alpha:0.6),
+                            AppColors.black.withValues(alpha: 0.6),
                             AppColors.transparent,
-                            AppColors.black.withValues(alpha:0.95),
+                            AppColors.black.withValues(alpha: 0.95),
                           ],
                         ),
                       ),
@@ -176,7 +168,6 @@ class _ShootSummaryScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           /// NAME
                           Text(
                             bookingData?['creative']?['name'] ?? "",
@@ -211,164 +202,155 @@ class _ShootSummaryScreenState
                   ],
                 ),
 
-
                 /// 🟢 MAIN CARD
                 Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                        /// 🔥 MULTI / SINGLE HANDLE
-                        if (isMulti) ...[
-
-                    /// ✅ MULTI DAY LOOP
-                    ...List.generate(days.length, (index) {
-                  final day = days[index];
-
-                  return Column(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      /// 🔥 MULTI / SINGLE HANDLE
+                      if (isMulti) ...[
+                        /// ✅ MULTI DAY LOOP
+                        ...List.generate(days.length, (index) {
+                          final day = days[index];
 
-                      infoRow(
-                        AppAssets.calendarDate,
-                      DateTimeUtils.formatDate(day['date']),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              infoRow(
+                                AppAssets.calendarDate,
+                                DateTimeUtils.formatDate(day['date']),
+                              ),
+
+                              infoRow(
+                                AppAssets.clock,
+                                "${DateTimeUtils.formatTime(day['start_time'])} - "
+                                "${DateTimeUtils.formatTime(day['end_time'])} "
+                                "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
+                              ),
+
+                              const SizedBox(height: AppSpacing.smd),
+                            ],
+                          );
+                        }),
+                      ] else ...[
+                        /// ✅ SINGLE DAY
+                        if (event?['event_date'] != null)
+                          infoRow(
+                            AppAssets.calendarDate,
+                            DateTimeUtils.formatDate(event?['event_date']),
+                          ),
+
+                        if (event?['start_time'] != null &&
+                            event?['end_time'] != null)
+                          infoRow(
+                            AppAssets.clock,
+                            "${DateTimeUtils.formatTime(event?['start_time'])} - "
+                            "${DateTimeUtils.formatTime(event?['end_time'])} "
+                            "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
+                          ),
+                      ],
+
+                      /// 📍 LOCATION
+                      if ((event?['location'] ?? "").isNotEmpty)
+                        infoRow(AppAssets.location, event?['location']),
+
+                      const SizedBox(height: AppSpacing.md),
+
+                      /// 📄 DESCRIPTION CARD
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.smd),
+                        decoration: BoxDecoration(
+                          color: AppColors.white.withValues(alpha: 0.05),
+                          borderRadius: AppRadii.hugeAll,
+                          border: Border.all(
+                            color: AppColors.white.withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              event?['name'] ?? "",
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+
+                            const SizedBox(height: AppSpacing.xs),
+
+                            Text(
+                              event?['type'] ?? "",
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.white70,
+                              ),
+                            ),
+
+                            const SizedBox(height: AppSpacing.md),
+
+                            Text(
+                              "Description",
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+
+                            const SizedBox(height: AppSpacing.xs),
+
+                            Text(
+                              event?['description'] ??
+                                  "No description available",
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.white70,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
-                      infoRow(
-                        AppAssets.clock,
-                        "${DateTimeUtils.formatTime(day['start_time'])} - "
-                            "${DateTimeUtils.formatTime(day['end_time'])} "
-                            "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())})",
-                      ),
+                      const SizedBox(height: AppSpacing.xl),
 
-                      const SizedBox(height: AppSpacing.smd),
+                      /// 🔹 BUDGET + CREW
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.hugeAll,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: infoItem(
+                                icon: Icons.attach_money,
+                                title: "Event Budget",
+                                value: _formatBudget(bookingData),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.base),
+                            Expanded(
+                              child: infoItem(
+                                icon: Icons.group,
+                                title: "Crew Size Needed",
+                                value: event?['crew_size_needed'] != null
+                                    ? "${event?['crew_size_needed']} members"
+                                    : "-",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                  );
-                }),
-
-              ] else ...[
-
-            /// ✅ SINGLE DAY
-            if (event?['event_date'] != null)
-            infoRow(
-            AppAssets.calendarDate,
-              DateTimeUtils.formatDate(event?['event_date']),
-          ),
-
-          if (event?['start_time'] != null && event?['end_time'] != null)
-            infoRow(
-              AppAssets.clock,
-              "${DateTimeUtils.formatTime(event?['start_time'])} - "
-                  "${DateTimeUtils.formatTime(event?['end_time'])} "
-                  "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
-            ),
-        ],
-
-          /// 📍 LOCATION
-          if ((event?['location'] ?? "").isNotEmpty)
-    infoRow(
-      AppAssets.location,
-      event?['location'],
-    ),
-
-    const SizedBox(height: AppSpacing.md),
-
-    /// 📄 DESCRIPTION CARD
-    Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(AppSpacing.smd),
-    decoration: BoxDecoration(
-    color: AppColors.white.withValues(alpha:0.05),
-    borderRadius: AppRadii.hugeAll,
-    border: Border.all(
-    color: AppColors.white.withValues(alpha:0.1),
-    ),
-    ),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-
-    Text(
-    event?['name'] ?? "",
-    style: AppTextStyles.labelLarge.copyWith(
-    color: AppColors.white,
-    ),
-    ),
-
-    const SizedBox(height: AppSpacing.xs),
-
-    Text(
-    event?['type'] ?? "",
-    style: AppTextStyles.bodySmall.copyWith(
-    color: AppColors.white70,
-    ),
-    ),
-
-    const SizedBox(height: AppSpacing.md),
-
-    Text(
-    "Description",
-    style: AppTextStyles.labelLarge.copyWith(
-    color: AppColors.white,
-    ),
-    ),
-
-    const SizedBox(height: AppSpacing.xs),
-
-    Text(
-    event?['description'] ?? "No description available",
-    style: AppTextStyles.bodySmall.copyWith(
-    color: AppColors.white70,
-    ),
-    ),
-    ],
-    ),
-    ),
-
-    const SizedBox(height: AppSpacing.xl),
-
-    /// 🔹 BUDGET + CREW
-    Container(
-    padding: const EdgeInsets.all(AppSpacing.md),
-    decoration: BoxDecoration(
-    color: AppColors.surfaceVariant,
-    borderRadius: AppRadii.hugeAll,
-    ),
-    child: Row(
-    children: [
-    Expanded(
-    child: infoItem(
-    icon: Icons.attach_money,
-    title: "Event Budget",
-    value: _formatBudget(bookingData),
-    ),
-    ),
-    const SizedBox(width: AppSpacing.base),
-    Expanded(
-    child: infoItem(
-    icon: Icons.group,
-    title: "Crew Size Needed",
-    value: event?['crew_size_needed'] != null
-    ? "${event?['crew_size_needed']} members"
-        : "-",
-    ),
-    ),
-    ],
-    ),
-    ),
-    ],
-    ),
-    ),
+                  ),
+                ),
               ],
             ),
           ),
           if (loading)
             const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
-            )
+            ),
         ],
-
       ),
 
       bottomNavigationBar: Padding(
@@ -378,36 +360,35 @@ class _ShootSummaryScreenState
           height: 55,
           child: ElevatedButton(
             onPressed: () {
-
-
-              context.pushNamed(RouteNames.manageBooking, extra: {
-                'projectName': bookingData?['event']?['name'] ?? '',
-                'eventDate': isMulti
-                    ? days.map((d) => d['date']).join(", ")
-                    : event?['event_date'] ?? '',
-                'startTime': isMulti
-                    ? (days.isNotEmpty ? days.first['start_time'] : '')
-                    : event?['start_time'] ?? '',
-                'endTime': isMulti
-                    ? (days.isNotEmpty ? days.first['end_time'] : '')
-                    : event?['end_time'] ?? '',
-                'durationHours': (event?['duration_hours'] ?? 0).toDouble(),
-                'multiDays': days,
-                'location': bookingData?['event']?['location'] ?? '',
-                'imageUrl': _getFinalImage(bookingData),
-                'bookingId': widget.bookingId,
-                'shootTypeId': widget.shootTypeId,
-                'contentType': widget.contentType,
-              });
+              context.pushNamed(
+                RouteNames.manageBooking,
+                pathParameters: {'bookingId': widget.bookingId.toString()},
+                extra: {
+                  'projectName': bookingData?['event']?['name'] ?? '',
+                  'eventDate': isMulti
+                      ? days.map((d) => d['date']).join(", ")
+                      : event?['event_date'] ?? '',
+                  'startTime': isMulti
+                      ? (days.isNotEmpty ? days.first['start_time'] : '')
+                      : event?['start_time'] ?? '',
+                  'endTime': isMulti
+                      ? (days.isNotEmpty ? days.first['end_time'] : '')
+                      : event?['end_time'] ?? '',
+                  'durationHours': (event?['duration_hours'] ?? 0).toDouble(),
+                  'multiDays': days,
+                  'location': bookingData?['event']?['location'] ?? '',
+                  'imageUrl': _getFinalImage(bookingData),
+                  'bookingId': widget.bookingId,
+                  'shootTypeId': widget.shootTypeId,
+                  'contentType': widget.contentType,
+                },
+              );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor:  AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadii.lgAll,
-              ),
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
             ),
-            child:
-            Text(
+            child: Text(
               "Manage Shoot",
               style: AppTextStyles.titleSmall.copyWith(
                 fontSize: 14,
@@ -450,7 +431,10 @@ class _ShootSummaryScreenState
   /// 🔹 CHIP
   Widget chip(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smd, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.smd,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.white10,
         borderRadius: AppRadii.hugeAll,
@@ -460,8 +444,8 @@ class _ShootSummaryScreenState
         style: AppTextStyles.bodySmall.copyWith(color: AppColors.white70),
       ),
     );
-
   }
+
   Widget infoItem({
     required IconData icon,
     required String title,
@@ -470,7 +454,6 @@ class _ShootSummaryScreenState
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         /// ICON BOX
         Container(
           height: 33,
@@ -478,8 +461,8 @@ class _ShootSummaryScreenState
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primary.withValues(alpha:0.9),
-                AppColors.primary.withValues(alpha:0.6),
+                AppColors.primary.withValues(alpha: 0.9),
+                AppColors.primary.withValues(alpha: 0.6),
               ],
             ),
             borderRadius: BorderRadius.circular(AppRadii.mld),
@@ -495,15 +478,13 @@ class _ShootSummaryScreenState
           children: [
             Text(
               title,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
             const SizedBox(height: AppSpacing.xxs),
             Text(
               value,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.white.withValues(alpha:0.6),
+                color: AppColors.white.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -513,7 +494,9 @@ class _ShootSummaryScreenState
   }
 
   void showProjectTimelineDialog(BuildContext context) {
-    final currentState = ref.read(shootSummaryNotifierProvider(widget.bookingId));
+    final currentState = ref.read(
+      shootSummaryNotifierProvider(widget.bookingId),
+    );
     final loadingTimeline = currentState.status == ShootSummaryStatus.loading;
     final timelineData = currentState.timeline;
 
@@ -529,9 +512,7 @@ class _ShootSummaryScreenState
               padding: const EdgeInsets.all(AppSpacing.smd),
               decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(32),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
               ),
               child: Column(
                 children: [
@@ -561,8 +542,10 @@ class _ShootSummaryScreenState
                         ),
                         InkWell(
                           onTap: () => context.pop(),
-                          child:
-                          const Icon(Icons.close, color: AppColors.white),
+                          child: const Icon(
+                            Icons.close,
+                            color: AppColors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -573,34 +556,34 @@ class _ShootSummaryScreenState
                   /// BODY
                   Expanded(
                     child: loadingTimeline
-                        ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
+                        ? const Center(child: CircularProgressIndicator())
                         : timelineData.isEmpty
                         ? Center(
-                      child: Text(
-                        "No timeline available",
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white70),
-                      ),
-                    )
+                            child: Text(
+                              "No timeline available",
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.white70,
+                              ),
+                            ),
+                          )
                         : ListView.builder(
-                      padding: const EdgeInsets.all(30),
-                      itemCount: timelineData.length,
-                      itemBuilder: (context, index) {
-                        final item = timelineData[index];
+                            padding: const EdgeInsets.all(30),
+                            itemCount: timelineData.length,
+                            itemBuilder: (context, index) {
+                              final item = timelineData[index];
 
-                        return timelineItem(
-                          title: item['title'] ?? "",
-                          subtitle: item['description'] ?? "",
-                          time: formatTimelineTime(
-                              item['timestamp']),
-                          isActive:
-                          index == timelineData.length - 1,
-                          showLine:
-                          index != timelineData.length - 1,
-                        );
-                      },
-                    ),
+                              return timelineItem(
+                                title: item['title'] ?? "",
+                                subtitle: item['description'] ?? "",
+                                time: DateTimeUtils.formatTimelineDateTime(
+                                  item['timestamp'],
+                                  fallback: "",
+                                ),
+                                isActive: index == timelineData.length - 1,
+                                showLine: index != timelineData.length - 1,
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -629,15 +612,9 @@ class _ShootSummaryScreenState
               width: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isActive
-                    ? AppColors.primary
-                    : AppColors.surfaceInput,
+                color: isActive ? AppColors.primary : AppColors.surfaceInput,
               ),
-              child: Center(
-                child: Image.asset(
-                  AppAssets.userCheckTimeline,
-                ),
-              ),
+              child: Center(child: Image.asset(AppAssets.userCheckTimeline)),
             ),
             const SizedBox(height: AppSpacing.xxs),
             if (showLine)
@@ -646,18 +623,20 @@ class _ShootSummaryScreenState
                   Column(
                     children: List.generate(
                       4,
-                          (_) => Container(
+                      (_) => Container(
                         height: 5,
                         width: 1,
-                        margin:
-                        const EdgeInsets.symmetric(vertical: 1),
+                        margin: const EdgeInsets.symmetric(vertical: 1),
                         color: AppColors.white,
                       ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xxs),
-                  const Icon(Icons.keyboard_arrow_down,
-                      size: 14, color: AppColors.white),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: AppColors.white,
+                  ),
                 ],
               ),
           ],
@@ -673,8 +652,7 @@ class _ShootSummaryScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
@@ -710,5 +688,4 @@ class _ShootSummaryScreenState
       ],
     );
   }
-
 }

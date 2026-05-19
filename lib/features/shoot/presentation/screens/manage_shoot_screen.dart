@@ -391,7 +391,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    context.goNamed(
+                                    context.pushNamed(
                                       RouteNames.selectBookingType,
                                       pathParameters: {
                                         'bookingId': widget.bookingId
