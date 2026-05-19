@@ -7,6 +7,7 @@ import '../../app/route_names.dart';
 import '../../config/env.dart';
 import '../firebase/crashlytics_service.dart';
 import '../network/dio_client.dart';
+import '../storage/secure_token_storage.dart';
 import '../utils/shared_service.dart';
 import 'auth_state_provider.dart';
 
@@ -20,10 +21,8 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
 
 /// Provider for DioClient singleton.
 final dioClientProvider = Provider<DioClient>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-
   return DioClient(
-    getToken: () async => prefs.getString('token'),
+    getToken: () => SecureTokenStorage.read(),
     onUnauthorized: () async {
       // Token rejected by server (expired / revoked / stale after app update).
       // Clear local session, flip auth state, force user to login.

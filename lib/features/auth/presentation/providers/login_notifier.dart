@@ -7,6 +7,7 @@ import '../../../../core/firebase/crashlytics_service.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/providers/guest_mode_provider.dart';
+import '../../../../core/storage/secure_token_storage.dart';
 
 import 'auth_providers.dart';
 import 'login_state.dart';
@@ -68,7 +69,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     String department,
     String departmentId,
   ) async {
-    await prefs.setString('token', token);
+    await SecureTokenStorage.write(token);
     await prefs.setInt('environment_id', environmentId);
     await prefs.setString('folder', folder);
     await prefs.setString('name', name);

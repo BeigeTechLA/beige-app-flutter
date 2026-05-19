@@ -9,6 +9,7 @@ import 'config/env.dart';
 import 'core/providers/core_providers.dart';
 import 'core/firebase/firebase_service.dart';
 import 'core/firebase/crashlytics_service.dart';
+import 'core/utils/install_marker.dart';
 
 
 Future<void> startApp(Environment environment) async {
@@ -22,6 +23,11 @@ Future<void> startApp(Environment environment) async {
       await FirebaseService.initialize();
       await CrashlyticsService.initialize();
       await CrashlyticsService.setBuildMode();
+
+      // Wipe SharedPreferences if this is a fresh install whose prefs were
+      // restored from OS backup. Must run before SharedPreferences is read
+      // anywhere downstream (authStateProvider, etc.).
+      await InstallMarker.ensureFreshInstallCleared();
 
       final prefs = await SharedPreferences.getInstance();
 
