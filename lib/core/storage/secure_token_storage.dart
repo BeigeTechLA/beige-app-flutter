@@ -6,9 +6,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 ///   bound to this device (no iCloud Keychain sync) and only readable after
 ///   the user has unlocked the device at least once since boot.
 /// - Android: `EncryptedSharedPreferences` (AES-256 GCM, keys in Android
-///   Keystore). Backup is disabled at the app level (AndroidManifest
-///   `allowBackup=false`), so the encrypted prefs file is not restored on
-///   reinstall.
+///   Keystore). Keystore keys are not backed up, so even if the encrypted
+///   prefs file were restored on reinstall, the decryption key would be
+///   gone. Backup is also disabled at the app level via AndroidManifest
+///   `allowBackup=false` + `fullBackupContent=false`.
 class SecureTokenStorage {
   static const _tokenKey = 'auth_token';
 
