@@ -1557,9 +1557,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     vertical: AppSpacing.lg,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: selectedIndex == 1
-                                        ? AppColors.primary
-                                        : AppColors.transparent,
+                                    gradient: selectedIndex == 1
+                                        ? AppColors.goldHorizontalGradient
+                                        : null,
                                     borderRadius: AppRadii.lgAll,
                                     border: selectedIndex == 1
                                         ? null
@@ -1667,9 +1667,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     vertical: AppSpacing.lg,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: selectedIndex == 2
-                                        ? AppColors.primary
-                                        : AppColors.transparent,
+                                    gradient: selectedIndex == 2
+                                        ? AppColors.goldHorizontalGradient
+                                        : null,
                                     borderRadius: AppRadii.lgAll,
                                     border: selectedIndex == 2
                                         ? null

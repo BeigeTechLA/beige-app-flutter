@@ -130,9 +130,9 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 duration: const Duration(milliseconds: 250),
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
-                                  color: isUpcomingSelected
-                                      ? AppColors.primary
-                                      : AppColors.transparent,
+                                  gradient: isUpcomingSelected
+                                      ? AppColors.goldHorizontalGradient
+                                      : null,
                                   borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,
@@ -162,9 +162,9 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 duration: const Duration(milliseconds: 250),
                                 curve: Curves.easeInOut,
                                 decoration: BoxDecoration(
-                                  color: !isUpcomingSelected
-                                      ? AppColors.primary
-                                      : AppColors.transparent,
+                                  gradient: !isUpcomingSelected
+                                      ? AppColors.goldHorizontalGradient
+                                      : null,
                                   borderRadius: AppRadii.mdAll,
                                 ),
                                 alignment: Alignment.center,

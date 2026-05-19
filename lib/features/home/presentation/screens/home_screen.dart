@@ -3054,7 +3054,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       vertical: 9,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      gradient: AppColors.goldHorizontalGradient,
                       borderRadius: AppRadii.smAll,
                     ),
                     child: const Text(
@@ -3166,7 +3166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         vertical: AppSpacing.smd,
                       ), // 🔥 better button size
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        gradient: AppColors.goldHorizontalGradient,
                         borderRadius: AppRadii.mdAll,
                       ),
                       child: Text(
