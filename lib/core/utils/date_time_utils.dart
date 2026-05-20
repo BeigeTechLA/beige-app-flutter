@@ -6,7 +6,7 @@ class DateTimeUtils {
   // Format pattern constants (single source of truth).
   // ───────────────────────────────────────────────────────────────
 
-  /// `19-05-2026`
+  /// `05-19-2026`
   static const String kDatePattern = "MM-dd-yyyy";
 
   /// `May 19, 2026`
@@ -51,12 +51,12 @@ class DateTimeUtils {
   /// `May 19` — month + day (range start).
   static const String kMonthDayPattern = "MMM d";
 
-  /// `19-05-2026 09:00 AM`
+  /// `05-19-2026 09:00 AM`
   static const String kDateTimePattern = "MM-dd-yyyy hh:mm a";
 
   // ───────────────────────────────────────────────────────────────
 
-  /// ✅ Format Date → dd-MM-yyyy
+  /// ✅ Format Date → MM-dd-yyyy
   ///
   /// Used in:
   /// - home_screen.dart
@@ -68,7 +68,21 @@ class DateTimeUtils {
       if (date == null || date.isEmpty) return fallback;
 
       final parsed = DateTime.parse(date);
-      return DateFormat(kDatePattern).format(parsed);
+      return formatDateValue(parsed, fallback: fallback);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  /// ✅ Format DateTime → MM-dd-yyyy
+  ///
+  /// Used in:
+  /// - shoot_date_time_screen.dart
+  static String formatDateValue(DateTime? date, {String fallback = "--"}) {
+    try {
+      if (date == null) return fallback;
+
+      return DateFormat(kDatePattern).format(date);
     } catch (_) {
       return fallback;
     }
@@ -441,7 +455,7 @@ class DateTimeUtils {
     }
   }
 
-  /// ✅ Date + Time together → 19-05-2026 09:00 AM
+  /// ✅ Date + Time together → MM-dd-yyyy 09:00 AM
   ///
   /// Used in: (available — no current call sites)
   static String formatDateTime(

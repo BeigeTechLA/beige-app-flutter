@@ -252,7 +252,6 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
                                       // ⏳ loading
                                       placeholder: (context, url) {
-                                        debugPrint("⏳ IMAGE LOADING → $url");
                                         return Center(
                                           child: Lottie.asset(
                                             AppAssets.lottieSpinner,
@@ -264,7 +263,6 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
                                       // ✅ success
                                       imageBuilder: (context, imageProvider) {
-                                        debugPrint("✅ IMAGE LOADED → ${getShootImage(shootImageUrl)}");
                                         return Image(
                                           image: imageProvider,
                                           fit: BoxFit.cover,

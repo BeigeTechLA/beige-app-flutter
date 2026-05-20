@@ -1023,8 +1023,10 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
         /// 🔥 SINGLE DAY MODE
         if (selectedIndex == 1) {
           selectedDate = picked;
-          dateController.text =
-              "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
+          dateController.text = DateTimeUtils.formatDateValue(
+            picked,
+            fallback: "",
+          );
         }
         /// 🔥 MULTIPLE DAY MODE
         else {
