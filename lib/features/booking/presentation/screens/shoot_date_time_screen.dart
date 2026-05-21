@@ -397,7 +397,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       return bookedHours * includedPhotosPerHour;
     }*/
 
-  int getIncludedPhotoCount() {
+ /* int getIncludedPhotoCount() {
     final hours = getRoundedBookedHours();
 
     if (hours == 0) return 0;
@@ -408,8 +408,17 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     } else {
       return hours * 25;
     }
-  }
+  }*/
 
+  int getIncludedPhotoCount() {
+    final hours = getRoundedBookedHours();
+
+    if (hours == 0) return 0;
+
+    // ✅ Wedding = 50 per hour
+    // ✅ Other = 25 per hour
+    return isWeddingShoot ? hours * 50 : hours * 25;
+  }
   int getTotalPhotos() {
     /// 🔥 VIDEO ONLY → NO PHOTOS
     if (widget.contentTypeId == 1) {
@@ -660,21 +669,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     return true;
   }
 
-  String getEditingDescription() {
-    // 🎬 Video Content
-    if (widget.contentTypeId == 1) {
-      return "Professional editing includes color grading, sound mixing, and basic revisions.";
-    }
-
-    // 📸 Photo Content (Special Case 16 & 9)
-    if (isWeddingShoot &&
-        (widget.contentTypeId == 2 || widget.contentTypeId == 3)) {
-      return "Wedding shoots include 50 edited photos per hour, with extra add-ons available in sets of 25 photos.";
-    }
-
-    // 📷 Default Photo
-    return "This shoot includes 25 edited photos per hour, with extra add-ons available in sets of 25 photos.";
-  }
 
   String getPhotoInclusionMessage() {
     final includedPhotos = getIncludedPhotoCount();
@@ -1518,7 +1512,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                   children: [
                     Text(
                       textAlign: TextAlign.start,
-                      "Select Booking Type",
+                      "Select Booking Typesssss",
                       style: AppTextStyles.titleSmall,
                     ),
                   ],
@@ -3091,44 +3085,55 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                             ),
                           ),
                         ),
+                        /// 🔥 ADDED EXTRA BOX — shows only when count > 0
+
                       ],
                     ),
                   ),
 
-                  /// 🔥 ADD THIS BELOW INCLUDE BOX
-                  /* Container(
-                      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.smd),
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.mld),
+                  /// 🔥 ADDED EXTRA BOX
+                  // if (count > 0)
+                    Container(
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
-                        borderRadius: AppRadii.lgAll,
+                        // color: Colors.green
+                        //color: AppColors.surfaceVariant,
+                        //borderRadius: AppRadii.xlAll,
                       ),
-                      child: Row(
-                        children: [
-                          /// ➕ ICON
-                          Icon(
-                            Icons.add,
-                            color: AppColors.primary,
-                            size: 18,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.all(AppSpacing.mld),
+                          padding: const EdgeInsets.all(AppSpacing.mld),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            borderRadius: AppRadii.xlAll,
                           ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.add,
+                                size: 12,
+                                color: AppColors.primary,
+                              ),
 
-                          const SizedBox(width: 10),
+                              const SizedBox(width: 8),
 
-                          /// TEXT
-                          Text(
-                            "25 Added Extra",
-                            style: const TextStyle(
-                              fontFamily: AppAssets.fontHelveticaNeue,
+                              Text(
+                                "$count Added Extra",
+                                style: const TextStyle(
+                                  fontFamily: AppAssets.fontHelveticaNeue,
 
-
-                              color: AppColors.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                                  color: AppColors.primary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),*/
+                    ),
                   Container(height: 0.5, color: AppColors.dividerDark),
                 ],
               );
