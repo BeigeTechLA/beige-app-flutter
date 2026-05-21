@@ -1512,7 +1512,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                   children: [
                     Text(
                       textAlign: TextAlign.start,
-                      "Select Booking Typesssss",
+                      "Select Booking Types",
                       style: AppTextStyles.titleSmall,
                     ),
                   ],
