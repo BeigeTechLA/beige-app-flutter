@@ -230,14 +230,33 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     }
   }
 
-  String getContentTypeTitle(int contentTypeId) {
-    switch (contentTypeId) {
+  String getContentTypeTitle(dynamic value) {
+    if (value is int) {
+      return _contentTypeLabelForId(value);
+    }
+    if (value is String) {
+      final asId = int.tryParse(value);
+      if (asId != null) return _contentTypeLabelForId(asId);
+
+      final normalized = value.toLowerCase().replaceAll(' ', '');
+      final hasPhoto = normalized.contains('photographer');
+      final hasVideo = normalized.contains('videographer');
+      if (hasPhoto && hasVideo) return "Photography,Videography";
+      if (hasPhoto) return "Photography";
+      if (hasVideo) return "Videography";
+      if (value.trim().isNotEmpty) return value;
+    }
+    return "Shoot Type";
+  }
+
+  String _contentTypeLabelForId(int id) {
+    switch (id) {
       case 1:
         return "Videography";
       case 2:
         return "Photography";
       case 3:
-        return "Photography & Videography";
+        return "Photography,Videography";
       default:
         return "Shoot Type";
     }
@@ -280,9 +299,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
     final creativeName = booking?['shoot_type_name'] ?? "No Name";
     final creativeImage = booking?['shoot_type_image_url'] ?? "";
-    final creativeRole = getContentTypeTitle(
-      int.tryParse(booking?['content_type']?.toString() ?? "0") ?? 0,
-    );
+    final creativeRole = getContentTypeTitle(booking?['content_type']);
 
     if (!hasSavedCard && selectedIndex != 0) {
       selectedIndex = 0;
