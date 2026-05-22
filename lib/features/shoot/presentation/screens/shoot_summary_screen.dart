@@ -30,6 +30,15 @@ class ShootSummaryScreen extends ConsumerStatefulWidget {
 }
 
 class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
+  void _goBackToMyShoots() {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+
+    context.goNamed(RouteNames.myShoots);
+  }
+
   String _imageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     return '${ApiEndpoints.imageUrl}$path';
@@ -86,6 +95,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
     final days = multiDay?['days'] ?? [];
     final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
     final image = _getFinalImage(bookingData);
+    final creativeName = (bookingData?['creative']?['name'] ?? "").toString();
     return Scaffold(
       body: Stack(
         children: [
@@ -148,7 +158,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                       top: 45,
                       left: 16,
                       child: InkWell(
-                        onTap: () => context.pop(),
+                        onTap: _goBackToMyShoots,
                         child: SvgPicture.asset(
                           AppAssets.back,
                           height: 24,

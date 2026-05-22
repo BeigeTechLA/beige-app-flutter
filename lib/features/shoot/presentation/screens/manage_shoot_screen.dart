@@ -47,6 +47,15 @@ class ManageShootScreen extends ConsumerStatefulWidget {
 }
 
 class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
+  void _goBackToMyShoots() {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+
+    context.goNamed(RouteNames.myShoots);
+  }
+
   String _getFullImageUrl() {
     final url = widget.imageUrl ?? "";
     if (url.isEmpty) return "";
@@ -135,7 +144,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                           ),
                           AppSpacing.verticalXxs,
                           Text(
-                            "View, reschedule, or cancel your upcoming \nappointments.",
+                            "View or cancel your upcoming \nappointments.",
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.white70,
                               fontWeight: FontWeight.w400,
@@ -145,9 +154,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.close, color: AppColors.white),
-                        onPressed: () {
-                          context.pop();
-                        },
+                        onPressed: _goBackToMyShoots,
                       ),
                     ],
                   ),
@@ -329,89 +336,81 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                         const SizedBox(height: 20),
 
                         /// 🔹 ACTION BUTTONS
-                        Row(
-                          children: [
-                            // ✅ Back Button
-                            Expanded(
-                              child: SizedBox(
-                                height: 55,
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: AppColors.textHeading,
-                                    side: const BorderSide(
-                                      color: AppColors.white70,
-                                      width: 0.5,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: AppRadii.lgAll,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    context.pushNamed(
-                                      RouteNames.cancelBooking,
-                                      pathParameters: {
-                                        'bookingId': widget.bookingId
-                                            .toString(),
-                                      },
-                                      extra: {
-                                        'projectName': widget.projectName,
-                                        'eventDate': widget.eventDate,
-                                        'startTime': widget.startTime,
-                                        'endTime': widget.endTime,
-                                        'durationHours': widget.durationHours,
-                                        'location': widget.location,
-                                        'contentType': widget.contentType,
-                                        'imageUrl': widget.imageUrl,
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    "Cancel",
-                                    style: AppTextStyles.labelLarge.copyWith(
-                                      color: AppColors.white,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textHeading,
+                              side: const BorderSide(
+                                color: AppColors.white70,
+                                width: 0.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: AppRadii.lgAll,
                               ),
                             ),
-
-                            const SizedBox(width: AppSpacing.md),
-
-                            Expanded(
-                              child: SizedBox(
-                                height: 55,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.goldCta,
-                                    foregroundColor: AppColors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: AppRadii.lgAll,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    context.pushNamed(
-                                      RouteNames.selectBookingType,
-                                      pathParameters: {
-                                        'bookingId': widget.bookingId
-                                            .toString(),
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    "Reschedule",
-                                    style: AppTextStyles.labelLarge.copyWith(
-                                      color: AppColors.textHeading,
-                                      fontFamily: AppAssets.fontUnbounded,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
+                            onPressed: () {
+                              context.pushNamed(
+                                RouteNames.cancelBooking,
+                                pathParameters: {
+                                  'bookingId': widget.bookingId.toString(),
+                                },
+                                extra: {
+                                  'projectName': widget.projectName,
+                                  'eventDate': widget.eventDate,
+                                  'startTime': widget.startTime,
+                                  'endTime': widget.endTime,
+                                  'durationHours': widget.durationHours,
+                                  'location': widget.location,
+                                  'contentType': widget.contentType,
+                                  'imageUrl': widget.imageUrl,
+                                },
+                              );
+                            },
+                            child: Text(
+                              "Cancel",
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.white,
+                                fontFamily: AppAssets.fontUnbounded,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
+                          ),
                         ),
+                        // Reschedule is intentionally hidden for now.
+                        //
+                        // const SizedBox(width: AppSpacing.md),
+                        // Expanded(
+                        //   child: SizedBox(
+                        //     height: 55,
+                        //     child: ElevatedButton(
+                        //       style: ElevatedButton.styleFrom(
+                        //         backgroundColor: AppColors.goldCta,
+                        //         foregroundColor: AppColors.black,
+                        //         shape: RoundedRectangleBorder(
+                        //           borderRadius: AppRadii.lgAll,
+                        //         ),
+                        //       ),
+                        //       onPressed: () {
+                        //         context.pushNamed(
+                        //           RouteNames.selectBookingType,
+                        //           pathParameters: {
+                        //             'bookingId': widget.bookingId.toString(),
+                        //           },
+                        //         );
+                        //       },
+                        //       child: Text(
+                        //         "Reschedule",
+                        //         style: AppTextStyles.labelLarge.copyWith(
+                        //           color: AppColors.textHeading,
+                        //           fontFamily: AppAssets.fontUnbounded,
+                        //           fontWeight: FontWeight.w500,
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

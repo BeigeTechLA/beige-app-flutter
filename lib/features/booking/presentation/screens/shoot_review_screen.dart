@@ -741,7 +741,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                 ),
                                                 child: Text(
                                                   "${item['value']} x${item['count']}"
-                                                  "${item['note'] != null ? ' (${item['note']})' : ''}",
+                                                 "${item['note'] != null ? ' (${item['note']})' : ''}",
                                                   style: AppTextStyles
                                                       .labelMedium
                                                       .copyWith(
