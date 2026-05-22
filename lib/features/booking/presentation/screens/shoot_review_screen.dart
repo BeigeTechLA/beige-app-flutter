@@ -725,57 +725,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                             return Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                /// TOP TITLE
-                                                Row(
-                                                  children: [
-                                                  /*  Expanded(
-                                                      child: Text(
-                                                        item['value'] ?? "",
-                                                        style: AppTextStyles.labelLarge.copyWith(
-                                                          color: AppColors.primary,
-                                                          fontWeight: FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                    ),*/
-
-                                                /*    Container(
-                                                      padding: const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors.primary.withValues(alpha: 0.12),
-                                                        borderRadius: BorderRadius.circular(30),
-                                                      ),
-                                                      child: Text(
-                                                        "x${item['count']}",
-                                                        style: AppTextStyles.labelMedium.copyWith(
-                                                          color: AppColors.primary,
-                                                          fontWeight: FontWeight.w700,
-                                                        ),
-                                                      ),
-                                                    ),*/
-                                                  ],
-                                                ),
-
-                                                /// NOTE
-                                            /*    if (item['note'] != null) ...[
-                                                  const SizedBox(height: 6),
-
-                                                  Text(
-                                                    item['note'],
-                                                    style: AppTextStyles.bodySmall.copyWith(
-                                                      color: AppColors.white70,
-                                                    ),
-                                                  ),
-                                                ],*/
-
-                                                const SizedBox(height: 14),
-
-                                                /// CARDS
                                                 if ((item['cards'] ?? []).isNotEmpty)
                                                   Container(
-                                                    margin: const EdgeInsets.only(bottom: 8),
+                                                    margin: const EdgeInsets.only(bottom: 14),
                                                     padding: const EdgeInsets.symmetric(
                                                       horizontal: 20,
                                                       vertical: 8,
@@ -791,33 +743,6 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                       ),
                                                     ),
                                                   ),
-                                                const SizedBox(height: 16),
-
-
-
-                                                const SizedBox(height: 14),
-
-                                                /// RECEIVE TEXT
-                                              /*  Container(
-                                                  width: double.infinity,
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 14,
-                                                    vertical: 12,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.black.withValues(alpha: 0.22),
-                                                    borderRadius: BorderRadius.circular(14),
-                                                  ),
-                                                  child: Text(
-                                                    booking?['receive_text'] ??
-                                                        "You'll Receive ${item['total_photos']} Photos",
-                                                    style: AppTextStyles.bodyMedium.copyWith(
-                                                      color: AppColors.primary,
-                                                      fontStyle: FontStyle.italic,
-                                                      fontWeight: FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                ),*/
                                               ],
                                             );
                                           },
