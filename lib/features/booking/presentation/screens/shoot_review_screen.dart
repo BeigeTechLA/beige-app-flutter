@@ -703,59 +703,153 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                     ],
 
                                     /// ================= PHOTO EDITS =================
-                                    if ((booking?['photo_edit_types'] ?? [])
-                                        .isNotEmpty) ...[
+                                    /// ================= PHOTO EDITS =================
+                                    if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8,
-                                        ),
+                                        padding: const EdgeInsets.only(bottom: 10),
                                         child: Text(
                                           "Photo Edits:",
-                                          style: AppTextStyles.bodySmall
-                                              .copyWith(color: AppColors.white),
+                                          style: AppTextStyles.bodySmall.copyWith(
+                                            color: AppColors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
 
                                       Column(
                                         children: List.generate(
-                                          booking?['photo_edit_types'].length ??
-                                              0,
-                                          (index) {
-                                            final item =
-                                                booking?['photo_edit_types'][index];
+                                          booking?['photo_edit_types'].length ?? 0,
+                                              (index) {
+                                            final item = booking?['photo_edit_types'][index];
 
-                                            return Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Container(
-                                                margin: const EdgeInsets.only(
-                                                  bottom: 8,
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                /// TOP TITLE
+                                                Row(
+                                                  children: [
+                                                  /*  Expanded(
+                                                      child: Text(
+                                                        item['value'] ?? "",
+                                                        style: AppTextStyles.labelLarge.copyWith(
+                                                          color: AppColors.primary,
+                                                          fontWeight: FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ),*/
+
+                                                /*    Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors.primary.withValues(alpha: 0.12),
+                                                        borderRadius: BorderRadius.circular(30),
+                                                      ),
+                                                      child: Text(
+                                                        "x${item['count']}",
+                                                        style: AppTextStyles.labelMedium.copyWith(
+                                                          color: AppColors.primary,
+                                                          fontWeight: FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ),*/
+                                                  ],
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
+
+                                                /// NOTE
+                                            /*    if (item['note'] != null) ...[
+                                                  const SizedBox(height: 6),
+
+                                                  Text(
+                                                    item['note'],
+                                                    style: AppTextStyles.bodySmall.copyWith(
+                                                      color: AppColors.white70,
+                                                    ),
+                                                  ),
+                                                ],*/
+
+                                                const SizedBox(height: 14),
+
+                                                /// CARDS
+                                                if ((item['cards'] ?? []).isNotEmpty)
+                                                  Container(
+                                                    margin: const EdgeInsets.only(bottom: 8),
+                                                    padding: const EdgeInsets.symmetric(
                                                       horizontal: 20,
                                                       vertical: 8,
                                                     ),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.goldLight20,
-                                                  borderRadius: AppRadii.xsAll,
-                                                ),
-                                                child: Text(
-                                                  "${item['value']} x${item['count']}"
-                                                  "${item['note'] != null ? ' (${item['note']})' : ''}",
-                                                  style: AppTextStyles
-                                                      .labelMedium
-                                                      .copyWith(
-                                                        color:
-                                                            AppColors.primary,
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors.goldLight20,
+                                                      borderRadius: AppRadii.xsAll,
+                                                    ),
+                                                    child: Text(
+                                                      "${item['cards'][0].toString().replaceAll("Includes ", "Edited Photos ").replaceAll(" free photo edits", " Included")} ${item['cards'][2].toString().replaceAll("+ ", "+")}",
+                                                      style: AppTextStyles.labelMedium.copyWith(
+                                                        color: AppColors.primary,
                                                       ),
-                                                ),
-                                              ),
+                                                    ),
+                                                  ),
+                                                const SizedBox(height: 16),
+
+
+
+                                                const SizedBox(height: 14),
+
+                                                /// RECEIVE TEXT
+                                              /*  Container(
+                                                  width: double.infinity,
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 14,
+                                                    vertical: 12,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.black.withValues(alpha: 0.22),
+                                                    borderRadius: BorderRadius.circular(14),
+                                                  ),
+                                                  child: Text(
+                                                    booking?['receive_text'] ??
+                                                        "You'll Receive ${item['total_photos']} Photos",
+                                                    style: AppTextStyles.bodyMedium.copyWith(
+                                                      color: AppColors.primary,
+                                                      fontStyle: FontStyle.italic,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),*/
+                                              ],
                                             );
                                           },
                                         ),
                                       ),
                                     ],
-                                  ],
+                                    Divider(
+                                      color: AppColors.white.withValues(alpha: 0.08),
+                                      height: 1,
+                                    ),
+                                    if ((booking?['receive_text'] ?? "").toString().isNotEmpty)
+                                      Container(
+                                        width: double.infinity,
+                                        margin: const EdgeInsets.only(top: 14),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.black.withValues(alpha: 0.22),
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                        child: Text(
+                                          booking?['receive_text'] ?? "",
+                                          style: AppTextStyles.bodyMedium.copyWith(
+                                            color: AppColors.primary,
+                                            fontStyle: FontStyle.italic,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+              ],
                                 ),
                               ),
 
