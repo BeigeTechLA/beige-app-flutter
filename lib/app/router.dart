@@ -12,6 +12,8 @@ import '../features/shoot/presentation/screens/shoot_summary_screen.dart';
 import '../features/shoot/presentation/screens/shoot_type_selection_screen.dart';
 import '../features/shoot/presentation/screens/shoot_update_success_screen.dart';
 import '../features/booking/presentation/screens/content_type_screen.dart';
+import '../features/file_manager/presentation/screens/file_manager_screen.dart';
+import '../features/meetings/presentation/screens/meetings_screen.dart';
 import '../features/booking/presentation/screens/crew_selection_screen.dart';
 import '../features/booking/presentation/screens/crew_size_matching_screen.dart';
 import '../features/booking/presentation/screens/payment_method_screen.dart';
@@ -314,6 +316,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                 name: RouteNames.messages,
                 builder: (context, state) =>
                     const Center(child: Text('Messages')),
+              ),
+            ],
+          ),
+          // Tab 4: File Manager
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/file-manager',
+                name: RouteNames.fileManager,
+                builder: (context, state) => const FileManagerScreen(),
+              ),
+            ],
+          ),
+          // Tab 5: Meetings
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/meetings',
+                name: RouteNames.meetings,
+                builder: (context, state) => const MeetingsScreen(),
               ),
             ],
           ),
@@ -640,7 +662,12 @@ class _MainShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       extendBody: true,
-      body: navigationShell,
+      body: Row(
+        children: [
+          _buildNavigationRail(context, ref),
+          Expanded(child: navigationShell),
+        ],
+      ),
       bottomNavigationBar: ScaleClampedText(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -713,6 +740,30 @@ class _MainShell extends ConsumerWidget {
                       activeIcon: _buildActiveIcon(AppAssets.activeMessages),
                       label: " Messages",
                     ),
+                    const BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.folder_outlined,
+                            size: _bottomNavIconSize),
+                      ),
+                      activeIcon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.folder, size: _bottomNavIconSize),
+                      ),
+                      label: " Files",
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.videocam_outlined,
+                            size: _bottomNavIconSize),
+                      ),
+                      activeIcon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.videocam, size: _bottomNavIconSize),
+                      ),
+                      label: " Meetings",
+                    ),
                   ],
                 ),
               ),
@@ -720,6 +771,72 @@ class _MainShell extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNavigationRail(BuildContext context, WidgetRef ref) {
+    return NavigationRail(
+      backgroundColor: AppColors.background,
+      selectedIndex: navigationShell.currentIndex,
+      labelType: NavigationRailLabelType.all,
+      selectedIconTheme: const IconThemeData(color: AppColors.white, size: 24),
+      unselectedIconTheme:
+          const IconThemeData(color: AppColors.white70, size: 24),
+      selectedLabelTextStyle:
+          AppTextStyles.labelSmall.copyWith(color: AppColors.white),
+      unselectedLabelTextStyle:
+          AppTextStyles.labelSmall.copyWith(color: AppColors.white70),
+      onDestinationSelected: (index) {
+        final isGuest = ref.read(guestModeProvider);
+        if (isGuest && index != 0) {
+          showLoginDialog(context);
+          return;
+        }
+        navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        );
+      },
+      destinations: [
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveHome),
+          selectedIcon: _railSvgIcon(AppAssets.activeHome),
+          label: const Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveBookShoot),
+          selectedIcon: _railSvgIcon(AppAssets.activeBookShoot),
+          label: const Text('Book'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveMyShoot),
+          selectedIcon: _railSvgIcon(AppAssets.activeMyShoot),
+          label: const Text('Shoots'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveMessages),
+          selectedIcon: _railSvgIcon(AppAssets.activeMessages),
+          label: const Text('Messages'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.folder_outlined),
+          selectedIcon: Icon(Icons.folder),
+          label: Text('Files'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.videocam_outlined),
+          selectedIcon: Icon(Icons.videocam),
+          label: Text('Meetings'),
+        ),
+      ],
+    );
+  }
+
+  Widget _railSvgIcon(String path) {
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: SvgPicture.asset(path, fit: BoxFit.contain),
     );
   }
 

@@ -18,6 +18,8 @@ abstract class RouteNames {
   static const bookShoot = 'book_shoot';
   static const myShoots = 'my_shoots';
   static const messages = 'messages';
+  static const fileManager = 'file_manager';
+  static const meetings = 'meetings';
 
   // Home sub-screens
   static const viewProfile = 'view_profile';
