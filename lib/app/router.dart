@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/messages/messages.dart';
 import '../features/shoot/presentation/screens/cancel_shoot_screen.dart';
 import '../features/shoot/presentation/screens/manage_shoot_screen.dart';
 import '../features/shoot/presentation/screens/my_shoots_screen.dart';
@@ -314,8 +315,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/messages',
                 name: RouteNames.messages,
-                builder: (context, state) =>
-                    const Center(child: Text('Messages')),
+                builder: (context, state) => const Messages(),
               ),
             ],
           ),
@@ -664,7 +664,7 @@ class _MainShell extends ConsumerWidget {
       extendBody: true,
       body: Row(
         children: [
-          _buildNavigationRail(context, ref),
+           // _buildNavigationRail(context, ref),
           Expanded(child: navigationShell),
         ],
       ),
@@ -740,7 +740,7 @@ class _MainShell extends ConsumerWidget {
                       activeIcon: _buildActiveIcon(AppAssets.activeMessages),
                       label: " Messages",
                     ),
-                    const BottomNavigationBarItem(
+                   /* const BottomNavigationBarItem(
                       icon: Padding(
                         padding: EdgeInsets.only(bottom: 4),
                         child: Icon(Icons.folder_outlined,
@@ -763,7 +763,7 @@ class _MainShell extends ConsumerWidget {
                         child: Icon(Icons.videocam, size: _bottomNavIconSize),
                       ),
                       label: " Meetings",
-                    ),
+                    ),*/
                   ],
                 ),
               ),
@@ -817,16 +817,6 @@ class _MainShell extends ConsumerWidget {
           icon: _railSvgIcon(AppAssets.inactiveMessages),
           selectedIcon: _railSvgIcon(AppAssets.activeMessages),
           label: const Text('Messages'),
-        ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.folder_outlined),
-          selectedIcon: Icon(Icons.folder),
-          label: Text('Files'),
-        ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.videocam_outlined),
-          selectedIcon: Icon(Icons.videocam),
-          label: Text('Meetings'),
         ),
       ],
     );

@@ -21,6 +21,9 @@ class AppAssets {
   static const String topWords = 'assets/mock_data/top_words';
   static const String _mockCreatives = 'assets/mock_data/creatives';
 
+
+  static const String svgDrawer =
+      'assets/svg/drawer';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -38,6 +41,17 @@ class AppAssets {
   static const String cropImage = '$_svg/crop_image.svg';
   static const String zoomIn = '$_svg/zoom_in.svg';
   static const String zoomOut = '$_svg/zoom_out.svg';
+
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — drawer
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String menu =
+      '$svgDrawer/menu.svg';
+
+  static const String logoDrawer =
+      '$svgDrawer/logo_drawer.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Icons & UI Elements
@@ -116,6 +130,11 @@ class AppAssets {
   static const String inactiveMyShoot = '$svgBottom/inactive_my_shoots.svg';
   static const String activeMessages = '$svgBottom/active_messages.svg';
   static const String inactiveMessages = '$svgBottom/inactive_messages.svg';
+  static const String active_file_manager = '$svgBottom/active_file_manager.svg';
+
+  static const String inactive_filemanager = '$svgBottom/inactive_filemanager.svg';
+  static const String active_meetings = '$svgBottom/active_meetings.svg';
+  static const String inactive_meetings = '$svgBottom/inactive_meetings.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Profile Menu

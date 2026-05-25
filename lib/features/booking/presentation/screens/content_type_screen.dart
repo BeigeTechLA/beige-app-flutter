@@ -110,29 +110,53 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
     return AppScaffold(
+
       hasAppBar: true,
+
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Stack(
-          alignment: Alignment.center,
+        titleSpacing: 0,
+
+        title: Row(
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child:
-                  widget
-                      .fromHome // 👈 condition
-                  ? InkWell(
-                      onTap: () => context.pop(),
-                      child: SvgPicture.asset(AppAssets.back, height: 24),
-                    )
-                  : const SizedBox(), // 👈 hide
+
+            /// MENU BUTTON
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  icon: SvgPicture.asset(
+                    AppAssets.menu,
+                    height: 22,
+                    width: 22,
+                  ),
+                );
+              },
             ),
 
-            /// Center Title
-            Center(
+            /// BACK BUTTON
+            if (widget.fromHome)
+              InkWell(
+                onTap: () => context.pop(),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: AppSpacing.sm,
+                  ),
+                  child: SvgPicture.asset(
+                    AppAssets.back,
+                    height: 22,
+                  ),
+                ),
+              ),
+
+            /// TITLE CENTER
+            Expanded(
               child: Text(
                 "Create Project",
+                textAlign: TextAlign.center,
                 style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.white,
                   fontFamily: AppAssets.fontOutfit,
@@ -141,9 +165,11 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               ),
             ),
 
-            /// Right Step Text
-            Align(
-              alignment: Alignment.centerRight,
+            /// STEP TEXT
+            Padding(
+              padding: const EdgeInsets.only(
+                right: AppSpacing.md,
+              ),
               child: Text(
                 "1/3",
                 style: AppTextStyles.titleSmall.copyWith(

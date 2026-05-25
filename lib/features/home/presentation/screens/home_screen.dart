@@ -21,6 +21,8 @@ import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
+import '../../../drawer_screen.dart';
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -557,8 +559,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final isLoading = homeState.status == HomeStatus.loading;
 
     return Scaffold(
+      drawer: const DrawerScreen(),
       body: Stack(
+
         children: [
+
           SingleChildScrollView(
             child: Column(
               children: [
@@ -603,6 +608,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                Builder(
+                                  builder: (context) {
+                                    return IconButton(
+                                      onPressed: () {
+                                        Scaffold.of(context).openDrawer();
+                                      },
+                                      icon: SvgPicture.asset(
+                                        AppAssets.menu,
+                                        height: 24,
+                                        width: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:

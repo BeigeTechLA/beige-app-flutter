@@ -17,6 +17,8 @@ import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.d
 import 'package:beige/shared/widgets/app_booking_card.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
+import '../../../drawer_screen.dart';
+
 class MyShootsScreen extends ConsumerStatefulWidget {
   const MyShootsScreen({super.key});
 
@@ -74,6 +76,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final isLoading = shootsState.status == MyShootsStatus.loading;
 
     return Scaffold(
+      drawer: DrawerScreen(),
       body: Stack(
         children: [
           Padding(
@@ -85,13 +88,30 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
                 /// HEADER
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    ScaleClampedText(
-                      child: Text(
-                        "My Shoots",
-                        style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.white,
+                    Builder(
+                      builder: (context) {
+                        return IconButton(
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          icon: SvgPicture.asset(
+                            AppAssets.menu,
+                            height: 22,
+                            width: 22,
+                          ),
+                        );
+                      },
+                    ),
+                    Center(
+                      child: ScaleClampedText(
+                        child: Text(
+                          "My Shoots",
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.white,
+
+                          ),
                         ),
                       ),
                     ),
