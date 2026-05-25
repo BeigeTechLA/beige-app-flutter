@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/restoration/restoration_providers.dart';
+import '../shared/widgets/connectivity_listener.dart';
+import 'router.dart';
+import 'theme.dart';
+
+/// Global ScaffoldMessenger key — kept temporarily for pre-GoRouter screens
+/// that show snackbars outside of a widget context.
+/// Will be removed in Batch 14 cleanup.
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
+/// Root application widget.
+/// ProviderScope wraps this in main.dart (not here) so that
+/// SharedPreferences can be injected before the widget tree builds.
+class App extends ConsumerStatefulWidget {
+  const App({super.key});
+
+  @override
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(appLifecycleObserverProvider).attach();
+  }
+
+  @override
+  void dispose() {
+    ref.read(appLifecycleObserverProvider).detach();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final goRouter = ref.watch(routerProvider);
+
+    return MaterialApp.router(
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      debugShowCheckedModeBanner: false,
+      title: 'BEIGE',
+      theme: AppTheme.dark(),
+      routerConfig: goRouter,
+      builder: (context, child) {
+        return ConnectivityListener(child: child ?? const SizedBox.shrink());
+      },
+    );
+  }
+}

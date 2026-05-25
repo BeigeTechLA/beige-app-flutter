@@ -1,174 +1,45 @@
-import 'package:beige/utility/commen.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'MainScreen.dart';
-import 'No_internet/internet_helper.dart';
-import 'SplashScreen/splash_screen.dart';
+import 'app/app.dart';
 import 'config/env.dart';
-import 'utility/ColorCode.dart';
+import 'core/providers/core_providers.dart';
+import 'core/firebase/firebase_service.dart';
+import 'core/firebase/crashlytics_service.dart';
+import 'core/utils/install_marker.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-    GlobalKey<ScaffoldMessengerState>();
 
 Future<void> startApp(Environment environment) async {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  Env.init(environment);
-  Stripe.publishableKey = Env.stripePublishableKey;
+      Env.init(environment);
+      Stripe.publishableKey = Env.stripePublishableKey;
 
-  final prefs = await SharedPreferences.getInstance();
-  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-  await AuthManager().init(); // 🔥 IMPORTANT
+      await FirebaseService.initialize();
+      await CrashlyticsService.initialize();
+      await CrashlyticsService.setBuildMode();
 
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+      // Wipe SharedPreferences if this is a fresh install whose prefs were
+      // restored from OS backup. Must run before SharedPreferences is read
+      // anywhere downstream (authStateProvider, etc.).
+      await InstallMarker.ensureFreshInstallCleared();
+
+      final prefs = await SharedPreferences.getInstance();
+
+      runApp(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+          ],
+          child: const App(),
+        ),
+      );
+    },
+    (error, stack) => CrashlyticsService.recordError(error, stack, fatal: true),
+  );
 }
-
-class MyApp extends StatefulWidget {
-  final bool isLoggedIn;
-
-  const MyApp({super.key, required this.isLoggedIn});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-
-  @override
-  void initState() {
-    super.initState();
-    InternetHelper.startListening(); // 👈 start listening here
-  }
-
-  @override
-  void dispose() {
-    InternetHelper.dispose();
-    super.dispose();
-  }
-
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-       navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      title: 'BEIGE',
-    /*  theme: ThemeData(
-
-        scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
-        appBarTheme:  AppBarTheme(
-          backgroundColor: ColorCode.bcakgroundcolor,
-          iconTheme: IconThemeData(color: Colors.white),
-          elevation: 0, // 🔥 remove shadow
-          scrolledUnderElevation: 0, // 🔥 FIX (scroll pe color change nahi hoga)
-          surfaceTintColor: Colors.transparent, // 🔥 extra fix (Material 3)
-        ),
-        colorScheme: ColorScheme.dark(
-          background: ColorCode.bcakgroundcolor,
-          primary: Colors.white,
-        ),
-      ),*/
-
-
-     /* theme: ThemeData(
-        // useMaterial3: true, // 🔥 latest UI behavior control
-
-        scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
-
-        appBarTheme: const AppBarTheme(
-          backgroundColor: ColorCode.bcakgroundcolor,
-          iconTheme: IconThemeData(color: Colors.white),
-
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent, // 🔥 extra safety
-        ),
-
-        colorScheme: ColorScheme.dark(
-          background: ColorCode.bcakgroundcolor,
-          primary: Colors.white,
-        ),
-
-        // 🔥 remove splash/highlight unwanted effects
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-
-        // 🔥 smooth page transitions (optional but pro)
-      *//*  pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          },
-        ),*//*
-      ),*/
-      theme: ThemeData(
-        scaffoldBackgroundColor: ColorCode.bcakgroundcolor,
-
-        appBarTheme: const AppBarTheme(
-          backgroundColor: ColorCode.bcakgroundcolor,
-          iconTheme: IconThemeData(color: Colors.white),
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-        ),
-
-        colorScheme: ColorScheme.dark(
-          background: ColorCode.bcakgroundcolor,
-          primary: Colors.white,
-        ),
-
-        // ✅ REMOVE ALL CLICK EFFECTS
-        splashFactory: NoSplash.splashFactory, // 🔥 MOST IMPORTANT
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: Colors.transparent,
-
-        // ✅ Remove Ink ripple globally
-        // useMaterial3: false, // sometimes M3 adds effects
-
-        // ✅ Remove button overlay effect
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            splashFactory: NoSplash.splashFactory,
-          ),
-        ),
-
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            splashFactory: NoSplash.splashFactory,
-          ),
-        ),
-
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            splashFactory: NoSplash.splashFactory,
-          ),
-        ),
-      ),
-      // ✅ Correct navigation logic
-      home: widget.isLoggedIn
-          ?  Mainscreen()
-          :  SplashScreen(),
-
-  /*    home: isLoggedIn
-          ?  Mainscreen()
-          :  Mainscreen(),*/
-    );
-  }
-}
-
-
-
-
-
-
-
-
-
-
-

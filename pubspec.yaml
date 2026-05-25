@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+3
+version: 1.1.0+10
 
 environment:
   sdk: ^3.9.2
@@ -30,39 +30,46 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # State management & navigation
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+
+  # Firebase
+  firebase_core: ^4.8.0
+  firebase_analytics: ^12.4.0
+  firebase_crashlytics: ^5.2.1
+
+  # Functional programming (Either type for error handling)
+  dartz: ^0.10.1
   calendar_date_picker2: ^2.0.1
-  fluttertoast: ^9.0.0
   shared_preferences: ^2.5.3
   dio: ^5.9.0
-  http: ^1.4.0
-  video_player: ^2.8.2
-  google_maps_flutter: ^2.6.0
-  geolocator: ^11.0.0
-  flutter_stripe: ^12.1.1
+  google_maps_flutter: ^2.17.0
+  geolocator: ^14.0.2
+  flutter_stripe: ^12.6.0
   geocoding: ^2.1.1
-  flutter_dotenv: ^5.0.2
-  image_picker: ^1.0.7
-  file_picker: ^8.0.0
-  dotted_border: ^3.1.0
-  image_cropper: ^10.0.0+1
+  image_picker: ^1.2.2
+  package_info_plus: ^9.0.1
   path_provider: ^2.1.2
   intl: ^0.19.0
   lottie: ^3.1.0
-  open_file: ^3.3.2
-  photo_view: ^0.15.0
   google_places_flutter: ^2.0.6
   cached_network_image: ^3.3.1
-  connectivity_plus: ^7.0.0
   flutter_svg: ^2.0.10
   url_launcher: ^6.2.5
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  connectivity_plus: ^6.1.0
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
+
+  # Testing
+  mocktail: ^1.0.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -87,15 +94,16 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/Splash/
-    - assets/Onboding/
-    - assets/Icons/
+    - assets/splash/
+    - assets/onboarding/
+    - assets/icons/
     - assets/lottie/
     - assets/svg/
-    - assets/svg/my_profile/
-    - assets/new_home/
-    - assets/svg/new_bottom_image/
-    - assets/new_home/Topwrods/
+    - assets/svg/profile/
+    - assets/home/
+    - assets/svg/bottom_nav/
+    - assets/mock_data/creatives/
+    - assets/mock_data/top_words/
 
 
 
@@ -130,36 +138,8 @@ flutter:
         - asset: assets/fonts/HelveticaNeueBold.otf
           weight: 700
 
-
-
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/Icons/app_icon.png
+  # image_path: assets/icons/app_icon.png  # TODO: add app_icon.png to assets/icons/ before running flutter_launcher_icons
   remove_alpha_ios: true
