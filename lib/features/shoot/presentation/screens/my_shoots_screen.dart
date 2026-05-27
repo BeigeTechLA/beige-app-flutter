@@ -223,7 +223,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                             : ListView.builder(
                                 padding: const EdgeInsets.only(
                                   top: AppSpacing.mld,
-                                  bottom: AppSpacing.xxl,
+                                  bottom:
+                                      AppSpacing.bottomNavHeight +
+                                      AppSpacing.massive +
+                                      AppSpacing.xxl,
                                 ),
                                 itemCount: upcomingShoots.length,
                                 itemBuilder: (context, index) {
@@ -246,7 +249,10 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                       : ListView.builder(
                           padding: const EdgeInsets.only(
                             top: AppSpacing.mld,
-                            bottom: AppSpacing.xxl,
+                            bottom:
+                                AppSpacing.bottomNavHeight +
+                                AppSpacing.massive +
+                                AppSpacing.xxl,
                           ),
                           itemCount: completedShoots.length,
                           itemBuilder: (context, index) {
@@ -437,7 +443,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
         endTime: cardEndTime,
         duration: durationText,
       ),
-      actionLabel: "Manage Shoot",
+      actionLabel: "Shoot Details",
       onTap: () {
         context.pushNamed(
           RouteNames.bookingEventSummary,
