@@ -12,6 +12,8 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
+import '../../../drawer_screen.dart';
+
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
   final bool fromHome;
@@ -110,6 +112,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
     return AppScaffold(
+      drawer: const DrawerScreen(),
 
       hasAppBar: true,
 

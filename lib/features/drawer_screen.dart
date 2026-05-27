@@ -26,189 +26,188 @@ class DrawerScreen extends ConsumerWidget {
             /// ─── TOP PROFILE ─────────────────
             Padding(
               padding: const EdgeInsets.all(18.0),
-              child: Column(
-                children: [
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: AppColors.borderGold
+                ),
+                child: Column(
+                  children: [
 
-                  /// ───── TOP LOGO ROW ─────
-                  Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-                    children: [
+                    /// ───── TOP LOGO ROW ─────
+                    Row(
+                      mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
+                      children: [
 
-                      /// LOGO
-                      SvgPicture.asset(
-                        AppAssets.logoDrawer,
+                        /// LOGO
+                        SvgPicture.asset(
+                          AppAssets.logoDrawer,
 
-                      ),
+                        ),
 
-                      /// CLOSE BUTTON
-                      GestureDetector(
-                        onTap: () => context.pop(),
-                        child: Container(
-                          height: 34,
-                          width: 34,
-                          decoration: BoxDecoration(
-                            color: AppColors.white.withValues(
-                              alpha: 0.04,
-                            ),
-                            borderRadius:
-                            BorderRadius.circular(
-                              AppRadii.header,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.close,
+                        /// CLOSE BUTTON
+                        GestureDetector(
+                          onTap: () => context.pop(),
+                          child: SvgPicture.asset(
+                            AppAssets.cancel,
+                            height: AppSpacing.xxxl,
+                            width: AppSpacing.xxxl,
                             color: AppColors.white,
-                            size: 18,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: AppSpacing.huge),
 
-                  /// ───── PROFILE CARD ─────
-                  InkWell(
-                    borderRadius:
-                    BorderRadius.circular(AppRadii.none),
-                    onTap: () async {
+                    /// ───── PROFILE CARD ─────
+                    InkWell(
+                      borderRadius:
+                      BorderRadius.circular(AppRadii.none),
+                      onTap: () async {
 
-                      /*context.pushNamed(
-                        RouteNames.myProfile,
-                      ).then((value) {
-                        fetchprofiledata();
-                      });*/
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(
-                        AppSpacing.md,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-
-                        borderRadius:
-                        BorderRadius.circular(
-                          AppRadii.statsInner,
+                        /*context.pushNamed(
+                          RouteNames.myProfile,
+                        ).then((value) {
+                          fetchprofiledata();
+                        });*/
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(
+                          AppSpacing.md,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                              alpha: 0.15,
-                            ),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
 
-                          /// PROFILE IMAGE
-                          Container(
-                            height: 52,
-                            width: 52,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppColors.black
-                                    .withValues(alpha: 0.08),
-                                width: 1,
+                          borderRadius:
+                          BorderRadius.circular(
+                            AppRadii.statsInner,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(
+                                alpha: 0.15,
                               ),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
-                            child: ClipOval(
-                              child:
-                             /* (Myprofile_user
-                                  ?.profileImageUrl ??
-                                  "")
-                                  .isNotEmpty
-                                  ? Image.network(
-                                "${ApiService.imageURL}${Myprofile_user!.profileImageUrl}",
-                                fit: BoxFit.cover,
-                              )*/
-                                   Padding(
-                                padding:
-                                const EdgeInsets.all(8),
-                                child: SvgPicture.asset(
-                                  AppAssets.imagePlaceholder,
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+
+                            /// PROFILE IMAGE
+                            Container(
+                              height: 52,
+                              width: 52,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.black
+                                      .withValues(alpha: 0.08),
+                                  width: 1,
                                 ),
                               ),
-                            ),
-                          ),
-
-                          const SizedBox(width: AppSpacing.md),
-
-                          /// USER INFO
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-
-                                Text(
-                                      "User Name",
-                                  maxLines: 1,
-                                  overflow:
-                                  TextOverflow.ellipsis,
-                                  style:
-                                  AppTextStyles.bodyLarge
-                                      .copyWith(
-                                    color: AppColors.black,
-                                    fontWeight:
-                                    FontWeight.w700,
-                                    fontSize: 15,
+                              child: ClipOval(
+                                child:
+                               /* (Myprofile_user
+                                    ?.profileImageUrl ??
+                                    "")
+                                    .isNotEmpty
+                                    ? Image.network(
+                                  "${ApiService.imageURL}${Myprofile_user!.profileImageUrl}",
+                                  fit: BoxFit.cover,
+                                )*/
+                                     Padding(
+                                  padding:
+                                  const EdgeInsets.all(8),
+                                  child: SvgPicture.asset(
+                                    AppAssets.imagePlaceholder,
                                   ),
                                 ),
+                              ),
+                            ),
 
-                                const SizedBox(height: 4),
+                            const SizedBox(width: AppSpacing.md),
 
-                                Text(
-                                      "demo@gmail.com",
-                                  maxLines: 1,
-                                  overflow:
-                                  TextOverflow.ellipsis,
-                                  style:
-                                  AppTextStyles.bodySmall
-                                      .copyWith(
-                                    color: AppColors.black
-                                        .withValues(
-                                      alpha: 0.7,
+                            /// USER INFO
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+
+                                  Text(
+                                        "User Name",
+                                    maxLines: 1,
+                                    overflow:
+                                    TextOverflow.ellipsis,
+                                    style:
+                                    AppTextStyles.bodyLarge
+                                        .copyWith(
+                                      color: AppColors.black,
+                                      fontWeight:
+                                      FontWeight.w700,
+                                      fontSize: 15,
                                     ),
-                                    fontWeight:
-                                    FontWeight.w500,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
 
-                          /// ARROW
-                          Container(
-                            height: 28,
-                            width: 28,
-                            decoration: BoxDecoration(
-                              color: Colors.black
-                                  .withValues(alpha: 0.08),
-                              borderRadius:
-                              BorderRadius.circular(
-                                100,
+                                  const SizedBox(height: 4),
+
+                                  Text(
+                                        "demo@gmail.com",
+                                    maxLines: 1,
+                                    overflow:
+                                    TextOverflow.ellipsis,
+                                    style:
+                                    AppTextStyles.bodySmall
+                                        .copyWith(
+                                      color: AppColors.black
+                                          .withValues(
+                                        alpha: 0.7,
+                                      ),
+                                      fontWeight:
+                                      FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            child: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 14,
-                              color: AppColors.black,
+
+                            /// ARROW
+                            Container(
+                              height: 28,
+                              width: 28,
+                              decoration: BoxDecoration(
+                                color: Colors.black
+                                    .withValues(alpha: 0.08),
+                                borderRadius:
+                                BorderRadius.circular(
+                                  100,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: AppColors.black,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: AppSpacing.xxl),
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 14),
+            const Divider(
+              color: AppColors.dividerDark,
+              thickness: 0.7,
+            ),
+
 
             /// ─── MENU ITEMS ─────────────────
 
@@ -270,7 +269,10 @@ class DrawerScreen extends ConsumerWidget {
                 context.go('/messages');
               },
             ),
-
+            const Divider(
+              color: AppColors.dividerDark,
+              thickness: 0.7,
+            ),
             _drawerItem(
               context,
               isActive: false,
@@ -279,6 +281,7 @@ class DrawerScreen extends ConsumerWidget {
               title: "Meetings",
               onTap: () {
                 context.goNamed(RouteNames.meetings);
+
               },
             ),
 
@@ -321,7 +324,7 @@ class DrawerScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.xs,
+        vertical: AppSpacing.xxs,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadii.md),

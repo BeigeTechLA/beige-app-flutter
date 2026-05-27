@@ -17,6 +17,7 @@ class AppScaffold extends StatelessWidget {
     this.floatingActionButton,
     this.backgroundColor,
     this.resizeToAvoidBottomInset = true,
+    this.drawer,
   });
 
   final Widget body;
@@ -28,21 +29,26 @@ class AppScaffold extends StatelessWidget {
   final Color? backgroundColor;
   final bool resizeToAvoidBottomInset;
 
+  /// OPTIONAL DRAWER
+  final Widget? drawer;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const DrawerScreen(),
+      /// DEFAULT DRAWER
+      drawer: drawer ?? const DrawerScreen(),
 
       appBar: appBar,
       backgroundColor: backgroundColor,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
+
       body: useSafeArea
           ? SafeArea(
-              top: !hasAppBar,
-              child: body,
-            )
+        top: !hasAppBar,
+        child: body,
+      )
           : body,
     );
   }

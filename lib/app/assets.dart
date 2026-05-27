@@ -24,11 +24,16 @@ class AppAssets {
 
   static const String svgDrawer =
       'assets/svg/drawer';
+
+  static const String svgMessage =
+      'assets/svg/message';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const String back = '$_svg/back.svg';
+  static const String cancel = '$_svg/cancel.svg';
+
   static const String filter = '$_svg/filter.svg';
   static const String search = '$_svg/search.svg';
   static const String notification = '$_svg/notification.svg';
@@ -43,6 +48,16 @@ class AppAssets {
   static const String zoomOut = '$_svg/zoom_out.svg';
 
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — Message
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String clipAttachment =
+      '$svgMessage/clip_attachment.svg';
+
+
+  static const String microphone =
+      '$svgMessage/microphone.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — drawer
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -86,6 +101,7 @@ class AppAssets {
   static const String revisions = '$_svg/up_to_sets_revisions.svg';
   static const String production = '$_svg/production.svg';
   static const String calndermark = '$_svg/calendar_mark.svg';
+
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Social

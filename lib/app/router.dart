@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/messages/messages.dart';
+import '../features/messages/presentation/screens/chat_message_screen.dart';
+import '../features/messages/presentation/screens/message_details.dart';
+import '../features/messages/presentation/screens/messages.dart';
 import '../features/shoot/presentation/screens/cancel_shoot_screen.dart';
 import '../features/shoot/presentation/screens/manage_shoot_screen.dart';
 import '../features/shoot/presentation/screens/my_shoots_screen.dart';
@@ -319,13 +321,15 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Tab 4: File Manager
+
+        /*  // Tab 4: File Manager
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/file-manager',
                 name: RouteNames.fileManager,
-                builder: (context, state) => const FileManagerScreen(),
+                builder: (context, state) =>
+                const FileManagerScreen(),
               ),
             ],
           ),
@@ -335,10 +339,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/meetings',
                 name: RouteNames.meetings,
-                builder: (context, state) => const MeetingsScreen(),
+                builder: (context, state) =>
+                const MeetingsScreen(),
               ),
             ],
-          ),
+          ),*/
         ],
       ),
 
@@ -497,6 +502,33 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/chat-message',
+        name: RouteNames.chatmessage,
+
+        builder: (context, state) {
+
+          final data =
+          state.extra as Map<String, dynamic>;
+
+          return ChatMessageScreen(
+            name: data["name"],
+            image: data["image"],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/message-detils',
+        name: RouteNames.messagesdetils,
+        builder: (context, state) {
+          final data =
+          state.extra as Map<String, dynamic>;
+          return MessageDetails(
+            name: data["name"] ?? "",
+            image: data["image"] ?? "",
+          );
+        },
+      ),
+      GoRoute(
         path: '/manage-booking/:bookingId',
         name: RouteNames.manageBooking,
         builder: (context, state) {
@@ -642,6 +674,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/delete-account-otp',
         name: RouteNames.deleteAccountOtp,
         builder: (context, state) => const DeleteAccountOtpScreen(),
+      ),
+
+
+      ///
+      // ── Drawer ────────────────────────────────────────────────────
+
+      GoRoute(
+        path: '/file-manager',
+        name: RouteNames.fileManager,
+        builder: (context, state) =>
+        const FileManagerScreen(),
+      ),
+
+      GoRoute(
+        path: '/meetings',
+        name: RouteNames.meetings,
+        builder: (context, state) =>
+        const MeetingsScreen(),
       ),
     ],
   );

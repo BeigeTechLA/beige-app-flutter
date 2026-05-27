@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../app/assets.dart';
-import '../../app/colors.dart';
-import '../../app/radii.dart';
-import '../../app/spacing.dart';
-import '../../app/text_styles.dart';
-import '../drawer_screen.dart';
+import '../../../../app/assets.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/radii.dart';
+import '../../../../app/route_names.dart';
+import '../../../../app/spacing.dart';
+import '../../../../app/text_styles.dart';
+import '../../../drawer_screen.dart';
 
 class Messages extends ConsumerStatefulWidget {
   const Messages({super.key});
@@ -17,8 +19,8 @@ class Messages extends ConsumerStatefulWidget {
       _MessagesState();
 }
 
-class _MessagesState
-    extends ConsumerState<Messages> {
+class _MessagesState extends ConsumerState<Messages> {
+
 
   final List<Map<String, dynamic>> chats = [
     {
@@ -442,81 +444,90 @@ class _MessagesState
                       AppSpacing.gapHBase,
 
                       /// CHAT INFO
-                      GestureDetector(
-                        onTap: () {
-                        /*  Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ChatDetailsScreen(
-                                name: chat["name"],
-                                image: chat["image"],
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            context.pushNamed(
+                              RouteNames.chatmessage,
+                              extra: {
+                                "name": chat["name"],
+                                "image": chat["image"],
+                              },
+                            );
+                          /*  Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChatDetailsScreen(
+                                  name: chat["name"],
+                                  image: chat["image"],
+                                ),
                               ),
-                            ),
-                          );*/
-                        },
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-                            children: [
-                        
-                              Row(
-                                children: [
-                        
-                                  Expanded(
-                                    child: Text(
-                                      chat["name"],
+                            );*/
+                          },
+                          child: Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+                              children: [
+
+                                Row(
+                                  children: [
+
+                                    Expanded(
+                                      child: Text(
+                                        chat["name"],
+                                        style:
+                                        AppTextStyles
+                                            .bodyLarge
+                                            .copyWith(
+                                          color:
+                                          AppColors
+                                              .white,
+                                          fontWeight:
+                                          FontWeight
+                                              .w600,
+                                          fontFamily: AppTextStyles.fontFamilyBody
+                                        ),
+                                      ),
+                                    ),
+
+                                    Text(
+                                      chat["time"],
                                       style:
                                       AppTextStyles
-                                          .bodyLarge
+                                          .caption
                                           .copyWith(
                                         color:
                                         AppColors
-                                            .white,
-                                        fontWeight:
-                                        FontWeight
-                                            .w600,
-                                        fontFamily: AppTextStyles.fontFamilyBody
+                                            .white38,
+                                          fontFamily: AppTextStyles.fontFamilyBody
+
                                       ),
                                     ),
-                                  ),
-                        
-                                  Text(
-                                    chat["time"],
-                                    style:
-                                    AppTextStyles
-                                        .caption
-                                        .copyWith(
-                                      color:
-                                      AppColors
-                                          .white38,
-                                        fontFamily: AppTextStyles.fontFamilyBody
-                        
-                                    ),
-                                  ),
-                                ],
-                              ),
-                        
-                              const SizedBox(
-                                height: 4,
-                              ),
-                        
-                              Text(
-                                chat["message"],
-                                style:
-                                AppTextStyles
-                                    .bodyMedium
-                                    .copyWith(
-                                  color:
-                                  AppColors
-                                      .white70,
-                                    fontFamily: AppTextStyles.fontFamilyBody,
-                                  fontWeight: FontWeight.w500
-                        
+                                  ],
                                 ),
-                              ),
-                            ],
+
+                                const SizedBox(
+                                  height: 4,
+                                ),
+
+                                Text(
+                                  chat["message"],
+                                  style:
+                                  AppTextStyles
+                                      .bodyMedium
+                                      .copyWith(
+                                    color:
+                                    AppColors
+                                        .white70,
+                                      fontFamily: AppTextStyles.fontFamilyBody,
+                                    fontWeight: FontWeight.w500
+
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
