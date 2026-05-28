@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../features/drawer_screen.dart';
+import '../../features/app_drawer/screen/drawer_screen.dart';
 
 /// Shared scaffold wrapper with consistent SafeArea handling.
 ///

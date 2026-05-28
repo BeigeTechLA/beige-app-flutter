@@ -21,7 +21,8 @@ import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
-import '../../../drawer_screen.dart';
+import '../../../app_drawer/screen/drawer_screen.dart';
+
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -561,9 +562,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Scaffold(
       drawer: const DrawerScreen(),
       body: Stack(
-
         children: [
-
           SingleChildScrollView(
             child: Column(
               children: [

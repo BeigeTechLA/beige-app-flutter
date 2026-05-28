@@ -71,7 +71,7 @@ class AppFilePickerService {
     try {
 
       final FilePickerResult? result =
-      await FilePicker.platform.pickFiles(
+      await FilePicker.pickFiles(
         type: FileType.custom,
 
         allowedExtensions: [
@@ -110,7 +110,7 @@ class AppFilePickerService {
     try {
 
       final FilePickerResult? result =
-      await FilePicker.platform.pickFiles(
+      await FilePicker.pickFiles(
         type: FileType.audio,
       );
 
@@ -163,7 +163,7 @@ class AppFilePickerService {
     try {
 
       final FilePickerResult? result =
-      await FilePicker.platform.pickFiles();
+      await FilePicker.pickFiles();
 
       if (result == null ||
           result.files.single.path == null) {

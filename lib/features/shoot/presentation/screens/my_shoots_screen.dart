@@ -17,7 +17,8 @@ import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.d
 import 'package:beige/shared/widgets/app_booking_card.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
-import '../../../drawer_screen.dart';
+import '../../../app_drawer/screen/drawer_screen.dart';
+
 
 class MyShootsScreen extends ConsumerStatefulWidget {
   const MyShootsScreen({super.key});

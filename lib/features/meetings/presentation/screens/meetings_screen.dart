@@ -7,7 +7,6 @@ import '../../../../app/colors.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
-import '../../../drawer_screen.dart' show DrawerScreen;
 
 class MeetingsScreen extends ConsumerWidget {
   const MeetingsScreen({super.key});

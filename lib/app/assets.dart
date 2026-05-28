@@ -87,6 +87,7 @@ class AppAssets {
   static const String eyeOpen = '$_svg/eyes1.svg';
   static const String eyeClosed = '$_svg/eyes2.svg';
   static const String imagePlaceholder = '$_svg/image_placeholder.svg';
+  static const String arrow_right_ = '$_svg/arrow_right_.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Features & Booking

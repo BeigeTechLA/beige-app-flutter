@@ -12,7 +12,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
-import '../../../drawer_screen.dart';
+import '../../../app_drawer/screen/drawer_screen.dart';
 
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/app_drawer/screen/drawer_screen.dart';
 import '../features/messages/presentation/screens/chat_message_screen.dart';
 import '../features/messages/presentation/screens/message_details.dart';
 import '../features/messages/presentation/screens/messages.dart';
@@ -711,13 +712,17 @@ class _MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      drawer: const DrawerScreen(),
       extendBody: true,
-      body: Row(
+
+      body: navigationShell,
+
+      /* Row(
         children: [
            // _buildNavigationRail(context, ref),
           Expanded(child: navigationShell),
         ],
-      ),
+      ),*/
       bottomNavigationBar: ScaleClampedText(
         child: Column(
           mainAxisSize: MainAxisSize.min,

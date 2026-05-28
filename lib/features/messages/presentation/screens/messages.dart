@@ -9,7 +9,7 @@ import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
-import '../../../drawer_screen.dart';
+import '../../../app_drawer/screen/drawer_screen.dart';
 
 class Messages extends ConsumerStatefulWidget {
   const Messages({super.key});
