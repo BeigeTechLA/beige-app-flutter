@@ -17,8 +17,10 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
 
 class ShootDetailsScreen extends ConsumerStatefulWidget {
@@ -61,6 +63,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
+  bool _hasLocationPermission = false;
 
   String selectedAddress = "Search or select location";
   TextEditingController searchController = TextEditingController();
@@ -249,7 +252,11 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _getCurrentLocation();
+      }
+    });
     locationFocusNode.addListener(() {
       setState(() {
         if (locationFocusNode.hasFocus) {
@@ -304,28 +311,11 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "Location permission permanently denied. Enable from settings.",
-          ),
-        ),
-      );
-      await Geolocator.openAppSettings(); // 👈 Open app settings
+    final hasPermission = await ensureLocationPermission(context);
+    if (!mounted || !hasPermission) {
+      if (mounted && _hasLocationPermission) {
+        setState(() => _hasLocationPermission = false);
+      }
       return;
     }
 
@@ -333,7 +323,10 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    if (!mounted) return;
+
     setState(() {
+      _hasLocationPermission = true;
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
   }
@@ -909,11 +902,10 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                                           height: 20,
                                           child: SvgPicture.asset(
                                             AppAssets.locationPin,
-                                            colorFilter:
-                                                const ColorFilter.mode(
-                                                  AppColors.white,
-                                                  BlendMode.srcIn,
-                                                ),
+                                            colorFilter: const ColorFilter.mode(
+                                              AppColors.white,
+                                              BlendMode.srcIn,
+                                            ),
                                             fit: BoxFit.none,
                                           ),
                                         ),
@@ -1023,45 +1015,47 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                           height: 350,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: currentLatLng == null
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      target: currentLatLng!,
-                                      zoom: 14,
+                            child: GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target:
+                                    currentLatLng ??
+                                    AppMapDefaults.fallbackCenter,
+                                zoom: currentLatLng == null
+                                    ? AppMapDefaults.fallbackZoom
+                                    : 14,
+                              ),
+
+                              myLocationEnabled: _hasLocationPermission,
+                              myLocationButtonEnabled: _hasLocationPermission,
+                              zoomControlsEnabled: true,
+                              compassEnabled: false,
+
+                              // 🔥 IMPORTANT FIX (touch enable)
+                              gestureRecognizers:
+                                  <Factory<OneSequenceGestureRecognizer>>{
+                                    Factory<OneSequenceGestureRecognizer>(
+                                      () => EagerGestureRecognizer(),
                                     ),
+                                  },
 
-                                    myLocationEnabled: true,
-                                    myLocationButtonEnabled: true,
-                                    zoomControlsEnabled: true,
-                                    compassEnabled: false,
+                              onMapCreated: (controller) {
+                                mapController = controller;
+                                controller.setMapStyle(darkMapStyle);
+                              },
 
-                                    // 🔥 IMPORTANT FIX (touch enable)
-                                    gestureRecognizers:
-                                        <Factory<OneSequenceGestureRecognizer>>{
-                                          Factory<OneSequenceGestureRecognizer>(
-                                            () => EagerGestureRecognizer(),
-                                          ),
-                                        },
-
-                                    onMapCreated: (controller) {
-                                      mapController = controller;
-                                      controller.setMapStyle(darkMapStyle);
-                                    },
-
-                                    markers: {
+                              markers: currentLatLng == null
+                                  ? const <Marker>{}
+                                  : {
                                       Marker(
                                         markerId: const MarkerId("selected"),
                                         position: currentLatLng!,
                                       ),
                                     },
 
-                                    onTap: (latLng) async {
-                                      await _updateLocationFromLatLng(latLng);
-                                    },
-                                  ),
+                              onTap: (latLng) async {
+                                await _updateLocationFromLatLng(latLng);
+                              },
+                            ),
                           ),
                         ),
                       ),

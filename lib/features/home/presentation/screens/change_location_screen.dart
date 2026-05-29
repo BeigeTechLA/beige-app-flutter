@@ -15,8 +15,10 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
+import 'package:beige/shared/widgets/location_permission_dialog.dart';
 
 class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});
@@ -33,6 +35,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   LatLng? selectedLatLng;
   String selectedAddress = "select location";
   bool isManualSelection = false;
+  bool _hasLocationPermission = false;
 
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
@@ -41,9 +44,11 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   void initState() {
     super.initState();
 
-    if (selectedLatLng == null) {
-      _getCurrentLocation();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && selectedLatLng == null) {
+        _getCurrentLocation();
+      }
+    });
   }
 
   @override
@@ -56,23 +61,23 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   // ================= CURRENT LOCATION =================
   Future<void> _getCurrentLocation() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+      final hasPermission = await ensureLocationPermission(context);
+      if (!mounted || !hasPermission) {
+        if (mounted && _hasLocationPermission) {
+          setState(() => _hasLocationPermission = false);
+        }
+        return;
       }
-
-      if (permission == LocationPermission.deniedForever) return;
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
       LatLng latLng = LatLng(position.latitude, position.longitude);
+      if (!mounted) return;
 
       setState(() {
+        _hasLocationPermission = true;
         selectedLatLng = latLng;
       });
 
@@ -302,48 +307,46 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
             child: Stack(
               children: [
                 /// ================= MAP =================
-                selectedLatLng == null
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.white,
-                        ),
-                      )
-                    : GoogleMap(
-                        style: _darkMapStyle,
-                        initialCameraPosition: CameraPosition(
-                          target: selectedLatLng!,
-                          zoom: 15,
-                        ),
-                        onMapCreated: (controller) {
-                          mapController = controller;
-                          _mapController.complete(controller);
-                        },
-                        zoomControlsEnabled: false, // ❗ ANDROID zoom +/- remove
-                        // Android zoom buttons
-                        mapToolbarEnabled: false, // 🔥 IMPORTANT (iOS fix)
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: false,
-                        compassEnabled: false,
-                        indoorViewEnabled: false,
+                GoogleMap(
+                  style: _darkMapStyle,
+                  initialCameraPosition: CameraPosition(
+                    target: selectedLatLng ?? AppMapDefaults.fallbackCenter,
+                    zoom: selectedLatLng == null
+                        ? AppMapDefaults.fallbackZoom
+                        : 15,
+                  ),
+                  onMapCreated: (controller) {
+                    mapController = controller;
+                    _mapController.complete(controller);
+                  },
+                  zoomControlsEnabled: false, // ❗ ANDROID zoom +/- remove
+                  // Android zoom buttons
+                  mapToolbarEnabled: false, // 🔥 IMPORTANT (iOS fix)
+                  myLocationEnabled: _hasLocationPermission,
+                  myLocationButtonEnabled: false,
+                  compassEnabled: false,
+                  indoorViewEnabled: false,
 
-                        /// gestures (keep ON)
-                        zoomGesturesEnabled: true,
-                        scrollGesturesEnabled: true,
-                        tiltGesturesEnabled: true,
-                        rotateGesturesEnabled: true,
-                        onTap: (latLng) async {
-                          setState(() => selectedLatLng = latLng);
-                          await _getAddressFromLatLng(latLng);
-                        },
-                        markers: {
+                  /// gestures (keep ON)
+                  zoomGesturesEnabled: true,
+                  scrollGesturesEnabled: true,
+                  tiltGesturesEnabled: true,
+                  rotateGesturesEnabled: true,
+                  onTap: (latLng) async {
+                    setState(() => selectedLatLng = latLng);
+                    await _getAddressFromLatLng(latLng);
+                  },
+                  markers: selectedLatLng == null
+                      ? const <Marker>{}
+                      : {
                           Marker(
                             markerId: const MarkerId("selected"),
                             position: selectedLatLng!,
                           ),
                         },
 
-                        // scrollGesturesEnabled: true,
-                      ),
+                  // scrollGesturesEnabled: true,
+                ),
 
                 /// ================= ZOOM BUTTONS =================
                 Positioned(

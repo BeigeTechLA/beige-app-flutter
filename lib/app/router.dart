@@ -307,16 +307,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           // Tab 3: Messages
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/messages',
-                name: RouteNames.messages,
-                builder: (context, state) =>
-                    const Center(child: Text('Messages')),
-              ),
-            ],
-          ),
+          // Temporarily hidden. Keep this branch code for when messages are
+          // ready to bind back into the bottom navigation.
+          // StatefulShellBranch(
+          //   routes: [
+          //     GoRoute(
+          //       path: '/messages',
+          //       name: RouteNames.messages,
+          //       builder: (context, state) =>
+          //           const Center(child: Text('Messages')),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
 
@@ -708,11 +710,13 @@ class _MainShell extends ConsumerWidget {
                       ),
                       label: " My Shoots",
                     ),
-                    BottomNavigationBarItem(
-                      icon: _buildInactiveIcon(AppAssets.inactiveMessages),
-                      activeIcon: _buildActiveIcon(AppAssets.activeMessages),
-                      label: " Messages",
-                    ),
+                    // Messages tab is temporarily hidden until the feature is
+                    // ready to bind. Keep the item code for easy re-enable.
+                    // BottomNavigationBarItem(
+                    //   icon: _buildInactiveIcon(AppAssets.inactiveMessages),
+                    //   activeIcon: _buildActiveIcon(AppAssets.activeMessages),
+                    //   label: " Messages",
+                    // ),
                   ],
                 ),
               ),
