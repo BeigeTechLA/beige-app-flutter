@@ -19,6 +19,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
@@ -478,45 +479,43 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     borderRadius: AppRadii.xxlAll,
                     child: SizedBox(
                       height: 250,
-                      child: currentLatLng == null
-                          ? const Center(child: CircularProgressIndicator())
-                          : GoogleMap(
-                              style: darkMapStyle,
-                              initialCameraPosition: CameraPosition(
-                                target: currentLatLng!,
-                                zoom: 14,
+                      child: GoogleMap(
+                        style: darkMapStyle,
+                        initialCameraPosition: CameraPosition(
+                          target:
+                              currentLatLng ?? AppMapDefaults.fallbackCenter,
+                          zoom: currentLatLng == null
+                              ? AppMapDefaults.fallbackZoom
+                              : 14,
+                        ),
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        zoomControlsEnabled: true,
+                        compassEnabled: true,
+                        markers: markers,
+                        gestureRecognizers:
+                            <Factory<OneSequenceGestureRecognizer>>{
+                              Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
                               ),
-                              myLocationEnabled: true,
-                              myLocationButtonEnabled: true,
-                              zoomControlsEnabled: true,
-                              compassEnabled: true,
-                              markers: markers,
-                              gestureRecognizers:
-                                  <Factory<OneSequenceGestureRecognizer>>{
-                                    Factory<OneSequenceGestureRecognizer>(
-                                      () => EagerGestureRecognizer(),
-                                    ),
-                                  },
-                              onMapCreated: (controller) {
-                                mapController = controller;
-                                if (currentLatLng != null) {
-                                  mapController!.animateCamera(
-                                    CameraUpdate.newLatLngZoom(
-                                      currentLatLng!,
-                                      14,
-                                    ),
-                                  );
-                                }
-                              },
-                              onTap: (latLng) async {
-                                _updateMarker(latLng);
-                                await getAddressFromLatLng(latLng);
-                                locationController.text = selectedAddress;
-                                mapController?.animateCamera(
-                                  CameraUpdate.newLatLngZoom(latLng, 14),
-                                );
-                              },
-                            ),
+                            },
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          if (currentLatLng != null) {
+                            mapController!.animateCamera(
+                              CameraUpdate.newLatLngZoom(currentLatLng!, 14),
+                            );
+                          }
+                        },
+                        onTap: (latLng) async {
+                          _updateMarker(latLng);
+                          await getAddressFromLatLng(latLng);
+                          locationController.text = selectedAddress;
+                          mapController?.animateCamera(
+                            CameraUpdate.newLatLngZoom(latLng, 14),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   AppSpacing.verticalXl,
