@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
 import '../../../../core/network/api_endpoints.dart';
+import '../../../../core/utils/shared_service.dart';
+import '../../../app_drawer/providers/drawer_notifier.dart';
 import 'profile_providers.dart';
 
 enum EditProfileStatus { initial, loading, loaded, saving, saved, error }
@@ -84,14 +86,25 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
       (error) => state = state.copyWith(
         status: EditProfileStatus.error,
         errorMessage: error.message,
-      ),
-      (_) {
-        AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
-        state = state.copyWith(
-          status: EditProfileStatus.saved,
-          successMessage: 'Profile updated successfully',
-        );
-      },
+      ),(_) async {
+      final userData = await SharedService.getUserData();
+
+
+      await SharedService.updateUserData(
+        name: data['name'] ?? userData['name'],
+        email: userData['email'],
+        profileImageUrl: userData['profile_image_url'],
+      );
+
+      ref.invalidate(drawerUserProvider);
+
+      AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
+
+      state = state.copyWith(
+        status: EditProfileStatus.saved,
+        successMessage: 'Profile updated successfully',
+      );
+    }
     );
   }
 

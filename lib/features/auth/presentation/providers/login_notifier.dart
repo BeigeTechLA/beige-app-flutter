@@ -36,9 +36,20 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
       (user) async {
         // Save login details to SharedPreferences
         final prefs = ref.read(sharedPreferencesProvider);
-        await _saveLoginDetails(prefs, user.token, user.environmentId,
-            user.folder, user.name, user.designation, user.department,
-            user.departmentId);
+        await _saveLoginDetails(
+          prefs,
+          user.token,
+          user.environmentId,
+          user.folder,
+          user.name,
+          email, // login email
+          '',    // profile image
+          user.designation,
+          user.department,
+          user.departmentId,
+        );
+
+
 
         if (savePassword) {
           await prefs.setString("email", email);
@@ -65,6 +76,8 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     int environmentId,
     String folder,
     String name,
+      String email,
+      String profileImageUrl,
     String designation,
     String department,
     String departmentId,
@@ -73,6 +86,8 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     await prefs.setInt('environment_id', environmentId);
     await prefs.setString('folder', folder);
     await prefs.setString('name', name);
+    await prefs.setString('email', email);
+    await prefs.setString('profile_image_url', profileImageUrl);
     await prefs.setString('designation', designation);
     await prefs.setString('department', department);
     await prefs.setString('department_id', departmentId);

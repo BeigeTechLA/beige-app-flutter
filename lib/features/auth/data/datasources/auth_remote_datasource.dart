@@ -28,7 +28,9 @@ class AuthRemoteDataSource {
   }
 
   /// POST auth/register (multipart — includes optional profile image)
-  Future<Map<String, dynamic>> signUp({
+  Future<Map<String, dynamic>> signUp
+
+      ({
     required String name,
     required String email,
     required String password,

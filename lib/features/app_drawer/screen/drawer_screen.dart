@@ -9,6 +9,8 @@
   import '../../../../../../app/route_names.dart';
   import '../../../../../../app/spacing.dart';
   import '../../../app/text_styles.dart';
+import '../../../core/network/api_endpoints.dart';
+import '../providers/drawer_notifier.dart';
 
   class DrawerScreen extends ConsumerWidget {
     const DrawerScreen({super.key});
@@ -17,8 +19,7 @@
     Widget build(BuildContext context, WidgetRef ref) {
       final currentRoute =   GoRouterState.of(context).uri.path;
 
-     /* final userData =ref.watch(drawerUserProvider);
-      */
+      final userAsync = ref.watch(drawerUserProvider);
 
       return Drawer(
         backgroundColor: AppColors.black,
@@ -112,19 +113,27 @@
                                   width: 1,
                                 ),
                               ),
-                              child: ClipOval(
-                                child:
-                               /* (Myprofile_user
-                                    ?.profileImageUrl ??
-                                    "")
-                                    .isNotEmpty
-                                    ? Image.network(
-                                  "${ApiService.imageURL}${Myprofile_user!.profileImageUrl}",
-                                  fit: BoxFit.cover,
-                                )*/
-                                     Padding(
-                                  padding:
-                                  const EdgeInsets.all(8),
+                              child: userAsync.when(
+                                data: (user) {
+                                  final image = user['profile_image_url'] ?? '';
+
+                                  if (image.isNotEmpty) {
+                                    return Image.network(
+                                      "${ApiEndpoints.imageUrl}$image",
+                                      fit: BoxFit.cover,
+                                    );
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: SvgPicture.asset(
+                                      AppAssets.imagePlaceholder,
+                                    ),
+                                  );
+                                },
+                                loading: () => const SizedBox(),
+                                error: (_, __) => Padding(
+                                  padding: const EdgeInsets.all(8),
                                   child: SvgPicture.asset(
                                     AppAssets.imagePlaceholder,
                                   ),
@@ -135,47 +144,36 @@
                             const SizedBox(width: AppSpacing.md),
 
                             /// USER INFO
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-
-                                  Text(
-                                        "User Name",
-                                    maxLines: 1,
-                                    overflow:
-                                    TextOverflow.ellipsis,
-                                    style:
-                                    AppTextStyles.bodyLarge
-                                        .copyWith(
-                                      color: AppColors.black,
-                                      fontWeight:
-                                      FontWeight.w700,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 4),
-
-                                  Text(
-                                        "demo@gmail.com",
-                                    maxLines: 1,
-                                    overflow:
-                                    TextOverflow.ellipsis,
-                                    style:
-                                    AppTextStyles.bodySmall
-                                        .copyWith(
-                                      color: AppColors.black
-                                          .withValues(
-                                        alpha: 0.7,
+                            userAsync.when(
+                              data: (user) => Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user['name'] ?? '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: AppColors.black,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15,
                                       ),
-                                      fontWeight:
-                                      FontWeight.w500,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      user['email'] ?? '',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.black.withValues(alpha: 0.7),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              loading: () => const CircularProgressIndicator(),
+                              error: (_, __) => const SizedBox(),
                             ),
 
                             /// ARROW
