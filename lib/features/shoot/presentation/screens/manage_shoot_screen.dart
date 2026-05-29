@@ -144,7 +144,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                           ),
                           AppSpacing.verticalXxs,
                           Text(
-                            "View your upcoming \nappointments.",
+                            "View your upcoming \nshoot.",
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.white70,
                               fontWeight: FontWeight.w400,
