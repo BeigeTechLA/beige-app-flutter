@@ -32,7 +32,7 @@
                 width: 336,
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg,vertical: AppSpacing.huge),
                 decoration: BoxDecoration(
-                  color: AppColors.background
+                  color: AppColors.drawerHeader
                 ),
                 child: Column(
                   children: [
@@ -325,7 +325,7 @@
           ),
           decoration: BoxDecoration(
             color: isActive
-                ? AppColors.matteBlack
+                ? AppColors.surfaceGradientDark
                 : AppColors.black,
 
             // borderRadius: BorderRadius.circular(14),

@@ -150,7 +150,7 @@ class AppAssets {
   static const String active_file_manager = '$svgBottom/active_file_manager.svg';
 
   static const String inactive_filemanager = '$svgBottom/inactive_filemanager.svg';
-  static const String active_meetings = '$svgBottom/active_meetings.svg';
+  static const String active_meetings = '$svgBottom/active_meeting.svg';
   static const String inactive_meetings = '$svgBottom/inactive_meetings.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

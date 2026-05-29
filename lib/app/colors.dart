@@ -233,7 +233,7 @@
     static const Color shimmerBase = Color(0xFF2A2A2A);
     static const Color shimmerHighlight = Color(0xFF3A3A38);
     static const Color transparent = Color(0x00000000);
-    static const Color matteBlack = Color(0xFF121212);
+
     // — Material-compatible —
     /// Amber — star ratings, warnings
     static const Color amber = Color(0xFFFFC107);
