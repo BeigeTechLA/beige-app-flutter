@@ -57,6 +57,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _isPlusCode(String value) {
     return RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$').hasMatch(value);
   }
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =TextEditingController();
+
 
   bool get isFormValid {
     return nameController.text.isNotEmpty &&
@@ -168,6 +174,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           fontSize: 18,
                           fontFamily: AppTextStyles.fontFamilyBody,
                           fontWeight: FontWeight.w500,
+
+
                         ),
                       ),
 
@@ -532,12 +540,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
   }
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+
 
   Future<void> _fetchSignup() async {
     final name = nameController.text.trim();
@@ -551,6 +554,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       TopMessage.show(context, "Please enter your name");
       return;
     }
+
 
     /// 🔴 EMAIL
     if (email.isEmpty) {
@@ -602,9 +606,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       TopMessage.show(context, "Please accept Terms & Conditions");
       return;
     }
-
+    
     ref
-        .read(signupNotifierProvider.notifier)
+        .read(signupNotifierProvider.notifier,
+    )
         .signUp(
           name: name,
           email: email,
@@ -615,6 +620,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           longitude: selectedLng!,
           profileImage: profileImage,
         );
+
   }
 
   void _showSnack(String message) {
@@ -632,6 +638,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     super.dispose();
   }
+
 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(

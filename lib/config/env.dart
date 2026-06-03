@@ -5,6 +5,7 @@ class Env {
   static late String apiUrl;
   static late String imageUrl;
   static late String stripePublishableKey;
+  static late String socketUrl;
 
   static void init(Environment environment) {
     current = environment;
@@ -16,6 +17,7 @@ class Env {
         imageUrl = 'https://d1pgtgqp0jru64.cloudfront.net/';
         stripePublishableKey =
             'pk_test_51S5czd54hnPNgHXUq7sunp8uvTDW4ln6aw8Y3bP249JZmx4xuvoIED4mZTuNIkAFcOoCApICfgv9dM4VbbleJo7L00GqNEkj3I';
+        socketUrl = "https://api2.dev.beige.app";
       case Environment.prod:
         apiUrl = 'https://mobile.prod.beige.app/api/';
         imageUrl = 'https://d2jhn32fsulyac.cloudfront.net/';
