@@ -42,13 +42,16 @@ abstract class ApiEndpoints {
   static const String paymentSheet = "paymentsheet";
 
   /// 👔 Crew Registration
-  static const String registerCrewStep1 = "auth/register-crew-step1";
+/*  static const String registerCrewStep1 = "auth/register-crew-step1";
   static const String registerCrewRoles = "auth/crew-roles";
   static const String registerCrewSkills = "auth/skills";
   static const String registerCrewEquipment = "auth/equipment-autocomplete";
   static const String registerCrewStep2 = "auth/register-crew-step2";
-  static const String registerCrewStep3 = "auth/register-crew-step3";
+  static const String registerCrewStep3 = "auth/register-crew-step3";*/
 
+
+  /// messages
+  static const String chatRooms = 'v1/external-chat/rooms';
   // ─── Legacy aliases (used by pre-migration code) ───
   // These will be removed as each feature is migrated.
 

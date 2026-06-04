@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +12,7 @@ import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/services/websocket_service.dart';
 import '../../../../shared/widgets/app_filepicker_service.dart';
 
 
@@ -34,6 +37,15 @@ class _ChatMessageScreenState
   late final TextEditingController _messageController;
   late final ScrollController _scrollController;
   late final FocusNode _focusNode;
+
+  static const String roomId = '6a19559547e2b54e2e4778b1';
+
+  // ✅ Socket
+  final _socket = SocketService();
+  late StreamSubscription _messageSub;
+  late StreamSubscription _typingSub;
+  bool _isTyping = false;
+  Timer? _typingTimer;
 
   final List<Map<String, dynamic>> messages = [
     {
@@ -61,7 +73,6 @@ class _ChatMessageScreenState
   @override
   void initState() {
     super.initState();
-
     _messageController = TextEditingController();
     _scrollController = ScrollController();
     _focusNode = FocusNode();
@@ -455,231 +466,226 @@ class _ChatMessageScreenState
                   horizontal: AppSpacing.md,
                   vertical: AppSpacing.sm,
                 ),
-
                 decoration: const BoxDecoration(
                   color: AppColors.surfaceMid,
-
                   border: Border(
-                    top: BorderSide(
-                      color: AppColors.dividerDark,
-                    ),
+                    top: BorderSide(color: AppColors.dividerDark),
                   ),
                 ),
-
                 child: SafeArea(
                   top: false,
-
                   child: Row(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.end,
-
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
 
-
-
-                      Expanded(
-                        child: TextField(
-                          controller: _messageController,
-                          focusNode: _focusNode,
-                          textInputAction: TextInputAction.send,
-
-                          minLines: 1,
-                          maxLines: 5,
-                          cursorColor: AppColors.primary,
-
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-
-                          onSubmitted: (_) {
-                            sendMessage();
-                          },
-
-                          decoration: InputDecoration(
-                            hintText: "Write your message",
-                            fillColor: AppColors.black,                            hintStyle: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
+                      /// Attachment Icon (left of field)
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: AppColors.surfaceStats,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: AppRadii.roundAll,
-                              borderSide: BorderSide.none,
-                            ),
-
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: AppRadii.roundAll,
-                              borderSide: BorderSide.none,
-                            ),
-
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: AppRadii.roundAll,
-                              borderSide: BorderSide.none,
-                            ),
-
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-
-                                GestureDetector(
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: AppColors.surface,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(25),
-                                        ),
+                            builder: (context) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.xl,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 36, height: 4,
+                                      margin: const EdgeInsets.only(bottom: AppSpacing.xl),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.white24,
+                                        borderRadius: BorderRadius.circular(4),
                                       ),
-                                      builder: (context) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-
-                                              /// Camera
-                                              _buildAttachmentTile(
-                                                icon: Icons.camera_alt,
-                                                color: Colors.purple,
-                                                title: "Camera",
-                                                onTap: () async {
-
-                                                  context.pop();
-
-                                                  final file =
-                                                  await AppFilePickerService
-                                                      .pickCameraImage();
-
-                                                  if (file != null) {
-
-                                                    setState(() {
-                                                      messages.add({
-                                                        "text": " Camera Image Sent",
-                                                        "isMe": true,
-                                                        "time": "Now",
-                                                      });
-                                                    });
-                                                  }
-                                                },
-                                              ),
-
-                                              /// Gallery
-                                              _buildAttachmentTile(
-                                                icon: Icons.photo,
-                                                color: Colors.blue,
-                                                title: "Gallery",
-                                                onTap: () async {
-
-                                                  context.pop();
-
-                                                  final file =
-                                                  await AppFilePickerService
-                                                      .pickGalleryImage();
-
-                                                  if (file != null) {
-
-                                                    setState(() {
-                                                      messages.add({
-                                                        "text": "🖼 Gallery Image Sent",
-                                                        "isMe": true,
-                                                        "time": "Now",
-                                                      });
-                                                    });
-                                                  }
-                                                },
-                                              ),
-
-                                              /// Document
-                                              _buildAttachmentTile(
-                                                icon: Icons.insert_drive_file,
-                                                color: Colors.orange,
-                                                title: "Document",
-                                                onTap: () async {
-
-                                                  context.pop();
-
-                                                  final file =
-                                                  await AppFilePickerService
-                                                      .pickDocument();
-
-                                                  if (file != null) {
-
-                                                    setState(() {
-                                                      messages.add({
-                                                        "text": " Document Sent",
-                                                        "isMe": true,
-                                                        "time": "Now",
-                                                      });
-                                                    });
-                                                  }
-                                                },
-                                              ),
-
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(.15),
-                                      shape: BoxShape.circle,
                                     ),
-                                    child: SvgPicture.asset(
-                                      AppAssets.clipAttachment,
-                                      color: AppColors.primary,
-                                      height: 22,
-                                      width: 22,
+                                    GridView.count(
+                                      crossAxisCount: 3,
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      mainAxisSpacing: 20,
+                                      crossAxisSpacing: AppSpacing.sm,
+                                      children: [
+                                        _buildWAItem(
+                                          icon: Icons.camera_alt_rounded,
+                                          color: const Color(0xFF7C3AED),
+                                          label: "Camera",
+                                          onTap: () async {
+                                            context.pop();
+                                            final file = await AppFilePickerService.pickCameraImage();
+                                            if (file != null) setState(() {
+                                              messages.add({"text": "Camera Image Sent", "isMe": true, "time": "Now"});
+                                            });
+                                          },
+                                        ),
+                                        _buildWAItem(
+                                          icon: Icons.photo_rounded,
+                                          color: AppColors.warning,
+                                          label: "Gallery",
+                                          onTap: () async {
+                                            context.pop();
+                                            final file = await AppFilePickerService.pickGalleryImage();
+                                            if (file != null) setState(() {
+                                              messages.add({"text": "Gallery Image Sent", "isMe": true, "time": "Now"});
+                                            });
+                                          },
+                                        ),
+                                        _buildWAItem(
+                                          icon: Icons.insert_drive_file_rounded,
+                                          color: AppColors.info,
+                                          label: "Document",
+                                          onTap: () async {
+                                            context.pop();
+                                            final file = await AppFilePickerService.pickDocument();
+                                            if (file != null) setState(() {
+                                              messages.add({"text": "Document Sent", "isMe": true, "time": "Now"});
+                                            });
+                                          },
+                                        ),
+                                        _buildWAItem(
+                                          icon: Icons.mic_rounded,
+                                          color: AppColors.online,
+                                          label: "Audio",
+                                          onTap: () { context.pop(); },
+                                        ),
+                                        _buildWAItem(
+                                          icon: Icons.location_on_rounded,
+                                          color: AppColors.error,
+                                          label: "Location",
+                                          onTap: () { context.pop(); },
+                                        ),
+                                        _buildWAItem(
+                                          icon: Icons.person_rounded,
+                                          color: AppColors.mapBlue,
+                                          label: "Contact",
+                                          onTap: () { context.pop(); },
+                                        ),
+                                      ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-
-                                const SizedBox(width: 10),
-
-                                /// Microphone Button
-                                GestureDetector(
-                                  onLongPress: () {
-                                    /// Start Recording
-                                  },
-
-                                  onLongPressUp: () {
-                                    /// Stop Recording & Send Voice
-                                  },
-
-                                  child: SvgPicture.asset(
-                                    AppAssets.microphone,
-                                    color: AppColors.white,
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                ),
-
-                                const SizedBox(width: 8),
-                              ],
+                              );
+                            },
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            right: AppSpacing.sm,
+                            bottom: 12,
+                          ),
+                          child: SvgPicture.asset(
+                            AppAssets.clipAttachment,
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.textSecondary,
+                              BlendMode.srcIn,
                             ),
+                            height: 22,
+                            width: 22,
                           ),
                         ),
                       ),
 
-                      AppSpacing.gapHSm,
+                      /// Text Field (pill shaped, icons inside suffix)
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            borderRadius: AppRadii.roundAll,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
 
-                      Container(
-                        height: 50,
-                        width: 50,
+                              /// Text Input
+                              Expanded(
+                                child: TextField(
+                                  controller: _messageController,
+                                  focusNode: _focusNode,
+                                  textInputAction: TextInputAction.send,
+                                  minLines: 1,
+                                  maxLines: 5,
+                                  cursorColor: AppColors.primary,
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.textPrimary,
+                                    fontFamily: AppTextStyles.fontFamilyBody,
+                                  ),
+                                  onSubmitted: (_) => sendMessage(),
+                                  decoration: InputDecoration(
+                                    hintText: "Write your message",
+                                    hintStyle: AppTextStyles.bodyMedium.copyWith(
+                                      color: AppColors.textSecondary,
+                                      fontFamily: AppTextStyles.fontFamilyBody,
+                                    ),
+                                    filled: false,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                      vertical: 12,
+                                    ),
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                  ),
+                                ),
+                              ),
 
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
+                              /// Right Icons inside pill
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  right: AppSpacing.sm,
+                                  bottom: 8,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+
+                                    /// Mic Icon
+                                    GestureDetector(
+                                      onLongPress: () { /* Start recording */ },
+                                      onLongPressUp: () { /* Stop & send */ },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 6),
+                                        child: SvgPicture.asset(
+                                          AppAssets.microphone,
+                                          colorFilter: const ColorFilter.mode(
+                                            AppColors.textSecondary,
+                                            BlendMode.srcIn,
+                                          ),
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ),
 
-                        child: IconButton(
-                          onPressed: sendMessage,
-
-                          icon: const Icon(
-                            Icons.send_rounded,
-                            color: AppColors.onPrimary,
+                      /// Send Button
+                      Padding(
+                        padding: const EdgeInsets.only(left: AppSpacing.sm),
+                        child: GestureDetector(
+                          onTap: sendMessage,
+                          child: Container(
+                            height: 46,
+                            width: 46,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.send_rounded,
+                              color: AppColors.onPrimary,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -698,40 +704,35 @@ class _ChatMessageScreenState
   /// Attachment Tile Widget
   /// ======================
 
-  Widget _buildAttachmentTile({
+  Widget _buildWAItem({
     required IconData icon,
     required Color color,
-    required String title,
+    required String label,
     required VoidCallback onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: ListTile(
-        onTap: onTap,
-
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(.15),
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.white, size: 26),
           ),
-
-          child: Icon(
-            icon,
-            color: color,
-            size: 26,
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white70,
+            ),
           ),
-        ),
-
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-
-        trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 18),
+        ],
       ),
     );
   }
