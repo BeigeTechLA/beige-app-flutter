@@ -105,6 +105,7 @@ import '../providers/drawer_notifier.dart';
                             Container(
                               height: 52,
                               width: 52,
+                              clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(

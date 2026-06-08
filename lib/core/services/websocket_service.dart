@@ -14,9 +14,6 @@ class SocketService {
   String? _currentRoomId;
 
   // ✅ Static userId — screen se set karo login ke baad
-  static String userId = '';
-  static String userName = '';
-
   // ✅ Streams
   final _messageController = StreamController<Map<String, dynamic>>.broadcast();
   final _typingController = StreamController<bool>.broadcast();
@@ -39,8 +36,6 @@ class SocketService {
     }
 
     _currentRoomId = roomId;
-    SocketService.userId = userId;
-    SocketService.userName = userName;
 
     // Already connected but different room — sirf rejoin
     if (_socket != null && _socket!.connected) {
@@ -97,29 +92,11 @@ class SocketService {
     _socket!.connect();
   }
 
-  // ✅ Raw socket event listener (screen ke liye)
   void on(String event, Function(dynamic) handler) {
     _socket?.on(event, handler);
   }
 
-  // ✅ Message Send
-  void sendMessage(String content) {
-    _socket?.emit('send_message', {
-      'roomId': _currentRoomId,
-      'senderId': userId,
-      'content': content,
-      'time': DateTime.now().toIso8601String(),
-    });
-  }
 
-  // ✅ Typing Emit
-  void sendTyping() {
-    _socket?.emit('typing', {'roomId': _currentRoomId});
-  }
-
-  void sendStopTyping() {
-    _socket?.emit('stop_typing', {'roomId': _currentRoomId});
-  }
 
   // ✅ Disconnect + cleanup
   void disconnect() {

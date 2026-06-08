@@ -505,15 +505,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/chat-message',
         name: RouteNames.chatmessage,
-
         builder: (context, state) {
-
-          final data =
-          state.extra as Map<String, dynamic>;
-
+          final data = state.extra as Map<String, dynamic>;
           return ChatMessageScreen(
-            name: data["name"],
-            image: data["image"],
+            roomId: data["roomId"] ?? '',
+            chatId: data["chatId"] ?? 0,
           );
         },
       ),

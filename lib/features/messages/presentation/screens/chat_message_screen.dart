@@ -17,13 +17,12 @@ import '../../../../shared/widgets/app_filepicker_service.dart';
 
 
 class ChatMessageScreen extends ConsumerStatefulWidget {
-  final String name;
-  final String image;
+  final String roomId;
+  final int chatId;
 
   const ChatMessageScreen({
-    super.key,
-    required this.name,
-    required this.image,
+    super.key, required this.roomId, required this.chatId,
+
   });
 
   @override
@@ -38,7 +37,7 @@ class _ChatMessageScreenState
   late final ScrollController _scrollController;
   late final FocusNode _focusNode;
 
-  static const String roomId = '6a19559547e2b54e2e4778b1';
+
 
   // ✅ Socket
   final _socket = SocketService();
@@ -185,7 +184,7 @@ class _ChatMessageScreenState
                       children: [
 
                         GestureDetector(
-                          onTap: () {
+                       /*   onTap: () {
                             context.pushNamed(
                               RouteNames.messagesdetils,
                               extra: {
@@ -194,14 +193,14 @@ class _ChatMessageScreenState
                               },
 
                             );
-                          },
+                          },*/
                           child: CircleAvatar(
                             radius: AppRadii.massive,
                             backgroundColor:
                             AppColors.surfaceVariant,
 
-                            backgroundImage:
-                            NetworkImage(widget.image),
+                         /*   backgroundImage:
+                            NetworkImage(widget.image),*/
                           ),
                         ),
 
@@ -239,7 +238,7 @@ class _ChatMessageScreenState
                         children: [
 
                           Text(
-                            widget.name,
+                          "  widget.name,",
 
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -358,12 +357,12 @@ class _ChatMessageScreenState
 
                               if (!isMe) ...[
 
-                                CircleAvatar(
+                           /*     CircleAvatar(
                                   radius: 14,
                                   backgroundImage:
                                   NetworkImage(widget.image),
                                 ),
-
+*/
                                 AppSpacing.gapHSm,
                               ],
 

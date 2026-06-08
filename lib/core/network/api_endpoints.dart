@@ -51,7 +51,7 @@ abstract class ApiEndpoints {
 
 
   /// messages
-  static const String chatRooms = 'v1/external-chat/rooms';
+  static const String chatRooms = 'external-chat/rooms';
   // ─── Legacy aliases (used by pre-migration code) ───
   // These will be removed as each feature is migrated.
 

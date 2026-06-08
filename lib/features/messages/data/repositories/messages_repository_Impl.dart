@@ -12,46 +12,26 @@ class MessagesRepositoryImpl implements MessagesRepository {
   MessagesRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Either<AppException, List<dynamic>>> getChatRooms({
+  Future<Either<AppException, List<dynamic>>> getRooms({
     int page = 1,
     int limit = 100,
     String sortBy = 'updatedAt:desc',
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.getChatRooms(
+      final response = await _remoteDataSource.getRooms(
         page: page,
         limit: limit,
         sortBy: sortBy,
       );
+
       _assertNoError(response);
-      final data = response['data'];
-      // API may return { data: { results: [...] } } or { data: [...] }
-      if (data is Map && data['results'] is List) {
-        return data['results'] as List<dynamic>;
-      }
+
+      final data = response['results'];
       if (data is List) return data;
+
       return <dynamic>[];
     });
   }
-
-  @override
-  Future<Either<AppException, Map<String, dynamic>>> getChatMessages({
-    required String roomId,
-    int page = 1,
-    int limit = 50,
-  }) {
-    return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.getChatMessages(
-        roomId: roomId,
-        page: page,
-        limit: limit,
-      );
-      _assertNoError(response);
-      return response['data'] as Map<String, dynamic>;
-    });
-  }
-  
-
   void _assertNoError(Map<String, dynamic> response) {
     if (response['error'] == true) {
       throw UnknownException(
@@ -61,20 +41,8 @@ class MessagesRepositoryImpl implements MessagesRepository {
   }
 
   @override
-  Future<Either<AppException, Map<String, dynamic>>> markAllRead({required String roomId}) {
-    // TODO: implement markAllRead
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<AppException, Map<String, dynamic>>> markMessageRead({required String roomId, required String messageId}) {
-    // TODO: implement markMessageRead
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<AppException, Map<String, dynamic>>> sendMessage({required String roomId, required Map<String, dynamic> data}) {
-    // TODO: implement sendMessage
+  Future<Either<AppException, List<dynamic>>> getChatMessages({required String roomId, int page = 1, int limit = 50}) {
+    // TODO: implement getChatMessages
     throw UnimplementedError();
   }
 }

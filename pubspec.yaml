@@ -114,6 +114,7 @@ flutter:
     - assets/mock_data/top_words/
     - assets/svg/drawer/
     - assets/svg/message/
+    - assets/svg/file_manager/
 
 
 

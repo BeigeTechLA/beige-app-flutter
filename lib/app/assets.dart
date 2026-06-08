@@ -20,6 +20,7 @@ class AppAssets {
   static const String home = 'assets/home';
   static const String topWords = 'assets/mock_data/top_words';
   static const String _mockCreatives = 'assets/mock_data/creatives';
+  static const String svgFileManager = 'assets/svg/file_manager';
 
 
   static const String svgDrawer =
@@ -47,7 +48,8 @@ class AppAssets {
   static const String zoomIn = '$_svg/zoom_in.svg';
   static const String zoomOut = '$_svg/zoom_out.svg';
 
-
+  static const String grid = '$svgFileManager/grid.svg';
+  static const String list = '$svgFileManager/list.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Message
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -256,7 +258,7 @@ class AppAssets {
   static const String splash5 = '$splash/splash_5.png';
   static const String splash6 = '$splash/splash_6.png';
 
-  static const String onboarding1 = '$onboarding/onboarding_1.webp';
+  static const String onboarding1 = '$onboarding/onboarding_2.webp';
   static const String onboarding2 = '$onboarding/onboarding_2.webp';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

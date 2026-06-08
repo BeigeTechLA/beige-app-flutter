@@ -7,14 +7,14 @@ class MessagesRemoteDataSource {
 
   MessagesRemoteDataSource(this._dioClient);
 
-  /// GET v1/external-chat/rooms?page=1&limit=100&sortBy=updatedAt:desc
-  Future<Map<String, dynamic>> getChatRooms({
+  /// GET external-chat/rooms?page=1&limit=100&sortBy=updatedAt:desc
+  Future<Map<String, dynamic>> getRooms({
     int page = 1,
     int limit = 100,
     String sortBy = 'updatedAt:desc',
   }) async {
     final response = await _dioClient.dio.get(
-      ApiEndpoints.chatRooms,
+      ApiEndpoints.chatRooms, // 'external-chat/rooms'
       queryParameters: {
         'page': page,
         'limit': limit,
