@@ -7,7 +7,9 @@ import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/app_main_toolbar.dart';
 import '../providers/conversation_list_providers.dart';
 import '../routes/messages_args.dart';
 import 'widgets/conversation_tile.dart';
@@ -62,51 +64,37 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       }
     });
 
-    return Scaffold(
+    return AppScaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(
-          'Message',
-          style: AppTextStyles.titleMedium.copyWith(
-            color: AppColors.textPrimary,
+      body: Column(
+        children: [
+          const AppMainToolbar(title: 'Message'),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenH,
+            ),
+            child: _SearchRow(
+              controller: _searchCtrl,
+              onChanged: notifier.updateSearch,
+              onNewChat: () {
+                // Stubbed — new-chat directory flow lands later.
+              },
+            ),
           ),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: AppSpacing.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-              ),
-              child: _SearchRow(
-                controller: _searchCtrl,
-                onChanged: notifier.updateSearch,
-                onNewChat: () {
-                  // Stubbed — new-chat directory flow lands later.
-                },
+          const SizedBox(height: AppSpacing.md),
+          Expanded(
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              backgroundColor: AppColors.surface,
+              onRefresh: notifier.refresh,
+              child: _ListBody(
+                state: state,
+                onOpen: _openChat,
+                onRetry: notifier.refresh,
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Expanded(
-              child: RefreshIndicator(
-                color: AppColors.primary,
-                backgroundColor: AppColors.surface,
-                onRefresh: notifier.refresh,
-                child: _ListBody(
-                  state: state,
-                  onOpen: _openChat,
-                  onRetry: notifier.refresh,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

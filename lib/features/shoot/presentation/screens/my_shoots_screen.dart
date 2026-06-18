@@ -14,10 +14,10 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
 import 'package:beige/shared/widgets/app_booking_card.dart';
+import 'package:beige/shared/widgets/app_main_toolbar.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
-
-import '../../../app_drawer/screen/drawer_screen.dart';
 
 
 class MyShootsScreen extends ConsumerStatefulWidget {
@@ -76,52 +76,19 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final completedShoots = shootsState.completedShoots;
     final isLoading = shootsState.status == MyShootsStatus.loading;
 
-    return Scaffold(
-      drawer: DrawerScreen(),
+    return AppScaffold(
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppSpacing.massive),
-
-                /// HEADER
-                Row(
-                  // mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Builder(
-                      builder: (context) {
-                        return IconButton(
-                          onPressed: () {
-                            Scaffold.of(context).openDrawer();
-                          },
-                          icon: SvgPicture.asset(
-                            AppAssets.menu,
-                            height: 22,
-                            width: 22,
-                          ),
-                        );
-                      },
-                    ),
-                    Center(
-                      child: ScaleClampedText(
-                        child: Text(
-                          "My Shoots",
-                          style: AppTextStyles.titleSmall.copyWith(
-                            color: AppColors.white,
-
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: AppSpacing.md),
-
-                /// TOGGLE
+          Column(
+            children: [
+              const AppMainToolbar(title: 'My Shoots'),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// TOGGLE
                 ClipRRect(
                   borderRadius: AppRadii.lgAll,
                   child: BackdropFilter(
@@ -277,6 +244,9 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                 ),
               ],
             ),
+          ),
+              ),
+            ],
           ),
           if (shootsState.status == MyShootsStatus.error)
             Center(
