@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../config/env.dart';
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
+import '../../../../core/providers/core_providers.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/entities/participant.dart';
 import '../../domain/events/chat_socket_event.dart';

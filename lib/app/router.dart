@@ -18,6 +18,8 @@ import '../features/shoot/presentation/screens/shoot_type_selection_screen.dart'
 import '../features/shoot/presentation/screens/shoot_update_success_screen.dart';
 import '../features/booking/presentation/screens/content_type_screen.dart';
 import '../features/file_manager/presentation/screens/file_manager_screen.dart';
+import '../features/meetings/presentation/screens/create_meeting_screen.dart';
+import '../features/meetings/presentation/screens/meeting_scheduled_screen.dart';
 import '../features/meetings/presentation/screens/meetings_screen.dart';
 import '../features/booking/presentation/screens/crew_selection_screen.dart';
 import '../features/booking/presentation/screens/crew_size_matching_screen.dart';
@@ -692,6 +694,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.meetings,
         builder: (context, state) =>
         const MeetingsScreen(),
+      ),
+
+      GoRoute(
+        path: '/meeting/create',
+        name: RouteNames.meetingCreate,
+        builder: (context, state) => const CreateMeetingScreen(),
+      ),
+
+      GoRoute(
+        path: '/meeting/scheduled',
+        name: RouteNames.meetingScheduled,
+        builder: (context, state) => const MeetingScheduledScreen(),
       ),
     ],
   );

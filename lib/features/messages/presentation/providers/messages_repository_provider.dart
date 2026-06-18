@@ -4,16 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
-import '../../../../core/session/session_store.dart';
 import '../../data/repositories/messages_repository_impl.dart';
 import '../../data/sources/messages_remote_source.dart';
 import '../../data/sources/messages_socket_source.dart';
 import '../../domain/repositories/messages_repository.dart';
-
-/// `SessionStore` is stateless — instantiate once and reuse.
-final sessionStoreProvider = Provider<SessionStore>(
-  (_) => const SessionStore(),
-);
 
 final _remoteMessagesSourceProvider = Provider<MessagesRemoteSource>(
   (ref) => MessagesRemoteSource(

@@ -269,4 +269,11 @@
 
     static const Color mapBlue = Color(0xFF1A73E8);
     static const Color mapGrey = Color(0xFF757575);
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // MEETING STATUS COLORS
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    /// Soft mint background for completed-state badges.
+    static const Color softMint = Color(0xFFD8FDE6);
   }

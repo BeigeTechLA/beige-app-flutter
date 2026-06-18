@@ -7,6 +7,7 @@ import '../../app/route_names.dart';
 import '../../config/env.dart';
 import '../firebase/crashlytics_service.dart';
 import '../network/dio_client.dart';
+import '../session/session_store.dart';
 import '../storage/secure_token_storage.dart';
 import '../utils/shared_service.dart';
 import 'auth_state_provider.dart';
@@ -18,6 +19,13 @@ import 'auth_state_provider.dart';
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError('SharedPreferences must be overridden in ProviderScope');
 });
+
+/// Session accessor used by features that need the persisted user id
+/// (meetings list URL, messaging socket auth, etc.). Read-only adapter
+/// over `SharedPreferences` + `SecureTokenStorage`.
+final sessionStoreProvider = Provider<SessionStore>(
+  (_) => const SessionStore(),
+);
 
 /// Provider for DioClient singleton.
 final dioClientProvider = Provider<DioClient>((ref) {

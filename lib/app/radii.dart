@@ -89,6 +89,7 @@ class AppRadii {
   static final BorderRadius xsAll = BorderRadius.circular(xs);
   static final BorderRadius smAll = BorderRadius.circular(sm);
   static final BorderRadius mdAll = BorderRadius.circular(md);
+  static final BorderRadius mldAll = BorderRadius.circular(mld);
   static final BorderRadius lgAll = BorderRadius.circular(lg);
   static final BorderRadius statsInnerAll = BorderRadius.circular(statsInner);
   static final BorderRadius xlAll = BorderRadius.circular(xl);

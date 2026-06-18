@@ -61,6 +61,14 @@ abstract class ApiEndpoints {
   static String chatUpload(String roomId) =>
       'external-chat/messages/$roomId/upload';
 
+  /// 📅 Meetings (external-meetings)
+  static const String meetings = 'external-meetings';
+  static String meetingsByUser(String userId) =>
+      'external-meetings/user/$userId';
+  static String meetingById(String id) => 'external-meetings/$id';
+  static String meetingParticipants(String id) =>
+      'external-meetings/$id/participants';
+
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";
   static const String registerCrewRoles = "auth/crew-roles";
