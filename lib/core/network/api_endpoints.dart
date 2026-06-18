@@ -41,6 +41,26 @@ abstract class ApiEndpoints {
   static const String paymentAttach = "stripe/confirm";
   static const String paymentSheet = "paymentsheet";
 
+  /// 💬 Chat (external-chat)
+  static const String chatRooms = 'external-chat/rooms';
+  static const String chatDirectory = 'external-chat/directory';
+  static String chatMessages(String roomId) =>
+      'external-chat/messages/$roomId';
+  static String chatEditMessage(String messageId) =>
+      'external-chat/messages/$messageId/edit';
+  static String chatDeleteMessage(String messageId) =>
+      'external-chat/messages/$messageId/delete';
+  static String chatMarkRead(String roomId) =>
+      'external-chat/room/$roomId/mark-read';
+  static String chatRoomDetails(String roomId) =>
+      'external-chat/room/$roomId/details';
+  static String chatParticipants(String roomId) =>
+      'external-chat/participants/$roomId';
+  /// Multipart upload endpoint — final path TBD with backend. Reserved name
+  /// keeps the call site stable while the endpoint settles.
+  static String chatUpload(String roomId) =>
+      'external-chat/messages/$roomId/upload';
+
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";
   static const String registerCrewRoles = "auth/crew-roles";

@@ -20,8 +20,8 @@ abstract class RouteNames {
   static const messages = 'messages';
   static const fileManager = 'file_manager';
   static const meetings = 'meetings';
-  static const chatmessage = 'chat-message';
-  static const messagesdetils = 'message-detils';
+  static const chat = 'chat';
+  static const chatDetails = 'chat_details';
 
   // Home sub-screens
   static const viewProfile = 'view_profile';

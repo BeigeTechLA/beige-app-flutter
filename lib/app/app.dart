@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/restoration/restoration_providers.dart';
+import '../features/messages/presentation/providers/messages_repository_provider.dart';
 import '../shared/widgets/connectivity_listener.dart';
 import 'router.dart';
 import 'theme.dart';
@@ -38,6 +39,9 @@ class _AppState extends ConsumerState<App> {
   @override
   Widget build(BuildContext context) {
     final goRouter = ref.watch(routerProvider);
+    // Keeps the chat socket alive for the app session and ties its
+    // connect/disconnect to auth state.
+    ref.watch(chatSocketLifecycleProvider);
 
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,

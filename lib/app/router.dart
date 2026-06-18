@@ -5,9 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/app_drawer/screen/drawer_screen.dart';
-import '../features/messages/presentation/screens/chat_message_screen.dart';
-import '../features/messages/presentation/screens/message_details.dart';
-import '../features/messages/presentation/screens/messages.dart';
+import '../features/messages/presentation/routes/messages_args.dart';
+import '../features/messages/presentation/screens/chat_details_screen.dart';
+import '../features/messages/presentation/screens/chat_thread_screen.dart';
+import '../features/messages/presentation/screens/messages_screen.dart';
 import '../features/shoot/presentation/screens/cancel_shoot_screen.dart';
 import '../features/shoot/presentation/screens/manage_shoot_screen.dart';
 import '../features/shoot/presentation/screens/my_shoots_screen.dart';
@@ -318,7 +319,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/messages',
                 name: RouteNames.messages,
-                builder: (context, state) => const Messages(),
+                builder: (context, state) => const MessagesScreen(),
               ),
             ],
           ),
@@ -503,31 +504,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/chat-message',
-        name: RouteNames.chatmessage,
-
+        path: '/chat',
+        name: RouteNames.chat,
         builder: (context, state) {
-
-          final data =
-          state.extra as Map<String, dynamic>;
-
-          return ChatMessageScreen(
-            name: data["name"],
-            image: data["image"],
+          final args = ChatArgs.fromExtra(
+            state.extra as Map<String, dynamic>,
+          );
+          return ChatThreadScreen(
+            conversationId: args.conversationId,
+            contactName: args.contactName,
           );
         },
-      ),
-      GoRoute(
-        path: '/message-detils',
-        name: RouteNames.messagesdetils,
-        builder: (context, state) {
-          final data =
-          state.extra as Map<String, dynamic>;
-          return MessageDetails(
-            name: data["name"] ?? "",
-            image: data["image"] ?? "",
-          );
-        },
+        routes: [
+          GoRoute(
+            path: 'details',
+            name: RouteNames.chatDetails,
+            builder: (context, state) {
+              final args = ChatDetailsArgs.fromExtra(
+                state.extra as Map<String, dynamic>,
+              );
+              return ChatDetailsScreen(conversationId: args.conversationId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/manage-booking/:bookingId',
