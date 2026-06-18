@@ -15,13 +15,6 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    debugPrint('\n✅ [RESPONSE] ${response.statusCode} ${response.requestOptions.uri}');
-    debugPrint('📦 Body: ${_prettyJson(response.data)}');
-    return handler.next(response);
-  }
-
-  @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     debugPrint('\n🔥 [ERROR] ${err.response?.statusCode} ${err.requestOptions.uri}');
     debugPrint('💬 Message: ${err.message}');

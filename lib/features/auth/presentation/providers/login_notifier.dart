@@ -38,6 +38,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
         final prefs = ref.read(sharedPreferencesProvider);
         await _saveLoginDetails(
           prefs,
+          user.id,
           user.token,
           user.environmentId,
           user.folder,
@@ -47,7 +48,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
           user.designation,
           user.department,
           user.departmentId,
-        );
+         );
 
 
 
@@ -72,6 +73,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
 
   Future<void> _saveLoginDetails(
     SharedPreferences prefs,
+    String userId,
     String token,
     int environmentId,
     String folder,
@@ -83,6 +85,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     String departmentId,
   ) async {
     await SecureTokenStorage.write(token);
+    await prefs.setString('user_id', userId);
     await prefs.setInt('environment_id', environmentId);
     await prefs.setString('folder', folder);
     await prefs.setString('name', name);

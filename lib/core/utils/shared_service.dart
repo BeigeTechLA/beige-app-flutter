@@ -15,6 +15,7 @@ class SharedService {
     final userData = data['user'] ?? {};
 
     final String token = data['token'] ?? '';
+    final String userId = userData['id']?.toString() ?? '';
     final int environmentId = userData['environment_id'] ?? -1;
     final String folder = userData['folder'] ?? '';
     final String name = userData['name'] ?? '';
@@ -26,6 +27,7 @@ class SharedService {
     final String departmentId = userData['department_id'] ?? '';
 
     await SecureTokenStorage.write(token);
+    await prefs.setString('user_id', userId);
     await prefs.setInt('environment_id', environmentId);
     await prefs.setString('folder', folder);
     await prefs.setString('name', name);

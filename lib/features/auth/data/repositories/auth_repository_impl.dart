@@ -32,6 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
           {};
 
       return UserEntity(
+        id: userData['id']?.toString() ?? '',
         token: (data['token'] as String?) ?? '',
         environmentId: (userData['environment_id'] as int?) ?? -1,
         folder: (userData['folder'] as String?) ?? '',
