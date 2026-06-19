@@ -65,7 +65,7 @@ class ConversationTile extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xxs),
                     if (last != null && last.preview.isNotEmpty)
                       Text(
-                        last.preview,
+                        last.fromMe ? 'You: ${last.preview}' : last.preview,
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: hasUnread
                               ? AppColors.textPrimary

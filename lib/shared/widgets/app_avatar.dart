@@ -45,17 +45,33 @@ class AppAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dim = _dimension;
-    final avatar = CircleAvatar(
-      radius: dim / 2,
-      backgroundColor: AppColors.surfaceVariant,
-      backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
-      child: imageUrl == null
-          ? Text(
+    final hasImage = imageUrl != null && imageUrl!.isNotEmpty;
+    final Widget avatar = hasImage
+        ? CircleAvatar(
+            radius: dim / 2,
+            backgroundColor: AppColors.surfaceVariant,
+            backgroundImage: NetworkImage(imageUrl!),
+          )
+        : Container(
+            width: dim,
+            height: dim,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFE8EFEC), Color(0xFFBFCBC4)],
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
               _initials,
-              style: _textStyle.copyWith(color: AppColors.primary),
-            )
-          : null,
-    );
+              style: _textStyle.copyWith(
+                color: const Color(0xFF1F1F1F),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
 
     if (onTap == null) return avatar;
     return GestureDetector(onTap: onTap, child: avatar);
