@@ -1,433 +1,271 @@
-  import 'package:flutter/material.dart';
-  import 'package:flutter_riverpod/flutter_riverpod.dart';
-  import 'package:flutter_svg/flutter_svg.dart';
-  import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
-  import '../../../../../../app/assets.dart';
-  import '../../../../../../app/colors.dart';
-  import '../../../../../../app/radii.dart';
-  import '../../../../../../app/route_names.dart';
-  import '../../../../../../app/spacing.dart';
-  import '../../../app/text_styles.dart';
+import '../../../../../../app/assets.dart';
+import '../../../../../../app/colors.dart';
+import '../../../../../../app/radii.dart';
+import '../../../../../../app/route_names.dart';
+import '../../../../../../app/spacing.dart';
+import '../../../app/text_styles.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../providers/drawer_notifier.dart';
 
-  class DrawerScreen extends ConsumerWidget {
-    const DrawerScreen({super.key});
+class DrawerScreen extends ConsumerWidget {
+  const DrawerScreen({super.key});
 
-    @override
-    Widget build(BuildContext context, WidgetRef ref) {
-      final currentRoute =   GoRouterState.of(context).uri.path;
+  static const List<_DrawerMenuItemData> _drawerItems = [
+    _DrawerMenuItemData(
+      label: 'Home',
+      route: '/',
+      activeIcon: AppAssets.activeHome,
+      inactiveIcon: AppAssets.inactiveHome,
+    ),
+    _DrawerMenuItemData(
+      label: 'Book Shoot',
+      route: '/book-shoot',
+      activeIcon: AppAssets.activeBookShoot,
+      inactiveIcon: AppAssets.inactiveBookShoot,
+    ),
+    _DrawerMenuItemData(
+      label: 'My Shoots',
+      route: '/my-shoots',
+      activeIcon: AppAssets.activeMyShoot,
+      inactiveIcon: AppAssets.inactiveMyShoot,
+    ),
+    _DrawerMenuItemData(
+      label: 'Messages',
+      route: '/messages',
+      activeIcon: AppAssets.activeMessages,
+      inactiveIcon: AppAssets.inactiveMessages,
+    ),
+    _DrawerMenuItemData(
+      label: 'Meetings',
+      route: '/meetings',
+      activeIcon: AppAssets.active_meetings,
+      inactiveIcon: AppAssets.inactive_meetings,
+    ),
+    _DrawerMenuItemData(
+      label: 'File Manager',
+      route: '/file-manager',
+      activeIcon: AppAssets.active_file_manager,
+      inactiveIcon: AppAssets.inactive_filemanager,
+    ),
+  ];
 
-      final userAsync = ref.watch(drawerUserProvider);
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentRoute = GoRouterState.of(context).uri.path;
+    final userAsync = ref.watch(drawerUserProvider);
 
-      return Drawer(
-        backgroundColor: AppColors.black,
-        child: SafeArea(
-          child: Column(
-            children: [
-
-              /// ─── TOP PROFILE ─────────────────
-              Container(
-                height: 247,
-                width: 336,
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg,vertical: AppSpacing.huge),
-                decoration: BoxDecoration(
-                  color: AppColors.drawerHeader
-                ),
-                child: Column(
-                  children: [
-
-                    /// ───── TOP LOGO ROW ─────
-                    Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      children: [
-
-                        /// LOGO
-                        SvgPicture.asset(
-                          AppAssets.logoDrawer,
-
-                        ),
-
-                        /// CLOSE BUTTON
-                        GestureDetector(
-                          onTap: () => context.pop(),
-                          child: SvgPicture.asset(
-                            AppAssets.cancel,
-                            height: AppSpacing.xxxl,
-                            width: AppSpacing.xxxl,
-                            color: AppColors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: AppSpacing.massive),
-
-                    /// ───── PROFILE CARD ─────
-                    InkWell(
-                      borderRadius:
-                      BorderRadius.circular(AppRadii.none),
-                      onTap: () async {
-
-                        /*context.pushNamed(
-                          RouteNames.myProfile,
-                        ).then((value) {
-                          fetchprofiledata();
-                        });*/
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(
-                          AppSpacing.md,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-
-                          borderRadius:
-                          BorderRadius.circular(
-                            AppRadii.statsInner,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(
-                                alpha: 0.15,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-
-                            /// PROFILE IMAGE
-                            Container(
-                              height: 52,
-                              width: 52,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.black
-                                      .withValues(alpha: 0.08),
-                                  width: 1,
+    return Drawer(
+      backgroundColor: AppColors.surfaceAbyss,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(AppAssets.groupLogo),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: AppColors.white),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                  AppSpacing.verticalXl,
+                  InkWell(
+                    borderRadius: AppRadii.xxlAll,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      context.pushNamed(RouteNames.profile);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: AppRadii.xxlAll,
+                      ),
+                      child: Row(
+                        children: [
+                          userAsync.when(
+                            data: (user) {
+                              final image = user['profile_image_url'] ?? '';
+                              final avatarUrl = image.isEmpty
+                                  ? ''
+                                  : '${ApiEndpoints.imageUrl}$image';
+                              return CircleAvatar(
+                                radius: 25,
+                                backgroundColor: AppColors.surfaceVariant,
+                                backgroundImage: avatarUrl.isNotEmpty
+                                    ? CachedNetworkImageProvider(avatarUrl)
+                                    : null,
+                                child: avatarUrl.isEmpty
+                                    ? SvgPicture.asset(AppAssets.userCircle)
+                                    : null,
+                              );
+                            },
+                            loading: () => const CircleAvatar(
+                              radius: 25,
+                              backgroundColor: AppColors.surfaceVariant,
+                              child: Center(
+                                child: SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                               ),
-                              child: userAsync.when(
-                                data: (user) {
-                                  final image = user['profile_image_url'] ?? '';
-
-                                  if (image.isNotEmpty) {
-                                    return Image.network(
-                                      "${ApiEndpoints.imageUrl}$image",
-                                      fit: BoxFit.cover,
-                                    );
-                                  }
-
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: SvgPicture.asset(
-                                      AppAssets.imagePlaceholder,
+                            ),
+                            error: (_, __) => CircleAvatar(
+                              radius: 25,
+                              backgroundColor: AppColors.surfaceVariant,
+                              child: SvgPicture.asset(AppAssets.userCircle),
+                            ),
+                          ),
+                          AppSpacing.gapHMd,
+                          Expanded(
+                            child: userAsync.when(
+                              data: (user) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user['name'] ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTextStyles.bodyMediumStrong.copyWith(
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  );
-                                },
-                                loading: () => const SizedBox(),
-                                error: (_, __) => Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: SvgPicture.asset(
-                                    AppAssets.imagePlaceholder,
                                   ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: AppSpacing.md),
-
-                            /// USER INFO
-                            userAsync.when(
-                              data: (user) => Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      user['name'] ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: AppTextStyles.bodyLarge.copyWith(
-                                        color: AppColors.black,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15,
-                                      ),
+                                  Text(
+                                    user['email'] ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTextStyles.bodySmallMedium.copyWith(
+                                      color: AppColors.black,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      user['email'] ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: AppColors.black.withValues(alpha: 0.7),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              loading: () => const CircularProgressIndicator(),
-                              error: (_, __) => const SizedBox(),
+                              loading: () => const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              error: (_, _) => const SizedBox.shrink(),
                             ),
-
-                            /// ARROW
-                            SvgPicture.asset(AppAssets.arrow_right_,
-                            // height: AppSpacing.xl,
-                            ),
-                          ],
-                        ),
+                          ),
+                          AppSpacing.gapHSm,
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: AppColors.black,
+                          ),
+                        ],
                       ),
                     ),
-
-                    // const SizedBox(height: AppSpacing.xxl),
-                  ],
-                ),
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-
-              /// ─── MENU ITEMS ─────────────────
-
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/',
-                activeSvg: AppAssets.activeHome,
-                inactiveSvg: AppAssets.inactiveHome,
-                title: "Home",
-                onTap: () {
-                  context.go('/');
-                },
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/book-shoot',
-                activeSvg: AppAssets.activeBookShoot,
-                inactiveSvg: AppAssets.inactiveBookShoot,
-                title: "Book Shoot",
-                onTap: () {
-                  context.go('/book-shoot');
-                },
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/my-shoots',
-                activeSvg: AppAssets.activeMyShoot,
-                inactiveSvg: AppAssets.inactiveMyShoot,
-                title: "My Shoots",
-                onTap: () {
-                  context.go('/my-shoots');
-                },
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/messages',
-                activeSvg: AppAssets.activeMessages,
-                inactiveSvg: AppAssets.inactiveMessages,
-                title: "Messages",
-                onTap: () {
-                  context.go('/messages');
-                },
-              ),
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/meetings',
-
-                activeSvg: AppAssets.active_meetings,
-                inactiveSvg: AppAssets.inactive_meetings,
-                title: "Meetings",
-                onTap: () {
-                  context.goNamed(RouteNames.meetings);
-
-                },
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-              _drawerItem(
-                context,
-                isActive: currentRoute == '/file-manager',
-                activeSvg: AppAssets.active_file_manager,
-                inactiveSvg: AppAssets.inactive_filemanager,
-                title: "File Manager",
-                onTap: () {
-                  context.goNamed(RouteNames.fileManager);
-                },
-              ),
-
-              const Divider(
-                color: AppColors.dividerDark,
-                thickness: 0.7,
-              ),
-
-            ],
-          ),
-        ),
-      );
-    }
-
-    /// ─── DRAWER ITEM ─────────────────
-    Widget _drawerItem(
-        BuildContext context, {
-          required bool isActive,
-          required String activeSvg,
-          required String inactiveSvg,
-          required String title,
-          required VoidCallback onTap,
-        }) {
-      return InkWell(
-        borderRadius: BorderRadius.circular(AppRadii.md),
-        onTap: () {
-          Navigator.pop(context);
-          onTap();
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          height: 58,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-          ),
-          decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.surfaceGradientDark
-                : AppColors.black,
-
-            // borderRadius: BorderRadius.circular(14),
-
-
-
-
-          ),
-          child: Row(
-            children: [
-
-              /// SVG ICON
-              isActive
-                  ? _buildActiveIcon(
-                activeSvg,
-                width: AppSpacing.xxxl,
-                height: AppSpacing.xxxl,
-              )
-                  : _buildInactiveIcon(inactiveSvg),
-
-              const SizedBox(width: AppSpacing.xxl),
-
-              /// TITLE
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.labelLarge.copyWith(
-                    color: isActive
-                        ? AppColors.white
-                        : AppColors.white70,
-                    fontWeight: FontWeight.w600,
                   ),
-                ),
+                ],
               ),
-
-            ],
-          ),
-        ),
-      );
-    }
-
-
-    static const double _bottomNavIconSize = 26;
-    static const double _bottomNavActiveArtSize = 44;
-    static const double _bottomNavActiveBookShootArtWidth = 46;
-    static const double _bottomNavActiveMyShootsArtWidth = 50;
-    static const double _bottomNavActiveMyShootsArtHeight = 48;
-    static const double _bottomNavIconSlotWidth = 44;
-    static const double _bottomNavLabelFontSize = 10;
-
-    Widget _buildInactiveIcon(String path) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: SizedBox(
-          width: _bottomNavIconSlotWidth,
-          height: _bottomNavIconSize,
-          child: Center(
-            child: SvgPicture.asset(
-              path,
-              height: _bottomNavIconSize,
-              width: _bottomNavIconSize,
-              fit: BoxFit.contain,
             ),
-          ),
-        ),
-      );
-    }
-
-    Widget _buildActiveIcon(String path, {double? width, double? height}) {
-      final artWidth = width ?? _bottomNavActiveArtSize;
-      final artHeight = height ?? _bottomNavActiveArtSize;
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: SizedBox(
-          width: artWidth,
-          height: _bottomNavIconSize,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              // Soft white glow behind active icon
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.white.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    ),
-                  ],
+            const Divider(color: AppColors.neutralGrey),
+            Expanded(
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
+                itemCount: _drawerItems.length,
+                separatorBuilder: (_, _) => const Divider(
+                  height: 1,
+                  thickness: 0.8,
+                  color: AppColors.dividerDark,
                 ),
+                itemBuilder: (context, index) {
+                  final item = _drawerItems[index];
+                  final isActive = currentRoute == item.route;
+                  return _DrawerItem(
+                    label: item.label,
+                    activeIcon: item.activeIcon,
+                    inactiveIcon: item.inactiveIcon,
+                    isActive: isActive,
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (item.route == '/meetings') {
+                        context.goNamed(RouteNames.meetings);
+                      } else if (item.route == '/file-manager') {
+                        context.goNamed(RouteNames.fileManager);
+                      } else {
+                        context.go(item.route);
+                      }
+                    },
+                  );
+                },
               ),
-              SvgPicture.asset(
-                path,
-                width: artWidth,
-                height: artHeight,
-                fit: BoxFit.contain,
-              ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerMenuItemData {
+  final String label;
+  final String route;
+  final String activeIcon;
+  final String inactiveIcon;
+
+  const _DrawerMenuItemData({
+    required this.label,
+    required this.route,
+    required this.activeIcon,
+    required this.inactiveIcon,
+  });
+}
+
+class _DrawerItem extends StatelessWidget {
+  final String label;
+  final String activeIcon;
+  final String inactiveIcon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _DrawerItem({
+    required this.label,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      minLeadingWidth: 32,
+      minVerticalPadding: AppSpacing.base,
+      leading: SizedBox(
+        width: 32,
+        height: 32,
+        child: Center(
+          child: SvgPicture.asset(
+            isActive ? activeIcon : inactiveIcon,
+            width: 24,
+            height: 24,
+            fit: BoxFit.contain,
           ),
         ),
-      );
-    }
+      ),
+      title: Text(
+        label,
+        style: AppTextStyles.bodyLargeMedium.copyWith(
+          color: isActive ? AppColors.white : AppColors.white38,
+        ),
+      ),
+      onTap: onTap,
+    );
   }
+}

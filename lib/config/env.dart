@@ -31,7 +31,7 @@ class Env {
         imageUrl = 'https://d1pgtgqp0jru64.cloudfront.net/';
         socketUrl = _socketOverride.isNotEmpty
             ? _socketOverride
-            : 'https://mobile.beige.app';
+            : 'https://api2.dev.beige.app';
         stripePublishableKey =
             'pk_test_51S5czd54hnPNgHXUq7sunp8uvTDW4ln6aw8Y3bP249JZmx4xuvoIED4mZTuNIkAFcOoCApICfgv9dM4VbbleJo7L00GqNEkj3I';
       case Environment.prod:
@@ -39,7 +39,7 @@ class Env {
         imageUrl = 'https://d2jhn32fsulyac.cloudfront.net/';
         socketUrl = _socketOverride.isNotEmpty
             ? _socketOverride
-            : 'https://mobile.prod.beige.app';
+            : 'https://api.prod.beige.app';
         stripePublishableKey = 'PLACE_HOLDER_LIVE_STRIPE_KEY';
     }
   }

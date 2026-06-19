@@ -240,6 +240,9 @@
 
     /// Drawer & Header dark background
     static const Color drawerHeader = Color(0xFF201F1F);
+
+    /// Abyss dark
+    static const Color surfaceAbyss = Color(0xFF111111);
     /// Grey 200 — light platform UI (image picker, sheets)
     static const Color greyShade200 = Color(0xFFEEEEEE);
 

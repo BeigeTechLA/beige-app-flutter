@@ -68,6 +68,9 @@ class AppAssets {
   static const String logoDrawer =
       '$svgDrawer/logo_drawer.svg';
 
+  static const String groupLogo = '$images/group_logo.png';
+  static const String userCircle = '$_svg/user_circle.svg';
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Icons & UI Elements
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
