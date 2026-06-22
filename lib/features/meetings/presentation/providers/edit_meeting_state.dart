@@ -1,47 +1,57 @@
 import 'package:flutter/foundation.dart';
 
 import '../../domain/models/meeting.dart';
-import '../../domain/models/meeting_platform.dart';
-import '../../domain/models/shoot_participant_option.dart';
+import 'create_meeting_state.dart' show TimeOfDayValue;
 
-enum CreateMeetingSubmitStatus { idle, submitting, success, error }
+/// Lifecycle of the edit-meeting form.
+///
+/// - `loading` — initial fetch of the meeting payload.
+/// - `loadError` — fetch failed; show retry.
+/// - `ready` — form hydrated, user editing.
+/// - `submitting` — PATCH in flight.
+/// - `submitError` — PATCH failed; stay on form with snackbar.
+/// - `saved` — PATCH succeeded; UI pops + invalidates list.
+enum EditMeetingStatus {
+  loading,
+  loadError,
+  ready,
+  submitting,
+  submitError,
+  saved,
+}
 
 @immutable
-class CreateMeetingState {
+class EditMeetingState {
+  final EditMeetingStatus status;
+
+  /// Source-of-truth meeting fetched from `getById`. Used as the diff baseline
+  /// when building the `UpdateMeetingInput` patch.
+  final Meeting? original;
+
   final String title;
   final String description;
-  final String project;
-  final int? shootId;
   final DateTime? date;
   final TimeOfDayValue? startTime;
   final TimeOfDayValue? endTime;
-  final MeetingPlatform platform;
   final String link;
   final int reminderMinutes;
-  final List<ShootParticipantOption> invitedParticipants;
-  final CreateMeetingSubmitStatus status;
-  final String? error;
-  final Meeting? created;
 
-  const CreateMeetingState({
+  final String? error;
+
+  const EditMeetingState({
+    this.status = EditMeetingStatus.loading,
+    this.original,
     this.title = '',
     this.description = '',
-    this.project = '',
-    this.shootId,
     this.date,
     this.startTime,
     this.endTime,
-    this.platform = MeetingPlatform.meet,
     this.link = '',
     this.reminderMinutes = 15,
-    this.invitedParticipants = const [],
-    this.status = CreateMeetingSubmitStatus.idle,
     this.error,
-    this.created,
   });
 
   bool get hasTitle => title.trim().isNotEmpty;
-  bool get hasDescription => description.trim().isNotEmpty;
   bool get hasDate => date != null;
   bool get hasTimes => startTime != null && endTime != null;
   bool get hasLink => link.trim().isNotEmpty && _looksLikeUrl(link.trim());
@@ -53,57 +63,41 @@ class CreateMeetingState {
     return (e.hour * 60 + e.minute) > (s.hour * 60 + s.minute);
   }
 
-  bool get isValid =>
+  /// Form valid + at least one field changed vs. baseline.
+  bool get canSubmit =>
+      status == EditMeetingStatus.ready &&
       hasTitle &&
-      hasDescription &&
-      shootId != null &&
       hasDate &&
       hasTimes &&
       endAfterStart &&
-      hasLink &&
-      invitedParticipants.isNotEmpty;
+      hasLink;
 
-  CreateMeetingState copyWith({
+  EditMeetingState copyWith({
+    EditMeetingStatus? status,
+    Meeting? original,
     String? title,
     String? description,
-    String? project,
-    int? shootId,
     DateTime? date,
     TimeOfDayValue? startTime,
     TimeOfDayValue? endTime,
-    MeetingPlatform? platform,
     String? link,
     int? reminderMinutes,
-    List<ShootParticipantOption>? invitedParticipants,
-    CreateMeetingSubmitStatus? status,
     String? error,
     bool clearError = false,
-    Meeting? created,
   }) {
-    return CreateMeetingState(
+    return EditMeetingState(
+      status: status ?? this.status,
+      original: original ?? this.original,
       title: title ?? this.title,
       description: description ?? this.description,
-      project: project ?? this.project,
-      shootId: shootId ?? this.shootId,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
-      platform: platform ?? this.platform,
       link: link ?? this.link,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
-      invitedParticipants: invitedParticipants ?? this.invitedParticipants,
-      status: status ?? this.status,
       error: clearError ? null : (error ?? this.error),
-      created: created ?? this.created,
     );
   }
-}
-
-@immutable
-class TimeOfDayValue {
-  final int hour;
-  final int minute;
-  const TimeOfDayValue(this.hour, this.minute);
 }
 
 bool _looksLikeUrl(String value) {

@@ -28,6 +28,17 @@ class BookingRemoteDataSource {
     return response.data as Map<String, dynamic>;
   }
 
+  /// GET bookings/{bookingId}/participants — roster of users tied to a
+  /// booking. Used by the meetings create-flow picker.
+  Future<Map<String, dynamic>> getBookingParticipants({
+    required int bookingId,
+  }) async {
+    final response = await _dioClient.dio.get(
+      ApiEndpoints.bookingParticipants(bookingId),
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
   /// POST bookings/{bookingId}
   Future<Map<String, dynamic>> updateBooking({
     required int bookingId,

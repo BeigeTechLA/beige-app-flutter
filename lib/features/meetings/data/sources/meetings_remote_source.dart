@@ -7,6 +7,7 @@ import '../../../../core/network/exceptions/exception_handler.dart';
 import '../../../../core/session/session_store.dart';
 import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting.dart';
+import '../../domain/models/meeting_rsvp.dart';
 import '../dto/meeting_dto.dart';
 import '../mappers/meeting_enum_mapper.dart';
 
@@ -105,6 +106,13 @@ class MeetingsRemoteSource {
       if (createdById != null) {
         body['created_by_id'] = createdById;
       }
+      // Shoot/order id — backend field name is the unconfirmed `order_id`
+      // (inferred from the `order: {name}` read shape on MeetingDto). If the
+      // server rejects with an unknown-field error, swap to `booking_id` or
+      // confirm with backend.
+      if (input.shootId != null) {
+        body['order_id'] = input.shootId;
+      }
       // `participants` deliberately omitted — confirmed dead path on create.
       // Two-step flow handled by repository impl.
       final resp = await _dio.post<dynamic>(
@@ -151,6 +159,18 @@ class MeetingsRemoteSource {
   Future<void> delete(String id) {
     return _guard(() async {
       await _dio.delete<dynamic>(ApiEndpoints.meetingById(id));
+    });
+  }
+
+  /// Records the signed-in user's RSVP. Server returns the updated meeting
+  /// payload in the same shape as `getById`.
+  Future<Meeting> respond(String id, MeetingResponse response) {
+    return _guard(() async {
+      final resp = await _dio.post<dynamic>(
+        ApiEndpoints.meetingRespond(id),
+        data: {'status': response.wireValue},
+      );
+      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
     });
   }
 

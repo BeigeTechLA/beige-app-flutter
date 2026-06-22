@@ -72,4 +72,11 @@ abstract class BookingRepository {
     required int bookingId,
     required int crewMemberId,
   });
+
+  /// GET bookings/{bookingId}/participants — roster of users tied to a
+  /// booking (Client, assigned CP, crew). Used as the data source for the
+  /// meeting-create participant picker.
+  Future<Either<AppException, List<dynamic>>> getBookingParticipants({
+    required int bookingId,
+  });
 }

@@ -1,4 +1,5 @@
 import '../../domain/models/meeting_participant.dart';
+import '../../domain/models/meeting_rsvp.dart';
 
 /// REST mapper for the User sub-object served by `external-meetings` reads.
 ///
@@ -19,11 +20,16 @@ class MeetingUserDto {
         json['profileImage'] ??
         json['avatar_url'] ??
         json['avatarUrl']) as String?;
+    final rsvp = rsvpFromServer((json['rsvp_status'] ??
+            json['rsvpStatus'] ??
+            json['response_status'] ??
+            json['status']) as String?);
 
     return MeetingParticipant(
       id: id,
       name: name,
       avatarUrl: avatar,
+      rsvpStatus: rsvp,
     );
   }
 }

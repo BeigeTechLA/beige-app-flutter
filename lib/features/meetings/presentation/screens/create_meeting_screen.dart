@@ -8,9 +8,11 @@ import '../../../../app/route_names.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../providers/client_shoots_provider.dart';
 import '../providers/create_meeting_notifier.dart';
 import '../providers/create_meeting_state.dart';
 import '../providers/meetings_list_notifier.dart';
+import '../widgets/meeting_participant_picker_sheet.dart';
 import '../widgets/select_meet_link_picker.dart';
 
 class CreateMeetingScreen extends ConsumerStatefulWidget {
@@ -22,34 +24,35 @@ class CreateMeetingScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
+  final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _linkCtrl = TextEditingController();
-  final _participantCtrl = TextEditingController();
   static final _dateFmt = DateFormat('dd MMM yyyy');
-
-  static const _titleOptions = <String>[
-    'Pre-Production Kickoff',
-    'Editorial Cover Story Sync',
-    'Brand Workshop Recap',
-    'Production Prep Session',
-    'Post-Production Review',
-    'Client Design Sync',
-  ];
-
-  static const _shootOptions = <String>[
-    'Pre-Production Kickoff Shoot',
-    'Editorial Cover Story',
-    'Brand Workshop Recap',
-    'Commercial Video Shoot',
-    'Product Launch Promo',
-  ];
 
   @override
   void dispose() {
+    _titleCtrl.dispose();
     _descCtrl.dispose();
     _linkCtrl.dispose();
-    _participantCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _openParticipantPicker() async {
+    final state = ref.read(createMeetingNotifierProvider);
+    final shootId = state.shootId;
+    if (shootId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a shoot first')),
+      );
+      return;
+    }
+    final picked = await showMeetingParticipantPickerSheet(
+      context,
+      bookingId: shootId,
+      initialSelected: state.invitedParticipants,
+    );
+    if (picked == null) return;
+    ref.read(createMeetingNotifierProvider.notifier).setParticipants(picked);
   }
 
   Future<void> _pickDate() async {
@@ -198,52 +201,29 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    DropdownButtonFormField<String>(
-                      initialValue: state.title.isEmpty ? null : state.title,
-                      dropdownColor: AppColors.surfaceStats,
-                      decoration: _inputDecoration(
-                        label: 'Title*',
-                        hint: 'Select title',
-                      ),
-                      icon: const Icon(
-                        Icons.expand_more,
-                        color: AppColors.textSecondary,
-                      ),
+                    TextFormField(
+                      controller: _titleCtrl,
+                      onChanged: notifier.setTitle,
                       style: AppTextStyles.bodyLarge.copyWith(
                         color: AppColors.textPrimary,
                       ),
-                      items: [
-                        for (final t in _titleOptions)
-                          DropdownMenuItem(value: t, child: Text(t)),
-                      ],
-                      onChanged: (v) {
-                        if (v != null) notifier.setTitle(v);
-                      },
+                      decoration: _inputDecoration(
+                        label: 'Title*',
+                        hint: 'e.g. Pre-Production Kickoff',
+                      ),
                     ),
                     const SizedBox(height: 16),
 
-                    DropdownButtonFormField<String>(
-                      initialValue:
-                          state.project.isEmpty ? null : state.project,
-                      dropdownColor: AppColors.surfaceStats,
+                    _ShootDropdown(
+                      selectedId: state.shootId,
                       decoration: _inputDecoration(
                         label: 'Select Shoot*',
                         hint: 'Select shoot/project',
                       ),
-                      icon: const Icon(
-                        Icons.expand_more,
-                        color: AppColors.textSecondary,
+                      onChanged: (opt) => notifier.setShoot(
+                        shootId: opt.id,
+                        name: opt.title,
                       ),
-                      style: AppTextStyles.bodyLarge.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                      items: [
-                        for (final s in _shootOptions)
-                          DropdownMenuItem(value: s, child: Text(s)),
-                      ],
-                      onChanged: (v) {
-                        if (v != null) notifier.setProject(v);
-                      },
                     ),
                     const SizedBox(height: 16),
 
@@ -377,51 +357,33 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _participantCtrl,
-                            style: AppTextStyles.bodyLarge.copyWith(
-                              color: AppColors.textPrimary,
-                            ),
-                            decoration: _inputDecoration(
-                              label: 'Invite Participants*',
-                              hint: 'Search team members, clients...',
+                    InkWell(
+                      onTap: _openParticipantPicker,
+                      borderRadius: BorderRadius.circular(12),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          readOnly: true,
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                          decoration: _inputDecoration(
+                            label: 'Invite Participants*',
+                            hint: state.shootId == null
+                                ? 'Select a shoot first'
+                                : 'Tap to pick from the booking roster',
+                            suffixIcon: const Icon(
+                              Icons.person_add_alt_1_outlined,
+                              color: AppColors.textSecondary,
+                              size: 20,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        InkWell(
-                          onTap: () {
-                            final text = _participantCtrl.text;
-                            if (text.trim().isNotEmpty) {
-                              notifier.addParticipant(text);
-                              _participantCtrl.clear();
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            height: 56,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Add',
-                              style: AppTextStyles.buttonMedium.copyWith(
-                                color: AppColors.onPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          controller: TextEditingController(
+                            text: state.invitedParticipants.isEmpty
+                                ? ''
+                                : '${state.invitedParticipants.length} selected',
                           ),
                         ),
-                      ],
+                      ),
                     ),
 
                     if (state.invitedParticipants.isNotEmpty) ...[
@@ -433,7 +395,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                           for (final p in state.invitedParticipants)
                             Chip(
                               label: Text(
-                                p,
+                                p.name,
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: AppColors.textPrimary,
                                 ),
@@ -451,7 +413,8 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                                 size: 14,
                                 color: AppColors.textSecondary,
                               ),
-                              onDeleted: () => notifier.removeParticipant(p),
+                              onDeleted: () =>
+                                  notifier.removeParticipant(p.id),
                             ),
                         ],
                       ),
@@ -532,6 +495,88 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ShootDropdown extends ConsumerWidget {
+  const _ShootDropdown({
+    required this.selectedId,
+    required this.decoration,
+    required this.onChanged,
+  });
+
+  final int? selectedId;
+  final InputDecoration decoration;
+  final ValueChanged<ShootOption> onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shootsAsync = ref.watch(clientShootsProvider);
+
+    return shootsAsync.when(
+      loading: () => InputDecorator(
+        decoration: decoration,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 4),
+          child: SizedBox(
+            height: 18,
+            width: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ),
+      error: (e, _) => InputDecorator(
+        decoration: decoration.copyWith(
+          errorText: 'Could not load shoots — pull to retry',
+        ),
+        child: TextButton(
+          onPressed: () => ref.invalidate(clientShootsProvider),
+          child: Text(
+            'Retry',
+            style: AppTextStyles.buttonMedium.copyWith(
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ),
+      data: (shoots) {
+        if (shoots.isEmpty) {
+          return InputDecorator(
+            decoration: decoration.copyWith(
+              errorText: 'No upcoming shoots — book one to schedule a meeting',
+            ),
+            child: const SizedBox(height: 18),
+          );
+        }
+        final initial = shoots.any((s) => s.id == selectedId)
+            ? selectedId
+            : null;
+        return DropdownButtonFormField<int>(
+          initialValue: initial,
+          dropdownColor: AppColors.surfaceStats,
+          decoration: decoration,
+          icon: const Icon(
+            Icons.expand_more,
+            color: AppColors.textSecondary,
+          ),
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: AppColors.textPrimary,
+          ),
+          items: [
+            for (final s in shoots)
+              DropdownMenuItem(value: s.id, child: Text(s.title)),
+          ],
+          onChanged: (v) {
+            if (v == null) return;
+            final picked = shoots.firstWhere((s) => s.id == v);
+            onChanged(picked);
+          },
+        );
+      },
     );
   }
 }

@@ -41,7 +41,23 @@ class MeetingDto {
       // Server has no structured agenda — leave empty.
       agenda: const <String>[],
       participants: _readParticipants(json['participants']),
+      createdById: _readCreatedById(json['created_by']),
     );
+  }
+
+  /// `created_by` arrives as the full user sub-object (`{id, name, ...}`)
+  /// when present, occasionally as a bare scalar id, or null on legacy /
+  /// system-generated rows. Extract the id only.
+  static String? _readCreatedById(Object? raw) {
+    if (raw == null) return null;
+    if (raw is Map<String, dynamic>) {
+      final id = raw['id'] ?? raw['_id'];
+      if (id == null) return null;
+      final s = id.toString();
+      return s.isEmpty ? null : s;
+    }
+    final s = raw.toString();
+    return s.isEmpty ? null : s;
   }
 
   static List<MeetingParticipant> _readParticipants(Object? raw) {

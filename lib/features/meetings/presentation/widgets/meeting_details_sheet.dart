@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/radii.dart';
+import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/providers/current_user_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../domain/models/meeting.dart';
+import '../providers/cancel_meeting_notifier.dart';
 import '../providers/meeting_details_providers.dart';
+import '../providers/meetings_list_notifier.dart';
 import '../util/launch_meeting_link.dart';
 import 'meeting_agenda_tile.dart';
 import 'meeting_participant_tile.dart';
+import 'meeting_rsvp_buttons.dart';
 
 Future<void> showMeetingDetailsSheet(
   BuildContext context, {
@@ -51,6 +57,7 @@ class MeetingDetailsSheet extends ConsumerWidget {
               data: (m) => _DetailsBody(
                 meeting: m,
                 scrollController: scrollController,
+                isOwner: _isOwner(ref, m),
               ),
               loading: () => _SheetShell(
                 scrollController: scrollController,
@@ -102,6 +109,12 @@ class MeetingDetailsSheet extends ConsumerWidget {
       },
     );
   }
+
+  bool _isOwner(WidgetRef ref, Meeting m) {
+    final me = ref.read(currentUserIdProvider);
+    if (me == null || m.createdById == null) return false;
+    return me == m.createdById;
+  }
 }
 
 class _SheetShell extends StatelessWidget {
@@ -122,18 +135,26 @@ class _SheetShell extends StatelessWidget {
   }
 }
 
-class _DetailsBody extends StatelessWidget {
-  const _DetailsBody({required this.meeting, required this.scrollController});
+class _DetailsBody extends ConsumerWidget {
+  const _DetailsBody({
+    required this.meeting,
+    required this.scrollController,
+    required this.isOwner,
+  });
 
   final Meeting meeting;
   final ScrollController scrollController;
+  final bool isOwner;
 
   static final _dateFmt = DateFormat('dd MMM yyyy');
   static final _timeFmt = DateFormat('hh:mm a');
 
   void _onEdit(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit meeting — coming soon')),
+    // Close the sheet so the edit screen is the top route.
+    Navigator.of(context).pop();
+    context.pushNamed(
+      RouteNames.meetingEdit,
+      pathParameters: {'id': meeting.id},
     );
   }
 
@@ -141,8 +162,76 @@ class _DetailsBody extends StatelessWidget {
     launchMeetingLink(context, meeting.link);
   }
 
+  Future<void> _onCancel(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('Cancel meeting?', style: AppTextStyles.titleSmall),
+        content: Text(
+          'Participants will be notified that this meeting was cancelled.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Keep meeting',
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Cancel meeting',
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref
+        .read(cancelMeetingNotifierProvider(meeting.id).notifier)
+        .cancel();
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cancelState =
+        ref.watch(cancelMeetingNotifierProvider(meeting.id));
+
+    ref.listen<CancelMeetingState>(
+      cancelMeetingNotifierProvider(meeting.id),
+      (prev, next) {
+        if (prev?.status == next.status) return;
+        switch (next.status) {
+          case CancelMeetingStatus.done:
+            ref.invalidate(meetingsListNotifierProvider);
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Meeting cancelled')),
+            );
+          case CancelMeetingStatus.error:
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(next.error ?? 'Could not cancel meeting'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          case _:
+            break;
+        }
+      },
+    );
+    final cancelling = cancelState.status == CancelMeetingStatus.submitting;
     return Stack(
       children: [
         ListView(
@@ -166,15 +255,16 @@ class _DetailsBody extends StatelessWidget {
                           ),
                         ),
                       ),
-                      IconButton(
-                        tooltip: 'Edit meeting',
-                        onPressed: () => _onEdit(context),
-                        icon: const Icon(
-                          Icons.edit_outlined,
-                          color: AppColors.primary,
-                          size: 20,
+                      if (isOwner)
+                        IconButton(
+                          tooltip: 'Edit meeting',
+                          onPressed: () => _onEdit(context),
+                          icon: const Icon(
+                            Icons.edit_outlined,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   AppSpacing.verticalMd,
@@ -211,6 +301,8 @@ class _DetailsBody extends StatelessWidget {
                   AppSpacing.verticalSm,
                   for (final p in meeting.participants)
                     MeetingParticipantTile(participant: p),
+                  AppSpacing.verticalBase,
+                  MeetingRsvpButtons(meeting: meeting),
                   AppSpacing.verticalXl,
                 ],
               ),
@@ -234,15 +326,34 @@ class _DetailsBody extends StatelessWidget {
               AppSpacing.xl,
               AppSpacing.base,
             ),
-            child: AppButton(
-              label: 'Join Meeting',
-              fullWidth: true,
-              icon: const Icon(
-                Icons.videocam_outlined,
-                color: AppColors.onPrimary,
-                size: 18,
-              ),
-              onPressed: () => _onJoin(context),
+            child: Row(
+              children: [
+                if (isOwner) ...[
+                  Expanded(
+                    child: AppButton(
+                      label: 'Cancel',
+                      fullWidth: true,
+                      variant: AppButtonVariant.outline,
+                      isLoading: cancelling,
+                      onPressed:
+                          cancelling ? null : () => _onCancel(context, ref),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                ],
+                Expanded(
+                  child: AppButton(
+                    label: 'Join Meeting',
+                    fullWidth: true,
+                    icon: const Icon(
+                      Icons.videocam_outlined,
+                      color: AppColors.onPrimary,
+                      size: 18,
+                    ),
+                    onPressed: () => _onJoin(context),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

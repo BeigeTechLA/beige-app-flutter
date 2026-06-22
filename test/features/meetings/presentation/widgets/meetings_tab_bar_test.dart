@@ -1,4 +1,4 @@
-import 'package:beige/features/meetings/domain/models/meeting_status.dart';
+import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/presentation/widgets/meetings_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,27 +6,28 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  testWidgets('renders both labels', (tester) async {
+  testWidgets('renders all three labels', (tester) async {
     await tester.pumpProviderApp(
       Material(
         child: MeetingsTabBar(
-          selected: MeetingStatus.upcoming,
+          selected: MeetingsTab.upcoming,
           onChanged: (_) {},
         ),
       ),
     );
 
     expect(find.text('Upcoming'), findsOneWidget);
+    expect(find.text('Invited'), findsOneWidget);
     expect(find.text('Completed'), findsOneWidget);
   });
 
   testWidgets('tap on inactive pill fires onChanged with the right enum',
       (tester) async {
-    MeetingStatus? captured;
+    MeetingsTab? captured;
     await tester.pumpProviderApp(
       Material(
         child: MeetingsTabBar(
-          selected: MeetingStatus.upcoming,
+          selected: MeetingsTab.upcoming,
           onChanged: (v) => captured = v,
         ),
       ),
@@ -35,7 +36,7 @@ void main() {
     await tester.tap(find.text('Completed'));
     await tester.pump();
 
-    expect(captured, MeetingStatus.completed);
+    expect(captured, MeetingsTab.completed);
   });
 
   testWidgets('tap on active pill still emits (parent decides no-op)',
@@ -44,7 +45,7 @@ void main() {
     await tester.pumpProviderApp(
       Material(
         child: MeetingsTabBar(
-          selected: MeetingStatus.upcoming,
+          selected: MeetingsTab.upcoming,
           onChanged: (_) => hits += 1,
         ),
       ),
@@ -54,5 +55,33 @@ void main() {
     await tester.pump();
 
     expect(hits, 1);
+  });
+
+  testWidgets('Invited tab shows badge when count > 0', (tester) async {
+    await tester.pumpProviderApp(
+      Material(
+        child: MeetingsTabBar(
+          selected: MeetingsTab.upcoming,
+          onChanged: (_) {},
+          invitedBadgeCount: 3,
+        ),
+      ),
+    );
+
+    expect(find.text('3'), findsOneWidget);
+  });
+
+  testWidgets('Invited tab hides badge when count is 0', (tester) async {
+    await tester.pumpProviderApp(
+      Material(
+        child: MeetingsTabBar(
+          selected: MeetingsTab.upcoming,
+          onChanged: (_) {},
+          invitedBadgeCount: 0,
+        ),
+      ),
+    );
+
+    expect(find.text('0'), findsNothing);
   });
 }

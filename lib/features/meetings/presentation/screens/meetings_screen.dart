@@ -76,6 +76,7 @@ class MeetingsScreen extends ConsumerWidget {
               child: MeetingsTabBar(
                 selected: state.tab,
                 onChanged: notifier.selectTab,
+                invitedBadgeCount: state.pendingInviteCount,
               ),
             ),
             AppSpacing.verticalBase,

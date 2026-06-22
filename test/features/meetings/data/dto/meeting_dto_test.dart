@@ -115,5 +115,47 @@ void main() {
       expect(m.startAt.millisecondsSinceEpoch, 0);
       expect(m.endAt.millisecondsSinceEpoch, 0);
     });
+
+    test('extracts createdById from nested created_by user object', () {
+      final m = MeetingDto.fromRestJson({
+        'id': '1',
+        'meeting_title': 'T',
+        'meeting_date_time': '2026-06-11T13:00:00Z',
+        'meeting_end_time': '2026-06-11T14:00:00Z',
+        'meeting_status': 'pending',
+        'meetLink': '',
+        'created_by': {'id': 198, 'name': 'Arpit S', 'role': 'client'},
+      });
+
+      expect(m.createdById, '198');
+    });
+
+    test('accepts scalar created_by id', () {
+      final m = MeetingDto.fromRestJson({
+        'id': '1',
+        'meeting_title': 'T',
+        'meeting_date_time': '2026-06-11T13:00:00Z',
+        'meeting_end_time': '2026-06-11T14:00:00Z',
+        'meeting_status': 'pending',
+        'meetLink': '',
+        'created_by': 42,
+      });
+
+      expect(m.createdById, '42');
+    });
+
+    test('null created_by → createdById null', () {
+      final m = MeetingDto.fromRestJson({
+        'id': '1',
+        'meeting_title': 'T',
+        'meeting_date_time': '2026-06-11T13:00:00Z',
+        'meeting_end_time': '2026-06-11T14:00:00Z',
+        'meeting_status': 'pending',
+        'meetLink': '',
+        // created_by omitted
+      });
+
+      expect(m.createdById, isNull);
+    });
   });
 }

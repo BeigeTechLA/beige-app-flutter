@@ -15,7 +15,7 @@ abstract class MessagesRepository {
   Future<Message?> fetchLatestMessage(String conversationId);
 
   /// socket.io-backed per-room event stream. UI never imports `socket_io_client`.
-  /// Caller must pair with [joinConversation]/[leaveConversation] for lifecycle.
+  /// Caller must pair with [joinConversation]/[exitRoom] for lifecycle.
   Stream<ChatSocketEvent> events(String conversationId);
 
   /// Cross-room event firehose for the conversation list (preview / unread
@@ -26,9 +26,11 @@ abstract class MessagesRepository {
   /// Idempotent; safe to call before socket connect resolves.
   Future<void> joinConversation(String conversationId);
 
-  /// Emit `leaveRoom` + drop per-room subscription. Called from thread-screen
-  /// dispose via `ref.onDispose`.
-  Future<void> leaveConversation(String conversationId);
+  /// Socket-level room exit on screen-dispose. NOT a user-initiated "leave
+  /// chat" — that affordance does not exist per spec. Emits `leaveRoom` to
+  /// drop the per-room subscription; backend treats this as session/lifecycle
+  /// only. Called from thread-screen dispose via `ref.onDispose`.
+  Future<void> exitRoom(String conversationId);
 
   /// Composer typing pulses.
   void notifyTyping(String conversationId);

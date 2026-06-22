@@ -6,6 +6,7 @@ import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting_category.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
+import '../../domain/models/shoot_participant_option.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'create_meeting_state.dart';
 import 'meetings_repository_provider.dart';
@@ -21,7 +22,13 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
   void setTitle(String v) => state = state.copyWith(title: v);
   void setDescription(String v) => state = state.copyWith(description: v);
-  void setProject(String v) => state = state.copyWith(project: v);
+
+  /// Selects a shoot from the user's bookings. `shootId` is required for
+  /// `isValid`; `name` is the display label persisted only for UI rendering.
+  void setShoot({required int shootId, required String name}) {
+    state = state.copyWith(shootId: shootId, project: name);
+  }
+
   void setDate(DateTime v) => state = state.copyWith(date: v);
   void setStartTime(TimeOfDayValue v) => state = state.copyWith(startTime: v);
   void setEndTime(TimeOfDayValue v) => state = state.copyWith(endTime: v);
@@ -30,18 +37,23 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   void setReminder(int minutes) =>
       state = state.copyWith(reminderMinutes: minutes);
 
-  void addParticipant(String name) {
-    if (name.trim().isEmpty) return;
-    if (state.invitedParticipants.contains(name.trim())) return;
-    state = state.copyWith(
-      invitedParticipants: [...state.invitedParticipants, name.trim()],
-    );
+  /// Replaces the invited-participants list. Picker sheet returns the full
+  /// selected set so the notifier just mirrors it.
+  void setParticipants(List<ShootParticipantOption> picked) {
+    // Deduplicate by id — `ShootParticipantOption.==` is id-based, so toSet
+    // collapses duplicates while preserving the picked order.
+    final unique = <ShootParticipantOption>{};
+    final ordered = <ShootParticipantOption>[];
+    for (final p in picked) {
+      if (unique.add(p)) ordered.add(p);
+    }
+    state = state.copyWith(invitedParticipants: ordered);
   }
 
-  void removeParticipant(String name) {
+  void removeParticipant(String id) {
     state = state.copyWith(
       invitedParticipants:
-          state.invitedParticipants.where((p) => p != name).toList(),
+          state.invitedParticipants.where((p) => p.id != id).toList(),
     );
   }
 
@@ -59,6 +71,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         title: state.title.trim(),
         description: state.description.trim(),
         project: state.project.trim(),
+        shootId: state.shootId,
         startAt: DateTime(d.year, d.month, d.day, s.hour, s.minute),
         endAt: DateTime(d.year, d.month, d.day, e.hour, e.minute),
         platform: state.platform,
@@ -66,9 +79,10 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         reminderMinutes: state.reminderMinutes,
         category: MeetingCategory.commercial,
         participants: state.invitedParticipants
-            .map((name) => MeetingParticipant(
-                  id: name.toLowerCase().replaceAll(RegExp(r'\s+'), '_'),
-                  name: name,
+            .map((p) => MeetingParticipant(
+                  id: p.id,
+                  name: p.name,
+                  avatarUrl: p.avatarUrl,
                 ))
             .toList(),
       );

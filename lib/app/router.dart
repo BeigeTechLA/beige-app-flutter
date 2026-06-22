@@ -19,6 +19,7 @@ import '../features/shoot/presentation/screens/shoot_update_success_screen.dart'
 import '../features/booking/presentation/screens/content_type_screen.dart';
 import '../features/file_manager/presentation/screens/file_manager_screen.dart';
 import '../features/meetings/presentation/screens/create_meeting_screen.dart';
+import '../features/meetings/presentation/screens/edit_meeting_screen.dart';
 import '../features/meetings/presentation/screens/meeting_scheduled_screen.dart';
 import '../features/meetings/presentation/screens/meetings_screen.dart';
 import '../features/booking/presentation/screens/crew_selection_screen.dart';
@@ -700,6 +701,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/meeting/create',
         name: RouteNames.meetingCreate,
         builder: (context, state) => const CreateMeetingScreen(),
+      ),
+
+      GoRoute(
+        path: '/meeting/edit/:id',
+        name: RouteNames.meetingEdit,
+        builder: (context, state) => EditMeetingScreen(
+          meetingId: state.pathParameters['id']!,
+        ),
       ),
 
       GoRoute(

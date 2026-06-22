@@ -20,7 +20,6 @@ class ChatComposer extends StatefulWidget {
     super.key,
     required this.controller,
     required this.onSendText,
-    required this.onAttachPressed,
     required this.onCameraPressed,
     required this.onEmojiPressed,
     required this.onMicToggle,
@@ -31,7 +30,6 @@ class ChatComposer extends StatefulWidget {
 
   final TextEditingController controller;
   final ValueChanged<String> onSendText;
-  final VoidCallback onAttachPressed;
   final VoidCallback onCameraPressed;
   final VoidCallback onEmojiPressed;
   final VoidCallback onMicToggle;
@@ -152,14 +150,7 @@ class _ChatComposerState extends State<ChatComposer> {
           ),
           child: Row(
             children: [
-              IconButton(
-                tooltip: 'Attach',
-                onPressed: widget.onAttachPressed,
-                icon: const Icon(
-                  Icons.attach_file,
-                  color: AppColors.textSecondary,
-                ),
-              ),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: TextField(
                   controller: widget.controller,

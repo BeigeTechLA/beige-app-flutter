@@ -6,7 +6,9 @@ import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
 import 'package:beige/features/meetings/domain/models/meeting_participant.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
+import 'package:beige/features/meetings/domain/models/meeting_rsvp.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
+import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Meeting _m({
@@ -92,6 +94,10 @@ class _FakeRemote implements MeetingsRemoteSource {
   Future<void> delete(String id) async {
     items.removeWhere((m) => m.id == id);
   }
+
+  @override
+  Future<Meeting> respond(String id, MeetingResponse response) async =>
+      items.firstWhere((m) => m.id == id);
 }
 
 CreateMeetingInput _input({List<MeetingParticipant> participants = const []}) =>
@@ -120,7 +126,7 @@ void main() {
       );
       final repo = MeetingsRepositoryImpl(remote);
 
-      final result = await repo.list(tab: MeetingStatus.upcoming);
+      final result = await repo.list(tab: MeetingsTab.upcoming);
 
       expect(result.map((m) => m.id).toSet(), {'a', 'c'});
     });
@@ -134,7 +140,7 @@ void main() {
       );
       final repo = MeetingsRepositoryImpl(remote);
 
-      final result = await repo.list(tab: MeetingStatus.completed);
+      final result = await repo.list(tab: MeetingsTab.completed);
 
       expect(result.map((m) => m.id).toList(), ['b']);
     });

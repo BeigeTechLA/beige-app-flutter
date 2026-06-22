@@ -21,6 +21,7 @@ abstract class RouteNames {
   static const fileManager = 'file_manager';
   static const meetings = 'meetings';
   static const meetingCreate = 'meeting_create';
+  static const meetingEdit = 'meeting_edit';
   static const meetingScheduled = 'meeting_scheduled';
   static const chat = 'chat';
   static const chatDetails = 'chat_details';

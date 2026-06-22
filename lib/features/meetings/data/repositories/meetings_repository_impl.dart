@@ -1,7 +1,9 @@
 import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
+import '../../domain/models/meeting_rsvp.dart';
 import '../../domain/models/meeting_status.dart';
+import '../../domain/models/meetings_tab.dart';
 import '../../domain/models/update_meeting_input.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import '../mappers/meeting_enum_mapper.dart';
@@ -24,11 +26,17 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
 
   @override
   Future<List<Meeting>> list({
-    MeetingStatus? tab,
+    MeetingsTab? tab,
     MeetingFilter? filter,
+    String? currentUserId,
   }) async {
     final page = await _remote.list();
-    return _applyClientFilters(page.items, tab: tab, filter: filter);
+    return _applyClientFilters(
+      page.items,
+      tab: tab,
+      filter: filter,
+      currentUserId: currentUserId,
+    );
   }
 
   @override
@@ -61,6 +69,10 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
   Future<Meeting> addParticipants(String id, List<String> userIds) =>
       _remote.addParticipants(id, userIds);
 
+  @override
+  Future<Meeting> respond(String id, MeetingResponse response) =>
+      _remote.respond(id, response);
+
   /// Serializes [UpdateMeetingInput] to the server's snake_case patch body.
   /// Skips `null` fields so PATCH stays truly partial. `duration` never
   /// included — server recomputes from times.
@@ -86,21 +98,38 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
   }
 
   /// Server only exposes `limit/page/sortBy` query params today, so `tab` +
-  /// [MeetingFilter] are applied client-side. `tab=upcoming` includes anything
-  /// that isn't `completed`; `tab=completed` includes completed only. Other
-  /// tabs fall through (no filter applied — defensive, no UI surface today).
+  /// [MeetingFilter] are applied client-side.
+  ///
+  /// - `upcoming` — anything that isn't `completed`.
+  /// - `completed` — completed only.
+  /// - `invited` — viewer is a participant with `pending` (or unknown)
+  ///   RSVP; needs `currentUserId`. When `currentUserId` is null, falls
+  ///   through to no-op so legacy callers don't break.
   List<Meeting> _applyClientFilters(
     List<Meeting> items, {
-    MeetingStatus? tab,
+    MeetingsTab? tab,
     MeetingFilter? filter,
+    String? currentUserId,
   }) {
     Iterable<Meeting> result = items;
 
     if (tab != null) {
-      if (tab == MeetingStatus.upcoming) {
-        result = result.where((m) => m.status != MeetingStatus.completed);
-      } else if (tab == MeetingStatus.completed) {
-        result = result.where((m) => m.status == MeetingStatus.completed);
+      switch (tab) {
+        case MeetingsTab.upcoming:
+          result = result.where((m) => m.status != MeetingStatus.completed);
+        case MeetingsTab.completed:
+          result = result.where((m) => m.status == MeetingStatus.completed);
+        case MeetingsTab.invited:
+          if (currentUserId != null) {
+            result = result.where((m) {
+              for (final p in m.participants) {
+                if (p.id != currentUserId) continue;
+                final s = p.rsvpStatus;
+                return s == null || s == MeetingRsvpStatus.pending;
+              }
+              return false;
+            });
+          }
       }
     }
 

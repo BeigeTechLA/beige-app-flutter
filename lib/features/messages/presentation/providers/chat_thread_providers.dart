@@ -128,9 +128,10 @@ class ChatThreadNotifier
     ref.onDispose(() {
       _eventsSub?.cancel();
       _eventsSub = null;
-      // Best-effort leave — socket source closes per-room stream regardless
-      // of connection state.
-      unawaited(repo.leaveConversation(arg));
+      // Socket-only room exit — not user-initiated. Per spec the Client app
+      // has no "leave chat" affordance; this is the lifecycle handler that
+      // drops the per-room subscription on screen close.
+      unawaited(repo.exitRoom(arg));
     });
     Future.microtask(_hydrate);
     return const ChatThreadState(isLoading: true);

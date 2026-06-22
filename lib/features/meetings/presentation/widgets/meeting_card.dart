@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
@@ -8,11 +9,12 @@ import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
 import '../../domain/models/meeting_status.dart';
+import 'meeting_rsvp_buttons.dart';
 
 /// Single meeting summary card — title, platform chip, date/time meta,
 /// participants, and a full-width Join CTA. Tap anywhere outside the CTA opens
 /// the meeting-details bottom sheet (wired by parent).
-class MeetingCard extends StatefulWidget {
+class MeetingCard extends ConsumerStatefulWidget {
   const MeetingCard({
     super.key,
     required this.meeting,
@@ -25,10 +27,10 @@ class MeetingCard extends StatefulWidget {
   final VoidCallback onJoin;
 
   @override
-  State<MeetingCard> createState() => _MeetingCardState();
+  ConsumerState<MeetingCard> createState() => _MeetingCardState();
 }
 
-class _MeetingCardState extends State<MeetingCard> {
+class _MeetingCardState extends ConsumerState<MeetingCard> {
   bool _syncMeeting = true;
 
   static final _date = DateFormat('dd MMM,yyyy');
@@ -285,6 +287,11 @@ class _MeetingCardState extends State<MeetingCard> {
                 ],
               ),
               const SizedBox(height: 12),
+
+              MeetingRsvpButtons(
+                meeting: widget.meeting,
+                compact: true,
+              ),
 
               // 6. Action buttons
               Row(

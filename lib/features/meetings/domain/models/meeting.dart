@@ -21,6 +21,12 @@ class Meeting {
   final List<String> agenda;
   final List<MeetingParticipant> participants;
 
+  /// Id of the user who created the meeting. Sourced from `created_by.id` on
+  /// the REST payload. Nullable — payload occasionally omits the field on
+  /// legacy / system-generated meetings. Used for owner-gated UI (edit /
+  /// cancel buttons render only when this matches `currentUserId`).
+  final String? createdById;
+
   const Meeting({
     required this.id,
     required this.title,
@@ -35,6 +41,7 @@ class Meeting {
     required this.category,
     required this.agenda,
     required this.participants,
+    this.createdById,
   });
 
   Meeting copyWith({
@@ -51,6 +58,7 @@ class Meeting {
     MeetingCategory? category,
     List<String>? agenda,
     List<MeetingParticipant>? participants,
+    String? createdById,
   }) {
     return Meeting(
       id: id ?? this.id,
@@ -66,6 +74,7 @@ class Meeting {
       category: category ?? this.category,
       agenda: agenda ?? this.agenda,
       participants: participants ?? this.participants,
+      createdById: createdById ?? this.createdById,
     );
   }
 }

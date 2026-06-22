@@ -16,7 +16,6 @@ import '../../domain/entities/message.dart';
 import '../../domain/entities/participant.dart';
 import '../providers/chat_thread_providers.dart';
 import '../routes/messages_args.dart';
-import 'widgets/attach_action_sheet.dart';
 import 'widgets/audio_bubble.dart';
 import 'widgets/chat_app_bar.dart';
 import 'widgets/chat_composer.dart';
@@ -93,40 +92,6 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
         curve: Curves.easeOut,
       );
     });
-  }
-
-  Future<void> _openAttach(BuildContext ctx) async {
-    final kind = await showAttachActionSheet(ctx);
-    if (kind == null || !mounted) return;
-    final notifier = ref.read(
-      chatThreadProvider(widget.conversationId).notifier,
-    );
-    switch (kind) {
-      case AttachKind.camera:
-      case AttachKind.gallery:
-        final picker = ImagePicker();
-        final picked = await picker.pickImage(
-          source: kind == AttachKind.camera
-              ? ImageSource.camera
-              : ImageSource.gallery,
-          imageQuality: 85,
-        );
-        if (picked == null || !mounted) return;
-        final file = File(picked.path);
-        final size = await file.length();
-        await notifier.sendAttachment(
-          localPath: picked.path,
-          name: picked.name,
-          mimeType: picked.mimeType ?? 'image/jpeg',
-          sizeBytes: size,
-        );
-      case AttachKind.file:
-      case AttachKind.linkShoot:
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${kind.name} attach — coming soon')),
-        );
-    }
   }
 
   Future<void> _openCamera() async {
@@ -206,7 +171,6 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             controller: _composerCtrl,
             isRecording: state.isRecording,
             onSendText: notifier.sendText,
-            onAttachPressed: () => _openAttach(context),
             onCameraPressed: _openCamera,
             onEmojiPressed: () {
               FocusScope.of(context).unfocus();

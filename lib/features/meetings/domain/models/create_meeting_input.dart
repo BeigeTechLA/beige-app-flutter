@@ -9,6 +9,7 @@ class CreateMeetingInput {
   final String title;
   final String description;
   final String project;
+  final int? shootId;
   final DateTime startAt;
   final DateTime endAt;
   final MeetingPlatform platform;
@@ -22,6 +23,7 @@ class CreateMeetingInput {
     required this.title,
     required this.description,
     required this.project,
+    this.shootId,
     required this.startAt,
     required this.endAt,
     required this.platform,

@@ -29,6 +29,10 @@ abstract class ApiEndpoints {
   static const String bookingStartOptions = "bookings/start-options";
   static const String bookingSpecialties = "bookings/specialties";
   static const String bookingShootTypes = "bookings/shoot-types/";
+  /// Roster of users associated with a booking — Client + assigned CP +
+  /// crew/team. Sourced by the meeting-create participant picker.
+  static String bookingParticipants(int bookingId) =>
+      'bookings/$bookingId/participants';
 
   /// 🎨 Creatives
   static const String creatives = "creatives";
@@ -68,6 +72,10 @@ abstract class ApiEndpoints {
   static String meetingById(String id) => 'external-meetings/$id';
   static String meetingParticipants(String id) =>
       'external-meetings/$id/participants';
+  /// POST `{ status: 'accepted' | 'declined' }` — records the signed-in
+  /// user's RSVP. Backend route name unconfirmed; swap if backend rejects.
+  static String meetingRespond(String id) =>
+      'external-meetings/$id/respond';
 
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";

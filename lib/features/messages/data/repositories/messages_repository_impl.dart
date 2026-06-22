@@ -47,7 +47,7 @@ class MessagesRepositoryImpl implements MessagesRepository {
   }
 
   @override
-  Future<void> leaveConversation(String conversationId) {
+  Future<void> exitRoom(String conversationId) {
     return socket.leaveRoom(conversationId);
   }
 

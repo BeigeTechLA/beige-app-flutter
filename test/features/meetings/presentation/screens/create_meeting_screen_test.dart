@@ -3,7 +3,8 @@ import 'package:beige/features/meetings/domain/models/meeting.dart';
 import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
-import 'package:beige/features/meetings/domain/models/meeting_status.dart';
+import 'package:beige/features/meetings/domain/models/meeting_rsvp.dart';
+import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/update_meeting_input.dart';
 import 'package:beige/features/meetings/domain/repositories/meetings_repository.dart';
 import 'package:beige/features/meetings/presentation/providers/create_meeting_notifier.dart';
@@ -19,8 +20,9 @@ import '../../../../helpers/pump_app.dart';
 class _StubRepo implements MeetingsRepository {
   @override
   Future<List<Meeting>> list({
-    MeetingStatus? tab,
+    MeetingsTab? tab,
     MeetingFilter? filter,
+    String? currentUserId,
   }) async =>
       const [];
 
@@ -40,6 +42,10 @@ class _StubRepo implements MeetingsRepository {
 
   @override
   Future<Meeting> addParticipants(String id, List<String> userIds) async =>
+      throw UnimplementedError();
+
+  @override
+  Future<Meeting> respond(String id, MeetingResponse response) async =>
       throw UnimplementedError();
 }
 
