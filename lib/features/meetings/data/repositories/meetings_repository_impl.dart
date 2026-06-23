@@ -102,9 +102,6 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
   ///
   /// - `upcoming` — anything that isn't `completed`.
   /// - `completed` — completed only.
-  /// - `invited` — viewer is a participant with `pending` (or unknown)
-  ///   RSVP; needs `currentUserId`. When `currentUserId` is null, falls
-  ///   through to no-op so legacy callers don't break.
   List<Meeting> _applyClientFilters(
     List<Meeting> items, {
     MeetingsTab? tab,
@@ -119,17 +116,6 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
           result = result.where((m) => m.status != MeetingStatus.completed);
         case MeetingsTab.completed:
           result = result.where((m) => m.status == MeetingStatus.completed);
-        case MeetingsTab.invited:
-          if (currentUserId != null) {
-            result = result.where((m) {
-              for (final p in m.participants) {
-                if (p.id != currentUserId) continue;
-                final s = p.rsvpStatus;
-                return s == null || s == MeetingRsvpStatus.pending;
-              }
-              return false;
-            });
-          }
       }
     }
 

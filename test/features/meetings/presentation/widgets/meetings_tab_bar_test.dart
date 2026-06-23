@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  testWidgets('renders all three labels', (tester) async {
+  testWidgets('renders both labels', (tester) async {
     await tester.pumpProviderApp(
       Material(
         child: MeetingsTabBar(
@@ -17,7 +17,6 @@ void main() {
     );
 
     expect(find.text('Upcoming'), findsOneWidget);
-    expect(find.text('Invited'), findsOneWidget);
     expect(find.text('Completed'), findsOneWidget);
   });
 
@@ -55,33 +54,5 @@ void main() {
     await tester.pump();
 
     expect(hits, 1);
-  });
-
-  testWidgets('Invited tab shows badge when count > 0', (tester) async {
-    await tester.pumpProviderApp(
-      Material(
-        child: MeetingsTabBar(
-          selected: MeetingsTab.upcoming,
-          onChanged: (_) {},
-          invitedBadgeCount: 3,
-        ),
-      ),
-    );
-
-    expect(find.text('3'), findsOneWidget);
-  });
-
-  testWidgets('Invited tab hides badge when count is 0', (tester) async {
-    await tester.pumpProviderApp(
-      Material(
-        child: MeetingsTabBar(
-          selected: MeetingsTab.upcoming,
-          onChanged: (_) {},
-          invitedBadgeCount: 0,
-        ),
-      ),
-    );
-
-    expect(find.text('0'), findsNothing);
   });
 }

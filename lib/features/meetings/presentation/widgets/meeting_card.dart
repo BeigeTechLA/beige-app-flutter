@@ -20,12 +20,15 @@ class MeetingCard extends ConsumerStatefulWidget {
     required this.meeting,
     required this.onTap,
     required this.onJoin,
+    this.onAccept,
+    this.onReject,
   });
 
   final Meeting meeting;
   final VoidCallback onTap;
   final VoidCallback onJoin;
-
+  final VoidCallback? onAccept;
+  final VoidCallback? onReject;
   @override
   ConsumerState<MeetingCard> createState() => _MeetingCardState();
 }
@@ -39,6 +42,11 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
   String get _dateLabel => _date.format(widget.meeting.startAt);
   String get _timeLabel =>
       '${_time.format(widget.meeting.startAt)} to ${_time.format(widget.meeting.endAt)}';
+
+  bool get _showRsvp =>
+      widget.onAccept != null &&
+          widget.onReject != null &&
+          widget.meeting.status != MeetingStatus.completed;
 
   Color _getStatusBgColor(MeetingStatus status) {
     switch (status) {
@@ -142,6 +150,7 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                       widget.meeting.title,
                       style: AppTextStyles.titleSmall.copyWith(
                         color: AppColors.primary,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -190,13 +199,14 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                   const Icon(
                     Icons.calendar_today_outlined,
                     size: 16,
-                    color: AppColors.textSecondary,
+                    color: AppColors.white,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     _dateLabel,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.white,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -207,13 +217,14 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                   const Icon(
                     Icons.schedule_outlined,
                     size: 16,
-                    color: AppColors.textSecondary,
+                    color: AppColors.white,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     _timeLabel,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.white,
+                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -288,11 +299,31 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
               ),
               const SizedBox(height: 12),
 
-              MeetingRsvpButtons(
-                meeting: widget.meeting,
-                compact: true,
-              ),
-
+              // 6a. Accept / Reject row (CP invitation response).
+              if (_showRsvp) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: _RsvpButton(
+                        label: 'Accept',
+                        backgroundColor: const Color(0xFFD8FDE6),
+                        textColor: const Color(0xFF1DAA23),
+                        onTap: widget.onAccept!,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _RsvpButton(
+                        label: 'Reject',
+                        backgroundColor: const Color(0xFFEECCC9),
+                        textColor: const Color(0xFFD33732),
+                        onTap: widget.onReject!,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
               // 6. Action buttons
               Row(
                 children: [
@@ -301,7 +332,7 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                       onTap: widget.onJoin,
                       borderRadius: BorderRadius.circular(24),
                       child: Container(
-                        height: 48,
+                        height: 38,
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(24),
@@ -333,8 +364,8 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                     onTap: widget.onTap,
                     borderRadius: BorderRadius.circular(24),
                     child: Container(
-                      width: 48,
-                      height: 48,
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
                         color: AppColors.textPrimary.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
@@ -349,6 +380,48 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                 ],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RsvpButton extends StatelessWidget {
+  const _RsvpButton({
+    required this.label,
+    required this.backgroundColor,
+    required this.textColor,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color backgroundColor;
+  final Color textColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          height: 28,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: AppTextStyles.buttonMedium.copyWith(
+              color: textColor,
+              fontFamily: 'Outfit',
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),

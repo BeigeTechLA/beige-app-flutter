@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
-import '../../domain/models/meeting_rsvp.dart';
 import '../../domain/models/meeting_status.dart';
 import '../../domain/models/meetings_tab.dart';
 
@@ -16,15 +15,14 @@ class MeetingsListState {
 
   /// Full unfiltered page from the API. Stored once on load so tab + filter
   /// changes can recompute locally without refetching. Notifier derives the
-  /// visible [items] list + the invited-tab [pendingInviteCount] from this.
+  /// visible [items] list from this.
   final List<Meeting> allItems;
 
   /// View-model list — already filtered by [tab] and [filter].
   final List<Meeting> items;
   final String? error;
 
-  /// Id of the signed-in user. Needed to compute the invited tab filter and
-  /// pending-invite badge count. Null when logged out.
+  /// Id of the signed-in user. Null when logged out.
   final String? currentUserId;
 
   const MeetingsListState({
@@ -38,24 +36,6 @@ class MeetingsListState {
   });
 
   bool get isFiltered => !filter.isEmpty;
-
-  /// Count of meetings where the signed-in user is invited and the RSVP is
-  /// still pending (or unknown — legacy payloads). Drives the Invited tab
-  /// badge.
-  int get pendingInviteCount {
-    final me = currentUserId;
-    if (me == null) return 0;
-    var n = 0;
-    for (final m in allItems) {
-      for (final p in m.participants) {
-        if (p.id != me) continue;
-        final s = p.rsvpStatus;
-        if (s == null || s == MeetingRsvpStatus.pending) n += 1;
-        break;
-      }
-    }
-    return n;
-  }
 
   MeetingsListState copyWith({
     MeetingsTab? tab,
@@ -86,7 +66,6 @@ List<Meeting> applyLocalMeetingFilters(
   List<Meeting> items, {
   required MeetingsTab tab,
   required MeetingFilter filter,
-  required String? currentUserId,
 }) {
   Iterable<Meeting> result = items;
 
@@ -95,19 +74,6 @@ List<Meeting> applyLocalMeetingFilters(
       result = result.where((m) => m.status != MeetingStatus.completed);
     case MeetingsTab.completed:
       result = result.where((m) => m.status == MeetingStatus.completed);
-    case MeetingsTab.invited:
-      if (currentUserId == null) {
-        result = const Iterable.empty();
-      } else {
-        result = result.where((m) {
-          for (final p in m.participants) {
-            if (p.id != currentUserId) continue;
-            final s = p.rsvpStatus;
-            return s == null || s == MeetingRsvpStatus.pending;
-          }
-          return false;
-        });
-      }
   }
 
   if (!filter.isEmpty) {

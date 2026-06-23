@@ -36,7 +36,14 @@ class MeetingsScreen extends ConsumerWidget {
   void _onCardTap(BuildContext context, String meetingId) {
     showMeetingDetailsSheet(context, meetingId: meetingId);
   }
-
+  void _onRsvp(BuildContext context, {required bool accept}) {
+    // RSVP endpoint not wired yet — see BOOKING_FEATURES_GUIDELINES.md §3.3.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(accept ? 'Meeting accepted' : 'Meeting rejected'),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(meetingsListNotifierProvider);
@@ -76,7 +83,6 @@ class MeetingsScreen extends ConsumerWidget {
               child: MeetingsTabBar(
                 selected: state.tab,
                 onChanged: notifier.selectTab,
-                invitedBadgeCount: state.pendingInviteCount,
               ),
             ),
             AppSpacing.verticalBase,
@@ -89,6 +95,7 @@ class MeetingsScreen extends ConsumerWidget {
                   state: state,
                   onTap: _onCardTap,
                   onJoin: _onJoin,
+                  onRsvp: _onRsvp,
                   onRetry: notifier.refresh,
                 ),
               ),
@@ -124,12 +131,14 @@ class _ListBody extends StatelessWidget {
     required this.state,
     required this.onTap,
     required this.onJoin,
+    required this.onRsvp,
     required this.onRetry,
   });
 
   final MeetingsListState state;
   final void Function(BuildContext, String meetingId) onTap;
   final void Function(BuildContext, String link) onJoin;
+  final void Function(BuildContext, {required bool accept}) onRsvp;
   final Future<void> Function() onRetry;
 
   @override
@@ -216,6 +225,8 @@ class _ListBody extends StatelessWidget {
           meeting: m,
           onTap: () => onTap(context, m.id),
           onJoin: () => onJoin(context, m.link),
+          onAccept: () => onRsvp(context, accept: true),
+          onReject: () => onRsvp(context, accept: false),
         );
       },
     );

@@ -69,6 +69,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       body: Column(
         children: [
           const AppMainToolbar(title: 'Message'),
+          const SizedBox(height: AppSpacing.md),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenH,

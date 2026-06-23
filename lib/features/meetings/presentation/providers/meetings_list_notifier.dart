@@ -29,8 +29,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       clearError: true,
     );
     try {
-      // Single fetch — tab + filter both applied locally so the Invited badge
-      // can be computed off the raw page without a second round trip.
       final all = await _repo.list();
       state = state.copyWith(
         allItems: all,
@@ -38,7 +36,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
           all,
           tab: state.tab,
           filter: state.filter,
-          currentUserId: state.currentUserId,
         ),
         status: MeetingsListStatus.ready,
       );
@@ -64,7 +61,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       state.allItems,
       tab: tab,
       filter: state.filter,
-      currentUserId: state.currentUserId,
     );
     state = state.copyWith(tab: tab, items: items);
   }
@@ -74,7 +70,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       state.allItems,
       tab: state.tab,
       filter: filter,
-      currentUserId: state.currentUserId,
     );
     state = state.copyWith(filter: filter, items: items);
   }
@@ -84,7 +79,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       state.allItems,
       tab: state.tab,
       filter: MeetingFilter.empty,
-      currentUserId: state.currentUserId,
     );
     state = state.copyWith(filter: MeetingFilter.empty, items: items);
   }
