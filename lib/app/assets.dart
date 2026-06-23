@@ -33,6 +33,7 @@ class AppAssets {
 
   static const String back = '$_svg/back.svg';
   static const String cancel = '$_svg/cancel.svg';
+  static const String rectangleProfile = '$_svg/rectangle_profile.svg';
 
   static const String filter = '$_svg/filter.svg';
   static const String search = '$_svg/search.svg';

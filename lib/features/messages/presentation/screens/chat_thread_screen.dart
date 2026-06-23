@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/durations.dart';
@@ -94,26 +91,6 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     });
   }
 
-  Future<void> _openCamera() async {
-    final notifier = ref.read(
-      chatThreadProvider(widget.conversationId).notifier,
-    );
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 85,
-    );
-    if (picked == null || !mounted) return;
-    final file = File(picked.path);
-    final size = await file.length();
-    await notifier.sendAttachment(
-      localPath: picked.path,
-      name: picked.name,
-      mimeType: picked.mimeType ?? 'image/jpeg',
-      sizeBytes: size,
-    );
-  }
-
   void _openDetails() {
     context.pushNamed(
       RouteNames.chatDetails,
@@ -148,9 +125,8 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             // Don't override with `state.peerName` — chat details may resolve
             // a different display name and that would diverge from the list.
             contactName: widget.contactName ?? state.peerName ?? 'Chat',
-            isOnline: state.peerOnline,
+            participantCount: state.participantsById.length,
             isTyping: state.peerTyping,
-            peerRole: state.peerRole,
             onSearch: _toggleSearch,
             onOpenDetails: _openDetails,
           ),
@@ -169,19 +145,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
           ),
           ChatComposer(
             controller: _composerCtrl,
-            isRecording: state.isRecording,
             onSendText: notifier.sendText,
-            onCameraPressed: _openCamera,
-            onEmojiPressed: () {
-              FocusScope.of(context).unfocus();
-            },
-            onMicToggle: () {
-              if (state.isRecording) {
-                notifier.finishRecording(const Duration(seconds: 3));
-              } else {
-                notifier.toggleRecording();
-              }
-            },
             onTypingPulse: notifier.notifyTyping,
             onTypingStop: notifier.notifyStopTyping,
           ),

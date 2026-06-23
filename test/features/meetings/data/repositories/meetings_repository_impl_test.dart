@@ -145,7 +145,7 @@ void main() {
       expect(result.map((m) => m.id).toList(), ['b']);
     });
 
-    test('category filter shrinks result + sorts by startAt asc', () async {
+    test('category filter shrinks result + sorts by startAt desc', () async {
       final remote = _FakeRemote(
         seed: [
           _m(
@@ -173,7 +173,7 @@ void main() {
         ),
       );
 
-      expect(result.map((m) => m.id).toList(), ['c', 'a']);
+      expect(result.map((m) => m.id).toList(), ['a', 'c']);
     });
   });
 

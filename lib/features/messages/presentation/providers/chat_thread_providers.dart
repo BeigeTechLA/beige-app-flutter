@@ -21,19 +21,22 @@ String? _absoluteAvatar(String? raw) {
   return '${Env.imageUrl}$raw';
 }
 
-/// Resolves the session user against the room's participant list. Tries id
-/// match first (cheap, exact), then email (unique, stable across name edits),
-/// then case-insensitive name. Returns the participant id when found —
-/// callers replace [currentUserId] with this so message-level `isMine`
-/// resolves even when login persisted a non-canonical id (e.g.
-/// crew_member_id while messages carry user_id).
+/// Resolves the session user against the room's participant list, falling
+/// back to the message thread itself. Tries id match (cheap, exact), then
+/// email (unique, stable across name edits), then case-insensitive name —
+/// first against [participants], then against [messages] by sender name.
+///
+/// The message-thread pass is critical for 1-1 rooms where the backend's
+/// `participants` block lists only the peer; without it, own messages
+/// render on the wrong side until the user sends a new message (which
+/// reveals the canonical sender id via `sendText`).
 String? _resolveSelfId({
   required List<Participant> participants,
+  required List<Message> messages,
   required String? currentUserId,
   required String? email,
   required String? name,
 }) {
-  if (participants.isEmpty) return null;
   if (currentUserId != null && currentUserId.isNotEmpty) {
     for (final p in participants) {
       if (p.id == currentUserId) return p.id;
@@ -52,7 +55,20 @@ String? _resolveSelfId({
     for (final p in participants) {
       if (p.name.trim().toLowerCase() == normalizedName) return p.id;
     }
+    for (final m in messages) {
+      if (m.senderId.isEmpty) continue;
+      if (m.senderName.trim().toLowerCase() == normalizedName) return m.senderId;
+    }
   }
+  // Last-resort id elimination: backend `participants.items` often lists only
+  // the peer in 1-1 rooms. Any senderId in the thread that isn't a known
+  // peer is us. Works without trusting session name/email at all.
+  final peerIds = participants.map((p) => p.id).toSet();
+  final candidates = <String>{
+    for (final m in messages)
+      if (m.senderId.isNotEmpty && !peerIds.contains(m.senderId)) m.senderId,
+  };
+  if (candidates.length == 1) return candidates.first;
   return null;
 }
 
@@ -158,22 +174,12 @@ class ChatThreadNotifier
       String? peerName;
       String? peerAvatarUrl;
       String? peerRole;
+      List<Participant> detailsParticipants = const [];
       try {
         final details = await repo.fetchDetails(arg);
+        detailsParticipants = details.participants;
         for (final p in details.participants) {
           participantsById[p.id] = p;
-        }
-        // Resolve self against participants. Login may persist a
-        // crew_member_id while messages carry the underlying user_id —
-        // fall back to email then name match so `isMine` works regardless.
-        final resolvedSelfId = _resolveSelfId(
-          participants: details.participants,
-          currentUserId: currentUserId,
-          email: sessionUserEmail,
-          name: sessionUserName,
-        );
-        if (resolvedSelfId != null) {
-          currentUserId = resolvedSelfId;
         }
         // AppBar shows chat-room identity, not per-message sender. Prefer
         // room-level contact (room display_name + avatar). Fall back to a
@@ -202,6 +208,30 @@ class ChatThreadNotifier
       await repo.joinConversation(arg);
       _eventsSub = repo.events(arg).listen(_onEvent);
       final thread = await repo.fetchThread(arg);
+      // Resolve self after both details + thread are in. 1-1 rooms may list
+      // only the peer in `participants` — falling back to the message
+      // thread's senderName lets `isMine` resolve on first render instead
+      // of waiting for the user to send a message.
+      final resolvedSelfId = _resolveSelfId(
+        participants: detailsParticipants,
+        messages: thread.messages,
+        currentUserId: currentUserId,
+        email: sessionUserEmail,
+        name: sessionUserName,
+      );
+      if (resolvedSelfId != null) {
+        currentUserId = resolvedSelfId;
+      }
+      if (kDebugMode) {
+        debugPrint(
+          '[thread] self-resolve conversationId=$arg '
+          'sessionId=${currentUserId ?? '∅'} '
+          'sessionEmail=${sessionUserEmail ?? '∅'} '
+          'sessionName=${sessionUserName ?? '∅'} '
+          'resolvedSelfId=${resolvedSelfId ?? '∅'} '
+          'participantIds=${detailsParticipants.map((p) => p.id).toList()}',
+        );
+      }
       state = state.copyWith(
         messages: thread.messages,
         isLoading: false,

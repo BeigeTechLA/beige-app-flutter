@@ -57,9 +57,8 @@ class _Body extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: DetailsHeroHeader(
-            contact: details.contact,
+            roomName: details.roomName,
             onBack: onBack,
-            onMenu: () {},
           ),
         ),
         SliverToBoxAdapter(
@@ -68,6 +67,7 @@ class _Body extends StatelessWidget {
             title: 'Participants',
             trailingCount: details.participants.length,
             initiallyExpanded: true,
+            collapsible: false,
             body: _ParticipantsBody(items: details.participants),
           ),
         ),

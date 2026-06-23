@@ -150,7 +150,7 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
     }
 
     final list = result.toList()
-      ..sort((a, b) => a.startAt.compareTo(b.startAt));
+      ..sort((a, b) => b.startAt.compareTo(a.startAt));
     return list;
   }
 }
