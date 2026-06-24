@@ -6,9 +6,23 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 
+enum TopMessageType { error, success }
+
 class TopMessage {
-  static void show(BuildContext context, String message) {
+  /// Default variant — red error banner. Existing call sites keep working
+  /// unchanged. Pass [type] = [TopMessageType.success] for the green variant.
+  static void show(
+    BuildContext context,
+    String message, {
+    TopMessageType type = TopMessageType.error,
+  }) {
     final overlay = Overlay.of(context);
+    final isSuccess = type == TopMessageType.success;
+    final accent = isSuccess ? AppColors.greenBright : AppColors.errorAccent;
+    final surface = isSuccess
+        ? AppColors.greenBright.withValues(alpha: 0.12)
+        : AppColors.errorSurface;
+    final icon = isSuccess ? Icons.check_circle_outline : Icons.do_not_disturb;
 
     late OverlayEntry overlayEntry;
 
@@ -33,29 +47,24 @@ class TopMessage {
                   vertical: AppSpacing.mld,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.errorSurface,
+                  color: surface,
                   borderRadius: AppRadii.xlAll,
-                  border: Border.all(color: AppColors.errorAccent),
+                  border: Border.all(color: accent),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.do_not_disturb,
-                      color: AppColors.errorAccent,
-                    ),
+                    Icon(icon, color: accent),
                     AppSpacing.gapHSmd,
                     Expanded(
                       child: Text(
                         message,
                         style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.errorAccent,
+                          color: accent,
                         ),
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        overlayEntry.remove();
-                      },
+                      onTap: () => overlayEntry.remove(),
                       child: const Icon(Icons.close, color: AppColors.white),
                     ),
                   ],

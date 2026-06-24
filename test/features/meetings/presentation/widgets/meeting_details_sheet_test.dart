@@ -6,7 +6,7 @@ import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
 import 'package:beige/features/meetings/domain/models/meeting_participant.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
-import 'package:beige/features/meetings/domain/models/meeting_rsvp.dart';
+import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/update_meeting_input.dart';
@@ -117,8 +117,9 @@ void main() {
     expect(find.text('Editorial Sync'), findsOneWidget);
     expect(find.text('Cover Story'), findsOneWidget);
     expect(find.text('Agenda'), findsOneWidget);
-    expect(find.text('Recap'), findsOneWidget);
-    expect(find.text('Storyboards'), findsOneWidget);
+    // Redesigned sheet collapses agenda into a single description card —
+    // when `description` is non-empty it wins over the agenda list.
+    expect(find.text('planning'), findsOneWidget);
     expect(find.text('Alice'), findsOneWidget);
     expect(find.text('Bob'), findsOneWidget);
     expect(find.text('Join Meeting'), findsOneWidget);

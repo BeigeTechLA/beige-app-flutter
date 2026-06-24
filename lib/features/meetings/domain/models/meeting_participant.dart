@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'meeting_rsvp.dart';
+import 'meeting_response.dart';
 
 @immutable
 class MeetingParticipant {
@@ -8,11 +8,10 @@ class MeetingParticipant {
   final String name;
   final String? avatarUrl;
 
-  /// Optional invitation status. Defaults to `pending` when the server payload
-  /// omits the field (legacy meetings predate RSVP tracking). Null means
-  /// "field genuinely absent" — UI treats null the same as `pending` for CTA
-  /// gating so invited users are never stuck without an Accept/Decline.
-  final MeetingRsvpStatus? rsvpStatus;
+  /// Participant's RSVP state on the meeting. `null` means the server omitted
+  /// the field (legacy meetings predate RSVP tracking); UI treats null the
+  /// same as `pending` so invited users always see Accept/Decline.
+  final MeetingResponse? rsvpStatus;
 
   const MeetingParticipant({
     required this.id,
@@ -25,7 +24,7 @@ class MeetingParticipant {
     String? id,
     String? name,
     String? avatarUrl,
-    MeetingRsvpStatus? rsvpStatus,
+    MeetingResponse? rsvpStatus,
   }) {
     return MeetingParticipant(
       id: id ?? this.id,

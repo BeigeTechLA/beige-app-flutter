@@ -1,7 +1,7 @@
 import '../models/create_meeting_input.dart';
 import '../models/meeting.dart';
 import '../models/meeting_filter.dart';
-import '../models/meeting_rsvp.dart';
+import '../models/meeting_response.dart';
 import '../models/meetings_tab.dart';
 import '../models/update_meeting_input.dart';
 

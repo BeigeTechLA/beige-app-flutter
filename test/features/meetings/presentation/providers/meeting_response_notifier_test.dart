@@ -4,7 +4,7 @@ import 'package:beige/features/meetings/domain/models/meeting.dart';
 import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
-import 'package:beige/features/meetings/domain/models/meeting_rsvp.dart';
+import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/update_meeting_input.dart';
@@ -98,7 +98,7 @@ void main() {
     );
   });
 
-  test('accept → MeetingResponse.accept + accepted status', () async {
+  test('accept → MeetingResponse.accepted + accepted status', () async {
     final repo = _FakeRepo();
     final container = await _container(repo: repo);
     addTearDown(container.dispose);
@@ -113,7 +113,7 @@ void main() {
         .accept();
 
     expect(repo.respondCalls, 1);
-    expect(repo.lastResponse, MeetingResponse.accept);
+    expect(repo.lastResponse, MeetingResponse.accepted);
     expect(repo.lastId, 'm_1');
     expect(
       container.read(meetingResponseNotifierProvider('m_1')).status,
@@ -121,7 +121,7 @@ void main() {
     );
   });
 
-  test('decline → MeetingResponse.decline + declined status', () async {
+  test('decline → MeetingResponse.declined + declined status', () async {
     final repo = _FakeRepo();
     final container = await _container(repo: repo);
     addTearDown(container.dispose);
@@ -135,7 +135,7 @@ void main() {
         .read(meetingResponseNotifierProvider('m_1').notifier)
         .decline();
 
-    expect(repo.lastResponse, MeetingResponse.decline);
+    expect(repo.lastResponse, MeetingResponse.declined);
     expect(
       container.read(meetingResponseNotifierProvider('m_1')).status,
       MeetingResponseStatus.declined,
@@ -163,17 +163,17 @@ void main() {
   });
 
   test('wire value mapping accept→accepted, decline→declined', () {
-    expect(MeetingResponse.accept.wireValue, 'accepted');
-    expect(MeetingResponse.decline.wireValue, 'declined');
+    expect(MeetingResponse.accepted.serverValue, 'accepted');
+    expect(MeetingResponse.declined.serverValue, 'declined');
   });
 
   test('rsvpFromServer maps known + unknown variants', () {
-    expect(rsvpFromServer('accepted'), MeetingRsvpStatus.accepted);
-    expect(rsvpFromServer('ACCEPT'), MeetingRsvpStatus.accepted);
-    expect(rsvpFromServer('declined'), MeetingRsvpStatus.declined);
-    expect(rsvpFromServer('rejected'), MeetingRsvpStatus.declined);
-    expect(rsvpFromServer('pending'), MeetingRsvpStatus.pending);
-    expect(rsvpFromServer('invited'), MeetingRsvpStatus.pending);
+    expect(rsvpFromServer('accepted'), MeetingResponse.accepted);
+    expect(rsvpFromServer('ACCEPT'), MeetingResponse.accepted);
+    expect(rsvpFromServer('declined'), MeetingResponse.declined);
+    expect(rsvpFromServer('rejected'), MeetingResponse.declined);
+    expect(rsvpFromServer('pending'), MeetingResponse.pending);
+    expect(rsvpFromServer('invited'), MeetingResponse.pending);
     expect(rsvpFromServer(null), isNull);
     expect(rsvpFromServer('garbage'), isNull);
   });

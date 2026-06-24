@@ -279,4 +279,25 @@
 
     /// Soft mint background for completed-state badges.
     static const Color softMint = Color(0xFFD8FDE6);
+
+    /// Bright green — accept toast, "Your Response: Accepted" line.
+    static const Color greenBright = Color(0xFF1DAA23);
+
+    /// Forest green — text on completed status pill.
+    static const Color greenForest = Color(0xFF2F855A);
+
+    /// Ice blue background for upcoming-state badges.
+    static const Color blueIce = Color(0xFFE0E7F8);
+
+    /// Royal blue text on upcoming status pill.
+    static const Color blueRoyal = Color(0xFF2D66D2);
+
+    /// Bright orange text on revision status pill.
+    static const Color orangeBright = Color(0xFFFF9D25);
+
+    /// Dark grey track for AppToggleSwitch off state.
+    static const Color surfaceFog = Color(0xFF4A4A4C);
+
+    /// Soft black drop shadow — 20% alpha.
+    static const Color black20 = Color(0x33000000);
   }

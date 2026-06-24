@@ -7,7 +7,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../core/providers/current_user_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../domain/models/meeting.dart';
-import '../../domain/models/meeting_rsvp.dart';
+import '../../domain/models/meeting_response.dart';
 import '../providers/meeting_details_providers.dart';
 import '../providers/meeting_response_notifier.dart';
 import '../providers/meetings_list_notifier.dart';
@@ -39,7 +39,7 @@ class MeetingRsvpButtons extends ConsumerWidget {
     // Only show when the viewer is an invited participant with no response
     // yet. `null` is treated as `pending` so legacy payloads still surface
     // the CTAs.
-    if (rsvp != null && rsvp != MeetingRsvpStatus.pending) {
+    if (rsvp != null && rsvp != MeetingResponse.pending) {
       return const SizedBox.shrink();
     }
     if (!_isViewerInvited(me)) return const SizedBox.shrink();
@@ -130,7 +130,7 @@ class MeetingRsvpButtons extends ConsumerWidget {
   bool _isViewerInvited(String me) =>
       meeting.participants.any((p) => p.id == me);
 
-  MeetingRsvpStatus? _viewerRsvp(String me) {
+  MeetingResponse? _viewerRsvp(String me) {
     for (final p in meeting.participants) {
       if (p.id == me) return p.rsvpStatus;
     }

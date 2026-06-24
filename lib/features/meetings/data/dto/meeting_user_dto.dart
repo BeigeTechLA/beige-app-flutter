@@ -1,10 +1,11 @@
 import '../../domain/models/meeting_participant.dart';
-import '../../domain/models/meeting_rsvp.dart';
+import '../../domain/models/meeting_response.dart';
 
 /// REST mapper for the User sub-object served by `external-meetings` reads.
 ///
 /// Used by every nested user slot: `client`, `admin`, `created_by`, and each
-/// entry of `cps[]` / `participants[]`. Observed shape:
+/// entry of `cps[]` / `participants[]`. Observed shape
+/// (`MEETINGS_API.md` §User sub-object):
 ///
 /// ```json
 /// { "id": 198, "name": "Arpit S", "email": "arpits85@gmail.com", "role": "admin" }
@@ -20,16 +21,16 @@ class MeetingUserDto {
         json['profileImage'] ??
         json['avatar_url'] ??
         json['avatarUrl']) as String?;
-    final rsvp = rsvpFromServer((json['rsvp_status'] ??
-            json['rsvpStatus'] ??
-            json['response_status'] ??
-            json['status']) as String?);
+    final rsvpRaw = (json['rsvp_status'] ??
+        json['rsvpStatus'] ??
+        json['response'] ??
+        json['status']) as String?;
 
     return MeetingParticipant(
       id: id,
       name: name,
       avatarUrl: avatar,
-      rsvpStatus: rsvp,
+      rsvpStatus: rsvpFromServer(rsvpRaw),
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
 import 'package:beige/features/meetings/domain/models/meeting_participant.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
-import 'package:beige/features/meetings/domain/models/meeting_rsvp.dart';
+import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,7 +155,7 @@ void main() {
           ),
           _m(
             id: 'b',
-            category: MeetingCategory.editorial,
+            category: MeetingCategory.wedding,
             startAt: DateTime(2026, 6, 10, 13),
           ),
           _m(

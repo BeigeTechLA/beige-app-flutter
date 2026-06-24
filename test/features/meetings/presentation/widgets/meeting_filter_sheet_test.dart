@@ -55,6 +55,8 @@ void main() {
       await tester.tap(find.text(MeetingCategory.commercial.label));
       await tester.pump();
 
+      await tester.ensureVisible(find.text('Apply'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Apply'));
       await tester.pumpAndSettle();
 
@@ -75,6 +77,8 @@ void main() {
       ),
     );
 
+    await tester.ensureVisible(find.text('Clear All'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Clear All'));
     await tester.pump();
 

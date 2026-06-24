@@ -7,7 +7,7 @@ import '../../../../core/network/exceptions/exception_handler.dart';
 import '../../../../core/session/session_store.dart';
 import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting.dart';
-import '../../domain/models/meeting_rsvp.dart';
+import '../../domain/models/meeting_response.dart';
 import '../dto/meeting_dto.dart';
 import '../mappers/meeting_enum_mapper.dart';
 
@@ -166,9 +166,9 @@ class MeetingsRemoteSource {
   /// payload in the same shape as `getById`.
   Future<Meeting> respond(String id, MeetingResponse response) {
     return _guard(() async {
-      final resp = await _dio.post<dynamic>(
+      final resp = await _dio.patch<dynamic>(
         ApiEndpoints.meetingRespond(id),
-        data: {'status': response.wireValue},
+        data: {'response': response.serverValue},
       );
       return MeetingDto.fromRestJson(_unwrapItem(resp.data));
     });

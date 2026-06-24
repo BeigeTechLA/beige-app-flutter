@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
-import '../../domain/models/meeting_rsvp.dart';
+import '../../domain/models/meeting_response.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'meetings_repository_provider.dart';
 
@@ -45,8 +45,8 @@ class MeetingResponseNotifier
     return const MeetingResponseState();
   }
 
-  Future<void> accept() => _submit(MeetingResponse.accept);
-  Future<void> decline() => _submit(MeetingResponse.decline);
+  Future<void> accept() => _submit(MeetingResponse.accepted);
+  Future<void> decline() => _submit(MeetingResponse.declined);
 
   Future<void> _submit(MeetingResponse response) async {
     if (state.isSubmitting) return;
@@ -57,7 +57,7 @@ class MeetingResponseNotifier
     try {
       await _repo.respond(arg, response);
       state = state.copyWith(
-        status: response == MeetingResponse.accept
+        status: response == MeetingResponse.accepted
             ? MeetingResponseStatus.accepted
             : MeetingResponseStatus.declined,
       );

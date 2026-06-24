@@ -4,10 +4,13 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/providers/current_user_provider.dart';
 import '../../../../shared/widgets/app_avatar.dart';
+import '../../../../shared/widgets/app_toggle_switch.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
+import '../../domain/models/meeting_response.dart';
 import '../../domain/models/meeting_status.dart';
 import '../../domain/util/can_rsvp.dart';
 
@@ -22,6 +25,7 @@ class MeetingCard extends ConsumerStatefulWidget {
     required this.onJoin,
     this.onAccept,
     this.onReject,
+    this.rsvpPending = false,
   });
 
   final Meeting meeting;
@@ -29,6 +33,11 @@ class MeetingCard extends ConsumerStatefulWidget {
   final VoidCallback onJoin;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
+
+  /// True while an Accept/Reject network call for this meeting is in flight.
+  /// Disables both RSVP buttons and renders a spinner on each.
+  final bool rsvpPending;
+
   @override
   ConsumerState<MeetingCard> createState() => _MeetingCardState();
 }
@@ -51,13 +60,13 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
   Color _getStatusBgColor(MeetingStatus status) {
     switch (status) {
       case MeetingStatus.initiated:
-        return const Color(0xFFFEF5E5);
+        return AppColors.lightGoldenBg;
       case MeetingStatus.completed:
         return AppColors.softMint;
-      case MeetingStatus.reviewer:
+      case MeetingStatus.revision:
         return const Color(0xFFFFEAE0);
       case MeetingStatus.upcoming:
-        return const Color(0xFFE0E7F8);
+        return AppColors.blueIce;
     }
   }
 
@@ -66,12 +75,24 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
       case MeetingStatus.initiated:
         return const Color(0xFF8A5C1F);
       case MeetingStatus.completed:
-        return const Color(0xFF2F855A);
-      case MeetingStatus.reviewer:
-        return const Color(0xFFFF9D25);
+        return AppColors.greenForest;
+      case MeetingStatus.revision:
+        return AppColors.orangeBright;
       case MeetingStatus.upcoming:
-        return const Color(0xFF2D66D2);
+        return AppColors.blueRoyal;
     }
+  }
+
+  /// Current user's RSVP state on this meeting, or `null` when they aren't a
+  /// listed participant (or haven't responded yet). Used to gate the
+  /// Accept/Reject buttons and surface a "Your Response: ..." status line.
+  MeetingResponse? get _myRsvp {
+    final me = ref.read(currentUserIdProvider);
+    if (me == null) return null;
+    for (final p in widget.meeting.participants) {
+      if (p.id == me) return p.rsvpStatus;
+    }
+    return null;
   }
 
   Widget _buildOverlappingAvatars(List<MeetingParticipant> participants) {
@@ -280,47 +301,58 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
                     ),
                   ),
                   const Spacer(),
-                  Switch(
+                  AppToggleSwitch(
                     value: _syncMeeting,
-                    onChanged: (val) {
-                      setState(() {
-                        _syncMeeting = val;
-                      });
-                    },
-                    activeTrackColor: AppColors.primary,
-                    activeThumbColor: Colors.white,
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor:
-                        AppColors.textPrimary.withValues(alpha: 0.08),
-                    trackOutlineColor:
-                        WidgetStateProperty.all(Colors.transparent),
+                    onChanged: (val) => setState(() => _syncMeeting = val),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
 
-              // 6a. Accept / Reject row (CP invitation response).
+              // 6a. RSVP — status line + Accept / Reject buttons.
+              // Once the user has responded, hide the matching action button
+              // (Accept once accepted, Reject once declined) and show a
+              // "Your Response: ..." label so they can flip the answer with
+              // the remaining button.
               if (_showRsvp) ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: _RsvpButton(
-                        label: 'Accept',
-                        backgroundColor: const Color(0xFFD8FDE6),
-                        textColor: const Color(0xFF1DAA23),
-                        onTap: widget.onAccept!,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _RsvpButton(
-                        label: 'Reject',
-                        backgroundColor: const Color(0xFFEECCC9),
-                        textColor: const Color(0xFFD33732),
-                        onTap: widget.onReject!,
-                      ),
-                    ),
-                  ],
+                if (_myRsvp == MeetingResponse.accepted ||
+                    _myRsvp == MeetingResponse.declined) ...[
+                  _ResponseStatusLine(rsvp: _myRsvp!),
+                  const SizedBox(height: 12),
+                ],
+                Builder(
+                  builder: (_) {
+                    final showAccept = _myRsvp != MeetingResponse.accepted;
+                    final showReject = _myRsvp != MeetingResponse.declined;
+                    final accept = _RsvpButton(
+                      label: 'Accept',
+                      backgroundColor: const Color(0xFFD8FDE6),
+                      textColor: AppColors.greenBright,
+                      onTap: widget.onAccept!,
+                      loading: widget.rsvpPending,
+                    );
+                    final reject = _RsvpButton(
+                      label: 'Reject',
+                      backgroundColor: const Color(0xFFEECCC9),
+                      textColor: const Color(0xFFD33732),
+                      onTap: widget.onReject!,
+                      loading: widget.rsvpPending,
+                    );
+                    // Single visible button always sits in the left half so
+                    // it never drifts to the right column.
+                    final Widget left = showAccept ? accept : reject;
+                    final bool showBoth = showAccept && showReject;
+                    return Row(
+                      children: [
+                        Expanded(child: left),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child:
+                              showBoth ? reject : const SizedBox.shrink(),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
               ],
@@ -393,20 +425,23 @@ class _RsvpButton extends StatelessWidget {
     required this.backgroundColor,
     required this.textColor,
     required this.onTap,
+    this.loading = false,
   });
 
   final String label;
   final Color backgroundColor;
   final Color textColor;
   final VoidCallback onTap;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
       label: label,
+      enabled: !loading,
       child: InkWell(
-        onTap: onTap,
+        onTap: loading ? null : onTap,
         borderRadius: BorderRadius.circular(24),
         child: Container(
           height: 28,
@@ -415,16 +450,67 @@ class _RsvpButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: AppTextStyles.buttonMedium.copyWith(
-              color: textColor,
-              fontFamily: 'Outfit',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: loading
+              ? SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(textColor),
+                  ),
+                )
+              : Text(
+                  label,
+                  style: AppTextStyles.buttonMedium.copyWith(
+                    color: textColor,
+                    fontFamily: 'Outfit',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
       ),
+    );
+  }
+}
+
+class _ResponseStatusLine extends StatelessWidget {
+  const _ResponseStatusLine({required this.rsvp});
+
+  final MeetingResponse rsvp;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAccepted = rsvp == MeetingResponse.accepted;
+    final color = isAccepted
+        ? AppColors.greenBright
+        : const Color(0xFFD33732);
+    final label = isAccepted ? 'Accepted' : 'Rejected';
+    return Row(
+      children: [
+        Icon(
+          isAccepted ? Icons.check_circle_outline : Icons.cancel_outlined,
+          size: 16,
+          color: color,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'Your Response: ',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+            fontFamily: 'Outfit',
+            fontSize: 12,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: color,
+            fontFamily: 'Outfit',
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 }

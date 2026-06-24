@@ -47,7 +47,7 @@ void main() {
   });
 
   group('statusToServer', () {
-    test('upcoming/initiated/reviewer → pending', () {
+    test('upcoming/initiated/revision → pending', () {
       expect(
         MeetingEnumMapper.statusToServer(MeetingStatus.upcoming),
         'pending',
@@ -57,7 +57,7 @@ void main() {
         'pending',
       );
       expect(
-        MeetingEnumMapper.statusToServer(MeetingStatus.reviewer),
+        MeetingEnumMapper.statusToServer(MeetingStatus.revision),
         'pending',
       );
     });

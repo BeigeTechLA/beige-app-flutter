@@ -10,6 +10,9 @@ import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
+import '../../../../shared/widgets/top_message.dart';
+import '../../domain/models/meeting.dart';
+import '../providers/meeting_response_notifier.dart';
 import '../providers/meetings_list_notifier.dart';
 import '../providers/meetings_list_state.dart';
 import '../util/launch_meeting_link.dart';
@@ -36,14 +39,23 @@ class MeetingsScreen extends ConsumerWidget {
   void _onCardTap(BuildContext context, String meetingId) {
     showMeetingDetailsSheet(context, meetingId: meetingId);
   }
-  void _onRsvp(BuildContext context, {required bool accept}) {
-    // RSVP endpoint not wired yet — see BOOKING_FEATURES_GUIDELINES.md §3.3.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(accept ? 'Meeting accepted' : 'Meeting rejected'),
-      ),
+
+  Future<void> _onRsvp(
+    BuildContext context,
+    WidgetRef ref, {
+    required Meeting meeting,
+    required bool accept,
+  }) async {
+    final notifier = ref.read(
+      meetingResponseNotifierProvider(meeting.id).notifier,
     );
+    if (accept) {
+      await notifier.accept();
+    } else {
+      await notifier.decline();
+    }
   }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(meetingsListNotifierProvider);
@@ -95,7 +107,8 @@ class MeetingsScreen extends ConsumerWidget {
                   state: state,
                   onTap: _onCardTap,
                   onJoin: _onJoin,
-                  onRsvp: _onRsvp,
+                  onRsvp: (m, accept) =>
+                      _onRsvp(context, ref, meeting: m, accept: accept),
                   onRetry: notifier.refresh,
                 ),
               ),
@@ -126,7 +139,7 @@ class MeetingsScreen extends ConsumerWidget {
   }
 }
 
-class _ListBody extends StatelessWidget {
+class _ListBody extends ConsumerWidget {
   const _ListBody({
     required this.state,
     required this.onTap,
@@ -138,11 +151,11 @@ class _ListBody extends StatelessWidget {
   final MeetingsListState state;
   final void Function(BuildContext, String meetingId) onTap;
   final void Function(BuildContext, String link) onJoin;
-  final void Function(BuildContext, {required bool accept}) onRsvp;
+  final void Function(Meeting meeting, bool accept) onRsvp;
   final Future<void> Function() onRetry;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (state.status == MeetingsListStatus.loading && state.items.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -221,14 +234,72 @@ class _ListBody extends StatelessWidget {
       separatorBuilder: (_, __) => AppSpacing.verticalMd,
       itemBuilder: (context, i) {
         final m = state.items[i];
-        return MeetingCard(
+        return _MeetingCardSlot(
           meeting: m,
           onTap: () => onTap(context, m.id),
           onJoin: () => onJoin(context, m.link),
-          onAccept: () => onRsvp(context, accept: true),
-          onReject: () => onRsvp(context, accept: false),
+          onAccept: () => onRsvp(m, true),
+          onReject: () => onRsvp(m, false),
         );
       },
+    );
+  }
+}
+
+/// Wraps [MeetingCard] with the per-meeting response notifier so the
+/// in-flight Accept/Reject state stays local to the card and the list-level
+/// refresh fires on a successful submission.
+class _MeetingCardSlot extends ConsumerWidget {
+  const _MeetingCardSlot({
+    required this.meeting,
+    required this.onTap,
+    required this.onJoin,
+    required this.onAccept,
+    required this.onReject,
+  });
+
+  final Meeting meeting;
+  final VoidCallback onTap;
+  final VoidCallback onJoin;
+  final VoidCallback onAccept;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<MeetingResponseState>(
+      meetingResponseNotifierProvider(meeting.id),
+      (prev, next) {
+        if (prev?.status == next.status) return;
+        switch (next.status) {
+          case MeetingResponseStatus.accepted:
+            TopMessage.show(
+              context,
+              'Meeting accepted',
+              type: TopMessageType.success,
+            );
+            ref.read(meetingsListNotifierProvider.notifier).refresh();
+          case MeetingResponseStatus.declined:
+            TopMessage.show(context, 'Meeting rejected');
+            ref.read(meetingsListNotifierProvider.notifier).refresh();
+          case MeetingResponseStatus.error:
+            TopMessage.show(
+              context,
+              next.error ?? 'Could not submit response',
+            );
+          case _:
+            break;
+        }
+      },
+    );
+    final responseState =
+        ref.watch(meetingResponseNotifierProvider(meeting.id));
+    return MeetingCard(
+      meeting: meeting,
+      onTap: onTap,
+      onJoin: onJoin,
+      onAccept: onAccept,
+      onReject: onReject,
+      rsvpPending: responseState.isSubmitting,
     );
   }
 }
