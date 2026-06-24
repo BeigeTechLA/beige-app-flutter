@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'meeting_category.dart';
 import 'meeting_participant.dart';
 import 'meeting_platform.dart';
+import 'meeting_response.dart';
 import 'meeting_status.dart';
 
 @immutable
@@ -27,6 +28,16 @@ class Meeting {
   /// cancel buttons render only when this matches `currentUserId`).
   final String? createdById;
 
+  /// Per-user RSVP map, keyed by userId (stringified). Mirrors the server
+  /// `participant_responses` array — entry shape: `{ user_id, response }`.
+  /// Unknown / unmapped values are dropped at the DTO boundary.
+  final Map<String, MeetingResponse> participantResponses;
+
+  /// Current logged-in user's response if present in [participantResponses].
+  /// Resolved at the DTO boundary against the session userId so UI layers
+  /// don't need to look up the session themselves.
+  final MeetingResponse? myResponse;
+
   const Meeting({
     required this.id,
     required this.title,
@@ -42,6 +53,8 @@ class Meeting {
     required this.agenda,
     required this.participants,
     this.createdById,
+    this.participantResponses = const {},
+    this.myResponse,
   });
 
   Meeting copyWith({
@@ -59,6 +72,9 @@ class Meeting {
     List<String>? agenda,
     List<MeetingParticipant>? participants,
     String? createdById,
+    Map<String, MeetingResponse>? participantResponses,
+    MeetingResponse? myResponse,
+    bool clearMyResponse = false,
   }) {
     return Meeting(
       id: id ?? this.id,
@@ -75,6 +91,8 @@ class Meeting {
       agenda: agenda ?? this.agenda,
       participants: participants ?? this.participants,
       createdById: createdById ?? this.createdById,
+      participantResponses: participantResponses ?? this.participantResponses,
+      myResponse: clearMyResponse ? null : (myResponse ?? this.myResponse),
     );
   }
 }

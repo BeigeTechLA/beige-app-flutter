@@ -20,7 +20,6 @@ import '../providers/meeting_details_providers.dart';
 import '../providers/meetings_list_notifier.dart';
 import '../util/launch_meeting_link.dart';
 import 'meeting_participant_tile.dart';
-import 'meeting_rsvp_buttons.dart';
 
 Future<void> showMeetingDetailsSheet(
   BuildContext context, {
@@ -155,17 +154,10 @@ class _DetailsBody extends ConsumerWidget {
   String get _dateTimeLabel =>
       '${_dateFmt.format(meeting.startAt)}, ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
 
-  /// Current user's RSVP state on this meeting, or `null` when they aren't a
-  /// listed participant. Used to surface the "(Accepted)" / "(Rejected)"
-  /// label under the title.
-  MeetingResponse? _myRsvp(WidgetRef ref) {
-    final me = ref.read(currentUserIdProvider);
-    if (me == null) return null;
-    for (final p in meeting.participants) {
-      if (p.id == me) return p.rsvpStatus;
-    }
-    return null;
-  }
+  /// Current user's RSVP — precomputed at the DTO boundary from the
+  /// meeting-level `participant_responses[]` array against the session id.
+  /// `null` when the user has not responded yet.
+  MeetingResponse? get _myRsvp => meeting.myResponse;
 
   void _onEdit(BuildContext context) {
     Navigator.of(context).pop();
@@ -257,7 +249,7 @@ class _DetailsBody extends ConsumerWidget {
     );
 
     final cancelling = cancelState.status == CancelMeetingStatus.submitting;
-    final myRsvp = _myRsvp(ref);
+    final myRsvp = _myRsvp;
     final agendaText = meeting.description.isNotEmpty
         ? meeting.description
         : meeting.agenda.join('\n');
@@ -368,8 +360,6 @@ class _DetailsBody extends ConsumerWidget {
                     MeetingParticipantTile(participant: p),
                     AppSpacing.verticalSm,
                   ],
-                  AppSpacing.verticalBase,
-                  MeetingRsvpButtons(meeting: meeting),
                   AppSpacing.verticalXl,
                 ],
               ),

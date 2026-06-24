@@ -70,7 +70,9 @@ class MeetingsRemoteSource {
       );
       final raw = resp.data;
       final rawList = _unwrapResults(raw);
-      final items = rawList.map(MeetingDto.fromRestJson).toList(growable: false);
+      final items = rawList
+          .map((m) => MeetingDto.fromRestJson(m, currentUserId: userId))
+          .toList(growable: false);
       return MeetingsPage(
         items: items,
         hasMore: _hasMoreFromEnvelope(raw, page: page, limit: limit),
@@ -80,8 +82,12 @@ class MeetingsRemoteSource {
 
   Future<Meeting> getById(String id) {
     return _guard(() async {
+      final userId = await _currentUserId();
       final resp = await _dio.get<dynamic>(ApiEndpoints.meetingById(id));
-      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
+      return MeetingDto.fromRestJson(
+        _unwrapItem(resp.data),
+        currentUserId: userId,
+      );
     });
   }
 
@@ -119,7 +125,10 @@ class MeetingsRemoteSource {
         ApiEndpoints.meetings,
         data: body,
       );
-      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
+      return MeetingDto.fromRestJson(
+        _unwrapItem(resp.data),
+        currentUserId: user?.id ?? '',
+      );
     });
   }
 
@@ -131,6 +140,7 @@ class MeetingsRemoteSource {
   /// behavior does not depend on backend ignoring an unknown role.
   Future<Meeting> addParticipants(String meetingId, List<String> userIds) {
     return _guard(() async {
+      final currentUserId = await _currentUserId();
       final resp = await _dio.post<dynamic>(
         ApiEndpoints.meetingParticipants(meetingId),
         data: {
@@ -138,7 +148,10 @@ class MeetingsRemoteSource {
           'user_ids': userIds,
         },
       );
-      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
+      return MeetingDto.fromRestJson(
+        _unwrapItem(resp.data),
+        currentUserId: currentUserId,
+      );
     });
   }
 
@@ -147,12 +160,16 @@ class MeetingsRemoteSource {
   /// `duration` is stripped defensively — server recomputes from start/end.
   Future<Meeting> update(String id, Map<String, dynamic> patch) {
     return _guard(() async {
+      final currentUserId = await _currentUserId();
       final body = Map<String, dynamic>.of(patch)..remove('duration');
       final resp = await _dio.patch<dynamic>(
         ApiEndpoints.meetingById(id),
         data: body,
       );
-      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
+      return MeetingDto.fromRestJson(
+        _unwrapItem(resp.data),
+        currentUserId: currentUserId,
+      );
     });
   }
 
@@ -166,12 +183,23 @@ class MeetingsRemoteSource {
   /// payload in the same shape as `getById`.
   Future<Meeting> respond(String id, MeetingResponse response) {
     return _guard(() async {
+      final currentUserId = await _currentUserId();
       final resp = await _dio.patch<dynamic>(
         ApiEndpoints.meetingRespond(id),
         data: {'response': response.serverValue},
       );
-      return MeetingDto.fromRestJson(_unwrapItem(resp.data));
+      return MeetingDto.fromRestJson(
+        _unwrapItem(resp.data),
+        currentUserId: currentUserId,
+      );
     });
+  }
+
+  /// Reads the session user id once per call. Empty string when no user is in
+  /// session — MeetingDto treats empty as "skip myResponse resolution".
+  Future<String> _currentUserId() async {
+    final user = await _session.readUser();
+    return user?.id ?? '';
   }
 
   // ───── envelope helpers ────────────────────────────────────────────────

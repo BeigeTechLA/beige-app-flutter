@@ -12,7 +12,7 @@ import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
 import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting.dart';
-import '../providers/meeting_response_notifier.dart';
+import '../../domain/models/meeting_response.dart';
 import '../providers/meetings_list_notifier.dart';
 import '../providers/meetings_list_state.dart';
 import '../util/launch_meeting_link.dart';
@@ -43,16 +43,21 @@ class MeetingsScreen extends ConsumerWidget {
   Future<void> _onRsvp(
     BuildContext context,
     WidgetRef ref, {
-    required Meeting meeting,
+    required String meetingId,
     required bool accept,
   }) async {
-    final notifier = ref.read(
-      meetingResponseNotifierProvider(meeting.id).notifier,
+    final notifier = ref.read(meetingsListNotifierProvider.notifier);
+    final ok = await notifier.respond(
+      meetingId,
+      accept ? MeetingResponse.accepted : MeetingResponse.declined,
     );
-    if (accept) {
-      await notifier.accept();
-    } else {
-      await notifier.decline();
+    if (!context.mounted) return;
+    if (ok) {
+      TopMessage.show(
+        context,
+        accept ? 'Meeting accepted' : 'Meeting rejected',
+        type: accept ? TopMessageType.success : TopMessageType.error,
+      );
     }
   }
 
@@ -61,6 +66,15 @@ class MeetingsScreen extends ConsumerWidget {
     final state = ref.watch(meetingsListNotifierProvider);
     final notifier = ref.read(meetingsListNotifierProvider.notifier);
 
+    ref.listen<String?>(
+      meetingsListNotifierProvider.select((s) => s.rsvpError),
+      (prev, next) {
+        if (next == null || next == prev) return;
+        TopMessage.show(context, next);
+        notifier.clearRsvpError();
+      },
+    );
+
     return AppScaffold(
       hasAppBar: false,
       body: SafeArea(
@@ -68,24 +82,30 @@ class MeetingsScreen extends ConsumerWidget {
           children: [
             AppMainToolbar(
               title: 'Meetings',
-              trailing: Stack(
-                alignment: Alignment.topRight,
-                children: [
-                  IconButton(
-                    tooltip: 'Filter meetings',
-                    onPressed: () => _openFilter(context, ref),
-                    icon: const Icon(
-                      Icons.tune_rounded,
-                      color: AppColors.textPrimary,
+              trailing: Visibility(
+                visible: false,
+                maintainSize: false,
+                maintainAnimation: false,
+                maintainState: false,
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    IconButton(
+                      tooltip: 'Filter meetings',
+                      onPressed: () => _openFilter(context, ref),
+                      icon: const Icon(
+                        Icons.tune_rounded,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  if (state.isFiltered)
-                    const Positioned(
-                      top: 10,
-                      right: 10,
-                      child: _FilterDot(),
-                    ),
-                ],
+                    if (state.isFiltered)
+                      const Positioned(
+                        top: 10,
+                        right: 10,
+                        child: _FilterDot(),
+                      ),
+                  ],
+                ),
               ),
             ),
             Padding(
@@ -108,7 +128,7 @@ class MeetingsScreen extends ConsumerWidget {
                   onTap: _onCardTap,
                   onJoin: _onJoin,
                   onRsvp: (m, accept) =>
-                      _onRsvp(context, ref, meeting: m, accept: accept),
+                      _onRsvp(context, ref, meetingId: m.id, accept: accept),
                   onRetry: notifier.refresh,
                 ),
               ),
@@ -139,7 +159,7 @@ class MeetingsScreen extends ConsumerWidget {
   }
 }
 
-class _ListBody extends ConsumerWidget {
+class _ListBody extends StatelessWidget {
   const _ListBody({
     required this.state,
     required this.onTap,
@@ -155,7 +175,7 @@ class _ListBody extends ConsumerWidget {
   final Future<void> Function() onRetry;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     if (state.status == MeetingsListStatus.loading && state.items.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -234,72 +254,15 @@ class _ListBody extends ConsumerWidget {
       separatorBuilder: (_, __) => AppSpacing.verticalMd,
       itemBuilder: (context, i) {
         final m = state.items[i];
-        return _MeetingCardSlot(
+        return MeetingCard(
           meeting: m,
           onTap: () => onTap(context, m.id),
           onJoin: () => onJoin(context, m.link),
           onAccept: () => onRsvp(m, true),
           onReject: () => onRsvp(m, false),
+          rsvpPending: state.isRsvpPending(m.id),
         );
       },
-    );
-  }
-}
-
-/// Wraps [MeetingCard] with the per-meeting response notifier so the
-/// in-flight Accept/Reject state stays local to the card and the list-level
-/// refresh fires on a successful submission.
-class _MeetingCardSlot extends ConsumerWidget {
-  const _MeetingCardSlot({
-    required this.meeting,
-    required this.onTap,
-    required this.onJoin,
-    required this.onAccept,
-    required this.onReject,
-  });
-
-  final Meeting meeting;
-  final VoidCallback onTap;
-  final VoidCallback onJoin;
-  final VoidCallback onAccept;
-  final VoidCallback onReject;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<MeetingResponseState>(
-      meetingResponseNotifierProvider(meeting.id),
-      (prev, next) {
-        if (prev?.status == next.status) return;
-        switch (next.status) {
-          case MeetingResponseStatus.accepted:
-            TopMessage.show(
-              context,
-              'Meeting accepted',
-              type: TopMessageType.success,
-            );
-            ref.read(meetingsListNotifierProvider.notifier).refresh();
-          case MeetingResponseStatus.declined:
-            TopMessage.show(context, 'Meeting rejected');
-            ref.read(meetingsListNotifierProvider.notifier).refresh();
-          case MeetingResponseStatus.error:
-            TopMessage.show(
-              context,
-              next.error ?? 'Could not submit response',
-            );
-          case _:
-            break;
-        }
-      },
-    );
-    final responseState =
-        ref.watch(meetingResponseNotifierProvider(meeting.id));
-    return MeetingCard(
-      meeting: meeting,
-      onTap: onTap,
-      onJoin: onJoin,
-      onAccept: onAccept,
-      onReject: onReject,
-      rsvpPending: responseState.isSubmitting,
     );
   }
 }

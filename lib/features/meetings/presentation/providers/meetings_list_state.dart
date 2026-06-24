@@ -25,6 +25,15 @@ class MeetingsListState {
   /// Id of the signed-in user. Null when logged out.
   final String? currentUserId;
 
+  /// Meeting ids with an in-flight Accept/Reject call. Card uses
+  /// [isRsvpPending] to render the spinner + disable both buttons.
+  final Set<String> pendingRsvpIds;
+
+  /// One-shot error from the last RSVP submit. Screen consumes via
+  /// `ref.listen` and calls [MeetingsListNotifier.clearRsvpError] after
+  /// surfacing the toast.
+  final String? rsvpError;
+
   const MeetingsListState({
     this.tab = MeetingsTab.upcoming,
     this.filter = MeetingFilter.empty,
@@ -33,9 +42,13 @@ class MeetingsListState {
     this.items = const [],
     this.error,
     this.currentUserId,
+    this.pendingRsvpIds = const {},
+    this.rsvpError,
   });
 
   bool get isFiltered => !filter.isEmpty;
+
+  bool isRsvpPending(String meetingId) => pendingRsvpIds.contains(meetingId);
 
   MeetingsListState copyWith({
     MeetingsTab? tab,
@@ -45,7 +58,10 @@ class MeetingsListState {
     List<Meeting>? items,
     String? error,
     String? currentUserId,
+    Set<String>? pendingRsvpIds,
+    String? rsvpError,
     bool clearError = false,
+    bool clearRsvpError = false,
   }) {
     return MeetingsListState(
       tab: tab ?? this.tab,
@@ -55,6 +71,8 @@ class MeetingsListState {
       items: items ?? this.items,
       error: clearError ? null : (error ?? this.error),
       currentUserId: currentUserId ?? this.currentUserId,
+      pendingRsvpIds: pendingRsvpIds ?? this.pendingRsvpIds,
+      rsvpError: clearRsvpError ? null : (rsvpError ?? this.rsvpError),
     );
   }
 }

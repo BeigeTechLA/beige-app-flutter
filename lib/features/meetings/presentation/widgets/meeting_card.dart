@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
-import '../../../../core/providers/current_user_provider.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_toggle_switch.dart';
 import '../../domain/models/meeting.dart';
@@ -17,7 +15,7 @@ import '../../domain/util/can_rsvp.dart';
 /// Single meeting summary card — title, platform chip, date/time meta,
 /// participants, and a full-width Join CTA. Tap anywhere outside the CTA opens
 /// the meeting-details bottom sheet (wired by parent).
-class MeetingCard extends ConsumerStatefulWidget {
+class MeetingCard extends StatefulWidget {
   const MeetingCard({
     super.key,
     required this.meeting,
@@ -39,10 +37,10 @@ class MeetingCard extends ConsumerStatefulWidget {
   final bool rsvpPending;
 
   @override
-  ConsumerState<MeetingCard> createState() => _MeetingCardState();
+  State<MeetingCard> createState() => _MeetingCardState();
 }
 
-class _MeetingCardState extends ConsumerState<MeetingCard> {
+class _MeetingCardState extends State<MeetingCard> {
   bool _syncMeeting = true;
 
   static final _date = DateFormat('dd MMM,yyyy');
@@ -83,17 +81,10 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
     }
   }
 
-  /// Current user's RSVP state on this meeting, or `null` when they aren't a
-  /// listed participant (or haven't responded yet). Used to gate the
-  /// Accept/Reject buttons and surface a "Your Response: ..." status line.
-  MeetingResponse? get _myRsvp {
-    final me = ref.read(currentUserIdProvider);
-    if (me == null) return null;
-    for (final p in widget.meeting.participants) {
-      if (p.id == me) return p.rsvpStatus;
-    }
-    return null;
-  }
+  /// Current user's RSVP — precomputed at the DTO boundary from the
+  /// meeting-level `participant_responses[]` array against the session id.
+  /// `null` when the user has not responded yet.
+  MeetingResponse? get _myRsvp => widget.meeting.myResponse;
 
   Widget _buildOverlappingAvatars(List<MeetingParticipant> participants) {
     if (participants.isEmpty) return const SizedBox.shrink();
@@ -317,7 +308,7 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
               if (_showRsvp) ...[
                 if (_myRsvp == MeetingResponse.accepted ||
                     _myRsvp == MeetingResponse.declined) ...[
-                  _ResponseStatusLine(rsvp: _myRsvp!),
+                  _ResponseStatusLine(response: _myRsvp!),
                   const SizedBox(height: 12),
                 ],
                 Builder(
@@ -474,15 +465,15 @@ class _RsvpButton extends StatelessWidget {
 }
 
 class _ResponseStatusLine extends StatelessWidget {
-  const _ResponseStatusLine({required this.rsvp});
+  const _ResponseStatusLine({required this.response});
 
-  final MeetingResponse rsvp;
+  final MeetingResponse response;
 
   @override
   Widget build(BuildContext context) {
-    final isAccepted = rsvp == MeetingResponse.accepted;
+    final isAccepted = response == MeetingResponse.accepted;
     final color = isAccepted
-        ? AppColors.greenBright
+        ? const Color(0xFF1DAA23)
         : const Color(0xFFD33732);
     final label = isAccepted ? 'Accepted' : 'Rejected';
     return Row(

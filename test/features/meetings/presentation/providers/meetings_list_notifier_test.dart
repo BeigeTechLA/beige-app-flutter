@@ -36,11 +36,21 @@ Meeting _m(String id, {MeetingStatus status = MeetingStatus.upcoming}) =>
     );
 
 class _FakeRepo implements MeetingsRepository {
-  _FakeRepo({this.items = const [], this.throws});
+  _FakeRepo({
+    this.items = const [],
+    this.throws,
+    this.respondThrows,
+    this.respondResult,
+  });
 
   final List<Meeting> items;
   final Object? throws;
+  final Object? respondThrows;
+  final Meeting? respondResult;
   int listCalls = 0;
+  int respondCalls = 0;
+  String? lastRespondId;
+  MeetingResponse? lastRespondValue;
 
   @override
   Future<List<Meeting>> list({
@@ -72,8 +82,13 @@ class _FakeRepo implements MeetingsRepository {
       throw UnimplementedError();
 
   @override
-  Future<Meeting> respond(String id, MeetingResponse response) async =>
-      throw UnimplementedError();
+  Future<Meeting> respond(String id, MeetingResponse response) async {
+    respondCalls += 1;
+    lastRespondId = id;
+    lastRespondValue = response;
+    if (respondThrows != null) throw respondThrows!;
+    return respondResult ?? items.firstWhere((m) => m.id == id);
+  }
 }
 
 Future<ProviderContainer> _buildContainer({
@@ -171,5 +186,88 @@ void main() {
     // No second fetch — filter applied locally.
     expect(repo.listCalls, 1);
     expect(container.read(meetingsListNotifierProvider).isFiltered, true);
+  });
+
+  test('respond patches the matching item in place + clears pending id',
+      () async {
+    final original = _m('a');
+    final updated = original.copyWith(status: MeetingStatus.completed);
+    final repo = _FakeRepo(items: [original], respondResult: updated);
+    final container = await _buildContainer(repo: repo);
+    addTearDown(container.dispose);
+
+    container.listen(meetingsListNotifierProvider, (_, __) {});
+    await Future<void>.delayed(Duration.zero);
+
+    final notifier = container.read(meetingsListNotifierProvider.notifier);
+    final ok = await notifier.respond('a', MeetingResponse.accepted);
+
+    expect(ok, true);
+    expect(repo.respondCalls, 1);
+    expect(repo.lastRespondId, 'a');
+    expect(repo.lastRespondValue, MeetingResponse.accepted);
+
+    final state = container.read(meetingsListNotifierProvider);
+    expect(state.allItems.single.status, MeetingStatus.completed);
+    expect(state.isRsvpPending('a'), false);
+    expect(state.rsvpError, isNull);
+  });
+
+  test('respond re-entrant call is ignored while first is in flight',
+      () async {
+    final repo = _FakeRepo(items: [_m('a')]);
+    final container = await _buildContainer(repo: repo);
+    addTearDown(container.dispose);
+
+    container.listen(meetingsListNotifierProvider, (_, __) {});
+    await Future<void>.delayed(Duration.zero);
+
+    final notifier = container.read(meetingsListNotifierProvider.notifier);
+    final first = notifier.respond('a', MeetingResponse.accepted);
+    final second = notifier.respond('a', MeetingResponse.declined);
+    final results = await Future.wait([first, second]);
+
+    expect(results, [true, false]);
+    expect(repo.respondCalls, 1);
+  });
+
+  test('respond failure surfaces error + clears pending id', () async {
+    final repo = _FakeRepo(
+      items: [_m('a')],
+      respondThrows: const ServerException(message: 'boom'),
+    );
+    final container = await _buildContainer(repo: repo);
+    addTearDown(container.dispose);
+
+    container.listen(meetingsListNotifierProvider, (_, __) {});
+    await Future<void>.delayed(Duration.zero);
+
+    final notifier = container.read(meetingsListNotifierProvider.notifier);
+    final ok = await notifier.respond('a', MeetingResponse.accepted);
+
+    expect(ok, false);
+    final state = container.read(meetingsListNotifierProvider);
+    expect(state.isRsvpPending('a'), false);
+    expect(state.rsvpError, 'boom');
+
+    notifier.clearRsvpError();
+    expect(container.read(meetingsListNotifierProvider).rsvpError, isNull);
+  });
+
+  test('respond UnauthorizedException flips auth state to false', () async {
+    final repo = _FakeRepo(
+      items: [_m('a')],
+      respondThrows: const UnauthorizedException(message: 'expired'),
+    );
+    final container = await _buildContainer(repo: repo);
+    addTearDown(container.dispose);
+
+    container.listen(meetingsListNotifierProvider, (_, __) {});
+    await Future<void>.delayed(Duration.zero);
+
+    final notifier = container.read(meetingsListNotifierProvider.notifier);
+    await notifier.respond('a', MeetingResponse.accepted);
+
+    expect(container.read(authStateProvider), false);
   });
 }

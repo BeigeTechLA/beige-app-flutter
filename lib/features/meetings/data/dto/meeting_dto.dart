@@ -1,5 +1,6 @@
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
+import '../../domain/models/meeting_response.dart';
 import '../mappers/meeting_enum_mapper.dart';
 import 'meeting_user_dto.dart';
 
@@ -9,17 +10,30 @@ import 'meeting_user_dto.dart';
 ///   - `POST /external-meetings` (create response)
 ///   - `POST /external-meetings/:id/participants` (full updated)
 ///   - `PATCH /external-meetings/:id` (full updated)
+///   - `PATCH /external-meetings/:id/respond` (full updated)
 ///
 /// Nullables observed in live data: `description`, `client`, `admin`,
 /// `created_by`, `change_request`, `order`. Each guarded individually.
+///
+/// Per-user RSVP state lives in the meeting-level `participant_responses[]`
+/// array — NOT inside the User sub-object on `participants[]`. The current
+/// viewer's response is precomputed into [Meeting.myResponse] using the
+/// session-resolved [currentUserId] so the UI doesn't need to look it up.
 class MeetingDto {
-  static Meeting fromRestJson(Map<String, dynamic> json) {
+  /// [currentUserId] is the session-resolved user id used to populate
+  /// `myResponse` from the `participant_responses` array. Pass empty when no
+  /// user is in session — caller already guards against that for list calls.
+  static Meeting fromRestJson(
+    Map<String, dynamic> json, {
+    String currentUserId = '',
+  }) {
     final order = json['order'];
     final projectName = order is Map<String, dynamic>
         ? (order['name'] as String?) ?? ''
         : '';
 
     final link = (json['meetLink'] ?? json['meet_link'] ?? '') as String;
+    final responses = _readParticipantResponses(json['participant_responses']);
 
     return Meeting(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
@@ -42,6 +56,8 @@ class MeetingDto {
       agenda: const <String>[],
       participants: _readParticipants(json['participants']),
       createdById: _readCreatedById(json['created_by']),
+      participantResponses: responses,
+      myResponse: currentUserId.isEmpty ? null : responses[currentUserId],
     );
   }
 
@@ -66,6 +82,21 @@ class MeetingDto {
         .whereType<Map<String, dynamic>>()
         .map(MeetingUserDto.fromRestJson)
         .toList(growable: false);
+  }
+
+  /// Server shape: `participant_responses: [{ user_id, response }]`.
+  /// Unknown response strings are dropped (treated as no response).
+  static Map<String, MeetingResponse> _readParticipantResponses(Object? raw) {
+    if (raw is! List) return const {};
+    final out = <String, MeetingResponse>{};
+    for (final entry in raw) {
+      if (entry is! Map<String, dynamic>) continue;
+      final userId = (entry['user_id'] ?? entry['userId'] ?? '').toString();
+      if (userId.isEmpty) continue;
+      final r = rsvpFromServer(entry['response'] as String?);
+      if (r != null && r != MeetingResponse.pending) out[userId] = r;
+    }
+    return out;
   }
 
   /// Server emits ISO 8601 UTC with `Z` suffix. Convert to local for display

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/current_user_provider.dart';
+import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
+import '../../domain/models/meeting_response.dart';
 import '../../domain/models/meetings_tab.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'meetings_list_state.dart';
@@ -84,6 +86,58 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
   }
 
   Future<void> refresh() => _load();
+
+  /// RSVP — call server, mark id pending while in-flight, patch the item
+  /// in `allItems` + `items` on success, surface error via `rsvpError`
+  /// otherwise.
+  ///
+  /// Re-entrancy guarded: ignores a second call for the same meeting while
+  /// the first is in flight.
+  Future<bool> respond(String meetingId, MeetingResponse response) async {
+    if (state.pendingRsvpIds.contains(meetingId)) return false;
+
+    state = state.copyWith(
+      pendingRsvpIds: {...state.pendingRsvpIds, meetingId},
+      clearRsvpError: true,
+    );
+
+    try {
+      final updated = await _repo.respond(meetingId, response);
+      final nextAll = _replaceItem(state.allItems, updated);
+      state = state.copyWith(
+        allItems: nextAll,
+        items: applyLocalMeetingFilters(
+          nextAll,
+          tab: state.tab,
+          filter: state.filter,
+        ),
+        pendingRsvpIds: state.pendingRsvpIds.difference({meetingId}),
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        pendingRsvpIds: state.pendingRsvpIds.difference({meetingId}),
+        rsvpError: _messageFor(e),
+      );
+      if (e is UnauthorizedException) {
+        ref.read(authStateProvider.notifier).updateState(false);
+      }
+      return false;
+    }
+  }
+
+  void clearRsvpError() {
+    if (state.rsvpError == null) return;
+    state = state.copyWith(clearRsvpError: true);
+  }
+
+  List<Meeting> _replaceItem(List<Meeting> items, Meeting updated) {
+    final idx = items.indexWhere((m) => m.id == updated.id);
+    if (idx < 0) return items;
+    final next = List<Meeting>.of(items);
+    next[idx] = updated;
+    return next;
+  }
 }
 
 final meetingsListNotifierProvider =
