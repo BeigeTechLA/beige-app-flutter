@@ -1,3 +1,4 @@
+import '../../../../config/env.dart';
 import '../../domain/entities/conversation.dart';
 
 class ConversationDto {
@@ -53,7 +54,9 @@ class ConversationDto {
     for (final item in raw) {
       if (item is Map) {
         final v = item['profileImage'] ?? item['profile_image'] ?? item['avatar_url'];
-        if (v is String && v.isNotEmpty) return v;
+        if (v is String && v.isNotEmpty) {
+          return v.startsWith('http') ? v : '${Env.imageUrl}$v';
+        }
       }
     }
     return null;

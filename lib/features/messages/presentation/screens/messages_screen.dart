@@ -133,6 +133,12 @@ class _SearchRow extends StatelessWidget {
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                filled: false,
                 isCollapsed: true,
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.md,

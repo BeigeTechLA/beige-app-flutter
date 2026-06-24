@@ -152,7 +152,14 @@ class _ChatComposerState extends State<ChatComposer> {
                   ),
                   decoration: InputDecoration(
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    filled: false,
                     isCollapsed: true,
+                    contentPadding: EdgeInsets.zero,
                     hintText: 'Write a message...',
                     hintStyle: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textTertiary,

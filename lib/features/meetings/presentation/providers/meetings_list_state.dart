@@ -92,6 +92,6 @@ List<Meeting> applyLocalMeetingFilters(
     }
   }
 
-  final list = result.toList()..sort((a, b) => a.startAt.compareTo(b.startAt));
+  final list = result.toList()..sort((a, b) => b.startAt.compareTo(a.startAt));
   return list;
 }

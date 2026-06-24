@@ -50,7 +50,10 @@ class AppMainToolbar extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Text(title, style: AppTextStyles.titleSmall),
+          Text(
+            title,
+            style: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
+          ),
           const Spacer(),
           SizedBox.square(
             dimension: _navigationTargetSize,

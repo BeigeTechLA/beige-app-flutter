@@ -7,6 +7,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../domain/entities/chat_details.dart';
 import '../../domain/entities/participant.dart';
+import '../../domain/role_label.dart';
 import '../providers/chat_details_providers.dart';
 import 'widgets/details_hero_header.dart';
 import 'widgets/details_section_card.dart';
@@ -111,7 +112,7 @@ class _ParticipantsBody extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  p.role,
+                  roleLabel(p.role),
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.textTertiary,
                   ),

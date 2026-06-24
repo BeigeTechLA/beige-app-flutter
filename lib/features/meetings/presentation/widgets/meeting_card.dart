@@ -9,7 +9,7 @@ import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
 import '../../domain/models/meeting_status.dart';
-import 'meeting_rsvp_buttons.dart';
+import '../../domain/util/can_rsvp.dart';
 
 /// Single meeting summary card — title, platform chip, date/time meta,
 /// participants, and a full-width Join CTA. Tap anywhere outside the CTA opens
@@ -46,7 +46,7 @@ class _MeetingCardState extends ConsumerState<MeetingCard> {
   bool get _showRsvp =>
       widget.onAccept != null &&
           widget.onReject != null &&
-          widget.meeting.status != MeetingStatus.completed;
+          canRsvpToMeeting(widget.meeting);
 
   Color _getStatusBgColor(MeetingStatus status) {
     switch (status) {
