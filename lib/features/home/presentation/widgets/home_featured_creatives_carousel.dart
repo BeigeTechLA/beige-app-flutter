@@ -106,7 +106,7 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                     children: List.generate(images.length, (index) {
                       bool isActive = index == activeIndex;
                       return AnimatedContainer(
-                        duration: const Duration(milliseconds: 400),
+                        duration: const Duration(milliseconds: 200),
                         margin: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.xxs,
                         ),
