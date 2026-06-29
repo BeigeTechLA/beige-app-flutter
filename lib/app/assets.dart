@@ -97,14 +97,15 @@ class AppAssets {
   // SVG — Features & Booking
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  static const String aiMatchmaking = '$_svg/ai_matchmaking.svg';
-  static const String aiMatchmakingAlt = '$_svg/ai_matchmaking_alt.svg';
-  static const String aiPostProduction = '$_svg/ai_post_production.svg';
+  static const String aiMatchmaking = '$_svg/ic_ai_matching.svg';
+  static const String preProdcution = '$_svg/ic_pre_production.svg';
+  static const String production = '$_svg/ic_production.svg';
+  static const String aiPostProduction = '$_svg/ic_ai_post_production.svg';
   static const String allRawContent = '$_svg/all_raw_content.svg';
   static const String unlimitedUsage = '$_svg/unlimited_usage_rights.svg';
   static const String includeEdited = '$_svg/include_edited_deliverable.svg';
   static const String revisions = '$_svg/up_to_sets_revisions.svg';
-  static const String production = '$_svg/production.svg';
+
   static const String calndermark = '$_svg/calendar_mark.svg';
 
 
