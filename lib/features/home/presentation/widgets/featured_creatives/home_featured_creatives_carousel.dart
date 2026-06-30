@@ -12,6 +12,7 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
   final PageController controller;
   final List<String> images;
   final List<String> names;
+  final List<String> locations;
   final int initialPage;
 
   const HomeFeaturedCreativesCarousel({
@@ -19,6 +20,7 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
     required this.controller,
     required this.images,
     required this.names,
+    required this.locations,
     required this.initialPage,
   });
 
@@ -27,7 +29,7 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 280,
+          height: 270,
           child: AnimatedBuilder(
             animation: controller,
             builder: (context, child) {
@@ -50,13 +52,21 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                   rotation = rotation.clamp(-0.8, 0.9);
 
                   // Off-centre cards shrink and fade for the 3D look.
-                  double scale = (1 - (difference.abs() * 0.10))
-                      .clamp(0.0, 1.0);
-                  double opacity = (1 - (difference.abs() * 0.10))
-                      .clamp(0.6, 2.0);
+                  double scale = (1 - (difference.abs() * 0.10)).clamp(
+                    0.0,
+                    1.0,
+                  );
+                  double opacity = (1 - (difference.abs() * 0.10)).clamp(
+                    0.6,
+                    2.0,
+                  );
 
                   // Negative X pull squeezes neighbours toward the centre.
                   double translateX = difference * -100;
+
+                  // Details (name & location) fade out quickly when swiped away from center.
+                  double detailsOpacity = (1.0 - (difference.abs() * 3.0))
+                      .clamp(0.0, 1.0);
 
                   return Opacity(
                     opacity: opacity,
@@ -70,6 +80,8 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                       child: HomeTeamCard(
                         image: images[actualIndex],
                         name: names[actualIndex],
+                        location: locations[actualIndex],
+                        detailsOpacity: detailsOpacity,
                       ),
                     ),
                   );
@@ -87,7 +99,7 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
             ),
             // Top padding lifts the dot row clear of the bevel.
             Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.md),
+              padding: const EdgeInsets.only(top: 2),
               child: AnimatedBuilder(
                 animation: controller,
                 builder: (context, child) {
@@ -120,8 +132,9 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                           boxShadow: isActive
                               ? [
                                   BoxShadow(
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.4),
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
                                     blurRadius: 4,
                                   ),
                                 ]

@@ -128,6 +128,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AppAssets.creativeMikeyD,
     AppAssets.creativeNathanGrant,
   ];
+
+  final List<String> featuredLocations = [
+    "Seattle, Washington State",
+    "Los Angeles, California",
+    "New York, New York State",
+    "Austin, Texas",
+    "Chicago, Illinois",
+    "Miami, Florida",
+    "San Francisco, California",
+    "Denver, Colorado",
+    "Boston, Massachusetts",
+  ];
   final List<Map<String, String>> studioList = [
     {
       "image": AppAssets.studioBeige,
@@ -514,258 +526,240 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       drawer: const DrawerScreen(),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                // ── Section 1: Header ──
-                HomeHeader(
-                  controller: _controller,
-                  userName: homeData?.name,
-                  location: homeData?.location,
-                  profileImageUrl: homeData?.profileImageUrl,
-                  isGuest: isGuest,
-                  searchTexts: _searchTexts,
-                  searchTextColors: _textColors,
-                  onLocationTap: () async {
-                    if (_blockIfGuest()) return;
-                    final result = await context
-                        .pushNamed<Map<String, dynamic>>(
-                          RouteNames.changeLocation,
-                        );
-                    if (result != null) {
-                      ref.read(homeNotifierProvider.notifier).fetchHomeData();
-                    }
-                  },
-                  onProfileTap: () async {
-                    if (_blockIfGuest()) return;
-                    await context.pushNamed(RouteNames.profile);
-                    ref.read(homeNotifierProvider.notifier).fetchHomeData();
-                  },
-                ),
-                const SizedBox(height: 40),
+          Positioned.fill(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 76,
+              ),
+              child: Column(
+                children: [
+                  HomeMapSection(
+                    controller: _controller,
+                    searchTexts: _searchTexts,
+                    searchTextColors: _textColors,
+                  ),
+                  const SizedBox(height: 30),
+                  const HomeSectionDivider(),
+                  const SizedBox(height: 5),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Section 2: Explore Services ──
+                      const HomeSectionTitle(title: "Explore Services"),
 
-                const HomeSectionDivider(),
-                const SizedBox(height: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Section 2: Explore Services ──
-                    const HomeSectionTitle(title: "Explore Services"),
+                      const SizedBox(height: 10),
 
-                    const SizedBox(height: 10),
-
-                    HomeServicesRow(
-                      selectedIndices: selectedIndices,
-                      controller: _controller,
-                      onTap: (index, title) {
-                        if ((title == "Photo" || title == "Video") &&
-                            _blockIfGuest()) {
-                          return;
-                        }
-                        if (title == "Photo" || title == "Video") {
-                          setState(() {
-                            if (selectedIndices.contains(index)) {
-                              selectedIndices.remove(index);
-                            } else {
-                              selectedIndices.add(index);
-                            }
-                          });
-                          playBorderAnimationOnce();
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("$title Coming Soon"),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-
-                    AnimatedCrossFade(
-                      firstChild: const SizedBox.shrink(),
-                      secondChild: Padding(
-                        padding: const EdgeInsets.only(
-                          left: AppSpacing.xl,
-                          right: AppSpacing.xl,
-                          top: AppSpacing.md,
-                          bottom: AppSpacing.xs,
-                        ),
-                        child: SizedBox(
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (selectedIndices.isEmpty) return;
-                              final hasPhoto = selectedIndices.contains(0);
-                              final hasVideo = selectedIndices.contains(1);
-
-                              if (hasPhoto && hasVideo) {
-                                if (_blockIfGuest()) return;
-                                _continueBooking(3);
-                              } else if (hasPhoto) {
-                                if (_blockIfGuest()) return;
-                                _continueBooking(2);
-                              } else if (hasVideo) {
-                                if (_blockIfGuest()) return;
-                                _continueBooking(1);
+                      HomeServicesRow(
+                        selectedIndices: selectedIndices,
+                        controller: _controller,
+                        onTap: (index, title) {
+                          if ((title == "Photo" || title == "Video") &&
+                              _blockIfGuest()) {
+                            return;
+                          }
+                          if (title == "Photo" || title == "Video") {
+                            setState(() {
+                              if (selectedIndices.contains(index)) {
+                                selectedIndices.remove(index);
+                              } else {
+                                selectedIndices.add(index);
                               }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: AppColors.onPrimary,
-                              shape: const StadiumBorder(),
-                              minimumSize: const Size(double.infinity, 56),
-                              elevation: 0,
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Continue",
-                                  style: TextStyle(
-                                    fontFamily: AppAssets.fontOutfit,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
+                            });
+                            playBorderAnimationOnce();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("$title Coming Soon"),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+
+                      AnimatedCrossFade(
+                        firstChild: const SizedBox.shrink(),
+                        secondChild: Padding(
+                          padding: const EdgeInsets.only(
+                            left: AppSpacing.xl,
+                            right: AppSpacing.xl,
+                            top: AppSpacing.md,
+                            bottom: AppSpacing.xs,
+                          ),
+                          child: SizedBox(
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (selectedIndices.isEmpty) return;
+                                final hasPhoto = selectedIndices.contains(0);
+                                final hasVideo = selectedIndices.contains(1);
+
+                                if (hasPhoto && hasVideo) {
+                                  if (_blockIfGuest()) return;
+                                  _continueBooking(3);
+                                } else if (hasPhoto) {
+                                  if (_blockIfGuest()) return;
+                                  _continueBooking(2);
+                                } else if (hasVideo) {
+                                  if (_blockIfGuest()) return;
+                                  _continueBooking(1);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: AppColors.onPrimary,
+                                shape: const StadiumBorder(),
+                                minimumSize: const Size(double.infinity, 56),
+                                elevation: 0,
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Continue",
+                                    style: TextStyle(
+                                      fontFamily: AppAssets.fontUnbounded,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(Icons.arrow_forward, size: 18),
-                              ],
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward, size: 18),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      crossFadeState: selectedIndices.isNotEmpty
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                      duration: const Duration(milliseconds: 300),
-                    ),
-
-                    const SizedBox(height: 10),
-                    const HomeSectionDivider(centerAlpha: 0.24),
-
-                    const SizedBox(height: 10),
-
-                    // ── Section 3: Continue Booking (conditional) ──
-                    if (homeData?.continueBooking != null &&
-                        homeData!.continueBooking!.show)
-                      HomeContinueBookingCard(
-                        booking: homeData.continueBooking!,
-                        onResume: () => handleResume(homeData.continueBooking!),
+                        crossFadeState: selectedIndices.isNotEmpty
+                            ? CrossFadeState.showSecond
+                            : CrossFadeState.showFirst,
+                        duration: const Duration(milliseconds: 300),
                       ),
 
-                    const SizedBox(height: 20),
-                    // ── Section 4: Promo Carousel ──
-                    HomePromoCarousel(
-                      controller: _cardController,
-                      cards: cardData,
-                      currentIndex: _currentCard,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentCard = index;
-                        });
-                      },
-                      onBookShoot: () {
-                        if (_blockIfGuest()) return;
-                        context.pushNamed(
-                          RouteNames.contentType,
-                          extra: {'fromHome': true},
-                        );
-                      },
-                      onExploreCreatives: () => scrollTo(featuredKey),
-                      onFindCreative: () => scrollTo(topCreativeKey),
-                    ),
-                    const SizedBox(height: 20),
-                    const HomeSectionDivider(centerAlpha: 0.24),
-                    const SizedBox(height: 10),
-                    // ── Section 5: Featured Creatives ──
-                    HomeSectionTitle(
-                      key: featuredKey,
-                      title: "Featured Creatives",
-                    ),
-                    const SizedBox(height: 20),
-                    HomeFeaturedCreativesCarousel(
-                      controller: _pageController,
-                      images: featuredImages,
-                      names: featuredNames,
-                      initialPage: _initialPage,
-                    ),
-                    const SizedBox(height: 10),
+                      const HomeSectionDivider(centerAlpha: 0.24),
 
-                    const HomeSectionDivider(centerAlpha: 0.24),
-                    const SizedBox(height: 10),
-                    // ── Section 6: Studios ──
-                    HomeStudiosSection(
-                      borderController: _controller,
-                      studioController: _studioController,
-                      activeIndex: _activeStudioIndex,
-                      studios: studioList,
-                      onPageChanged: (i) =>
-                          setState(() => _activeStudioIndex = i),
-                    ),
-                    const SizedBox(height: 20),
-                    const HomeSectionDivider(centerAlpha: 0.24),
-                    const SizedBox(height: 20),
-                    // ── Section 7: Your Bookings ──
-                    const HomeSectionTitle(
-                      title: "Your Bookings",
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: AppAssets.fontUnbounded,
+                      // ── Section 3: Continue Booking (conditional) ──
+                      if (homeData?.continueBooking != null &&
+                          homeData!.continueBooking!.show)
+                        HomeContinueBookingCard(
+                          booking: homeData.continueBooking!,
+                          onResume: () =>
+                              handleResume(homeData.continueBooking!),
+                        ),
+
+                      const SizedBox(height: 20),
+                      // ── Section 4: Promo Carousel ──
+                      HomePromoCarousel(
+                        controller: _cardController,
+                        cards: cardData,
+                        currentIndex: _currentCard,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentCard = index;
+                          });
+                        },
+                        onBookShoot: () {
+                          if (_blockIfGuest()) return;
+                          context.pushNamed(
+                            RouteNames.contentType,
+                            extra: {'fromHome': true},
+                          );
+                        },
+                        onExploreCreatives: () => scrollTo(featuredKey),
+                        onFindCreative: () => scrollTo(topCreativeKey),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    HomeBookingsStack(
-                      swipeController: _bookingSwipeController,
-                      bookings: bookingList,
-                      currentIndex: _currentBookingIndex,
-                      onAdvance: () => setState(() {
-                        _currentBookingIndex =
-                            (_currentBookingIndex + 1) % bookingList.length;
-                      }),
-                      onBookShoot: () {
-                        if (_blockIfGuest()) return;
-                        context.pushNamed(
-                          RouteNames.contentType,
-                          extra: {'fromHome': true},
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-                    // ── Section 8: Recommended Creatives (non-guest) ──
-                    if (!isGuest) const HomeSectionDivider(centerAlpha: 0.09),
-                    if (!isGuest) const SizedBox(height: 20),
-                    if (!isGuest)
+                      const SizedBox(height: 20),
+                      const HomeSectionDivider(centerAlpha: 0.24),
+                      const SizedBox(height: 10),
+                      // ── Section 5: Featured Creatives ──
                       HomeSectionTitle(
-                        title: "We Think You’ll Love These ",
-                        style: AppTextStyles.titleSmall.copyWith(
+                        key: featuredKey,
+                        title: "Featured Creatives",
+                      ),
+                      const SizedBox(height: 20),
+                      HomeFeaturedCreativesCarousel(
+                        controller: _pageController,
+                        images: featuredImages,
+                        names: featuredNames,
+                        locations: featuredLocations,
+                        initialPage: _initialPage,
+                      ),
+                      const SizedBox(height: 10),
+
+                      const HomeSectionDivider(centerAlpha: 0.24),
+                      const SizedBox(height: 10),
+                      // ── Section 6: Studios ──
+                      HomeStudiosSection(
+                        borderController: _controller,
+                        studioController: _studioController,
+                        activeIndex: _activeStudioIndex,
+                        studios: studioList,
+                        onPageChanged: (i) =>
+                            setState(() => _activeStudioIndex = i),
+                      ),
+                      const SizedBox(height: 20),
+                      const HomeSectionDivider(centerAlpha: 0.24),
+                      const SizedBox(height: 20),
+                      // ── Section 7: Your Bookings ──
+                      const HomeSectionTitle(
+                        title: "Your Bookings",
+                        style: TextStyle(
                           color: AppColors.white,
-                          height: 1.2,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: AppAssets.fontUnbounded,
                         ),
                       ),
-                    if (!isGuest) const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    if (!isGuest)
-                      HomeRecommendedCreativesRail(
-                        creatives: homeData?.featuredCreatives ?? const [],
-                        onViewProfile: (id) {
+                      HomeBookingsStack(
+                        swipeController: _bookingSwipeController,
+                        bookings: bookingList,
+                        currentIndex: _currentBookingIndex,
+                        onAdvance: () => setState(() {
+                          _currentBookingIndex =
+                              (_currentBookingIndex + 1) % bookingList.length;
+                        }),
+                        onBookShoot: () {
+                          if (_blockIfGuest()) return;
                           context.pushNamed(
-                            RouteNames.recommendedDetails,
-                            pathParameters: {'id': id.toString()},
-                            queryParameters: {'bookingId': '121'},
+                            RouteNames.contentType,
+                            extra: {'fromHome': true},
                           );
                         },
                       ),
-                    const SizedBox(height: 10),
-                    const HomeSectionDivider(centerAlpha: 0.09),
-                    const SizedBox(height: 10),
-                    // TODO(rebook-shoots): planned feature — full design
-                    //  preserved below; do not delete without product sign-off.
-                    /*  Column(
+
+                      const SizedBox(height: 10),
+                      // ── Section 8: Recommended Creatives (non-guest) ──
+                      if (!isGuest) const HomeSectionDivider(centerAlpha: 0.09),
+                      if (!isGuest) const SizedBox(height: 20),
+                      if (!isGuest)
+                        HomeSectionTitle(
+                          title: "We Think You’ll Love These ",
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.white,
+                            height: 1.2,
+                          ),
+                        ),
+                      if (!isGuest) const SizedBox(height: 20),
+
+                      if (!isGuest)
+                        HomeRecommendedCreativesRail(
+                          creatives: homeData?.featuredCreatives ?? const [],
+                          onViewProfile: (id) {
+                            context.pushNamed(
+                              RouteNames.recommendedDetails,
+                              pathParameters: {'id': id.toString()},
+                              queryParameters: {'bookingId': '121'},
+                            );
+                          },
+                        ),
+                      const SizedBox(height: 10),
+                      const HomeSectionDivider(centerAlpha: 0.09),
+                      const SizedBox(height: 10),
+                      // TODO(rebook-shoots): planned feature — full design
+                      //  preserved below; do not delete without product sign-off.
+                      /*  Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
@@ -931,10 +925,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             ),
                           ),
                           const SizedBox(height: 10),*/
-                    // Recent Project section.
-                    // TODO(recent-project): planned feature — full design
-                    //  preserved below; do not delete without product sign-off.
-                    /*       Padding(
+                      // Recent Project section.
+                      // TODO(recent-project): planned feature — full design
+                      //  preserved below; do not delete without product sign-off.
+                      /*       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 10),
                         child: Column(
@@ -969,7 +963,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                       const SizedBox(height: 20),*/
-                    /*    Padding(
+                      /*    Padding(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.smd),
                         child: Container(
                           height: 1,
@@ -988,85 +982,114 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                       const SizedBox(height: 10),*/
-                    // ── Section 9: How It Works ──
-                    const HomeHowItWorksSection(),
-                    const HomeSectionDivider(centerAlpha: 0.09),
-                    const SizedBox(height: 10),
-                    // ── Section 10: Top Influencers ──
-                    HomeTopInfluencersSection(
-                      animationController: _controller,
-                      pageController: _featuredController,
-                      words: words,
-                      images: Topwords,
-                      names: Topname,
-                      instagramUrls: Topinstagram,
-                      youtubeUrls: Topyoutube,
-                      tiktokUrls: Toptiktok,
-                      instagramFollowers: instaFollowers,
-                      youtubeFollowers: youtubeFollowers,
-                      tiktokFollowers: tiktokFollowers,
-                      onOpenLink: openLink,
-                    ),
-                    const SizedBox(height: 20),
-
-                    const HomeSectionDivider(centerAlpha: 0.09),
-                    const SizedBox(height: 20),
-
-                    // ── Section 11: Top Creatives Near You (non-guest) ──
-                    if (isGuest) const SizedBox(height: 50),
-                    if (!isGuest)
-                      Padding(
-                        key: topCreativeKey,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xl,
-                          vertical: AppSpacing.smd,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Top Creatives Near you",
-                              style: AppTextStyles.titleSmall.copyWith(
-                                color: AppColors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            HomeTopCreativesStack(
-                              swipeController: _swipeController,
-                              creatives: homeData?.mainCreatives ?? const [],
-                              currentIndex: _currentCreativeIndex,
-                              onAdvance: () => setState(() {
-                                final list =
-                                    homeData?.mainCreatives ?? const [];
-                                if (list.isEmpty) return;
-                                _currentCreativeIndex =
-                                    (_currentCreativeIndex + 1) % list.length;
-                              }),
-                              onReverse: () => setState(() {
-                                final list =
-                                    homeData?.mainCreatives ?? const [];
-                                if (list.isEmpty) return;
-                                _currentCreativeIndex =
-                                    (_currentCreativeIndex - 1 + list.length) %
-                                    list.length;
-                              }),
-                              onViewProfile: (id) {
-                                if (_blockIfGuest()) return;
-                                context.pushNamed(
-                                  RouteNames.recommendedDetails,
-                                  pathParameters: {'id': id.toString()},
-                                  queryParameters: {'bookingId': '121'},
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                      // ── Section 9: How It Works ──
+                      const HomeHowItWorksSection(),
+                      const HomeSectionDivider(centerAlpha: 0.09),
+                      const SizedBox(height: 10),
+                      // ── Section 10: Top Influencers ──
+                      HomeTopInfluencersSection(
+                        animationController: _controller,
+                        pageController: _featuredController,
+                        words: words,
+                        images: Topwords,
+                        names: Topname,
+                        instagramUrls: Topinstagram,
+                        youtubeUrls: Topyoutube,
+                        tiktokUrls: Toptiktok,
+                        instagramFollowers: instaFollowers,
+                        youtubeFollowers: youtubeFollowers,
+                        tiktokFollowers: tiktokFollowers,
+                        onOpenLink: openLink,
                       ),
-                    if (!isGuest) const SizedBox(height: 70),
-                  ],
-                ),
-              ],
+                      const SizedBox(height: 20),
+
+                      const HomeSectionDivider(centerAlpha: 0.09),
+                      const SizedBox(height: 20),
+
+                      // ── Section 11: Top Creatives Near You (non-guest) ──
+                      if (isGuest) const SizedBox(height: 50),
+                      if (!isGuest)
+                        Padding(
+                          key: topCreativeKey,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                            vertical: AppSpacing.smd,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Top Creatives Near you",
+                                style: AppTextStyles.titleSmall.copyWith(
+                                  color: AppColors.white,
+                                  height: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              HomeTopCreativesStack(
+                                swipeController: _swipeController,
+                                creatives: homeData?.mainCreatives ?? const [],
+                                currentIndex: _currentCreativeIndex,
+                                onAdvance: () => setState(() {
+                                  final list =
+                                      homeData?.mainCreatives ?? const [];
+                                  if (list.isEmpty) return;
+                                  _currentCreativeIndex =
+                                      (_currentCreativeIndex + 1) % list.length;
+                                }),
+                                onReverse: () => setState(() {
+                                  final list =
+                                      homeData?.mainCreatives ?? const [];
+                                  if (list.isEmpty) return;
+                                  _currentCreativeIndex =
+                                      (_currentCreativeIndex -
+                                          1 +
+                                          list.length) %
+                                      list.length;
+                                }),
+                                onViewProfile: (id) {
+                                  if (_blockIfGuest()) return;
+                                  context.pushNamed(
+                                    RouteNames.recommendedDetails,
+                                    pathParameters: {'id': id.toString()},
+                                    queryParameters: {'bookingId': '121'},
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (!isGuest) const SizedBox(height: 70),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // ── Sticky Header ──
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: HomeHeader(
+              userName: homeData?.name,
+              location: homeData?.location,
+              profileImageUrl: homeData?.profileImageUrl,
+              isGuest: isGuest,
+              onLocationTap: () async {
+                if (_blockIfGuest()) return;
+                final result = await context.pushNamed<Map<String, dynamic>>(
+                  RouteNames.changeLocation,
+                );
+                if (result != null) {
+                  ref.read(homeNotifierProvider.notifier).fetchHomeData();
+                }
+              },
+              onProfileTap: () async {
+                if (_blockIfGuest()) return;
+                await context.pushNamed(RouteNames.profile);
+                ref.read(homeNotifierProvider.notifier).fetchHomeData();
+              },
             ),
           ),
           if (isLoading)

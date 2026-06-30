@@ -8,11 +8,15 @@ import 'package:beige/app/radii.dart';
 class HomeTeamCard extends StatelessWidget {
   final String image;
   final String name;
+  final String location;
+  final double detailsOpacity;
 
   const HomeTeamCard({
     super.key,
     required this.image,
     required this.name,
+    required this.location,
+    required this.detailsOpacity,
   });
 
   @override
@@ -34,14 +38,33 @@ class HomeTeamCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        Text(
-          name,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.white,
-            fontFamily: AppAssets.fontOutfit,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+        Opacity(
+          opacity: detailsOpacity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontFamily: AppAssets.fontOutfit,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                location,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.white.withValues(alpha: 0.6),
+                  fontFamily: AppAssets.fontOutfit,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
         ),
       ],
