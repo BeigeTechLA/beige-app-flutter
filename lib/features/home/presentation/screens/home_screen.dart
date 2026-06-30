@@ -701,13 +701,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const HomeSectionDivider(centerAlpha: 0.24),
                       const SizedBox(height: 20),
                       // ── Section 7: Your Bookings ──
-                      const HomeSectionTitle(
+                      HomeSectionTitle(
                         title: "Your Bookings",
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           fontFamily: AppAssets.fontUnbounded,
+                        ),
+                        trailing: GestureDetector(
+                          onTap: () => context.goNamed(RouteNames.myShoots),
+                          behavior: HitTestBehavior.opaque,
+                          child: const Icon(
+                            Icons.chevron_right,
+                            color: AppColors.white,
+                            size: 22,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -725,6 +734,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           context.pushNamed(
                             RouteNames.contentType,
                             extra: {'fromHome': true},
+                          );
+                        },
+                        onCardTap: (booking) {
+                          context.pushNamed(
+                            RouteNames.bookingEventSummary,
+                            pathParameters: {
+                              'bookingId': booking.bookingId.toString(),
+                            },
                           );
                         },
                       ),

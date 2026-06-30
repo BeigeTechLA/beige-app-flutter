@@ -11,11 +11,13 @@ import 'package:beige/app/text_styles.dart';
 class HomeSectionTitle extends StatelessWidget {
   final String title;
   final TextStyle? style;
+  final Widget? trailing;
 
   const HomeSectionTitle({
     super.key,
     required this.title,
     this.style,
+    this.trailing,
   });
 
   @override
@@ -27,13 +29,15 @@ class HomeSectionTitle extends StatelessWidget {
         children: [
           Text(
             title,
-            style: style ??
+            style:
+                style ??
                 AppTextStyles.labelLarge.copyWith(
                   fontFamily: AppAssets.fontUnbounded,
                   color: AppColors.white,
                   height: 1.2,
                 ),
           ),
+          if (trailing != null) trailing!,
         ],
       ),
     );

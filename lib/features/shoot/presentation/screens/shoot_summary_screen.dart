@@ -95,7 +95,6 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
     final days = multiDay?['days'] ?? [];
     final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
     final image = _getFinalImage(bookingData);
-    final creativeName = (bookingData?['creative']?['name'] ?? "").toString();
     return Scaffold(
       body: Stack(
         children: [
@@ -157,14 +156,21 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                     Positioned(
                       top: 45,
                       left: 16,
-                      child: InkWell(
+                      child: GestureDetector(
                         onTap: _goBackToMyShoots,
-                        child: SvgPicture.asset(
-                          AppAssets.back,
-                          height: 24,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.white,
-                            BlendMode.srcIn,
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          alignment: Alignment.centerLeft,
+                          color: AppColors.transparent,
+                          child: SvgPicture.asset(
+                            AppAssets.back,
+                            height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.white,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),

@@ -14,6 +14,7 @@ class HomeBookingsStack extends StatelessWidget {
   final int currentIndex;
   final VoidCallback onAdvance;
   final VoidCallback onBookShoot;
+  final Function(Your_Booking) onCardTap;
 
   const HomeBookingsStack({
     super.key,
@@ -22,6 +23,7 @@ class HomeBookingsStack extends StatelessWidget {
     required this.currentIndex,
     required this.onAdvance,
     required this.onBookShoot,
+    required this.onCardTap,
   });
 
   void _advance() {
@@ -105,6 +107,7 @@ class HomeBookingsStack extends StatelessWidget {
                     child: HomeBookingCard(
                       booking: bookings[frontIndex],
                       isBackCard: false,
+                      onTap: () => onCardTap(bookings[frontIndex]),
                     ),
                   ),
                 ),

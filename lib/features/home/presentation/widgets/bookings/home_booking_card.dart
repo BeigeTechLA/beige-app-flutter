@@ -14,11 +14,13 @@ import 'package:beige/shared/widgets/scale_clamped_text.dart';
 class HomeBookingCard extends StatelessWidget {
   final Your_Booking booking;
   final bool isBackCard;
+  final VoidCallback? onTap;
 
   const HomeBookingCard({
     super.key,
     required this.booking,
     this.isBackCard = false,
+    this.onTap,
   });
 
   static Color _statusColorFromLabel(String label) {
@@ -189,15 +191,20 @@ class HomeBookingCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-
-                // Secondary icon action placeholder.
-                // TODO(booking-card): icon button placement under design
-                //  review.
-                /*      SvgPicture.asset(
-                  AppAssets.homeViewProfile,
-                  height: 36,
-                  color: AppColors.white,
-                ),*/
+                GestureDetector(
+                  onTap: onTap,
+                  child: SizedBox(
+                    height: 45,
+                    width: 45,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        AppAssets.homeViewProfile,
+                        height: 43,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
         ],
