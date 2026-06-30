@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/spacing.dart';
 
-import 'home_painters.dart';
+import '../common/home_painters.dart';
 import 'home_team_card.dart';
 
 /// 3D PageView of featured creative team cards plus the beveled tray

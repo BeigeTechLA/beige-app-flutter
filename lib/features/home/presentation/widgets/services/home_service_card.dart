@@ -82,8 +82,8 @@ class HomeServiceCard extends StatelessWidget {
                       Flexible(
                         child: Image.asset(
                           imagePath,
-                          height: 24,
-                          width: 30,
+                          height: 36,
+                          width: 40,
                           fit: BoxFit.contain,
                         ),
                       ),

@@ -12,19 +12,19 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
 import 'package:beige/features/home/presentation/providers/home_providers.dart';
-import 'package:beige/features/home/presentation/widgets/home_bookings_stack.dart';
-import 'package:beige/features/home/presentation/widgets/home_continue_booking_card.dart';
-import 'package:beige/features/home/presentation/widgets/home_featured_creatives_carousel.dart';
-import 'package:beige/features/home/presentation/widgets/home_header.dart';
-import 'package:beige/features/home/presentation/widgets/home_how_it_works_section.dart';
-import 'package:beige/features/home/presentation/widgets/home_promo_carousel.dart';
-import 'package:beige/features/home/presentation/widgets/home_recommended_creatives_rail.dart';
-import 'package:beige/features/home/presentation/widgets/home_section_divider.dart';
-import 'package:beige/features/home/presentation/widgets/home_section_title.dart';
-import 'package:beige/features/home/presentation/widgets/home_services_row.dart';
-import 'package:beige/features/home/presentation/widgets/home_studios_section.dart';
-import 'package:beige/features/home/presentation/widgets/home_top_creatives_stack.dart';
-import 'package:beige/features/home/presentation/widgets/home_top_influencers_section.dart';
+import 'package:beige/features/home/presentation/widgets/bookings/home_bookings_stack.dart';
+import 'package:beige/features/home/presentation/widgets/common/home_section_divider.dart';
+import 'package:beige/features/home/presentation/widgets/common/home_section_title.dart';
+import 'package:beige/features/home/presentation/widgets/continue_booking/home_continue_booking_card.dart';
+import 'package:beige/features/home/presentation/widgets/featured_creatives/home_featured_creatives_carousel.dart';
+import 'package:beige/features/home/presentation/widgets/header/home_header.dart';
+import 'package:beige/features/home/presentation/widgets/how_it_works/home_how_it_works_section.dart';
+import 'package:beige/features/home/presentation/widgets/promo/home_promo_carousel.dart';
+import 'package:beige/features/home/presentation/widgets/recommended_creatives/home_recommended_creatives_rail.dart';
+import 'package:beige/features/home/presentation/widgets/services/home_services_row.dart';
+import 'package:beige/features/home/presentation/widgets/studios/home_studios_section.dart';
+import 'package:beige/features/home/presentation/widgets/top_creatives/home_top_creatives_stack.dart';
+import 'package:beige/features/home/presentation/widgets/top_influencers/home_top_influencers_section.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
 
 import '../../../app_drawer/screen/drawer_screen.dart';
@@ -58,7 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late PageController _cardController;
   int _currentBookingIndex = 0;
   late AnimationController _bookingSwipeController;
-  int selectedIndex = -1;
+  final Set<int> selectedIndices = {};
 
   late AnimationController _swipeController;
   int _currentCreativeIndex = 0;
@@ -517,6 +517,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           SingleChildScrollView(
             child: Column(
               children: [
+                // ── Section 1: Header ──
                 HomeHeader(
                   controller: _controller,
                   userName: homeData?.name,
@@ -548,7 +549,113 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Promo banner.
+                    // ── Section 2: Explore Services ──
+                    const HomeSectionTitle(title: "Explore Services"),
+
+                    const SizedBox(height: 10),
+
+                    HomeServicesRow(
+                      selectedIndices: selectedIndices,
+                      controller: _controller,
+                      onTap: (index, title) {
+                        if ((title == "Photo" || title == "Video") &&
+                            _blockIfGuest()) {
+                          return;
+                        }
+                        if (title == "Photo" || title == "Video") {
+                          setState(() {
+                            if (selectedIndices.contains(index)) {
+                              selectedIndices.remove(index);
+                            } else {
+                              selectedIndices.add(index);
+                            }
+                          });
+                          playBorderAnimationOnce();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("$title Coming Soon"),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+
+                    AnimatedCrossFade(
+                      firstChild: const SizedBox.shrink(),
+                      secondChild: Padding(
+                        padding: const EdgeInsets.only(
+                          left: AppSpacing.xl,
+                          right: AppSpacing.xl,
+                          top: AppSpacing.md,
+                          bottom: AppSpacing.xs,
+                        ),
+                        child: SizedBox(
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (selectedIndices.isEmpty) return;
+                              final hasPhoto = selectedIndices.contains(0);
+                              final hasVideo = selectedIndices.contains(1);
+
+                              if (hasPhoto && hasVideo) {
+                                if (_blockIfGuest()) return;
+                                _continueBooking(3);
+                              } else if (hasPhoto) {
+                                if (_blockIfGuest()) return;
+                                _continueBooking(2);
+                              } else if (hasVideo) {
+                                if (_blockIfGuest()) return;
+                                _continueBooking(1);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.onPrimary,
+                              shape: const StadiumBorder(),
+                              minimumSize: const Size(double.infinity, 56),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Continue",
+                                  style: TextStyle(
+                                    fontFamily: AppAssets.fontOutfit,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Icon(Icons.arrow_forward, size: 18),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      crossFadeState: selectedIndices.isNotEmpty
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      duration: const Duration(milliseconds: 300),
+                    ),
+
+                    const SizedBox(height: 10),
+                    const HomeSectionDivider(centerAlpha: 0.24),
+
+                    const SizedBox(height: 10),
+
+                    // ── Section 3: Continue Booking (conditional) ──
+                    if (homeData?.continueBooking != null &&
+                        homeData!.continueBooking!.show)
+                      HomeContinueBookingCard(
+                        booking: homeData.continueBooking!,
+                        onResume: () => handleResume(homeData.continueBooking!),
+                      ),
+
+                    const SizedBox(height: 20),
+                    // ── Section 4: Promo Carousel ──
                     HomePromoCarousel(
                       controller: _cardController,
                       cards: cardData,
@@ -569,54 +676,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       onFindCreative: () => scrollTo(topCreativeKey),
                     ),
                     const SizedBox(height: 20),
-                    const HomeSectionDivider(),
-                    const SizedBox(height: 20),
-                    // Explore services section.
-                    const HomeSectionTitle(title: "Explore Services"),
-
-                    const SizedBox(height: 10),
-
-                    // Services horizontal list.
-                    HomeServicesRow(
-                      selectedIndex: selectedIndex,
-                      controller: _controller,
-                      onTap: (index, title) {
-                        if ((title == "Photo" || title == "Video") &&
-                            _blockIfGuest()) {
-                          return;
-                        }
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                        playBorderAnimationOnce();
-                        if (title == "Photo") {
-                          _continueBooking(2);
-                        } else if (title == "Video") {
-                          _continueBooking(1);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("$title Coming Soon"),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
                     const HomeSectionDivider(centerAlpha: 0.24),
-
                     const SizedBox(height: 10),
-
-                    // Continue-booking prompt from backend state.
-                    if (homeData?.continueBooking != null &&
-                        homeData!.continueBooking!.show)
-                      HomeContinueBookingCard(
-                        booking: homeData.continueBooking!,
-                        onResume: () => handleResume(homeData.continueBooking!),
-                      ),
-
-                    const SizedBox(height: 10),
+                    // ── Section 5: Featured Creatives ──
                     HomeSectionTitle(
                       key: featuredKey,
                       title: "Featured Creatives",
@@ -632,6 +694,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
                     const HomeSectionDivider(centerAlpha: 0.24),
                     const SizedBox(height: 10),
+                    // ── Section 6: Studios ──
                     HomeStudiosSection(
                       borderController: _controller,
                       studioController: _studioController,
@@ -643,7 +706,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     const SizedBox(height: 20),
                     const HomeSectionDivider(centerAlpha: 0.24),
                     const SizedBox(height: 20),
-                    // Your Bookings swipe-stack section.
+                    // ── Section 7: Your Bookings ──
                     const HomeSectionTitle(
                       title: "Your Bookings",
                       style: TextStyle(
@@ -673,6 +736,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ),
 
                     const SizedBox(height: 10),
+                    // ── Section 8: Recommended Creatives (non-guest) ──
                     if (!isGuest) const HomeSectionDivider(centerAlpha: 0.09),
                     if (!isGuest) const SizedBox(height: 20),
                     if (!isGuest)
@@ -924,9 +988,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       ),
                       const SizedBox(height: 10),*/
+                    // ── Section 9: How It Works ──
                     const HomeHowItWorksSection(),
                     const HomeSectionDivider(centerAlpha: 0.09),
                     const SizedBox(height: 10),
+                    // ── Section 10: Top Influencers ──
                     HomeTopInfluencersSection(
                       animationController: _controller,
                       pageController: _featuredController,
@@ -946,7 +1012,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     const HomeSectionDivider(centerAlpha: 0.09),
                     const SizedBox(height: 20),
 
-                    // Top Creatives section.
+                    // ── Section 11: Top Creatives Near You (non-guest) ──
                     if (isGuest) const SizedBox(height: 50),
                     if (!isGuest)
                       Padding(

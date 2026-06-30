@@ -5,8 +5,8 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 
-import 'home_painters.dart';
-import 'home_section_divider.dart';
+import '../common/home_painters.dart';
+import '../common/home_section_divider.dart';
 import 'home_studio_card.dart';
 
 /// "Beige Studios" section — animated border wrapper, studio carousel,

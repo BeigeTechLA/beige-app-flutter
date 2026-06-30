@@ -11,8 +11,8 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/home/data/models/home_model.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
-import 'home_section_divider.dart';
-import 'home_section_title.dart';
+import '../common/home_section_divider.dart';
+import '../common/home_section_title.dart';
 
 /// Continue-booking card — title row, beige container with image + label,
 /// 3-segment progress bar, Resume button, and trailing divider. Caller is

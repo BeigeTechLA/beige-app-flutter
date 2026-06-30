@@ -8,7 +8,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
-import 'home_painters.dart';
+import '../common/home_painters.dart';
 
 /// Top of the Home screen — animated border + map background + drawer
 /// trigger, greeting + location, profile pill, and the floating animated

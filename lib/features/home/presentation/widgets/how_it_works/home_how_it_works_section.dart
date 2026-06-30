@@ -7,7 +7,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 
 import 'home_how_it_works_item.dart';
-import 'home_side_dot.dart';
+import '../common/home_side_dot.dart';
 
 /// "How It Works" timeline card section.
 class HomeHowItWorksSection extends StatelessWidget {
