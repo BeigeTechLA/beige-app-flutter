@@ -50,7 +50,12 @@ class _AppState extends ConsumerState<App> {
       theme: AppTheme.dark(),
       routerConfig: goRouter,
       builder: (context, child) {
-        return ConnectivityListener(child: child ?? const SizedBox.shrink());
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.noScaling,
+          ),
+          child: ConnectivityListener(child: child ?? const SizedBox.shrink()),
+        );
       },
     );
   }
