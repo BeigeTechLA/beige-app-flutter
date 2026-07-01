@@ -270,6 +270,16 @@ class AppColors {
   static const Color statusArrived = Color(0xFF4CAF50);
   static const Color statusPending = Color(0xFFE53935);
 
+  // Booking lifecycle status colors (home booking card, shoot cards).
+  static const Color statusInitiated = Color(0xFFF29F3F);
+  static const Color statusPreProduction = Color(0xFFED70FD);
+  static const Color statusShootDay = Color(0xFF70C7FD);
+  static const Color statusPostProduction = Color(0xFFC686FF);
+  static const Color statusRevision = Color(0xFF88A0FF);
+  static const Color statusAssetsDelivered = Color(0xFFFFBA88);
+  static const Color statusPendingBright = Color(0xFFFFE83D);
+  static const Color statusCancelled = Color(0xFFFB6C6C);
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // MAP COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

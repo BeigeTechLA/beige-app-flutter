@@ -25,10 +25,27 @@ class HomeBookingCard extends StatelessWidget {
 
   static Color _statusColorFromLabel(String label) {
     switch (label.toLowerCase()) {
+      case "initiated":
+        return AppColors.statusInitiated;
+      case "pre production":
+      case "pre-production":
+        return AppColors.statusPreProduction;
+      case "shoot day":
+        return AppColors.statusShootDay;
+      case "post production":
+      case "post-production":
+        return AppColors.statusPostProduction;
+      case "revision":
+        return AppColors.statusRevision;
       case "completed":
-        return AppColors.success; // Completed booking status.
+        return AppColors.greenBright;
+      case "assets delivered":
+        return AppColors.statusAssetsDelivered;
       case "pending":
-        return AppColors.error; // Pending booking status.
+        return AppColors.statusPendingBright;
+      case "cancelled":
+      case "canceled":
+        return AppColors.statusCancelled;
       default:
         return AppColors.error;
     }
