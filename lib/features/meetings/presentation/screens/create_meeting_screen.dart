@@ -559,6 +559,7 @@ class _ShootDropdown extends ConsumerWidget {
           initialValue: initial,
           dropdownColor: AppColors.surfaceStats,
           decoration: decoration,
+          isExpanded: true,
           icon: const Icon(
             Icons.expand_more,
             color: AppColors.textSecondary,
@@ -568,7 +569,16 @@ class _ShootDropdown extends ConsumerWidget {
           ),
           items: [
             for (final s in shoots)
-              DropdownMenuItem(value: s.id, child: Text(s.title)),
+              DropdownMenuItem(
+                value: s.id,
+                child: Text(
+                  s.title,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
           ],
           onChanged: (v) {
             if (v == null) return;

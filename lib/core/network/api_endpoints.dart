@@ -29,10 +29,6 @@ abstract class ApiEndpoints {
   static const String bookingStartOptions = "bookings/start-options";
   static const String bookingSpecialties = "bookings/specialties";
   static const String bookingShootTypes = "bookings/shoot-types/";
-  /// Roster of users associated with a booking — Client + assigned CP +
-  /// crew/team. Sourced by the meeting-create participant picker.
-  static String bookingParticipants(int bookingId) =>
-      'bookings/$bookingId/participants';
 
   /// 🎨 Creatives
   static const String creatives = "creatives";

@@ -195,7 +195,10 @@ class BookingRepositoryImpl implements BookingRepository {
       _assertNoError(response);
       final data = response['data'];
       if (data is List) return data;
-      // Some endpoints wrap the list under `participants`. Stay tolerant.
+      // external-chat/directory has been observed under `users` and
+      // `participants` in different builds — stay tolerant.
+      final users = response['users'];
+      if (users is List) return users;
       final participants = response['participants'];
       if (participants is List) return participants;
       return <dynamic>[];
