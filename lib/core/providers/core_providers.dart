@@ -44,7 +44,9 @@ final dioClientProvider = Provider<DioClient>((ref) {
       final ctx = rootNavigatorKey.currentContext;
       if (ctx == null) return;
       // ignore: use_build_context_synchronously
-      final currentLocation = GoRouterState.of(ctx).matchedLocation;
+      final router = GoRouter.of(ctx);
+      final currentLocation =
+          router.routerDelegate.currentConfiguration.uri.path;
       if (currentLocation != '/login') {
         // ignore: use_build_context_synchronously
         ctx.goNamed(RouteNames.login);
