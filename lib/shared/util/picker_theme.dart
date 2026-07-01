@@ -37,15 +37,36 @@ Widget appTimePickerTheme(BuildContext ctx, Widget? child) {
         surface: AppColors.surfaceGradientDark,
         onSurface: AppColors.white,
       ),
-      timePickerTheme: const TimePickerThemeData(
+      timePickerTheme: TimePickerThemeData(
         backgroundColor: AppColors.surfaceGradientDark,
         dialBackgroundColor: AppColors.surfaceGradientDark,
         dialHandColor: AppColors.primary,
-        dialTextColor: AppColors.white,
-        hourMinuteColor: AppColors.primary,
-        hourMinuteTextColor: AppColors.onPrimary,
-        dayPeriodColor: AppColors.primary,
-        dayPeriodTextColor: AppColors.onPrimary,
+        dialTextColor: WidgetStateColor.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? AppColors.onPrimary
+              : AppColors.white;
+        }),
+        hourMinuteColor: WidgetStateColor.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : AppColors.surfaceVariant;
+        }),
+        hourMinuteTextColor: WidgetStateColor.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? AppColors.onPrimary
+              : AppColors.white;
+        }),
+        dayPeriodColor: WidgetStateColor.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : AppColors.transparent;
+        }),
+        dayPeriodTextColor: WidgetStateColor.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? AppColors.onPrimary
+              : AppColors.textSecondary;
+        }),
+        dayPeriodBorderSide: const BorderSide(color: AppColors.dividerDark),
         entryModeIconColor: AppColors.primary,
       ),
     ),

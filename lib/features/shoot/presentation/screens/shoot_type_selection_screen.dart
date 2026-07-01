@@ -14,6 +14,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/assets.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
+import 'package:beige/shared/util/picker_theme.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -76,6 +77,7 @@ class _ShootTypeSelectionScreenState
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: appTimePickerTheme,
     );
 
     if (picked != null) {
@@ -101,32 +103,7 @@ class _ShootTypeSelectionScreenState
     final picked = await showTimePicker(
       context: context,
       initialTime: initial,
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              onPrimary: AppColors.white,
-              surface: AppColors.background,
-              onSurface: AppColors.white,
-            ),
-            timePickerTheme: const TimePickerThemeData(
-              backgroundColor: AppColors.surfaceGradientDark,
-              dialBackgroundColor: AppColors.surfaceGradientDark,
-              dialHandColor: AppColors.white,
-              dialTextColor: AppColors.neutralGrey,
-              hourMinuteColor: AppColors.primary,
-              hourMinuteTextColor: AppColors.black,
-              dayPeriodColor: AppColors.primary,
-              dayPeriodTextColor: AppColors.white,
-            ),
-            dialogTheme: DialogThemeData(
-              backgroundColor: AppColors.surfaceGradientDark,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      builder: appTimePickerTheme,
     );
 
     if (picked != null) {

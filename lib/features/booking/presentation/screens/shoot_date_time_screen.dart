@@ -15,6 +15,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/util/picker_theme.dart';
 
 import '../../../../app/assets.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
@@ -1346,32 +1347,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       picked = await showTimePicker(
         context: context,
         initialTime: initial,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
-                onPrimary: AppColors.white,
-                surface: AppColors.background,
-                onSurface: AppColors.white,
-              ),
-              timePickerTheme: const TimePickerThemeData(
-                backgroundColor: AppColors.surfaceGradientDark,
-                dialBackgroundColor: AppColors.surfaceGradientDark,
-                dialHandColor: AppColors.white,
-                dialTextColor: AppColors.neutralGrey,
-                hourMinuteColor: AppColors.primary,
-                hourMinuteTextColor: AppColors.black,
-                dayPeriodColor: AppColors.primary,
-                dayPeriodTextColor: AppColors.white,
-              ),
-              dialogTheme: DialogThemeData(
-                backgroundColor: AppColors.surfaceGradientDark,
-              ),
-            ),
-            child: child!,
-          );
-        },
+        builder: appTimePickerTheme,
       );
     }
 
