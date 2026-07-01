@@ -104,41 +104,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   ];
 
   final List<String> featuredNames = [
-    "Alec H",
-    /* "Benson F",*/
-    "Christopher R",
-    "Corey B",
-    "Cornelius M",
-    "Daniel A",
-    "Daniel C",
-    "Gary Ahmed",
-    /* "Jesse S.",*/
-    "Mikey D",
-    "Nathan Grant",
+    "Benson F.",
+    "Corey B.",
+    "Mikey D.",
+    "Gary A.",
+    "Nathan G.",
+    "Cornelius M.",
+    "Jesse S.",
+    "Alec H.",
+    "Daniel C.",
+    "Christopher R.",
+    "Daniel A.",
   ];
 
   final List<String> featuredImages = [
-    AppAssets.creativeAlecH,
-    AppAssets.creativeChristopherR,
+    AppAssets.creativeBensonF,
     AppAssets.creativeCoreyB,
-    AppAssets.creativeCorneliumM,
-    AppAssets.creativeDanielA,
-    AppAssets.creativeDanielC,
-    AppAssets.creativeGaryAhmed,
     AppAssets.creativeMikeyD,
+    AppAssets.creativeGaryAhmed,
     AppAssets.creativeNathanGrant,
+    AppAssets.creativeCorneliumM,
+    AppAssets.creativeJesseS,
+    AppAssets.creativeAlecH,
+    AppAssets.creativeDanielC,
+    AppAssets.creativeChristopherR,
+    AppAssets.creativeDanielA,
   ];
 
   final List<String> featuredLocations = [
-    "Seattle, Washington State",
-    "Los Angeles, California",
-    "New York, New York State",
-    "Austin, Texas",
-    "Chicago, Illinois",
-    "Miami, Florida",
-    "San Francisco, California",
-    "Denver, Colorado",
-    "Boston, Massachusetts",
+    "Phoenix",
+    "Los Angeles",
+    "Nashville",
+    "Los Angeles",
+    "New York",
+    "Portland",
+    "Seattle",
+    "Houston",
+    "Dallas",
+    "Austin",
+    "Atlanta",
   ];
   final List<Map<String, String>> studioList = [
     {

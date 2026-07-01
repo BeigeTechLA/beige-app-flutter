@@ -227,12 +227,14 @@ class AppAssets {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const String creativeAlecH = '$_mockCreatives/alec_h.png';
+  static const String creativeBensonF = '$_mockCreatives/benson_f.png';
   static const String creativeChristopherR = '$_mockCreatives/christopher_r.png';
   static const String creativeCoreyB = '$_mockCreatives/corey_b.png';
   static const String creativeCorneliumM = '$_mockCreatives/cornelius_m.png';
   static const String creativeDanielA = '$_mockCreatives/daniel_a.png';
   static const String creativeDanielC = '$_mockCreatives/daniel_c.png';
   static const String creativeGaryAhmed = '$_mockCreatives/gary_ahmed.png';
+  static const String creativeJesseS = '$_mockCreatives/jesse_s.png';
   static const String creativeMikeyD = '$_mockCreatives/mikey_d.jpg';
   static const String creativeNathanGrant = '$_mockCreatives/nathan_grant.png';
 
