@@ -55,7 +55,7 @@ class MeetingsScreen extends ConsumerWidget {
     if (ok) {
       TopMessage.show(
         context,
-        accept ? 'Meeting accepted' : 'Meeting rejected',
+        accept ? 'You have Accepted Meeting' : 'You Have Rejected Meeting',
         type: accept ? TopMessageType.success : TopMessageType.error,
       );
     }

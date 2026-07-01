@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../providers/client_shoots_provider.dart';
@@ -27,7 +27,6 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _linkCtrl = TextEditingController();
-  static final _dateFmt = DateFormat('dd MMM yyyy');
 
   @override
   void dispose() {
@@ -246,7 +245,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                           controller: TextEditingController(
                             text: state.date == null
                                 ? ''
-                                : _dateFmt.format(state.date!),
+                                : DateTimeUtils.formatMeetingDate(state.date!),
                           ),
                         ),
                       ),

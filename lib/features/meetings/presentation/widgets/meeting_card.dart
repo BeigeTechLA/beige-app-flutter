@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_toggle_switch.dart';
 import '../../domain/models/meeting.dart';
@@ -43,10 +44,10 @@ class MeetingCard extends StatefulWidget {
 class _MeetingCardState extends State<MeetingCard> {
   bool _syncMeeting = true;
 
-  static final _date = DateFormat('dd MMM,yyyy');
   static final _time = DateFormat('hh:mm a');
 
-  String get _dateLabel => _date.format(widget.meeting.startAt);
+  String get _dateLabel =>
+      DateTimeUtils.formatMeetingDate(widget.meeting.startAt);
   String get _timeLabel =>
       '${_time.format(widget.meeting.startAt)} to ${_time.format(widget.meeting.endAt)}';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
@@ -28,7 +28,6 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _linkCtrl = TextEditingController();
-  static final _dateFmt = DateFormat('dd MMM yyyy');
   bool _seeded = false;
 
   @override
@@ -189,7 +188,6 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
               titleCtrl: _titleCtrl,
               descCtrl: _descCtrl,
               linkCtrl: _linkCtrl,
-              dateFmt: _dateFmt,
               decorationBuilder: _inputDecoration,
               onPickDate: _pickDate,
               onPickTime: _pickTime,
@@ -212,7 +210,6 @@ class _Form extends StatelessWidget {
     required this.titleCtrl,
     required this.descCtrl,
     required this.linkCtrl,
-    required this.dateFmt,
     required this.decorationBuilder,
     required this.onPickDate,
     required this.onPickTime,
@@ -228,7 +225,6 @@ class _Form extends StatelessWidget {
   final TextEditingController titleCtrl;
   final TextEditingController descCtrl;
   final TextEditingController linkCtrl;
-  final DateFormat dateFmt;
   final InputDecoration Function({
     required String label,
     String? hint,
@@ -307,8 +303,9 @@ class _Form extends StatelessWidget {
                         ),
                       ),
                       controller: TextEditingController(
-                        text:
-                            state.date == null ? '' : dateFmt.format(state.date!),
+                        text: state.date == null
+                            ? ''
+                            : DateTimeUtils.formatMeetingDate(state.date!),
                       ),
                     ),
                   ),

@@ -10,7 +10,9 @@ import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../core/providers/current_user_provider.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_platform.dart';
 import '../../domain/models/meeting_response.dart';
@@ -148,11 +150,10 @@ class _DetailsBody extends ConsumerWidget {
   final ScrollController scrollController;
   final bool isOwner;
 
-  static final _dateFmt = DateFormat('MMM d');
   static final _timeFmt = DateFormat('hh:mm a');
 
   String get _dateTimeLabel =>
-      '${_dateFmt.format(meeting.startAt)}, ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
+      '${DateTimeUtils.formatMeetingDate(meeting.startAt)}, ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
 
   /// Current user's RSVP — precomputed at the DTO boundary from the
   /// meeting-level `participant_responses[]` array against the session id.
@@ -174,8 +175,10 @@ class _DetailsBody extends ConsumerWidget {
   Future<void> _onCopyLink(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: meeting.link));
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Link copied')),
+    TopMessage.show(
+      context,
+      'Link copied',
+      type: TopMessageType.success,
     );
   }
 
@@ -232,15 +235,16 @@ class _DetailsBody extends ConsumerWidget {
           case CancelMeetingStatus.done:
             ref.invalidate(meetingsListNotifierProvider);
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Meeting cancelled')),
+            TopMessage.show(
+              context,
+              'Meeting cancelled',
+              type: TopMessageType.success,
             );
           case CancelMeetingStatus.error:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(next.error ?? 'Could not cancel meeting'),
-                backgroundColor: AppColors.error,
-              ),
+            TopMessage.show(
+              context,
+              next.error ?? 'Could not cancel meeting',
+              type: TopMessageType.error,
             );
           case _:
             break;

@@ -21,6 +21,9 @@ class DateTimeUtils {
   /// `May 19, 2026`
   static const String kFullMonthDatePattern = "MMMM dd, yyyy";
 
+  /// `May 19,2026` — meeting listing / details / create / edit.
+  static const String kMeetingDatePattern = "MMM dd,yyyy";
+
   /// `May 2026`
   static const String kMonthYearPattern = "MMM yyyy";
 
@@ -145,6 +148,23 @@ class DateTimeUtils {
       if (date == null) return fallback;
 
       return DateFormat(kFullMonthDatePattern).format(date);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  /// ✅ Format Date → May 19,2026
+  ///
+  /// Used in:
+  /// - meeting_card.dart
+  /// - meeting_details_sheet.dart
+  /// - create_meeting_screen.dart
+  /// - edit_meeting_screen.dart
+  static String formatMeetingDate(DateTime? date, {String fallback = "--"}) {
+    try {
+      if (date == null) return fallback;
+
+      return DateFormat(kMeetingDatePattern).format(date);
     } catch (_) {
       return fallback;
     }
