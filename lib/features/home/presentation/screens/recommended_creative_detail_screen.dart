@@ -95,18 +95,25 @@ class _RecommendedCreativeDetailScreenState
                 /// TOP IMAGE + ACTIONS
                 Stack(
                   children: [
-                    Image.network(
-                      _imageUrl(creative?['profile_image_url']),
-                      height: 360,
-                      width: double.infinity,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => SvgPicture.asset(
-                        AppAssets.imagePlaceholder,
-                        height: 360,
-                        width: double.infinity,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
+                    _imageUrl(creative?['profile_image_url']).isNotEmpty
+                        ? Image.network(
+                            _imageUrl(creative?['profile_image_url']),
+                            height: 360,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => SvgPicture.asset(
+                              AppAssets.imagePlaceholder,
+                              height: 360,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            AppAssets.imagePlaceholder,
+                            height: 360,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                     Container(
                       height: 360,
                       decoration: BoxDecoration(

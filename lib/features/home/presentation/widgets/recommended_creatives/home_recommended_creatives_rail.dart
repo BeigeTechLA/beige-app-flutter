@@ -34,7 +34,7 @@ class HomeRecommendedCreativesRail extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 280,
+      height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
