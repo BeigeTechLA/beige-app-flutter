@@ -10,17 +10,13 @@ import 'home_team_card.dart';
 /// indicator strip showing active dot per real index.
 class HomeFeaturedCreativesCarousel extends StatelessWidget {
   final PageController controller;
-  final List<String> images;
-  final List<String> names;
-  final List<String> locations;
+  final List<Map<String, String>> creatives;
   final int initialPage;
 
   const HomeFeaturedCreativesCarousel({
     super.key,
     required this.controller,
-    required this.images,
-    required this.names,
-    required this.locations,
+    required this.creatives,
     required this.initialPage,
   });
 
@@ -38,7 +34,8 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                 clipBehavior: Clip.none,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  final int actualIndex = index % images.length;
+                  final int actualIndex = index % creatives.length;
+                  final creative = creatives[actualIndex];
 
                   double page = controller.hasClients
                       ? controller.page ?? initialPage.toDouble()
@@ -78,9 +75,9 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                         ..rotateY(rotation)
                         ..scale(scale),
                       child: HomeTeamCard(
-                        image: images[actualIndex],
-                        name: names[actualIndex],
-                        location: locations[actualIndex],
+                        image: creative['image'] ?? '',
+                        name: creative['name'] ?? '',
+                        location: creative['location'] ?? '',
                         detailsOpacity: detailsOpacity,
                       ),
                     ),
@@ -111,11 +108,11 @@ class HomeFeaturedCreativesCarousel extends StatelessWidget {
                   } else {
                     page = initialPage.toDouble();
                   }
-                  int activeIndex = page.round() % images.length;
+                  int activeIndex = page.round() % creatives.length;
 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(images.length, (index) {
+                    children: List.generate(creatives.length, (index) {
                       bool isActive = index == activeIndex;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 200),

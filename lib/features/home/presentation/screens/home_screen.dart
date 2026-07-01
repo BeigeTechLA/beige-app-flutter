@@ -103,46 +103,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     },
   ];
 
-  final List<String> featuredNames = [
-    "Benson F.",
-    "Corey B.",
-    "Mikey D.",
-    "Gary A.",
-    "Nathan G.",
-    "Cornelius M.",
-    "Jesse S.",
-    "Alec H.",
-    "Daniel C.",
-    "Christopher R.",
-    "Daniel A.",
-  ];
-
-  final List<String> featuredImages = [
-    AppAssets.creativeBensonF,
-    AppAssets.creativeCoreyB,
-    AppAssets.creativeMikeyD,
-    AppAssets.creativeGaryAhmed,
-    AppAssets.creativeNathanGrant,
-    AppAssets.creativeCorneliumM,
-    AppAssets.creativeJesseS,
-    AppAssets.creativeAlecH,
-    AppAssets.creativeDanielC,
-    AppAssets.creativeChristopherR,
-    AppAssets.creativeDanielA,
-  ];
-
-  final List<String> featuredLocations = [
-    "Phoenix",
-    "Los Angeles",
-    "Nashville",
-    "Los Angeles",
-    "New York",
-    "Portland",
-    "Seattle",
-    "Houston",
-    "Dallas",
-    "Austin",
-    "Atlanta",
+  final List<Map<String, String>> featuredCreativeList = [
+    {
+      "image": AppAssets.creativeBensonF,
+      "name": "Benson F.",
+      "location": "Phoenix",
+    },
+    {
+      "image": AppAssets.creativeCoreyB,
+      "name": "Corey B.",
+      "location": "Los Angeles",
+    },
+    {
+      "image": AppAssets.creativeMikeyD,
+      "name": "Mikey D.",
+      "location": "Nashville",
+    },
+    {
+      "image": AppAssets.creativeGaryAhmed,
+      "name": "Gary A.",
+      "location": "Los Angeles",
+    },
+    {
+      "image": AppAssets.creativeNathanGrant,
+      "name": "Nathan G.",
+      "location": "New York",
+    },
+    {
+      "image": AppAssets.creativeCorneliumM,
+      "name": "Cornelius M.",
+      "location": "Portland",
+    },
+    {
+      "image": AppAssets.creativeJesseS,
+      "name": "Jesse S.",
+      "location": "Seattle",
+    },
+    {
+      "image": AppAssets.creativeAlecH,
+      "name": "Alec H.",
+      "location": "Houston",
+    },
+    {
+      "image": AppAssets.creativeDanielC,
+      "name": "Daniel C.",
+      "location": "Dallas",
+    },
+    {
+      "image": AppAssets.creativeChristopherR,
+      "name": "Christopher R.",
+      "location": "Austin",
+    },
+    {
+      "image": AppAssets.creativeDanielA,
+      "name": "Daniel A.",
+      "location": "Atlanta",
+    },
   ];
   final List<Map<String, String>> studioList = [
     {
@@ -683,9 +699,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(height: 20),
                       HomeFeaturedCreativesCarousel(
                         controller: _pageController,
-                        images: featuredImages,
-                        names: featuredNames,
-                        locations: featuredLocations,
+                        creatives: featuredCreativeList,
                         initialPage: _initialPage,
                       ),
                       const SizedBox(height: 10),

@@ -49,18 +49,18 @@ class HomeTeamCard extends StatelessWidget {
                 style: const TextStyle(
                   color: AppColors.white,
                   fontFamily: AppAssets.fontOutfit,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 location,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.white.withValues(alpha: 0.6),
+                style: const TextStyle(
+                  color: AppColors.textLightGrey,
                   fontFamily: AppAssets.fontOutfit,
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: FontWeight.w400,
                 ),
               ),
