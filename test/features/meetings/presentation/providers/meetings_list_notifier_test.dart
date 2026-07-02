@@ -142,7 +142,7 @@ void main() {
     expect(container.read(authStateProvider), false);
   });
 
-  test('selectTab updates tab without refetching (local filter)', () async {
+  test('selectTab kicks off a new fetch (server-driven meeting_time_status)', () async {
     final repo = _FakeRepo(
       items: [
         _m('a', status: MeetingStatus.upcoming),
@@ -157,20 +157,13 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     expect(repo.listCalls, 1);
 
-    notifier.selectTab(MeetingsTab.upcoming); // same tab — no recompute either
+    notifier.selectTab(MeetingsTab.upcoming); // same tab — no refetch
     expect(repo.listCalls, 1);
-    expect(
-      container.read(meetingsListNotifierProvider).items.map((m) => m.id),
-      ['a'],
-    );
 
     notifier.selectTab(MeetingsTab.completed);
-    // Local recompute only — no new repo call.
-    expect(repo.listCalls, 1);
-    expect(
-      container.read(meetingsListNotifierProvider).items.map((m) => m.id),
-      ['b'],
-    );
+    await Future<void>.delayed(Duration.zero);
+    // Server-side tab now → refetch triggered.
+    expect(repo.listCalls, 2);
   });
 
   test('applyFilter updates state + recomputes items locally', () async {

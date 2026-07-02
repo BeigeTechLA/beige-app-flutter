@@ -77,21 +77,23 @@ class MeetingsListState {
   }
 }
 
-/// Local filter applied to `allItems` to produce the visible list. Keeps the
-/// same tab + filter semantics as the repository's server-side path so the UI
-/// behavior is identical whether the data was fetched fresh or recomputed.
+/// Local filter applied to `allItems` to produce the visible list. Tab is
+/// now server-driven (`meeting_time_status`), so it is optional here — only
+/// the client-side [MeetingFilter] runs by default.
 List<Meeting> applyLocalMeetingFilters(
   List<Meeting> items, {
-  required MeetingsTab tab,
+  MeetingsTab? tab,
   required MeetingFilter filter,
 }) {
   Iterable<Meeting> result = items;
 
-  switch (tab) {
-    case MeetingsTab.upcoming:
-      result = result.where((m) => m.status != MeetingStatus.completed);
-    case MeetingsTab.completed:
-      result = result.where((m) => m.status == MeetingStatus.completed);
+  if (tab != null) {
+    switch (tab) {
+      case MeetingsTab.upcoming:
+        result = result.where((m) => m.status != MeetingStatus.completed);
+      case MeetingsTab.completed:
+        result = result.where((m) => m.status == MeetingStatus.completed);
+    }
   }
 
   if (!filter.isEmpty) {

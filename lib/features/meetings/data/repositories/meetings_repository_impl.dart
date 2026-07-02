@@ -2,7 +2,6 @@ import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
 import '../../domain/models/meeting_response.dart';
-import '../../domain/models/meeting_status.dart';
 import '../../domain/models/meetings_tab.dart';
 import '../../domain/models/shoot_option.dart';
 import '../../domain/models/update_meeting_input.dart';
@@ -31,13 +30,25 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
     MeetingFilter? filter,
     String? currentUserId,
   }) async {
-    final page = await _remote.list();
+    // Tab now drives a server-side `meeting_time_status` filter.
+    // MeetingFilter (category / status / date range) still applies locally.
+    final page = await _remote.list(meetingTimeStatus: _tabToServer(tab));
     return _applyClientFilters(
       page.items,
-      tab: tab,
       filter: filter,
       currentUserId: currentUserId,
     );
+  }
+
+  static String? _tabToServer(MeetingsTab? tab) {
+    switch (tab) {
+      case MeetingsTab.upcoming:
+        return 'upcoming';
+      case MeetingsTab.completed:
+        return 'completed';
+      case null:
+        return null;
+    }
   }
 
   @override
@@ -90,27 +101,14 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
     return body;
   }
 
-  /// Server only exposes `limit/page/sortBy` query params today, so `tab` +
-  /// [MeetingFilter] are applied client-side.
-  ///
-  /// - `upcoming` — anything that isn't `completed`.
-  /// - `completed` — completed only.
+  /// Tab is now server-side (`meeting_time_status`). [MeetingFilter]
+  /// (category / status / date range) still applies locally; sort stays local.
   List<Meeting> _applyClientFilters(
     List<Meeting> items, {
-    MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
   }) {
     Iterable<Meeting> result = items;
-
-    if (tab != null) {
-      switch (tab) {
-        case MeetingsTab.upcoming:
-          result = result.where((m) => m.status != MeetingStatus.completed);
-        case MeetingsTab.completed:
-          result = result.where((m) => m.status == MeetingStatus.completed);
-      }
-    }
 
     if (filter != null && !filter.isEmpty) {
       if (filter.categories.isNotEmpty) {

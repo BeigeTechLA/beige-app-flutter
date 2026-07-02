@@ -46,14 +46,18 @@ class _FakeRemote implements MeetingsRemoteSource {
   int addParticipantsCalls = 0;
   List<String>? lastAddedUserIds;
   String? lastAddedMeetingId;
+  String? lastMeetingTimeStatus;
 
   @override
   Future<MeetingsPage> list({
     int page = 1,
     int limit = 100,
     String sortBy = 'meeting_date_time:desc',
-  }) async =>
-      MeetingsPage(items: items, hasMore: false);
+    String? meetingTimeStatus,
+  }) async {
+    lastMeetingTimeStatus = meetingTimeStatus;
+    return MeetingsPage(items: items, hasMore: false);
+  }
 
   @override
   Future<Meeting> getById(String id) async =>
@@ -119,33 +123,26 @@ CreateMeetingInput _input({List<MeetingParticipant> participants = const []}) =>
     );
 
 void main() {
-  group('list — client-side filtering', () {
-    test('tab=upcoming excludes completed', () async {
+  group('list — server-side tab + local filtering', () {
+    test('tab=upcoming forwards meetingTimeStatus=upcoming', () async {
       final remote = _FakeRemote(
-        seed: [
-          _m(id: 'a', status: MeetingStatus.upcoming),
-          _m(id: 'b', status: MeetingStatus.completed),
-          _m(id: 'c', status: MeetingStatus.upcoming),
-        ],
+        seed: [_m(id: 'a'), _m(id: 'b')],
       );
       final repo = MeetingsRepositoryImpl(remote);
 
       final result = await repo.list(tab: MeetingsTab.upcoming);
 
-      expect(result.map((m) => m.id).toSet(), {'a', 'c'});
+      expect(remote.lastMeetingTimeStatus, 'upcoming');
+      expect(result.map((m) => m.id).toList(), ['a', 'b']);
     });
 
-    test('tab=completed keeps only completed', () async {
-      final remote = _FakeRemote(
-        seed: [
-          _m(id: 'a', status: MeetingStatus.upcoming),
-          _m(id: 'b', status: MeetingStatus.completed),
-        ],
-      );
+    test('tab=completed forwards meetingTimeStatus=completed', () async {
+      final remote = _FakeRemote(seed: [_m(id: 'b')]);
       final repo = MeetingsRepositoryImpl(remote);
 
       final result = await repo.list(tab: MeetingsTab.completed);
 
+      expect(remote.lastMeetingTimeStatus, 'completed');
       expect(result.map((m) => m.id).toList(), ['b']);
     });
 

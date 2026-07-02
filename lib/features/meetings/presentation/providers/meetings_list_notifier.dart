@@ -31,12 +31,12 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       clearError: true,
     );
     try {
-      final all = await _repo.list();
+      final all = await _repo.list(tab: state.tab);
       state = state.copyWith(
         allItems: all,
         items: applyLocalMeetingFilters(
           all,
-          tab: state.tab,
+          tab: null,
           filter: state.filter,
         ),
         status: MeetingsListStatus.ready,
@@ -57,20 +57,18 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
     return 'Failed to load meetings';
   }
 
+  /// Tab drives a server-side `meeting_time_status` filter. Switching
+  /// tab kicks off a fresh fetch rather than local re-filter.
   void selectTab(MeetingsTab tab) {
     if (tab == state.tab) return;
-    final items = applyLocalMeetingFilters(
-      state.allItems,
-      tab: tab,
-      filter: state.filter,
-    );
-    state = state.copyWith(tab: tab, items: items);
+    state = state.copyWith(tab: tab);
+    _load();
   }
 
   void applyFilter(MeetingFilter filter) {
     final items = applyLocalMeetingFilters(
       state.allItems,
-      tab: state.tab,
+      tab: null,
       filter: filter,
     );
     state = state.copyWith(filter: filter, items: items);
@@ -79,7 +77,7 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
   void clearFilter() {
     final items = applyLocalMeetingFilters(
       state.allItems,
-      tab: state.tab,
+      tab: null,
       filter: MeetingFilter.empty,
     );
     state = state.copyWith(filter: MeetingFilter.empty, items: items);

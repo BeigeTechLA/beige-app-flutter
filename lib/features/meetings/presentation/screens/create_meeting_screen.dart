@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,21 +74,136 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
   Future<void> _pickTime({required bool start}) async {
     final notifier = ref.read(createMeetingNotifierProvider.notifier);
     final state = ref.read(createMeetingNotifierProvider);
+    final date = state.date;
+    if (date == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Select a date first')),
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final isToday = date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
+
+    // Compute lower bound as a DateTime on the picked date.
+    DateTime lowerBound;
+    if (start) {
+      lowerBound = isToday
+          ? now.add(const Duration(hours: 2))
+          : DateTime(date.year, date.month, date.day, 0, 0);
+    } else {
+      final s = state.startTime;
+      if (s == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Select start time first')),
+        );
+        return;
+      }
+      lowerBound = DateTime(date.year, date.month, date.day, s.hour, s.minute)
+          .add(const Duration(hours: 1));
+    }
+    final upperBound = DateTime(date.year, date.month, date.day, 23, 59);
+    if (!lowerBound.isBefore(upperBound)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            start
+                ? 'No available start time today (needs 2h buffer)'
+                : 'No available end time — pick a later date',
+          ),
+        ),
+      );
+      return;
+    }
+
     final current = start ? state.startTime : state.endTime;
-    final picked = await showTimePicker(
+    DateTime initial = current == null
+        ? lowerBound
+        : DateTime(date.year, date.month, date.day, current.hour, current.minute);
+    if (initial.isBefore(lowerBound)) initial = lowerBound;
+    if (initial.isAfter(upperBound)) initial = upperBound;
+
+    DateTime tempPicked = initial;
+    final result = await showCupertinoModalPopup<DateTime>(
       context: context,
-      initialTime: current == null
-          ? TimeOfDay.now()
-          : TimeOfDay(hour: current.hour, minute: current.minute),
-      builder: _timePickerTheme,
+      builder: (ctx) => Container(
+        height: 280,
+        color: AppColors.surface,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: Text(
+                      'Cancel',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  CupertinoButton(
+                    onPressed: () => Navigator.of(ctx).pop(tempPicked),
+                    child: Text(
+                      'Done',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: CupertinoTheme(
+                  data: const CupertinoThemeData(
+                    brightness: Brightness.dark,
+                    textTheme: CupertinoTextThemeData(
+                      dateTimePickerTextStyle: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    use24hFormat: false,
+                    minuteInterval: 5,
+                    initialDateTime: _snapToInterval(initial, 5),
+                    minimumDate: lowerBound,
+                    maximumDate: upperBound,
+                    onDateTimeChanged: (v) => tempPicked = v,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-    if (picked == null) return;
-    final value = TimeOfDayValue(picked.hour, picked.minute);
+
+    if (result == null) return;
+    DateTime finalPick = result;
+    if (finalPick.isBefore(lowerBound)) finalPick = lowerBound;
+    if (finalPick.isAfter(upperBound)) finalPick = upperBound;
+    final value = TimeOfDayValue(finalPick.hour, finalPick.minute);
     if (start) {
       notifier.setStartTime(value);
     } else {
       notifier.setEndTime(value);
     }
+  }
+
+  DateTime _snapToInterval(DateTime dt, int minuteInterval) {
+    final remainder = dt.minute % minuteInterval;
+    if (remainder == 0) return dt;
+    final add = minuteInterval - remainder;
+    return dt.add(Duration(minutes: add));
   }
 
   Future<void> _submit() async {
@@ -822,6 +938,3 @@ String _formatTime(TimeOfDayValue t) {
 
 Widget _datePickerTheme(BuildContext ctx, Widget? child) =>
     appDatePickerTheme(ctx, child);
-
-Widget _timePickerTheme(BuildContext ctx, Widget? child) =>
-    appTimePickerTheme(ctx, child);

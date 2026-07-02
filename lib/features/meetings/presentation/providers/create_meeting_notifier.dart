@@ -53,7 +53,18 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
   /// Sets date/time/link/reminder values
   void setDate(DateTime v) => state = state.copyWith(date: v);
-  void setStartTime(TimeOfDayValue v) => state = state.copyWith(startTime: v);
+  /// Sets start time and auto-shifts end time to +60 minutes (rolls into
+  /// next day only via minute math — caller enforces same-day date).
+  void setStartTime(TimeOfDayValue v) {
+    final totalEnd = v.hour * 60 + v.minute + 60;
+    final endHour = (totalEnd ~/ 60) % 24;
+    final endMinute = totalEnd % 60;
+    state = state.copyWith(
+      startTime: v,
+      endTime: TimeOfDayValue(endHour, endMinute),
+    );
+  }
+
   void setEndTime(TimeOfDayValue v) => state = state.copyWith(endTime: v);
   void setPlatform(MeetingPlatform v) => state = state.copyWith(platform: v);
   void setLink(String v) => state = state.copyWith(link: v);

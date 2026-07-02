@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/colors.dart';
+import '../../../../app/durations.dart';
 import '../../../../app/radii.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -124,67 +125,34 @@ class _InviteAdditionalMembersBottomSheetState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Container(
+                  height: 53,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0D0D0D),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.surfaceMid,
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     children: [
                       Expanded(
-                        child: GestureDetector(
+                        child: _RolePill(
+                          label: 'Staff',
+                          isActive: isStaffTab,
                           onTap: () {
                             notifier.setSelectedTab('staff');
                             _searchController.clear();
                             notifier.setSearchText('');
                           },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isStaffTab
-                                  ? AppColors.primary
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Staff',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: isStaffTab
-                                    ? AppColors.onPrimary
-                                    : AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                       Expanded(
-                        child: GestureDetector(
+                        child: _RolePill(
+                          label: 'Creative Partner',
+                          isActive: !isStaffTab,
                           onTap: () {
                             notifier.setSelectedTab('cp');
                             _searchController.clear();
                             notifier.setSearchText('');
                           },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: !isStaffTab
-                                  ? AppColors.primary
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Creative Partner',
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: !isStaffTab
-                                    ? AppColors.onPrimary
-                                    : AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                     ],
@@ -195,42 +163,62 @@ class _InviteAdditionalMembersBottomSheetState
               // Search Field
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceInput,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.dividerDark),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: notifier.setSearchText,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.search,
-                        color: AppColors.textTertiary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          onChanged: notifier.setSearchText,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: isStaffTab
-                                ? 'Search Staff Members...'
-                                : 'Search Creative Partners...',
-                            hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: AppColors.surfaceInput,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    hintText: isStaffTab
+                        ? 'Search Staff Members...'
+                        : 'Search Creative Partners...',
+                    hintStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
+                    suffixIcon: state.searchText.isEmpty
+                        ? null
+                        : GestureDetector(
+                            onTap: () {
+                              _searchController.clear();
+                              notifier.setSearchText('');
+                            },
+                            child: const Icon(
+                              Icons.close,
                               color: AppColors.textTertiary,
+                              size: 18,
                             ),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
                           ),
-                        ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.dividerDark,
                       ),
-                    ],
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.dividerDark,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -353,6 +341,46 @@ class _InviteAdditionalMembersBottomSheetState
           ),
         );
       },
+    );
+  }
+}
+
+class _RolePill extends StatelessWidget {
+  const _RolePill({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: isActive,
+      label: label,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: AppDurations.fast,
+          curve: Curves.easeOut,
+          decoration: BoxDecoration(
+            gradient: isActive ? AppColors.goldHorizontalGradient : null,
+            borderRadius: AppRadii.mldAll,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: AppTextStyles.labelLarge.copyWith(
+              color: isActive ? AppColors.textHeading : AppColors.white30,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

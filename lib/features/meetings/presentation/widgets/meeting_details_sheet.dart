@@ -463,6 +463,7 @@ class _SheetHeader extends StatelessWidget {
               Text(
                 'Meeting Details',
                 style: AppTextStyles.titleMedium.copyWith(
+                  color: AppColors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
