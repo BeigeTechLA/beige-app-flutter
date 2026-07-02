@@ -492,8 +492,12 @@ class _StatusPill extends StatelessWidget {
       case MeetingStatus.completed:
         return AppColors.softMint;
       case MeetingStatus.revision:
+      case MeetingStatus.cancelled:
         return const Color(0xFFFFEAE0);
       case MeetingStatus.upcoming:
+      case MeetingStatus.pending:
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.scheduled:
         return AppColors.blueIce;
     }
   }
@@ -505,8 +509,12 @@ class _StatusPill extends StatelessWidget {
       case MeetingStatus.completed:
         return AppColors.greenForest;
       case MeetingStatus.revision:
+      case MeetingStatus.cancelled:
         return AppColors.orangeBright;
       case MeetingStatus.upcoming:
+      case MeetingStatus.pending:
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.scheduled:
         return AppColors.blueRoyal;
     }
   }

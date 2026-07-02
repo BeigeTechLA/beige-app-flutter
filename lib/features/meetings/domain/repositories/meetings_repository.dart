@@ -3,6 +3,7 @@ import '../models/meeting.dart';
 import '../models/meeting_filter.dart';
 import '../models/meeting_response.dart';
 import '../models/meetings_tab.dart';
+import '../models/shoot_option.dart';
 import '../models/update_meeting_input.dart';
 
 /// Stable interface for meetings. Backed by `MeetingsRepositoryImpl` (Dio)
@@ -41,4 +42,8 @@ abstract class MeetingsRepository {
   /// updated Meeting (or void — impl re-fetches if needed) so callers can
   /// refresh local state.
   Future<Meeting> respond(String id, MeetingResponse response);
+
+  /// Project summaries for the create-meeting shoot picker. Backed by
+  /// `admin/get-projects`.
+  Future<List<ShootOption>> listProjects();
 }

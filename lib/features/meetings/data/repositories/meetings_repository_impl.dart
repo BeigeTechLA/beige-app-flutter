@@ -4,6 +4,7 @@ import '../../domain/models/meeting_filter.dart';
 import '../../domain/models/meeting_response.dart';
 import '../../domain/models/meeting_status.dart';
 import '../../domain/models/meetings_tab.dart';
+import '../../domain/models/shoot_option.dart';
 import '../../domain/models/update_meeting_input.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import '../mappers/meeting_enum_mapper.dart';
@@ -43,18 +44,7 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
   Future<Meeting> getById(String id) => _remote.getById(id);
 
   @override
-  Future<Meeting> create(CreateMeetingInput input) async {
-    final created = await _remote.create(input);
-    if (input.participants.isEmpty) return created;
-    final ids = input.participants
-        .map((p) => p.id)
-        .where((id) => id.isNotEmpty)
-        .toList(growable: false);
-    if (ids.isEmpty) return created;
-    // Server response on add-participants is the full updated Meeting — no
-    // extra GET needed.
-    return _remote.addParticipants(created.id, ids);
-  }
+  Future<Meeting> create(CreateMeetingInput input) => _remote.create(input);
 
   @override
   Future<Meeting> update(String id, UpdateMeetingInput patch) {
@@ -72,6 +62,9 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
   @override
   Future<Meeting> respond(String id, MeetingResponse response) =>
       _remote.respond(id, response);
+
+  @override
+  Future<List<ShootOption>> listProjects() => _remote.getProjects();
 
   /// Serializes [UpdateMeetingInput] to the server's snake_case patch body.
   /// Skips `null` fields so PATCH stays truly partial. `duration` never

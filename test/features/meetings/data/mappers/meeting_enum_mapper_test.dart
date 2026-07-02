@@ -6,17 +6,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('statusFromServer', () {
-    test('pending → upcoming', () {
+    test('pending → pending', () {
       expect(
         MeetingEnumMapper.statusFromServer('pending'),
-        MeetingStatus.upcoming,
+        MeetingStatus.pending,
       );
     });
 
-    test('rescheduled → upcoming', () {
+    test('rescheduled → rescheduled', () {
       expect(
         MeetingEnumMapper.statusFromServer('rescheduled'),
-        MeetingStatus.upcoming,
+        MeetingStatus.rescheduled,
       );
     });
 
@@ -27,27 +27,27 @@ void main() {
       );
     });
 
-    test('cancelled → completed', () {
+    test('cancelled → cancelled', () {
       expect(
         MeetingEnumMapper.statusFromServer('cancelled'),
-        MeetingStatus.completed,
+        MeetingStatus.cancelled,
       );
     });
 
-    test('unknown / null → upcoming', () {
+    test('unknown / null → pending', () {
       expect(
         MeetingEnumMapper.statusFromServer('garbage'),
-        MeetingStatus.upcoming,
+        MeetingStatus.pending,
       );
       expect(
         MeetingEnumMapper.statusFromServer(null),
-        MeetingStatus.upcoming,
+        MeetingStatus.pending,
       );
     });
   });
 
   group('statusToServer', () {
-    test('upcoming/initiated/revision → pending', () {
+    test('upcoming/initiated/revision/pending → pending', () {
       expect(
         MeetingEnumMapper.statusToServer(MeetingStatus.upcoming),
         'pending',
@@ -60,12 +60,23 @@ void main() {
         MeetingEnumMapper.statusToServer(MeetingStatus.revision),
         'pending',
       );
+      expect(
+        MeetingEnumMapper.statusToServer(MeetingStatus.pending),
+        'pending',
+      );
     });
 
     test('completed → completed', () {
       expect(
         MeetingEnumMapper.statusToServer(MeetingStatus.completed),
         'completed',
+      );
+    });
+
+    test('cancelled → cancelled', () {
+      expect(
+        MeetingEnumMapper.statusToServer(MeetingStatus.cancelled),
+        'cancelled',
       );
     });
   });

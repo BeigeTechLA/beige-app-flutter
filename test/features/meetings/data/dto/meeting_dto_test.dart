@@ -27,7 +27,7 @@ void main() {
       expect(m.description, 'planning sync');
       expect(m.project, 'Cover Story Shoot');
       expect(m.platform, MeetingPlatform.meet);
-      expect(m.status, MeetingStatus.upcoming);
+      expect(m.status, MeetingStatus.pending);
       expect(m.link, 'https://meet.google.com/abc');
       expect(m.participants.length, 2);
       expect(m.participants.first.id, '5');
@@ -52,8 +52,8 @@ void main() {
       expect(m.description, '');
       expect(m.project, '');
       expect(m.participants, isEmpty);
-      // cancelled → completed bucket on client.
-      expect(m.status, MeetingStatus.completed);
+      // cancelled → cancelled (direct pass-through).
+      expect(m.status, MeetingStatus.cancelled);
       // Empty link → meet default.
       expect(m.platform, MeetingPlatform.meet);
     });

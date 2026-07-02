@@ -195,8 +195,14 @@ class BookingRepositoryImpl implements BookingRepository {
       _assertNoError(response);
       final data = response['data'];
       if (data is List) return data;
-      // external-chat/directory has been observed under `users` and
-      // `participants` in different builds — stay tolerant.
+      if (data is Map) {
+        final flat = <dynamic>[];
+        for (final key in const ['staff', 'clients', 'creativePartners', 'cp']) {
+          final v = data[key];
+          if (v is List) flat.addAll(v);
+        }
+        if (flat.isNotEmpty) return flat;
+      }
       final users = response['users'];
       if (users is List) return users;
       final participants = response['participants'];

@@ -9,6 +9,7 @@ import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
 import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
+import 'package:beige/features/meetings/domain/models/shoot_option.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Meeting _m({
@@ -98,6 +99,9 @@ class _FakeRemote implements MeetingsRemoteSource {
   @override
   Future<Meeting> respond(String id, MeetingResponse response) async =>
       items.firstWhere((m) => m.id == id);
+
+  @override
+  Future<List<ShootOption>> getProjects() async => const [];
 }
 
 CreateMeetingInput _input({List<MeetingParticipant> participants = const []}) =>
@@ -177,8 +181,8 @@ void main() {
     });
   });
 
-  group('create — two-step chain', () {
-    test('input without participants → single POST only', () async {
+  group('create — single POST', () {
+    test('input without participants → single POST, no addParticipants', () async {
       final remote = _FakeRemote();
       final repo = MeetingsRepositoryImpl(remote);
 
@@ -188,33 +192,16 @@ void main() {
       expect(remote.addParticipantsCalls, 0);
     });
 
-    test('input with participants → POST then addParticipants', () async {
-      final remote = _FakeRemote();
-      final repo = MeetingsRepositoryImpl(remote);
-
-      final result = await repo.create(
-        _input(
-          participants: const [
-            MeetingParticipant(id: '4', name: 'A'),
-            MeetingParticipant(id: '7', name: 'B'),
-          ],
-        ),
-      );
-
-      expect(remote.createCalls, 1);
-      expect(remote.addParticipantsCalls, 1);
-      expect(remote.lastAddedMeetingId, 'created');
-      expect(remote.lastAddedUserIds, ['4', '7']);
-      expect(result.participants.map((p) => p.id).toList(), ['4', '7']);
-    });
-
-    test('only empty-id participants → no add-participants call', () async {
+    test('input with participants → single POST, participants sent inline', () async {
       final remote = _FakeRemote();
       final repo = MeetingsRepositoryImpl(remote);
 
       await repo.create(
         _input(
-          participants: const [MeetingParticipant(id: '', name: 'Blank')],
+          participants: const [
+            MeetingParticipant(id: '4', name: 'A'),
+            MeetingParticipant(id: '7', name: 'B'),
+          ],
         ),
       );
 

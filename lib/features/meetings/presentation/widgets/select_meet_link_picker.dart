@@ -18,9 +18,10 @@ class SelectMeetLinkPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const visiblePlatforms = [MeetingPlatform.meet];
     return Row(
       children: [
-        for (final p in MeetingPlatform.values) ...[
+        for (final p in visiblePlatforms) ...[
           _Option(
             platform: p,
             isActive: p == selected,

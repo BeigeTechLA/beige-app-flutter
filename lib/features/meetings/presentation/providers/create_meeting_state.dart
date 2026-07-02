@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../domain/models/directory_participant.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_platform.dart';
 import '../../domain/models/shoot_participant_option.dart';
@@ -18,10 +19,21 @@ class CreateMeetingState {
   final MeetingPlatform platform;
   final String link;
   final int reminderMinutes;
-  final List<ShootParticipantOption> invitedParticipants;
+  final List<ShootParticipantOption> invitedParticipants; // Deprecated but kept for backward compatibility/types
   final CreateMeetingSubmitStatus status;
   final String? error;
   final Meeting? created;
+
+  // New participant state fields
+  final bool directoryLoading;
+  final String? directoryError;
+  final List<DirectoryParticipant> directoryParticipants;
+  final List<DirectoryParticipant> defaultInvitedMembers;
+  final List<DirectoryParticipant> optionalSelectedDefaultMembers;
+  final List<DirectoryParticipant> selectedAdditionalStaffMembers;
+  final List<DirectoryParticipant> selectedAdditionalCreativePartners;
+  final String searchText;
+  final String selectedTab; // 'staff' | 'cp'
 
   const CreateMeetingState({
     this.title = '',
@@ -38,6 +50,15 @@ class CreateMeetingState {
     this.status = CreateMeetingSubmitStatus.idle,
     this.error,
     this.created,
+    this.directoryLoading = false,
+    this.directoryError,
+    this.directoryParticipants = const [],
+    this.defaultInvitedMembers = const [],
+    this.optionalSelectedDefaultMembers = const [],
+    this.selectedAdditionalStaffMembers = const [],
+    this.selectedAdditionalCreativePartners = const [],
+    this.searchText = '',
+    this.selectedTab = 'staff',
   });
 
   bool get hasTitle => title.trim().isNotEmpty;
@@ -53,6 +74,48 @@ class CreateMeetingState {
     return (e.hour * 60 + e.minute) > (s.hour * 60 + s.minute);
   }
 
+  /// Unified deduplicated list of all selected participants.
+  List<DirectoryParticipant> get selectedParticipants {
+    final List<DirectoryParticipant> allSelected = [];
+    
+    // 1. Legacy/test compatibility: include deprecated invitedParticipants
+    for (final p in invitedParticipants) {
+      allSelected.add(DirectoryParticipant(
+        id: p.id,
+        name: p.name,
+        role: p.role,
+        type: p.role == 'client' ? 'client' : ((p.role == 'cp' || p.role == 'creative_partner') ? 'creativePartner' : 'staff'),
+        avatarUrl: p.avatarUrl,
+        isOptional: p.role != 'client',
+        isSelected: true,
+      ));
+    }
+    
+    // 2. Default invited members: Clients are mandatory and selectedByDefault is true.
+    // Optional default members are included only if they are present in optionalSelectedDefaultMembers.
+    for (final p in defaultInvitedMembers) {
+      if (!p.isOptional || optionalSelectedDefaultMembers.contains(p)) {
+        allSelected.add(p);
+      }
+    }
+    
+    // 3. Selected additional staff members
+    allSelected.addAll(selectedAdditionalStaffMembers);
+    
+    // 4. Selected additional creative partners
+    allSelected.addAll(selectedAdditionalCreativePartners);
+    
+    // Deduplicate by ID
+    final seenIds = <String>{};
+    final List<DirectoryParticipant> result = [];
+    for (final p in allSelected) {
+      if (seenIds.add(p.id)) {
+        result.add(p);
+      }
+    }
+    return result;
+  }
+
   bool get isValid =>
       hasTitle &&
       hasDescription &&
@@ -61,7 +124,7 @@ class CreateMeetingState {
       hasTimes &&
       endAfterStart &&
       hasLink &&
-      invitedParticipants.isNotEmpty;
+      selectedParticipants.isNotEmpty;
 
   CreateMeetingState copyWith({
     String? title,
@@ -79,6 +142,16 @@ class CreateMeetingState {
     String? error,
     bool clearError = false,
     Meeting? created,
+    bool? directoryLoading,
+    String? directoryError,
+    bool clearDirectoryError = false,
+    List<DirectoryParticipant>? directoryParticipants,
+    List<DirectoryParticipant>? defaultInvitedMembers,
+    List<DirectoryParticipant>? optionalSelectedDefaultMembers,
+    List<DirectoryParticipant>? selectedAdditionalStaffMembers,
+    List<DirectoryParticipant>? selectedAdditionalCreativePartners,
+    String? searchText,
+    String? selectedTab,
   }) {
     return CreateMeetingState(
       title: title ?? this.title,
@@ -95,6 +168,15 @@ class CreateMeetingState {
       status: status ?? this.status,
       error: clearError ? null : (error ?? this.error),
       created: created ?? this.created,
+      directoryLoading: directoryLoading ?? this.directoryLoading,
+      directoryError: clearDirectoryError ? null : (directoryError ?? this.directoryError),
+      directoryParticipants: directoryParticipants ?? this.directoryParticipants,
+      defaultInvitedMembers: defaultInvitedMembers ?? this.defaultInvitedMembers,
+      optionalSelectedDefaultMembers: optionalSelectedDefaultMembers ?? this.optionalSelectedDefaultMembers,
+      selectedAdditionalStaffMembers: selectedAdditionalStaffMembers ?? this.selectedAdditionalStaffMembers,
+      selectedAdditionalCreativePartners: selectedAdditionalCreativePartners ?? this.selectedAdditionalCreativePartners,
+      searchText: searchText ?? this.searchText,
+      selectedTab: selectedTab ?? this.selectedTab,
     );
   }
 }

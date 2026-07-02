@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import '../../../../../app/colors.dart';
 import '../../../../../app/spacing.dart';
 import '../../../../../app/text_styles.dart';
+import '../../../../../shared/util/role_label.dart';
 import '../../../../../shared/widgets/app_avatar.dart';
 import '../../../domain/entities/message.dart';
-import '../../../domain/role_label.dart';
 
 /// Voice-note bubble. Playback wiring lands later — this is presentation
 /// only: play/pause button toggles a local bool, waveform is static.

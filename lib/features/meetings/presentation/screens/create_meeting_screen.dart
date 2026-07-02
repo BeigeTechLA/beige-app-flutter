@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/colors.dart';
+import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -12,7 +13,9 @@ import '../providers/client_shoots_provider.dart';
 import '../providers/create_meeting_notifier.dart';
 import '../providers/create_meeting_state.dart';
 import '../providers/meetings_list_notifier.dart';
-import '../widgets/meeting_participant_picker_sheet.dart';
+import '../widgets/default_invited_members_section.dart';
+import '../widgets/invite_additional_members_bottom_sheet.dart';
+import '../widgets/selected_participant_chip.dart';
 import '../widgets/select_meet_link_picker.dart';
 
 class CreateMeetingScreen extends ConsumerStatefulWidget {
@@ -36,7 +39,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     super.dispose();
   }
 
-  Future<void> _openParticipantPicker() async {
+  Future<void> _openInviteAdditionalBottomSheet() async {
     final state = ref.read(createMeetingNotifierProvider);
     final shootId = state.shootId;
     if (shootId == null) {
@@ -45,13 +48,12 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
       );
       return;
     }
-    final picked = await showMeetingParticipantPickerSheet(
-      context,
-      bookingId: shootId,
-      initialSelected: state.invitedParticipants,
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const InviteAdditionalMembersBottomSheet(),
     );
-    if (picked == null) return;
-    ref.read(createMeetingNotifierProvider.notifier).setParticipants(picked);
   }
 
   Future<void> _pickDate() async {
@@ -143,7 +145,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     ref.listen<CreateMeetingState>(createMeetingNotifierProvider, (prev, next) {
       if (prev?.status != next.status) {
         if (next.status == CreateMeetingSubmitStatus.success) {
-          ref.invalidate(meetingsListNotifierProvider);
+          ref.read(meetingsListNotifierProvider.notifier).refresh();
           context.pushReplacementNamed(RouteNames.meetingScheduled);
         } else if (next.status == CreateMeetingSubmitStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -219,10 +221,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                         label: 'Select Shoot*',
                         hint: 'Select shoot/project',
                       ),
-                      onChanged: (opt) => notifier.setShoot(
-                        shootId: opt.id,
-                        name: opt.title,
-                      ),
+                      onChanged: (opt) => notifier.setShoot(opt),
                     ),
                     const SizedBox(height: 16),
 
@@ -356,65 +355,25 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    InkWell(
-                      onTap: _openParticipantPicker,
-                      borderRadius: BorderRadius.circular(12),
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          readOnly: true,
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                          decoration: _inputDecoration(
-                            label: 'Invite Participants*',
-                            hint: state.shootId == null
-                                ? 'Select a shoot first'
-                                : 'Tap to pick from the booking roster',
-                            suffixIcon: const Icon(
-                              Icons.person_add_alt_1_outlined,
-                              color: AppColors.textSecondary,
-                              size: 20,
-                            ),
-                          ),
-                          controller: TextEditingController(
-                            text: state.invitedParticipants.isEmpty
-                                ? ''
-                                : '${state.invitedParticipants.length} selected',
-                          ),
-                        ),
-                      ),
+                    DefaultInvitedMembersSection(
+                      onInviteAdditionalTap: _openInviteAdditionalBottomSheet,
                     ),
 
-                    if (state.invitedParticipants.isNotEmpty) ...[
+                    if (state.selectedAdditionalStaffMembers.isNotEmpty ||
+                        state.selectedAdditionalCreativePartners.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 8.0,
                         runSpacing: 8.0,
                         children: [
-                          for (final p in state.invitedParticipants)
-                            Chip(
-                              label: Text(
-                                p.name,
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              backgroundColor:
-                                  AppColors.white.withValues(alpha: 0.08),
-                              side: const BorderSide(
-                                color: AppColors.dividerDark,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              deleteIcon: const Icon(
-                                Icons.close,
-                                size: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                              onDeleted: () =>
-                                  notifier.removeParticipant(p.id),
-                            ),
+                          ...state.selectedAdditionalStaffMembers.map((p) => SelectedParticipantChip(
+                                participant: p,
+                                onDeleted: () => notifier.removeAdditionalMember(p.id),
+                              )),
+                          ...state.selectedAdditionalCreativePartners.map((p) => SelectedParticipantChip(
+                                participant: p,
+                                onDeleted: () => notifier.removeAdditionalMember(p.id),
+                              )),
                         ],
                       ),
                     ],
@@ -514,16 +473,17 @@ class _ShootDropdown extends ConsumerWidget {
     final shootsAsync = ref.watch(clientShootsProvider);
 
     return shootsAsync.when(
-      loading: () => InputDecorator(
-        decoration: decoration,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 4),
-          child: SizedBox(
-            height: 18,
-            width: 18,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: AppColors.primary,
+      loading: () => AbsorbPointer(
+        absorbing: true,
+        child: InputDecorator(
+          decoration: decoration,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              'Loading projects…',
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
         ),
@@ -551,39 +511,247 @@ class _ShootDropdown extends ConsumerWidget {
             child: const SizedBox(height: 18),
           );
         }
-        final initial = shoots.any((s) => s.id == selectedId)
-            ? selectedId
-            : null;
-        return DropdownButtonFormField<int>(
-          initialValue: initial,
-          dropdownColor: AppColors.surfaceStats,
-          decoration: decoration,
-          isExpanded: true,
-          icon: const Icon(
-            Icons.expand_more,
-            color: AppColors.textSecondary,
+        final selected = shoots.where((s) => s.id == selectedId).firstOrNull;
+        return GestureDetector(
+          onTap: () async {
+            final picked = await showModalBottomSheet<ShootOption>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => _ShootPickerBottomSheet(
+                shoots: shoots,
+                selectedId: selectedId,
+              ),
+            );
+            if (picked != null) onChanged(picked);
+          },
+          child: AbsorbPointer(
+            child: TextFormField(
+              key: ValueKey(selected?.id ?? 'none'),
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.textPrimary,
+              ),
+              decoration: decoration.copyWith(
+                suffixIcon: const Icon(
+                  Icons.expand_more,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              controller: TextEditingController(
+                text: selected == null ? '' : 'Booking #${selected.id}',
+              ),
+            ),
           ),
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: AppColors.textPrimary,
+        );
+      },
+    );
+  }
+}
+
+class _ShootPickerBottomSheet extends StatefulWidget {
+  const _ShootPickerBottomSheet({
+    required this.shoots,
+    required this.selectedId,
+  });
+
+  final List<ShootOption> shoots;
+  final int? selectedId;
+
+  @override
+  State<_ShootPickerBottomSheet> createState() =>
+      _ShootPickerBottomSheetState();
+}
+
+class _ShootPickerBottomSheetState extends State<_ShootPickerBottomSheet> {
+  final TextEditingController _searchCtrl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final q = _query.trim().toLowerCase();
+    final filtered = q.isEmpty
+        ? widget.shoots
+        : widget.shoots
+            .where((s) => s.title.toLowerCase().contains(q))
+            .toList(growable: false);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      minChildSize: 0.5,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.background,
+            borderRadius: AppRadii.topSheet,
           ),
-          items: [
-            for (final s in shoots)
-              DropdownMenuItem(
-                value: s.id,
-                child: Text(
-                  s.title,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.textPrimary,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Center(
+                  child: Container(
+                    width: 48,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.dividerDark,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
               ),
-          ],
-          onChanged: (v) {
-            if (v == null) return;
-            final picked = shoots.firstWhere((s) => s.id == v);
-            onChanged(picked);
-          },
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Select Shoot',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.textPrimary,
+                        size: 24,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: TextField(
+                  controller: _searchCtrl,
+                  onChanged: (v) => setState(() => _query = v),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: AppColors.surfaceInput,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    hintText: 'Search shoots…',
+                    hintStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: AppColors.textTertiary,
+                      size: 20,
+                    ),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : GestureDetector(
+                            onTap: () {
+                              _searchCtrl.clear();
+                              setState(() => _query = '');
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              color: AppColors.textTertiary,
+                              size: 18,
+                            ),
+                          ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.dividerDark,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.dividerDark,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: filtered.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No matching shoots',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final s = filtered[index];
+                          final isSelected = s.id == widget.selectedId;
+                          return GestureDetector(
+                            onTap: () => Navigator.of(context).pop(s),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 6,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppColors.primary
+                                      : Colors.transparent,
+                                ),
+                              ),
+                              child: Text(
+                                s.title,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: isSelected
+                                      ? AppColors.onPrimary
+                                      : AppColors.textPrimary,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         );
       },
     );

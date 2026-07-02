@@ -8,6 +8,7 @@ import '../../../../core/session/session_store.dart';
 import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_response.dart';
+import '../../domain/models/shoot_option.dart';
 import '../dto/meeting_dto.dart';
 import '../mappers/meeting_enum_mapper.dart';
 
@@ -94,6 +95,10 @@ class MeetingsRemoteSource {
   Future<Meeting> create(CreateMeetingInput input) {
     return _guard(() async {
       final user = await _session.readUser();
+      final participantIds = input.participants
+          .map((p) => p.id)
+          .where((id) => id.isNotEmpty)
+          .toList(growable: false);
       final body = <String, dynamic>{
         'meeting_date_time': input.startAt.toUtc().toIso8601String(),
         'meeting_end_time': input.endAt.toUtc().toIso8601String(),
@@ -103,24 +108,18 @@ class MeetingsRemoteSource {
         'description': input.description,
         'meetLink': input.link,
         'cp_ids': const <int>[],
-        'send_notification': true,
-        // Backend behavior unconfirmed. Forward for now; if backend rejects,
-        // drop the key.
+        'participants': participantIds,
+        'send_notification': false,
         'reminder_minutes': input.reminderMinutes,
       };
       final createdById = int.tryParse(user?.id ?? '');
       if (createdById != null) {
+        body['admin_id'] = createdById;
         body['created_by_id'] = createdById;
       }
-      // Shoot/order id — backend field name is the unconfirmed `order_id`
-      // (inferred from the `order: {name}` read shape on MeetingDto). If the
-      // server rejects with an unknown-field error, swap to `booking_id` or
-      // confirm with backend.
       if (input.shootId != null) {
-        body['order_id'] = input.shootId;
+        body['order_id'] = input.shootId.toString();
       }
-      // `participants` deliberately omitted — confirmed dead path on create.
-      // Two-step flow handled by repository impl.
       final resp = await _dio.post<dynamic>(
         ApiEndpoints.meetings,
         data: body,
@@ -177,6 +176,76 @@ class MeetingsRemoteSource {
     return _guard(() async {
       await _dio.delete<dynamic>(ApiEndpoints.meetingById(id));
     });
+  }
+
+  /// GET `admin/get-projects` — projects list used by the create-meeting
+  /// shoot dropdown. Response shape:
+  /// `{data: {stats, projects: [{project: {stream_project_booking_id, name,
+  /// ...}}]}}`. Maps each entry to a [ShootOption] using
+  /// `stream_project_booking_id` as `id` and `name` as `title`. Entries
+  /// missing either field are skipped.
+  Future<List<ShootOption>> getProjects() {
+    return _guard(() async {
+      final resp = await _dio.get<dynamic>(ApiEndpoints.adminGetProjects);
+      final raw = resp.data;
+      Iterable<dynamic> projects = const [];
+      if (raw is Map<String, dynamic>) {
+        final data = raw['data'];
+        if (data is Map<String, dynamic>) {
+          final list = data['projects'];
+          if (list is List) projects = list;
+        }
+      }
+      return projects
+          .map(_projectToOption)
+          .whereType<ShootOption>()
+          .toList(growable: false);
+    });
+  }
+
+  static ShootOption? _projectToOption(dynamic entry) {
+    if (entry is! Map) return null;
+    final project = entry['project'];
+    if (project is! Map) return null;
+    final id = project['stream_project_booking_id'];
+    if (id is! int) return null;
+    final rawMembers = project['default_members'] ?? project['defaultMembers'];
+    final List<dynamic> defaultMembers = rawMembers is List ? rawMembers : const [];
+    final title = _buildShootLabel(project, id);
+    if (title.isEmpty) return null;
+    return ShootOption(
+      id: id,
+      title: title,
+      defaultMembers: defaultMembers,
+    );
+  }
+
+  /// Builds `{SHOOT_TYPE} Shoot - {Client Name} (Booking #{id})`.
+  /// Client name comes from `client_name` if present, else parsed from
+  /// `project_name` (segment after last " - "). Falls back to `project_name` /
+  /// `name` when shoot_type or client are missing.
+  static String _buildShootLabel(Map<dynamic, dynamic> project, int id) {
+    final projectName = (project['project_name'] as String?)?.trim() ??
+        (project['name'] as String?)?.trim() ??
+        '';
+    final shootType = (project['shoot_type'] as String?)?.trim();
+    final clientName = (project['client_name'] as String?)?.trim() ??
+        _clientFromProjectName(projectName);
+
+    if (shootType != null && shootType.isNotEmpty && clientName.isNotEmpty) {
+      return '${shootType.toUpperCase()} Shoot - $clientName (Booking #$id)';
+    }
+    if (projectName.isNotEmpty) {
+      return '$projectName (Booking #$id)';
+    }
+    return '';
+  }
+
+  static String _clientFromProjectName(String projectName) {
+    if (projectName.isEmpty) return '';
+    final idx = projectName.lastIndexOf(' - ');
+    if (idx == -1) return projectName;
+    return projectName.substring(idx + 3).trim();
   }
 
   /// Records the signed-in user's RSVP. Server returns the updated meeting

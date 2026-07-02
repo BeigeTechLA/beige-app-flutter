@@ -2,10 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
+import '../../../booking/presentation/providers/booking_providers.dart';
 import '../../domain/models/create_meeting_input.dart';
+import '../../domain/models/directory_participant.dart';
 import '../../domain/models/meeting_category.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
+import '../../domain/models/shoot_option.dart';
 import '../../domain/models/shoot_participant_option.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'create_meeting_state.dart';
@@ -23,12 +26,32 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   void setTitle(String v) => state = state.copyWith(title: v);
   void setDescription(String v) => state = state.copyWith(description: v);
 
-  /// Selects a shoot from the user's bookings. `shootId` is required for
-  /// `isValid`; `name` is the display label persisted only for UI rendering.
-  void setShoot({required int shootId, required String name}) {
-    state = state.copyWith(shootId: shootId, project: name);
+  /// Selects a shoot/project option. Parses `defaultMembers`, seeds the
+  /// default invited list, and pre-selects all optional members (user can
+  /// deselect from the UI).
+  void setShoot(ShootOption opt) {
+    final List<DirectoryParticipant> defaultParticipants = [];
+    for (final member in opt.defaultMembers) {
+      if (member is Map) {
+        final parsedJson = Map<String, dynamic>.from(member);
+        defaultParticipants.add(DirectoryParticipant.fromJson(parsedJson, isDefault: true));
+      }
+    }
+    final optionalPreselected = defaultParticipants
+        .where((p) => p.isOptional)
+        .toList(growable: false);
+
+    state = state.copyWith(
+      shootId: opt.id,
+      project: opt.title,
+      defaultInvitedMembers: defaultParticipants,
+      optionalSelectedDefaultMembers: optionalPreselected,
+      selectedAdditionalStaffMembers: const [],
+      selectedAdditionalCreativePartners: const [],
+    );
   }
 
+  /// Sets date/time/link/reminder values
   void setDate(DateTime v) => state = state.copyWith(date: v);
   void setStartTime(TimeOfDayValue v) => state = state.copyWith(startTime: v);
   void setEndTime(TimeOfDayValue v) => state = state.copyWith(endTime: v);
@@ -37,11 +60,89 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   void setReminder(int minutes) =>
       state = state.copyWith(reminderMinutes: minutes);
 
-  /// Replaces the invited-participants list. Picker sheet returns the full
-  /// selected set so the notifier just mirrors it.
+  /// Toggles selection of optional default members. No-op for mandatory
+  /// (`is_optional == false`) rows — they stay selected by design.
+  void toggleOptionalDefaultMember(DirectoryParticipant member) {
+    if (!member.isOptional) return;
+    final list = List<DirectoryParticipant>.from(state.optionalSelectedDefaultMembers);
+    if (list.contains(member)) {
+      list.remove(member);
+    } else {
+      list.add(member);
+    }
+    state = state.copyWith(optionalSelectedDefaultMembers: list);
+  }
+
+  /// Fetches directory participants (all staff and creative partners) from external-chat/directory
+  Future<void> fetchDirectory() async {
+    if (state.directoryLoading) return;
+    state = state.copyWith(directoryLoading: true, clearDirectoryError: true);
+
+    final bookingRepo = ref.read(bookingRepositoryProvider);
+    final result = await bookingRepo.getBookingParticipants(bookingId: state.shootId ?? 0);
+
+    result.fold(
+      (e) => state = state.copyWith(
+        directoryLoading: false,
+        directoryError: e.message,
+      ),
+      (list) {
+        final List<DirectoryParticipant> participants = [];
+        for (final item in list) {
+          if (item is Map) {
+            final parsedJson = Map<String, dynamic>.from(item);
+            participants.add(DirectoryParticipant.fromJson(parsedJson, isDefault: false));
+          }
+        }
+        state = state.copyWith(
+          directoryLoading: false,
+          directoryParticipants: participants,
+        );
+      },
+    );
+  }
+
+  void setSearchText(String v) {
+    state = state.copyWith(searchText: v);
+  }
+
+  void setSelectedTab(String v) {
+    state = state.copyWith(selectedTab: v);
+  }
+
+  /// Toggles selection of staff / CP in the bottom sheet selection
+  void toggleAdditionalMember(DirectoryParticipant member) {
+    if (member.type == 'creativePartner') {
+      final list = List<DirectoryParticipant>.from(state.selectedAdditionalCreativePartners);
+      if (list.contains(member)) {
+        list.remove(member);
+      } else {
+        list.add(member);
+      }
+      state = state.copyWith(selectedAdditionalCreativePartners: list);
+    } else {
+      final list = List<DirectoryParticipant>.from(state.selectedAdditionalStaffMembers);
+      if (list.contains(member)) {
+        list.remove(member);
+      } else {
+        list.add(member);
+      }
+      state = state.copyWith(selectedAdditionalStaffMembers: list);
+    }
+  }
+
+  /// Removes an additional member from selected additional lists (triggered by chip's close button)
+  void removeAdditionalMember(String id) {
+    state = state.copyWith(
+      selectedAdditionalStaffMembers:
+          state.selectedAdditionalStaffMembers.where((p) => p.id != id).toList(),
+      selectedAdditionalCreativePartners:
+          state.selectedAdditionalCreativePartners.where((p) => p.id != id).toList(),
+    );
+  }
+
+  /// Kept for backward compatibility with tests/external components
   void setParticipants(List<ShootParticipantOption> picked) {
-    // Deduplicate by id — `ShootParticipantOption.==` is id-based, so toSet
-    // collapses duplicates while preserving the picked order.
     final unique = <ShootParticipantOption>{};
     final ordered = <ShootParticipantOption>[];
     for (final p in picked) {
@@ -78,7 +179,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         link: state.link.trim(),
         reminderMinutes: state.reminderMinutes,
         category: MeetingCategory.commercial,
-        participants: state.invitedParticipants
+        participants: state.selectedParticipants
             .map((p) => MeetingParticipant(
                   id: p.id,
                   name: p.name,

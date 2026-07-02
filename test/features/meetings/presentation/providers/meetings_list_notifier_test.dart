@@ -10,6 +10,7 @@ import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/update_meeting_input.dart';
+import 'package:beige/features/meetings/domain/models/shoot_option.dart';
 import 'package:beige/features/meetings/domain/repositories/meetings_repository.dart';
 import 'package:beige/features/meetings/presentation/providers/meetings_list_notifier.dart';
 import 'package:beige/features/meetings/presentation/providers/meetings_list_state.dart';
@@ -89,6 +90,9 @@ class _FakeRepo implements MeetingsRepository {
     if (respondThrows != null) throw respondThrows!;
     return respondResult ?? items.firstWhere((m) => m.id == id);
   }
+
+  @override
+  Future<List<ShootOption>> listProjects() async => const [];
 }
 
 Future<ProviderContainer> _buildContainer({

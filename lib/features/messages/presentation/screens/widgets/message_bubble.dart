@@ -8,9 +8,9 @@ import '../../../../../app/colors.dart';
 import '../../../../../app/radii.dart';
 import '../../../../../app/spacing.dart';
 import '../../../../../app/text_styles.dart';
+import '../../../../../shared/util/role_label.dart';
 import '../../../../../shared/widgets/app_avatar.dart';
 import '../../../domain/entities/message.dart';
-import '../../../domain/role_label.dart';
 
 const double _avatarDiameter = 24;
 const double _bubbleRadius = 16;
