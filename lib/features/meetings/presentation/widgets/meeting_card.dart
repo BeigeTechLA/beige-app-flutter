@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
@@ -58,35 +60,37 @@ class _MeetingCardState extends State<MeetingCard> {
 
   Color _getStatusBgColor(MeetingStatus status) {
     switch (status) {
-      case MeetingStatus.initiated:
-        return AppColors.lightGoldenBg;
-      case MeetingStatus.completed:
-        return AppColors.softMint;
-      case MeetingStatus.revision:
-      case MeetingStatus.cancelled:
-        return const Color(0xFFFFEAE0);
-      case MeetingStatus.upcoming:
       case MeetingStatus.pending:
-      case MeetingStatus.rescheduled:
+      case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return AppColors.blueIce;
+        return const Color(0xFFFFF4C9);
+      case MeetingStatus.initiated:
+        return const Color(0xFFC3E7FD);
+      case MeetingStatus.completed:
+        return const Color(0xFFD4FFE4);
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.revision:
+        return const Color(0xFFFFDDAD);
+      case MeetingStatus.cancelled:
+        return const Color(0xFFFFD3D3);
     }
   }
 
   Color _getStatusTextColor(MeetingStatus status) {
     switch (status) {
-      case MeetingStatus.initiated:
-        return const Color(0xFF8A5C1F);
-      case MeetingStatus.completed:
-        return AppColors.greenForest;
-      case MeetingStatus.revision:
-      case MeetingStatus.cancelled:
-        return AppColors.orangeBright;
-      case MeetingStatus.upcoming:
       case MeetingStatus.pending:
-      case MeetingStatus.rescheduled:
+      case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return AppColors.blueRoyal;
+        return const Color(0xFFBA6605);
+      case MeetingStatus.initiated:
+        return const Color(0xFF0575BA);
+      case MeetingStatus.completed:
+        return const Color(0xFF16A34A);
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.revision:
+        return const Color(0xFFC07711);
+      case MeetingStatus.cancelled:
+        return const Color(0xFFE44040);
     }
   }
 
@@ -159,23 +163,45 @@ class _MeetingCardState extends State<MeetingCard> {
                       color: AppColors.textPrimary.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
-                      Icons.videocam_outlined,
-                      size: 20,
+                    padding: const EdgeInsets.all(8),
+                    child: SvgPicture.asset(
+                      AppAssets.icMeetingLink,
+                      width: 18,
+                      height: 18,
+                      fit: BoxFit.contain,
                       color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      widget.meeting.title,
-                      style: AppTextStyles.titleSmall.copyWith(
-                        color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.meeting.title,
+                          style: AppTextStyles.titleSmall.copyWith(
+                            color: AppColors.primary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (widget.meeting.meetingTypeDisplay != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.meeting.meetingTypeDisplay!,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
+                              fontFamily: 'Outfit',
+                              fontWeight: FontWeight.w300,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],

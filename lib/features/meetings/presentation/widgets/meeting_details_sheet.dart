@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
@@ -314,14 +316,14 @@ class _DetailsBody extends ConsumerWidget {
                   _InfoCard(
                     children: [
                       _InfoRow(
-                        icon: Icons.calendar_today_outlined,
+                        iconAsset: AppAssets.icMeetingDatetime,
                         label: 'Date & Time',
                         value: _dateTimeLabel,
                       ),
                       AppSpacing.verticalBase,
                       _InfoRow(
-                        icon: Icons.videocam_outlined,
-                        label: meeting.platform.label.toLowerCase(),
+                        iconAsset: AppAssets.icMeetingLink,
+                        label: meeting.platform.label,
                         value: meeting.link,
                         trailing: _SquareIconButton(
                           icon: Icons.copy_outlined,
@@ -332,9 +334,10 @@ class _DetailsBody extends ConsumerWidget {
                       if (meeting.project.isNotEmpty) ...[
                         AppSpacing.verticalBase,
                         _InfoRow(
-                          icon: Icons.work_outline,
+                          iconAsset: AppAssets.icRelatedShoot,
                           label: 'Related Shoot',
                           value: meeting.project,
+                          valueColor: AppColors.primary,
                         ),
                       ],
                     ],
@@ -488,35 +491,37 @@ class _StatusPill extends StatelessWidget {
 
   Color get _bg {
     switch (status) {
-      case MeetingStatus.initiated:
-        return AppColors.lightGoldenBg;
-      case MeetingStatus.completed:
-        return AppColors.softMint;
-      case MeetingStatus.revision:
-      case MeetingStatus.cancelled:
-        return const Color(0xFFFFEAE0);
-      case MeetingStatus.upcoming:
       case MeetingStatus.pending:
-      case MeetingStatus.rescheduled:
+      case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return AppColors.blueIce;
+        return const Color(0xFFFFF4C9);
+      case MeetingStatus.initiated:
+        return const Color(0xFFC3E7FD);
+      case MeetingStatus.completed:
+        return const Color(0xFFD4FFE4);
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.revision:
+        return const Color(0xFFFFDDAD);
+      case MeetingStatus.cancelled:
+        return const Color(0xFFFFD3D3);
     }
   }
 
   Color get _fg {
     switch (status) {
-      case MeetingStatus.initiated:
-        return const Color(0xFF8A5C1F);
-      case MeetingStatus.completed:
-        return AppColors.greenForest;
-      case MeetingStatus.revision:
-      case MeetingStatus.cancelled:
-        return AppColors.orangeBright;
-      case MeetingStatus.upcoming:
       case MeetingStatus.pending:
-      case MeetingStatus.rescheduled:
+      case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return AppColors.blueRoyal;
+        return const Color(0xFFBA6605);
+      case MeetingStatus.initiated:
+        return const Color(0xFF0575BA);
+      case MeetingStatus.completed:
+        return const Color(0xFF16A34A);
+      case MeetingStatus.rescheduled:
+      case MeetingStatus.revision:
+        return const Color(0xFFC07711);
+      case MeetingStatus.cancelled:
+        return const Color(0xFFE44040);
     }
   }
 
@@ -596,16 +601,18 @@ class _InfoCard extends StatelessWidget {
 
 class _InfoRow extends StatelessWidget {
   const _InfoRow({
-    required this.icon,
+    required this.iconAsset,
     required this.label,
     required this.value,
     this.trailing,
+    this.valueColor,
   });
 
-  final IconData icon;
+  final String iconAsset;
   final String label;
   final String value;
   final Widget? trailing;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) {
@@ -614,7 +621,12 @@ class _InfoRow extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 18, color: AppColors.textSecondary),
+          child: SvgPicture.asset(
+            iconAsset,
+            width: 18,
+            height: 18,
+            fit: BoxFit.contain,
+          ),
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
@@ -632,7 +644,7 @@ class _InfoRow extends StatelessWidget {
               Text(
                 value,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                  color: valueColor ?? AppColors.textSecondary,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

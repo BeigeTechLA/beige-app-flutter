@@ -27,6 +27,9 @@ class AppAssets {
 
   static const String svgMessage =
       'assets/svg/message';
+
+  static const String svgMeeting =
+      'assets/svg/meeting';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -59,6 +62,14 @@ class AppAssets {
 
   static const String microphone =
       '$svgMessage/microphone.svg';
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — Meeting
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String icMeetingDatetime = '$svgMeeting/ic_meeting_datetime.svg';
+  static const String icMeetingLink = '$svgMeeting/ic_meeting_link.svg';
+  static const String icRelatedShoot = '$svgMeeting/ic_related_shoot.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — drawer
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

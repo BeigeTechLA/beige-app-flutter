@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
@@ -75,85 +77,96 @@ class MeetingsScreen extends ConsumerWidget {
       },
     );
 
+    final rsvpInFlight = state.pendingRsvpIds.isNotEmpty;
+
     return AppScaffold(
       hasAppBar: false,
-      body: SafeArea(
-        child: Column(
-          children: [
-            AppMainToolbar(
-              title: 'Meetings',
-              trailing: Visibility(
-                visible: false,
-                maintainSize: false,
-                maintainAnimation: false,
-                maintainState: false,
-                child: Stack(
-                  alignment: Alignment.topRight,
-                  children: [
-                    IconButton(
-                      tooltip: 'Filter meetings',
-                      onPressed: () => _openFilter(context, ref),
-                      icon: const Icon(
-                        Icons.tune_rounded,
-                        color: AppColors.textPrimary,
-                      ),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                AppMainToolbar(
+                  title: 'Meetings',
+                  trailing: Visibility(
+                    visible: false,
+                    maintainSize: false,
+                    maintainAnimation: false,
+                    maintainState: false,
+                    child: Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        IconButton(
+                          tooltip: 'Filter meetings',
+                          onPressed: () => _openFilter(context, ref),
+                          icon: const Icon(
+                            Icons.tune_rounded,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        if (state.isFiltered)
+                          const Positioned(
+                            top: 10,
+                            right: 10,
+                            child: _FilterDot(),
+                          ),
+                      ],
                     ),
-                    if (state.isFiltered)
-                      const Positioned(
-                        top: 10,
-                        right: 10,
-                        child: _FilterDot(),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.base,
+                  ),
+                  child: MeetingsTabBar(
+                    selected: state.tab,
+                    onChanged: notifier.selectTab,
+                  ),
+                ),
+                AppSpacing.verticalBase,
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: notifier.refresh,
+                    color: AppColors.primary,
+                    backgroundColor: AppColors.surface,
+                    child: _ListBody(
+                      state: state,
+                      onTap: _onCardTap,
+                      onJoin: _onJoin,
+                      onRsvp: (m, accept) => _onRsvp(
+                        context,
+                        ref,
+                        meetingId: m.id,
+                        accept: accept,
                       ),
-                  ],
+                      onRetry: notifier.refresh,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.base,
-              ),
-              child: MeetingsTabBar(
-                selected: state.tab,
-                onChanged: notifier.selectTab,
-              ),
-            ),
-            AppSpacing.verticalBase,
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: notifier.refresh,
-                color: AppColors.primary,
-                backgroundColor: AppColors.surface,
-                child: _ListBody(
-                  state: state,
-                  onTap: _onCardTap,
-                  onJoin: _onJoin,
-                  onRsvp: (m, accept) =>
-                      _onRsvp(context, ref, meetingId: m.id, accept: accept),
-                  onRetry: notifier.refresh,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.base,
+                    AppSpacing.sm,
+                    AppSpacing.base,
+                    AppSpacing.base,
+                  ),
+                  child: AppButton(
+                    label: 'Create Meeting',
+                    fullWidth: true,
+                    icon: const Icon(
+                      Icons.add,
+                      color: AppColors.onPrimary,
+                      size: 18,
+                    ),
+                    onPressed: () =>
+                        context.pushNamed(RouteNames.meetingCreate),
+                  ),
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.base,
-                AppSpacing.sm,
-                AppSpacing.base,
-                AppSpacing.base,
-              ),
-              child: AppButton(
-                label: 'Create Meeting',
-                fullWidth: true,
-                icon: const Icon(
-                  Icons.add,
-                  color: AppColors.onPrimary,
-                  size: 18,
-                ),
-                onPressed: () =>
-                    context.pushNamed(RouteNames.meetingCreate),
-              ),
-            ),
-          ],
-        ),
+          ),
+          if (rsvpInFlight) const _RsvpLoaderOverlay(),
+        ],
       ),
     );
   }
@@ -177,14 +190,16 @@ class _ListBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.status == MeetingsListStatus.loading && state.items.isEmpty) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
-          SizedBox(height: 120),
-          Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: constraints.maxHeight,
+            child: const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
           ),
-        ],
+        ),
       );
     }
     if (state.status == MeetingsListStatus.error && state.items.isEmpty) {
@@ -194,9 +209,7 @@ class _ListBody extends StatelessWidget {
           const SizedBox(height: 80),
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xxl,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
               child: Column(
                 children: [
                   const Icon(
@@ -260,9 +273,30 @@ class _ListBody extends StatelessWidget {
           onJoin: () => onJoin(context, m.link),
           onAccept: () => onRsvp(m, true),
           onReject: () => onRsvp(m, false),
-          rsvpPending: state.isRsvpPending(m.id),
         );
       },
+    );
+  }
+}
+
+class _RsvpLoaderOverlay extends StatelessWidget {
+  const _RsvpLoaderOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: AbsorbPointer(
+        child: ColoredBox(
+          color: AppColors.black.withValues(alpha: 0.4),
+          child: Center(
+            child: Lottie.asset(
+              AppAssets.lottieLoader,
+              height: 70,
+              width: 70,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

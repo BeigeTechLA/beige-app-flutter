@@ -5,6 +5,7 @@ import 'meeting_participant.dart';
 import 'meeting_platform.dart';
 import 'meeting_response.dart';
 import 'meeting_status.dart';
+import 'meeting_type.dart';
 
 @immutable
 class Meeting {
@@ -19,6 +20,23 @@ class Meeting {
   final int reminderMinutes;
   final MeetingStatus status;
   final MeetingCategory category;
+
+  /// Server `meeting_type` — production stage (planning / pre_production /
+  /// production / post_production / review / delivery). Nullable when the
+  /// backend value is empty or falls outside the known set. Card / detail UI
+  /// renders [MeetingType.label] verbatim.
+  final MeetingType? meetingType;
+
+  /// Raw server `meeting_type` string, preserved for unmapped values so the
+  /// UI can fall back to it via [meetingTypeDisplay] when [meetingType] is
+  /// null.
+  final String? meetingTypeRaw;
+
+  /// Human-readable stage — [MeetingType.label] when mapped, otherwise the
+  /// raw server string. `null` when both are empty.
+  String? get meetingTypeDisplay =>
+      meetingType?.label ?? (meetingTypeRaw?.isEmpty ?? true ? null : meetingTypeRaw);
+
   final List<String> agenda;
   final List<MeetingParticipant> participants;
 
@@ -52,6 +70,8 @@ class Meeting {
     required this.category,
     required this.agenda,
     required this.participants,
+    this.meetingType,
+    this.meetingTypeRaw,
     this.createdById,
     this.participantResponses = const {},
     this.myResponse,
@@ -69,6 +89,8 @@ class Meeting {
     int? reminderMinutes,
     MeetingStatus? status,
     MeetingCategory? category,
+    MeetingType? meetingType,
+    String? meetingTypeRaw,
     List<String>? agenda,
     List<MeetingParticipant>? participants,
     String? createdById,
@@ -88,6 +110,8 @@ class Meeting {
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       status: status ?? this.status,
       category: category ?? this.category,
+      meetingType: meetingType ?? this.meetingType,
+      meetingTypeRaw: meetingTypeRaw ?? this.meetingTypeRaw,
       agenda: agenda ?? this.agenda,
       participants: participants ?? this.participants,
       createdById: createdById ?? this.createdById,

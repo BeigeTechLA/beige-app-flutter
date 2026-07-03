@@ -58,10 +58,17 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
   }
 
   /// Tab drives a server-side `meeting_time_status` filter. Switching
-  /// tab kicks off a fresh fetch rather than local re-filter.
+  /// tab kicks off a fresh fetch — clear the current list so the previous
+  /// tab's items don't flash while the new fetch is in flight.
   void selectTab(MeetingsTab tab) {
     if (tab == state.tab) return;
-    state = state.copyWith(tab: tab);
+    state = state.copyWith(
+      tab: tab,
+      allItems: const [],
+      items: const [],
+      status: MeetingsListStatus.loading,
+      clearError: true,
+    );
     _load();
   }
 

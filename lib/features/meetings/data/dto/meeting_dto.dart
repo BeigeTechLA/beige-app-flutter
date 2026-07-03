@@ -1,6 +1,7 @@
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_response.dart';
+import '../../domain/models/meeting_type.dart';
 import '../mappers/meeting_enum_mapper.dart';
 import 'meeting_user_dto.dart';
 
@@ -52,6 +53,8 @@ class MeetingDto {
       category: MeetingEnumMapper.categoryFromServer(
         json['meeting_type'] as String?,
       ),
+      meetingType: MeetingType.fromServer(json['meeting_type'] as String?),
+      meetingTypeRaw: json['meeting_type'] as String?,
       // Server has no structured agenda — leave empty.
       agenda: const <String>[],
       participants: _readParticipants(json['participants']),
