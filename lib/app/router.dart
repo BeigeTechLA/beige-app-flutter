@@ -242,7 +242,34 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         name: RouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const LoginScreen(),
+          transitionDuration: const Duration(milliseconds: 380),
+          reverseTransitionDuration: const Duration(milliseconds: 380),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return AnimatedBuilder(
+              animation: animation,
+              child: child,
+              builder: (context, inner) {
+                final status = animation.status;
+                final isExiting = status == AnimationStatus.reverse ||
+                    status == AnimationStatus.dismissed;
+                final curved = Curves.easeInOutCubic.transform(
+                  animation.value.clamp(0.0, 1.0),
+                );
+                final dy = isExiting ? -(1 - curved) : (1 - curved);
+                return FractionalTranslation(
+                  translation: Offset(0, dy),
+                  child: Opacity(
+                    opacity: curved,
+                    child: inner,
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
       GoRoute(
         path: '/signup',
@@ -281,8 +308,25 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Main Shell (bottom nav with IndexedStack) ──────────────────
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return _MainShell(navigationShell: navigationShell);
+        pageBuilder: (context, state, navigationShell) {
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: _MainShell(navigationShell: navigationShell),
+            transitionDuration: const Duration(milliseconds: 380),
+            reverseTransitionDuration: const Duration(milliseconds: 380),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 1.0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOutCubic,
+                )),
+                child: child,
+              );
+            },
+          );
         },
         branches: [
           // Tab 0: Home
