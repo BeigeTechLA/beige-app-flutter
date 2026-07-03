@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/restoration/restoration_providers.dart';
 import '../features/messages/presentation/providers/messages_repository_provider.dart';
 import '../shared/widgets/connectivity_listener.dart';
+import 'colors.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -54,7 +55,12 @@ class _AppState extends ConsumerState<App> {
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.noScaling,
           ),
-          child: ConnectivityListener(child: child ?? const SizedBox.shrink()),
+          child: ColoredBox(
+            color: AppColors.background,
+            child: ConnectivityListener(
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
         );
       },
     );
