@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
@@ -286,11 +288,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
               padding: const EdgeInsets.only(left: 8.0, top: 12.0),
               child: IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: AppColors.textPrimary,
-                  size: 24,
-                ),
+                icon: SvgPicture.asset(AppAssets.back, height: 24),
               ),
             ),
             Expanded(
@@ -647,6 +645,8 @@ class _ShootDropdown extends ConsumerWidget {
               style: AppTextStyles.bodyLarge.copyWith(
                 color: AppColors.textPrimary,
               ),
+              maxLines: 1,
+              readOnly: true,
               decoration: decoration.copyWith(
                 suffixIcon: const Icon(
                   Icons.expand_more,
@@ -654,7 +654,11 @@ class _ShootDropdown extends ConsumerWidget {
                 ),
               ),
               controller: TextEditingController(
-                text: selected == null ? '' : 'Booking #${selected.id}',
+                text: selected == null
+                    ? ''
+                    : (selected.title.trim().isNotEmpty
+                        ? selected.title
+                        : 'Booking #${selected.id}'),
               ),
             ),
           ),

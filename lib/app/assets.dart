@@ -70,6 +70,7 @@ class AppAssets {
   static const String icMeetingDatetime = '$svgMeeting/ic_meeting_datetime.svg';
   static const String icMeetingLink = '$svgMeeting/ic_meeting_link.svg';
   static const String icRelatedShoot = '$svgMeeting/ic_related_shoot.svg';
+  static const String icGoogleMeet = '$svgMeeting/ic_google_meet.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — drawer
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

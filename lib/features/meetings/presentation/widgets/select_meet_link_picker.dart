@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/spacing.dart';
 import '../../domain/models/meeting_platform.dart';
@@ -50,7 +52,12 @@ class _Option extends StatelessWidget {
     Widget logo;
     switch (platform) {
       case MeetingPlatform.meet:
-        logo = const _GoogleMeetLogo(size: 20);
+        logo = SvgPicture.asset(
+          AppAssets.icGoogleMeet,
+          width: 20,
+          height: 20,
+          fit: BoxFit.contain,
+        );
         break;
       case MeetingPlatform.zoom:
         logo = const _ZoomLogo();
@@ -86,80 +93,6 @@ class _Option extends StatelessWidget {
       ),
     );
   }
-}
-
-class _GoogleMeetLogo extends StatelessWidget {
-  const _GoogleMeetLogo({this.size = 20.0});
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _GoogleMeetLogoPainter()),
-    );
-  }
-}
-
-class _GoogleMeetLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final w = size.width;
-    final h = size.height;
-
-    paint.color = const Color(0xFF1A73E8);
-    final pathBlue = Path()
-      ..moveTo(0, h * 0.5)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..lineTo(w * 0.5, h)
-      ..lineTo(w * 0.2, h)
-      ..quadraticBezierTo(0, h, 0, h * 0.8)
-      ..close();
-    canvas.drawPath(pathBlue, paint);
-
-    paint.color = const Color(0xFF00A859);
-    final pathGreen = Path()
-      ..moveTo(0, h * 0.5)
-      ..lineTo(0, h * 0.2)
-      ..quadraticBezierTo(0, 0, w * 0.2, 0)
-      ..lineTo(w * 0.5, 0)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..close();
-    canvas.drawPath(pathGreen, paint);
-
-    paint.color = const Color(0xFFFFBA00);
-    final pathYellow = Path()
-      ..moveTo(w * 0.5, 0)
-      ..lineTo(w * 0.7, 0)
-      ..quadraticBezierTo(w * 0.75, 0, w * 0.75, h * 0.15)
-      ..lineTo(w * 0.75, h * 0.5)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..close();
-    canvas.drawPath(pathYellow, paint);
-
-    paint.color = const Color(0xFFEA4335);
-    final pathRedBody = Path()
-      ..moveTo(w * 0.5, h * 0.5)
-      ..lineTo(w * 0.75, h * 0.5)
-      ..lineTo(w * 0.75, h * 0.85)
-      ..quadraticBezierTo(w * 0.75, h, w * 0.65, h)
-      ..lineTo(w * 0.5, h)
-      ..close();
-    canvas.drawPath(pathRedBody, paint);
-
-    final pathLens = Path()
-      ..moveTo(w * 0.75, h * 0.3)
-      ..lineTo(w, h * 0.15)
-      ..lineTo(w, h * 0.85)
-      ..lineTo(w * 0.75, h * 0.7)
-      ..close();
-    canvas.drawPath(pathLens, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _ZoomLogo extends StatelessWidget {

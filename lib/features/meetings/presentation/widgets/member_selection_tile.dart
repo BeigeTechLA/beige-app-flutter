@@ -37,25 +37,26 @@ class MemberSelectionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.dividerDark,
-            width: isSelected ? 1.5 : 1.0,
+            width: 0.5,
           ),
         ),
         child: Row(
           children: [
             // Initials Avatar
             Container(
-              width: 40,
-              height: 40,
+              width: 60,
+              height: 60,
               decoration: const BoxDecoration(
-                color: Color(0xFF322F2A),
+                color: AppColors.surfaceWarm,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Text(
                 initials,
-                style: AppTextStyles.bodyMedium.copyWith(
+                style: AppTextStyles.bodyLarge.copyWith(
                   color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -68,8 +69,9 @@ class MemberSelectionTile extends StatelessWidget {
                   Text(
                     participant.name,
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.textPrimary,
+                      color: AppColors.textOffWhite,
                       fontWeight: FontWeight.w600,
+                      fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -89,26 +91,38 @@ class MemberSelectionTile extends StatelessWidget {
                     Text(
                       participant.email!,
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textTertiary,
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
                 ],
               ),
             ),
-            // Custom Checkbox
-            Theme(
-              data: ThemeData(
-                unselectedWidgetColor: AppColors.textSecondary,
-              ),
-              child: Checkbox(
-                value: isSelected,
-                onChanged: (_) => onTap(),
-                activeColor: AppColors.primary,
-                checkColor: AppColors.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+            // Gradient checkbox — mirrors the Staff / Creative Partner tab
+            // pill treatment (goldHorizontalGradient).
+            GestureDetector(
+              onTap: onTap,
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  gradient: isSelected ? AppColors.goldHorizontalGradient : null,
+                  color: isSelected ? null : AppColors.transparent,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color:
+                        isSelected ? AppColors.primary : AppColors.textSecondary,
+                    width: 1.5,
+                  ),
                 ),
+                child: isSelected
+                    ? const Icon(
+                        Icons.check,
+                        size: 18,
+                        color: AppColors.onPrimary,
+                      )
+                    : null,
               ),
             ),
           ],

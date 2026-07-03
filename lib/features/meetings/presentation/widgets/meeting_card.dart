@@ -63,16 +63,16 @@ class _MeetingCardState extends State<MeetingCard> {
       case MeetingStatus.pending:
       case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return const Color(0xFFFFF4C9);
+        return AppColors.meetingPendingBg;
       case MeetingStatus.initiated:
-        return const Color(0xFFC3E7FD);
+        return AppColors.meetingOngoingBg;
       case MeetingStatus.completed:
-        return const Color(0xFFD4FFE4);
+        return AppColors.meetingCompletedBg;
       case MeetingStatus.rescheduled:
       case MeetingStatus.revision:
-        return const Color(0xFFFFDDAD);
+        return AppColors.meetingRescheduledBg;
       case MeetingStatus.cancelled:
-        return const Color(0xFFFFD3D3);
+        return AppColors.meetingCancelledBg;
     }
   }
 
@@ -81,16 +81,16 @@ class _MeetingCardState extends State<MeetingCard> {
       case MeetingStatus.pending:
       case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return const Color(0xFFBA6605);
+        return AppColors.meetingPendingFg;
       case MeetingStatus.initiated:
-        return const Color(0xFF0575BA);
+        return AppColors.meetingOngoingFg;
       case MeetingStatus.completed:
-        return const Color(0xFF16A34A);
+        return AppColors.meetingCompletedFg;
       case MeetingStatus.rescheduled:
       case MeetingStatus.revision:
-        return const Color(0xFFC07711);
+        return AppColors.meetingRescheduledFg;
       case MeetingStatus.cancelled:
-        return const Color(0xFFE44040);
+        return AppColors.meetingCancelledFg;
     }
   }
 
@@ -169,7 +169,10 @@ class _MeetingCardState extends State<MeetingCard> {
                       width: 18,
                       height: 18,
                       fit: BoxFit.contain,
-                      color: AppColors.primary,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.primary,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -352,15 +355,15 @@ class _MeetingCardState extends State<MeetingCard> {
                     final showReject = _myRsvp != MeetingResponse.declined;
                     final accept = _RsvpButton(
                       label: 'Accept',
-                      backgroundColor: const Color(0xFFD8FDE6),
+                      backgroundColor: AppColors.softMint,
                       textColor: AppColors.greenBright,
                       onTap: widget.onAccept!,
                       loading: widget.rsvpPending,
                     );
                     final reject = _RsvpButton(
                       label: 'Reject',
-                      backgroundColor: const Color(0xFFEECCC9),
-                      textColor: const Color(0xFFD33732),
+                      backgroundColor: AppColors.meetingRejectSoftBg,
+                      textColor: AppColors.meetingRejected,
                       onTap: widget.onReject!,
                       loading: widget.rsvpPending,
                     );
@@ -507,9 +510,7 @@ class _ResponseStatusLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAccepted = response == MeetingResponse.accepted;
-    final color = isAccepted
-        ? const Color(0xFF1DAA23)
-        : const Color(0xFFD33732);
+    final color = isAccepted ? AppColors.greenBright : AppColors.meetingRejected;
     final label = isAccepted ? 'Accepted' : 'Rejected';
     return Row(
       children: [
@@ -551,7 +552,12 @@ class _PlatformBadge extends StatelessWidget {
     Widget icon;
     switch (platform) {
       case MeetingPlatform.meet:
-        icon = const _GoogleMeetLogo(size: 14);
+        icon = SvgPicture.asset(
+          AppAssets.icGoogleMeet,
+          width: 14,
+          height: 14,
+          fit: BoxFit.contain,
+        );
         break;
       case MeetingPlatform.zoom:
         icon = const Icon(Icons.videocam, size: 14, color: Color(0xFF2D8CFF));
@@ -588,82 +594,3 @@ class _PlatformBadge extends StatelessWidget {
   }
 }
 
-class _GoogleMeetLogo extends StatelessWidget {
-  const _GoogleMeetLogo({this.size = 14.0});
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _GoogleMeetLogoPainter(),
-      ),
-    );
-  }
-}
-
-class _GoogleMeetLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final w = size.width;
-    final h = size.height;
-
-    // 1. Blue (bottom-left)
-    paint.color = const Color(0xFF1A73E8);
-    final pathBlue = Path()
-      ..moveTo(0, h * 0.5)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..lineTo(w * 0.5, h)
-      ..lineTo(w * 0.2, h)
-      ..quadraticBezierTo(0, h, 0, h * 0.8)
-      ..close();
-    canvas.drawPath(pathBlue, paint);
-
-    // 2. Green (top-left)
-    paint.color = const Color(0xFF00A859);
-    final pathGreen = Path()
-      ..moveTo(0, h * 0.5)
-      ..lineTo(0, h * 0.2)
-      ..quadraticBezierTo(0, 0, w * 0.2, 0)
-      ..lineTo(w * 0.5, 0)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..close();
-    canvas.drawPath(pathGreen, paint);
-
-    // 3. Yellow (top-right corner of body)
-    paint.color = const Color(0xFFFFBA00);
-    final pathYellow = Path()
-      ..moveTo(w * 0.5, 0)
-      ..lineTo(w * 0.7, 0)
-      ..quadraticBezierTo(w * 0.75, 0, w * 0.75, h * 0.15)
-      ..lineTo(w * 0.75, h * 0.5)
-      ..lineTo(w * 0.5, h * 0.5)
-      ..close();
-    canvas.drawPath(pathYellow, paint);
-
-    // 4. Red (lens + bottom-right of body)
-    paint.color = const Color(0xFFEA4335);
-    final pathRedBody = Path()
-      ..moveTo(w * 0.5, h * 0.5)
-      ..lineTo(w * 0.75, h * 0.5)
-      ..lineTo(w * 0.75, h * 0.85)
-      ..quadraticBezierTo(w * 0.75, h, w * 0.65, h)
-      ..lineTo(w * 0.5, h)
-      ..close();
-    canvas.drawPath(pathRedBody, paint);
-
-    final pathLens = Path()
-      ..moveTo(w * 0.75, h * 0.3)
-      ..lineTo(w, h * 0.15)
-      ..lineTo(w, h * 0.85)
-      ..lineTo(w * 0.75, h * 0.7)
-      ..close();
-    canvas.drawPath(pathLens, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

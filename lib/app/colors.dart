@@ -151,6 +151,7 @@ class AppColors {
   static const Color white24 = Color(0x3DFFFFFF);
   static const Color white15 = Color(0x26FFFFFF);
   static const Color white10 = Color(0x1AFFFFFF);
+  static const Color white6 = Color(0x0FFFFFFF);
 
   // — Black opacities —
   static const Color black = Color(0xFF000000);
@@ -314,4 +315,48 @@ class AppColors {
 
   /// Soft black drop shadow — 20% alpha.
   static const Color black20 = Color(0x33000000);
+
+  // Meeting status pill palette (card + details sheet).
+  /// Pending / upcoming / scheduled — background.
+  static const Color meetingPendingBg = Color(0xFFFFF4C9);
+
+  /// Pending / upcoming / scheduled — foreground text.
+  static const Color meetingPendingFg = Color(0xFFBA6605);
+
+  /// Ongoing (initiated) — background.
+  static const Color meetingOngoingBg = Color(0xFFC3E7FD);
+
+  /// Ongoing (initiated) — foreground text.
+  static const Color meetingOngoingFg = Color(0xFF0575BA);
+
+  /// Completed — background.
+  static const Color meetingCompletedBg = Color(0xFFD4FFE4);
+
+  /// Completed — foreground text.
+  static const Color meetingCompletedFg = Color(0xFF16A34A);
+
+  /// Rescheduled / revision — background.
+  static const Color meetingRescheduledBg = Color(0xFFFFDDAD);
+
+  /// Rescheduled / revision — foreground text.
+  static const Color meetingRescheduledFg = Color(0xFFC07711);
+
+  /// Cancelled — background.
+  static const Color meetingCancelledBg = Color(0xFFFFD3D3);
+
+  /// Cancelled — foreground text.
+  static const Color meetingCancelledFg = Color(0xFFE44040);
+
+  /// Rejected RSVP marker + declined status text.
+  static const Color meetingRejected = Color(0xFFD33732);
+
+  /// Reject RSVP button — soft pink background.
+  static const Color meetingRejectSoftBg = Color(0xFFEECCC9);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MISC TEXT TOKENS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Neutral off-white — participant tile name, subtle emphasis text.
+  static const Color textOffWhite = Color(0xFFCECECE);
 }

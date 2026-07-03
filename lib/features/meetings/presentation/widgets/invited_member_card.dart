@@ -84,9 +84,9 @@ class InvitedMemberCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.surfaceInput,
+          color: AppColors.white6,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.dividerDark),
+          border: Border.all(color: AppColors.white30, width: 0.5),
         ),
         child: Row(
           children: [

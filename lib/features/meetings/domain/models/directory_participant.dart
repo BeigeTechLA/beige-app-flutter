@@ -48,10 +48,15 @@ class DirectoryParticipant {
     }
 
     final email = json['email'] as String?;
-    final role = (json['role'] as String?) ??
-        (json['user_role'] as String?) ??
-        (json['member_type'] as String?) ??
-        '';
+    // Default members (from a shoot's `default_members[]`) only carry
+    // `member_type` — ignore `role`/`user_role` even when present so the
+    // meeting-create picker classifies them by the intended field.
+    final role = isDefault
+        ? ((json['member_type'] as String?) ?? '')
+        : ((json['role'] as String?) ??
+            (json['user_role'] as String?) ??
+            (json['member_type'] as String?) ??
+            '');
     final avatarUrl = (json['profile_image_url'] as String?) ??
         (json['avatar_url'] as String?) ??
         (json['profile_image'] as String?) ??

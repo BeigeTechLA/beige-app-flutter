@@ -307,7 +307,7 @@ class _DetailsBody extends ConsumerWidget {
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: myRsvp == MeetingResponse.accepted
                             ? AppColors.greenBright
-                            : const Color(0xFFD33732),
+                            : AppColors.meetingRejected,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -494,16 +494,16 @@ class _StatusPill extends StatelessWidget {
       case MeetingStatus.pending:
       case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return const Color(0xFFFFF4C9);
+        return AppColors.meetingPendingBg;
       case MeetingStatus.initiated:
-        return const Color(0xFFC3E7FD);
+        return AppColors.meetingOngoingBg;
       case MeetingStatus.completed:
-        return const Color(0xFFD4FFE4);
+        return AppColors.meetingCompletedBg;
       case MeetingStatus.rescheduled:
       case MeetingStatus.revision:
-        return const Color(0xFFFFDDAD);
+        return AppColors.meetingRescheduledBg;
       case MeetingStatus.cancelled:
-        return const Color(0xFFFFD3D3);
+        return AppColors.meetingCancelledBg;
     }
   }
 
@@ -512,16 +512,16 @@ class _StatusPill extends StatelessWidget {
       case MeetingStatus.pending:
       case MeetingStatus.upcoming:
       case MeetingStatus.scheduled:
-        return const Color(0xFFBA6605);
+        return AppColors.meetingPendingFg;
       case MeetingStatus.initiated:
-        return const Color(0xFF0575BA);
+        return AppColors.meetingOngoingFg;
       case MeetingStatus.completed:
-        return const Color(0xFF16A34A);
+        return AppColors.meetingCompletedFg;
       case MeetingStatus.rescheduled:
       case MeetingStatus.revision:
-        return const Color(0xFFC07711);
+        return AppColors.meetingRescheduledFg;
       case MeetingStatus.cancelled:
-        return const Color(0xFFE44040);
+        return AppColors.meetingCancelledFg;
     }
   }
 
