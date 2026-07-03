@@ -18,7 +18,7 @@ Future<void> startApp(Environment environment) async {
       WidgetsFlutterBinding.ensureInitialized();
 
       Env.init(environment);
-      // Stripe.publishableKey = Env.stripePublishableKey;
+       Stripe.publishableKey = Env.stripePublishableKey;
 
       await FirebaseService.initialize();
       await CrashlyticsService.initialize();
