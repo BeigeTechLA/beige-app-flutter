@@ -21,10 +21,12 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/signup_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/signup_state.dart';
 import 'package:beige/core/utils/google_config.dart';
+import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
@@ -48,6 +50,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   double? selectedLng;
   GoogleMapController? mapController;
   LatLng? currentLatLng;
+  bool _hasLocationPermission = false;
   final FocusNode locationFocusNode = FocusNode();
   bool showMap = false;
   String selectedAddress = "Search or select location";
@@ -98,7 +101,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     passwordController.addListener(() => setState(() {}));
     confirmPasswordController.addListener(() => setState(() {}));
 
-    _getCurrentLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _getCurrentLocation();
+      }
+    });
     /*   _getCurrentLocation();
     nameController.addListener(() {
       setState(() {});
@@ -458,29 +465,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      _showSnack(
-        'Location permission permanently denied. Enable from settings.',
-      );
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(
-      //     content: Text("Location permission permanently denied. Enable from settings."),
-      //   ),
-      // );
-      await Geolocator.openAppSettings(); // 👈 Open app settings
+    final hasPermission = await ensureLocationPermission(context);
+    if (!mounted || !hasPermission) {
+      if (mounted && _hasLocationPermission) {
+        setState(() => _hasLocationPermission = false);
+      }
       return;
     }
 
@@ -488,7 +477,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       desiredAccuracy: LocationAccuracy.high,
     );
 
+    if (!mounted) return;
+
     setState(() {
+      _hasLocationPermission = true;
       currentLatLng = LatLng(position.latitude, position.longitude);
     });
   }
@@ -496,6 +488,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Future<void> _updateLocationFromLatLng(LatLng latLng) async {
     setState(() {
       currentLatLng = latLng;
+      selectedLat = latLng.latitude;
+      selectedLng = latLng.longitude;
+      isLocationSelected = true;
     });
 
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
@@ -615,10 +610,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           longitude: selectedLng!,
           profileImage: profileImage,
         );
-  }
-
-  void _showSnack(String message) {
-    TopMessage.show(context, message);
   }
 
   @override
@@ -970,45 +961,42 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   height: 280,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16),
-                                    child: currentLatLng == null
-                                        ? const Center(
-                                            child: CircularProgressIndicator(),
-                                          )
-                                        : GoogleMap(
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                                  target: currentLatLng!,
-                                                  zoom: 14,
-                                                ),
+                                    child: GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                        target:
+                                            currentLatLng ??
+                                            AppMapDefaults.fallbackCenter,
+                                        zoom: currentLatLng == null
+                                            ? AppMapDefaults.fallbackZoom
+                                            : 14,
+                                      ),
 
-                                            myLocationEnabled: true,
-                                            myLocationButtonEnabled: true,
-                                            zoomControlsEnabled: true,
-                                            compassEnabled: false,
+                                      myLocationEnabled: _hasLocationPermission,
+                                      myLocationButtonEnabled:
+                                          _hasLocationPermission,
+                                      zoomControlsEnabled: true,
+                                      compassEnabled: false,
 
-                                            // 🔥 IMPORTANT FIX (touch enable)
-                                            gestureRecognizers:
-                                                <
-                                                  Factory<
-                                                    OneSequenceGestureRecognizer
-                                                  >
-                                                >{
-                                                  Factory<
-                                                    OneSequenceGestureRecognizer
-                                                  >(
-                                                    () =>
-                                                        EagerGestureRecognizer(),
-                                                  ),
-                                                },
+                                      // 🔥 IMPORTANT FIX (touch enable)
+                                      gestureRecognizers:
+                                          <
+                                            Factory<
+                                              OneSequenceGestureRecognizer
+                                            >
+                                          >{
+                                            Factory<
+                                              OneSequenceGestureRecognizer
+                                            >(() => EagerGestureRecognizer()),
+                                          },
 
-                                            onMapCreated: (controller) {
-                                              mapController = controller;
-                                              controller.setMapStyle(
-                                                darkMapStyle,
-                                              );
-                                            },
+                                      onMapCreated: (controller) {
+                                        mapController = controller;
+                                        controller.setMapStyle(darkMapStyle);
+                                      },
 
-                                            markers: {
+                                      markers: currentLatLng == null
+                                          ? const <Marker>{}
+                                          : {
                                               Marker(
                                                 markerId: const MarkerId(
                                                   "selected",
@@ -1017,12 +1005,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                               ),
                                             },
 
-                                            onTap: (latLng) async {
-                                              await _updateLocationFromLatLng(
-                                                latLng,
-                                              );
-                                            },
-                                          ),
+                                      onTap: (latLng) async {
+                                        await _updateLocationFromLatLng(latLng);
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
