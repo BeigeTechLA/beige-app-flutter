@@ -16,6 +16,9 @@ class AuthInterceptor extends QueuedInterceptor {
 
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
+      options.extra['_hadAuthToken'] = true;
+    } else {
+      options.extra['_hadAuthToken'] = false;
     }
 
     options.headers['Accept'] = 'application/json';
@@ -25,7 +28,10 @@ class AuthInterceptor extends QueuedInterceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final hadToken = err.requestOptions.extra['_hadAuthToken'] == true;
+
     if (err.response?.statusCode == 401 &&
+        hadToken &&
         onUnauthorized != null &&
         !_handlingUnauthorized) {
       _handlingUnauthorized = true;
