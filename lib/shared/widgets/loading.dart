@@ -21,3 +21,32 @@ class AppLoader extends StatelessWidget {
     );
   }
 }
+
+class AppLoadingOverlay extends StatelessWidget {
+  const AppLoadingOverlay({super.key, this.size = 70});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: AbsorbPointer(
+        child: ColoredBox(
+          color: AppColors.black.withValues(alpha: 0.5),
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Center(
+              child: Lottie.asset(
+                AppAssets.lottieCircleLoader,
+                height: size,
+                width: size,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -25,6 +25,7 @@ import 'package:beige/features/home/presentation/widgets/services/home_services_
 import 'package:beige/features/home/presentation/widgets/studios/home_studios_section.dart';
 import 'package:beige/features/home/presentation/widgets/top_creatives/home_top_creatives_stack.dart';
 import 'package:beige/features/home/presentation/widgets/top_influencers/home_top_influencers_section.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
 
 import '../../../app_drawer/screen/drawer_screen.dart';
@@ -1127,10 +1128,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               },
             ),
           ),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
+          if (isLoading) const AppLoadingOverlay(),
         ],
       ),
     );
