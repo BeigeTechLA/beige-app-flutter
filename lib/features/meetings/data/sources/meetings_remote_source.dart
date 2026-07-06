@@ -98,18 +98,19 @@ class MeetingsRemoteSource {
   Future<Meeting> create(CreateMeetingInput input) {
     return _guard(() async {
       final user = await _session.readUser();
+      final adminId = int.tryParse(user?.id ?? '');
+      final selfId = user?.id ?? '';
       final cpIds = <String>[];
-      final adminIds = <String>[];
       final participantIds = <String>[];
       for (final p in input.participants) {
+
         if (p.id.isEmpty) continue;
+        if (p.id == selfId) continue;
         final role = (p.role ?? '').toLowerCase();
         if (role == 'cp' ||
             role == 'creative_partner' ||
             role == 'creativepartner') {
           cpIds.add(p.id);
-        } else if (role == 'admin') {
-          adminIds.add(p.id);
         } else {
           participantIds.add(p.id);
         }
@@ -123,14 +124,13 @@ class MeetingsRemoteSource {
         'description': input.description,
         'meetLink': input.link,
         'cp_ids': cpIds,
-        'admin_id': adminIds,
+        if (adminId != null) 'admin_id': adminId,
         'participants': participantIds,
         'send_notification': false,
         'reminder_minutes': input.reminderMinutes,
       };
-      final createdById = int.tryParse(user?.id ?? '');
-      if (createdById != null) {
-        body['created_by_id'] = createdById;
+      if (adminId != null) {
+        body['created_by_id'] = adminId;
       }
       if (input.shootId != null) {
         body['order_id'] = input.shootId.toString();
