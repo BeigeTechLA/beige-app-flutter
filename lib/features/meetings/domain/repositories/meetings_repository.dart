@@ -1,4 +1,5 @@
 import '../models/create_meeting_input.dart';
+import '../models/generate_meet_link_input.dart';
 import '../models/meeting.dart';
 import '../models/meeting_filter.dart';
 import '../models/meeting_response.dart';
@@ -46,4 +47,9 @@ abstract class MeetingsRepository {
   /// Project summaries for the create-meeting shoot picker. Backed by
   /// `admin/get-projects`.
   Future<List<ShootOption>> listProjects();
+
+  /// Generates a Google Meet link via backend. Returns the raw `meetLink`
+  /// URL. Throws [AppException] on failure, including when backend responds
+  /// with `authUrl` (Google OAuth required — surfaced as generic error).
+  Future<String> generateMeetLink(GenerateMeetLinkInput input);
 }

@@ -1,6 +1,7 @@
 import 'package:beige/features/meetings/data/repositories/meetings_repository_impl.dart';
 import 'package:beige/features/meetings/data/sources/meetings_remote_source.dart';
 import 'package:beige/features/meetings/domain/models/create_meeting_input.dart';
+import 'package:beige/features/meetings/domain/models/generate_meet_link_input.dart';
 import 'package:beige/features/meetings/domain/models/meeting.dart';
 import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
@@ -106,6 +107,10 @@ class _FakeRemote implements MeetingsRemoteSource {
 
   @override
   Future<List<ShootOption>> getProjects() async => const [];
+
+  @override
+  Future<String> generateMeetLink(GenerateMeetLinkInput input) async =>
+      'https://meet.google.com/fake';
 }
 
 CreateMeetingInput _input({List<MeetingParticipant> participants = const []}) =>

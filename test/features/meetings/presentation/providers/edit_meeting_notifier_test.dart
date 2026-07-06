@@ -1,5 +1,6 @@
 import 'package:beige/core/providers/core_providers.dart';
 import 'package:beige/features/meetings/domain/models/create_meeting_input.dart';
+import 'package:beige/features/meetings/domain/models/generate_meet_link_input.dart';
 import 'package:beige/features/meetings/domain/models/meeting.dart';
 import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
@@ -81,6 +82,10 @@ class _FakeRepo implements MeetingsRepository {
 
   @override
   Future<List<ShootOption>> listProjects() async => const [];
+
+  @override
+  Future<String> generateMeetLink(GenerateMeetLinkInput input) async =>
+      throw UnimplementedError();
 }
 
 Future<ProviderContainer> _container({required MeetingsRepository repo}) async {

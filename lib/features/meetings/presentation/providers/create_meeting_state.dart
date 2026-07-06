@@ -7,6 +7,8 @@ import '../../domain/models/shoot_participant_option.dart';
 
 enum CreateMeetingSubmitStatus { idle, submitting, success, error }
 
+enum MeetLinkGenerationStatus { idle, loading, success, error }
+
 @immutable
 class CreateMeetingState {
   final String title;
@@ -35,6 +37,10 @@ class CreateMeetingState {
   final String searchText;
   final String selectedTab; // 'staff' | 'cp'
 
+  // Meet link generation
+  final MeetLinkGenerationStatus linkGenStatus;
+  final String? linkGenError;
+
   const CreateMeetingState({
     this.title = '',
     this.description = '',
@@ -59,6 +65,8 @@ class CreateMeetingState {
     this.selectedAdditionalCreativePartners = const [],
     this.searchText = '',
     this.selectedTab = 'staff',
+    this.linkGenStatus = MeetLinkGenerationStatus.idle,
+    this.linkGenError,
   });
 
   bool get hasTitle => title.trim().isNotEmpty;
@@ -66,6 +74,18 @@ class CreateMeetingState {
   bool get hasDate => date != null;
   bool get hasTimes => startTime != null && endTime != null;
   bool get hasLink => link.trim().isNotEmpty && _looksLikeUrl(link.trim());
+
+  /// Prereqs for the Generate Meet Link button. Only Meet platform supports
+  /// backend-driven generation. Requires all fields the backend needs to
+  /// create the Google Calendar event.
+  bool get canGenerateMeetLink =>
+      platform == MeetingPlatform.meet &&
+      hasTitle &&
+      hasDescription &&
+      hasDate &&
+      hasTimes &&
+      endAfterStart &&
+      shootId != null;
 
   bool get endAfterStart {
     if (!hasTimes) return false;
@@ -152,6 +172,9 @@ class CreateMeetingState {
     List<DirectoryParticipant>? selectedAdditionalCreativePartners,
     String? searchText,
     String? selectedTab,
+    MeetLinkGenerationStatus? linkGenStatus,
+    String? linkGenError,
+    bool clearLinkGenError = false,
   }) {
     return CreateMeetingState(
       title: title ?? this.title,
@@ -177,6 +200,9 @@ class CreateMeetingState {
       selectedAdditionalCreativePartners: selectedAdditionalCreativePartners ?? this.selectedAdditionalCreativePartners,
       searchText: searchText ?? this.searchText,
       selectedTab: selectedTab ?? this.selectedTab,
+      linkGenStatus: linkGenStatus ?? this.linkGenStatus,
+      linkGenError:
+          clearLinkGenError ? null : (linkGenError ?? this.linkGenError),
     );
   }
 }

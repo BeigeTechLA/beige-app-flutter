@@ -1,4 +1,5 @@
 import '../../domain/models/create_meeting_input.dart';
+import '../../domain/models/generate_meet_link_input.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
 import '../../domain/models/meeting_response.dart';
@@ -76,6 +77,10 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
 
   @override
   Future<List<ShootOption>> listProjects() => _remote.getProjects();
+
+  @override
+  Future<String> generateMeetLink(GenerateMeetLinkInput input) =>
+      _remote.generateMeetLink(input);
 
   /// Serializes [UpdateMeetingInput] to the server's snake_case patch body.
   /// Skips `null` fields so PATCH stays truly partial. `duration` never

@@ -63,6 +63,8 @@ abstract class ApiEndpoints {
 
   /// 📅 Meetings (external-meetings)
   static const String meetings = 'external-meetings';
+  static const String externalMeetingsCreateEvent =
+      'external-meetings/create-event';
   /// Project summaries for the create-meeting shoot picker. Returns
   /// `{data: {stats, projects: [{project: {stream_project_booking_id, name,
   /// ...}}]}}`.

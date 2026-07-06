@@ -12,6 +12,8 @@ import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/top_message.dart';
+import '../../domain/models/meeting_platform.dart';
 import '../providers/client_shoots_provider.dart';
 import '../providers/create_meeting_notifier.dart';
 import '../providers/create_meeting_state.dart';
@@ -217,6 +219,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     required String label,
     String? hint,
     Widget? suffixIcon,
+    BoxConstraints? suffixIconConstraints,
     String? errorText,
   }) {
     return InputDecoration(
@@ -230,6 +233,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
       filled: true,
       fillColor: AppColors.surfaceInput,
       suffixIcon: suffixIcon,
+      suffixIconConstraints: suffixIconConstraints,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       floatingLabelBehavior: FloatingLabelBehavior.always,
       border: OutlineInputBorder(
@@ -272,6 +276,24 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
               backgroundColor: AppColors.error,
             ),
           );
+        }
+      }
+
+      if (prev?.linkGenStatus != next.linkGenStatus) {
+        if (next.linkGenStatus == MeetLinkGenerationStatus.success) {
+          if (_linkCtrl.text != next.link) {
+            _linkCtrl.text = next.link;
+            _linkCtrl.selection = TextSelection.fromPosition(
+              TextPosition(offset: _linkCtrl.text.length),
+            );
+          }
+        } else if (next.linkGenStatus == MeetLinkGenerationStatus.error) {
+          TopMessage.show(
+            context,
+            next.linkGenError ??
+                'Something went wrong. Please try again after sometime.',
+          );
+          notifier.clearLinkGenError();
         }
       }
     });
@@ -456,11 +478,24 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                       ),
                       decoration: _inputDecoration(
                         label: 'Attach Meet Link',
-                        hint: 'Auto-generated or paste custom link',
-                        suffixIcon: const Icon(
-                          Icons.link,
-                          color: AppColors.textSecondary,
-                          size: 20,
+                        hint: 'Auto-generated google meet link..',
+                        suffixIcon: state.platform == MeetingPlatform.meet
+                            ? _GenerateMeetLinkButton(
+                                enabled: state.canGenerateMeetLink &&
+                                    state.linkGenStatus !=
+                                        MeetLinkGenerationStatus.loading,
+                                loading: state.linkGenStatus ==
+                                    MeetLinkGenerationStatus.loading,
+                                onPressed: notifier.generateMeetLink,
+                              )
+                            : const Icon(
+                                Icons.link,
+                                color: AppColors.textSecondary,
+                                size: 20,
+                              ),
+                        suffixIconConstraints: const BoxConstraints(
+                          minWidth: 0,
+                          minHeight: 0,
                         ),
                         errorText: _linkCtrl.text.isNotEmpty && !state.hasLink
                             ? 'Enter a valid URL'
@@ -942,3 +977,55 @@ String _formatTime(TimeOfDayValue t) {
 
 Widget _datePickerTheme(BuildContext ctx, Widget? child) =>
     appDatePickerTheme(ctx, child);
+
+class _GenerateMeetLinkButton extends StatelessWidget {
+  const _GenerateMeetLinkButton({
+    required this.enabled,
+    required this.loading,
+    required this.onPressed,
+  });
+
+  final bool enabled;
+  final bool loading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: enabled ? AppColors.primary : AppColors.disabled,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: enabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: loading
+                ? const SizedBox(
+                    height: 14,
+                    width: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                    ),
+                  )
+                : Text(
+                    'Generate',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.onPrimary,
+                      fontWeight: FontWeight.w400,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -2,9 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/session/session_store.dart';
 import '../../../booking/presentation/providers/booking_providers.dart';
 import '../../domain/models/create_meeting_input.dart';
 import '../../domain/models/directory_participant.dart';
+import '../../domain/models/generate_meet_link_input.dart';
 import '../../domain/models/meeting_category.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
@@ -16,10 +19,12 @@ import 'meetings_repository_provider.dart';
 
 class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   late final MeetingsRepository _repo;
+  late final SessionStore _session;
 
   @override
   CreateMeetingState build() {
     _repo = ref.watch(meetingsRepositoryProvider);
+    _session = ref.watch(sessionStoreProvider);
     return const CreateMeetingState();
   }
 
@@ -217,6 +222,65 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   String _messageFor(Object e) {
     if (e is AppException) return e.message;
     return 'Could not create meeting';
+  }
+
+  /// Calls backend to generate a Google Meet link and writes it into
+  /// `state.link`. Guarded by [CreateMeetingState.canGenerateMeetLink] — the
+  /// UI wraps the Generate button in the same gate, this is defense in depth.
+  ///
+  /// On success: `state.link` updated, status = success. UI listens and
+  /// mirrors into the text controller.
+  /// On error (including `authUrl` OAuth response): status = error with a
+  /// generic message per product decision — no in-app Google OAuth flow.
+  Future<void> generateMeetLink() async {
+    if (!state.canGenerateMeetLink) return;
+    if (state.linkGenStatus == MeetLinkGenerationStatus.loading) return;
+
+    state = state.copyWith(
+      linkGenStatus: MeetLinkGenerationStatus.loading,
+      clearLinkGenError: true,
+    );
+
+    try {
+      final user = await _session.readUser();
+      final userId = user?.id ?? '';
+      final d = state.date!;
+      final s = state.startTime!;
+      final e = state.endTime!;
+      final startAt = DateTime(d.year, d.month, d.day, s.hour, s.minute);
+      final endAt = DateTime(d.year, d.month, d.day, e.hour, e.minute);
+
+      final link = await _repo.generateMeetLink(
+        GenerateMeetLinkInput(
+          userId: userId,
+          summary: state.title.trim(),
+          description: state.description.trim(),
+          startAt: startAt,
+          endAt: endAt,
+          orderId: state.shootId!,
+        ),
+      );
+
+      state = state.copyWith(
+        link: link,
+        linkGenStatus: MeetLinkGenerationStatus.success,
+      );
+    } on AppException {
+      state = state.copyWith(
+        linkGenStatus: MeetLinkGenerationStatus.error,
+        linkGenError: 'Something went wrong. Please try again after sometime.',
+      );
+    }
+  }
+
+  /// Resets the generation status/error without touching `state.link`, so a
+  /// previously generated link survives the error dismissal and still flows
+  /// into the Create Meeting POST body as `meetLink`.
+  void clearLinkGenError() {
+    state = state.copyWith(
+      linkGenStatus: MeetLinkGenerationStatus.idle,
+      clearLinkGenError: true,
+    );
   }
 }
 

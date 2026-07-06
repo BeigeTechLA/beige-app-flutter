@@ -6,6 +6,7 @@ import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/network/exceptions/exception_handler.dart';
 import '../../../../core/session/session_store.dart';
 import '../../domain/models/create_meeting_input.dart';
+import '../../domain/models/generate_meet_link_input.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_response.dart';
 import '../../domain/models/shoot_option.dart';
@@ -248,6 +249,41 @@ class MeetingsRemoteSource {
     final idx = projectName.lastIndexOf(' - ');
     if (idx == -1) return projectName;
     return projectName.substring(idx + 3).trim();
+  }
+
+  /// Generates a Google Meet link via `external-meetings/create-event`.
+  /// Backend proxies Google Calendar API. Returns the raw `meetLink` string.
+  ///
+  /// If backend responds with `authUrl` (Google OAuth required), throws
+  /// [ServerException] so the notifier surfaces a generic error toast — the
+  /// in-app OAuth flow is intentionally not implemented per product decision.
+  Future<String> generateMeetLink(GenerateMeetLinkInput input) {
+    return _guard(() async {
+      final body = <String, dynamic>{
+        'userId': input.userId,
+        'summary': input.summary,
+        'location': 'Online',
+        'description': input.description,
+        'startDateTime': input.startAt.toUtc().toIso8601String(),
+        'endDateTime': input.endAt.toUtc().toIso8601String(),
+        'orderId': input.orderId.toString(),
+      };
+      final resp = await _dio.post<dynamic>(
+        ApiEndpoints.externalMeetingsCreateEvent,
+        data: body,
+      );
+      final data = resp.data;
+      if (data is Map) {
+        final link = data['meetLink'];
+        if (link is String && link.isNotEmpty) return link;
+        if (data['authUrl'] is String) {
+          throw const ServerException(
+            message: 'Meet link authorization required',
+          );
+        }
+      }
+      throw const ServerException(message: 'Unexpected meet link response');
+    });
   }
 
   /// Records the signed-in user's RSVP. Server returns the updated meeting
