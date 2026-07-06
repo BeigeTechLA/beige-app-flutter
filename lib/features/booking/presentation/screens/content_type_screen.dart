@@ -112,6 +112,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
     return AppScaffold(
+      disableDrawer: widget.fromHome,
       drawer: const DrawerScreen(),
 
       hasAppBar: true,
@@ -125,20 +126,21 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
           children: [
 
             /// MENU BUTTON
-            Builder(
-              builder: (context) {
-                return IconButton(
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  icon: SvgPicture.asset(
-                    AppAssets.menu,
-                    height: 22,
-                    width: 22,
-                  ),
-                );
-              },
-            ),
+            if (!widget.fromHome)
+              Builder(
+                builder: (context) {
+                  return IconButton(
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    icon: SvgPicture.asset(
+                      AppAssets.menu,
+                      height: 22,
+                      width: 22,
+                    ),
+                  );
+                },
+              ),
 
             /// BACK BUTTON
             if (widget.fromHome)
@@ -146,6 +148,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                 onTap: () => context.pop(),
                 child: Padding(
                   padding: const EdgeInsets.only(
+                    left: AppSpacing.base,
                     right: AppSpacing.sm,
                   ),
                   child: SvgPicture.asset(

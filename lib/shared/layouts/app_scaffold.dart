@@ -18,6 +18,7 @@ class AppScaffold extends StatelessWidget {
     this.backgroundColor,
     this.resizeToAvoidBottomInset = true,
     this.drawer,
+    this.disableDrawer = false,
   });
 
   final Widget body;
@@ -28,6 +29,7 @@ class AppScaffold extends StatelessWidget {
   final Widget? floatingActionButton;
   final Color? backgroundColor;
   final bool resizeToAvoidBottomInset;
+  final bool disableDrawer;
 
   /// OPTIONAL DRAWER
   final Widget? drawer;
@@ -36,7 +38,7 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       /// DEFAULT DRAWER
-      drawer: drawer ?? const DrawerScreen(),
+      drawer: disableDrawer ? null : (drawer ?? const DrawerScreen()),
 
       appBar: appBar,
       backgroundColor: backgroundColor,
