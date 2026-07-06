@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:lottie/lottie.dart' show Lottie;
-
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
 import 'package:beige/core/utils/shared_service.dart';
@@ -17,6 +15,7 @@ import 'package:beige/core/firebase/analytics_events.dart';
 import 'package:beige/core/firebase/analytics_service.dart';
 import 'package:beige/core/firebase/crashlytics_service.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -117,16 +116,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         if (loadingProgress == null) {
                                           return child;
                                         }
-                                        return Center(
-                                          child: SizedBox(
-                                            width: 96,
-                                            height: 96,
-                                            child: Lottie.asset(
-                                              AppAssets.lottieSpinner,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        );
+                                        return const AppImageLoader(size: 96);
                                       },
                                       errorBuilder:
                                           (context, error, stackTrace) {

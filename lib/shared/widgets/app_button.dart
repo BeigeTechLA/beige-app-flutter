@@ -4,6 +4,7 @@ import '../../app/colors.dart';
 import '../../app/radii.dart';
 import '../../app/spacing.dart';
 import '../../app/text_styles.dart';
+import 'loading.dart';
 import 'scale_clamped_text.dart';
 
 enum AppButtonVariant { primary, secondary, outline, text, destructive }
@@ -58,13 +59,10 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = isLoading
-        ? SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(_foregroundColor),
-            ),
+        ? AppCircularLoader(
+            size: 20,
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(_foregroundColor),
           )
         : Row(
             mainAxisSize: MainAxisSize.min,

@@ -6,6 +6,7 @@ import '../../../../app/durations.dart';
 import '../../../../app/radii.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../providers/create_meeting_notifier.dart';
 import 'member_selection_tile.dart';
 
@@ -244,7 +245,7 @@ class _InviteAdditionalMembersBottomSheetState
                   builder: (context) {
                     if (state.directoryLoading) {
                       return const Center(
-                        child: CircularProgressIndicator(
+                        child: AppCircularLoader(
                           color: AppColors.primary,
                         ),
                       );

@@ -15,6 +15,7 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/app_booking_card.dart';
 import 'package:beige/shared/widgets/app_main_toolbar.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
@@ -179,7 +180,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                 Expanded(
                   child: isUpcomingSelected
                       ? isLoading
-                            ? const Center(child: CircularProgressIndicator())
+                            ? const Center(child: AppCircularLoader())
                             : upcomingShoots.isEmpty
                             ? Center(
                                 child: Column(
@@ -224,7 +225,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 },
                               )
                       : isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: AppCircularLoader())
                       : completedShoots.isEmpty
                       ? Center(
                           child: Text(

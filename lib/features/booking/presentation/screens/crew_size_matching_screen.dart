@@ -4,8 +4,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
@@ -13,6 +11,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/features/booking/presentation/providers/crew_recommendation_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSizeMatchingScreen extends ConsumerStatefulWidget {
@@ -252,13 +251,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
 
                                       // ⏳ loading
                                       placeholder: (context, url) {
-                                        return Center(
-                                          child: Lottie.asset(
-                                            AppAssets.lottieSpinner,
-                                            width: 120,
-                                            height: 120,
-                                          ),
-                                        );
+                                        return const AppImageLoader(size: 120);
                                       },
 
                                       // ✅ success
@@ -272,13 +265,7 @@ class _CrewSizeMatchingScreenState extends ConsumerState<CrewSizeMatchingScreen>
                                       // ❌ error
                                       errorWidget: (context, url, error) {
                                         debugPrint("❌ IMAGE FAILED → $url");
-                                        return Center(
-                                          child: Lottie.asset(
-                                            AppAssets.lottieSpinner,
-                                            width: 120,
-                                            height: 120,
-                                          ),
-                                        );
+                                        return const AppImageLoader(size: 120);
                                       },
                                     ),
                                   ),

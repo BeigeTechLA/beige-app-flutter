@@ -13,6 +13,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/features/shoot/presentation/providers/shoot_summary_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ShootSummaryScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -364,7 +365,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
           ),
           if (loading)
             const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: AppCircularLoader(color: AppColors.primary),
             ),
         ],
       ),
@@ -572,7 +573,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                   /// BODY
                   Expanded(
                     child: loadingTimeline
-                        ? const Center(child: CircularProgressIndicator())
+                        ? const Center(child: AppCircularLoader())
                         : timelineData.isEmpty
                         ? Center(
                             child: Text(

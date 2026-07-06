@@ -13,6 +13,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/features/shoot/presentation/providers/shoot_edit_review_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ShootEditReviewScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -124,7 +125,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
       body: booking == null
           ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: AppCircularLoader(color: AppColors.primary),
             )
           : Stack(
               children: [
@@ -577,7 +578,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                 if (loding)
                   const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                    child: AppCircularLoader(color: AppColors.primary),
                   ),
               ],
             ),

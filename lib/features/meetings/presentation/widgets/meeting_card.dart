@@ -8,6 +8,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/widgets/app_avatar.dart';
 import '../../../../shared/widgets/app_toggle_switch.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
@@ -480,13 +481,10 @@ class _RsvpButton extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: loading
-              ? SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(textColor),
-                  ),
+              ? AppCircularLoader(
+                  size: 14,
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(textColor),
                 )
               : Text(
                   label,

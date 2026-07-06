@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
-import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../shared/widgets/loading.dart';
 
 class MeetingScheduledScreen extends ConsumerStatefulWidget {
   const MeetingScheduledScreen({super.key});
@@ -57,11 +55,7 @@ class _MeetingScheduledScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Lottie.asset(
-                    AppAssets.lottieSuccess,
-                    height: 160,
-                    repeat: false,
-                  ),
+                  const AppSuccessAnimation(height: 160),
                   AppSpacing.verticalBase,
                   const Text(
                     'Meeting Scheduled',

@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/features/profile/presentation/providers/booking_history_notifier.dart';
 
 class ShootHistoryScreen extends ConsumerWidget {
@@ -58,7 +59,7 @@ class ShootHistoryScreen extends ConsumerWidget {
             Expanded(
               child: isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
+                      child: AppCircularLoader(
                         color: AppColors.primary,
                       ),
                     )

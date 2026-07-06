@@ -7,6 +7,7 @@ import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../domain/models/shoot_participant_option.dart';
 import '../providers/shoot_participants_provider.dart';
 
@@ -110,7 +111,7 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
                 Expanded(
                   child: async.when(
                     loading: () => const Center(
-                      child: CircularProgressIndicator(
+                      child: AppCircularLoader(
                         color: AppColors.primary,
                       ),
                     ),

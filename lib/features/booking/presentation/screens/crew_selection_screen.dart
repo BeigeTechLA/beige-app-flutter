@@ -5,8 +5,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
@@ -14,7 +12,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
-import 'package:beige/shared/widgets/loading.dart' show AppLoader;
+import 'package:beige/shared/widgets/loading.dart' show AppLoader, AppSuccessAnimation;
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
@@ -1434,9 +1432,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               mainAxisSize: MainAxisSize.min, // 🔥 IMPORTANT
               children: [
                 /// 🔥 SMALL ICON / LOTTIE
-                SizedBox(
-                  child: Lottie.asset(
-                    AppAssets.lottieSuccess,
+                const SizedBox(
+                  child: AppSuccessAnimation(
                     height: 150,
                     fit: BoxFit.cover,
                   ),

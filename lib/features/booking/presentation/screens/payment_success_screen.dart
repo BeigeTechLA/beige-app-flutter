@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
@@ -11,6 +9,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class PaymentSuccessScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -55,7 +54,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               /// 🎉 LOTTIE
-              Lottie.asset(AppAssets.lottieSuccess, height: 180),
+              const AppSuccessAnimation(height: 180, repeat: true),
 
               AppSpacing.verticalXl,
 

@@ -9,6 +9,7 @@ import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../providers/create_meeting_state.dart' show TimeOfDayValue;
 import '../providers/edit_meeting_notifier.dart';
 import '../providers/edit_meeting_state.dart';
@@ -171,7 +172,7 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
       body: SafeArea(
         child: switch (state.status) {
           EditMeetingStatus.loading => const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: AppCircularLoader(color: AppColors.primary),
             ),
           EditMeetingStatus.loadError => Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),

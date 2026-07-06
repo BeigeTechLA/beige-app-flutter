@@ -12,6 +12,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting_platform.dart';
 import '../providers/client_shoots_provider.dart';
@@ -1003,14 +1004,11 @@ class _GenerateMeetLinkButton extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: loading
-                ? const SizedBox(
-                    height: 14,
-                    width: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
-                    ),
+                ? const AppCircularLoader(
+                    size: 14,
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
                   )
                 : Text(
                     'Generate',

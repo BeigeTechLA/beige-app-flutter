@@ -12,6 +12,7 @@ import '../../../../../../app/spacing.dart';
 import '../../../app/text_styles.dart';
 import '../../../core/network/api_endpoints.dart';
 import '../providers/drawer_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class DrawerScreen extends ConsumerWidget {
   const DrawerScreen({super.key});
@@ -114,11 +115,10 @@ class DrawerScreen extends ConsumerWidget {
                             loading: () => const CircleAvatar(
                               radius: 25,
                               backgroundColor: AppColors.surfaceVariant,
-                              child: Center(
-                                child: SizedBox(
-                                  height: 18,
-                                  width: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                              child: const Center(
+                                child: AppCircularLoader(
+                                  size: 18,
+                                  strokeWidth: 2,
                                 ),
                               ),
                             ),
@@ -153,10 +153,9 @@ class DrawerScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
-                              loading: () => const SizedBox(
-                                height: 18,
-                                width: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                              loading: () => const AppCircularLoader(
+                                size: 18,
+                                strokeWidth: 2,
                               ),
                               error: (_, _) => const SizedBox.shrink(),
                             ),

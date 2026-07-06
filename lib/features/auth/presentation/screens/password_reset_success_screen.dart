@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
-import 'package:beige/app/assets.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
@@ -42,11 +40,7 @@ class _PasswordResetSuccessScreenState
             /// ✅ SUCCESS LOTTIE
             Transform.translate(
               offset: Offset(0, 20),
-              child: Lottie.asset(
-                AppAssets.lottieSuccess,
-                height: 180,
-                repeat: false,
-              ),
+              child: const AppSuccessAnimation(height: 180),
             ),
 
             Text(

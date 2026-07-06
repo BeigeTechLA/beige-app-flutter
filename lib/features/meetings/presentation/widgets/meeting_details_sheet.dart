@@ -14,6 +14,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../core/providers/current_user_provider.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_platform.dart';
@@ -70,7 +71,7 @@ class MeetingDetailsSheet extends ConsumerWidget {
                 child: const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                    child: AppCircularLoader(color: AppColors.primary),
                   ),
                 ),
               ),

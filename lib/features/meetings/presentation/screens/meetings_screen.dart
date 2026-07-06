@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
@@ -11,6 +9,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
 import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting.dart';
@@ -165,7 +164,11 @@ class MeetingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          if (rsvpInFlight) const _RsvpLoaderOverlay(),
+          if (rsvpInFlight)
+            const AppLoadingOverlay(
+              dimOpacity: 0.4,
+              asset: AppAssets.lottieLoader,
+            ),
         ],
       ),
     );
@@ -196,7 +199,7 @@ class _ListBody extends StatelessWidget {
           child: SizedBox(
             height: constraints.maxHeight,
             child: const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: AppCircularLoader(color: AppColors.primary),
             ),
           ),
         ),
@@ -275,28 +278,6 @@ class _ListBody extends StatelessWidget {
           onReject: () => onRsvp(m, false),
         );
       },
-    );
-  }
-}
-
-class _RsvpLoaderOverlay extends StatelessWidget {
-  const _RsvpLoaderOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: AbsorbPointer(
-        child: ColoredBox(
-          color: AppColors.black.withValues(alpha: 0.4),
-          child: Center(
-            child: Lottie.asset(
-              AppAssets.lottieLoader,
-              height: 70,
-              width: 70,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

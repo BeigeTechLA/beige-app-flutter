@@ -9,6 +9,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/features/creative/presentation/providers/creative_profile_notifier.dart';
 
 class RecommendedCreativeDetailScreen extends ConsumerStatefulWidget {
@@ -368,7 +369,7 @@ class _RecommendedCreativeDetailScreenState
           ),
           if (isLoading)
             const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+              child: AppCircularLoader(color: AppColors.primary),
             ),
         ],
       ),

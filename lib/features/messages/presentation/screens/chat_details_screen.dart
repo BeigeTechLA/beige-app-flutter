@@ -6,6 +6,7 @@ import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/util/role_label.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../domain/entities/chat_details.dart';
 import '../../domain/entities/participant.dart';
 import '../providers/chat_details_providers.dart';
@@ -25,7 +26,7 @@ class ChatDetailsScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: detailsAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+          child: AppCircularLoader(color: AppColors.primary),
         ),
         error: (e, _) => Center(
           child: AppEmptyState(

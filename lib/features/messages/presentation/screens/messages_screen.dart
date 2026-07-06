@@ -9,6 +9,7 @@ import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
+import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
 import '../providers/conversation_list_providers.dart';
 import '../routes/messages_args.dart';
@@ -171,7 +172,7 @@ class _ListBody extends StatelessWidget {
   Widget build(BuildContext context) {
     if (state.isLoading && state.items.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+        child: AppCircularLoader(color: AppColors.primary),
       );
     }
     if (state.errorMessage != null && state.items.isEmpty) {
