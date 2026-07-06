@@ -124,9 +124,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
       ),
 
       body: booking == null
-          ? const Center(
-              child: AppCircularLoader(color: AppColors.primary),
-            )
+          ? const AppScreenLoader()
           : Stack(
               children: [
                 Padding(
@@ -576,10 +574,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                   ),
                 ),
 
-                if (loding)
-                  const Center(
-                    child: AppCircularLoader(color: AppColors.primary),
-                  ),
+                if (loding) const AppScreenLoader(),
               ],
             ),
       bottomNavigationBar: booking == null

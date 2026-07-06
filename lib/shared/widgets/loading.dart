@@ -51,10 +51,31 @@ class AppLoader extends StatelessWidget {
       color: AppColors.background,
       child: Center(
         child: Lottie.asset(
-          AppAssets.lottieLoader,
+          AppAssets.lottieCircleLoader,
           height: 70,
           width: 70,
         ),
+      ),
+    );
+  }
+}
+
+/// Bare centered Lottie loader for screen-body / sheet-body / list-empty
+/// loading states. No background paint — parent controls surface. Default
+/// 70px matches [AppLoader] and [AppLoadingOverlay] for consistent visual
+/// language.
+class AppScreenLoader extends StatelessWidget {
+  const AppScreenLoader({super.key, this.size = 70});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Lottie.asset(
+        AppAssets.lottieCircleLoader,
+        height: size,
+        width: size,
       ),
     );
   }
@@ -96,7 +117,7 @@ class AppImageLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Lottie.asset(
-        AppAssets.lottieSpinner,
+        AppAssets.lottieCircleLoader,
         width: size,
         height: size,
         fit: BoxFit.contain,

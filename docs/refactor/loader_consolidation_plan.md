@@ -1,5 +1,9 @@
 # Loader Consolidation — Unified `lottieCircleLoader`
 
+> **Status: SHIPPED (all 3 categories executed).** See "Execution
+> Status" section at the bottom for what landed, how it was verified,
+> and any deviations from the original plan.
+
 ## Goal
 
 Standardize app-wide loading UI on `AppAssets.lottieCircleLoader` (Lottie
@@ -171,3 +175,129 @@ Lottie renders soft/illegible; Material stays crisp.
 3. **Land Category C** (11 profile/shoot/home screen swaps). Full-app regression pass.
 
 Keeps blast radius small per PR, easy revert per phase.
+
+---
+
+# Execution Status
+
+**All three categories executed in one pass.**
+
+## What Landed
+
+### New central widget
+Added to `lib/shared/widgets/loading.dart`:
+
+```dart
+class AppScreenLoader extends StatelessWidget {
+  const AppScreenLoader({super.key, this.size = 70});
+  final double size;
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Lottie.asset(
+        AppAssets.lottieCircleLoader,
+        height: size,
+        width: size,
+      ),
+    );
+  }
+}
+```
+
+Rationale: Category B/C sites needed a canonical Lottie-based screen
+loader. Reusing `AppLoader` was wrong — that widget paints a full
+`AppColors.background` surface, which would clobber body content when
+overlaid or embedded in a scroll body. `AppScreenLoader` is a bare
+`Center + Lottie` with no background, so parent controls surface.
+
+### Category A — asset swaps (done)
+
+| Widget | Before | After |
+|--------|--------|-------|
+| `AppLoader` | `lottieLoader` | `lottieCircleLoader` |
+| `AppImageLoader` | `lottieSpinner` | `lottieCircleLoader` |
+| `_RsvpLoaderOverlay` override in `meetings_screen` | `asset: AppAssets.lottieLoader` param | dropped — falls back to `lottieCircleLoader` default |
+
+`meetings_screen.dart` also lost its `AppAssets` import (no longer
+referenced after the override was removed).
+
+### Category B — 7 screen/sheet loaders migrated
+
+Each site now uses `AppScreenLoader`. Enclosing `Center` wrappers
+removed where redundant (widget already centers).
+
+- `lib/features/messages/presentation/screens/chat_details_screen.dart`
+- `lib/features/messages/presentation/screens/chat_thread_screen.dart`
+- `lib/features/messages/presentation/screens/messages_screen.dart`
+- `lib/features/meetings/presentation/screens/edit_meeting_screen.dart`
+- `lib/features/meetings/presentation/screens/meetings_screen.dart`
+- `lib/features/meetings/presentation/widgets/meeting_details_sheet.dart`
+- `lib/features/meetings/presentation/widgets/meeting_participant_picker_sheet.dart`
+
+### Category C — 11 additional loaders migrated
+
+- `lib/features/profile/presentation/screens/shoot_history_screen.dart`
+- `lib/features/profile/presentation/screens/favorites_screen.dart`
+- `lib/features/shoot/presentation/screens/my_shoots_screen.dart` (2 spots)
+- `lib/features/shoot/presentation/screens/shoot_edit_review_screen.dart` (2 spots)
+- `lib/features/shoot/presentation/screens/shoot_summary_screen.dart` (2 spots)
+- `lib/features/meetings/presentation/widgets/invite_additional_members_bottom_sheet.dart`
+- `lib/features/home/presentation/screens/creative_profile_screen.dart`
+- `lib/features/home/presentation/screens/recommended_creative_detail_screen.dart`
+
+## Test Update
+
+One existing widget test asserted the presence of
+`CircularProgressIndicator` in the meeting-details-sheet loading branch.
+Post-swap the tree now contains `AppScreenLoader`. Updated:
+
+- `test/features/meetings/presentation/widgets/meeting_details_sheet_test.dart:158`
+  - Test title renamed `loading branch shows CircularProgressIndicator`
+    → `loading branch shows AppScreenLoader`.
+  - Finder switched to `find.byType(AppScreenLoader)`.
+  - Added `import 'package:beige/shared/widgets/loading.dart';`.
+  - All 3 tests in the file green.
+
+## Sites Intentionally Left on Material Spinner
+
+Unchanged, matching the "Reason 1 / Reason 2" carve-outs above:
+
+- `lib/shared/widgets/app_button.dart` — spinner tinted to
+  `_foregroundColor` per button variant.
+- `lib/features/meetings/presentation/widgets/meeting_card.dart` — RSVP
+  button spinner tinted to `textColor`, 14×14.
+- `lib/features/meetings/presentation/screens/create_meeting_screen.dart`
+  — Generate-button spinner tinted `AppColors.onPrimary`, 14×14.
+- `lib/features/app_drawer/screen/drawer_screen.dart` — 2× 18×18
+  micro-spinners inside `CircleAvatar`.
+- `lib/features/shoot/presentation/screens/cancel_shoot_screen.dart` —
+  button spinner tinted `AppColors.textHeading`.
+
+All remain on `AppCircularLoader` (Material `CircularProgressIndicator`).
+
+## Verification
+
+| Check | Result |
+|-------|--------|
+| `flutter analyze` (lib scope) | Zero errors. No new warnings. |
+| `flutter test` (full suite) | 3 pre-existing failures unchanged (`create_meeting_notifier setShoot`, `meeting_card date label`, `widget_test App loads test`). Zero regressions from this refactor. |
+| Test count delta | Same total; `meeting_details_sheet_test` still 3 tests, all green after finder update. |
+
+## Deviations From Plan
+
+1. **Introduced `AppScreenLoader` widget** — plan text said "swap to
+   `Lottie.asset(lottieCircleLoader, ...)` centered" at each site.
+   Instead, one central widget was added and reused, preserving the
+   consolidation principle established by earlier loader refactors.
+2. **Test file touched** — original plan flagged "widget tests
+   referencing `CircularProgressIndicator` finder would break — audit
+   before swap". Confirmed and fixed the single affected test.
+3. **Micro-spinner carve-out expanded by one site** — cancel_shoot
+   button spinner (tinted, small) added to the "leave on Material" list
+   for the same reasons as app_button.
+
+## Rollback
+
+Two commits will land this work (loader plan doc + implementation).
+Revert both to restore prior loader state. Widgets kept small and
+self-contained; no data-layer changes accompany the visual swap.

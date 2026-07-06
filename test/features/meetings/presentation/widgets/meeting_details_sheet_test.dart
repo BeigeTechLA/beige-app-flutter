@@ -15,6 +15,7 @@ import 'package:beige/features/meetings/domain/models/shoot_option.dart';
 import 'package:beige/features/meetings/domain/repositories/meetings_repository.dart';
 import 'package:beige/features/meetings/presentation/providers/meetings_repository_provider.dart';
 import 'package:beige/features/meetings/presentation/widgets/meeting_details_sheet.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -155,8 +156,7 @@ void main() {
     expect(find.text('Retry'), findsOneWidget);
   });
 
-  testWidgets('loading branch shows CircularProgressIndicator',
-      (tester) async {
+  testWidgets('loading branch shows AppScreenLoader', (tester) async {
     // _PendingRepo never completes — keeps the FutureProvider in loading state.
     await tester.pumpProviderApp(
       const Scaffold(body: MeetingDetailsSheet(meetingId: 'm-1')),
@@ -167,7 +167,7 @@ void main() {
 
     await tester.pump();
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(AppScreenLoader), findsOneWidget);
   });
 }
 

@@ -68,11 +68,9 @@ class MeetingDetailsSheet extends ConsumerWidget {
               ),
               loading: () => _SheetShell(
                 scrollController: scrollController,
-                child: const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
-                    child: AppCircularLoader(color: AppColors.primary),
-                  ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
+                  child: AppScreenLoader(),
                 ),
               ),
               error: (e, _) => _SheetShell(

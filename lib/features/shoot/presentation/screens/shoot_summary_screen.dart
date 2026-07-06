@@ -363,10 +363,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
               ],
             ),
           ),
-          if (loading)
-            const Center(
-              child: AppCircularLoader(color: AppColors.primary),
-            ),
+          if (loading) const AppScreenLoader(),
         ],
       ),
 
@@ -573,7 +570,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                   /// BODY
                   Expanded(
                     child: loadingTimeline
-                        ? const Center(child: AppCircularLoader())
+                        ? const AppScreenLoader()
                         : timelineData.isEmpty
                         ? Center(
                             child: Text(

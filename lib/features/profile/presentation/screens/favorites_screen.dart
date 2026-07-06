@@ -68,7 +68,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
             Expanded(
               child: isLoading
-                  ? const Center(child: AppCircularLoader())
+                  ? const AppScreenLoader()
                   : favourites.isEmpty
                       ? Center(
                           child: Text(

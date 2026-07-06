@@ -171,9 +171,7 @@ class _ListBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.isLoading && state.items.isEmpty) {
-      return const Center(
-        child: AppCircularLoader(color: AppColors.primary),
-      );
+      return const AppScreenLoader();
     }
     if (state.errorMessage != null && state.items.isEmpty) {
       return ListView(

@@ -110,11 +110,7 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
                 ),
                 Expanded(
                   child: async.when(
-                    loading: () => const Center(
-                      child: AppCircularLoader(
-                        color: AppColors.primary,
-                      ),
-                    ),
+                    loading: () => const AppScreenLoader(),
                     error: (e, _) => Padding(
                       padding: const EdgeInsets.all(AppSpacing.xl),
                       child: AppEmptyState(

@@ -25,9 +25,7 @@ class ChatDetailsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: detailsAsync.when(
-        loading: () => const Center(
-          child: AppCircularLoader(color: AppColors.primary),
-        ),
+        loading: () => const AppScreenLoader(),
         error: (e, _) => Center(
           child: AppEmptyState(
             icon: Icons.error_outline,

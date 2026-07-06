@@ -58,11 +58,7 @@ class ShootHistoryScreen extends ConsumerWidget {
 
             Expanded(
               child: isLoading
-                  ? const Center(
-                      child: AppCircularLoader(
-                        color: AppColors.primary,
-                      ),
-                    )
+                  ? const AppScreenLoader()
                   : bookings.isEmpty
                       ? Center(
                           child: Text(

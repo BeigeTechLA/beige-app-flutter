@@ -244,11 +244,7 @@ class _InviteAdditionalMembersBottomSheetState
                 child: Builder(
                   builder: (context) {
                     if (state.directoryLoading) {
-                      return const Center(
-                        child: AppCircularLoader(
-                          color: AppColors.primary,
-                        ),
-                      );
+                      return const AppScreenLoader();
                     }
 
                     if (state.directoryError != null) {

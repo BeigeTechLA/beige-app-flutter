@@ -171,9 +171,7 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: switch (state.status) {
-          EditMeetingStatus.loading => const Center(
-              child: AppCircularLoader(color: AppColors.primary),
-            ),
+          EditMeetingStatus.loading => const AppScreenLoader(),
           EditMeetingStatus.loadError => Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: AppEmptyState(

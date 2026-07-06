@@ -180,7 +180,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                 Expanded(
                   child: isUpcomingSelected
                       ? isLoading
-                            ? const Center(child: AppCircularLoader())
+                            ? const AppScreenLoader()
                             : upcomingShoots.isEmpty
                             ? Center(
                                 child: Column(
@@ -225,7 +225,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                 },
                               )
                       : isLoading
-                      ? const Center(child: AppCircularLoader())
+                      ? const AppScreenLoader()
                       : completedShoots.isEmpty
                       ? Center(
                           child: Text(

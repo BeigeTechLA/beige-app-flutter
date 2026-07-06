@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
@@ -164,11 +163,7 @@ class MeetingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          if (rsvpInFlight)
-            const AppLoadingOverlay(
-              dimOpacity: 0.4,
-              asset: AppAssets.lottieLoader,
-            ),
+          if (rsvpInFlight) const AppLoadingOverlay(dimOpacity: 0.4),
         ],
       ),
     );
@@ -198,9 +193,7 @@ class _ListBody extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           child: SizedBox(
             height: constraints.maxHeight,
-            child: const Center(
-              child: AppCircularLoader(color: AppColors.primary),
-            ),
+            child: const AppScreenLoader(),
           ),
         ),
       );

@@ -170,9 +170,7 @@ class _ThreadBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.isLoading && state.messages.isEmpty) {
-      return const Center(
-        child: AppCircularLoader(color: AppColors.primary),
-      );
+      return const AppScreenLoader();
     }
     if (state.errorMessage != null && state.messages.isEmpty) {
       return AppEmptyState(

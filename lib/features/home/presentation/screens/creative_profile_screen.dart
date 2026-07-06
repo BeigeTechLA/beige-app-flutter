@@ -335,10 +335,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
               ],
             ),
           ),
-          if (isLoading)
-            const Center(
-              child: AppCircularLoader(color: AppColors.primary),
-            ),
+          if (isLoading) const AppScreenLoader(),
         ],
       ),
     );
