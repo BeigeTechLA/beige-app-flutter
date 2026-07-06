@@ -309,7 +309,9 @@ class CrewSelectionNotifier
       (data) {
         final creatives = data['creatives'] as List? ?? [];
         final addedIds = creatives
-            .map<int>((e) => e['creative_user_id'] as int)
+            .map((e) => (e as Map)['creative_user_id'])
+            .whereType<num>()
+            .map((v) => v.toInt())
             .toSet();
 
         final summary = data['summary'] as Map<String, dynamic>?;
