@@ -200,6 +200,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
                   id: p.id,
                   name: p.name,
                   avatarUrl: p.avatarUrl,
+                  role: p.role,
                 ))
             .toList(),
       );

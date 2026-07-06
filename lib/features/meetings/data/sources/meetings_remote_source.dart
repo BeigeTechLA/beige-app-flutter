@@ -98,10 +98,22 @@ class MeetingsRemoteSource {
   Future<Meeting> create(CreateMeetingInput input) {
     return _guard(() async {
       final user = await _session.readUser();
-      final participantIds = input.participants
-          .map((p) => p.id)
-          .where((id) => id.isNotEmpty)
-          .toList(growable: false);
+      final cpIds = <String>[];
+      final adminIds = <String>[];
+      final participantIds = <String>[];
+      for (final p in input.participants) {
+        if (p.id.isEmpty) continue;
+        final role = (p.role ?? '').toLowerCase();
+        if (role == 'cp' ||
+            role == 'creative_partner' ||
+            role == 'creativepartner') {
+          cpIds.add(p.id);
+        } else if (role == 'admin') {
+          adminIds.add(p.id);
+        } else {
+          participantIds.add(p.id);
+        }
+      }
       final body = <String, dynamic>{
         'meeting_date_time': input.startAt.toUtc().toIso8601String(),
         'meeting_end_time': input.endAt.toUtc().toIso8601String(),
@@ -110,14 +122,14 @@ class MeetingsRemoteSource {
         'meeting_title': input.title,
         'description': input.description,
         'meetLink': input.link,
-        'cp_ids': const <int>[],
+        'cp_ids': cpIds,
+        'admin_id': adminIds,
         'participants': participantIds,
         'send_notification': false,
         'reminder_minutes': input.reminderMinutes,
       };
       final createdById = int.tryParse(user?.id ?? '');
       if (createdById != null) {
-        body['admin_id'] = createdById;
         body['created_by_id'] = createdById;
       }
       if (input.shootId != null) {
