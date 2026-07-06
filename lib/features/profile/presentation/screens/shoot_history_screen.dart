@@ -75,12 +75,28 @@ class ShootHistoryScreen extends ConsumerWidget {
                           itemBuilder: (context, index) {
                             final booking = bookings[index];
 
-                            final String image =
-                                booking['profile_image_url'] ?? "";
-                            final String name =
-                                booking['creator_name'] ?? "-";
-                            final String role =
-                                booking['primary_title'] ?? "";
+                            final creative =
+                                booking['creative'] as Map<String, dynamic>?;
+
+                            final String profileImageRaw =
+                                creative?['profile_image_url'] ??
+                                    booking['profile_image_url'] ??
+                                    "";
+                            final String shootImageRaw =
+                                booking['image_url'] ?? "";
+                            final String image = profileImageRaw.isNotEmpty
+                                ? profileImageRaw
+                                : shootImageRaw;
+
+                            final String name = booking['project_name'] ??
+                                booking['event']?['project_name'] ??
+                                "-";
+                            final String role = booking['shoot_type_name'] ??
+                                (booking['shoot_type'] is Map
+                                    ? booking['shoot_type']['name']
+                                    : booking['shoot_type']) ??
+                                booking['content_type'] ??
+                                "";
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
