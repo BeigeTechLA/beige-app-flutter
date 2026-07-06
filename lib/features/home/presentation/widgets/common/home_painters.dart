@@ -11,36 +11,40 @@ class BeveledTrayPainter extends CustomPainter {
     double w = size.width;
     double h = size.height;
 
-    // Tweakable bevel geometry.
-    double bevelHeight = 12; // Depth the slot drops below the top edge.
-    double slopeWidth = 15; // Width of the slanted edge on each side.
-    double shoulderWidth = w * 0.18; // Flat strips flanking the slot.
+    // Scale factors to dynamically adjust SVG coordinate space (375x56) to size w x h.
+    final double scaleX = w / 375.0;
+    final double scaleY = h / 56.0;
 
-    // 1. Draw flat shoulders (should blend with page background).
-    Path shoulderLeft = Path()
-      ..moveTo(0, 0)
-      ..lineTo(shoulderWidth, 0)
-      ..lineTo(shoulderWidth, h)
-      ..lineTo(0, h)
-      ..close();
-    canvas.drawPath(shoulderLeft, Paint()..color = AppColors.background);
+    final double x1 = 67.0 * scaleX;
+    final double x2 = 77.0 * scaleX;
+    final double x3 = 298.5 * scaleX;
+    final double x4 = 309.5 * scaleX;
 
-    Path shoulderRight = Path()
-      ..moveTo(w - shoulderWidth, 0)
-      ..lineTo(w, 0)
-      ..lineTo(w, h)
-      ..lineTo(w - shoulderWidth, h)
-      ..close();
-    canvas.drawPath(shoulderRight, Paint()..color = AppColors.background);
+    final double yTopShoulder = 0.25 * scaleY;
+    final double yTopCenter = 6.36111 * scaleY;
+    final double yBottomShoulder = 51.1759 * scaleY;
+    final double yBottomCenter = 55.25 * scaleY;
+
+    // 1. Paint background for the entire widget.
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, w, h),
+      Paint()..color = AppColors.background,
+    );
 
     // 2. Draw sunken center tray base path.
     Path trayPath = Path()
-      ..moveTo(shoulderWidth, 0)
-      ..lineTo(shoulderWidth + slopeWidth, bevelHeight)
-      ..lineTo(w - shoulderWidth - slopeWidth, bevelHeight)
-      ..lineTo(w - shoulderWidth, 0)
-      ..lineTo(w - shoulderWidth, h)
-      ..lineTo(shoulderWidth, h)
+      ..moveTo(x1, yTopShoulder)
+      ..lineTo(0.0, yTopShoulder)
+      ..lineTo(0.0, yBottomShoulder)
+      ..lineTo(x1, yBottomShoulder)
+      ..lineTo(x2, yBottomCenter)
+      ..lineTo(x3, yBottomCenter)
+      ..lineTo(x4, yBottomShoulder)
+      ..lineTo(w, yBottomShoulder)
+      ..lineTo(w, yTopShoulder)
+      ..lineTo(x4, yTopShoulder)
+      ..lineTo(x3, yTopCenter)
+      ..lineTo(x2, yTopCenter)
       ..close();
 
     // Fill tray with a slightly lighter premium dark vertical gradient to create depth.
@@ -49,7 +53,7 @@ class BeveledTrayPainter extends CustomPainter {
         colors: [Color(0xFF222225), Color(0xFF131315)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-      ).createShader(Rect.fromLTWH(shoulderWidth, 0, w - 2 * shoulderWidth, h));
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawPath(trayPath, trayPaint);
 
     // 3. Side-wall shadows along the slanted edges to suggest depth.
@@ -58,85 +62,79 @@ class BeveledTrayPainter extends CustomPainter {
         colors: [AppColors.black.withValues(alpha: 0.7), AppColors.transparent],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-      ).createShader(Rect.fromLTWH(shoulderWidth, 0, slopeWidth, h));
+      ).createShader(Rect.fromLTWH(x1, 0, x2 - x1, h));
 
     Path leftWallPath = Path()
-      ..moveTo(shoulderWidth, 0)
-      ..lineTo(shoulderWidth + slopeWidth, bevelHeight)
-      ..lineTo(shoulderWidth + slopeWidth, h)
-      ..lineTo(shoulderWidth, h)
+      ..moveTo(x1, yTopShoulder)
+      ..lineTo(x2, yTopCenter)
+      ..lineTo(x2, yBottomCenter)
+      ..lineTo(x1, yBottomShoulder)
       ..close();
     canvas.drawPath(leftWallPath, leftWallPaint);
 
     final rightWallPaint = Paint()
-      ..shader =
-          LinearGradient(
-            colors: [
-              AppColors.transparent,
-              AppColors.black.withValues(alpha: 0.7),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ).createShader(
-            Rect.fromLTWH(w - shoulderWidth - slopeWidth, 0, slopeWidth, h),
-          );
+      ..shader = LinearGradient(
+        colors: [AppColors.transparent, AppColors.black.withValues(alpha: 0.7)],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(Rect.fromLTWH(x3, 0, x4 - x3, h));
 
     Path rightWallPath = Path()
-      ..moveTo(w - shoulderWidth, 0)
-      ..lineTo(w - shoulderWidth - slopeWidth, bevelHeight)
-      ..lineTo(w - shoulderWidth - slopeWidth, h)
-      ..lineTo(w - shoulderWidth, h)
+      ..moveTo(x4, yTopShoulder)
+      ..lineTo(x3, yTopCenter)
+      ..lineTo(x3, yBottomCenter)
+      ..lineTo(x4, yBottomShoulder)
       ..close();
     canvas.drawPath(rightWallPath, rightWallPaint);
 
-    // 4. Inner top shadow that deepens the sunken floor.
+    // 4. Subtle inner shadows that deepen the sunken floor without banding.
     final topInnerShadow = Paint()
       ..shader = LinearGradient(
-        colors: [AppColors.black.withValues(alpha: 0.5), AppColors.transparent],
+        colors: [
+          AppColors.black.withValues(alpha: 0.18),
+          AppColors.transparent,
+        ],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-      ).createShader(Rect.fromLTWH(0, bevelHeight, w, 20));
+      ).createShader(Rect.fromLTWH(x2, yTopCenter, x3 - x2, 10 * scaleY));
 
     canvas.drawRect(
-      Rect.fromLTWH(
-        shoulderWidth + slopeWidth,
-        bevelHeight,
-        w - 2 * (shoulderWidth + slopeWidth),
-        15,
-      ),
+      Rect.fromLTWH(x2, yTopCenter, x3 - x2, 8 * scaleY),
       topInnerShadow,
     );
 
-    // 5. Sharp edge highlights.
-    final highlightPaint = Paint()
+    final bottomInnerShadow = Paint()
+      ..shader =
+          LinearGradient(
+            colors: [
+              AppColors.black.withValues(alpha: 0.08),
+              AppColors.transparent,
+            ],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ).createShader(
+            Rect.fromLTWH(x2, yBottomCenter - 8 * scaleY, x3 - x2, 8 * scaleY),
+          );
+
+    canvas.drawRect(
+      Rect.fromLTWH(x2, yBottomCenter - 6 * scaleY, x3 - x2, 6 * scaleY),
+      bottomInnerShadow,
+    );
+
+    // 5. Border stroke gradient exactly as in the SVG spec.
+    final strokePaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
+      ..strokeWidth = 0.5
+      ..shader = LinearGradient(
+        colors: [
+          const Color(0xFF1D1D1B).withValues(alpha: 0.4),
+          const Color(0xFF898989).withValues(alpha: 0.4),
+        ],
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
 
-    // Top horizontal shoulders.
-    highlightPaint.color = AppColors.white.withValues(alpha: 0.08);
-    canvas.drawLine(Offset(0, 0), Offset(shoulderWidth, 0), highlightPaint);
-    canvas.drawLine(Offset(w - shoulderWidth, 0), Offset(w, 0), highlightPaint);
-
-    // Slanted bevel diagonal highlights (bright and clean).
-    highlightPaint.color = AppColors.white.withValues(alpha: 0.18);
-    canvas.drawLine(
-      Offset(shoulderWidth, 0),
-      Offset(shoulderWidth + slopeWidth, bevelHeight),
-      highlightPaint,
-    );
-    canvas.drawLine(
-      Offset(w - shoulderWidth, 0),
-      Offset(w - shoulderWidth - slopeWidth, bevelHeight),
-      highlightPaint,
-    );
-
-    // Bottom sunken-floor horizontal edge.
-    highlightPaint.color = AppColors.white.withValues(alpha: 0.12);
-    canvas.drawLine(
-      Offset(shoulderWidth + slopeWidth, bevelHeight),
-      Offset(w - (shoulderWidth + slopeWidth), bevelHeight),
-      highlightPaint,
-    );
+    canvas.drawPath(trayPath, strokePaint);
   }
 
   @override
@@ -212,4 +210,217 @@ class BorderAnimationPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BorderAnimationPainter oldDelegate) => true;
+}
+
+class FigmaVectorPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    double w = size.width;
+    double h = size.height;
+
+    // Scale factors to dynamically adjust SVG coordinate space (375x54) to size w x h.
+    final double scaleX = w / 375.0;
+    final double scaleY = h / 54.0;
+
+    final double x1 = 67.0 * scaleX;
+    final double x2 = 76.5 * scaleX;
+    final double x3 = 298.5 * scaleX;
+    final double x4 = 310.0 * scaleX;
+
+    final double yTopShoulder = 0.0 * scaleY;
+    final double yTopCenter = 6.0 * scaleY;
+    final double yBottomShoulder = 50.0 * scaleY;
+    final double yBottomCenter = 54.0 * scaleY;
+
+    // 1. Paint background for the entire widget.
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, w, h),
+      Paint()..color = AppColors.background,
+    );
+
+    // 2. Draw sunken center tray base path.
+    Path trayPath = Path()
+      ..moveTo(x1, yTopShoulder)
+      ..lineTo(0.0, yTopShoulder)
+      ..lineTo(0.0, yBottomShoulder)
+      ..lineTo(x1, yBottomShoulder)
+      ..lineTo(x2, yBottomCenter)
+      ..lineTo(x3, yBottomCenter)
+      ..lineTo(x4, yBottomShoulder)
+      ..lineTo(w, yBottomShoulder)
+      ..lineTo(w, yTopShoulder)
+      ..lineTo(x4, yTopShoulder)
+      ..lineTo(x3, yTopCenter)
+      ..lineTo(x2, yTopCenter)
+      ..close();
+
+    // Fill tray with the specified linear gradient flowing top-to-bottom with a ~184° tilt.
+    // Alignment uses normalized coordinates: top (Alignment(0.07, -1.0)) to bottom (Alignment(-0.07, 1.0)).
+    final trayPaint = Paint()
+      ..shader = LinearGradient(
+        colors: const [Color(0xFF131313), Color(0xFF242424)],
+        stops: const [0.0302, 0.9699],
+        begin: const Alignment(0.07, -1.0),
+        end: const Alignment(-0.07, 1.0),
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawPath(trayPath, trayPaint);
+
+    // 3. Side-wall shadows along the slanted edges to suggest depth.
+    final leftWallPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [AppColors.black.withValues(alpha: 0.7), AppColors.transparent],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(Rect.fromLTWH(x1, 0, x2 - x1, h));
+
+    Path leftWallPath = Path()
+      ..moveTo(x1, yTopShoulder)
+      ..lineTo(x2, yTopCenter)
+      ..lineTo(x2, yBottomCenter)
+      ..lineTo(x1, yBottomShoulder)
+      ..close();
+    canvas.drawPath(leftWallPath, leftWallPaint);
+
+    final rightWallPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [AppColors.transparent, AppColors.black.withValues(alpha: 0.7)],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(Rect.fromLTWH(x3, 0, x4 - x3, h));
+
+    Path rightWallPath = Path()
+      ..moveTo(x4, yTopShoulder)
+      ..lineTo(x3, yTopCenter)
+      ..lineTo(x3, yBottomCenter)
+      ..lineTo(x4, yBottomShoulder)
+      ..close();
+    canvas.drawPath(rightWallPath, rightWallPaint);
+
+    // 4. Subtle inner shadows that deepen the sunken floor without banding.
+    final topInnerShadow = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          AppColors.black.withValues(alpha: 0.18),
+          AppColors.transparent,
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(x2, yTopCenter, x3 - x2, 10 * scaleY));
+
+    canvas.drawRect(
+      Rect.fromLTWH(x2, yTopCenter, x3 - x2, 8 * scaleY),
+      topInnerShadow,
+    );
+
+    final bottomInnerShadow = Paint()
+      ..shader =
+          LinearGradient(
+            colors: [
+              AppColors.black.withValues(alpha: 0.08),
+              AppColors.transparent,
+            ],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ).createShader(
+            Rect.fromLTWH(x2, yBottomCenter - 8 * scaleY, x3 - x2, 8 * scaleY),
+          );
+
+    canvas.drawRect(
+      Rect.fromLTWH(x2, yBottomCenter - 6 * scaleY, x3 - x2, 6 * scaleY),
+      bottomInnerShadow,
+    );
+
+    // 5. Border stroke gradient exactly as in the SVG spec.
+    final strokePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5
+      ..shader = LinearGradient(
+        colors: [
+          const Color(0xFF1D1D1B).withValues(alpha: 0.4),
+          const Color(0xFF898989).withValues(alpha: 0.4),
+        ],
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+
+    canvas.drawPath(trayPath, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class FigmaVectorWidget extends StatelessWidget {
+  const FigmaVectorWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 375 / 54,
+      child: CustomPaint(painter: FigmaVectorPainter()),
+    );
+  }
+}
+
+class UpperGradientPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    double w = size.width;
+    double h = size.height;
+
+    // Scale factors to dynamically adjust SVG coordinate space (375x184.5) to size w x h.
+    final double scaleX = w / 375.0;
+    final double scaleY = h / 184.5;
+
+    final double x1 = 67.0 * scaleX;
+    final double x2 = 76.5 * scaleX;
+    final double x3 = 298.5 * scaleX;
+    final double x4 = 310.0 * scaleX;
+
+    final double yBottomShoulder = 178.5 * scaleY;
+    final double yBottomCenter = 184.5 * scaleY;
+
+    // 1. Draw beveled bottom edge shape path.
+    Path path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(0, yBottomShoulder)
+      ..lineTo(x1, yBottomShoulder)
+      ..lineTo(x2, yBottomCenter)
+      ..lineTo(x3, yBottomCenter)
+      ..lineTo(x4, yBottomShoulder)
+      ..lineTo(w, yBottomShoulder)
+      ..lineTo(w, 0)
+      ..close();
+
+    // 2. Linear Gradient (180 degrees perfectly vertical):
+    // Top (0.27%): #1D1D1B (0% opacity)
+    // Bottom (99.73%): #222222 (100% opacity)
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: const [
+          Color(0x001D1D1B), // 0% opacity
+          Color(0xFF222222), // 100% opacity
+        ],
+        stops: const [0.0027, 0.9973],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class UpperGradientWidget extends StatelessWidget {
+  const UpperGradientWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 375 / 184.5,
+      child: CustomPaint(painter: UpperGradientPainter()),
+    );
+  }
 }
