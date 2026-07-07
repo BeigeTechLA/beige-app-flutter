@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:beige/app/assets.dart';
@@ -6,6 +7,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 import '../common/home_painters.dart';
 
@@ -125,7 +127,7 @@ class HomeMapBackground extends StatelessWidget {
 }
 
 /// Navigation row containing drawer trigger, greeting, location dropdown and profile actions.
-class HomeNavigationHeader extends StatelessWidget {
+class HomeNavigationHeader extends ConsumerWidget {
   final String? userName;
   final String? location;
   final String? profileImageUrl;
@@ -144,7 +146,8 @@ class HomeNavigationHeader extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bust = ref.watch(profileImageBustProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -239,7 +242,7 @@ class HomeNavigationHeader extends StatelessWidget {
                     child:
                         profileImageUrl != null && profileImageUrl!.isNotEmpty
                         ? Image.network(
-                            ApiEndpoints.imageUrl + profileImageUrl!,
+                            '${ApiEndpoints.imageUrl}${profileImageUrl!}${bust > 0 ? '?v=$bust' : ''}',
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,

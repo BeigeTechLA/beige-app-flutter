@@ -23,11 +23,13 @@ class MeetingUserDto {
         json['profileImage'] ??
         json['avatar_url'] ??
         json['avatarUrl']) as String?;
+    final role = json['role'] as String?;
 
     return MeetingParticipant(
       id: id,
       name: name,
       avatarUrl: avatar,
+      role: role,
     );
   }
 }

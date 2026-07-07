@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,6 +10,9 @@ import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/providers/guest_mode_provider.dart';
 import '../../../../core/storage/secure_token_storage.dart';
+import '../../../../core/utils/shared_service.dart';
+import '../../../app_drawer/providers/drawer_notifier.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 
 import 'auth_providers.dart';
 import 'login_state.dart';
@@ -66,9 +71,34 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
         AnalyticsService.setUserId(user.environmentId.toString());
         CrashlyticsService.setUserContext(userId: user.environmentId, email: email);
 
+        // Login response omits `profile_image_url` — fire a profile fetch
+        // so the drawer avatar hydrates on first open without waiting for
+        // the user to visit Edit Profile.
+        unawaited(_hydrateProfileImage());
+
         state = state.copyWith(status: LoginStatus.success, user: user);
       },
     );
+  }
+
+  Future<void> _hydrateProfileImage() async {
+    try {
+      final repo = ref.read(profileRepositoryProvider);
+      final result = await repo.getProfile();
+      await result.fold(
+        (_) async {},
+        (profile) async {
+          final url = profile['user_profile_image_url']?.toString() ?? '';
+          if (url.isEmpty) return;
+          await SharedService.updateUserData(profileImageUrl: url);
+          ref.invalidate(drawerUserProvider);
+          ref.read(profileImageBustProvider.notifier).state++;
+        },
+      );
+    } catch (_) {
+      // Non-blocking — drawer will simply show the fallback avatar until the
+      // user visits Edit Profile which triggers the same fetch.
+    }
   }
 
   Future<void> _saveLoginDetails(

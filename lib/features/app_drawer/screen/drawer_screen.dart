@@ -60,6 +60,7 @@ class DrawerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = GoRouterState.of(context).uri.path;
     final userAsync = ref.watch(drawerUserProvider);
+    final bust = ref.watch(profileImageBustProvider);
 
     return Drawer(
       backgroundColor: AppColors.surfaceAbyss,
@@ -100,7 +101,7 @@ class DrawerScreen extends ConsumerWidget {
                               final image = user['profile_image_url'] ?? '';
                               final avatarUrl = image.isEmpty
                                   ? ''
-                                  : '${ApiEndpoints.imageUrl}$image';
+                                  : '${ApiEndpoints.imageUrl}$image${bust > 0 ? '?v=$bust' : ''}';
                               return CircleAvatar(
                                 radius: 25,
                                 backgroundColor: AppColors.surfaceVariant,

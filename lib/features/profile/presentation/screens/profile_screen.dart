@@ -14,6 +14,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/core/firebase/analytics_events.dart';
 import 'package:beige/core/firebase/analytics_service.dart';
 import 'package:beige/core/firebase/crashlytics_service.dart';
+import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
@@ -29,7 +30,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final profileState = ref.watch(profileNotifierProvider);
     final myProfile = profileState.profile;
-    final profileImageUrl = profileState.profileImageUrl;
+    final bust = ref.watch(profileImageBustProvider);
+    final rawImageUrl = profileState.profileImageUrl;
+    final profileImageUrl = rawImageUrl == null
+        ? null
+        : (bust > 0 ? '$rawImageUrl?v=$bust' : rawImageUrl);
 
     return Scaffold(
       body: SingleChildScrollView(

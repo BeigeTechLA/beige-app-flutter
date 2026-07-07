@@ -63,6 +63,9 @@ class AppAssets {
   static const String microphone =
       '$svgMessage/microphone.svg';
 
+  static const String icGroupChat =
+      '$svgMessage/ic_group_chat.svg';
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Meeting
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

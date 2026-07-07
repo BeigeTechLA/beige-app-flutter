@@ -7,7 +7,6 @@ import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/widgets/app_avatar.dart';
-import '../../../../shared/widgets/app_toggle_switch.dart';
 import '../../../../shared/widgets/loading.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_participant.dart';
@@ -45,8 +44,6 @@ class MeetingCard extends StatefulWidget {
 }
 
 class _MeetingCardState extends State<MeetingCard> {
-  bool _syncMeeting = true;
-
   static final _time = DateFormat('hh:mm a');
 
   String get _dateLabel =>
@@ -311,30 +308,6 @@ class _MeetingCardState extends State<MeetingCard> {
                       ),
                     ),
                   ],
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Divider(
-                color: AppColors.dividerDark,
-                height: 1,
-                thickness: 1,
-              ),
-              const SizedBox(height: 12),
-
-              // 5. Sync Meeting toggle
-              Row(
-                children: [
-                  Text(
-                    'Sync Meeting',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const Spacer(),
-                  AppToggleSwitch(
-                    value: _syncMeeting,
-                    onChanged: (val) => setState(() => _syncMeeting = val),
-                  ),
                 ],
               ),
               const SizedBox(height: 12),

@@ -103,17 +103,24 @@ class _ParticipantsBody extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: Text(
-                    p.name,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
+                  child: Text.rich(
+                    TextSpan(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                      children: [
+                        TextSpan(text: p.name),
+                        if (roleLabel(p.role).isNotEmpty)
+                          TextSpan(
+                            text: ' (${roleLabel(p.role)})',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                ),
-                Text(
-                  roleLabel(p.role),
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textTertiary,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

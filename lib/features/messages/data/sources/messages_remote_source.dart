@@ -10,6 +10,7 @@ import '../../domain/entities/chat_details.dart';
 import '../../domain/entities/chat_thread.dart';
 import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
+import '../../domain/util/conversation_sort.dart';
 import '../dto/chat_details_dto.dart';
 import '../dto/conversation_dto.dart';
 import '../dto/message_dto.dart';
@@ -59,13 +60,15 @@ class MessagesRemoteSource {
         queryParameters: {
           'page': 1,
           'limit': 50,
+          'sortBy': 'updatedAt:desc',
           if (query != null && query.isNotEmpty) 'search': query,
         },
       );
       final rooms = PaginationEnvelope.unwrapList(resp.data);
-      return rooms
+      final list = rooms
           .map((r) => ConversationDto.fromRestJson(r, currentUserId: userId))
-          .toList(growable: false);
+          .toList();
+      return sortConversationsByActivityDesc(list);
     });
   }
 
@@ -76,11 +79,7 @@ class MessagesRemoteSource {
       final userId = await _currentUserId();
       final resp = await _dio.get<dynamic>(
         ApiEndpoints.chatMessages(conversationId),
-        queryParameters: {
-          'page': 1,
-          'limit': 1,
-          'sortBy': '-createdAt',
-        },
+        queryParameters: {'page': 1, 'limit': 1, 'sortBy': '-createdAt'},
       );
       final list = PaginationEnvelope.unwrapList(resp.data);
       if (list.isEmpty) return null;
@@ -128,13 +127,53 @@ class MessagesRemoteSource {
     String? replyToId,
   }) {
     return _guard(() async {
-      final userId = await _currentUserId();
+      // Backend expects the full sender block + an empty-string `replyTo`
+      // (not null / absent) for non-reply sends. Matches web-chat contract:
+      // {"message": "...", "sender": {"id","name","email"}, "replyTo": ""}.
+      final user = await _session.readUser();
+      final userId = user?.id ?? '';
       final resp = await _dio.post<dynamic>(
         ApiEndpoints.chatMessages(conversationId),
-        data: {'message': body, 'replyTo': replyToId},
+        data: {
+          'message': body,
+          'sender': {
+            'id': userId,
+            'name': user?.name ?? '',
+            'email': user?.email ?? '',
+          },
+          'replyTo': (replyToId == null || replyToId.isEmpty) ? '' : replyToId,
+        },
       );
       final json = PaginationEnvelope.unwrapItem(resp.data);
       return MessageDto.fromRestJson(json, currentUserId: userId);
+    });
+  }
+
+  /// POST `external-chat/messages/:messageId/reaction`.
+  /// Body: `{emoji, roomId, sender: {id, name, email}}`.
+  /// Returns the emoji + reactor id so the caller can patch state locally
+  /// without waiting for the socket echo.
+  Future<({String emoji, String userId})> sendReaction({
+    required String messageId,
+    required String roomId,
+    required String emoji,
+  }) {
+    return _guard(() async {
+      final user = await _session.readUser();
+      final userId = user?.id ?? '';
+      await _dio.post<dynamic>(
+        ApiEndpoints.chatMessageReaction(messageId),
+        data: {
+          'emoji': emoji,
+          'roomId': roomId,
+          'sender': {
+            'id': userId,
+            'name': user?.name ?? '',
+            'email': user?.email ?? '',
+          },
+        },
+      );
+      return (emoji: emoji, userId: userId);
     });
   }
 
@@ -182,8 +221,8 @@ class MessagesRemoteSource {
         'message_type': mimeType.startsWith('image/')
             ? 'image'
             : mimeType.startsWith('audio/')
-                ? 'audio'
-                : 'file',
+            ? 'audio'
+            : 'file',
         ...extraFields,
       });
       final resp = await _dio.post<dynamic>(

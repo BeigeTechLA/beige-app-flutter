@@ -86,6 +86,8 @@ class AppColors {
   /// Dark text — for use on light/gold surfaces
   static const Color textDark = Color(0xFF4E4B44);
 
+  static const Color textDarkGolden = Color(0xFF898181);
+
   /// Heading text on dark backgrounds
   static const Color textHeading = Color(0xFF1D1D1B);
 
@@ -171,6 +173,7 @@ class AppColors {
   static const Color goldLight20 = Color(0x33E8D5B5);
   static const Color goldOpacity40 = Color(0x66E9BE78);
   static const Color primary50 = Color(0x80E8D1AB);
+  static const Color primary20 = Color(0x33E8D1AB);
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GRADIENT COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

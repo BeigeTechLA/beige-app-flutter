@@ -31,13 +31,21 @@ class ConversationDto {
     return Conversation(
       id: (json['id'] ?? json['_id'] ?? json['chat_id']).toString(),
       title: (json['display_name'] ?? json['name'] ?? '') as String,
-      avatarUrl: _firstAvatar(json['cp_ids']) ?? _firstAvatar(json['manager_ids']),
+      avatarUrl:
+          _firstAvatar(json['cp_ids']) ?? _firstAvatar(json['manager_ids']),
       lastMessage: _previewFromRoom(json),
       unreadCount: unread,
       isOnline: false,
-      linkedShootId: (json['external_order_ref'] ?? json['order_id']) as String?,
+      linkedShootId:
+          (json['external_order_ref'] ?? json['order_id']) as String?,
       participantIds: participantIds,
+      updatedAt: _parseTs(json['updatedAt'] ?? json['updated_at']),
     );
+  }
+
+  static DateTime? _parseTs(Object? raw) {
+    if (raw == null) return null;
+    return DateTime.tryParse(raw.toString())?.toLocal();
   }
 
   static List<String> _readParticipants(Object? raw) {
@@ -53,7 +61,8 @@ class ConversationDto {
     if (raw is! List) return null;
     for (final item in raw) {
       if (item is Map) {
-        final v = item['profileImage'] ?? item['profile_image'] ?? item['avatar_url'];
+        final v =
+            item['profileImage'] ?? item['profile_image'] ?? item['avatar_url'];
         if (v is String && v.isNotEmpty) {
           return v.startsWith('http') ? v : '${Env.imageUrl}$v';
         }
@@ -62,16 +71,12 @@ class ConversationDto {
     return null;
   }
 
-  /// Backend serves `last_message` as a String id only. Without a hydrated
-  /// preview/timestamp, show the room as having no preview but stamp `sentAt`
-  /// from `updatedAt` so list ordering still works upstream.
+  /// Backend serves `last_message` as a String id only. Until preview
+  /// hydration fetches the actual latest message, use `updatedAt` as the
+  /// fallback activity timestamp.
   static ConversationPreview? _previewFromRoom(Map<String, dynamic> json) {
-    final updatedAt = json['updatedAt'] ?? json['updated_at'];
+    final updatedAt = _parseTs(json['updatedAt'] ?? json['updated_at']);
     if (updatedAt == null) return null;
-    return ConversationPreview(
-      preview: '',
-      sentAt: DateTime.parse(updatedAt.toString()).toLocal(),
-      fromMe: false,
-    );
+    return ConversationPreview(preview: '', sentAt: updatedAt, fromMe: false);
   }
 }

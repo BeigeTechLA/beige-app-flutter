@@ -9,10 +9,9 @@ import '../../../../../app/radii.dart';
 import '../../../../../app/spacing.dart';
 import '../../../../../app/text_styles.dart';
 import '../../../../../shared/util/role_label.dart';
-import '../../../../../shared/widgets/app_avatar.dart';
 import '../../../domain/entities/message.dart';
 
-const double _avatarDiameter = 24;
+const double _avatarDiameter = 40;
 const double _bubbleRadius = 16;
 
 /// Text or system message bubble. Audio variant lives in `audio_bubble.dart`.
@@ -58,10 +57,7 @@ class MessageBubble extends StatelessWidget {
         children: [
           if (!isMine) ...[
             if (showSenderHeader)
-              AppAvatar(
-                name: _displayName,
-                size: AppAvatarSize.xs,
-              )
+              _InitialsAvatar(name: _displayName)
             else
               const SizedBox(width: _avatarDiameter),
             const SizedBox(width: AppSpacing.sm),
@@ -83,6 +79,10 @@ class MessageBubble extends StatelessWidget {
                     child: _Bubble(message: message, isMine: isMine),
                   ),
                 ),
+                if (message.reactions.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xxs),
+                  _ReactionsRow(reactions: message.reactions),
+                ],
                 const SizedBox(height: AppSpacing.xxs),
                 _BubbleMeta(message: message, isMine: isMine),
               ],
@@ -99,6 +99,42 @@ class MessageBubble extends StatelessWidget {
         : (message.body ?? 'Attachment message');
     final sender = isMine ? 'You' : _displayName;
     return '$sender: $body';
+  }
+}
+
+class _InitialsAvatar extends StatelessWidget {
+  const _InitialsAvatar({required this.name});
+
+  final String name;
+
+  String get _initials {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return parts.first[0].toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _avatarDiameter,
+      height: _avatarDiameter,
+      decoration: const BoxDecoration(
+        color: AppColors.primary20,
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        _initials,
+        style: AppTextStyles.caption.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }
 
@@ -126,7 +162,7 @@ class _SenderHeader extends StatelessWidget {
         if (formattedRole.isNotEmpty) ...[
           const SizedBox(width: AppSpacing.xs),
           Text(
-            formattedRole,
+            '($formattedRole)',
             style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
           ),
         ],
@@ -154,7 +190,12 @@ class _Bubble extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(_bubbleRadius),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(isMine ? _bubbleRadius : 0),
+            topRight: Radius.circular(isMine ? 0 : _bubbleRadius),
+            bottomLeft: const Radius.circular(_bubbleRadius),
+            bottomRight: const Radius.circular(_bubbleRadius),
+          ),
         ),
         child: Text(
           'This message was deleted',
@@ -175,11 +216,101 @@ class _Bubble extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(_bubbleRadius),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(isMine ? _bubbleRadius : 0),
+          topRight: Radius.circular(isMine ? 0 : _bubbleRadius),
+          bottomLeft: const Radius.circular(_bubbleRadius),
+          bottomRight: const Radius.circular(_bubbleRadius),
+        ),
       ),
-      child: Text(
-        message.body ?? '',
-        style: AppTextStyles.bodyMedium.copyWith(color: fg),
+      child: IntrinsicWidth(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (message.replyTo != null) ...[
+              _ReplyPreview(preview: message.replyTo!, isMine: isMine),
+              const SizedBox(height: AppSpacing.xs),
+            ],
+            Text(
+              message.body ?? '',
+              style: AppTextStyles.bodyMedium.copyWith(color: fg),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Quoted-message strip rendered above the bubble body when the current
+/// message is a reply. Author name + one-line body preview; image/file
+/// replies get a type-appropriate placeholder label.
+class _ReplyPreview extends StatelessWidget {
+  const _ReplyPreview({required this.preview, required this.isMine});
+
+  final MessageReplyPreview preview;
+  final bool isMine;
+
+  String get _previewText {
+    final body = preview.body?.trim();
+    if (body != null && body.isNotEmpty) return body;
+    switch (preview.type) {
+      case MessageType.image:
+        return 'Photo';
+      case MessageType.file:
+        return preview.fileName ?? 'Attachment';
+      case MessageType.system:
+      case MessageType.text:
+        return '';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = isMine
+        ? AppColors.onPrimary.withValues(alpha: 0.85)
+        : AppColors.primary;
+    final bg = isMine
+        ? AppColors.onPrimary.withValues(alpha: 0.12)
+        : AppColors.surfaceMid.withValues(alpha: 0.55);
+    final nameColor = isMine
+        ? AppColors.onPrimary
+        : AppColors.textPrimary;
+    final bodyColor = isMine
+        ? AppColors.onPrimary.withValues(alpha: 0.8)
+        : AppColors.textSecondary;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(AppRadii.sm),
+        border: Border(left: BorderSide(color: accent, width: 3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            preview.senderName.isNotEmpty ? preview.senderName : 'Message',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.caption.copyWith(
+              color: nameColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            _previewText,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.caption.copyWith(color: bodyColor),
+          ),
+        ],
       ),
     );
   }
@@ -217,6 +348,55 @@ class _ImageContent extends StatelessWidget {
                 ),
               ),
       ),
+    );
+  }
+}
+
+/// Compact reaction strip below the bubble body — one pill per unique emoji
+/// with a small count when >1 reactor. Mirrors WhatsApp's clustered style.
+class _ReactionsRow extends StatelessWidget {
+  const _ReactionsRow({required this.reactions});
+
+  final Map<String, Set<String>> reactions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpacing.xxs,
+      runSpacing: AppSpacing.xxs,
+      children: [
+        for (final entry in reactions.entries)
+          if (entry.value.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMid,
+                borderRadius: BorderRadius.circular(AppRadii.pillSm),
+                border: Border.all(
+                  color: AppColors.dividerDark,
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(entry.key, style: const TextStyle(fontSize: 12)),
+                  if (entry.value.length > 1) ...[
+                    const SizedBox(width: 2),
+                    Text(
+                      '${entry.value.length}',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+      ],
     );
   }
 }

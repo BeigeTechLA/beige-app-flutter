@@ -8,6 +8,7 @@ import '../../../../app/radii.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
+import '../../../../shared/util/conversation_title.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/loading.dart';
 import '../../domain/entities/message.dart';
@@ -19,6 +20,8 @@ import 'widgets/chat_app_bar.dart';
 import 'widgets/chat_composer.dart';
 import 'widgets/day_separator.dart';
 import 'widgets/message_bubble.dart';
+import 'widgets/message_gesture_wrapper.dart';
+import 'widgets/reply_composer_strip.dart';
 
 class ChatThreadScreen extends ConsumerStatefulWidget {
   const ChatThreadScreen({
@@ -125,7 +128,9 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
             // Title matches the list tile (`conversation.title` / room name).
             // Don't override with `state.peerName` — chat details may resolve
             // a different display name and that would diverge from the list.
-            contactName: widget.contactName ?? state.peerName ?? 'Chat',
+            contactName: displayConversationTitle(
+              widget.contactName ?? state.peerName ?? 'Chat',
+            ),
             participantCount: state.participantsById.length,
             isTyping: state.peerTyping,
             onSearch: _toggleSearch,
@@ -142,8 +147,17 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
               state: state,
               scrollController: _scrollCtrl,
               searchQuery: _searchQuery,
+              onReply: notifier.setReplyTarget,
+              onReact: notifier.sendReaction,
             ),
           ),
+          if (state.replyTarget != null)
+            ReplyComposerStrip(
+              target: state.replyTarget!,
+              isTargetMine: state.currentUserId != null &&
+                  state.replyTarget!.senderId == state.currentUserId,
+              onClose: notifier.clearReply,
+            ),
           ChatComposer(
             controller: _composerCtrl,
             onSendText: notifier.sendText,
@@ -160,12 +174,16 @@ class _ThreadBody extends StatelessWidget {
   const _ThreadBody({
     required this.state,
     required this.scrollController,
+    required this.onReply,
+    required this.onReact,
     this.searchQuery = '',
   });
 
   final ChatThreadState state;
   final ScrollController scrollController;
   final String searchQuery;
+  final ValueChanged<Message> onReply;
+  final void Function(String messageId, String emoji) onReact;
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +248,8 @@ class _ThreadBody extends StatelessWidget {
         participant: state.participantsById[m.senderId],
         peerName: state.peerName,
         peerRole: state.peerRole,
+        onReply: onReply,
+        onReact: onReact,
       ));
     }
     return ListView.builder(
@@ -248,7 +268,9 @@ class _Item {
         currentUserId = null,
         participant = null,
         peerName = null,
-        peerRole = null;
+        peerRole = null,
+        onReply = null,
+        onReact = null;
   _Item.msg(
     this.message, {
     required this.showSenderHeader,
@@ -256,6 +278,8 @@ class _Item {
     this.participant,
     this.peerName,
     this.peerRole,
+    this.onReply,
+    this.onReact,
   }) : day = null;
 
   final DateTime? day;
@@ -268,6 +292,8 @@ class _Item {
   final Participant? participant;
   final String? peerName;
   final String? peerRole;
+  final ValueChanged<Message>? onReply;
+  final void Function(String messageId, String emoji)? onReact;
 
   Widget build() {
     if (day != null) return DaySeparator(day: day!);
@@ -283,27 +309,33 @@ class _Item {
             ? m.senderName
             : (isMine ? 'You' : (peerName ?? '')));
     final senderName = resolvedName;
-    if (isAudio) {
-      return _BubbleEntrance(
-        key: ValueKey('message_${m.id}'),
-        child: AudioBubble(
-          message: m,
-          isMine: isMine,
-          showSenderHeader: showSenderHeader,
-          senderRole: senderRole,
-          senderName: senderName,
-        ),
-      );
-    }
+    final Widget bubble = isAudio
+        ? AudioBubble(
+            message: m,
+            isMine: isMine,
+            showSenderHeader: showSenderHeader,
+            senderRole: senderRole,
+            senderName: senderName,
+          )
+        : MessageBubble(
+            message: m,
+            isMine: isMine,
+            showSenderHeader: showSenderHeader,
+            senderRole: senderRole,
+            senderName: senderName,
+          );
+    final Widget interactive = (onReply == null || onReact == null)
+        ? bubble
+        : MessageGestureWrapper(
+            message: m,
+            isMine: isMine,
+            onReply: () => onReply!(m),
+            onReact: (emoji) => onReact!(m.id, emoji),
+            child: bubble,
+          );
     return _BubbleEntrance(
       key: ValueKey('message_${m.id}'),
-      child: MessageBubble(
-        message: m,
-        isMine: isMine,
-        showSenderHeader: showSenderHeader,
-        senderRole: senderRole,
-        senderName: senderName,
-      ),
+      child: interactive,
     );
   }
 }

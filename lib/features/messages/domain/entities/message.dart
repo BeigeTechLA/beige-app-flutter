@@ -26,6 +26,27 @@ class MessageFile {
   bool get isImage => mimeType.startsWith('image/');
 }
 
+/// Snippet of the message being replied to. Ships inline with the parent
+/// message so bubbles can render the quoted preview without a second fetch.
+@immutable
+class MessageReplyPreview {
+  final String id;
+  final String senderId;
+  final String senderName;
+  final MessageType type;
+  final String? body;
+  final String? fileName;
+
+  const MessageReplyPreview({
+    required this.id,
+    required this.senderId,
+    required this.senderName,
+    required this.type,
+    this.body,
+    this.fileName,
+  });
+}
+
 @immutable
 class Message {
   final String id;
@@ -38,7 +59,12 @@ class Message {
   final bool isEdited;
   final bool isDeleted;
   final String? replyToId;
+  final MessageReplyPreview? replyTo;
   final DeliveryStatus deliveryStatus;
+  /// Emoji → set of user ids that reacted with it. Empty map = no reactions.
+  /// Ordering across emojis is insertion order (server-sent order) so the
+  /// bubble strip is stable across rebuilds.
+  final Map<String, Set<String>> reactions;
 
   const Message({
     required this.id,
@@ -51,7 +77,9 @@ class Message {
     this.isEdited = false,
     this.isDeleted = false,
     this.replyToId,
+    this.replyTo,
     this.deliveryStatus = DeliveryStatus.sent,
+    this.reactions = const {},
   });
 
   Message copyWith({
@@ -61,6 +89,7 @@ class Message {
     bool? isEdited,
     bool? isDeleted,
     DateTime? sentAt,
+    Map<String, Set<String>>? reactions,
   }) {
     return Message(
       id: id ?? this.id,
@@ -73,7 +102,9 @@ class Message {
       isEdited: isEdited ?? this.isEdited,
       isDeleted: isDeleted ?? this.isDeleted,
       replyToId: replyToId,
+      replyTo: replyTo,
       deliveryStatus: deliveryStatus ?? this.deliveryStatus,
+      reactions: reactions ?? this.reactions,
     );
   }
 }

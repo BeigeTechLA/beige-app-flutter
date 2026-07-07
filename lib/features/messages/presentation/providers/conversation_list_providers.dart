@@ -9,6 +9,7 @@ import '../../../../core/providers/core_providers.dart';
 import '../../domain/entities/conversation.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/events/chat_socket_event.dart';
+import '../../domain/util/conversation_sort.dart';
 import 'messages_repository_provider.dart';
 
 const Duration kConversationSearchDebounce = Duration(milliseconds: 250);
@@ -86,9 +87,7 @@ class ConversationListNotifier
         // One-shot banner per outage — socket source already throttles to
         // ≤1 emit per 30s. UI surfaces it via the state's errorMessage so
         // the list screen can render the warning regardless of thread focus.
-        state = state.copyWith(
-          errorMessage: 'Connection lost. Reconnecting…',
-        );
+        state = state.copyWith(errorMessage: 'Connection lost. Reconnecting…');
       case _:
         break;
     }
@@ -104,7 +103,10 @@ class ConversationListNotifier
     try {
       final repo = ref.read(messagesRepositoryProvider);
       final items = await repo.listConversations(query: state.query);
-      state = state.copyWith(items: items, isLoading: false);
+      state = state.copyWith(
+        items: sortConversationsByActivityDesc(items),
+        isLoading: false,
+      );
       // Backend `/rooms` ships `last_message` as an id only — hydrate the
       // preview text per room in parallel so the list shows a WhatsApp-style
       // snippet. Failures are swallowed: the row keeps its empty preview.
@@ -134,23 +136,27 @@ class ConversationListNotifier
     final results = await Future.wait(
       items.map((c) async {
         try {
-          return await repo.fetchLatestMessage(c.id);
+          final message = await repo.fetchLatestMessage(c.id);
+          return (conversationId: c.id, message: message, failed: false);
         } catch (e, st) {
           debugPrint('Latest-message hydration failed for ${c.id}: $e\n$st');
-          return null;
+          return (conversationId: c.id, message: null, failed: true);
         }
       }),
       eagerError: false,
     );
-    final byId = <String, Message>{};
-    for (var i = 0; i < items.length; i++) {
-      final m = results[i];
-      if (m != null) byId[items[i].id] = m;
-    }
+    final byId = {for (final result in results) result.conversationId: result};
     if (byId.isEmpty) return;
+
+    var hasHydratedMessage = false;
     final patched = state.items.map((c) {
-      final m = byId[c.id];
+      final result = byId[c.id];
+      if (result == null || result.failed) return c;
+
+      final m = result.message;
       if (m == null) return c;
+
+      hasHydratedMessage = true;
       final fromMe = currentUserId != null && m.senderId == currentUserId;
       return c.copyWith(
         lastMessage: ConversationPreview(
@@ -159,8 +165,9 @@ class ConversationListNotifier
           fromMe: fromMe,
         ),
       );
-    }).toList(growable: false);
-    state = state.copyWith(items: patched);
+    }).toList();
+    if (!hasHydratedMessage) return;
+    state = state.copyWith(items: sortConversationsByActivityDesc(patched));
   }
 
   String _previewText(Message m) {

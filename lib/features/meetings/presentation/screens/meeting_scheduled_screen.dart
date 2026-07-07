@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
@@ -55,18 +56,24 @@ class _MeetingScheduledScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppSuccessAnimation(height: 160),
-                  AppSpacing.verticalBase,
-                  const Text(
+                  const AppSuccessAnimation(height: 180,),
+                  AppSpacing.verticalXl,
+                  Text(
                     'Meeting Scheduled',
-                    style: AppTextStyles.titleMedium,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.primary,
+                      fontFamily: AppAssets.fontUnbounded,
+                      fontWeight: FontWeight.w500,
+                    ),
                     textAlign: TextAlign.center,
                   ),
-                  AppSpacing.verticalSm,
+                  AppSpacing.verticalSmd,
                   Text(
-                    'Your meeting has been created and invites are on their way to participants.',
+                    'Your meeting has been scheduled successfully.\nAll participants have been notified.',
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
+                      color: AppColors.white60,
+                      fontFamily: AppAssets.fontOutfit,
+                      fontWeight: FontWeight.w400,
                     ),
                     textAlign: TextAlign.center,
                   ),

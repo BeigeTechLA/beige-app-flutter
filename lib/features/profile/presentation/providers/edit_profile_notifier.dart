@@ -7,6 +7,7 @@ import '../../../../core/firebase/analytics_service.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/utils/shared_service.dart';
 import '../../../app_drawer/providers/drawer_notifier.dart';
+import 'profile_notifier.dart';
 import 'profile_providers.dart';
 
 enum EditProfileStatus { initial, loading, loaded, saving, saved, error }
@@ -97,6 +98,8 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
       );
 
       ref.invalidate(drawerUserProvider);
+      ref.invalidate(profileNotifierProvider);
+      ref.read(profileImageBustProvider.notifier).state++;
 
       AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
 
@@ -114,14 +117,25 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
     final repo = ref.read(profileRepositoryProvider);
     final result = await repo.uploadProfilePhoto(imageFile: imageFile);
 
-    result.fold(
-      (error) => state = state.copyWith(
+    await result.fold(
+      (error) async => state = state.copyWith(
         isUploadingImage: false,
         errorMessage: error.message,
       ),
-      (_) {
+      (_) async {
         state = state.copyWith(isUploadingImage: false);
-        fetchProfile();
+        // Refresh from server so `state.profileImageUrl` reflects the new
+        // filename, then mirror it into SharedPreferences so the drawer
+        // reads the fresh URL. Finally bump the cache-bust token so
+        // CachedNetworkImage bypasses its stale cache for the same URL.
+        await fetchProfile();
+        final newUrl = state.profileImageUrl;
+        if (newUrl != null && newUrl.isNotEmpty) {
+          await SharedService.updateUserData(profileImageUrl: newUrl);
+        }
+        ref.invalidate(drawerUserProvider);
+        ref.invalidate(profileNotifierProvider);
+        ref.read(profileImageBustProvider.notifier).state++;
       },
     );
   }
