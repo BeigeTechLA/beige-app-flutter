@@ -25,14 +25,14 @@ class AudioBubble extends StatefulWidget {
   final bool isMine;
   final bool showSenderHeader;
   final String? senderRole;
+
   /// Resolved from chat-details `participants.items` via id match. Falls back
   /// to `message.senderName` when null/empty.
   final String? senderName;
 
-  String get _displayName =>
-      (senderName != null && senderName!.isNotEmpty)
-          ? senderName!
-          : message.senderName;
+  String get _displayName => (senderName != null && senderName!.isNotEmpty)
+      ? senderName!
+      : message.senderName;
 
   @override
   State<AudioBubble> createState() => _AudioBubbleState();
@@ -66,10 +66,7 @@ class _AudioBubbleState extends State<AudioBubble> {
             : MainAxisAlignment.start,
         children: [
           if (!widget.isMine) ...[
-            AppAvatar(
-              name: widget._displayName,
-              size: AppAvatarSize.xs,
-            ),
+            AppAvatar(name: widget._displayName, size: AppAvatarSize.xs),
             const SizedBox(width: AppSpacing.sm),
           ],
           Flexible(
@@ -125,8 +122,7 @@ class _AudioBubbleState extends State<AudioBubble> {
                                 ? 'Pause voice note'
                                 : 'Play voice note',
                             child: InkResponse(
-                              onTap: () =>
-                                  setState(() => _playing = !_playing),
+                              onTap: () => setState(() => _playing = !_playing),
                               child: Container(
                                 width: 44,
                                 height: 44,

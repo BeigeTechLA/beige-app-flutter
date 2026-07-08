@@ -109,7 +109,9 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(notifierState.errorMessage ?? "Something went wrong"),
+              content: Text(
+                notifierState.errorMessage ?? "Something went wrong",
+              ),
             ),
           );
         }

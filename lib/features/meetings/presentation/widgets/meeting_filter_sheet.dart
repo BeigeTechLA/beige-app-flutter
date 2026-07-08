@@ -150,10 +150,7 @@ class _MeetingFilterSheetState extends State<MeetingFilterSheet> {
                   const Spacer(),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
-                      Icons.close,
-                      color: AppColors.textPrimary,
-                    ),
+                    icon: const Icon(Icons.close, color: AppColors.textPrimary),
                   ),
                 ],
               ),
@@ -223,8 +220,8 @@ class _MeetingFilterSheetState extends State<MeetingFilterSheet> {
                             onPressed: _draft.isEmpty
                                 ? null
                                 : () => setState(
-                                      () => _draft = MeetingFilter.empty,
-                                    ),
+                                    () => _draft = MeetingFilter.empty,
+                                  ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),

@@ -33,10 +33,7 @@ extension PumpProviderApp on WidgetTester {
           sharedPreferencesProvider.overrideWithValue(sharedPrefs),
           ...overrides,
         ],
-        child: MaterialApp(
-          theme: AppTheme.dark(),
-          home: widget,
-        ),
+        child: MaterialApp(theme: AppTheme.dark(), home: widget),
       ),
     );
   }
@@ -66,10 +63,7 @@ extension PumpProviderApp on WidgetTester {
     final router = GoRouter(
       initialLocation: '/',
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (_, __) => widget,
-        ),
+        GoRoute(path: '/', builder: (_, __) => widget),
         ...routes,
       ],
     );
@@ -80,10 +74,7 @@ extension PumpProviderApp on WidgetTester {
           sharedPreferencesProvider.overrideWithValue(sharedPrefs),
           ...overrides,
         ],
-        child: MaterialApp.router(
-          theme: AppTheme.dark(),
-          routerConfig: router,
-        ),
+        child: MaterialApp.router(theme: AppTheme.dark(), routerConfig: router),
       ),
     );
   }
@@ -92,10 +83,7 @@ extension PumpProviderApp on WidgetTester {
   static Future<SharedPreferences> _mockPrefs([
     Map<String, Object> values = const {},
   ]) async {
-    SharedPreferences.setMockInitialValues({
-      'isLoggedIn': false,
-      ...values,
-    });
+    SharedPreferences.setMockInitialValues({'isLoggedIn': false, ...values});
     return SharedPreferences.getInstance();
   }
 }
@@ -111,9 +99,6 @@ extension PumpProviderApp on WidgetTester {
 Future<SharedPreferences> createMockPrefs([
   Map<String, Object> values = const {},
 ]) async {
-  SharedPreferences.setMockInitialValues({
-    'isLoggedIn': false,
-    ...values,
-  });
+  SharedPreferences.setMockInitialValues({'isLoggedIn': false, ...values});
   return SharedPreferences.getInstance();
 }

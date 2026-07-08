@@ -147,29 +147,32 @@ void main() {
     expect(container.read(authStateProvider), false);
   });
 
-  test('selectTab kicks off a new fetch (server-driven meeting_time_status)', () async {
-    final repo = _FakeRepo(
-      items: [
-        _m('a', status: MeetingStatus.upcoming),
-        _m('b', status: MeetingStatus.completed),
-      ],
-    );
-    final container = await _buildContainer(repo: repo);
-    addTearDown(container.dispose);
+  test(
+    'selectTab kicks off a new fetch (server-driven meeting_time_status)',
+    () async {
+      final repo = _FakeRepo(
+        items: [
+          _m('a', status: MeetingStatus.upcoming),
+          _m('b', status: MeetingStatus.completed),
+        ],
+      );
+      final container = await _buildContainer(repo: repo);
+      addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
-    final notifier = container.read(meetingsListNotifierProvider.notifier);
-    await Future<void>.delayed(Duration.zero);
-    expect(repo.listCalls, 1);
+      container.listen(meetingsListNotifierProvider, (_, __) {});
+      final notifier = container.read(meetingsListNotifierProvider.notifier);
+      await Future<void>.delayed(Duration.zero);
+      expect(repo.listCalls, 1);
 
-    notifier.selectTab(MeetingsTab.upcoming); // same tab — no refetch
-    expect(repo.listCalls, 1);
+      notifier.selectTab(MeetingsTab.upcoming); // same tab — no refetch
+      expect(repo.listCalls, 1);
 
-    notifier.selectTab(MeetingsTab.completed);
-    await Future<void>.delayed(Duration.zero);
-    // Server-side tab now → refetch triggered.
-    expect(repo.listCalls, 2);
-  });
+      notifier.selectTab(MeetingsTab.completed);
+      await Future<void>.delayed(Duration.zero);
+      // Server-side tab now → refetch triggered.
+      expect(repo.listCalls, 2);
+    },
+  );
 
   test('applyFilter updates state + recomputes items locally', () async {
     final repo = _FakeRepo(items: [_m('a')]);
@@ -180,9 +183,7 @@ void main() {
     final notifier = container.read(meetingsListNotifierProvider.notifier);
     await Future<void>.delayed(Duration.zero);
 
-    const filter = MeetingFilter(
-      categories: {MeetingCategory.commercial},
-    );
+    const filter = MeetingFilter(categories: {MeetingCategory.commercial});
     notifier.applyFilter(filter);
 
     // No second fetch — filter applied locally.
@@ -190,33 +191,34 @@ void main() {
     expect(container.read(meetingsListNotifierProvider).isFiltered, true);
   });
 
-  test('respond patches the matching item in place + clears pending id',
-      () async {
-    final original = _m('a');
-    final updated = original.copyWith(status: MeetingStatus.completed);
-    final repo = _FakeRepo(items: [original], respondResult: updated);
-    final container = await _buildContainer(repo: repo);
-    addTearDown(container.dispose);
+  test(
+    'respond patches the matching item in place + clears pending id',
+    () async {
+      final original = _m('a');
+      final updated = original.copyWith(status: MeetingStatus.completed);
+      final repo = _FakeRepo(items: [original], respondResult: updated);
+      final container = await _buildContainer(repo: repo);
+      addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
-    await Future<void>.delayed(Duration.zero);
+      container.listen(meetingsListNotifierProvider, (_, __) {});
+      await Future<void>.delayed(Duration.zero);
 
-    final notifier = container.read(meetingsListNotifierProvider.notifier);
-    final ok = await notifier.respond('a', MeetingResponse.accepted);
+      final notifier = container.read(meetingsListNotifierProvider.notifier);
+      final ok = await notifier.respond('a', MeetingResponse.accepted);
 
-    expect(ok, true);
-    expect(repo.respondCalls, 1);
-    expect(repo.lastRespondId, 'a');
-    expect(repo.lastRespondValue, MeetingResponse.accepted);
+      expect(ok, true);
+      expect(repo.respondCalls, 1);
+      expect(repo.lastRespondId, 'a');
+      expect(repo.lastRespondValue, MeetingResponse.accepted);
 
-    final state = container.read(meetingsListNotifierProvider);
-    expect(state.allItems.single.status, MeetingStatus.completed);
-    expect(state.isRsvpPending('a'), false);
-    expect(state.rsvpError, isNull);
-  });
+      final state = container.read(meetingsListNotifierProvider);
+      expect(state.allItems.single.status, MeetingStatus.completed);
+      expect(state.isRsvpPending('a'), false);
+      expect(state.rsvpError, isNull);
+    },
+  );
 
-  test('respond re-entrant call is ignored while first is in flight',
-      () async {
+  test('respond re-entrant call is ignored while first is in flight', () async {
     final repo = _FakeRepo(items: [_m('a')]);
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);

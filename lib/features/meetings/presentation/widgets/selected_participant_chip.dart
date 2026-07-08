@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/colors.dart';
 import '../../../../app/text_styles.dart';
-import '../../../../shared/util/role_label.dart';
 import '../../domain/models/directory_participant.dart';
 
 class SelectedParticipantChip extends StatelessWidget {
@@ -17,7 +16,7 @@ class SelectedParticipantChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = roleLabel(participant.role);
+    final label = participant.categoryLabel;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -51,11 +50,7 @@ class SelectedParticipantChip extends StatelessWidget {
           const SizedBox(width: 6),
           GestureDetector(
             onTap: onDeleted,
-            child: const Icon(
-              Icons.close,
-              size: 14,
-              color: AppColors.white,
-            ),
+            child: const Icon(Icons.close, size: 14, color: AppColors.white),
           ),
         ],
       ),

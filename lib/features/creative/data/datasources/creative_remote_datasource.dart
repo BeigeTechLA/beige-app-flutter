@@ -11,8 +11,9 @@ class CreativeRemoteDataSource {
   Future<Map<String, dynamic>> getCreativeProfile({
     required int creativeId,
   }) async {
-    final response =
-        await _dioClient.dio.get('${ApiEndpoints.creatives}/$creativeId/profile');
+    final response = await _dioClient.dio.get(
+      '${ApiEndpoints.creatives}/$creativeId/profile',
+    );
     return response.data as Map<String, dynamic>;
   }
 }

@@ -8,10 +8,7 @@ class ForgotPasswordOtpNotifier
   @override
   ForgotPasswordOtpState build() => const ForgotPasswordOtpState();
 
-  Future<void> verifyOtp({
-    required String email,
-    required String otp,
-  }) async {
+  Future<void> verifyOtp({required String email, required String otp}) async {
     state = state.copyWith(verifyStatus: OtpVerifyStatus.loading);
 
     final repo = ref.read(authRepositoryProvider);
@@ -42,7 +39,8 @@ class ForgotPasswordOtpNotifier
   }
 }
 
-final forgotPasswordOtpNotifierProvider = NotifierProvider.autoDispose<
-    ForgotPasswordOtpNotifier, ForgotPasswordOtpState>(
-  ForgotPasswordOtpNotifier.new,
-);
+final forgotPasswordOtpNotifierProvider =
+    NotifierProvider.autoDispose<
+      ForgotPasswordOtpNotifier,
+      ForgotPasswordOtpState
+    >(ForgotPasswordOtpNotifier.new);

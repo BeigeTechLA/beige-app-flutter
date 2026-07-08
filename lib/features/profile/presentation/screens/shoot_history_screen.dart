@@ -18,8 +18,7 @@ class ShootHistoryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final historyState = ref.watch(bookingHistoryNotifierProvider);
-    final isLoading =
-        historyState.status == BookingHistoryStatus.loading;
+    final isLoading = historyState.status == BookingHistoryStatus.loading;
     final bookings = historyState.bookings;
 
     return Scaffold(
@@ -60,64 +59,66 @@ class ShootHistoryScreen extends ConsumerWidget {
               child: isLoading
                   ? const AppScreenLoader()
                   : bookings.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No bookings found",
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.white70,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
+                  ? Center(
+                      child: Text(
+                        "No bookings found",
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.white70,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.base,
+                      ),
+                      itemCount: bookings.length,
+                      itemBuilder: (context, index) {
+                        final booking = bookings[index];
+
+                        final creative =
+                            booking['creative'] as Map<String, dynamic>?;
+
+                        final String profileImageRaw =
+                            creative?['profile_image_url'] ??
+                            booking['profile_image_url'] ??
+                            "";
+                        final String shootImageRaw = booking['image_url'] ?? "";
+                        final String image = profileImageRaw.isNotEmpty
+                            ? profileImageRaw
+                            : shootImageRaw;
+
+                        final String name =
+                            booking['project_name'] ??
+                            booking['event']?['project_name'] ??
+                            "-";
+                        final String role =
+                            booking['shoot_type_name'] ??
+                            (booking['shoot_type'] is Map
+                                ? booking['shoot_type']['name']
+                                : booking['shoot_type']) ??
+                            booking['content_type'] ??
+                            "";
+
+                        return Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.base),
-                          itemCount: bookings.length,
-                          itemBuilder: (context, index) {
-                            final booking = bookings[index];
-
-                            final creative =
-                                booking['creative'] as Map<String, dynamic>?;
-
-                            final String profileImageRaw =
-                                creative?['profile_image_url'] ??
-                                    booking['profile_image_url'] ??
-                                    "";
-                            final String shootImageRaw =
-                                booking['image_url'] ?? "";
-                            final String image = profileImageRaw.isNotEmpty
-                                ? profileImageRaw
-                                : shootImageRaw;
-
-                            final String name = booking['project_name'] ??
-                                booking['event']?['project_name'] ??
-                                "-";
-                            final String role = booking['shoot_type_name'] ??
-                                (booking['shoot_type'] is Map
-                                    ? booking['shoot_type']['name']
-                                    : booking['shoot_type']) ??
-                                booking['content_type'] ??
-                                "";
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: AppSpacing.smd),
-                              child: ClipRRect(
-                                borderRadius: AppRadii.hugeAll,
-                                child: SizedBox(
-                                  height: 220,
-                                  child: Stack(
-                                    children: [
-                                      /// IMAGE
-                                      image.isNotEmpty
-                                          ? Image.network(
-                                              ApiEndpoints.imageUrl +
-                                                  image,
-                                              width: double.infinity,
-                                              height: 220,
-                                              fit: BoxFit.cover,
-                                              alignment: Alignment.center,
-                                              errorBuilder: (context,
-                                                  error, stackTrace) {
+                            vertical: AppSpacing.smd,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: AppRadii.hugeAll,
+                            child: SizedBox(
+                              height: 220,
+                              child: Stack(
+                                children: [
+                                  /// IMAGE
+                                  image.isNotEmpty
+                                      ? Image.network(
+                                          ApiEndpoints.imageUrl + image,
+                                          width: double.infinity,
+                                          height: 220,
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.center,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
                                                 return Center(
                                                   child: SvgPicture.asset(
                                                     AppAssets.imagePlaceholder,
@@ -127,70 +128,70 @@ class ShootHistoryScreen extends ConsumerWidget {
                                                   ),
                                                 );
                                               },
-                                            )
-                                          : Center(
-                                              child: SvgPicture.asset(
-                                                AppAssets.imagePlaceholder,
-                                                width: 120,
-                                                height: 120,
-                                                fit: BoxFit.contain,
-                                              ),
-                                            ),
-
-                                      /// GRADIENT
-                                      Positioned(
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: Container(
-                                          height: 110,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end:
-                                                  Alignment.bottomCenter,
-                                              colors: [
-                                                AppColors.transparent,
-                                                AppColors.black
-                                                    .withValues(alpha: 0.85),
-                                              ],
-                                            ),
+                                        )
+                                      : Center(
+                                          child: SvgPicture.asset(
+                                            AppAssets.imagePlaceholder,
+                                            width: 120,
+                                            height: 120,
+                                            fit: BoxFit.contain,
                                           ),
                                         ),
-                                      ),
 
-                                      /// DETAILS
-                                      Positioned(
-                                        bottom: AppSpacing.xl,
-                                        left: AppSpacing.base,
-                                        right: AppSpacing.base,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            AppSpacing.verticalXs,
-                                            Text(
-                                              name,
-                                              style: AppTextStyles.buttonMedium.copyWith(
-                                                color: AppColors.white,
-                                              ),
-                                            ),
-                                            Text(
-                                              role,
-                                              style: AppTextStyles.labelSmall.copyWith(
-                                                color: AppColors.white70,
-                                              ),
+                                  /// GRADIENT
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            AppColors.transparent,
+                                            AppColors.black.withValues(
+                                              alpha: 0.85,
                                             ),
                                           ],
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+
+                                  /// DETAILS
+                                  Positioned(
+                                    bottom: AppSpacing.xl,
+                                    left: AppSpacing.base,
+                                    right: AppSpacing.base,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppSpacing.verticalXs,
+                                        Text(
+                                          name,
+                                          style: AppTextStyles.buttonMedium
+                                              .copyWith(color: AppColors.white),
+                                        ),
+                                        Text(
+                                          role,
+                                          style: AppTextStyles.labelSmall
+                                              .copyWith(
+                                                color: AppColors.white70,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

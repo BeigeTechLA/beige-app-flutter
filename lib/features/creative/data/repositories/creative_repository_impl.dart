@@ -15,8 +15,9 @@ class CreativeRepositoryImpl implements CreativeRepository {
     required int creativeId,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response =
-          await _remoteDataSource.getCreativeProfile(creativeId: creativeId);
+      final response = await _remoteDataSource.getCreativeProfile(
+        creativeId: creativeId,
+      );
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;
     });

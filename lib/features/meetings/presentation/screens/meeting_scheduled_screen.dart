@@ -56,7 +56,7 @@ class _MeetingScheduledScreenState
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const AppSuccessAnimation(height: 180,),
+                  const AppSuccessAnimation(height: 180),
                   AppSpacing.verticalXl,
                   Text(
                     'Meeting Scheduled',

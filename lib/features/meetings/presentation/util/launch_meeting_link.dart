@@ -6,10 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 ///
 /// Falls back to an inline snackbar on parse failure, `canLaunchUrl` false,
 /// or any `PlatformException` thrown by the launcher.
-Future<void> launchMeetingLink(
-  BuildContext context,
-  String link,
-) async {
+Future<void> launchMeetingLink(BuildContext context, String link) async {
   final messenger = ScaffoldMessenger.of(context);
   if (link.trim().isEmpty) {
     messenger.showSnackBar(

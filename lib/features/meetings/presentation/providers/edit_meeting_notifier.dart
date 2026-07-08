@@ -107,17 +107,21 @@ class EditMeetingNotifier
     final newStart = DateTime(d.year, d.month, d.day, s.hour, s.minute);
     final newEnd = DateTime(d.year, d.month, d.day, e.hour, e.minute);
 
-    String? title = state.title.trim() == base.title ? null : state.title.trim();
+    String? title = state.title.trim() == base.title
+        ? null
+        : state.title.trim();
     String? description = state.description.trim() == base.description
         ? null
         : state.description.trim();
     DateTime? startAt = newStart == base.startAt ? null : newStart;
     DateTime? endAt = newEnd == base.endAt ? null : newEnd;
     String? link = state.link.trim() == base.link ? null : state.link.trim();
-    int? reminder =
-        state.reminderMinutes == base.reminderMinutes ? null : state.reminderMinutes;
-    MeetingType? meetingType =
-        state.meetingType == base.meetingType ? null : state.meetingType;
+    int? reminder = state.reminderMinutes == base.reminderMinutes
+        ? null
+        : state.reminderMinutes;
+    MeetingType? meetingType = state.meetingType == base.meetingType
+        ? null
+        : state.meetingType;
 
     return UpdateMeetingInput(
       title: title,
@@ -138,5 +142,5 @@ class EditMeetingNotifier
 
 final editMeetingNotifierProvider = NotifierProvider.autoDispose
     .family<EditMeetingNotifier, EditMeetingState, String>(
-  EditMeetingNotifier.new,
-);
+      EditMeetingNotifier.new,
+    );

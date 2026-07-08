@@ -6,6 +6,7 @@ import '../../../../../app/colors.dart';
 import '../../../../../app/radii.dart';
 import '../../../../../app/spacing.dart';
 import '../../../../../app/text_styles.dart';
+import '../../../../../features/home/presentation/widgets/common/home_section_divider.dart';
 import '../../../../../shared/util/conversation_title.dart';
 
 /// Beige curved header + dark name strip, matching the profile-screen pattern.
@@ -77,10 +78,7 @@ class DetailsHeroHeader extends StatelessWidget {
               left: 0,
               right: 0,
               child: Center(
-                child: _Avatar(
-                  diameter: _avatarDiameter,
-                  name: displayName,
-                ),
+                child: _Avatar(diameter: _avatarDiameter, name: displayName),
               ),
             ),
           ],
@@ -98,14 +96,7 @@ class DetailsHeroHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        const Divider(
-          height: 1,
-          thickness: 1,
-          color: AppColors.dividerDark,
-          indent: AppSpacing.screenH,
-          endIndent: AppSpacing.screenH,
-        ),
+        const HomeSectionDivider(),
       ],
     );
   }
@@ -118,9 +109,7 @@ class _Avatar extends StatelessWidget {
   final String name;
 
   String get _initials {
-    final cleaned = name
-        .replaceAll(RegExp(r'[_#]+'), ' ')
-        .trim();
+    final cleaned = name.replaceAll(RegExp(r'[_#]+'), ' ').trim();
     if (cleaned.isEmpty) return '?';
     final parts = cleaned.split(RegExp(r'\s+'));
     if (parts.length == 1) {
@@ -142,9 +131,7 @@ class _Avatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         _initials,
-        style: AppTextStyles.titleLarge.copyWith(
-          color: AppColors.textPrimary,
-        ),
+        style: AppTextStyles.titleLarge.copyWith(color: AppColors.textPrimary),
       ),
     );
   }

@@ -20,8 +20,7 @@ class SharedService {
     final String folder = userData['folder'] ?? '';
     final String name = userData['name'] ?? '';
     final String email = userData['email'] ?? '';
-    final String profileImageUrl =
-        userData['profile_image_url'] ?? '';
+    final String profileImageUrl = userData['profile_image_url'] ?? '';
     final String designation = userData['designation'] ?? '';
     final String department = userData['department'] ?? '';
     final String departmentId = userData['department_id'] ?? '';
@@ -55,9 +54,7 @@ class SharedService {
     final int environmentId = prefs.getInt('environment_id') ?? -1;
     final String folder = prefs.getString('folder') ?? '';
     final String email = prefs.getString('email') ?? '';
-    final String profileImageUrl =
-        prefs.getString('profile_image_url') ?? '';
-
+    final String profileImageUrl = prefs.getString('profile_image_url') ?? '';
 
     debugPrint("========== USER DATA ==========");
     debugPrint("NAME  => $name");
@@ -66,8 +63,9 @@ class SharedService {
     debugPrint("================================");
     return {
       'name': name,
-      'nameInitial':
-          name.isNotEmpty ? name.trim().substring(0, 1).toUpperCase() : '',
+      'nameInitial': name.isNotEmpty
+          ? name.trim().substring(0, 1).toUpperCase()
+          : '',
       'email': email,
       'profile_image_url': profileImageUrl,
       'designation': designation,
@@ -90,7 +88,7 @@ class SharedService {
   /// Get stored token.
   static Future<String?> getToken() => SecureTokenStorage.read();
 
- //// SharedPreferences
+  //// SharedPreferences
   static Future<void> updateUserData({
     String? name,
     String? email,
@@ -110,5 +108,4 @@ class SharedService {
       await prefs.setString('profile_image_url', profileImageUrl);
     }
   }
-
 }

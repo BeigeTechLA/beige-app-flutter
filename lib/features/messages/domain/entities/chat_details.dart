@@ -36,6 +36,7 @@ class ContactInfo {
 @immutable
 class ChatDetails {
   final String conversationId;
+
   /// Room display name (`room.display_name` / `room.name`) — used by the
   /// details hero (title + avatar initials). Falls back to empty when the
   /// backend ships neither.

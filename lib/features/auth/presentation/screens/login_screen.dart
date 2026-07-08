@@ -174,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ],
                   ),
                 ),
-    
+
                 /// Form container
                 Transform.translate(
                   offset: const Offset(0, -85),
@@ -185,10 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.background,
                       borderRadius: AppRadii.authCardAll,
-                      border: Border.all(
-                        color: AppColors.white10,
-                        width: 1,
-                      ),
+                      border: Border.all(color: AppColors.white10, width: 1),
                     ),
                     child: Column(
                       children: [
@@ -202,74 +199,74 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           label: "Password*",
                           controller: passwordController,
                           obscureText: !showConfirmPassword,
-                            suffix: IconButton(
+                          suffix: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showConfirmPassword = !showConfirmPassword;
+                              });
+                            },
+                            icon: SvgPicture.asset(
+                              showConfirmPassword
+                                  ? AppAssets.eyeOpen
+                                  : AppAssets.eyeClosed,
+                              height: 22,
+                              colorFilter: const ColorFilter.mode(
+                                AppColors.white,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
                               onPressed: () {
-                                setState(() {
-                                  showConfirmPassword = !showConfirmPassword;
-                                });
+                                context.pushNamed(RouteNames.forgotPassword);
                               },
-                              icon: SvgPicture.asset(
-                                showConfirmPassword
-                                    ? AppAssets.eyeOpen
-                                    : AppAssets.eyeClosed,
-                                height: 22,
-                                colorFilter: const ColorFilter.mode(
-                                  AppColors.white,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  context.pushNamed(RouteNames.forgotPassword);
-                                },
-                                child: Text(
-                                  "Forgot Password?",
-                                  style: AppTextStyles.labelMedium.copyWith(
-                                    fontFamily: AppTextStyles.fontFamilyBody,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationThickness: 1.8,
-                                    decorationColor: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.smd),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: (!isFormValid || isLoggingIn)
-                                  ? null
-                                  : () async {
-                                      _handleLogin();
-                                    },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                disabledBackgroundColor: AppColors.primary50,
-                                disabledForegroundColor: AppColors.onPrimary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: AppRadii.xlAll,
-                                ),
-                              ),
                               child: Text(
-                                "Login",
-                                style: AppTextStyles.bodyCompact.copyWith(
-                                  fontFamily: AppTextStyles.fontFamilyDisplay,
-                                  fontWeight: FontWeight.w600,
+                                "Forgot Password?",
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  fontFamily: AppTextStyles.fontFamilyBody,
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                  decorationThickness: 1.8,
+                                  decorationColor: AppColors.primary,
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.smd),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: (!isFormValid || isLoggingIn)
+                                ? null
+                                : () async {
+                                    _handleLogin();
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              disabledBackgroundColor: AppColors.primary50,
+                              disabledForegroundColor: AppColors.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: AppRadii.xlAll,
+                              ),
+                            ),
+                            child: Text(
+                              "Login",
+                              style: AppTextStyles.bodyCompact.copyWith(
+                                fontFamily: AppTextStyles.fontFamilyDisplay,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -303,8 +300,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-            if (isLoggingIn) const AppLoadingOverlay(),
-          ],
-        );
+        if (isLoggingIn) const AppLoadingOverlay(),
+      ],
+    );
   }
 }

@@ -5,8 +5,9 @@ import '../../data/datasources/booking_remote_datasource.dart';
 import '../../data/repositories/booking_repository_impl.dart';
 import '../../domain/repositories/booking_repository.dart';
 
-final _bookingRemoteDataSourceProvider =
-    Provider<BookingRemoteDataSource>((ref) {
+final _bookingRemoteDataSourceProvider = Provider<BookingRemoteDataSource>((
+  ref,
+) {
   final dioClient = ref.watch(dioClientProvider);
   return BookingRemoteDataSource(dioClient);
 });

@@ -87,27 +87,27 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
       (error) => state = state.copyWith(
         status: EditProfileStatus.error,
         errorMessage: error.message,
-      ),(_) async {
-      final userData = await SharedService.getUserData();
+      ),
+      (_) async {
+        final userData = await SharedService.getUserData();
 
+        await SharedService.updateUserData(
+          name: data['name'] ?? userData['name'],
+          email: userData['email'],
+          profileImageUrl: userData['profile_image_url'],
+        );
 
-      await SharedService.updateUserData(
-        name: data['name'] ?? userData['name'],
-        email: userData['email'],
-        profileImageUrl: userData['profile_image_url'],
-      );
+        ref.invalidate(drawerUserProvider);
+        ref.invalidate(profileNotifierProvider);
+        ref.read(profileImageBustProvider.notifier).state++;
 
-      ref.invalidate(drawerUserProvider);
-      ref.invalidate(profileNotifierProvider);
-      ref.read(profileImageBustProvider.notifier).state++;
+        AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
 
-      AnalyticsService.logEvent(AnalyticsEvents.profileUpdated);
-
-      state = state.copyWith(
-        status: EditProfileStatus.saved,
-        successMessage: 'Profile updated successfully',
-      );
-    }
+        state = state.copyWith(
+          status: EditProfileStatus.saved,
+          successMessage: 'Profile updated successfully',
+        );
+      },
     );
   }
 
@@ -143,5 +143,5 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
 
 final editProfileNotifierProvider =
     NotifierProvider.autoDispose<EditProfileNotifier, EditProfileState>(
-  EditProfileNotifier.new,
-);
+      EditProfileNotifier.new,
+    );

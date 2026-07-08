@@ -39,7 +39,7 @@ class DioClient {
       AuthInterceptor(getToken: getToken, onUnauthorized: onUnauthorized),
       RetryInterceptor(dio: _dio),
       ErrorInterceptor(),
- //    if (isDevelopment) LoggingInterceptor(),
+      //    if (isDevelopment) LoggingInterceptor(),
     ]);
   }
 

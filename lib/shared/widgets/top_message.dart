@@ -58,9 +58,7 @@ class TopMessage {
                     Expanded(
                       child: Text(
                         message,
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: accent,
-                        ),
+                        style: AppTextStyles.labelSmall.copyWith(color: accent),
                       ),
                     ),
                     GestureDetector(

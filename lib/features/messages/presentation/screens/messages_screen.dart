@@ -9,7 +9,7 @@ import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
-import '../../../../shared/widgets/loading.dart';
+import '../../../../shared/widgets/skeleton.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
 import '../providers/conversation_list_providers.dart';
 import '../routes/messages_args.dart';
@@ -58,9 +58,9 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       if (next.errorMessage != null &&
           next.items.isNotEmpty &&
           prev?.errorMessage != next.errorMessage) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage!)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
         notifier.clearError();
       }
     });
@@ -72,9 +72,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
           const AppMainToolbar(title: 'Message'),
           const SizedBox(height: AppSpacing.md),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenH,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
             child: _SearchRow(
               controller: _searchCtrl,
               onChanged: notifier.updateSearch,
@@ -100,10 +98,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
 }
 
 class _SearchRow extends StatelessWidget {
-  const _SearchRow({
-    required this.controller,
-    required this.onChanged,
-  });
+  const _SearchRow({required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -119,11 +114,7 @@ class _SearchRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            color: AppColors.textTertiary,
-            size: 20,
-          ),
+          const Icon(Icons.search, color: AppColors.textTertiary, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: TextField(
@@ -171,7 +162,7 @@ class _ListBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.isLoading && state.items.isEmpty) {
-      return const AppScreenLoader();
+      return const ConversationListSkeleton();
     }
     if (state.errorMessage != null && state.items.isEmpty) {
       return ListView(

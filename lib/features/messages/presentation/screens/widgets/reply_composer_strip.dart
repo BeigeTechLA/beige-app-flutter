@@ -95,10 +95,7 @@ class ReplyComposerStrip extends StatelessWidget {
               onPressed: onClose,
               iconSize: 18,
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(
-                minWidth: 32,
-                minHeight: 32,
-              ),
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               icon: const Icon(Icons.close, color: AppColors.textTertiary),
             ),
           ],

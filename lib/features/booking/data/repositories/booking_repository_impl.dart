@@ -144,9 +144,7 @@ class BookingRepositoryImpl implements BookingRepository {
     required int bookingId,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.getHolds(
-        bookingId: bookingId,
-      );
+      final response = await _remoteDataSource.getHolds(bookingId: bookingId);
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;
     });
@@ -197,7 +195,12 @@ class BookingRepositoryImpl implements BookingRepository {
       if (data is List) return data;
       if (data is Map) {
         final flat = <dynamic>[];
-        for (final key in const ['staff', 'clients', 'creativePartners', 'cp']) {
+        for (final key in const [
+          'staff',
+          'clients',
+          'creativePartners',
+          'cp',
+        ]) {
           final v = data[key];
           if (v is List) flat.addAll(v);
         }

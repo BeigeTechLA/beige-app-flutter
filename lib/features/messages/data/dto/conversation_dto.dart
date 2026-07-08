@@ -39,7 +39,8 @@ class ConversationDto {
     return Conversation(
       id: (json['id'] ?? json['_id'] ?? json['chat_id']).toString(),
       title: (json['display_name'] ?? json['name'] ?? '') as String,
-      avatarUrl: _firstAvatar(json['participants']) ??
+      avatarUrl:
+          _firstAvatar(json['participants']) ??
           _firstAvatar(json['cp_ids']) ??
           _firstAvatar(json['manager_ids']),
       lastMessage: _previewFromRoom(json),

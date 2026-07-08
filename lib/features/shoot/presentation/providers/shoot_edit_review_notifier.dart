@@ -2,7 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'shoot_providers.dart';
 
-enum ShootEditReviewStatus { initial, loading, loaded, confirming, confirmed, error }
+enum ShootEditReviewStatus {
+  initial,
+  loading,
+  loaded,
+  confirming,
+  confirmed,
+  error,
+}
 
 class ShootEditReviewState {
   final ShootEditReviewStatus status;
@@ -68,8 +75,7 @@ class ShootEditReviewNotifier
         errorMessage: error.message,
       ),
       (data) {
-        final message =
-            (data['message'] as String?) ?? 'Reschedule confirmed';
+        final message = (data['message'] as String?) ?? 'Reschedule confirmed';
         state = state.copyWith(
           status: ShootEditReviewStatus.confirmed,
           successMessage: message,
@@ -81,5 +87,5 @@ class ShootEditReviewNotifier
 
 final shootEditReviewNotifierProvider = NotifierProvider.autoDispose
     .family<ShootEditReviewNotifier, ShootEditReviewState, int>(
-  ShootEditReviewNotifier.new,
-);
+      ShootEditReviewNotifier.new,
+    );

@@ -23,7 +23,8 @@ class CreateMeetingState {
   final MeetingType meetingType;
   final String link;
   final int reminderMinutes;
-  final List<ShootParticipantOption> invitedParticipants; // Deprecated but kept for backward compatibility/types
+  final List<ShootParticipantOption>
+  invitedParticipants; // Deprecated but kept for backward compatibility/types
   final CreateMeetingSubmitStatus status;
   final String? error;
   final Meeting? created;
@@ -96,7 +97,6 @@ class CreateMeetingState {
   bool get canGenerateMeetLink =>
       platform == MeetingPlatform.meet &&
       hasTitle &&
-      hasDescription &&
       hasDate &&
       hasTimes &&
       endAfterStart &&
@@ -112,20 +112,26 @@ class CreateMeetingState {
   /// Unified deduplicated list of all selected participants.
   List<DirectoryParticipant> get selectedParticipants {
     final List<DirectoryParticipant> allSelected = [];
-    
+
     // 1. Legacy/test compatibility: include deprecated invitedParticipants
     for (final p in invitedParticipants) {
-      allSelected.add(DirectoryParticipant(
-        id: p.id,
-        name: p.name,
-        role: p.role,
-        type: p.role == 'client' ? 'client' : ((p.role == 'cp' || p.role == 'creative_partner') ? 'creativePartner' : 'staff'),
-        avatarUrl: p.avatarUrl,
-        isOptional: p.role != 'client',
-        isSelected: true,
-      ));
+      allSelected.add(
+        DirectoryParticipant(
+          id: p.id,
+          name: p.name,
+          role: p.role,
+          type: p.role == 'client'
+              ? 'client'
+              : ((p.role == 'cp' || p.role == 'creative_partner')
+                    ? 'creativePartner'
+                    : 'staff'),
+          avatarUrl: p.avatarUrl,
+          isOptional: p.role != 'client',
+          isSelected: true,
+        ),
+      );
     }
-    
+
     // 2. Default invited members: Clients are mandatory and selectedByDefault is true.
     // Optional default members are included only if they are present in optionalSelectedDefaultMembers.
     for (final p in defaultInvitedMembers) {
@@ -133,13 +139,13 @@ class CreateMeetingState {
         allSelected.add(p);
       }
     }
-    
+
     // 3. Selected additional staff members
     allSelected.addAll(selectedAdditionalStaffMembers);
-    
+
     // 4. Selected additional creative partners
     allSelected.addAll(selectedAdditionalCreativePartners);
-    
+
     // Deduplicate by ID
     final seenIds = <String>{};
     final List<DirectoryParticipant> result = [];
@@ -153,7 +159,6 @@ class CreateMeetingState {
 
   bool get isValid =>
       hasTitle &&
-      hasDescription &&
       shootId != null &&
       hasDate &&
       hasTimes &&
@@ -209,17 +214,26 @@ class CreateMeetingState {
       error: clearError ? null : (error ?? this.error),
       created: created ?? this.created,
       directoryLoading: directoryLoading ?? this.directoryLoading,
-      directoryError: clearDirectoryError ? null : (directoryError ?? this.directoryError),
-      directoryParticipants: directoryParticipants ?? this.directoryParticipants,
-      defaultInvitedMembers: defaultInvitedMembers ?? this.defaultInvitedMembers,
-      optionalSelectedDefaultMembers: optionalSelectedDefaultMembers ?? this.optionalSelectedDefaultMembers,
-      selectedAdditionalStaffMembers: selectedAdditionalStaffMembers ?? this.selectedAdditionalStaffMembers,
-      selectedAdditionalCreativePartners: selectedAdditionalCreativePartners ?? this.selectedAdditionalCreativePartners,
+      directoryError: clearDirectoryError
+          ? null
+          : (directoryError ?? this.directoryError),
+      directoryParticipants:
+          directoryParticipants ?? this.directoryParticipants,
+      defaultInvitedMembers:
+          defaultInvitedMembers ?? this.defaultInvitedMembers,
+      optionalSelectedDefaultMembers:
+          optionalSelectedDefaultMembers ?? this.optionalSelectedDefaultMembers,
+      selectedAdditionalStaffMembers:
+          selectedAdditionalStaffMembers ?? this.selectedAdditionalStaffMembers,
+      selectedAdditionalCreativePartners:
+          selectedAdditionalCreativePartners ??
+          this.selectedAdditionalCreativePartners,
       searchText: searchText ?? this.searchText,
       selectedTab: selectedTab ?? this.selectedTab,
       linkGenStatus: linkGenStatus ?? this.linkGenStatus,
-      linkGenError:
-          clearLinkGenError ? null : (linkGenError ?? this.linkGenError),
+      linkGenError: clearLinkGenError
+          ? null
+          : (linkGenError ?? this.linkGenError),
     );
   }
 }

@@ -265,6 +265,7 @@ class _ListBody extends StatelessWidget {
         final m = state.items[i];
         return MeetingCard(
           meeting: m,
+          currentUserId: state.currentUserId,
           onTap: () => onTap(context, m.id),
           onJoin: () => onJoin(context, m.link),
           onAccept: () => onRsvp(m, true),

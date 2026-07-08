@@ -18,7 +18,13 @@ class PaginationEnvelope {
       return raw.cast<Map<String, dynamic>>();
     }
     if (raw is Map<String, dynamic>) {
-      for (final key in const ['data', 'results', 'items', 'rooms', 'messages']) {
+      for (final key in const [
+        'data',
+        'results',
+        'items',
+        'rooms',
+        'messages',
+      ]) {
         final v = raw[key];
         if (v is List) return v.cast<Map<String, dynamic>>();
       }
@@ -47,7 +53,9 @@ class PaginationEnvelope {
       if (limit != null) {
         try {
           return unwrapList(raw).length >= limit;
-        } catch (_) {/* fall through */}
+        } catch (_) {
+          /* fall through */
+        }
       }
     }
     return false;

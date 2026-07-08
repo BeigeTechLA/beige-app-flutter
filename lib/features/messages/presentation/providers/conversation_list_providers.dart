@@ -160,14 +160,46 @@ class ConversationListNotifier
   ///   - not our own echo
   ///   - not the room the user is currently viewing
   void _handleInbound(String roomId, Message message) {
-    if (_selfUserId != null &&
-        _selfUserId!.isNotEmpty &&
-        message.senderId == _selfUserId) {
-      return;
-    }
     final active = ref.read(activeChatRoomProvider);
-    if (active == roomId) return;
-    _mutateUnread(roomId, delta: 1);
+    final isMe =
+        _selfUserId != null &&
+        _selfUserId!.isNotEmpty &&
+        message.senderId == _selfUserId;
+
+    final shouldBump = !isMe && active != roomId;
+    if (shouldBump) {
+      final current = _localUnread[roomId] ?? 0;
+      _localUnread[roomId] = current + 1;
+    }
+
+    final nextUnread = _localUnread[roomId] ?? 0;
+    final preview = ConversationPreview(
+      preview: _previewText(message),
+      sentAt: message.sentAt,
+      fromMe: isMe,
+    );
+
+    final patched = <Conversation>[];
+    var found = false;
+    for (final c in state.items) {
+      if (c.id == roomId) {
+        found = true;
+        patched.add(
+          c.copyWith(
+            unreadCount: nextUnread,
+            lastMessage: preview,
+            updatedAt: message.sentAt,
+          ),
+        );
+      } else {
+        patched.add(c);
+      }
+    }
+
+    if (found) {
+      state = state.copyWith(items: sortConversationsByActivityDesc(patched));
+    }
+    _persist();
   }
 
   void _scheduleRefresh() {
@@ -212,24 +244,37 @@ class ConversationListNotifier
   List<Conversation> _reconcile(List<Conversation> serverItems) {
     final seenIds = <String>{};
     final reconciled = <Conversation>[];
+    final existingConvs = {for (final c in state.items) c.id: c};
+
     for (final c in serverItems) {
       seenIds.add(c.id);
       final localCount = _localUnread[c.id];
       final serverUpdated = c.updatedAt;
+
+      final existing = existingConvs[c.id];
+      var reconciledConv = c;
+      if (existing != null &&
+          (c.lastMessage == null || c.lastMessage!.preview.isEmpty) &&
+          existing.lastMessage != null &&
+          existing.lastMessage!.preview.isNotEmpty) {
+        reconciledConv = c.copyWith(lastMessage: existing.lastMessage);
+      }
+
       if (localCount == null) {
         // First encounter — seed from server (may be 0). Client owns it now.
         _localUnread[c.id] = c.unreadCount;
         if (serverUpdated != null) {
           _lastKnownUpdatedAt[c.id] = serverUpdated;
         }
-        reconciled.add(c);
+        reconciled.add(reconciledConv);
         continue;
       }
       // Reconnect-catch-up hint: server says the room moved forward and the
       // user is not currently viewing it → bump conservatively by 1. Server
       // has no per-outage delta API; 1 keeps the badge honest.
       final previousStamp = _lastKnownUpdatedAt[c.id];
-      final movedForward = serverUpdated != null &&
+      final movedForward =
+          serverUpdated != null &&
           (previousStamp == null || serverUpdated.isAfter(previousStamp));
       final active = ref.read(activeChatRoomProvider);
       if (movedForward && active != c.id) {
@@ -238,7 +283,7 @@ class ConversationListNotifier
       if (serverUpdated != null) {
         _lastKnownUpdatedAt[c.id] = serverUpdated;
       }
-      reconciled.add(c.copyWith(unreadCount: _localUnread[c.id]!));
+      reconciled.add(reconciledConv.copyWith(unreadCount: _localUnread[c.id]!));
     }
     // Drop rooms the server dropped.
     _localUnread.removeWhere((id, _) => !seenIds.contains(id));

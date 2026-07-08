@@ -81,76 +81,81 @@ class InvitedMemberCard extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onChanged == null ? null : () => onChanged!(!selected),
         child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.white6,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.white30, width: 0.5),
-        ),
-        child: Row(
-          children: [
-            Theme(
-              data: ThemeData(
-                unselectedWidgetColor: AppColors.textSecondary,
-              ),
-              child: Checkbox(
-                value: selected,
-                onChanged: onChanged,
-                activeColor: AppColors.primary,
-                checkColor: AppColors.onPrimary,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.white6,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.white30, width: 0.5),
+          ),
+          child: Row(
+            children: [
+              Theme(
+                data: ThemeData(unselectedWidgetColor: AppColors.textSecondary),
+                child: Checkbox(
+                  value: selected,
+                  onChanged: onChanged,
+                  activeColor: AppColors.primary,
+                  checkColor: AppColors.onPrimary,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    participant.name,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      participant.name,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    roleLabel(participant.role ?? participant.type).toUpperCase(),
-                    style: AppTextStyles.caption.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
+                    const SizedBox(height: 4),
+                    Text(
+                      roleLabel(
+                        participant.role ?? participant.type,
+                      ).toUpperCase(),
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: selected ? AppColors.primary : AppColors.surfaceDark,
-                borderRadius: BorderRadius.circular(24),
-                border: selected
-                    ? null
-                    : Border.all(color: AppColors.dividerDark),
-              ),
-              child: Text(
-                selected ? 'Selected' : 'Optional',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: selected ? AppColors.onPrimary : AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.primary : AppColors.surfaceDark,
+                  borderRadius: BorderRadius.circular(24),
+                  border: selected
+                      ? null
+                      : Border.all(color: AppColors.dividerDark),
+                ),
+                child: Text(
+                  selected ? 'Selected' : 'Optional',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: selected
+                        ? AppColors.onPrimary
+                        : AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

@@ -167,10 +167,7 @@ class _ChatComposerState extends State<ChatComposer> {
                   ),
                 ),
               ),
-              _SendButton(
-                enabled: _hasText,
-                onTap: _submit,
-              ),
+              _SendButton(enabled: _hasText, onTap: _submit),
             ],
           ),
         ),
@@ -204,9 +201,7 @@ class _SendButton extends StatelessWidget {
               height: 44,
               child: Icon(
                 Icons.send,
-                color: enabled
-                    ? AppColors.onPrimary
-                    : AppColors.textTertiary,
+                color: enabled ? AppColors.onPrimary : AppColors.textTertiary,
                 size: 18,
               ),
             ),

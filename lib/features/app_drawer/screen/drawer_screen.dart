@@ -139,18 +139,18 @@ class DrawerScreen extends ConsumerWidget {
                                     user['name'] ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: AppTextStyles.bodyMediumStrong.copyWith(
-                                      color: AppColors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: AppTextStyles.bodyMediumStrong
+                                        .copyWith(
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   Text(
                                     user['email'] ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: AppTextStyles.bodySmallMedium.copyWith(
-                                      color: AppColors.black,
-                                    ),
+                                    style: AppTextStyles.bodySmallMedium
+                                        .copyWith(color: AppColors.black),
                                   ),
                                 ],
                               ),

@@ -8,9 +8,7 @@ class ShootRemoteDataSource {
   ShootRemoteDataSource(this._dioClient);
 
   /// GET creatives/my-shoots?status={status}
-  Future<Map<String, dynamic>> getMyShoots({
-    required String status,
-  }) async {
+  Future<Map<String, dynamic>> getMyShoots({required String status}) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.creativesMyShoots}?status=$status',
     );
@@ -18,9 +16,7 @@ class ShootRemoteDataSource {
   }
 
   /// GET creatives/my-shoots/{bookingId}
-  Future<Map<String, dynamic>> getShootDetails({
-    required int bookingId,
-  }) async {
+  Future<Map<String, dynamic>> getShootDetails({required int bookingId}) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.creativesMyShoots}/$bookingId',
     );
@@ -38,9 +34,7 @@ class ShootRemoteDataSource {
   }
 
   /// PUT creatives/my-shoots/{bookingId}/cancel
-  Future<Map<String, dynamic>> cancelShoot({
-    required int bookingId,
-  }) async {
+  Future<Map<String, dynamic>> cancelShoot({required int bookingId}) async {
     final response = await _dioClient.dio.put(
       '${ApiEndpoints.creativesMyShoots}/$bookingId/cancel',
       data: {},

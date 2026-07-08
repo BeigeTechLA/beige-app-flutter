@@ -49,13 +49,11 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
           user.folder,
           user.name,
           email, // login email
-          '',    // profile image
+          '', // profile image
           user.designation,
           user.department,
           user.departmentId,
-         );
-
-
+        );
 
         if (savePassword) {
           await prefs.setString("email", email);
@@ -67,9 +65,15 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
         ref.read(guestModeProvider.notifier).exit();
 
         // Analytics & Crashlytics
-        AnalyticsService.logEvent(AnalyticsEvents.login, params: {'method': 'email'});
+        AnalyticsService.logEvent(
+          AnalyticsEvents.login,
+          params: {'method': 'email'},
+        );
         AnalyticsService.setUserId(user.environmentId.toString());
-        CrashlyticsService.setUserContext(userId: user.environmentId, email: email);
+        CrashlyticsService.setUserContext(
+          userId: user.environmentId,
+          email: email,
+        );
 
         // Login response omits `profile_image_url` — fire a profile fetch
         // so the drawer avatar hydrates on first open without waiting for
@@ -85,16 +89,13 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     try {
       final repo = ref.read(profileRepositoryProvider);
       final result = await repo.getProfile();
-      await result.fold(
-        (_) async {},
-        (profile) async {
-          final url = profile['user_profile_image_url']?.toString() ?? '';
-          if (url.isEmpty) return;
-          await SharedService.updateUserData(profileImageUrl: url);
-          ref.invalidate(drawerUserProvider);
-          ref.read(profileImageBustProvider.notifier).state++;
-        },
-      );
+      await result.fold((_) async {}, (profile) async {
+        final url = profile['user_profile_image_url']?.toString() ?? '';
+        if (url.isEmpty) return;
+        await SharedService.updateUserData(profileImageUrl: url);
+        ref.invalidate(drawerUserProvider);
+        ref.read(profileImageBustProvider.notifier).state++;
+      });
     } catch (_) {
       // Non-blocking — drawer will simply show the fallback avatar until the
       // user visits Edit Profile which triggers the same fetch.
@@ -108,8 +109,8 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     int environmentId,
     String folder,
     String name,
-      String email,
-      String profileImageUrl,
+    String email,
+    String profileImageUrl,
     String designation,
     String department,
     String departmentId,
@@ -129,6 +130,4 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
 }
 
 final loginNotifierProvider =
-    NotifierProvider.autoDispose<LoginNotifier, LoginState>(
-  LoginNotifier.new,
-);
+    NotifierProvider.autoDispose<LoginNotifier, LoginState>(LoginNotifier.new);

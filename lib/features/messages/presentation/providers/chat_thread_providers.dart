@@ -59,7 +59,8 @@ String? _resolveSelfId({
     }
     for (final m in messages) {
       if (m.senderId.isEmpty) continue;
-      if (m.senderName.trim().toLowerCase() == normalizedName) return m.senderId;
+      if (m.senderName.trim().toLowerCase() == normalizedName)
+        return m.senderId;
     }
   }
   // Last-resort id elimination: backend `participants.items` often lists only
@@ -83,6 +84,7 @@ class ChatThreadState {
   final bool peerOnline;
   final bool isRecording;
   final String? currentUserId;
+
   /// Canonical sender directory keyed by participant id (from
   /// `participants.items` in chat details). Bubbles resolve name, role, and
   /// avatar by matching `message.senderId` against this map — message payloads
@@ -91,6 +93,7 @@ class ChatThreadState {
   final String? peerName;
   final String? peerAvatarUrl;
   final String? peerRole;
+
   /// Message the composer will quote in the next send. Set via
   /// `setReplyTarget`, cleared via `clearReply` or after successful send.
   final Message? replyTarget;
@@ -138,8 +141,7 @@ class ChatThreadState {
       peerName: peerName ?? this.peerName,
       peerAvatarUrl: peerAvatarUrl ?? this.peerAvatarUrl,
       peerRole: peerRole ?? this.peerRole,
-      replyTarget:
-          clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
+      replyTarget: clearReplyTarget ? null : (replyTarget ?? this.replyTarget),
     );
   }
 }
@@ -322,15 +324,16 @@ class ChatThreadNotifier
               if (m.id == messageId) m.copyWith(isDeleted: true) else m,
           ],
         );
-      case ReactionUpdated(:final conversationId, :final messageId, :final reactions)
+      case ReactionUpdated(
+            :final conversationId,
+            :final messageId,
+            :final reactions,
+          )
           when conversationId == arg:
         state = state.copyWith(
           messages: [
             for (final m in state.messages)
-              if (m.id == messageId)
-                m.copyWith(reactions: reactions)
-              else
-                m,
+              if (m.id == messageId) m.copyWith(reactions: reactions) else m,
           ],
         );
       case TypingStarted(:final conversationId) when conversationId == arg:
@@ -342,9 +345,7 @@ class ChatThreadNotifier
       case SocketErrored():
         // Throttled at the socket source (≤1 per 30s until reconnect), so
         // surfacing here is a one-shot user-visible banner per outage.
-        state = state.copyWith(
-          errorMessage: 'Connection lost. Reconnecting…',
-        );
+        state = state.copyWith(errorMessage: 'Connection lost. Reconnecting…');
       case _:
         // Other events (read receipts, room preview, etc.) ignored here —
         // conversationListProvider handles preview refresh in its own scope.
@@ -378,7 +379,9 @@ class ChatThreadNotifier
       ],
     );
     try {
-      await ref.read(messagesRepositoryProvider).sendReaction(
+      await ref
+          .read(messagesRepositoryProvider)
+          .sendReaction(
             conversationId: arg,
             messageId: messageId,
             emoji: emoji,
@@ -528,8 +531,7 @@ class ChatThreadNotifier
 
   /// Composer → backend pulse. Notifier wraps so the screen doesn't need a
   /// direct repository handle.
-  void notifyTyping() =>
-      ref.read(messagesRepositoryProvider).notifyTyping(arg);
+  void notifyTyping() => ref.read(messagesRepositoryProvider).notifyTyping(arg);
 
   void notifyStopTyping() =>
       ref.read(messagesRepositoryProvider).notifyStopTyping(arg);
@@ -583,7 +585,9 @@ class ChatThreadNotifier
     state = state.copyWith(messages: [...state.messages, optimistic]);
 
     try {
-      final saved = await ref.read(messagesRepositoryProvider).sendAttachment(
+      final saved = await ref
+          .read(messagesRepositoryProvider)
+          .sendAttachment(
             arg,
             localPath: localPath,
             name: name,

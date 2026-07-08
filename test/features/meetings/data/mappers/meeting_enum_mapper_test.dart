@@ -39,10 +39,7 @@ void main() {
         MeetingEnumMapper.statusFromServer('garbage'),
         MeetingStatus.pending,
       );
-      expect(
-        MeetingEnumMapper.statusFromServer(null),
-        MeetingStatus.pending,
-      );
+      expect(MeetingEnumMapper.statusFromServer(null), MeetingStatus.pending);
     });
   });
 
@@ -125,14 +122,8 @@ void main() {
     });
 
     test('empty / null / garbage → meet (default)', () {
-      expect(
-        MeetingEnumMapper.platformFromLink(''),
-        MeetingPlatform.meet,
-      );
-      expect(
-        MeetingEnumMapper.platformFromLink(null),
-        MeetingPlatform.meet,
-      );
+      expect(MeetingEnumMapper.platformFromLink(''), MeetingPlatform.meet);
+      expect(MeetingEnumMapper.platformFromLink(null), MeetingPlatform.meet);
       expect(
         MeetingEnumMapper.platformFromLink('https://example.com'),
         MeetingPlatform.meet,

@@ -18,6 +18,8 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
   MeetingsListState build() {
     _repo = ref.watch(meetingsRepositoryProvider);
     final currentUserId = ref.watch(currentUserIdProvider);
+    // ignore: avoid_print
+    print('[MEETINGS_NOTIFIER_DEBUG] build: currentUserId = $currentUserId');
     Future.microtask(_load);
     return MeetingsListState(
       status: MeetingsListStatus.loading,
@@ -26,6 +28,10 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
   }
 
   Future<void> _load() async {
+    // ignore: avoid_print
+    print(
+      '[MEETINGS_NOTIFIER_DEBUG] _load: state.currentUserId = ${state.currentUserId}',
+    );
     state = state.copyWith(
       status: MeetingsListStatus.loading,
       clearError: true,
@@ -34,11 +40,7 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
       final all = await _repo.list(tab: state.tab);
       state = state.copyWith(
         allItems: all,
-        items: applyLocalMeetingFilters(
-          all,
-          tab: null,
-          filter: state.filter,
-        ),
+        items: applyLocalMeetingFilters(all, tab: null, filter: state.filter),
         status: MeetingsListStatus.ready,
       );
     } catch (e) {
@@ -147,5 +149,5 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
 
 final meetingsListNotifierProvider =
     AutoDisposeNotifierProvider<MeetingsListNotifier, MeetingsListState>(
-  MeetingsListNotifier.new,
-);
+      MeetingsListNotifier.new,
+    );

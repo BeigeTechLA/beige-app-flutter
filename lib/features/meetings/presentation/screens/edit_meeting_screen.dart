@@ -54,7 +54,9 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
     final notifier = ref.read(
       editMeetingNotifierProvider(widget.meetingId).notifier,
     );
-    final current = ref.read(editMeetingNotifierProvider(widget.meetingId)).date;
+    final current = ref
+        .read(editMeetingNotifierProvider(widget.meetingId))
+        .date;
     final picked = await showDatePicker(
       context: context,
       initialDate: current ?? DateTime.now(),
@@ -104,10 +106,12 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
       labelText: label,
       hintText: hint,
       errorText: errorText,
-      labelStyle:
-          AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-      hintStyle:
-          AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
+      labelStyle: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.textSecondary,
+      ),
+      hintStyle: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.textTertiary,
+      ),
       filled: true,
       fillColor: AppColors.surfaceInput,
       suffixIcon: suffixIcon,
@@ -139,8 +143,9 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editMeetingNotifierProvider(widget.meetingId));
-    final notifier =
-        ref.read(editMeetingNotifierProvider(widget.meetingId).notifier);
+    final notifier = ref.read(
+      editMeetingNotifierProvider(widget.meetingId).notifier,
+    );
 
     _seedControllersFromState(state);
 
@@ -153,9 +158,9 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
             ref.invalidate(meetingDetailsProvider(widget.meetingId));
             ref.invalidate(meetingsListNotifierProvider);
             context.pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Meeting updated')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Meeting updated')));
           case EditMeetingStatus.submitError:
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -175,31 +180,31 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
         child: switch (state.status) {
           EditMeetingStatus.loading => const AppScreenLoader(),
           EditMeetingStatus.loadError => Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: AppEmptyState(
-                icon: Icons.error_outline,
-                title: 'Could not load meeting',
-                description: state.error,
-                actionLabel: 'Retry',
-                onAction: notifier.retryLoad,
-              ),
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: AppEmptyState(
+              icon: Icons.error_outline,
+              title: 'Could not load meeting',
+              description: state.error,
+              actionLabel: 'Retry',
+              onAction: notifier.retryLoad,
             ),
+          ),
           _ => _Form(
-              state: state,
-              titleCtrl: _titleCtrl,
-              descCtrl: _descCtrl,
-              linkCtrl: _linkCtrl,
-              decorationBuilder: _inputDecoration,
-              onPickDate: _pickDate,
-              onPickTime: _pickTime,
-              onTitleChanged: notifier.setTitle,
-              onDescriptionChanged: notifier.setDescription,
-              onLinkChanged: notifier.setLink,
-              onReminderChanged: notifier.setReminder,
-              onMeetingTypeChanged: notifier.setMeetingType,
-              onSave: _save,
-              onBack: () => context.pop(),
-            ),
+            state: state,
+            titleCtrl: _titleCtrl,
+            descCtrl: _descCtrl,
+            linkCtrl: _linkCtrl,
+            decorationBuilder: _inputDecoration,
+            onPickDate: _pickDate,
+            onPickTime: _pickTime,
+            onTitleChanged: notifier.setTitle,
+            onDescriptionChanged: notifier.setDescription,
+            onLinkChanged: notifier.setLink,
+            onReminderChanged: notifier.setReminder,
+            onMeetingTypeChanged: notifier.setMeetingType,
+            onSave: _save,
+            onBack: () => context.pop(),
+          ),
         },
       ),
     );
@@ -233,7 +238,8 @@ class _Form extends StatelessWidget {
     String? hint,
     Widget? suffixIcon,
     String? errorText,
-  }) decorationBuilder;
+  })
+  decorationBuilder;
   final Future<void> Function() onPickDate;
   final Future<void> Function({required bool start}) onPickTime;
   final ValueChanged<String> onTitleChanged;

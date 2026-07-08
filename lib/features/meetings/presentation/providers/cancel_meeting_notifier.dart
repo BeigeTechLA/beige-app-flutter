@@ -71,5 +71,5 @@ class CancelMeetingNotifier
 
 final cancelMeetingNotifierProvider = NotifierProvider.autoDispose
     .family<CancelMeetingNotifier, CancelMeetingState, String>(
-  CancelMeetingNotifier.new,
-);
+      CancelMeetingNotifier.new,
+    );

@@ -161,7 +161,9 @@ class _ConversationMeta extends StatelessWidget {
         const SizedBox(width: AppSpacing.xxs),
         Text(
           stamp == null ? count : '$count / $stamp',
-          style: AppTextStyles.caption.copyWith(color: AppColors.textDarkGolden),
+          style: AppTextStyles.caption.copyWith(
+            color: AppColors.textDarkGolden,
+          ),
         ),
       ],
     );

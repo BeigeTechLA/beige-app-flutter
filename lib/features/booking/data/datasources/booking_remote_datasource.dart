@@ -34,9 +34,7 @@ class BookingRemoteDataSource {
   Future<Map<String, dynamic>> getBookingParticipants({
     required int bookingId,
   }) async {
-    final response = await _dioClient.dio.get(
-      ApiEndpoints.chatDirectory,
-    );
+    final response = await _dioClient.dio.get(ApiEndpoints.chatDirectory);
     return response.data as Map<String, dynamic>;
   }
 
@@ -53,9 +51,7 @@ class BookingRemoteDataSource {
   }
 
   /// GET bookings/shoot-types/{shootTypeId}/edit-types
-  Future<Map<String, dynamic>> getEditTypes({
-    required int shootTypeId,
-  }) async {
+  Future<Map<String, dynamic>> getEditTypes({required int shootTypeId}) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.bookingShootTypes}$shootTypeId/edit-types',
     );
@@ -75,9 +71,7 @@ class BookingRemoteDataSource {
   }
 
   /// GET bookings/{bookingId}/time
-  Future<Map<String, dynamic>> getBookingTime({
-    required int bookingId,
-  }) async {
+  Future<Map<String, dynamic>> getBookingTime({required int bookingId}) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.bookings}/$bookingId/time',
     );
@@ -116,15 +110,12 @@ class BookingRemoteDataSource {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.bookings}/$bookingId/matches'
       '?sort=$sort&page=$page&limit=$limit',
-
     );
     return response.data as Map<String, dynamic>;
   }
 
   /// GET bookings/{bookingId}/holds
-  Future<Map<String, dynamic>> getHolds({
-    required int bookingId,
-  }) async {
+  Future<Map<String, dynamic>> getHolds({required int bookingId}) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.bookings}/$bookingId/holds',
     );
@@ -139,10 +130,7 @@ class BookingRemoteDataSource {
   }) async {
     final response = await _dioClient.dio.post(
       '${ApiEndpoints.bookings}/$bookingId/hold',
-      data: {
-        'crew_member_id': crewMemberId,
-        'role_id': roleId,
-      },
+      data: {'crew_member_id': crewMemberId, 'role_id': roleId},
     );
     return response.data as Map<String, dynamic>;
   }
@@ -154,9 +142,7 @@ class BookingRemoteDataSource {
   }) async {
     final response = await _dioClient.dio.post(
       '${ApiEndpoints.bookings}/$bookingId/hold/remove',
-      data: {
-        'crew_member_id': crewMemberId,
-      },
+      data: {'crew_member_id': crewMemberId},
     );
     return response.data as Map<String, dynamic>;
   }

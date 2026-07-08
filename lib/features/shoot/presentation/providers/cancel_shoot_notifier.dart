@@ -48,9 +48,10 @@ class CancelShootNotifier extends AutoDisposeNotifier<CancelShootState> {
         errorMessage: error.message,
       ),
       (data) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingCancelled, params: {
-          'booking_id': bookingId,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingCancelled,
+          params: {'booking_id': bookingId},
+        );
         final message =
             (data['message'] as String?) ?? 'Shoot cancelled successfully';
         state = state.copyWith(
@@ -64,5 +65,5 @@ class CancelShootNotifier extends AutoDisposeNotifier<CancelShootState> {
 
 final cancelShootNotifierProvider =
     NotifierProvider.autoDispose<CancelShootNotifier, CancelShootState>(
-  CancelShootNotifier.new,
-);
+      CancelShootNotifier.new,
+    );

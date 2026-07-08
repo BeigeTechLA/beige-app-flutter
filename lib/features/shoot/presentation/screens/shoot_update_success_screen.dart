@@ -12,10 +12,12 @@ class ShootUpdateSuccessScreen extends ConsumerStatefulWidget {
   const ShootUpdateSuccessScreen({super.key});
 
   @override
-  ConsumerState<ShootUpdateSuccessScreen> createState() => _ShootUpdateSuccessScreenState();
+  ConsumerState<ShootUpdateSuccessScreen> createState() =>
+      _ShootUpdateSuccessScreenState();
 }
 
-class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScreen> {
+class _ShootUpdateSuccessScreenState
+    extends ConsumerState<ShootUpdateSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,9 +73,7 @@ class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScr
             alignment: Alignment.center,
             child: Text(
               "View Summary",
-              style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.black,
-              ),
+              style: AppTextStyles.titleSmall.copyWith(color: AppColors.black),
             ),
           ),
         ),

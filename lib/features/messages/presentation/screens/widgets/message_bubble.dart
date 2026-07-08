@@ -29,6 +29,7 @@ class MessageBubble extends StatelessWidget {
   final bool isMine;
   final bool showSenderHeader;
   final String? senderRole;
+
   /// Resolved from chat-details `participants.items` via id match. Falls back
   /// to `message.senderName` when null/empty.
   final String? senderName;
@@ -52,8 +53,9 @@ class MessageBubble extends StatelessWidget {
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment:
-            isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMine
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!isMine) ...[
             if (showSenderHeader)
@@ -64,8 +66,9 @@ class MessageBubble extends StatelessWidget {
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment:
-                  isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: isMine
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (!isMine && showSenderHeader) ...[
@@ -163,7 +166,9 @@ class _SenderHeader extends StatelessWidget {
           const SizedBox(width: AppSpacing.xs),
           Text(
             '($formattedRole)',
-            style: AppTextStyles.caption.copyWith(color: AppColors.textTertiary),
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.textTertiary,
+            ),
           ),
         ],
       ],
@@ -274,9 +279,7 @@ class _ReplyPreview extends StatelessWidget {
     final bg = isMine
         ? AppColors.onPrimary.withValues(alpha: 0.12)
         : AppColors.surfaceMid.withValues(alpha: 0.55);
-    final nameColor = isMine
-        ? AppColors.onPrimary
-        : AppColors.textPrimary;
+    final nameColor = isMine ? AppColors.onPrimary : AppColors.textPrimary;
     final bodyColor = isMine
         ? AppColors.onPrimary.withValues(alpha: 0.8)
         : AppColors.textSecondary;
@@ -334,10 +337,8 @@ class _ImageContent extends StatelessWidget {
             : CachedNetworkImage(
                 imageUrl: file.url,
                 fit: BoxFit.cover,
-                placeholder: (_, _) => Container(
-                  color: AppColors.surfaceMid,
-                  height: 160,
-                ),
+                placeholder: (_, _) =>
+                    Container(color: AppColors.surfaceMid, height: 160),
                 errorWidget: (_, _, _) => Container(
                   color: AppColors.surfaceMid,
                   height: 160,
@@ -375,10 +376,7 @@ class _ReactionsRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surfaceMid,
                 borderRadius: BorderRadius.circular(AppRadii.pillSm),
-                border: Border.all(
-                  color: AppColors.dividerDark,
-                  width: 0.5,
-                ),
+                border: Border.all(color: AppColors.dividerDark, width: 0.5),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -414,10 +412,7 @@ class _BubbleMeta extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (message.isEdited) ...[
-          Text(
-            'edited',
-            style: AppTextStyles.caption.copyWith(color: color),
-          ),
+          Text('edited', style: AppTextStyles.caption.copyWith(color: color)),
           const SizedBox(width: AppSpacing.xxs),
         ],
         Text(
@@ -473,7 +468,9 @@ class _SystemNotice extends StatelessWidget {
       child: Center(
         child: Text(
           text,
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textTertiary),
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textTertiary,
+          ),
           textAlign: TextAlign.center,
         ),
       ),

@@ -118,21 +118,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                       fit: BoxFit.cover,
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return const AppImageLoader(size: 96);
-                                      },
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return const AppImageLoader(
+                                              size: 96,
+                                            );
+                                          },
                                       errorBuilder:
                                           (context, error, stackTrace) {
-                                        return Center(
-                                          child: SvgPicture.asset(
-                                            AppAssets.person,
-                                            width: 96,
-                                            height: 96,
-                                          ),
-                                        );
-                                      },
+                                            return Center(
+                                              child: SvgPicture.asset(
+                                                AppAssets.person,
+                                                width: 96,
+                                                height: 96,
+                                              ),
+                                            );
+                                          },
                                     ),
                             ),
                           ),
@@ -165,15 +167,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             InkWell(
               onTap: () async {
-                final result =
-                    await context.pushNamed<bool>(RouteNames.editProfile);
+                final result = await context.pushNamed<bool>(
+                  RouteNames.editProfile,
+                );
                 if (result == true) {
                   ref.invalidate(profileNotifierProvider);
                 }
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: AppSpacing.smd),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: AppSpacing.smd,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(AppRadii.massive),
@@ -204,7 +209,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _profileMenuCard() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.base,
+        vertical: AppSpacing.md,
+      ),
       child: Column(
         children: [
           Padding(
@@ -273,8 +281,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   AppAssets.profileTerms,
                   "Terms & Condition",
                   onTap: () async {
-                    final uri =
-                        Uri.parse("https://beige.app/terms-and-conditions");
+                    final uri = Uri.parse(
+                      "https://beige.app/terms-and-conditions",
+                    );
                     if (await canLaunchUrl(uri)) {
                       launchUrl(uri, mode: LaunchMode.externalApplication);
                     }
@@ -285,8 +294,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   AppAssets.profilePrivacy,
                   "Privacy Policy",
                   onTap: () async {
-                    final uri =
-                        Uri.parse("https://beige.app/privacy-policy");
+                    final uri = Uri.parse("https://beige.app/privacy-policy");
                     if (await canLaunchUrl(uri)) {
                       launchUrl(uri, mode: LaunchMode.externalApplication);
                     }
@@ -345,7 +353,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       borderRadius: AppRadii.hugeAll,
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base, vertical: AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.base,
+          vertical: AppSpacing.lg,
+        ),
         child: Row(
           children: [
             Container(
@@ -408,7 +419,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: const BoxDecoration(
             color: AppColors.surfaceInput,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.massive)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadii.massive),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -446,7 +459,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       onPressed: () => context.pop(),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.white60),
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.mld,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: AppRadii.xlAll,
                         ),
@@ -468,14 +483,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         CrashlyticsService.clearUserContext();
                         await SharedService.logout();
                         if (!mounted) return;
-                        ref
-                            .read(authStateProvider.notifier)
-                            .updateState(false);
+                        ref.read(authStateProvider.notifier).updateState(false);
                         context.goNamed(RouteNames.login);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.mld,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: AppRadii.xlAll,
                         ),

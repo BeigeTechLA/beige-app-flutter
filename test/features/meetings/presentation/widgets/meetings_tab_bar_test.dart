@@ -20,8 +20,9 @@ void main() {
     expect(find.text('Completed'), findsOneWidget);
   });
 
-  testWidgets('tap on inactive pill fires onChanged with the right enum',
-      (tester) async {
+  testWidgets('tap on inactive pill fires onChanged with the right enum', (
+    tester,
+  ) async {
     MeetingsTab? captured;
     await tester.pumpProviderApp(
       Material(
@@ -38,8 +39,9 @@ void main() {
     expect(captured, MeetingsTab.completed);
   });
 
-  testWidgets('tap on active pill still emits (parent decides no-op)',
-      (tester) async {
+  testWidgets('tap on active pill still emits (parent decides no-op)', (
+    tester,
+  ) async {
     int hits = 0;
     await tester.pumpProviderApp(
       Material(

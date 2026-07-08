@@ -9,9 +9,7 @@ class ErrorInterceptor extends Interceptor {
 
     // Wrap the custom exception inside DioException.error
     // so it can be retrieved easily in the repository.
-    final dioExceptionWithAppError = err.copyWith(
-      error: appException,
-    );
+    final dioExceptionWithAppError = err.copyWith(error: appException);
 
     return handler.next(dioExceptionWithAppError);
   }

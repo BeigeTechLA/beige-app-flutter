@@ -11,8 +11,7 @@ void main() {
       expect(b.shootTypeId, 5);
     });
 
-    test('toRouteExtra emits ShootTypeId casing the route builders expect',
-        () {
+    test('toRouteExtra emits ShootTypeId casing the route builders expect', () {
       final draft = BookingDraft(shootTypeId: 7, bookingId: 12);
       expect(draft.toRouteExtra()['ShootTypeId'], 7);
       expect(draft.toRouteExtra()['bookingId'], 12);
@@ -140,8 +139,7 @@ void main() {
       expect(prefs.getString(DraftKeys.booking), isNull);
     });
 
-    test('manage and cancel drafts are independent of booking draft',
-        () async {
+    test('manage and cancel drafts are independent of booking draft', () async {
       const booking = BookingDraft(bookingId: 1);
       const manage = ManageBookingDraft(bookingId: 2);
       const cancel = CancelBookingDraft(bookingId: 3);
@@ -156,8 +154,9 @@ void main() {
 
     test('clearBookingDraft only wipes the booking key', () async {
       await store.writeBookingDraft(const BookingDraft(bookingId: 1));
-      await store
-          .writeManageBookingDraft(const ManageBookingDraft(bookingId: 2));
+      await store.writeManageBookingDraft(
+        const ManageBookingDraft(bookingId: 2),
+      );
       await store.clearBookingDraft();
       expect(store.readBookingDraft(), isNull);
       expect(store.readManageBookingDraft()?.bookingId, 2);
@@ -165,10 +164,12 @@ void main() {
 
     test('clearAll wipes all draft keys', () async {
       await store.writeBookingDraft(const BookingDraft(bookingId: 1));
-      await store
-          .writeManageBookingDraft(const ManageBookingDraft(bookingId: 2));
-      await store
-          .writeCancelBookingDraft(const CancelBookingDraft(bookingId: 3));
+      await store.writeManageBookingDraft(
+        const ManageBookingDraft(bookingId: 2),
+      );
+      await store.writeCancelBookingDraft(
+        const CancelBookingDraft(bookingId: 3),
+      );
       await store.clearAll();
       expect(store.readBookingDraft(), isNull);
       expect(store.readManageBookingDraft(), isNull);

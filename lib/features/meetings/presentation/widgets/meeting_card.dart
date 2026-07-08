@@ -27,6 +27,7 @@ class MeetingCard extends StatefulWidget {
     this.onAccept,
     this.onReject,
     this.rsvpPending = false,
+    this.currentUserId,
   });
 
   final Meeting meeting;
@@ -34,6 +35,9 @@ class MeetingCard extends StatefulWidget {
   final VoidCallback onJoin;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
+
+  /// ID of the currently logged-in user. Used to check if the meeting is self-created.
+  final String? currentUserId;
 
   /// True while an Accept/Reject network call for this meeting is in flight.
   /// Disables both RSVP buttons and renders a spinner on each.
@@ -51,10 +55,20 @@ class _MeetingCardState extends State<MeetingCard> {
   String get _timeLabel =>
       '${_time.format(widget.meeting.startAt)} to ${_time.format(widget.meeting.endAt)}';
 
-  bool get _showRsvp =>
-      widget.onAccept != null &&
-          widget.onReject != null &&
-          canRsvpToMeeting(widget.meeting);
+  bool get _showRsvp {
+    debugPrint(
+      '[MEETING_CARD_DEBUG] title="${widget.meeting.title}" meeting.createdById="${widget.meeting.createdById}" widget.currentUserId="${widget.currentUserId}"',
+    );
+    final isSelfCreated =
+        widget.currentUserId != null &&
+        widget.meeting.createdById == widget.currentUserId;
+    debugPrint('[MEETING_CARD_DEBUG] isSelfCreated=$isSelfCreated');
+    if (isSelfCreated) return false;
+
+    return widget.onAccept != null &&
+        widget.onReject != null &&
+        canRsvpToMeeting(widget.meeting);
+  }
 
   Color _getStatusBgColor(MeetingStatus status) {
     switch (status) {
@@ -101,8 +115,9 @@ class _MeetingCardState extends State<MeetingCard> {
     if (participants.isEmpty) return const SizedBox.shrink();
     const double avatarSize = 24.0;
     const double overlap = 8.0;
-    final displayCount =
-        participants.length > 4 ? participants.sublist(0, 4) : participants;
+    final displayCount = participants.length > 4
+        ? participants.sublist(0, 4)
+        : participants;
     final stackWidth = displayCount.isEmpty
         ? 0.0
         : displayCount.length * (avatarSize - overlap) + overlap;
@@ -350,8 +365,7 @@ class _MeetingCardState extends State<MeetingCard> {
                         Expanded(child: left),
                         const SizedBox(width: 12),
                         Expanded(
-                          child:
-                              showBoth ? reject : const SizedBox.shrink(),
+                          child: showBoth ? reject : const SizedBox.shrink(),
                         ),
                       ],
                     );
@@ -481,7 +495,9 @@ class _ResponseStatusLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAccepted = response == MeetingResponse.accepted;
-    final color = isAccepted ? AppColors.greenBright : AppColors.meetingRejected;
+    final color = isAccepted
+        ? AppColors.greenBright
+        : AppColors.meetingRejected;
     final label = isAccepted ? 'Accepted' : 'Rejected';
     return Row(
       children: [
@@ -539,10 +555,7 @@ class _PlatformBadge extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -564,4 +577,3 @@ class _PlatformBadge extends StatelessWidget {
     );
   }
 }
-

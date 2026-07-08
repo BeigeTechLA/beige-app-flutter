@@ -12,9 +12,9 @@ void main() {
         'isLoggedIn': true,
         'user_id': '198',
       });
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       expect(container.read(currentUserIdProvider), '198');
@@ -22,9 +22,9 @@ void main() {
 
     test('returns null when user_id key missing (logged out)', () async {
       final prefs = await createMockPrefs();
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       expect(container.read(currentUserIdProvider), isNull);
@@ -32,9 +32,9 @@ void main() {
 
     test('returns null when user_id is empty string', () async {
       final prefs = await createMockPrefs({'user_id': ''});
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       expect(container.read(currentUserIdProvider), isNull);
@@ -49,9 +49,9 @@ void main() {
         'email': 'arpits85@gmail.com',
         'user_role': 'client',
       });
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       final user = container.read(currentUserProvider);
@@ -64,9 +64,9 @@ void main() {
 
     test('returns null when no user_id persisted', () async {
       final prefs = await createMockPrefs({'name': 'Stale'});
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       expect(container.read(currentUserProvider), isNull);
@@ -74,9 +74,9 @@ void main() {
 
     test('role is null when user_role not yet persisted', () async {
       final prefs = await createMockPrefs({'user_id': '198'});
-      final container = ProviderContainer(overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ]);
+      final container = ProviderContainer(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      );
       addTearDown(container.dispose);
 
       expect(container.read(currentUserProvider)?.role, isNull);

@@ -362,4 +362,10 @@ class AppColors {
 
   /// Neutral off-white — participant tile name, subtle emphasis text.
   static const Color textOffWhite = Color(0xFFCECECE);
+
+  /// Participant box background — 8% white opacity
+  static const Color participantBoxBg = Color(0x14FFFFFF);
+
+  /// Participant box border — 8% white opacity
+  static const Color participantBoxBorder = Color(0x14FFFFFF);
 }

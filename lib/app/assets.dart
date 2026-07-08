@@ -21,15 +21,11 @@ class AppAssets {
   static const String topWords = 'assets/mock_data/top_words';
   static const String _mockCreatives = 'assets/mock_data/creatives';
 
+  static const String svgDrawer = 'assets/svg/drawer';
 
-  static const String svgDrawer =
-      'assets/svg/drawer';
+  static const String svgMessage = 'assets/svg/message';
 
-  static const String svgMessage =
-      'assets/svg/message';
-
-  static const String svgMeeting =
-      'assets/svg/meeting';
+  static const String svgMeeting = 'assets/svg/meeting';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -51,20 +47,15 @@ class AppAssets {
   static const String zoomIn = '$_svg/zoom_in.svg';
   static const String zoomOut = '$_svg/zoom_out.svg';
 
-
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Message
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  static const String clipAttachment =
-      '$svgMessage/clip_attachment.svg';
+  static const String clipAttachment = '$svgMessage/clip_attachment.svg';
 
+  static const String microphone = '$svgMessage/microphone.svg';
 
-  static const String microphone =
-      '$svgMessage/microphone.svg';
-
-  static const String icGroupChat =
-      '$svgMessage/ic_group_chat.svg';
+  static const String icGroupChat = '$svgMessage/ic_group_chat.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Meeting
@@ -78,11 +69,9 @@ class AppAssets {
   // SVG — drawer
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  static const String menu =
-      '$svgDrawer/menu.svg';
+  static const String menu = '$svgDrawer/menu.svg';
 
-  static const String logoDrawer =
-      '$svgDrawer/logo_drawer.svg';
+  static const String logoDrawer = '$svgDrawer/logo_drawer.svg';
 
   static const String groupLogo = '$images/group_logo.png';
   static const String userCircle = '$_svg/user_circle.svg';
@@ -122,7 +111,6 @@ class AppAssets {
   static const String revisions = '$_svg/up_to_sets_revisions.svg';
 
   static const String calndermark = '$_svg/calendar_mark.svg';
-
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Social
@@ -167,9 +155,11 @@ class AppAssets {
   static const String inactiveMyShoot = '$svgBottom/inactive_my_shoots.svg';
   static const String activeMessages = '$svgBottom/active_messages.svg';
   static const String inactiveMessages = '$svgBottom/inactive_messages.svg';
-  static const String active_file_manager = '$svgBottom/active_file_manager.svg';
+  static const String active_file_manager =
+      '$svgBottom/active_file_manager.svg';
 
-  static const String inactive_filemanager = '$svgBottom/inactive_filemanager.svg';
+  static const String inactive_filemanager =
+      '$svgBottom/inactive_filemanager.svg';
   static const String active_meetings = '$svgBottom/active_meeting.svg';
   static const String inactive_meetings = '$svgBottom/inactive_meetings.svg';
 
@@ -243,7 +233,8 @@ class AppAssets {
 
   static const String creativeAlecH = '$_mockCreatives/alec_h.png';
   static const String creativeBensonF = '$_mockCreatives/benson_f.png';
-  static const String creativeChristopherR = '$_mockCreatives/christopher_r.png';
+  static const String creativeChristopherR =
+      '$_mockCreatives/christopher_r.png';
   static const String creativeCoreyB = '$_mockCreatives/corey_b.png';
   static const String creativeCorneliumM = '$_mockCreatives/cornelius_m.png';
   static const String creativeDanielA = '$_mockCreatives/daniel_a.png';

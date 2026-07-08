@@ -12,7 +12,10 @@ class AppAvatar extends StatefulWidget {
     this.name,
     this.size = AppAvatarSize.md,
     this.onTap,
-  }) : assert(imageUrl != null || name != null, 'Provide imageUrl or name for initials');
+  }) : assert(
+         imageUrl != null || name != null,
+         'Provide imageUrl or name for initials',
+       );
 
   final String? imageUrl;
   final String? name;
@@ -35,26 +38,27 @@ class _AppAvatarState extends State<AppAvatar> {
   }
 
   double get _dimension => switch (widget.size) {
-        AppAvatarSize.xs => 24,
-        AppAvatarSize.sm => 32,
-        AppAvatarSize.md => 40,
-        AppAvatarSize.lg => 56,
-        AppAvatarSize.xl => 72,
-      };
+    AppAvatarSize.xs => 24,
+    AppAvatarSize.sm => 32,
+    AppAvatarSize.md => 40,
+    AppAvatarSize.lg => 56,
+    AppAvatarSize.xl => 72,
+  };
 
   TextStyle get _textStyle => switch (widget.size) {
-        AppAvatarSize.xs => AppTextStyles.caption,
-        AppAvatarSize.sm => AppTextStyles.labelSmall,
-        AppAvatarSize.md => AppTextStyles.labelMedium,
-        AppAvatarSize.lg => AppTextStyles.labelLarge,
-        AppAvatarSize.xl => AppTextStyles.titleSmall,
-      };
+    AppAvatarSize.xs => AppTextStyles.caption,
+    AppAvatarSize.sm => AppTextStyles.labelSmall,
+    AppAvatarSize.md => AppTextStyles.labelMedium,
+    AppAvatarSize.lg => AppTextStyles.labelLarge,
+    AppAvatarSize.xl => AppTextStyles.titleSmall,
+  };
 
   String get _initials {
     final name = widget.name;
     if (name == null || name.isEmpty) return '?';
     final parts = name.trim().split(' ');
-    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    if (parts.length >= 2)
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
     return parts.first[0].toUpperCase();
   }
 

@@ -142,9 +142,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         fit: StackFit.expand,
         children: [
           /// 🔹 SOLID BACKGROUND
-          Container(
-            color: AppColors.textHeading,
-          ),
+          Container(color: AppColors.textHeading),
 
           /// 🔹 CENTER IMAGE (ONLY THIS CHANGES)
           Center(
@@ -157,12 +155,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
           /// 🔹 TAGLINE
           Positioned(
-            bottom: MediaQuery.of(context).size.height * 0.05, // 👈 responsive bottom
+            bottom:
+                MediaQuery.of(context).size.height *
+                0.05, // 👈 responsive bottom
             left: 0,
             right: 0,
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05, // 👈 side spacing
+                horizontal:
+                    MediaQuery.of(context).size.width * 0.05, // 👈 side spacing
               ),
               child: FittedBox(
                 fit: BoxFit.scaleDown,

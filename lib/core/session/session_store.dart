@@ -16,12 +16,7 @@ class UserSnapshot {
   final String? email;
   final String? role;
 
-  const UserSnapshot({
-    required this.id,
-    this.name,
-    this.email,
-    this.role,
-  });
+  const UserSnapshot({required this.id, this.name, this.email, this.role});
 }
 
 /// Thin adapter over `SharedPreferences` + `SecureTokenStorage`. Keeps the
@@ -48,12 +43,7 @@ class SessionStore {
     if (id.isEmpty && (name == null || name.isEmpty)) {
       return null;
     }
-    return UserSnapshot(
-      id: id,
-      name: name,
-      email: email,
-      role: role,
-    );
+    return UserSnapshot(id: id, name: name, email: email, role: role);
   }
 
   Future<String?> readToken() => SecureTokenStorage.read();

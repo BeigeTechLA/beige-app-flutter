@@ -152,9 +152,7 @@ class _Subtitle extends StatelessWidget {
         const SizedBox(width: AppSpacing.xxs),
         Text(
           '$participantCount $label',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.white60,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.white60),
         ),
       ],
     );

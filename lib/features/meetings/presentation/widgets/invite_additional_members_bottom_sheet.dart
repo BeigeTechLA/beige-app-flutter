@@ -124,7 +124,10 @@ class _InviteAdditionalMembersBottomSheetState
 
               // Segmented Tab Bar (Staff / Creative Partner)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Container(
                   height: 53,
                   padding: const EdgeInsets.all(4),
@@ -163,7 +166,10 @@ class _InviteAdditionalMembersBottomSheetState
 
               // Search Field
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: notifier.setSearchText,
@@ -216,9 +222,7 @@ class _InviteAdditionalMembersBottomSheetState
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                      ),
+                      borderSide: const BorderSide(color: AppColors.primary),
                     ),
                   ),
                 ),
@@ -305,8 +309,12 @@ class _InviteAdditionalMembersBottomSheetState
                       itemBuilder: (context, index) {
                         final member = filteredList[index];
                         final isSelected = isStaffTab
-                            ? state.selectedAdditionalStaffMembers.contains(member)
-                            : state.selectedAdditionalCreativePartners.contains(member);
+                            ? state.selectedAdditionalStaffMembers.contains(
+                                member,
+                              )
+                            : state.selectedAdditionalCreativePartners.contains(
+                                member,
+                              );
 
                         return MemberSelectionTile(
                           participant: member,

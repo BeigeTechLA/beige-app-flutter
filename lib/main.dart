@@ -11,14 +11,13 @@ import 'core/firebase/firebase_service.dart';
 import 'core/firebase/crashlytics_service.dart';
 import 'core/utils/install_marker.dart';
 
-
 Future<void> startApp(Environment environment) async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
       Env.init(environment);
-       Stripe.publishableKey = Env.stripePublishableKey;
+      Stripe.publishableKey = Env.stripePublishableKey;
 
       await FirebaseService.initialize();
       await CrashlyticsService.initialize();
@@ -33,9 +32,7 @@ Future<void> startApp(Environment environment) async {
 
       runApp(
         ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-          ],
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
           child: const App(),
         ),
       );

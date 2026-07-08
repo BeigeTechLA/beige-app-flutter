@@ -35,14 +35,18 @@ class AppEmptyState extends StatelessWidget {
             ],
             Text(
               title,
-              style: AppTextStyles.titleSmall.copyWith(color: AppColors.textPrimary),
+              style: AppTextStyles.titleSmall.copyWith(
+                color: AppColors.textPrimary,
+              ),
               textAlign: TextAlign.center,
             ),
             if (description != null) ...[
               AppSpacing.verticalXs,
               Text(
                 description!,
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

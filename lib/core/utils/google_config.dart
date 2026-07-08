@@ -1,11 +1,9 @@
 class GoogleConfig {
-  static const String placesApiKey =
-      "AIzaSyB55dzOzA9np8T1rn-DpKKqcqGcgbGmgOc";
+  static const String placesApiKey = "AIzaSyB55dzOzA9np8T1rn-DpKKqcqGcgbGmgOc";
 
   static const double defaultZoom = 14.0;
 
-  static final RegExp plusCodeRegex =
-  RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$');
+  static final RegExp plusCodeRegex = RegExp(r'^[A-Z0-9]{4,}\+[A-Z0-9]{2,}$');
 
   static const String darkMapStyle = '''
   [

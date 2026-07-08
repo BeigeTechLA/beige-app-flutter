@@ -67,9 +67,7 @@ class AppTheme {
           elevation: 0,
           padding: AppSpacing.buttonPadding,
           minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadii.lgAll,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
           textStyle: AppTextStyles.labelLarge,
         ),
       ),
@@ -88,9 +86,7 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           padding: AppSpacing.buttonPadding,
           minimumSize: const Size(double.infinity, 48),
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadii.lgAll,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           textStyle: AppTextStyles.labelLarge,
         ),
@@ -124,8 +120,12 @@ class AppTheme {
           borderRadius: AppRadii.lgAll,
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
-        labelStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textTertiary,
+        ),
+        labelStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
         errorStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
       ),
 
@@ -157,17 +157,19 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         surfaceTintColor: AppColors.transparent,
         shape: RoundedRectangleBorder(borderRadius: AppRadii.hugeAll),
-        titleTextStyle: AppTextStyles.titleMedium.copyWith(color: AppColors.white),
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        titleTextStyle: AppTextStyles.titleMedium.copyWith(
+          color: AppColors.white,
+        ),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
       ),
 
       // ━━━ BOTTOM SHEET ━━━
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         surfaceTintColor: AppColors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadii.topHuge,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.topHuge),
         showDragHandle: true,
         dragHandleColor: AppColors.textTertiary,
       ),
@@ -182,7 +184,9 @@ class AppTheme {
       // ━━━ SNACKBAR ━━━
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.surface,
-        contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.white,
+        ),
         shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
         behavior: SnackBarBehavior.floating,
         insetPadding: const EdgeInsets.all(AppSpacing.base),
@@ -193,8 +197,12 @@ class AppTheme {
         backgroundColor: AppColors.surfaceVariant,
         selectedColor: AppColors.primary.withValues(alpha: 0.2),
         disabledColor: AppColors.disabled,
-        labelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.textPrimary),
-        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(color: AppColors.onPrimary),
+        labelStyle: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.textPrimary,
+        ),
+        secondaryLabelStyle: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.onPrimary,
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.chipPaddingH,
           vertical: AppSpacing.chipPaddingV,
@@ -241,18 +249,32 @@ class AppTheme {
 
       // ━━━ TEXT THEME ━━━
       textTheme: TextTheme(
-        displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.white),
-        displayMedium: AppTextStyles.displayMedium.copyWith(color: AppColors.white),
-        displaySmall: AppTextStyles.displaySmall.copyWith(color: AppColors.white),
+        displayLarge: AppTextStyles.displayLarge.copyWith(
+          color: AppColors.white,
+        ),
+        displayMedium: AppTextStyles.displayMedium.copyWith(
+          color: AppColors.white,
+        ),
+        displaySmall: AppTextStyles.displaySmall.copyWith(
+          color: AppColors.white,
+        ),
         titleLarge: AppTextStyles.titleLarge.copyWith(color: AppColors.white),
         titleMedium: AppTextStyles.titleMedium.copyWith(color: AppColors.white),
         titleSmall: AppTextStyles.titleSmall.copyWith(color: AppColors.white),
         bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.white),
-        bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-        bodySmall: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        bodySmall: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.textSecondary,
+        ),
         labelLarge: AppTextStyles.labelLarge.copyWith(color: AppColors.white),
-        labelMedium: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary),
-        labelSmall: AppTextStyles.labelSmall.copyWith(color: AppColors.textTertiary),
+        labelMedium: AppTextStyles.labelMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+        labelSmall: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.textTertiary,
+        ),
       ),
     );
   }

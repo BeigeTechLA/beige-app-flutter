@@ -9,22 +9,27 @@ import '../../../../../app/text_styles.dart';
 class DetailsSectionCard extends StatefulWidget {
   const DetailsSectionCard({
     super.key,
-    required this.icon,
+    required this.leading,
     required this.title,
     this.trailingCount,
     this.initiallyExpanded = false,
     this.collapsible = true,
     this.body,
+    this.backgroundColor,
+    this.titleColor,
   });
 
-  final IconData icon;
+  final Widget leading;
   final String title;
   final int? trailingCount;
   final bool initiallyExpanded;
+
   /// When false, the body is always rendered and the chevron + tap toggle are
   /// suppressed. Use for sections that must stay open (e.g. participants).
   final bool collapsible;
   final Widget? body;
+  final Color? backgroundColor;
+  final Color? titleColor;
 
   @override
   State<DetailsSectionCard> createState() => _DetailsSectionCardState();
@@ -47,8 +52,9 @@ class _DetailsSectionCardState extends State<DetailsSectionCard> {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: widget.backgroundColor ?? AppColors.surface,
         borderRadius: AppRadii.xlAll,
+        border: Border.all(color: AppColors.participantBoxBorder, width: 1),
       ),
       child: Column(
         children: [
@@ -56,7 +62,7 @@ class _DetailsSectionCardState extends State<DetailsSectionCard> {
             button: widget.body != null && widget.collapsible,
             label: widget.collapsible
                 ? '${widget.title} section, '
-                    '${_expanded ? 'expanded' : 'collapsed'}'
+                      '${_expanded ? 'expanded' : 'collapsed'}'
                 : '${widget.title} section',
             child: InkWell(
               borderRadius: AppRadii.xlAll,
@@ -70,22 +76,27 @@ class _DetailsSectionCardState extends State<DetailsSectionCard> {
                 ),
                 child: Row(
                   children: [
-                    Icon(widget.icon, color: AppColors.primary, size: 20),
+                    widget.leading,
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: RichText(
                         text: TextSpan(
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w500,
+                            color: widget.titleColor ?? AppColors.textPrimary,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
                           ),
                           children: [
                             TextSpan(text: widget.title),
                             if (widget.trailingCount != null)
                               TextSpan(
                                 text: ' (${widget.trailingCount})',
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
+                                style: TextStyle(
+                                  color:
+                                      widget.titleColor ??
+                                      AppColors.textSecondary,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16,
                                 ),
                               ),
                           ],
@@ -108,14 +119,24 @@ class _DetailsSectionCardState extends State<DetailsSectionCard> {
           ),
           AnimatedCrossFade(
             firstChild: const SizedBox(width: double.infinity),
-            secondChild: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md,
-                0,
-                AppSpacing.md,
-                AppSpacing.md,
-              ),
-              child: widget.body ?? const SizedBox.shrink(),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.participantBoxBorder,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.md,
+                  ),
+                  child: widget.body ?? const SizedBox.shrink(),
+                ),
+              ],
             ),
             crossFadeState: _expanded
                 ? CrossFadeState.showSecond

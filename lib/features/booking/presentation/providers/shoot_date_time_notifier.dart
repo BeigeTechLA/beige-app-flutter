@@ -44,11 +44,14 @@ class ShootDateTimeNotifier
     // --- Booking Analytics: Drop-off tracking for Step 3 ---
     ref.onDispose(() {
       if (!_stepCompleted && _bookingId != null) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': _bookingId!,
-          'last_step': 'date_time',
-          'step_number': 3,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': _bookingId!,
+            'last_step': 'date_time',
+            'step_number': 3,
+          },
+        );
       }
     });
     _fetchEditTypes(shootTypeId);
@@ -93,11 +96,14 @@ class ShootDateTimeNotifier
       (_) {
         _stepCompleted = true;
         // --- Booking Analytics: Step 3 — Date & time selected ---
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStepDateTime, params: {
-          'booking_id': bookingId,
-          'shoot_date': payload['shoot_date']?.toString() ?? '',
-          'step_number': 3,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStepDateTime,
+          params: {
+            'booking_id': bookingId,
+            'shoot_date': payload['shoot_date']?.toString() ?? '',
+            'step_number': 3,
+          },
+        );
         state = state.copyWith(status: ShootDateTimeStatus.success);
       },
     );
@@ -106,5 +112,5 @@ class ShootDateTimeNotifier
 
 final shootDateTimeNotifierProvider = NotifierProvider.autoDispose
     .family<ShootDateTimeNotifier, ShootDateTimeState, int>(
-  ShootDateTimeNotifier.new,
-);
+      ShootDateTimeNotifier.new,
+    );

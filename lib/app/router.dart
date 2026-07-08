@@ -115,8 +115,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     connNotifier.value = next;
   });
 
-  final refreshListenable =
-      Listenable.merge([authNotifier, guestNotifier, connNotifier]);
+  final refreshListenable = Listenable.merge([
+    authNotifier,
+    guestNotifier,
+    connNotifier,
+  ]);
 
   // Set of routes the user has already visited while online during this
   // session. While offline, navigation is allowed only to these (plus public
@@ -135,8 +138,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     final extra = state.extra as Map<String, dynamic>?;
     final previous = draftStore.readBookingDraft() ?? const BookingDraft();
     if (extra != null) {
-      final fresh = BookingDraft.fromRouteExtra(extra, currentRoute: routeName)
-          .mergeOver(previous);
+      final fresh = BookingDraft.fromRouteExtra(
+        extra,
+        currentRoute: routeName,
+      ).mergeOver(previous);
       // ignore: discarded_futures
       draftStore.writeBookingDraft(fresh);
       return fresh;
@@ -144,13 +149,15 @@ final routerProvider = Provider<GoRouter>((ref) {
     final hydrated = previous;
     if (hydrated.currentRoute != routeName) {
       // ignore: discarded_futures
-      draftStore.writeBookingDraft(BookingDraft(
-        contentTypeId: hydrated.contentTypeId,
-        shootTypeId: hydrated.shootTypeId,
-        bookingId: hydrated.bookingId,
-        value: hydrated.value,
-        currentRoute: routeName,
-      ));
+      draftStore.writeBookingDraft(
+        BookingDraft(
+          contentTypeId: hydrated.contentTypeId,
+          shootTypeId: hydrated.shootTypeId,
+          bookingId: hydrated.bookingId,
+          value: hydrated.value,
+          currentRoute: routeName,
+        ),
+      );
     }
     return hydrated;
   }
@@ -204,9 +211,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
       // Guest can only access the home shell + public auth routes.
-      if (!isLoggedIn &&
-          isGuest &&
-          !_guestAllowedRoutes.contains(location)) {
+      if (!isLoggedIn && isGuest && !_guestAllowedRoutes.contains(location)) {
         return '/';
       }
 
@@ -253,7 +258,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               child: child,
               builder: (context, inner) {
                 final status = animation.status;
-                final isExiting = status == AnimationStatus.reverse ||
+                final isExiting =
+                    status == AnimationStatus.reverse ||
                     status == AnimationStatus.dismissed;
                 final curved = Curves.easeInOutCubic.transform(
                   animation.value.clamp(0.0, 1.0),
@@ -261,10 +267,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 final dy = isExiting ? -(1 - curved) : (1 - curved);
                 return FractionalTranslation(
                   translation: Offset(0, dy),
-                  child: Opacity(
-                    opacity: curved,
-                    child: inner,
-                  ),
+                  child: Opacity(opacity: curved, child: inner),
                 );
               },
             );
@@ -314,18 +317,22 @@ final routerProvider = Provider<GoRouter>((ref) {
             child: _MainShell(navigationShell: navigationShell),
             transitionDuration: const Duration(milliseconds: 380),
             reverseTransitionDuration: const Duration(milliseconds: 380),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0.0, 1.0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(
-                  parent: animation,
-                  curve: Curves.easeInOutCubic,
-                )),
-                child: child,
-              );
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0.0, 1.0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOutCubic,
+                          ),
+                        ),
+                    child: child,
+                  );
+                },
           );
         },
         branches: [
@@ -371,7 +378,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-        /*  // Tab 4: File Manager
+          /*  // Tab 4: File Manager
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -448,10 +455,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.contentType,
         builder: (context, state) {
           final draft = bookingDraftFor(state, '/content-type');
-          return ContentTypeScreen(
-            fromHome: true,
-            value: draft.value,
-          );
+          return ContentTypeScreen(fromHome: true, value: draft.value);
         },
       ),
       GoRoute(
@@ -554,9 +558,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/chat',
         name: RouteNames.chat,
         builder: (context, state) {
-          final args = ChatArgs.fromExtra(
-            state.extra as Map<String, dynamic>,
-          );
+          final args = ChatArgs.fromExtra(state.extra as Map<String, dynamic>);
           return ChatThreadScreen(
             conversationId: args.conversationId,
             contactName: args.contactName,
@@ -723,22 +725,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DeleteAccountOtpScreen(),
       ),
 
-
       ///
       // ── Drawer ────────────────────────────────────────────────────
-
       GoRoute(
         path: '/file-manager',
         name: RouteNames.fileManager,
-        builder: (context, state) =>
-        const FileManagerScreen(),
+        builder: (context, state) => const FileManagerScreen(),
       ),
 
       GoRoute(
         path: '/meetings',
         name: RouteNames.meetings,
-        builder: (context, state) =>
-        const MeetingsScreen(),
+        builder: (context, state) => const MeetingsScreen(),
       ),
 
       GoRoute(
@@ -750,9 +748,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/meeting/edit/:id',
         name: RouteNames.meetingEdit,
-        builder: (context, state) => EditMeetingScreen(
-          meetingId: state.pathParameters['id']!,
-        ),
+        builder: (context, state) =>
+            EditMeetingScreen(meetingId: state.pathParameters['id']!),
       ),
 
       GoRoute(
@@ -800,10 +797,7 @@ class _MainShell extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.transparent,
-                    AppColors.background,
-                  ],
+                  colors: [AppColors.transparent, AppColors.background],
                 ),
               ),
             ),
@@ -861,7 +855,7 @@ class _MainShell extends ConsumerWidget {
                       activeIcon: _buildActiveIcon(AppAssets.activeMessages),
                       label: " Messages",
                     ),
-                   /* const BottomNavigationBarItem(
+                    /* const BottomNavigationBarItem(
                       icon: Padding(
                         padding: EdgeInsets.only(bottom: 4),
                         child: Icon(Icons.folder_outlined,
@@ -901,12 +895,16 @@ class _MainShell extends ConsumerWidget {
       selectedIndex: navigationShell.currentIndex,
       labelType: NavigationRailLabelType.all,
       selectedIconTheme: const IconThemeData(color: AppColors.white, size: 24),
-      unselectedIconTheme:
-          const IconThemeData(color: AppColors.white70, size: 24),
-      selectedLabelTextStyle:
-          AppTextStyles.labelSmall.copyWith(color: AppColors.white),
-      unselectedLabelTextStyle:
-          AppTextStyles.labelSmall.copyWith(color: AppColors.white70),
+      unselectedIconTheme: const IconThemeData(
+        color: AppColors.white70,
+        size: 24,
+      ),
+      selectedLabelTextStyle: AppTextStyles.labelSmall.copyWith(
+        color: AppColors.white,
+      ),
+      unselectedLabelTextStyle: AppTextStyles.labelSmall.copyWith(
+        color: AppColors.white70,
+      ),
       onDestinationSelected: (index) {
         final isGuest = ref.read(guestModeProvider);
         if (isGuest && index != 0) {

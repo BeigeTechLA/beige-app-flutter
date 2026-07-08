@@ -23,20 +23,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Meeting _stubMeeting() => Meeting(
-      id: 'created',
-      title: 'New',
-      description: '',
-      project: '',
-      platform: MeetingPlatform.meet,
-      startAt: DateTime(2026, 6, 11, 13),
-      endAt: DateTime(2026, 6, 11, 14),
-      link: 'https://meet.google.com/x',
-      reminderMinutes: 15,
-      status: MeetingStatus.upcoming,
-      category: MeetingCategory.commercial,
-      agenda: const [],
-      participants: const [],
-    );
+  id: 'created',
+  title: 'New',
+  description: '',
+  project: '',
+  platform: MeetingPlatform.meet,
+  startAt: DateTime(2026, 6, 11, 13),
+  endAt: DateTime(2026, 6, 11, 14),
+  link: 'https://meet.google.com/x',
+  reminderMinutes: 15,
+  status: MeetingStatus.upcoming,
+  category: MeetingCategory.commercial,
+  agenda: const [],
+  participants: const [],
+);
 
 class _FakeRepo implements MeetingsRepository {
   _FakeRepo({this.throws});
@@ -50,8 +50,7 @@ class _FakeRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> getById(String id) async => throw UnimplementedError();
@@ -269,68 +268,95 @@ void main() {
     expect(cp.isSelected, false);
   });
 
-  test('setShoot parses default members and handles mandatory vs optional state', () async {
-    final repo = _FakeRepo();
-    final container = await _container(repo: repo);
-    addTearDown(container.dispose);
+  test(
+    'setShoot parses default members and handles mandatory vs optional state',
+    () async {
+      final repo = _FakeRepo();
+      final container = await _container(repo: repo);
+      addTearDown(container.dispose);
 
-    final n = container.read(createMeetingNotifierProvider.notifier);
-    final shoot = ShootOption(
-      id: 42,
-      title: 'Cover Story',
-      defaultMembers: const [
-        {'id': 'c_1', 'name': 'Pranav Client', 'role': 'client', 'email': 'pranav@revurge.com'},
-        {'id': 's_1', 'name': 'Staff One', 'role': 'sales_rep', 'email': 'staff1@revurge.com'},
-      ],
-    );
+      final n = container.read(createMeetingNotifierProvider.notifier);
+      final shoot = ShootOption(
+        id: 42,
+        title: 'Cover Story',
+        defaultMembers: const [
+          {
+            'id': 'c_1',
+            'name': 'Pranav Client',
+            'role': 'client',
+            'email': 'pranav@revurge.com',
+          },
+          {
+            'id': 's_1',
+            'name': 'Staff One',
+            'role': 'sales_rep',
+            'email': 'staff1@revurge.com',
+          },
+        ],
+      );
 
-    n.setShoot(shoot);
+      n.setShoot(shoot);
 
-    final state = container.read(createMeetingNotifierProvider);
-    expect(state.shootId, 42);
-    expect(state.project, 'Cover Story');
-    expect(state.defaultInvitedMembers.length, 2);
-    
-    expect(state.defaultInvitedMembers[0].id, 'c_1');
-    expect(state.defaultInvitedMembers[0].type, 'client');
-    expect(state.defaultInvitedMembers[0].isSelected, true);
+      final state = container.read(createMeetingNotifierProvider);
+      expect(state.shootId, 42);
+      expect(state.project, 'Cover Story');
+      expect(state.defaultInvitedMembers.length, 2);
 
-    expect(state.defaultInvitedMembers[1].id, 's_1');
-    expect(state.defaultInvitedMembers[1].type, 'staff');
-    expect(state.defaultInvitedMembers[1].isSelected, false);
+      expect(state.defaultInvitedMembers[0].id, 'c_1');
+      expect(state.defaultInvitedMembers[0].type, 'client');
+      expect(state.defaultInvitedMembers[0].isSelected, true);
 
-    // Optional defaults are pre-selected out of the box.
-    expect(state.optionalSelectedDefaultMembers.length, 1);
-    expect(state.optionalSelectedDefaultMembers[0].id, 's_1');
-    expect(state.selectedParticipants.map((p) => p.id), containsAll(['c_1', 's_1']));
+      expect(state.defaultInvitedMembers[1].id, 's_1');
+      expect(state.defaultInvitedMembers[1].type, 'staff');
+      expect(state.defaultInvitedMembers[1].isSelected, false);
 
-    // Toggle deselects the optional member.
-    n.toggleOptionalDefaultMember(state.defaultInvitedMembers[1]);
-    final updatedState = container.read(createMeetingNotifierProvider);
-    expect(updatedState.optionalSelectedDefaultMembers, isEmpty);
-    expect(updatedState.selectedParticipants.map((p) => p.id), ['c_1']);
-  });
+      // Optional defaults are pre-selected out of the box.
+      expect(state.optionalSelectedDefaultMembers.length, 1);
+      expect(state.optionalSelectedDefaultMembers[0].id, 's_1');
+      expect(
+        state.selectedParticipants.map((p) => p.id),
+        containsAll(['c_1', 's_1']),
+      );
 
-  test('toggleAdditionalMember and removeAdditionalMember updates state correctly', () async {
-    final repo = _FakeRepo();
-    final container = await _container(repo: repo);
-    addTearDown(container.dispose);
+      // Toggle deselects the optional member.
+      n.toggleOptionalDefaultMember(state.defaultInvitedMembers[1]);
+      final updatedState = container.read(createMeetingNotifierProvider);
+      expect(updatedState.optionalSelectedDefaultMembers, isEmpty);
+      expect(updatedState.selectedParticipants.map((p) => p.id), ['c_1']);
+    },
+  );
 
-    final n = container.read(createMeetingNotifierProvider.notifier);
-    final staff = const DirectoryParticipant(id: 's_2', name: 'Sarah', type: 'staff');
-    final cp = const DirectoryParticipant(id: 'cp_2', name: 'William', type: 'creativePartner');
+  test(
+    'toggleAdditionalMember and removeAdditionalMember updates state correctly',
+    () async {
+      final repo = _FakeRepo();
+      final container = await _container(repo: repo);
+      addTearDown(container.dispose);
 
-    n.toggleAdditionalMember(staff);
-    n.toggleAdditionalMember(cp);
+      final n = container.read(createMeetingNotifierProvider.notifier);
+      final staff = const DirectoryParticipant(
+        id: 's_2',
+        name: 'Sarah',
+        type: 'staff',
+      );
+      final cp = const DirectoryParticipant(
+        id: 'cp_2',
+        name: 'William',
+        type: 'creativePartner',
+      );
 
-    var state = container.read(createMeetingNotifierProvider);
-    expect(state.selectedAdditionalStaffMembers.length, 1);
-    expect(state.selectedAdditionalCreativePartners.length, 1);
-    expect(state.selectedParticipants.length, 2);
+      n.toggleAdditionalMember(staff);
+      n.toggleAdditionalMember(cp);
 
-    n.removeAdditionalMember('s_2');
-    state = container.read(createMeetingNotifierProvider);
-    expect(state.selectedAdditionalStaffMembers.length, 0);
-    expect(state.selectedAdditionalCreativePartners.length, 1);
-  });
+      var state = container.read(createMeetingNotifierProvider);
+      expect(state.selectedAdditionalStaffMembers.length, 1);
+      expect(state.selectedAdditionalCreativePartners.length, 1);
+      expect(state.selectedParticipants.length, 2);
+
+      n.removeAdditionalMember('s_2');
+      state = container.read(createMeetingNotifierProvider);
+      expect(state.selectedAdditionalStaffMembers.length, 0);
+      expect(state.selectedAdditionalCreativePartners.length, 1);
+    },
+  );
 }

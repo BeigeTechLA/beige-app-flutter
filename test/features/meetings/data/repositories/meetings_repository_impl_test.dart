@@ -19,29 +19,27 @@ Meeting _m({
   MeetingStatus status = MeetingStatus.upcoming,
   MeetingCategory category = MeetingCategory.commercial,
   DateTime? startAt,
-}) =>
-    Meeting(
-      id: id,
-      title: 'T-$id',
-      description: '',
-      project: '',
-      platform: MeetingPlatform.meet,
-      startAt: startAt ?? DateTime(2026, 6, 11, 13),
-      endAt: (startAt ?? DateTime(2026, 6, 11, 13))
-          .add(const Duration(hours: 1)),
-      link: 'https://meet.google.com/x',
-      reminderMinutes: 15,
-      status: status,
-      category: category,
-      agenda: const [],
-      participants: const [],
-    );
+}) => Meeting(
+  id: id,
+  title: 'T-$id',
+  description: '',
+  project: '',
+  platform: MeetingPlatform.meet,
+  startAt: startAt ?? DateTime(2026, 6, 11, 13),
+  endAt: (startAt ?? DateTime(2026, 6, 11, 13)).add(const Duration(hours: 1)),
+  link: 'https://meet.google.com/x',
+  reminderMinutes: 15,
+  status: status,
+  category: category,
+  agenda: const [],
+  participants: const [],
+);
 
 /// Hand-rolled fake — mocktail of `MeetingsRemoteSource` would drag in
 /// DioClient/SessionStore setup the repo doesn't need.
 class _FakeRemote implements MeetingsRemoteSource {
   _FakeRemote({List<Meeting>? seed})
-      : items = List<Meeting>.from(seed ?? const []);
+    : items = List<Meeting>.from(seed ?? const []);
 
   final List<Meeting> items;
   int createCalls = 0;
@@ -133,7 +131,10 @@ void main() {
   group('list — server-side tab + local filtering', () {
     test('tab=upcoming forwards meetingTimeStatus=upcoming', () async {
       final remote = _FakeRemote(
-        seed: [_m(id: 'a'), _m(id: 'b')],
+        seed: [
+          _m(id: 'a'),
+          _m(id: 'b'),
+        ],
       );
       final repo = MeetingsRepositoryImpl(remote);
 
@@ -176,9 +177,7 @@ void main() {
       final repo = MeetingsRepositoryImpl(remote);
 
       final result = await repo.list(
-        filter: const MeetingFilter(
-          categories: {MeetingCategory.commercial},
-        ),
+        filter: const MeetingFilter(categories: {MeetingCategory.commercial}),
       );
 
       expect(result.map((m) => m.id).toList(), ['a', 'c']);
@@ -186,31 +185,37 @@ void main() {
   });
 
   group('create — single POST', () {
-    test('input without participants → single POST, no addParticipants', () async {
-      final remote = _FakeRemote();
-      final repo = MeetingsRepositoryImpl(remote);
+    test(
+      'input without participants → single POST, no addParticipants',
+      () async {
+        final remote = _FakeRemote();
+        final repo = MeetingsRepositoryImpl(remote);
 
-      await repo.create(_input(participants: const []));
+        await repo.create(_input(participants: const []));
 
-      expect(remote.createCalls, 1);
-      expect(remote.addParticipantsCalls, 0);
-    });
+        expect(remote.createCalls, 1);
+        expect(remote.addParticipantsCalls, 0);
+      },
+    );
 
-    test('input with participants → single POST, participants sent inline', () async {
-      final remote = _FakeRemote();
-      final repo = MeetingsRepositoryImpl(remote);
+    test(
+      'input with participants → single POST, participants sent inline',
+      () async {
+        final remote = _FakeRemote();
+        final repo = MeetingsRepositoryImpl(remote);
 
-      await repo.create(
-        _input(
-          participants: const [
-            MeetingParticipant(id: '4', name: 'A'),
-            MeetingParticipant(id: '7', name: 'B'),
-          ],
-        ),
-      );
+        await repo.create(
+          _input(
+            participants: const [
+              MeetingParticipant(id: '4', name: 'A'),
+              MeetingParticipant(id: '7', name: 'B'),
+            ],
+          ),
+        );
 
-      expect(remote.createCalls, 1);
-      expect(remote.addParticipantsCalls, 0);
-    });
+        expect(remote.createCalls, 1);
+        expect(remote.addParticipantsCalls, 0);
+      },
+    );
   });
 }

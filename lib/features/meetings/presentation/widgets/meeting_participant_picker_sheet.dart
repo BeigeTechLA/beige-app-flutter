@@ -23,18 +23,13 @@ Future<List<ShootParticipantOption>?> showMeetingParticipantPickerSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => _PickerSheet(
-      bookingId: bookingId,
-      initialSelected: initialSelected,
-    ),
+    builder: (_) =>
+        _PickerSheet(bookingId: bookingId, initialSelected: initialSelected),
   );
 }
 
 class _PickerSheet extends ConsumerStatefulWidget {
-  const _PickerSheet({
-    required this.bookingId,
-    required this.initialSelected,
-  });
+  const _PickerSheet({required this.bookingId, required this.initialSelected});
 
   final int bookingId;
   final List<ShootParticipantOption> initialSelected;
@@ -126,11 +121,13 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
                     data: (people) {
                       final filtered = _query.trim().isEmpty
                           ? people
-                          : people.where((p) {
-                              final q = _query.toLowerCase();
-                              return p.name.toLowerCase().contains(q) ||
-                                  (p.email ?? '').toLowerCase().contains(q);
-                            }).toList(growable: false);
+                          : people
+                                .where((p) {
+                                  final q = _query.toLowerCase();
+                                  return p.name.toLowerCase().contains(q) ||
+                                      (p.email ?? '').toLowerCase().contains(q);
+                                })
+                                .toList(growable: false);
                       if (filtered.isEmpty) {
                         return Padding(
                           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -167,10 +164,7 @@ class _PickerSheetState extends ConsumerState<_PickerSheet> {
                     },
                   ),
                 ),
-                _Footer(
-                  count: _selected.length,
-                  onConfirm: _confirm,
-                ),
+                _Footer(count: _selected.length, onConfirm: _confirm),
               ],
             ),
           ),
@@ -229,10 +223,7 @@ class _SheetHeader extends StatelessWidget {
 }
 
 class _SearchField extends StatelessWidget {
-  const _SearchField({
-    required this.controller,
-    required this.onChanged,
-  });
+  const _SearchField({required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -260,8 +251,9 @@ class _SearchField extends StatelessWidget {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isCollapsed: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.md,
+                ),
                 hintText: 'Search name or email',
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textTertiary,
@@ -353,9 +345,7 @@ class _Footer extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.background,
-        border: Border(
-          top: BorderSide(color: AppColors.dividerDark, width: 1),
-        ),
+        border: Border(top: BorderSide(color: AppColors.dividerDark, width: 1)),
       ),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.xl,

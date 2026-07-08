@@ -4,15 +4,9 @@ class SignupState {
   final SignupStatus status;
   final String? errorMessage;
 
-  const SignupState({
-    this.status = SignupStatus.initial,
-    this.errorMessage,
-  });
+  const SignupState({this.status = SignupStatus.initial, this.errorMessage});
 
-  SignupState copyWith({
-    SignupStatus? status,
-    String? errorMessage,
-  }) {
+  SignupState copyWith({SignupStatus? status, String? errorMessage}) {
     return SignupState(
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,

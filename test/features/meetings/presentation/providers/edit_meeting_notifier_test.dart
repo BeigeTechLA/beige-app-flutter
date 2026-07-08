@@ -19,21 +19,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Meeting _baseline() => Meeting(
-      id: 'm_1',
-      title: 'Kickoff',
-      description: 'Planning sync',
-      project: 'Cover Story',
-      platform: MeetingPlatform.meet,
-      startAt: DateTime(2026, 6, 11, 13),
-      endAt: DateTime(2026, 6, 11, 14),
-      link: 'https://meet.google.com/abc',
-      reminderMinutes: 15,
-      status: MeetingStatus.upcoming,
-      category: MeetingCategory.commercial,
-      agenda: const [],
-      participants: const [],
-      createdById: 'u_42',
-    );
+  id: 'm_1',
+  title: 'Kickoff',
+  description: 'Planning sync',
+  project: 'Cover Story',
+  platform: MeetingPlatform.meet,
+  startAt: DateTime(2026, 6, 11, 13),
+  endAt: DateTime(2026, 6, 11, 14),
+  link: 'https://meet.google.com/abc',
+  reminderMinutes: 15,
+  status: MeetingStatus.upcoming,
+  category: MeetingCategory.commercial,
+  agenda: const [],
+  participants: const [],
+  createdById: 'u_42',
+);
 
 class _FakeRepo implements MeetingsRepository {
   _FakeRepo({this.failGet = false, this.failUpdate = false});
@@ -62,8 +62,7 @@ class _FakeRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> create(CreateMeetingInput input) async =>
@@ -150,29 +149,31 @@ void main() {
     expect(s.error, isNotNull);
   });
 
-  test('submit no-op when nothing changed → saved without update call',
-      () async {
-    final repo = _FakeRepo();
-    final container = await _container(repo: repo);
-    addTearDown(container.dispose);
+  test(
+    'submit no-op when nothing changed → saved without update call',
+    () async {
+      final repo = _FakeRepo();
+      final container = await _container(repo: repo);
+      addTearDown(container.dispose);
 
-    final sub = container.listen<EditMeetingState>(
-      editMeetingNotifierProvider('m_1'),
-      (_, _) {},
-    );
-    addTearDown(sub.close);
-    await _settle();
+      final sub = container.listen<EditMeetingState>(
+        editMeetingNotifierProvider('m_1'),
+        (_, _) {},
+      );
+      addTearDown(sub.close);
+      await _settle();
 
-    await container
-        .read(editMeetingNotifierProvider('m_1').notifier)
-        .submit();
+      await container
+          .read(editMeetingNotifierProvider('m_1').notifier)
+          .submit();
 
-    expect(repo.updateCalls, 0);
-    expect(
-      container.read(editMeetingNotifierProvider('m_1')).status,
-      EditMeetingStatus.saved,
-    );
-  });
+      expect(repo.updateCalls, 0);
+      expect(
+        container.read(editMeetingNotifierProvider('m_1')).status,
+        EditMeetingStatus.saved,
+      );
+    },
+  );
 
   test('submit sends only diffed fields in patch', () async {
     final repo = _FakeRepo();

@@ -48,9 +48,7 @@ class DeleteAccountOtpNotifier
       ),
       (_) {
         AnalyticsService.logEvent(AnalyticsEvents.accountDeleted);
-        state = state.copyWith(
-          confirmStatus: DeleteOtpStatus.success,
-        );
+        state = state.copyWith(confirmStatus: DeleteOtpStatus.success);
       },
     );
   }
@@ -60,22 +58,20 @@ class DeleteAccountOtpNotifier
 
     // Reuses requestDeleteAccount to trigger new OTP
     final repo = ref.read(profileRepositoryProvider);
-    final result =
-        await repo.requestDeleteAccount(reason: 'resend');
+    final result = await repo.requestDeleteAccount(reason: 'resend');
 
     result.fold(
       (error) => state = state.copyWith(
         resendStatus: DeleteOtpStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(
-        resendStatus: DeleteOtpStatus.success,
-      ),
+      (_) => state = state.copyWith(resendStatus: DeleteOtpStatus.success),
     );
   }
 }
 
-final deleteAccountOtpNotifierProvider = NotifierProvider.autoDispose<
-    DeleteAccountOtpNotifier, DeleteAccountOtpState>(
-  DeleteAccountOtpNotifier.new,
-);
+final deleteAccountOtpNotifierProvider =
+    NotifierProvider.autoDispose<
+      DeleteAccountOtpNotifier,
+      DeleteAccountOtpState
+    >(DeleteAccountOtpNotifier.new);

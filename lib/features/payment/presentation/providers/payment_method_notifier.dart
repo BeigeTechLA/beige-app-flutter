@@ -68,13 +68,10 @@ class PaymentMethodNotifier
     final repo = ref.read(paymentRepositoryProvider);
     final result = await repo.createPaymentSheet(bookingId: bookingId);
 
-    return result.fold(
-      (error) {
-        state = state.copyWith(errorMessage: error.message);
-        return null;
-      },
-      (data) => data['payment_sheet'] as Map<String, dynamic>?,
-    );
+    return result.fold((error) {
+      state = state.copyWith(errorMessage: error.message);
+      return null;
+    }, (data) => data['payment_sheet'] as Map<String, dynamic>?);
   }
 
   /// Confirm payment with backend. Returns true on success.
@@ -88,17 +85,14 @@ class PaymentMethodNotifier
       paymentIntentId: paymentIntentId,
     );
 
-    return result.fold(
-      (error) {
-        state = state.copyWith(errorMessage: error.message);
-        return false;
-      },
-      (_) => true,
-    );
+    return result.fold((error) {
+      state = state.copyWith(errorMessage: error.message);
+      return false;
+    }, (_) => true);
   }
 }
 
 final paymentMethodNotifierProvider = NotifierProvider.autoDispose
     .family<PaymentMethodNotifier, PaymentMethodState, int>(
-  PaymentMethodNotifier.new,
-);
+      PaymentMethodNotifier.new,
+    );

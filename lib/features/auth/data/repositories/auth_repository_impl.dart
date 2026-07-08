@@ -27,7 +27,8 @@ class AuthRepositoryImpl implements AuthRepository {
       _assertNoError(response);
 
       final data = response['data'] as Map<String, dynamic>? ?? {};
-      final userData = data['userData'] as Map<String, dynamic>? ??
+      final userData =
+          data['userData'] as Map<String, dynamic>? ??
           data['user'] as Map<String, dynamic>? ??
           {};
 
@@ -74,9 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<AppException, String>> forgotPassword({
-    required String email,
-  }) {
+  Future<Either<AppException, String>> forgotPassword({required String email}) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.forgotPassword(email: email);
       _assertNoError(response);
@@ -119,9 +118,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<AppException, String>> resendOtp({
-    required String email,
-  }) {
+  Future<Either<AppException, String>> resendOtp({required String email}) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.resendOtp(email: email);
       _assertNoError(response);

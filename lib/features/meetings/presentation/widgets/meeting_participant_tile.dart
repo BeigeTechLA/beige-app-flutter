@@ -55,5 +55,4 @@ class MeetingParticipantTile extends StatelessWidget {
       ),
     );
   }
-
 }

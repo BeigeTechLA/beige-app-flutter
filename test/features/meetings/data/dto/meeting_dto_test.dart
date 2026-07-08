@@ -82,10 +82,7 @@ void main() {
       });
 
       // Stored as local; the parsed instant must equal the UTC instant given.
-      expect(
-        m.startAt.toUtc().toIso8601String(),
-        '2026-06-11T13:00:00.000Z',
-      );
+      expect(m.startAt.toUtc().toIso8601String(), '2026-06-11T13:00:00.000Z');
       expect(m.startAt.isUtc, false);
     });
 

@@ -9,7 +9,7 @@ enum MeetingsTab { upcoming, completed }
 
 extension MeetingsTabX on MeetingsTab {
   String get label => switch (this) {
-        MeetingsTab.upcoming => 'Upcoming',
-        MeetingsTab.completed => 'Completed',
-      };
+    MeetingsTab.upcoming => 'Upcoming',
+    MeetingsTab.completed => 'Completed',
+  };
 }

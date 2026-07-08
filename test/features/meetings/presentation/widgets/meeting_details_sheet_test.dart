@@ -23,23 +23,23 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../../helpers/pump_app.dart';
 
 Meeting _meeting() => Meeting(
-      id: 'm-1',
-      title: 'Editorial Sync',
-      description: 'planning',
-      project: 'Cover Story',
-      platform: MeetingPlatform.meet,
-      startAt: DateTime(2026, 6, 11, 13),
-      endAt: DateTime(2026, 6, 11, 14),
-      link: 'https://meet.google.com/x',
-      reminderMinutes: 15,
-      status: MeetingStatus.upcoming,
-      category: MeetingCategory.commercial,
-      agenda: const ['Recap', 'Storyboards'],
-      participants: const [
-        MeetingParticipant(id: '1', name: 'Alice'),
-        MeetingParticipant(id: '2', name: 'Bob'),
-      ],
-    );
+  id: 'm-1',
+  title: 'Editorial Sync',
+  description: 'planning',
+  project: 'Cover Story',
+  platform: MeetingPlatform.meet,
+  startAt: DateTime(2026, 6, 11, 13),
+  endAt: DateTime(2026, 6, 11, 14),
+  link: 'https://meet.google.com/x',
+  reminderMinutes: 15,
+  status: MeetingStatus.upcoming,
+  category: MeetingCategory.commercial,
+  agenda: const ['Recap', 'Storyboards'],
+  participants: const [
+    MeetingParticipant(id: '1', name: 'Alice'),
+    MeetingParticipant(id: '2', name: 'Bob'),
+  ],
+);
 
 class _OkRepo implements MeetingsRepository {
   @override
@@ -47,8 +47,7 @@ class _OkRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> getById(String id) async => _meeting();
@@ -86,8 +85,7 @@ class _ErrRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> getById(String id) async => throw Exception('boom');
@@ -120,13 +118,12 @@ class _ErrRepo implements MeetingsRepository {
 }
 
 void main() {
-  testWidgets('data branch renders meeting + agenda + participants',
-      (tester) async {
+  testWidgets('data branch renders meeting + agenda + participants', (
+    tester,
+  ) async {
     await tester.pumpProviderApp(
       const Scaffold(body: MeetingDetailsSheet(meetingId: 'm-1')),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_OkRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_OkRepo())],
     );
 
     await tester.pumpAndSettle();
@@ -145,9 +142,7 @@ void main() {
   testWidgets('error branch renders retry CTA', (tester) async {
     await tester.pumpProviderApp(
       const Scaffold(body: MeetingDetailsSheet(meetingId: 'm-1')),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_ErrRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_ErrRepo())],
     );
 
     await tester.pumpAndSettle();
@@ -160,9 +155,7 @@ void main() {
     // _PendingRepo never completes — keeps the FutureProvider in loading state.
     await tester.pumpProviderApp(
       const Scaffold(body: MeetingDetailsSheet(meetingId: 'm-1')),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_PendingRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_PendingRepo())],
     );
 
     await tester.pump();
@@ -177,8 +170,7 @@ class _PendingRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) =>
-      Completer<List<Meeting>>().future;
+  }) => Completer<List<Meeting>>().future;
 
   @override
   Future<Meeting> getById(String id) => Completer<Meeting>().future;

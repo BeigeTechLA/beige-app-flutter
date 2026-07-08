@@ -92,9 +92,10 @@ class _MessageGestureWrapperState extends State<MessageGestureWrapper>
       widget.onReply();
     }
     _thresholdReached = false;
-    _snapAnimation = Tween<double>(begin: _dragOffset, end: 0).animate(
-      CurvedAnimation(parent: _snapController, curve: Curves.easeOut),
-    );
+    _snapAnimation = Tween<double>(
+      begin: _dragOffset,
+      end: 0,
+    ).animate(CurvedAnimation(parent: _snapController, curve: Curves.easeOut));
     _snapController.forward(from: 0);
   }
 
@@ -115,17 +116,17 @@ class _MessageGestureWrapperState extends State<MessageGestureWrapper>
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        (_dragOffset.abs() / _kReplySwipeThreshold).clamp(0.0, 1.0);
+    final progress = (_dragOffset.abs() / _kReplySwipeThreshold).clamp(
+      0.0,
+      1.0,
+    );
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onLongPress: _onLongPress,
       onHorizontalDragUpdate: _onDragUpdate,
       onHorizontalDragEnd: _onDragEnd,
       child: Stack(
-        alignment: widget.isMine
-            ? Alignment.centerRight
-            : Alignment.centerLeft,
+        alignment: widget.isMine ? Alignment.centerRight : Alignment.centerLeft,
         children: [
           if (progress > 0)
             Padding(

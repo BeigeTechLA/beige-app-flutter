@@ -24,7 +24,9 @@ class RetryInterceptor extends Interceptor {
       extra['retry_count'] = retryCount;
 
       final delay = retryInterval * retryCount; // Simple backoff
-      debugPrint('🔄 Retrying ${err.requestOptions.uri} (Attempt $retryCount/$maxRetries) in ${delay.inSeconds}s...');
+      debugPrint(
+        '🔄 Retrying ${err.requestOptions.uri} (Attempt $retryCount/$maxRetries) in ${delay.inSeconds}s...',
+      );
 
       await Future.delayed(delay);
 
@@ -55,6 +57,8 @@ class RetryInterceptor extends Interceptor {
 
   bool _shouldRetry(DioException err) {
     return err.type != DioExceptionType.cancel &&
-        (err.response == null || (err.response!.statusCode! >= 500 && err.response!.statusCode! <= 599));
+        (err.response == null ||
+            (err.response!.statusCode! >= 500 &&
+                err.response!.statusCode! <= 599));
   }
 }

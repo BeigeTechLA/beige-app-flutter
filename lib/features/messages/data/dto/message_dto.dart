@@ -14,10 +14,11 @@ class MessageDto {
     // (preferred — canonical numeric `id` matches session `currentUserId`)
     // or a bare id string when the backend skips ref expansion.
     final rawSentBy = json['sent_by'];
-    final Map<String, dynamic>? sentBy =
-        rawSentBy is Map<String, dynamic> ? rawSentBy : null;
-    final senderId =
-        (sentBy?['id'] ?? (rawSentBy is String ? rawSentBy : '')).toString();
+    final Map<String, dynamic>? sentBy = rawSentBy is Map<String, dynamic>
+        ? rawSentBy
+        : null;
+    final senderId = (sentBy?['id'] ?? (rawSentBy is String ? rawSentBy : ''))
+        .toString();
     final fileUrl = json['file_url'] as String?;
     return Message(
       id: json['_id'].toString(),
@@ -30,7 +31,8 @@ class MessageDto {
           : MessageFile(
               url: fileUrl,
               name: (json['file_name'] ?? '') as String,
-              mimeType: (json['file_type'] as String?) ?? 'application/octet-stream',
+              mimeType:
+                  (json['file_type'] as String?) ?? 'application/octet-stream',
               sizeBytes: ((json['file_size'] ?? 0) as num).toInt(),
               durationMs: (json['duration_ms'] as num?)?.toInt(),
             ),
@@ -39,7 +41,11 @@ class MessageDto {
       isDeleted: (json['is_deleted'] as bool?) ?? false,
       replyToId: _extractReplyId(json['reply_to']),
       replyTo: _extractReplyPreview(json['reply_to']),
-      deliveryStatus: _restStatus(json, currentUserId: currentUserId, senderId: senderId),
+      deliveryStatus: _restStatus(
+        json,
+        currentUserId: currentUserId,
+        senderId: senderId,
+      ),
       reactions: parseReactions(json['reactions']),
     );
   }
@@ -53,15 +59,16 @@ class MessageDto {
     String? sentByName;
     if (rawSender is Map<String, dynamic>) {
       // Prefer canonical `id` over Mongo `_id` — see REST DTO note above.
-      senderId = (rawSender['id'] ??
-              rawSender['userId'] ??
-              rawSender['user_id'] ??
-              rawSender['_id'] ??
-              '')
-          .toString();
-      sentByName = (rawSender['name'] ??
-          rawSender['full_name'] ??
-          rawSender['fullName']) as String?;
+      senderId =
+          (rawSender['id'] ??
+                  rawSender['userId'] ??
+                  rawSender['user_id'] ??
+                  rawSender['_id'] ??
+                  '')
+              .toString();
+      sentByName =
+          (rawSender['name'] ?? rawSender['full_name'] ?? rawSender['fullName'])
+              as String?;
     } else {
       senderId = (rawSender ?? '').toString();
     }
@@ -70,11 +77,9 @@ class MessageDto {
     return Message(
       id: (json['messageId'] ?? json['_id'] ?? json['id']).toString(),
       senderId: senderId,
-      senderName: (json['senderName'] ??
-              json['sender_name'] ??
-              sentByName ??
-              '')
-          as String,
+      senderName:
+          (json['senderName'] ?? json['sender_name'] ?? sentByName ?? '')
+              as String,
       type: _parseType(json['message_type'] as String?),
       body: json['message'] as String?,
       file: fileUrl == null
@@ -117,24 +122,22 @@ class MessageDto {
   /// `replyToId` alone.
   static MessageReplyPreview? _extractReplyPreview(dynamic raw) {
     if (raw is! Map) return null;
-    final id =
-        (raw['_id'] ?? raw['id'] ?? raw['messageId'])?.toString();
+    final id = (raw['_id'] ?? raw['id'] ?? raw['messageId'])?.toString();
     if (id == null || id.isEmpty) return null;
     final sentBy = raw['sent_by'];
     String senderId = '';
     String senderName = '';
     if (sentBy is Map) {
-      senderId = (sentBy['id'] ??
-              sentBy['userId'] ??
-              sentBy['user_id'] ??
-              sentBy['_id'] ??
-              '')
-          .toString();
-      senderName = (sentBy['name'] ??
-              sentBy['full_name'] ??
-              sentBy['fullName'] ??
-              '')
-          .toString();
+      senderId =
+          (sentBy['id'] ??
+                  sentBy['userId'] ??
+                  sentBy['user_id'] ??
+                  sentBy['_id'] ??
+                  '')
+              .toString();
+      senderName =
+          (sentBy['name'] ?? sentBy['full_name'] ?? sentBy['fullName'] ?? '')
+              .toString();
     } else if (sentBy != null) {
       senderId = sentBy.toString();
     }
@@ -183,9 +186,8 @@ class MessageDto {
         return DeliveryStatus.failed;
     }
     if (senderId == currentUserId) {
-      final readBy = (json['read_by'] as List?)
-              ?.map((e) => e.toString())
-              .toSet() ??
+      final readBy =
+          (json['read_by'] as List?)?.map((e) => e.toString()).toSet() ??
           const <String>{};
       return readBy.any((id) => id != currentUserId)
           ? DeliveryStatus.read

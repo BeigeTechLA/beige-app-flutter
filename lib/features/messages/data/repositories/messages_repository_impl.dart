@@ -8,10 +8,7 @@ import '../sources/messages_remote_source.dart';
 import '../sources/messages_socket_source.dart';
 
 class MessagesRepositoryImpl implements MessagesRepository {
-  MessagesRepositoryImpl({
-    required this.remote,
-    required this.socket,
-  });
+  MessagesRepositoryImpl({required this.remote, required this.socket});
 
   final MessagesRemoteSource remote;
   final MessagesSocketSource socket;

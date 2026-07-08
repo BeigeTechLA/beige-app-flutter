@@ -10,12 +10,16 @@ void main() {
     test('skips public auth routes', () {
       expect(RouteRestorationService.shouldPersist('/login'), isFalse);
       expect(RouteRestorationService.shouldPersist('/signup'), isFalse);
-      expect(RouteRestorationService.shouldPersist('/forgot-password'),
-          isFalse);
+      expect(
+        RouteRestorationService.shouldPersist('/forgot-password'),
+        isFalse,
+      );
       expect(RouteRestorationService.shouldPersist('/forgot-otp'), isFalse);
       expect(RouteRestorationService.shouldPersist('/reset-password'), isFalse);
       expect(
-          RouteRestorationService.shouldPersist('/password-success'), isFalse);
+        RouteRestorationService.shouldPersist('/password-success'),
+        isFalse,
+      );
     });
 
     test('skips splash and onboarding', () {
@@ -26,12 +30,17 @@ void main() {
     test('skips sensitive profile screens', () {
       expect(RouteRestorationService.shouldPersist('/profile-otp'), isFalse);
       expect(
-          RouteRestorationService.shouldPersist('/profile-new-password'),
-          isFalse);
+        RouteRestorationService.shouldPersist('/profile-new-password'),
+        isFalse,
+      );
       expect(
-          RouteRestorationService.shouldPersist('/change-password'), isFalse);
-      expect(RouteRestorationService.shouldPersist('/delete-account-otp'),
-          isFalse);
+        RouteRestorationService.shouldPersist('/change-password'),
+        isFalse,
+      );
+      expect(
+        RouteRestorationService.shouldPersist('/delete-account-otp'),
+        isFalse,
+      );
     });
 
     test('skips terminal payment-success', () {
@@ -61,10 +70,7 @@ void main() {
       expect(RouteRestorationService.shouldPersist('/favourites'), isTrue);
       expect(RouteRestorationService.shouldPersist('/profile'), isTrue);
       expect(RouteRestorationService.shouldPersist('/edit-profile'), isTrue);
-      expect(
-        RouteRestorationService.shouldPersist('/view-profile/12'),
-        isTrue,
-      );
+      expect(RouteRestorationService.shouldPersist('/view-profile/12'), isTrue);
       expect(
         RouteRestorationService.shouldPersist('/payment-method/12'),
         isTrue,

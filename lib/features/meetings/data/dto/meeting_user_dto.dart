@@ -19,10 +19,12 @@ class MeetingUserDto {
   static MeetingParticipant fromRestJson(Map<String, dynamic> json) {
     final id = (json['id'] ?? json['_id'] ?? '').toString();
     final name = (json['name'] ?? '') as String;
-    final avatar = (json['profile_image'] ??
-        json['profileImage'] ??
-        json['avatar_url'] ??
-        json['avatarUrl']) as String?;
+    final avatar =
+        (json['profile_image'] ??
+                json['profileImage'] ??
+                json['avatar_url'] ??
+                json['avatarUrl'])
+            as String?;
     final role = json['role'] as String?;
 
     return MeetingParticipant(

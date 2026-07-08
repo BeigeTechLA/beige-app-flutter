@@ -35,6 +35,7 @@ class Conversation {
   final bool isOnline;
   final String? linkedShootId;
   final List<String> participantIds;
+
   /// Room-level last-activity timestamp from server `updatedAt`.
   /// Used as fallback sort key when server ignores `sortBy=updatedAt:desc`.
   final DateTime? updatedAt;

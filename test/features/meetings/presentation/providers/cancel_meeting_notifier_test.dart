@@ -33,8 +33,7 @@ class _FakeRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> getById(String id) async => throw UnimplementedError();

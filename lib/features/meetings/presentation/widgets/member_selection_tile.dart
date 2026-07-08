@@ -24,8 +24,8 @@ class MemberSelectionTile extends StatelessWidget {
     final initials = nameParts.length >= 2
         ? '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase()
         : (participant.name.isNotEmpty
-            ? participant.name[0].toUpperCase()
-            : '?');
+              ? participant.name[0].toUpperCase()
+              : '?');
 
     return GestureDetector(
       onTap: onTap,
@@ -75,18 +75,21 @@ class MemberSelectionTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Builder(builder: (_) {
-                    final label = roleLabel(participant.role);
-                    if (label.isEmpty) return const SizedBox.shrink();
-                    return Text(
-                      label,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    );
-                  }),
-                  if (participant.email != null && participant.email!.isNotEmpty) ...[
+                  Builder(
+                    builder: (_) {
+                      final label = roleLabel(participant.role);
+                      if (label.isEmpty) return const SizedBox.shrink();
+                      return Text(
+                        label,
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
+                  ),
+                  if (participant.email != null &&
+                      participant.email!.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(
                       participant.email!,
@@ -107,12 +110,15 @@ class MemberSelectionTile extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  gradient: isSelected ? AppColors.goldHorizontalGradient : null,
+                  gradient: isSelected
+                      ? AppColors.goldHorizontalGradient
+                      : null,
                   color: isSelected ? null : AppColors.transparent,
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(
-                    color:
-                        isSelected ? AppColors.primary : AppColors.textSecondary,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
                     width: 1.5,
                   ),
                 ),

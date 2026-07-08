@@ -24,13 +24,13 @@ class ChatDetailsDto {
 
     final participantsItems =
         ((json['participants'] as Map<String, dynamic>?)?['items'] as List?) ??
-            const [];
+        const [];
 
     final shootRaw = json['linkedShoot'] as Map<String, dynamic>?;
 
     final filesItems =
         ((json['sharedFiles'] as Map<String, dynamic>?)?['items'] as List?) ??
-            const [];
+        const [];
 
     final notesBlock = json['notes'];
     final String notes = notesBlock is Map<String, dynamic>
@@ -65,7 +65,10 @@ class ChatDetailsDto {
     final title =
         (raw['name'] ?? raw['title'] ?? raw['shootType'] ?? '') as String;
     final dateStr =
-        (raw['eventDate'] ?? raw['date'] ?? raw['shoot_date'] ?? raw['createdAt'])
+        (raw['eventDate'] ??
+                raw['date'] ??
+                raw['shoot_date'] ??
+                raw['createdAt'])
             ?.toString();
     final date = dateStr == null
         ? DateTime.fromMillisecondsSinceEpoch(0)

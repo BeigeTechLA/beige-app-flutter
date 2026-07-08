@@ -41,9 +41,7 @@ class MeetingTypeDropdown extends StatelessWidget {
       child: AbsorbPointer(
         child: TextFormField(
           key: ValueKey(selected.serverValue),
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
           maxLines: 1,
           readOnly: true,
           decoration: decoration.copyWith(
@@ -113,10 +111,7 @@ class _MeetingTypePickerSheet extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -176,11 +171,7 @@ class _MeetingTypeOptionTile extends StatelessWidget {
               ),
             ),
             if (isSelected)
-              const Icon(
-                Icons.check,
-                size: 18,
-                color: AppColors.onPrimary,
-              ),
+              const Icon(Icons.check, size: 18, color: AppColors.onPrimary),
           ],
         ),
       ),

@@ -11,7 +11,10 @@ class AuthInterceptor extends QueuedInterceptor {
   AuthInterceptor({required this.getToken, this.onUnauthorized});
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final token = await getToken();
 
     if (token != null && token.isNotEmpty) {

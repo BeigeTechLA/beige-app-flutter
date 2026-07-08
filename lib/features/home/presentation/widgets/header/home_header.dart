@@ -202,7 +202,7 @@ class HomeNavigationHeader extends ConsumerWidget {
                         ? const SizedBox()
                         : const Row(
                             children: [
-                             SizedBox(width: 2),
+                              SizedBox(width: 2),
                               Icon(
                                 Icons.keyboard_arrow_down,
                                 color: AppColors.white,

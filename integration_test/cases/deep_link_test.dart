@@ -74,11 +74,7 @@ void runDeepLinkTests(ReportBuilder report) {
 
         final result = await verifyDeepLink(tester, uri);
 
-        report.record(
-          route: uri,
-          routeName: name,
-          deepLinkResult: result,
-        );
+        report.record(route: uri, routeName: name, deepLinkResult: result);
 
         expect(
           result.passed,

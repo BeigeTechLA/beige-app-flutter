@@ -50,9 +50,9 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final state = ref.read(createMeetingNotifierProvider);
     final shootId = state.shootId;
     if (shootId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select a shoot first')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Select a shoot first')));
       return;
     }
     await showModalBottomSheet<void>(
@@ -82,16 +82,15 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final state = ref.read(createMeetingNotifierProvider);
     final date = state.date;
     if (date == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select a date first')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Select a date first')));
       return;
     }
 
     final now = DateTime.now();
-    final isToday = date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
 
     // Compute lower bound as a DateTime on the picked date.
     DateTime lowerBound;
@@ -107,8 +106,13 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
         );
         return;
       }
-      lowerBound = DateTime(date.year, date.month, date.day, s.hour, s.minute)
-          .add(const Duration(hours: 1));
+      lowerBound = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        s.hour,
+        s.minute,
+      ).add(const Duration(hours: 1));
     }
     final upperBound = DateTime(date.year, date.month, date.day, 23, 59);
     if (!lowerBound.isBefore(upperBound)) {
@@ -127,7 +131,13 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final current = start ? state.startTime : state.endTime;
     DateTime initial = current == null
         ? lowerBound
-        : DateTime(date.year, date.month, date.day, current.hour, current.minute);
+        : DateTime(
+            date.year,
+            date.month,
+            date.day,
+            current.hour,
+            current.minute,
+          );
     if (initial.isBefore(lowerBound)) initial = lowerBound;
     if (initial.isAfter(upperBound)) initial = upperBound;
 
@@ -228,10 +238,12 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
       labelText: label,
       hintText: hint,
       errorText: errorText,
-      labelStyle:
-          AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-      hintStyle:
-          AppTextStyles.bodyMedium.copyWith(color: AppColors.textTertiary),
+      labelStyle: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.textSecondary,
+      ),
+      hintStyle: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.textTertiary,
+      ),
       filled: true,
       fillColor: AppColors.surfaceInput,
       suffixIcon: suffixIcon,
@@ -372,9 +384,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
 
                     MeetingTypeDropdown(
                       selected: state.meetingType,
-                      decoration: _inputDecoration(
-                        label: 'Meeting Type',
-                      ),
+                      decoration: _inputDecoration(label: 'Meeting Type'),
                       onChanged: notifier.setMeetingType,
                     ),
                     const SizedBox(height: 16),
@@ -440,8 +450,8 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                                 decoration: _inputDecoration(
                                   label: 'End Time',
                                   hint: '--:--',
-                                  errorText: state.hasTimes &&
-                                          !state.endAfterStart
+                                  errorText:
+                                      state.hasTimes && !state.endAfterStart
                                       ? 'End must be after start'
                                       : null,
                                 ),
@@ -499,10 +509,12 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                         hint: 'Auto-generated google meet link..',
                         suffixIcon: state.platform == MeetingPlatform.meet
                             ? _GenerateMeetLinkButton(
-                                enabled: state.canGenerateMeetLink &&
+                                enabled:
+                                    state.canGenerateMeetLink &&
                                     state.linkGenStatus !=
                                         MeetLinkGenerationStatus.loading,
-                                loading: state.linkGenStatus ==
+                                loading:
+                                    state.linkGenStatus ==
                                     MeetLinkGenerationStatus.loading,
                                 onPressed: notifier.generateMeetLink,
                               )
@@ -527,20 +539,28 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                     ),
 
                     if (state.selectedAdditionalStaffMembers.isNotEmpty ||
-                        state.selectedAdditionalCreativePartners.isNotEmpty) ...[
+                        state
+                            .selectedAdditionalCreativePartners
+                            .isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Wrap(
                         spacing: 8.0,
                         runSpacing: 8.0,
                         children: [
-                          ...state.selectedAdditionalStaffMembers.map((p) => SelectedParticipantChip(
-                                participant: p,
-                                onDeleted: () => notifier.removeAdditionalMember(p.id),
-                              )),
-                          ...state.selectedAdditionalCreativePartners.map((p) => SelectedParticipantChip(
-                                participant: p,
-                                onDeleted: () => notifier.removeAdditionalMember(p.id),
-                              )),
+                          ...state.selectedAdditionalStaffMembers.map(
+                            (p) => SelectedParticipantChip(
+                              participant: p,
+                              onDeleted: () =>
+                                  notifier.removeAdditionalMember(p.id),
+                            ),
+                          ),
+                          ...state.selectedAdditionalCreativePartners.map(
+                            (p) => SelectedParticipantChip(
+                              participant: p,
+                              onDeleted: () =>
+                                  notifier.removeAdditionalMember(p.id),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -710,8 +730,8 @@ class _ShootDropdown extends ConsumerWidget {
                 text: selected == null
                     ? ''
                     : (selected.title.trim().isNotEmpty
-                        ? selected.title
-                        : 'Booking #${selected.id}'),
+                          ? selected.title
+                          : 'Booking #${selected.id}'),
               ),
             ),
           ),
@@ -751,8 +771,8 @@ class _ShootPickerBottomSheetState extends State<_ShootPickerBottomSheet> {
     final filtered = q.isEmpty
         ? widget.shoots
         : widget.shoots
-            .where((s) => s.title.toLowerCase().contains(q))
-            .toList(growable: false);
+              .where((s) => s.title.toLowerCase().contains(q))
+              .toList(growable: false);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -859,9 +879,7 @@ class _ShootPickerBottomSheetState extends State<_ShootPickerBottomSheet> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: AppColors.primary,
-                      ),
+                      borderSide: const BorderSide(color: AppColors.primary),
                     ),
                   ),
                 ),
@@ -1018,14 +1036,14 @@ class _GenerateMeetLinkButton extends StatelessWidget {
           onTap: enabled ? onPressed : null,
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: loading
                 ? const AppCircularLoader(
                     size: 14,
                     strokeWidth: 2,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppColors.onPrimary),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.onPrimary,
+                    ),
                   )
                 : Text(
                     'Generate',

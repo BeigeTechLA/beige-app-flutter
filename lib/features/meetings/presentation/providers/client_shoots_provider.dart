@@ -10,9 +10,9 @@ export '../../domain/models/shoot_option.dart';
 /// [ShootOption] rows (`stream_project_booking_id` → `id`, `name` → `title`).
 ///
 /// AutoDispose so a stale snapshot does not leak between create-meeting visits.
-final clientShootsProvider = FutureProvider.autoDispose<List<ShootOption>>(
-  (ref) async {
-    final repo = ref.watch(meetingsRepositoryProvider);
-    return repo.listProjects();
-  },
-);
+final clientShootsProvider = FutureProvider.autoDispose<List<ShootOption>>((
+  ref,
+) async {
+  final repo = ref.watch(meetingsRepositoryProvider);
+  return repo.listProjects();
+});

@@ -51,14 +51,18 @@ class _AppState extends ConsumerState<App> {
       theme: AppTheme.dark(),
       routerConfig: goRouter,
       builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.noScaling,
-          ),
-          child: ColoredBox(
-            color: AppColors.background,
-            child: ConnectivityListener(
-              child: child ?? const SizedBox.shrink(),
+        return GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.translucent,
+          child: MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.noScaling),
+            child: ColoredBox(
+              color: AppColors.background,
+              child: ConnectivityListener(
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         );

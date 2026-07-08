@@ -35,7 +35,8 @@ class Meeting {
   /// Human-readable stage — [MeetingType.label] when mapped, otherwise the
   /// raw server string. `null` when both are empty.
   String? get meetingTypeDisplay =>
-      meetingType?.label ?? (meetingTypeRaw?.isEmpty ?? true ? null : meetingTypeRaw);
+      meetingType?.label ??
+      (meetingTypeRaw?.isEmpty ?? true ? null : meetingTypeRaw);
 
   final List<String> agenda;
   final List<MeetingParticipant> participants;

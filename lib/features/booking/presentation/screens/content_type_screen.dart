@@ -124,7 +124,6 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
         title: Row(
           children: [
-
             /// MENU BUTTON
             if (!widget.fromHome)
               Builder(
@@ -151,10 +150,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
                     left: AppSpacing.base,
                     right: AppSpacing.sm,
                   ),
-                  child: SvgPicture.asset(
-                    AppAssets.back,
-                    height: 22,
-                  ),
+                  child: SvgPicture.asset(AppAssets.back, height: 22),
                 ),
               ),
 
@@ -173,9 +169,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
             /// STEP TEXT
             Padding(
-              padding: const EdgeInsets.only(
-                right: AppSpacing.md,
-              ),
+              padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Text(
                 "1/3",
                 style: AppTextStyles.titleSmall.copyWith(

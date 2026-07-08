@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
@@ -32,8 +34,7 @@ class ChatDetailsScreen extends ConsumerWidget {
             title: 'Could not load',
             description: e.toString(),
             actionLabel: 'Retry',
-            onAction: () =>
-                ref.invalidate(chatDetailsProvider(conversationId)),
+            onAction: () => ref.invalidate(chatDetailsProvider(conversationId)),
           ),
         ),
         data: (details) => _Body(
@@ -56,18 +57,25 @@ class _Body extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: DetailsHeroHeader(
-            roomName: details.roomName,
-            onBack: onBack,
-          ),
+          child: DetailsHeroHeader(roomName: details.roomName, onBack: onBack),
         ),
         SliverToBoxAdapter(
           child: DetailsSectionCard(
-            icon: Icons.people_outline,
+            leading: SvgPicture.asset(
+              AppAssets.icGroupChat,
+              width: 16,
+              height: 16,
+              colorFilter: const ColorFilter.mode(
+                AppColors.primary,
+                BlendMode.srcIn,
+              ),
+            ),
             title: 'Participants',
             trailingCount: details.participants.length,
             initiallyExpanded: true,
             collapsible: false,
+            backgroundColor: AppColors.participantBoxBg,
+            titleColor: AppColors.primary,
             body: _ParticipantsBody(items: details.participants),
           ),
         ),
@@ -81,6 +89,18 @@ class _ParticipantsBody extends StatelessWidget {
   const _ParticipantsBody({required this.items});
   final List<Participant> items;
 
+  String _getInitials(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length > 1) {
+      final first = parts[0].isNotEmpty ? parts[0][0] : '';
+      final second = parts[1].isNotEmpty ? parts[1][0] : '';
+      return (first + second).toUpperCase();
+    }
+    return trimmed[0].toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -92,37 +112,36 @@ class _ParticipantsBody extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 14,
-                  backgroundColor: AppColors.surfaceInput,
+                  radius: 18,
+                  backgroundColor: AppColors.primary20,
                   child: Text(
-                    p.name.isEmpty ? '?' : p.name.characters.first,
-                    style: AppTextStyles.labelSmall.copyWith(
-                      color: AppColors.textPrimary,
+                    _getInitials(p.name),
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
-                      children: [
-                        TextSpan(text: p.name),
-                        if (roleLabel(p.role).isNotEmpty)
-                          TextSpan(
-                            text: ' (${roleLabel(p.role)})',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textTertiary,
-                            ),
-                          ),
-                      ],
+                  child: Text(
+                    p.name,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                if (roleLabel(p.role).isNotEmpty) ...[
+                  const SizedBox(width: AppSpacing.md),
+                  Text(
+                    roleLabel(p.role),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textTertiary,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

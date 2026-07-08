@@ -13,7 +13,9 @@ final connectivityStreamProvider = StreamProvider<ConnectivityStatus>((ref) {
 });
 
 final connectivityStatusProvider = Provider<ConnectivityStatus>((ref) {
-  return ref.watch(connectivityStreamProvider).maybeWhen(
+  return ref
+      .watch(connectivityStreamProvider)
+      .maybeWhen(
         data: (status) => status,
         orElse: () => ConnectivityStatus.unknown,
       );

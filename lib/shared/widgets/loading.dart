@@ -34,11 +34,7 @@ class AppCircularLoader extends StatelessWidget {
       valueColor: valueColor,
     );
     if (size == null) return indicator;
-    return SizedBox(
-      height: size,
-      width: size,
-      child: indicator,
-    );
+    return SizedBox(height: size, width: size, child: indicator);
   }
 }
 
@@ -149,11 +145,7 @@ class AppLoadingOverlay extends StatelessWidget {
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
             child: Center(
-              child: Lottie.asset(
-                asset,
-                height: size,
-                width: size,
-              ),
+              child: Lottie.asset(asset, height: size, width: size),
             ),
           ),
         ),

@@ -36,5 +36,5 @@ class ForgotPasswordNotifier extends AutoDisposeNotifier<ForgotPasswordState> {
 
 final forgotPasswordNotifierProvider =
     NotifierProvider.autoDispose<ForgotPasswordNotifier, ForgotPasswordState>(
-  ForgotPasswordNotifier.new,
-);
+      ForgotPasswordNotifier.new,
+    );

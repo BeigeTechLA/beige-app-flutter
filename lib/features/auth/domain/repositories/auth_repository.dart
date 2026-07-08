@@ -28,9 +28,7 @@ abstract class AuthRepository {
   });
 
   /// Sends forgot-password OTP to given email.
-  Future<Either<AppException, String>> forgotPassword({
-    required String email,
-  });
+  Future<Either<AppException, String>> forgotPassword({required String email});
 
   /// Verifies the forgot-password OTP.
   Future<Either<AppException, String>> verifyForgotPasswordOtp({
@@ -47,7 +45,5 @@ abstract class AuthRepository {
   });
 
   /// Resends OTP to the given email.
-  Future<Either<AppException, String>> resendOtp({
-    required String email,
-  });
+  Future<Either<AppException, String>> resendOtp({required String email});
 }

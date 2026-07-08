@@ -39,11 +39,14 @@ class CrewRecommendationNotifier
     // --- Booking Analytics: Drop-off tracking for Step 5 ---
     ref.onDispose(() {
       if (!_stepCompleted) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': bookingId,
-          'last_step': 'crew_size',
-          'step_number': 5,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': bookingId,
+            'last_step': 'crew_size',
+            'step_number': 5,
+          },
+        );
       }
     });
     _fetchRecommendation(bookingId);
@@ -64,11 +67,14 @@ class CrewRecommendationNotifier
       (data) {
         // --- Booking Analytics: Step 5 — Crew size recommendation viewed ---
         final crewSize = (data['crew_requirements'] as List?)?.length ?? 0;
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStepCrewSize, params: {
-          'booking_id': bookingId,
-          'recommended_crew_size': crewSize,
-          'step_number': 5,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStepCrewSize,
+          params: {
+            'booking_id': bookingId,
+            'recommended_crew_size': crewSize,
+            'step_number': 5,
+          },
+        );
         state = state.copyWith(
           status: CrewRecommendationStatus.loaded,
           data: data,
@@ -84,5 +90,5 @@ class CrewRecommendationNotifier
 
 final crewRecommendationNotifierProvider = NotifierProvider.autoDispose
     .family<CrewRecommendationNotifier, CrewRecommendationState, int>(
-  CrewRecommendationNotifier.new,
-);
+      CrewRecommendationNotifier.new,
+    );

@@ -8,21 +8,19 @@ import '../../domain/models/shoot_participant_option.dart';
 ///
 /// Family by `bookingId` — autoDispose so a stale roster does not leak when
 /// the user re-opens the picker after switching shoots.
-final shootParticipantsProvider =
-    FutureProvider.autoDispose.family<List<ShootParticipantOption>, int>(
-  (ref, bookingId) async {
-    final repo = ref.watch(bookingRepositoryProvider);
-    final result = await repo.getBookingParticipants(bookingId: bookingId);
-    return result.fold(
-      (e) => throw e,
-      (list) => list
-          .whereType<Map>()
-          .map(_toOption)
-          .whereType<ShootParticipantOption>()
-          .toList(growable: false),
-    );
-  },
-);
+final shootParticipantsProvider = FutureProvider.autoDispose
+    .family<List<ShootParticipantOption>, int>((ref, bookingId) async {
+      final repo = ref.watch(bookingRepositoryProvider);
+      final result = await repo.getBookingParticipants(bookingId: bookingId);
+      return result.fold(
+        (e) => throw e,
+        (list) => list
+            .whereType<Map>()
+            .map(_toOption)
+            .whereType<ShootParticipantOption>()
+            .toList(growable: false),
+      );
+    });
 
 ShootParticipantOption? _toOption(Map raw) {
   final id = (raw['id'] ?? raw['user_id'] ?? raw['_id'])?.toString();
@@ -33,7 +31,8 @@ ShootParticipantOption? _toOption(Map raw) {
     id: id,
     name: name,
     role: (raw['role'] as String?) ?? (raw['user_role'] as String?),
-    avatarUrl: (raw['profile_image_url'] as String?) ??
+    avatarUrl:
+        (raw['profile_image_url'] as String?) ??
         (raw['avatar_url'] as String?) ??
         (raw['profile_image'] as String?) ??
         (raw['avatar'] as String?),

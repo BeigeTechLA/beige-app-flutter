@@ -37,20 +37,17 @@ Meeting _meeting({
 }
 
 void main() {
-  testWidgets('renders title, date label, time range, status, platform',
-      (tester) async {
+  testWidgets('renders title, date label, time range, status, platform', (
+    tester,
+  ) async {
     await tester.pumpProviderApp(
       Material(
-        child: MeetingCard(
-          meeting: _meeting(),
-          onTap: () {},
-          onJoin: () {},
-        ),
+        child: MeetingCard(meeting: _meeting(), onTap: () {}, onJoin: () {}),
       ),
     );
 
     expect(find.text('Pre-Production Kickoff'), findsOneWidget);
-    expect(find.text('11 Jun,2026'), findsOneWidget);
+    expect(find.text('Jun 11,2026'), findsOneWidget);
     expect(find.text('01:00 PM to 02:00 PM'), findsOneWidget);
     expect(find.text('Upcoming'), findsOneWidget);
     expect(find.text('Google Meet'), findsOneWidget);
@@ -101,5 +98,84 @@ void main() {
     );
 
     expect(find.textContaining('Participants'), findsNothing);
+  });
+
+  testWidgets('hides RSVP buttons for self-created meetings', (tester) async {
+    final myUserId = 'user_123';
+    final futureTime = DateTime.now().add(const Duration(days: 1));
+    final selfCreatedMeeting = Meeting(
+      id: 'self',
+      title: 'Self Created',
+      description: 'd',
+      project: 'p',
+      platform: MeetingPlatform.meet,
+      startAt: futureTime,
+      endAt: futureTime.add(const Duration(hours: 1)),
+      link: 'https://example.com/self',
+      reminderMinutes: 15,
+      status: MeetingStatus.upcoming,
+      category: MeetingCategory.commercial,
+      agenda: const ['agenda'],
+      participants: const [],
+      createdById: myUserId,
+    );
+
+    await tester.pumpProviderApp(
+      Material(
+        child: MeetingCard(
+          meeting: selfCreatedMeeting,
+          currentUserId: myUserId,
+          onTap: () {},
+          onJoin: () {},
+          onAccept: () {},
+          onReject: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Accept'), findsNothing);
+    expect(find.text('Reject'), findsNothing);
+  });
+
+  testWidgets('shows RSVP buttons for meetings created by others', (
+    tester,
+  ) async {
+    final myUserId = 'user_123';
+    final otherUserId = 'user_456';
+    final futureTime = DateTime.now().add(const Duration(days: 1));
+    final otherCreatedMeeting = Meeting(
+      id: 'other',
+      title: 'Other Created',
+      description: 'd',
+      project: 'p',
+      platform: MeetingPlatform.meet,
+      startAt: futureTime,
+      endAt: futureTime.add(const Duration(hours: 1)),
+      link: 'https://example.com/other',
+      reminderMinutes: 15,
+      status: MeetingStatus.upcoming,
+      category: MeetingCategory.commercial,
+      agenda: const ['agenda'],
+      participants: const [],
+      createdById: otherUserId,
+    );
+
+    await tester.pumpProviderApp(
+      Material(
+        child: MeetingCard(
+          meeting: otherCreatedMeeting,
+          currentUserId: myUserId,
+          onTap: () {},
+          onJoin: () {},
+          onAccept: () {},
+          onReject: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Accept'), findsOneWidget);
+    expect(find.text('Reject'), findsOneWidget);
   });
 }

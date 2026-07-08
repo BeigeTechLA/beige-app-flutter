@@ -5,11 +5,7 @@ import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 
 class MeetingAgendaTile extends StatelessWidget {
-  const MeetingAgendaTile({
-    super.key,
-    required this.index,
-    required this.text,
-  });
+  const MeetingAgendaTile({super.key, required this.index, required this.text});
 
   final int index;
   final String text;

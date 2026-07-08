@@ -17,7 +17,9 @@ import 'auth_state_provider.dart';
 /// `final prefs = await SharedPreferences.getInstance();`
 /// `container.overrideWithValue(sharedPreferencesProvider.overrideWithValue(prefs))`
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('SharedPreferences must be overridden in ProviderScope');
+  throw UnimplementedError(
+    'SharedPreferences must be overridden in ProviderScope',
+  );
 });
 
 /// Session accessor used by features that need the persisted user id

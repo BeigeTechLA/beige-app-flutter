@@ -25,8 +25,7 @@ class _StubRepo implements MeetingsRepository {
     MeetingsTab? tab,
     MeetingFilter? filter,
     String? currentUserId,
-  }) async =>
-      const [];
+  }) async => const [];
 
   @override
   Future<Meeting> getById(String id) async => throw UnimplementedError();
@@ -62,9 +61,7 @@ void main() {
   testWidgets('header text + submit CTA render', (tester) async {
     await tester.pumpProviderApp(
       const CreateMeetingScreen(),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_StubRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_StubRepo())],
     );
 
     expect(find.text('Create New Meeting'), findsOneWidget);
@@ -74,9 +71,7 @@ void main() {
   testWidgets('submit CTA disabled while state is invalid', (tester) async {
     await tester.pumpProviderApp(
       const CreateMeetingScreen(),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_StubRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_StubRepo())],
     );
 
     final btn = tester.widget<ElevatedButton>(
@@ -88,13 +83,10 @@ void main() {
     expect(btn.onPressed, isNull);
   });
 
-  testWidgets('endAfterStart error surfaces in End Time field',
-      (tester) async {
+  testWidgets('endAfterStart error surfaces in End Time field', (tester) async {
     await tester.pumpProviderApp(
       const CreateMeetingScreen(),
-      overrides: [
-        meetingsRepositoryProvider.overrideWithValue(_StubRepo()),
-      ],
+      overrides: [meetingsRepositoryProvider.overrideWithValue(_StubRepo())],
     );
 
     // Reach the notifier and seed start > end.

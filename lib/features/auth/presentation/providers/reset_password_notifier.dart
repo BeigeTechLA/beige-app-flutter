@@ -41,5 +41,5 @@ class ResetPasswordNotifier extends AutoDisposeNotifier<ResetPasswordState> {
 
 final resetPasswordNotifierProvider =
     NotifierProvider.autoDispose<ResetPasswordNotifier, ResetPasswordState>(
-  ResetPasswordNotifier.new,
-);
+      ResetPasswordNotifier.new,
+    );

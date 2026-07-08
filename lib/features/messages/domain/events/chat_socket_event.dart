@@ -96,9 +96,5 @@ class ReactionUpdated extends ChatSocketEvent {
   final String conversationId;
   final String messageId;
   final Map<String, Set<String>> reactions;
-  const ReactionUpdated(
-    this.conversationId,
-    this.messageId,
-    this.reactions,
-  );
+  const ReactionUpdated(this.conversationId, this.messageId, this.reactions);
 }

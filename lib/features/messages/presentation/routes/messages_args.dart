@@ -7,14 +7,14 @@ class ChatArgs {
   const ChatArgs({required this.conversationId, this.contactName});
 
   Map<String, dynamic> toExtra() => {
-        'conversationId': conversationId,
-        if (contactName != null) 'contactName': contactName,
-      };
+    'conversationId': conversationId,
+    if (contactName != null) 'contactName': contactName,
+  };
 
   factory ChatArgs.fromExtra(Map<String, dynamic> extra) => ChatArgs(
-        conversationId: (extra['conversationId'] ?? '').toString(),
-        contactName: extra['contactName'] as String?,
-      );
+    conversationId: (extra['conversationId'] ?? '').toString(),
+    contactName: extra['contactName'] as String?,
+  );
 }
 
 class ChatDetailsArgs {

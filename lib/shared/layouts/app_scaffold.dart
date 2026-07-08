@@ -46,12 +46,7 @@ class AppScaffold extends StatelessWidget {
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
 
-      body: useSafeArea
-          ? SafeArea(
-        top: !hasAppBar,
-        child: body,
-      )
-          : body,
+      body: useSafeArea ? SafeArea(top: !hasAppBar, child: body) : body,
     );
   }
 }

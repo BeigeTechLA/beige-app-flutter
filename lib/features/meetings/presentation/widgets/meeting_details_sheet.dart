@@ -131,11 +131,7 @@ class _SheetShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       controller: scrollController,
-      children: [
-        const _Handle(),
-        const _SheetHeader(),
-        child,
-      ],
+      children: [const _Handle(), const _SheetHeader(), child],
     );
   }
 }
@@ -154,7 +150,7 @@ class _DetailsBody extends ConsumerWidget {
   static final _timeFmt = DateFormat('hh:mm a');
 
   String get _dateTimeLabel =>
-      '${DateTimeUtils.formatMeetingDate(meeting.startAt)}, ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
+      '${DateTimeUtils.formatMeetingDate(meeting.startAt)} ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
 
   /// Current user's RSVP — precomputed at the DTO boundary from the
   /// meeting-level `participant_responses[]` array against the session id.
@@ -176,11 +172,7 @@ class _DetailsBody extends ConsumerWidget {
   Future<void> _onCopyLink(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: meeting.link));
     if (!context.mounted) return;
-    TopMessage.show(
-      context,
-      'Link copied',
-      type: TopMessageType.success,
-    );
+    TopMessage.show(context, 'Link copied', type: TopMessageType.success);
   }
 
   Future<void> _onCancel(BuildContext context, WidgetRef ref) async {
@@ -219,39 +211,37 @@ class _DetailsBody extends ConsumerWidget {
       ),
     );
     if (confirmed != true) return;
-    await ref
-        .read(cancelMeetingNotifierProvider(meeting.id).notifier)
-        .cancel();
+    await ref.read(cancelMeetingNotifierProvider(meeting.id).notifier).cancel();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cancelState = ref.watch(cancelMeetingNotifierProvider(meeting.id));
 
-    ref.listen<CancelMeetingState>(
-      cancelMeetingNotifierProvider(meeting.id),
-      (prev, next) {
-        if (prev?.status == next.status) return;
-        switch (next.status) {
-          case CancelMeetingStatus.done:
-            ref.invalidate(meetingsListNotifierProvider);
-            Navigator.of(context).pop();
-            TopMessage.show(
-              context,
-              'Meeting cancelled',
-              type: TopMessageType.success,
-            );
-          case CancelMeetingStatus.error:
-            TopMessage.show(
-              context,
-              next.error ?? 'Could not cancel meeting',
-              type: TopMessageType.error,
-            );
-          case _:
-            break;
-        }
-      },
-    );
+    ref.listen<CancelMeetingState>(cancelMeetingNotifierProvider(meeting.id), (
+      prev,
+      next,
+    ) {
+      if (prev?.status == next.status) return;
+      switch (next.status) {
+        case CancelMeetingStatus.done:
+          ref.invalidate(meetingsListNotifierProvider);
+          Navigator.of(context).pop();
+          TopMessage.show(
+            context,
+            'Meeting cancelled',
+            type: TopMessageType.success,
+          );
+        case CancelMeetingStatus.error:
+          TopMessage.show(
+            context,
+            next.error ?? 'Could not cancel meeting',
+            type: TopMessageType.error,
+          );
+        case _:
+          break;
+      }
+    });
 
     final cancelling = cancelState.status == CancelMeetingStatus.submitting;
     final myRsvp = _myRsvp;
@@ -398,8 +388,9 @@ class _DetailsBody extends ConsumerWidget {
                       fullWidth: true,
                       variant: AppButtonVariant.outline,
                       isLoading: cancelling,
-                      onPressed:
-                          cancelling ? null : () => _onCancel(context, ref),
+                      onPressed: cancelling
+                          ? null
+                          : () => _onCancel(context, ref),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -531,10 +522,7 @@ class _StatusPill extends StatelessWidget {
         horizontal: AppSpacing.base,
         vertical: AppSpacing.xs,
       ),
-      decoration: BoxDecoration(
-        color: _bg,
-        borderRadius: AppRadii.fullAll,
-      ),
+      decoration: BoxDecoration(color: _bg, borderRadius: AppRadii.fullAll),
       child: Text(
         status.label,
         style: AppTextStyles.bodyMedium.copyWith(

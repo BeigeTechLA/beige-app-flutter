@@ -398,7 +398,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       return bookedHours * includedPhotosPerHour;
     }*/
 
- /* int getIncludedPhotoCount() {
+  /* int getIncludedPhotoCount() {
     final hours = getRoundedBookedHours();
 
     if (hours == 0) return 0;
@@ -420,6 +420,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     // ✅ Other = 25 per hour
     return isWeddingShoot ? hours * 50 : hours * 25;
   }
+
   int getTotalPhotos() {
     /// 🔥 VIDEO ONLY → NO PHOTOS
     if (widget.contentTypeId == 1) {
@@ -669,7 +670,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
     return true;
   }
-
 
   String getPhotoInclusionMessage() {
     final includedPhotos = getIncludedPhotoCount();
@@ -3061,55 +3061,55 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                             ),
                           ),
                         ),
-                        /// 🔥 ADDED EXTRA BOX — shows only when count > 0
 
+                        /// 🔥 ADDED EXTRA BOX — shows only when count > 0
                       ],
                     ),
                   ),
 
                   /// 🔥 ADDED EXTRA BOX
                   // if (count > 0)
-                    Container(
-                      decoration: BoxDecoration(
-                        // color: Colors.green
-                        //color: AppColors.surfaceVariant,
-                        //borderRadius: AppRadii.xlAll,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.all(AppSpacing.mld),
-                          padding: const EdgeInsets.all(AppSpacing.mld),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
-                            borderRadius: AppRadii.xlAll,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.add,
-                                size: 12,
+                  Container(
+                    decoration: BoxDecoration(
+                      // color: Colors.green
+                      //color: AppColors.surfaceVariant,
+                      //borderRadius: AppRadii.xlAll,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.mld),
+                        padding: const EdgeInsets.all(AppSpacing.mld),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.xlAll,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            Text(
+                              "$count Added Extra",
+                              style: const TextStyle(
+                                fontFamily: AppAssets.fontHelveticaNeue,
+
                                 color: AppColors.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
-
-                              const SizedBox(width: 8),
-
-                              Text(
-                                "$count Added Extra",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontHelveticaNeue,
-
-                                  color: AppColors.primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
                   Container(height: 0.5, color: AppColors.dividerDark),
                 ],
               );

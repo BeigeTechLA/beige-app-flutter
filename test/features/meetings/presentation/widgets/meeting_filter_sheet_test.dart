@@ -10,9 +10,7 @@ import '../../../../helpers/pump_app.dart';
 void main() {
   testWidgets('Apply disabled until a chip is toggled', (tester) async {
     await tester.pumpProviderApp(
-      const Scaffold(
-        body: MeetingFilterSheet(current: MeetingFilter.empty),
-      ),
+      const Scaffold(body: MeetingFilterSheet(current: MeetingFilter.empty)),
     );
 
     final apply = tester.widget<ElevatedButton>(

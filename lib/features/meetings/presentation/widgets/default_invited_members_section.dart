@@ -47,7 +47,8 @@ class DefaultInvitedMembersSection extends ConsumerWidget {
           )
         else
           ...state.defaultInvitedMembers.map((member) {
-            final selected = !member.isOptional ||
+            final selected =
+                !member.isOptional ||
                 state.optionalSelectedDefaultMembers.contains(member);
             return InvitedMemberCard(
               participant: member,
@@ -66,11 +67,7 @@ class DefaultInvitedMembersSection extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.add,
-                  color: AppColors.primary,
-                  size: 24,
-                ),
+                const Icon(Icons.add, color: AppColors.primary, size: 24),
                 const SizedBox(width: 6),
                 Text(
                   'Invite Additional Members',

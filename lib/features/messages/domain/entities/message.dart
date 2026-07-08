@@ -61,6 +61,7 @@ class Message {
   final String? replyToId;
   final MessageReplyPreview? replyTo;
   final DeliveryStatus deliveryStatus;
+
   /// Emoji → set of user ids that reacted with it. Empty map = no reactions.
   /// Ordering across emojis is insertion order (server-sent order) so the
   /// bubble strip is stable across rebuilds.

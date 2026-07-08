@@ -24,9 +24,15 @@ class DirectoryParticipant {
     this.isSelected = false,
   });
 
-  factory DirectoryParticipant.fromJson(Map<String, dynamic> json, {bool isDefault = false}) {
-    final id = (json['id'] ?? json['user_id'] ?? json['_id'] ?? json['member_id'])?.toString() ?? '';
-    
+  factory DirectoryParticipant.fromJson(
+    Map<String, dynamic> json, {
+    bool isDefault = false,
+  }) {
+    final id =
+        (json['id'] ?? json['user_id'] ?? json['_id'] ?? json['member_id'])
+            ?.toString() ??
+        '';
+
     String name = '';
     final direct = (json['name'] as String?)?.trim();
     if (direct != null && direct.isNotEmpty) {
@@ -54,10 +60,11 @@ class DirectoryParticipant {
     final role = isDefault
         ? ((json['member_type'] as String?) ?? '')
         : ((json['role'] as String?) ??
-            (json['user_role'] as String?) ??
-            (json['member_type'] as String?) ??
-            '');
-    final avatarUrl = (json['profile_image_url'] as String?) ??
+              (json['user_role'] as String?) ??
+              (json['member_type'] as String?) ??
+              '');
+    final avatarUrl =
+        (json['profile_image_url'] as String?) ??
         (json['avatar_url'] as String?) ??
         (json['profile_image'] as String?) ??
         (json['avatar'] as String?) ??
@@ -69,7 +76,9 @@ class DirectoryParticipant {
     if (roleLower == 'client') {
       type = 'client';
       roleImpliedOptional = false;
-    } else if (roleLower == 'cp' || roleLower == 'creative_partner' || roleLower == 'creativepartner') {
+    } else if (roleLower == 'cp' ||
+        roleLower == 'creative_partner' ||
+        roleLower == 'creativepartner') {
       type = 'creativePartner';
       roleImpliedOptional = true;
     } else {
@@ -116,6 +125,12 @@ class DirectoryParticipant {
       isOptional: isOptional ?? this.isOptional,
       isSelected: isSelected ?? this.isSelected,
     );
+  }
+
+  String get categoryLabel {
+    if (type == 'staff' || type == 'client') return 'Staff';
+    if (type == 'creativePartner') return 'Creative Partner';
+    return '';
   }
 
   @override

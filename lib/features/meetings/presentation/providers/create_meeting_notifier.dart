@@ -40,17 +40,16 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
     for (final member in opt.defaultMembers) {
       if (member is Map) {
         final parsedJson = Map<String, dynamic>.from(member);
-        defaultParticipants.add(DirectoryParticipant.fromJson(parsedJson, isDefault: true));
+        defaultParticipants.add(
+          DirectoryParticipant.fromJson(parsedJson, isDefault: true),
+        );
       }
     }
     final optionalPreselected = defaultParticipants
         .where((p) => p.isOptional)
         .toList(growable: false);
 
-    final projectName = opt.title
-        .split(' (Booking #')
-        .first
-        .trim();
+    final projectName = opt.title.split(' (Booking #').first.trim();
     final autoTitle = projectName.isEmpty ? '' : '$projectName Catch Up';
 
     state = state.copyWith(
@@ -66,6 +65,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
   /// Sets date/time/link/reminder values
   void setDate(DateTime v) => state = state.copyWith(date: v);
+
   /// Sets start time and auto-shifts end time to +60 minutes (rolls into
   /// next day only via minute math — caller enforces same-day date).
   void setStartTime(TimeOfDayValue v) {
@@ -89,7 +89,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   /// (`is_optional == false`) rows — they stay selected by design.
   void toggleOptionalDefaultMember(DirectoryParticipant member) {
     if (!member.isOptional) return;
-    final list = List<DirectoryParticipant>.from(state.optionalSelectedDefaultMembers);
+    final list = List<DirectoryParticipant>.from(
+      state.optionalSelectedDefaultMembers,
+    );
     if (list.contains(member)) {
       list.remove(member);
     } else {
@@ -104,7 +106,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
     state = state.copyWith(directoryLoading: true, clearDirectoryError: true);
 
     final bookingRepo = ref.read(bookingRepositoryProvider);
-    final result = await bookingRepo.getBookingParticipants(bookingId: state.shootId ?? 0);
+    final result = await bookingRepo.getBookingParticipants(
+      bookingId: state.shootId ?? 0,
+    );
 
     result.fold(
       (e) => state = state.copyWith(
@@ -116,7 +120,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         for (final item in list) {
           if (item is Map) {
             final parsedJson = Map<String, dynamic>.from(item);
-            participants.add(DirectoryParticipant.fromJson(parsedJson, isDefault: false));
+            participants.add(
+              DirectoryParticipant.fromJson(parsedJson, isDefault: false),
+            );
           }
         }
         state = state.copyWith(
@@ -138,7 +144,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   /// Toggles selection of staff / CP in the bottom sheet selection
   void toggleAdditionalMember(DirectoryParticipant member) {
     if (member.type == 'creativePartner') {
-      final list = List<DirectoryParticipant>.from(state.selectedAdditionalCreativePartners);
+      final list = List<DirectoryParticipant>.from(
+        state.selectedAdditionalCreativePartners,
+      );
       if (list.contains(member)) {
         list.remove(member);
       } else {
@@ -146,7 +154,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
       }
       state = state.copyWith(selectedAdditionalCreativePartners: list);
     } else {
-      final list = List<DirectoryParticipant>.from(state.selectedAdditionalStaffMembers);
+      final list = List<DirectoryParticipant>.from(
+        state.selectedAdditionalStaffMembers,
+      );
       if (list.contains(member)) {
         list.remove(member);
       } else {
@@ -159,10 +169,13 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   /// Removes an additional member from selected additional lists (triggered by chip's close button)
   void removeAdditionalMember(String id) {
     state = state.copyWith(
-      selectedAdditionalStaffMembers:
-          state.selectedAdditionalStaffMembers.where((p) => p.id != id).toList(),
-      selectedAdditionalCreativePartners:
-          state.selectedAdditionalCreativePartners.where((p) => p.id != id).toList(),
+      selectedAdditionalStaffMembers: state.selectedAdditionalStaffMembers
+          .where((p) => p.id != id)
+          .toList(),
+      selectedAdditionalCreativePartners: state
+          .selectedAdditionalCreativePartners
+          .where((p) => p.id != id)
+          .toList(),
     );
   }
 
@@ -178,8 +191,9 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
   void removeParticipant(String id) {
     state = state.copyWith(
-      invitedParticipants:
-          state.invitedParticipants.where((p) => p.id != id).toList(),
+      invitedParticipants: state.invitedParticipants
+          .where((p) => p.id != id)
+          .toList(),
     );
   }
 
@@ -206,12 +220,14 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         category: MeetingCategory.commercial,
         meetingType: state.meetingType,
         participants: state.selectedParticipants
-            .map((p) => MeetingParticipant(
-                  id: p.id,
-                  name: p.name,
-                  avatarUrl: p.avatarUrl,
-                  role: p.role,
-                ))
+            .map(
+              (p) => MeetingParticipant(
+                id: p.id,
+                name: p.name,
+                avatarUrl: p.avatarUrl,
+                role: p.role,
+              ),
+            )
             .toList(),
       );
       final created = await _repo.create(input);
@@ -297,5 +313,5 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
 final createMeetingNotifierProvider =
     AutoDisposeNotifierProvider<CreateMeetingNotifier, CreateMeetingState>(
-  CreateMeetingNotifier.new,
-);
+      CreateMeetingNotifier.new,
+    );

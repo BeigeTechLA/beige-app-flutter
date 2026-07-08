@@ -68,7 +68,8 @@ class MeetingsRemoteSource {
           'page': page,
           'limit': limit,
           'sortBy': sortBy,
-          if (meetingTimeStatus != null) 'meeting_time_status': meetingTimeStatus,
+          if (meetingTimeStatus != null)
+            'meeting_time_status': meetingTimeStatus,
         },
       );
       final raw = resp.data;
@@ -102,7 +103,6 @@ class MeetingsRemoteSource {
       final cpIds = <String>[];
       final participantIds = <String>[];
       for (final p in input.participants) {
-
         if (p.id.isEmpty) continue;
         if (p.id == selfId) continue;
         final role = (p.role ?? '').toLowerCase();
@@ -134,10 +134,7 @@ class MeetingsRemoteSource {
       if (input.shootId != null) {
         body['order_id'] = input.shootId.toString();
       }
-      final resp = await _dio.post<dynamic>(
-        ApiEndpoints.meetings,
-        data: body,
-      );
+      final resp = await _dio.post<dynamic>(ApiEndpoints.meetings, data: body);
       return MeetingDto.fromRestJson(
         _unwrapItem(resp.data),
         currentUserId: user?.id ?? '',
@@ -156,10 +153,7 @@ class MeetingsRemoteSource {
       final currentUserId = await _currentUserId();
       final resp = await _dio.post<dynamic>(
         ApiEndpoints.meetingParticipants(meetingId),
-        data: {
-          'role': 'participant',
-          'user_ids': userIds,
-        },
+        data: {'role': 'participant', 'user_ids': userIds},
       );
       return MeetingDto.fromRestJson(
         _unwrapItem(resp.data),
@@ -224,14 +218,12 @@ class MeetingsRemoteSource {
     final id = project['stream_project_booking_id'];
     if (id is! int) return null;
     final rawMembers = project['default_members'] ?? project['defaultMembers'];
-    final List<dynamic> defaultMembers = rawMembers is List ? rawMembers : const [];
+    final List<dynamic> defaultMembers = rawMembers is List
+        ? rawMembers
+        : const [];
     final title = _buildShootLabel(project, id);
     if (title.isEmpty) return null;
-    return ShootOption(
-      id: id,
-      title: title,
-      defaultMembers: defaultMembers,
-    );
+    return ShootOption(id: id, title: title, defaultMembers: defaultMembers);
   }
 
   /// Builds `{SHOOT_TYPE} Shoot - {Client Name} (Booking #{id})`.
@@ -239,11 +231,13 @@ class MeetingsRemoteSource {
   /// `project_name` (segment after last " - "). Falls back to `project_name` /
   /// `name` when shoot_type or client are missing.
   static String _buildShootLabel(Map<dynamic, dynamic> project, int id) {
-    final projectName = (project['project_name'] as String?)?.trim() ??
+    final projectName =
+        (project['project_name'] as String?)?.trim() ??
         (project['name'] as String?)?.trim() ??
         '';
     final shootType = (project['shoot_type'] as String?)?.trim();
-    final clientName = (project['client_name'] as String?)?.trim() ??
+    final clientName =
+        (project['client_name'] as String?)?.trim() ??
         _clientFromProjectName(projectName);
 
     if (shootType != null && shootType.isNotEmpty && clientName.isNotEmpty) {

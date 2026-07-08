@@ -8,16 +8,18 @@ import 'messages_repository_provider.dart';
 /// Loads details for a conversation. AsyncValue so screen can branch on
 /// loading / error / data without rolling its own state class.
 final chatDetailsProvider =
-    AutoDisposeFutureProviderFamily<ChatDetails, String>(
-        (ref, conversationId) async {
-  try {
-    return await ref
-        .read(messagesRepositoryProvider)
-        .fetchDetails(conversationId);
-  } catch (e) {
-    if (e is UnauthorizedException) {
-      ref.read(authStateProvider.notifier).updateState(false);
-    }
-    rethrow;
-  }
-});
+    AutoDisposeFutureProviderFamily<ChatDetails, String>((
+      ref,
+      conversationId,
+    ) async {
+      try {
+        return await ref
+            .read(messagesRepositoryProvider)
+            .fetchDetails(conversationId);
+      } catch (e) {
+        if (e is UnauthorizedException) {
+          ref.read(authStateProvider.notifier).updateState(false);
+        }
+        rethrow;
+      }
+    });

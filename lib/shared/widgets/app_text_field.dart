@@ -75,7 +75,9 @@ class _AppTextFieldState extends State<AppTextField> {
   void didUpdateWidget(AppTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _internalFocusNode).removeListener(_onFocusChange);
+      (oldWidget.focusNode ?? _internalFocusNode).removeListener(
+        _onFocusChange,
+      );
       _effectiveFocusNode.addListener(_onFocusChange);
     }
     if (oldWidget.controller != widget.controller) {
@@ -155,10 +157,7 @@ class _AppTextFieldState extends State<AppTextField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: const BorderSide(
-            color: AppColors.borderGold,
-            width: 0.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.borderGold, width: 0.5),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import '../../../../../app/radii.dart';
 import '../../../../../app/spacing.dart';
 import '../../../../../app/text_styles.dart';
 import '../../../domain/entities/message.dart';
+import 'emoji_picker_sheet.dart';
 
 /// Quick-reaction emoji strip surfaced above the action list. Matches the
 /// WhatsApp long-press sheet — tap picks that emoji, the sheet dismisses,
@@ -64,9 +65,9 @@ class _MessageActionsSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _ReactionsStrip(
-              onPick: (emoji) => Navigator.of(context).pop(
-                MessageActionResult.reaction(emoji),
-              ),
+              onPick: (emoji) => Navigator.of(
+                context,
+              ).pop(MessageActionResult.reaction(emoji)),
             ),
             const SizedBox(height: AppSpacing.sm),
             _ActionCard(
@@ -74,9 +75,8 @@ class _MessageActionsSheet extends StatelessWidget {
                 _ActionTile(
                   icon: Icons.reply_rounded,
                   label: 'Reply',
-                  onTap: () => Navigator.of(context).pop(
-                    MessageActionResult.reply(),
-                  ),
+                  onTap: () =>
+                      Navigator.of(context).pop(MessageActionResult.reply()),
                 ),
               ],
             ),
@@ -109,6 +109,7 @@ class _ReactionsStrip extends StatelessWidget {
         children: [
           for (final emoji in _quickReactions)
             _ReactionButton(emoji: emoji, onTap: () => onPick(emoji)),
+          _AddReactionButton(onPick: onPick),
         ],
       ),
     );
@@ -132,6 +133,46 @@ class _ReactionButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xs),
           child: Text(emoji, style: const TextStyle(fontSize: 28)),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddReactionButton extends StatelessWidget {
+  const _AddReactionButton({required this.onPick});
+
+  final ValueChanged<String> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Add custom reaction',
+      child: InkResponse(
+        onTap: () async {
+          final selectedEmoji = await showEmojiPickerSheet(context);
+          if (selectedEmoji != null) {
+            onPick(selectedEmoji);
+          }
+        },
+        radius: 24,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xs),
+          child: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceInput,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.dividerDark),
+            ),
+            child: const Icon(
+              Icons.add,
+              color: AppColors.textTertiary,
+              size: 20,
+            ),
+          ),
         ),
       ),
     );

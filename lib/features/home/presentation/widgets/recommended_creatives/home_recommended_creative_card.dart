@@ -34,10 +34,7 @@ class HomeRecommendedCreativeCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
                 gradient: const LinearGradient(
-                  colors: [
-                    AppColors.primary,
-                    AppColors.white,
-                  ],
+                  colors: [AppColors.primary, AppColors.white],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),

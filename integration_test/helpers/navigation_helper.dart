@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 /// Result of a single navigation verification step.
 class NavResult {
   final String route;
@@ -30,9 +29,7 @@ bool _firebaseInitialized = false;
 /// Required because [routerProvider] uses [AnalyticsService.observer].
 Future<void> ensureFirebaseInitialized() async {
   if (_firebaseInitialized) return;
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   _firebaseInitialized = true;
 }
 
@@ -80,16 +77,18 @@ Future<NavResult> navigateTo(
     await tester.pumpAndSettle(const Duration(seconds: 3));
     return NavResult(route: path, checkType: 'navigate', passed: true);
   } catch (e) {
-    return NavResult(route: path, checkType: 'navigate', passed: false, error: e.toString());
+    return NavResult(
+      route: path,
+      checkType: 'navigate',
+      passed: false,
+      error: e.toString(),
+    );
   }
 }
 
 /// Verifies that the current screen rendered without crashing
 /// by checking that no [ErrorWidget] is present.
-Future<NavResult> verifyScreenLoaded(
-  WidgetTester tester,
-  String route,
-) async {
+Future<NavResult> verifyScreenLoaded(WidgetTester tester, String route) async {
   try {
     final hasError = find.byType(ErrorWidget).evaluate().isNotEmpty;
     if (hasError) {
@@ -105,10 +104,17 @@ Future<NavResult> verifyScreenLoaded(
       route: route,
       checkType: 'screen_load',
       passed: hasContent,
-      error: hasContent ? null : 'No Scaffold found — screen may not have loaded',
+      error: hasContent
+          ? null
+          : 'No Scaffold found — screen may not have loaded',
     );
   } catch (e) {
-    return NavResult(route: route, checkType: 'screen_load', passed: false, error: e.toString());
+    return NavResult(
+      route: route,
+      checkType: 'screen_load',
+      passed: false,
+      error: e.toString(),
+    );
   }
 }
 
@@ -125,17 +131,25 @@ Future<NavResult> verifyAuthGuard(
     await tester.pumpAndSettle(const Duration(seconds: 3));
 
     final router = GoRouter.of(context);
-    final currentLocation = router.routerDelegate.currentConfiguration.uri.toString();
+    final currentLocation = router.routerDelegate.currentConfiguration.uri
+        .toString();
     final redirected = currentLocation.startsWith(expectedRedirect);
 
     return NavResult(
       route: protectedPath,
       checkType: 'auth_guard',
       passed: redirected,
-      error: redirected ? null : 'Expected redirect to $expectedRedirect, got $currentLocation',
+      error: redirected
+          ? null
+          : 'Expected redirect to $expectedRedirect, got $currentLocation',
     );
   } catch (e) {
-    return NavResult(route: protectedPath, checkType: 'auth_guard', passed: false, error: e.toString());
+    return NavResult(
+      route: protectedPath,
+      checkType: 'auth_guard',
+      passed: false,
+      error: e.toString(),
+    );
   }
 }
 
@@ -157,7 +171,12 @@ Future<NavResult> verifyDeepLink(
       error: hasError ? 'ErrorWidget after deep link navigation' : null,
     );
   } catch (e) {
-    return NavResult(route: deepLinkUri, checkType: 'deep_link', passed: false, error: e.toString());
+    return NavResult(
+      route: deepLinkUri,
+      checkType: 'deep_link',
+      passed: false,
+      error: e.toString(),
+    );
   }
 }
 
@@ -188,6 +207,11 @@ Future<NavResult> verifyBackNav(
       error: hasScaffold ? null : 'Screen after pop has no Scaffold',
     );
   } catch (e) {
-    return NavResult(route: path, checkType: 'back_nav', passed: false, error: e.toString());
+    return NavResult(
+      route: path,
+      checkType: 'back_nav',
+      passed: false,
+      error: e.toString(),
+    );
   }
 }
