@@ -11,7 +11,6 @@ import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_response.dart';
 import '../../domain/models/shoot_option.dart';
 import '../dto/meeting_dto.dart';
-import '../mappers/meeting_enum_mapper.dart';
 
 /// One page of meetings + a cursor-style `hasMore` flag.
 ///
@@ -119,7 +118,7 @@ class MeetingsRemoteSource {
         'meeting_date_time': input.startAt.toUtc().toIso8601String(),
         'meeting_end_time': input.endAt.toUtc().toIso8601String(),
         'meeting_status': 'pending',
-        'meeting_type': MeetingEnumMapper.categoryToServer(input.category),
+        'meeting_type': input.meetingType.serverValue,
         'meeting_title': input.title,
         'description': input.description,
         'meetLink': input.link,

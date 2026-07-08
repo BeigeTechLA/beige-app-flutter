@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/models/directory_participant.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_platform.dart';
+import '../../domain/models/meeting_type.dart';
 import '../../domain/models/shoot_participant_option.dart';
 
 enum CreateMeetingSubmitStatus { idle, submitting, success, error }
@@ -19,6 +20,7 @@ class CreateMeetingState {
   final TimeOfDayValue? startTime;
   final TimeOfDayValue? endTime;
   final MeetingPlatform platform;
+  final MeetingType meetingType;
   final String link;
   final int reminderMinutes;
   final List<ShootParticipantOption> invitedParticipants; // Deprecated but kept for backward compatibility/types
@@ -50,6 +52,7 @@ class CreateMeetingState {
     this.startTime,
     this.endTime,
     this.platform = MeetingPlatform.meet,
+    this.meetingType = MeetingType.postProduction,
     this.link = '',
     this.reminderMinutes = 15,
     this.invitedParticipants = const [],
@@ -68,6 +71,18 @@ class CreateMeetingState {
     this.linkGenStatus = MeetLinkGenerationStatus.idle,
     this.linkGenError,
   });
+
+  /// Seeds the form with today's date, start time rounded up to the next
+  /// full hour from now, and end time exactly one hour after start.
+  factory CreateMeetingState.withDefaultDateTime() {
+    final start = _ceilToNextHour(DateTime.now());
+    final end = start.add(const Duration(hours: 1));
+    return CreateMeetingState(
+      date: DateTime(start.year, start.month, start.day),
+      startTime: TimeOfDayValue(start.hour, start.minute),
+      endTime: TimeOfDayValue(end.hour, end.minute),
+    );
+  }
 
   bool get hasTitle => title.trim().isNotEmpty;
   bool get hasDescription => description.trim().isNotEmpty;
@@ -155,6 +170,7 @@ class CreateMeetingState {
     TimeOfDayValue? startTime,
     TimeOfDayValue? endTime,
     MeetingPlatform? platform,
+    MeetingType? meetingType,
     String? link,
     int? reminderMinutes,
     List<ShootParticipantOption>? invitedParticipants,
@@ -185,6 +201,7 @@ class CreateMeetingState {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       platform: platform ?? this.platform,
+      meetingType: meetingType ?? this.meetingType,
       link: link ?? this.link,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       invitedParticipants: invitedParticipants ?? this.invitedParticipants,
@@ -212,6 +229,12 @@ class TimeOfDayValue {
   final int hour;
   final int minute;
   const TimeOfDayValue(this.hour, this.minute);
+}
+
+DateTime _ceilToNextHour(DateTime now) {
+  final flooredToHour = DateTime(now.year, now.month, now.day, now.hour);
+  if (now.isAtSameMomentAs(flooredToHour)) return flooredToHour;
+  return flooredToHour.add(const Duration(hours: 1));
 }
 
 bool _looksLikeUrl(String value) {

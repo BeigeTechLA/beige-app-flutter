@@ -10,11 +10,13 @@ import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/loading.dart';
+import '../../domain/models/meeting_type.dart';
 import '../providers/create_meeting_state.dart' show TimeOfDayValue;
 import '../providers/edit_meeting_notifier.dart';
 import '../providers/edit_meeting_state.dart';
 import '../providers/meeting_details_providers.dart';
 import '../providers/meetings_list_notifier.dart';
+import '../widgets/meeting_type_dropdown.dart';
 
 class EditMeetingScreen extends ConsumerStatefulWidget {
   const EditMeetingScreen({super.key, required this.meetingId});
@@ -194,6 +196,7 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
               onDescriptionChanged: notifier.setDescription,
               onLinkChanged: notifier.setLink,
               onReminderChanged: notifier.setReminder,
+              onMeetingTypeChanged: notifier.setMeetingType,
               onSave: _save,
               onBack: () => context.pop(),
             ),
@@ -216,6 +219,7 @@ class _Form extends StatelessWidget {
     required this.onDescriptionChanged,
     required this.onLinkChanged,
     required this.onReminderChanged,
+    required this.onMeetingTypeChanged,
     required this.onSave,
     required this.onBack,
   });
@@ -236,6 +240,7 @@ class _Form extends StatelessWidget {
   final ValueChanged<String> onDescriptionChanged;
   final ValueChanged<String> onLinkChanged;
   final ValueChanged<int> onReminderChanged;
+  final ValueChanged<MeetingType> onMeetingTypeChanged;
   final Future<void> Function() onSave;
   final VoidCallback onBack;
 
@@ -283,6 +288,12 @@ class _Form extends StatelessWidget {
                     label: 'Title*',
                     hint: 'e.g. Pre-Production Kickoff',
                   ),
+                ),
+                const SizedBox(height: 16),
+                MeetingTypeDropdown(
+                  selected: state.meetingType,
+                  decoration: decorationBuilder(label: 'Meeting Type'),
+                  onChanged: onMeetingTypeChanged,
                 ),
                 const SizedBox(height: 16),
                 GestureDetector(

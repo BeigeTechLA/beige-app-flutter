@@ -9,6 +9,7 @@ import 'package:beige/features/meetings/domain/models/meeting_participant.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
 import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
+import 'package:beige/features/meetings/domain/models/meeting_type.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/shoot_option.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -124,6 +125,7 @@ CreateMeetingInput _input({List<MeetingParticipant> participants = const []}) =>
       link: 'https://meet.google.com/x',
       reminderMinutes: 15,
       category: MeetingCategory.commercial,
+      meetingType: MeetingType.postProduction,
       participants: participants,
     );
 

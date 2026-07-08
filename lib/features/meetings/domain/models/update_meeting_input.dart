@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'meeting_category.dart';
 import 'meeting_status.dart';
+import 'meeting_type.dart';
 
 /// Partial patch for an existing meeting. Every field nullable — `null` means
 /// "leave unchanged" (PATCH semantics). `duration` deliberately absent —
@@ -16,6 +17,7 @@ class UpdateMeetingInput {
   final int? reminderMinutes;
   final MeetingStatus? status;
   final MeetingCategory? category;
+  final MeetingType? meetingType;
 
   const UpdateMeetingInput({
     this.title,
@@ -26,6 +28,7 @@ class UpdateMeetingInput {
     this.reminderMinutes,
     this.status,
     this.category,
+    this.meetingType,
   });
 
   bool get isEmpty =>
@@ -36,5 +39,6 @@ class UpdateMeetingInput {
       link == null &&
       reminderMinutes == null &&
       status == null &&
-      category == null;
+      category == null &&
+      meetingType == null;
 }

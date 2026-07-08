@@ -11,6 +11,7 @@ import '../../domain/models/generate_meet_link_input.dart';
 import '../../domain/models/meeting_category.dart';
 import '../../domain/models/meeting_participant.dart';
 import '../../domain/models/meeting_platform.dart';
+import '../../domain/models/meeting_type.dart';
 import '../../domain/models/shoot_option.dart';
 import '../../domain/models/shoot_participant_option.dart';
 import '../../domain/repositories/meetings_repository.dart';
@@ -25,7 +26,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
   CreateMeetingState build() {
     _repo = ref.watch(meetingsRepositoryProvider);
     _session = ref.watch(sessionStoreProvider);
-    return const CreateMeetingState();
+    return CreateMeetingState.withDefaultDateTime();
   }
 
   void setTitle(String v) => state = state.copyWith(title: v);
@@ -46,9 +47,16 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         .where((p) => p.isOptional)
         .toList(growable: false);
 
+    final projectName = opt.title
+        .split(' (Booking #')
+        .first
+        .trim();
+    final autoTitle = projectName.isEmpty ? '' : '$projectName Catch Up';
+
     state = state.copyWith(
       shootId: opt.id,
       project: opt.title,
+      title: autoTitle,
       defaultInvitedMembers: defaultParticipants,
       optionalSelectedDefaultMembers: optionalPreselected,
       selectedAdditionalStaffMembers: const [],
@@ -72,6 +80,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 
   void setEndTime(TimeOfDayValue v) => state = state.copyWith(endTime: v);
   void setPlatform(MeetingPlatform v) => state = state.copyWith(platform: v);
+  void setMeetingType(MeetingType v) => state = state.copyWith(meetingType: v);
   void setLink(String v) => state = state.copyWith(link: v);
   void setReminder(int minutes) =>
       state = state.copyWith(reminderMinutes: minutes);
@@ -195,6 +204,7 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         link: state.link.trim(),
         reminderMinutes: state.reminderMinutes,
         category: MeetingCategory.commercial,
+        meetingType: state.meetingType,
         participants: state.selectedParticipants
             .map((p) => MeetingParticipant(
                   id: p.id,

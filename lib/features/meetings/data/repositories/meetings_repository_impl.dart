@@ -100,7 +100,9 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
     if (p.status != null) {
       body['meeting_status'] = MeetingEnumMapper.statusToServer(p.status!);
     }
-    if (p.category != null) {
+    if (p.meetingType != null) {
+      body['meeting_type'] = p.meetingType!.serverValue;
+    } else if (p.category != null) {
       body['meeting_type'] = MeetingEnumMapper.categoryToServer(p.category!);
     }
     return body;

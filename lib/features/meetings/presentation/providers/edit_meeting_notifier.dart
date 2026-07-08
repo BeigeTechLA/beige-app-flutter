@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../domain/models/meeting.dart';
+import '../../domain/models/meeting_type.dart';
 import '../../domain/models/update_meeting_input.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'create_meeting_state.dart' show TimeOfDayValue;
@@ -51,6 +52,7 @@ class EditMeetingNotifier
   void setLink(String v) => state = state.copyWith(link: v);
   void setReminder(int minutes) =>
       state = state.copyWith(reminderMinutes: minutes);
+  void setMeetingType(MeetingType v) => state = state.copyWith(meetingType: v);
 
   Future<void> submit() async {
     if (!state.canSubmit) return;
@@ -91,6 +93,7 @@ class EditMeetingNotifier
       endTime: end,
       link: m.link,
       reminderMinutes: m.reminderMinutes,
+      meetingType: m.meetingType ?? MeetingType.postProduction,
     );
   }
 
@@ -113,6 +116,8 @@ class EditMeetingNotifier
     String? link = state.link.trim() == base.link ? null : state.link.trim();
     int? reminder =
         state.reminderMinutes == base.reminderMinutes ? null : state.reminderMinutes;
+    MeetingType? meetingType =
+        state.meetingType == base.meetingType ? null : state.meetingType;
 
     return UpdateMeetingInput(
       title: title,
@@ -121,6 +126,7 @@ class EditMeetingNotifier
       endAt: endAt,
       link: link,
       reminderMinutes: reminder,
+      meetingType: meetingType,
     );
   }
 

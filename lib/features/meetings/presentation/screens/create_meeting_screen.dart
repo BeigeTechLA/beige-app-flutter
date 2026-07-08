@@ -21,6 +21,7 @@ import '../providers/create_meeting_state.dart';
 import '../providers/meetings_list_notifier.dart';
 import '../widgets/default_invited_members_section.dart';
 import '../widgets/invite_additional_members_bottom_sheet.dart';
+import '../widgets/meeting_type_dropdown.dart';
 import '../widgets/selected_participant_chip.dart';
 import '../widgets/select_meet_link_picker.dart';
 
@@ -266,6 +267,13 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final notifier = ref.read(createMeetingNotifierProvider.notifier);
 
     ref.listen<CreateMeetingState>(createMeetingNotifierProvider, (prev, next) {
+      if (prev?.title != next.title && _titleCtrl.text != next.title) {
+        _titleCtrl.text = next.title;
+        _titleCtrl.selection = TextSelection.fromPosition(
+          TextPosition(offset: _titleCtrl.text.length),
+        );
+      }
+
       if (prev?.status != next.status) {
         if (next.status == CreateMeetingSubmitStatus.success) {
           ref.read(meetingsListNotifierProvider.notifier).refresh();
@@ -359,6 +367,15 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
                         hint: 'Select shoot/project',
                       ),
                       onChanged: (opt) => notifier.setShoot(opt),
+                    ),
+                    const SizedBox(height: 16),
+
+                    MeetingTypeDropdown(
+                      selected: state.meetingType,
+                      decoration: _inputDecoration(
+                        label: 'Meeting Type',
+                      ),
+                      onChanged: notifier.setMeetingType,
                     ),
                     const SizedBox(height: 16),
 

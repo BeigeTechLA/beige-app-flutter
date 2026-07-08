@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'meeting_category.dart';
 import 'meeting_participant.dart';
 import 'meeting_platform.dart';
+import 'meeting_type.dart';
 
 @immutable
 class CreateMeetingInput {
@@ -16,6 +17,7 @@ class CreateMeetingInput {
   final String link;
   final int reminderMinutes;
   final MeetingCategory category;
+  final MeetingType meetingType;
   final List<String> agenda;
   final List<MeetingParticipant> participants;
 
@@ -30,6 +32,7 @@ class CreateMeetingInput {
     required this.link,
     required this.reminderMinutes,
     required this.category,
+    required this.meetingType,
     this.agenda = const [],
     this.participants = const [],
   });

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../domain/models/meeting.dart';
+import '../../domain/models/meeting_type.dart';
 import 'create_meeting_state.dart' show TimeOfDayValue;
 
 /// Lifecycle of the edit-meeting form.
@@ -35,6 +36,7 @@ class EditMeetingState {
   final TimeOfDayValue? endTime;
   final String link;
   final int reminderMinutes;
+  final MeetingType meetingType;
 
   final String? error;
 
@@ -48,6 +50,7 @@ class EditMeetingState {
     this.endTime,
     this.link = '',
     this.reminderMinutes = 15,
+    this.meetingType = MeetingType.postProduction,
     this.error,
   });
 
@@ -82,6 +85,7 @@ class EditMeetingState {
     TimeOfDayValue? endTime,
     String? link,
     int? reminderMinutes,
+    MeetingType? meetingType,
     String? error,
     bool clearError = false,
   }) {
@@ -95,6 +99,7 @@ class EditMeetingState {
       endTime: endTime ?? this.endTime,
       link: link ?? this.link,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
+      meetingType: meetingType ?? this.meetingType,
       error: clearError ? null : (error ?? this.error),
     );
   }
