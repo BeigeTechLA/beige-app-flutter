@@ -210,11 +210,8 @@ class _ThreadBody extends StatelessWidget {
         ? state.messages
         : state.messages.where((m) {
             if ((m.body ?? '').toLowerCase().contains(query)) return true;
-            final p = state.participantsById[m.senderId];
-            final name = (p?.name.isNotEmpty ?? false)
-                ? p!.name
-                : m.senderName;
-            return name.toLowerCase().contains(query);
+            if (m.file != null && m.file!.name.toLowerCase().contains(query)) return true;
+            return false;
           }).toList();
 
     if (filtered.isEmpty) {
@@ -428,6 +425,12 @@ class _SearchRow extends StatelessWidget {
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  filled: false,
                   isCollapsed: true,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: AppSpacing.md,

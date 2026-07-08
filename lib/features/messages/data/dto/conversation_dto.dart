@@ -8,7 +8,9 @@ class ConversationDto {
   /// - `id`: Mongo `_id`
   /// - `chat_id`: human-readable id
   /// - `display_name` / `name`: title (prefer display_name)
-  /// - `cp_ids` + `manager_ids`: arrays of participants (id, name, role, profileImage)
+  /// - `participants`: full array of every room member (client + cps + managers)
+  /// - `cp_ids` + `manager_ids`: role-partitioned subsets (kept as fallback
+  ///   for older room payloads that omit `participants`)
   /// - `last_message`: STRING id of last msg (no embedded preview/timestamp)
   /// - `unread_counts`: map { userId: count }
   /// - `order_id` / `external_order_ref`: linked booking
@@ -17,9 +19,15 @@ class ConversationDto {
     Map<String, dynamic> json, {
     required String currentUserId,
   }) {
-    final cpIds = _readParticipants(json['cp_ids']);
-    final managerIds = _readParticipants(json['manager_ids']);
-    final participantIds = [...cpIds, ...managerIds];
+    final allParticipants = _readParticipants(json['participants']);
+    final List<String> participantIds;
+    if (allParticipants.isNotEmpty) {
+      participantIds = allParticipants;
+    } else {
+      final cpIds = _readParticipants(json['cp_ids']);
+      final managerIds = _readParticipants(json['manager_ids']);
+      participantIds = [...cpIds, ...managerIds];
+    }
 
     final unreadMap = json['unread_counts'];
     int unread = 0;
@@ -31,8 +39,9 @@ class ConversationDto {
     return Conversation(
       id: (json['id'] ?? json['_id'] ?? json['chat_id']).toString(),
       title: (json['display_name'] ?? json['name'] ?? '') as String,
-      avatarUrl:
-          _firstAvatar(json['cp_ids']) ?? _firstAvatar(json['manager_ids']),
+      avatarUrl: _firstAvatar(json['participants']) ??
+          _firstAvatar(json['cp_ids']) ??
+          _firstAvatar(json['manager_ids']),
       lastMessage: _previewFromRoom(json),
       unreadCount: unread,
       isOnline: false,
