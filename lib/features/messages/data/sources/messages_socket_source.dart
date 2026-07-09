@@ -126,7 +126,7 @@ class MessagesSocketSource {
   void _emitJoinRoom(String roomId, UserSnapshot user) {
     if (kDebugMode) {
       debugPrint(
-        '[sock] EMIT joinRoom roomId=$roomId userId=${user.id} '
+        '[sock] EMIT joinRoom roomId=$roomId '
         'connected=${_socket?.connected}',
       );
     }
@@ -202,7 +202,7 @@ class MessagesSocketSource {
       if (user == null) return;
       if (kDebugMode) {
         debugPrint(
-          '[sock] CONNECT id=${socket.id} user=${user.id} '
+          '[sock] CONNECT id=${socket.id} '
           'activeRooms=$_activeRoomIds',
         );
       }
@@ -229,8 +229,8 @@ class MessagesSocketSource {
     });
 
     if (kDebugMode) {
-      socket.onAny((event, data) {
-        debugPrint('[sock] ANY event=$event data=$data');
+      socket.onAny((event, _) {
+        debugPrint('[sock] ANY event=$event');
       });
     }
 
@@ -272,7 +272,7 @@ class MessagesSocketSource {
       final payload = _asMap(raw);
       if (kDebugMode) {
         debugPrint(
-          '[sock] RECV message raw=$raw '
+          '[sock] RECV message '
           'roomControllers=${_roomControllers.keys.toList()} '
           'activeRooms=$_activeRoomIds',
         );

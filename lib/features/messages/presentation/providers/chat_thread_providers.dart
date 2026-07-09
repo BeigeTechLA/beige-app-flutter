@@ -250,11 +250,11 @@ class ChatThreadNotifier
       if (kDebugMode) {
         debugPrint(
           '[thread] self-resolve conversationId=$arg '
-          'sessionId=${currentUserId ?? '∅'} '
-          'sessionEmail=${sessionUserEmail ?? '∅'} '
-          'sessionName=${sessionUserName ?? '∅'} '
-          'resolvedSelfId=${resolvedSelfId ?? '∅'} '
-          'participantIds=${detailsParticipants.map((p) => p.id).toList()}',
+          'hasSessionId=${currentUserId != null} '
+          'hasSessionEmail=${sessionUserEmail != null} '
+          'hasSessionName=${sessionUserName != null} '
+          'resolvedSelf=${resolvedSelfId != null} '
+          'participantCount=${detailsParticipants.length}',
         );
       }
       state = state.copyWith(
