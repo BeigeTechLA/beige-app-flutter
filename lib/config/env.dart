@@ -39,7 +39,7 @@ class Env {
         imageUrl = 'https://d2jhn32fsulyac.cloudfront.net/';
         socketUrl = _socketOverride.isNotEmpty
             ? _socketOverride
-            : 'https://api.prod.beige.app';
+            : 'https://api2.prod.beige.app';
         stripePublishableKey = 'PLACE_HOLDER_LIVE_STRIPE_KEY';
     }
   }

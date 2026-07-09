@@ -48,12 +48,13 @@ class DrawerScreen extends ConsumerWidget {
       activeIcon: AppAssets.active_meetings,
       inactiveIcon: AppAssets.inactive_meetings,
     ),
-    _DrawerMenuItemData(
-      label: 'File Manager',
-      route: '/file-manager',
-      activeIcon: AppAssets.active_file_manager,
-      inactiveIcon: AppAssets.inactive_filemanager,
-    ),
+    // File Manager hidden per product request — keep code, restore later.
+    // _DrawerMenuItemData(
+    //   label: 'File Manager',
+    //   route: '/file-manager',
+    //   activeIcon: AppAssets.active_file_manager,
+    //   inactiveIcon: AppAssets.inactive_filemanager,
+    // ),
   ];
 
   @override

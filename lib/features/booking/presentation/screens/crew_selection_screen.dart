@@ -838,9 +838,13 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             onTap: () {
                                               context.pushNamed(
                                                 RouteNames.recommendedDetails,
-                                                extra: {
-                                                  'id': item['crew_member_id'],
-                                                  'bookingId': widget.bookingId,
+                                                pathParameters: {
+                                                  'id': item['crew_member_id']
+                                                      .toString(),
+                                                },
+                                                queryParameters: {
+                                                  'bookingId': widget.bookingId
+                                                      .toString(),
                                                 },
                                               );
                                             },

@@ -206,10 +206,13 @@ class _ThreadBody extends StatelessWidget {
       );
     }
 
+    final visible = state.messages
+        .where((m) => m.type != MessageType.system)
+        .toList();
     final query = searchQuery.trim().toLowerCase();
     final filtered = query.isEmpty
-        ? state.messages
-        : state.messages.where((m) {
+        ? visible
+        : visible.where((m) {
             if ((m.body ?? '').toLowerCase().contains(query)) {
               return true;
             }
