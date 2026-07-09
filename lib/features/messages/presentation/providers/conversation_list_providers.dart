@@ -351,7 +351,7 @@ class ConversationListNotifier
   }
 
   void updateSearch(String query) {
-    state = state.copyWith(query: query);
+    state = state.copyWith(query: query, isLoading: true);
     _debounce?.cancel();
     _debounce = Timer(kConversationSearchDebounce, refresh);
   }

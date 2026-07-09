@@ -66,19 +66,29 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       }
     });
 
+    final hideSearch =
+        state.items.isEmpty &&
+        state.query.isEmpty &&
+        !state.isLoading &&
+        state.errorMessage == null;
+
     return AppScaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
           const AppMainToolbar(title: 'Message'),
-          const SizedBox(height: AppSpacing.md),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
-            child: _SearchRow(
-              controller: _searchCtrl,
-              onChanged: notifier.updateSearch,
+          if (!hideSearch) ...[
+            const SizedBox(height: AppSpacing.md),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenH,
+              ),
+              child: _SearchRow(
+                controller: _searchCtrl,
+                onChanged: notifier.updateSearch,
+              ),
             ),
-          ),
+          ],
           const SizedBox(height: AppSpacing.md),
           Expanded(
             child: RefreshIndicator(
@@ -181,17 +191,24 @@ class _ListBody extends StatelessWidget {
       );
     }
     if (state.items.isEmpty) {
+      final isSearching = state.query.isNotEmpty;
       return LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: SizedBox(
             height: constraints.maxHeight,
-            child: const AppEmptyState(
-              svgAsset: AppAssets.msgEmptyState,
-              iconSize: 120,
-              title: 'No conversations',
-              description: 'New messages will appear here.',
-            ),
+            child: isSearching
+                ? AppEmptyState(
+                    icon: Icons.search_off,
+                    title: 'No results',
+                    description: 'No conversations match "${state.query}".',
+                  )
+                : const AppEmptyState(
+                    svgAsset: AppAssets.msgEmptyState,
+                    iconSize: 120,
+                    title: 'No conversations',
+                    description: 'New messages will appear here.',
+                  ),
           ),
         ),
       );
