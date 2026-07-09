@@ -24,14 +24,16 @@ class ReportBuilder {
     NavResult? deepLinkResult,
     NavResult? backNavResult,
   }) {
-    _entries.add(_RouteEntry(
-      route: route,
-      routeName: routeName,
-      loadResult: loadResult,
-      guardResult: guardResult,
-      deepLinkResult: deepLinkResult,
-      backNavResult: backNavResult,
-    ));
+    _entries.add(
+      _RouteEntry(
+        route: route,
+        routeName: routeName,
+        loadResult: loadResult,
+        guardResult: guardResult,
+        deepLinkResult: deepLinkResult,
+        backNavResult: backNavResult,
+      ),
+    );
   }
 
   /// Writes the final `navigation_report.md` to [outputPath].
@@ -51,7 +53,9 @@ class ReportBuilder {
     buffer.writeln();
     buffer.writeln('**Generated:** ${now.toIso8601String()}');
     buffer.writeln('**Duration:** ${duration}s');
-    buffer.writeln('**Total Routes:** $total | **Passed:** $passed | **Failed:** $failed');
+    buffer.writeln(
+      '**Total Routes:** $total | **Passed:** $passed | **Failed:** $failed',
+    );
     buffer.writeln();
 
     // ── Summary badges ──────────────────────────────────────
@@ -65,8 +69,12 @@ class ReportBuilder {
     // ── Main table ──────────────────────────────────────────
     buffer.writeln('## Results');
     buffer.writeln();
-    buffer.writeln('| # | Route Name | Path | Load | Auth Guard | Deep Link | Back Nav | Status |');
-    buffer.writeln('|---|-----------|------|------|-----------|----------|---------|--------|');
+    buffer.writeln(
+      '| # | Route Name | Path | Load | Auth Guard | Deep Link | Back Nav | Status |',
+    );
+    buffer.writeln(
+      '|---|-----------|------|------|-----------|----------|---------|--------|',
+    );
 
     for (var i = 0; i < _entries.length; i++) {
       final e = _entries[i];
@@ -85,7 +93,9 @@ class ReportBuilder {
     buffer.writeln();
 
     // ── Failures detail ──────────────────────────────────────
-    final failures = _entries.where((e) => e.overallStatus != '✅ PASS').toList();
+    final failures = _entries
+        .where((e) => e.overallStatus != '✅ PASS')
+        .toList();
     if (failures.isNotEmpty) {
       buffer.writeln('## Failure Details');
       buffer.writeln();
@@ -111,7 +121,9 @@ class ReportBuilder {
 
     for (var i = 0; i < checks.length; i++) {
       final covered = _entries.where((e) => _hasCheck(e, checks[i])).length;
-      final pct = total > 0 ? ((covered / total) * 100).toStringAsFixed(0) : '0';
+      final pct = total > 0
+          ? ((covered / total) * 100).toStringAsFixed(0)
+          : '0';
       buffer.writeln('| ${labels[i]} | $covered | $total | $pct% |');
     }
 
@@ -133,15 +145,24 @@ class ReportBuilder {
 
   bool _hasCheck(_RouteEntry e, String type) {
     switch (type) {
-      case 'load': return e.loadResult != null;
-      case 'guard': return e.guardResult != null;
-      case 'deepLink': return e.deepLinkResult != null;
-      case 'backNav': return e.backNavResult != null;
-      default: return false;
+      case 'load':
+        return e.loadResult != null;
+      case 'guard':
+        return e.guardResult != null;
+      case 'deepLink':
+        return e.deepLinkResult != null;
+      case 'backNav':
+        return e.backNavResult != null;
+      default:
+        return false;
     }
   }
 
-  void _appendFailureDetail(StringBuffer buffer, String label, NavResult? result) {
+  void _appendFailureDetail(
+    StringBuffer buffer,
+    String label,
+    NavResult? result,
+  ) {
     if (result != null && !result.passed) {
       buffer.writeln('- **$label:** ❌ `${result.error ?? "unknown error"}`');
     }
@@ -166,9 +187,12 @@ class _RouteEntry {
   });
 
   String get overallStatus {
-    final results = [loadResult, guardResult, deepLinkResult, backNavResult]
-        .where((r) => r != null)
-        .cast<NavResult>();
+    final results = [
+      loadResult,
+      guardResult,
+      deepLinkResult,
+      backNavResult,
+    ].where((r) => r != null).cast<NavResult>();
     if (results.isEmpty) return '⚠️ SKIP';
     return results.every((r) => r.passed) ? '✅ PASS' : '❌ FAIL';
   }

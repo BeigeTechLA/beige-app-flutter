@@ -4,6 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/app_drawer/screen/drawer_screen.dart';
+import '../features/messages/presentation/routes/messages_args.dart';
+import '../features/messages/presentation/screens/chat_details_screen.dart';
+import '../features/messages/presentation/screens/chat_thread_screen.dart';
+import '../features/messages/presentation/screens/messages_screen.dart';
 import '../features/shoot/presentation/screens/cancel_shoot_screen.dart';
 import '../features/shoot/presentation/screens/manage_shoot_screen.dart';
 import '../features/shoot/presentation/screens/my_shoots_screen.dart';
@@ -12,6 +17,11 @@ import '../features/shoot/presentation/screens/shoot_summary_screen.dart';
 import '../features/shoot/presentation/screens/shoot_type_selection_screen.dart';
 import '../features/shoot/presentation/screens/shoot_update_success_screen.dart';
 import '../features/booking/presentation/screens/content_type_screen.dart';
+import '../features/file_manager/presentation/screens/file_manager_screen.dart';
+import '../features/meetings/presentation/screens/create_meeting_screen.dart';
+import '../features/meetings/presentation/screens/edit_meeting_screen.dart';
+import '../features/meetings/presentation/screens/meeting_scheduled_screen.dart';
+import '../features/meetings/presentation/screens/meetings_screen.dart';
 import '../features/booking/presentation/screens/crew_selection_screen.dart';
 import '../features/booking/presentation/screens/crew_size_matching_screen.dart';
 import '../features/booking/presentation/screens/payment_method_screen.dart';
@@ -105,8 +115,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     connNotifier.value = next;
   });
 
-  final refreshListenable =
-      Listenable.merge([authNotifier, guestNotifier, connNotifier]);
+  final refreshListenable = Listenable.merge([
+    authNotifier,
+    guestNotifier,
+    connNotifier,
+  ]);
 
   // Set of routes the user has already visited while online during this
   // session. While offline, navigation is allowed only to these (plus public
@@ -125,8 +138,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     final extra = state.extra as Map<String, dynamic>?;
     final previous = draftStore.readBookingDraft() ?? const BookingDraft();
     if (extra != null) {
-      final fresh = BookingDraft.fromRouteExtra(extra, currentRoute: routeName)
-          .mergeOver(previous);
+      final fresh = BookingDraft.fromRouteExtra(
+        extra,
+        currentRoute: routeName,
+      ).mergeOver(previous);
       // ignore: discarded_futures
       draftStore.writeBookingDraft(fresh);
       return fresh;
@@ -134,13 +149,15 @@ final routerProvider = Provider<GoRouter>((ref) {
     final hydrated = previous;
     if (hydrated.currentRoute != routeName) {
       // ignore: discarded_futures
-      draftStore.writeBookingDraft(BookingDraft(
-        contentTypeId: hydrated.contentTypeId,
-        shootTypeId: hydrated.shootTypeId,
-        bookingId: hydrated.bookingId,
-        value: hydrated.value,
-        currentRoute: routeName,
-      ));
+      draftStore.writeBookingDraft(
+        BookingDraft(
+          contentTypeId: hydrated.contentTypeId,
+          shootTypeId: hydrated.shootTypeId,
+          bookingId: hydrated.bookingId,
+          value: hydrated.value,
+          currentRoute: routeName,
+        ),
+      );
     }
     return hydrated;
   }
@@ -194,9 +211,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
       // Guest can only access the home shell + public auth routes.
-      if (!isLoggedIn &&
-          isGuest &&
-          !_guestAllowedRoutes.contains(location)) {
+      if (!isLoggedIn && isGuest && !_guestAllowedRoutes.contains(location)) {
         return '/';
       }
 
@@ -232,7 +247,32 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         name: RouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const LoginScreen(),
+          transitionDuration: const Duration(milliseconds: 380),
+          reverseTransitionDuration: const Duration(milliseconds: 380),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return AnimatedBuilder(
+              animation: animation,
+              child: child,
+              builder: (context, inner) {
+                final status = animation.status;
+                final isExiting =
+                    status == AnimationStatus.reverse ||
+                    status == AnimationStatus.dismissed;
+                final curved = Curves.easeInOutCubic.transform(
+                  animation.value.clamp(0.0, 1.0),
+                );
+                final dy = isExiting ? -(1 - curved) : (1 - curved);
+                return FractionalTranslation(
+                  translation: Offset(0, dy),
+                  child: Opacity(opacity: curved, child: inner),
+                );
+              },
+            );
+          },
+        ),
       ),
       GoRoute(
         path: '/signup',
@@ -271,8 +311,29 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // ── Main Shell (bottom nav with IndexedStack) ──────────────────
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return _MainShell(navigationShell: navigationShell);
+        pageBuilder: (context, state, navigationShell) {
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: _MainShell(navigationShell: navigationShell),
+            transitionDuration: const Duration(milliseconds: 380),
+            reverseTransitionDuration: const Duration(milliseconds: 380),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0.0, 1.0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOutCubic,
+                          ),
+                        ),
+                    child: child,
+                  );
+                },
+          );
         },
         branches: [
           // Tab 0: Home
@@ -307,18 +368,38 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           // Tab 3: Messages
-          // Temporarily hidden. Keep this branch code for when messages are
-          // ready to bind back into the bottom navigation.
-          // StatefulShellBranch(
-          //   routes: [
-          //     GoRoute(
-          //       path: '/messages',
-          //       name: RouteNames.messages,
-          //       builder: (context, state) =>
-          //           const Center(child: Text('Messages')),
-          //     ),
-          //   ],
-          // ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/messages',
+                name: RouteNames.messages,
+                builder: (context, state) => const MessagesScreen(),
+              ),
+            ],
+          ),
+
+          /*  // Tab 4: File Manager
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/file-manager',
+                name: RouteNames.fileManager,
+                builder: (context, state) =>
+                const FileManagerScreen(),
+              ),
+            ],
+          ),
+          // Tab 5: Meetings
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/meetings',
+                name: RouteNames.meetings,
+                builder: (context, state) =>
+                const MeetingsScreen(),
+              ),
+            ],
+          ),*/
         ],
       ),
 
@@ -374,10 +455,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.contentType,
         builder: (context, state) {
           final draft = bookingDraftFor(state, '/content-type');
-          return ContentTypeScreen(
-            fromHome: true,
-            value: draft.value,
-          );
+          return ContentTypeScreen(fromHome: true, value: draft.value);
         },
       ),
       GoRoute(
@@ -475,6 +553,29 @@ final routerProvider = Provider<GoRouter>((ref) {
             shootTypeId: data['shootTypeId'] as int? ?? 0,
           );
         },
+      ),
+      GoRoute(
+        path: '/chat',
+        name: RouteNames.chat,
+        builder: (context, state) {
+          final args = ChatArgs.fromExtra(state.extra as Map<String, dynamic>);
+          return ChatThreadScreen(
+            conversationId: args.conversationId,
+            contactName: args.contactName,
+          );
+        },
+        routes: [
+          GoRoute(
+            path: 'details',
+            name: RouteNames.chatDetails,
+            builder: (context, state) {
+              final args = ChatDetailsArgs.fromExtra(
+                state.extra as Map<String, dynamic>,
+              );
+              return ChatDetailsScreen(conversationId: args.conversationId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/manage-booking/:bookingId',
@@ -623,6 +724,39 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.deleteAccountOtp,
         builder: (context, state) => const DeleteAccountOtpScreen(),
       ),
+
+      ///
+      // ── Drawer ────────────────────────────────────────────────────
+      GoRoute(
+        path: '/file-manager',
+        name: RouteNames.fileManager,
+        builder: (context, state) => const FileManagerScreen(),
+      ),
+
+      GoRoute(
+        path: '/meetings',
+        name: RouteNames.meetings,
+        builder: (context, state) => const MeetingsScreen(),
+      ),
+
+      GoRoute(
+        path: '/meeting/create',
+        name: RouteNames.meetingCreate,
+        builder: (context, state) => const CreateMeetingScreen(),
+      ),
+
+      GoRoute(
+        path: '/meeting/edit/:id',
+        name: RouteNames.meetingEdit,
+        builder: (context, state) =>
+            EditMeetingScreen(meetingId: state.pathParameters['id']!),
+      ),
+
+      GoRoute(
+        path: '/meeting/scheduled',
+        name: RouteNames.meetingScheduled,
+        builder: (context, state) => const MeetingScheduledScreen(),
+      ),
     ],
   );
 
@@ -641,8 +775,17 @@ class _MainShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      drawer: const DrawerScreen(),
       extendBody: true,
+
       body: navigationShell,
+
+      /* Row(
+        children: [
+           // _buildNavigationRail(context, ref),
+          Expanded(child: navigationShell),
+        ],
+      ),*/
       bottomNavigationBar: ScaleClampedText(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -654,10 +797,7 @@ class _MainShell extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.transparent,
-                    AppColors.background,
-                  ],
+                  colors: [AppColors.transparent, AppColors.background],
                 ),
               ),
             ),
@@ -710,13 +850,35 @@ class _MainShell extends ConsumerWidget {
                       ),
                       label: " My Shoots",
                     ),
-                    // Messages tab is temporarily hidden until the feature is
-                    // ready to bind. Keep the item code for easy re-enable.
-                    // BottomNavigationBarItem(
-                    //   icon: _buildInactiveIcon(AppAssets.inactiveMessages),
-                    //   activeIcon: _buildActiveIcon(AppAssets.activeMessages),
-                    //   label: " Messages",
-                    // ),
+                    BottomNavigationBarItem(
+                      icon: _buildInactiveIcon(AppAssets.inactiveMessages),
+                      activeIcon: _buildActiveIcon(AppAssets.activeMessages),
+                      label: " Messages",
+                    ),
+                    /* const BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.folder_outlined,
+                            size: _bottomNavIconSize),
+                      ),
+                      activeIcon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.folder, size: _bottomNavIconSize),
+                      ),
+                      label: " Files",
+                    ),
+                    const BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.videocam_outlined,
+                            size: _bottomNavIconSize),
+                      ),
+                      activeIcon: Padding(
+                        padding: EdgeInsets.only(bottom: 4),
+                        child: Icon(Icons.videocam, size: _bottomNavIconSize),
+                      ),
+                      label: " Meetings",
+                    ),*/
                   ],
                 ),
               ),
@@ -724,6 +886,66 @@ class _MainShell extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNavigationRail(BuildContext context, WidgetRef ref) {
+    return NavigationRail(
+      backgroundColor: AppColors.background,
+      selectedIndex: navigationShell.currentIndex,
+      labelType: NavigationRailLabelType.all,
+      selectedIconTheme: const IconThemeData(color: AppColors.white, size: 24),
+      unselectedIconTheme: const IconThemeData(
+        color: AppColors.white70,
+        size: 24,
+      ),
+      selectedLabelTextStyle: AppTextStyles.labelSmall.copyWith(
+        color: AppColors.white,
+      ),
+      unselectedLabelTextStyle: AppTextStyles.labelSmall.copyWith(
+        color: AppColors.white70,
+      ),
+      onDestinationSelected: (index) {
+        final isGuest = ref.read(guestModeProvider);
+        if (isGuest && index != 0) {
+          showLoginDialog(context);
+          return;
+        }
+        navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        );
+      },
+      destinations: [
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveHome),
+          selectedIcon: _railSvgIcon(AppAssets.activeHome),
+          label: const Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveBookShoot),
+          selectedIcon: _railSvgIcon(AppAssets.activeBookShoot),
+          label: const Text('Book'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveMyShoot),
+          selectedIcon: _railSvgIcon(AppAssets.activeMyShoot),
+          label: const Text('Shoots'),
+        ),
+        NavigationRailDestination(
+          icon: _railSvgIcon(AppAssets.inactiveMessages),
+          selectedIcon: _railSvgIcon(AppAssets.activeMessages),
+          label: const Text('Messages'),
+        ),
+      ],
+    );
+  }
+
+  Widget _railSvgIcon(String path) {
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: SvgPicture.asset(path, fit: BoxFit.contain),
     );
   }
 

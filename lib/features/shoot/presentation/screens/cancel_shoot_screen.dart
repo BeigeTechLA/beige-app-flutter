@@ -14,6 +14,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/features/shoot/presentation/providers/cancel_shoot_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
 import '../../../../core/utils/date_time_utils.dart';
@@ -356,7 +357,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                             ),
 
                                   child: isCancelling
-                                      ? const CircularProgressIndicator(
+                                      ? const AppCircularLoader(
                                           color: AppColors.textHeading,
                                           strokeWidth: 2,
                                         )

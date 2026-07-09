@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
-import 'package:beige/app/assets.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ShootUpdateSuccessScreen extends ConsumerStatefulWidget {
   const ShootUpdateSuccessScreen({super.key});
 
   @override
-  ConsumerState<ShootUpdateSuccessScreen> createState() => _ShootUpdateSuccessScreenState();
+  ConsumerState<ShootUpdateSuccessScreen> createState() =>
+      _ShootUpdateSuccessScreenState();
 }
 
-class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScreen> {
+class _ShootUpdateSuccessScreenState
+    extends ConsumerState<ShootUpdateSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,11 +29,7 @@ class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScr
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 /// 🎉 LOTTIE SUCCESS
-                Lottie.asset(
-                  AppAssets.lottieSuccess,
-                  height: 180,
-                  repeat: false,
-                ),
+                const AppSuccessAnimation(height: 180),
 
                 const SizedBox(height: AppSpacing.lg),
 
@@ -77,9 +73,7 @@ class _ShootUpdateSuccessScreenState extends ConsumerState<ShootUpdateSuccessScr
             alignment: Alignment.center,
             child: Text(
               "View Summary",
-              style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.black,
-              ),
+              style: AppTextStyles.titleSmall.copyWith(color: AppColors.black),
             ),
           ),
         ),

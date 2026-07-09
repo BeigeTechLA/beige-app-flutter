@@ -36,8 +36,7 @@ class ShootTypeState {
   }
 }
 
-class ShootTypeNotifier
-    extends AutoDisposeFamilyNotifier<ShootTypeState, int> {
+class ShootTypeNotifier extends AutoDisposeFamilyNotifier<ShootTypeState, int> {
   bool _stepCompleted = false;
 
   @override
@@ -45,11 +44,14 @@ class ShootTypeNotifier
     // --- Booking Analytics: Drop-off tracking for Step 2 ---
     ref.onDispose(() {
       if (!_stepCompleted && state.bookingId != null) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': state.bookingId!,
-          'last_step': 'shoot_type',
-          'step_number': 2,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': state.bookingId!,
+            'last_step': 'shoot_type',
+            'step_number': 2,
+          },
+        );
       }
     });
     _fetchShootTypes(contentTypeId);
@@ -99,10 +101,7 @@ class ShootTypeNotifier
       'shoot_type_id': shootTypeId,
     };
 
-    final result = await repo.updateBooking(
-      bookingId: bookingId,
-      data: body,
-    );
+    final result = await repo.updateBooking(bookingId: bookingId, data: body);
 
     result.fold(
       (error) => state = state.copyWith(
@@ -112,11 +111,14 @@ class ShootTypeNotifier
       (data) {
         _stepCompleted = true;
         // --- Booking Analytics: Step 2 — Shoot type selected ---
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStepShootType, params: {
-          'booking_id': bookingId,
-          'shoot_type': shootTypeName,
-          'step_number': 2,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStepShootType,
+          params: {
+            'booking_id': bookingId,
+            'shoot_type': shootTypeName,
+            'step_number': 2,
+          },
+        );
         state = state.copyWith(
           status: ShootTypeStatus.success,
           bookingId: data['data']?['booking_id'] as int?,
@@ -136,6 +138,4 @@ class ShootTypeNotifier
 }
 
 final shootTypeNotifierProvider = NotifierProvider.autoDispose
-    .family<ShootTypeNotifier, ShootTypeState, int>(
-  ShootTypeNotifier.new,
-);
+    .family<ShootTypeNotifier, ShootTypeState, int>(ShootTypeNotifier.new);

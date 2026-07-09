@@ -185,4 +185,25 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     fontStyle: FontStyle.italic,
   );
+
+  /// Outfit 16 w500 — Emphasised body
+  static const TextStyle bodyLargeMedium = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
+
+  /// Outfit 12 w500 — Small label
+  static const TextStyle bodySmallMedium = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+  );
+
+  /// Outfit 14 w600 — Body emphasised
+  static const TextStyle bodyMediumStrong = TextStyle(
+    fontFamily: fontFamilyBody,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 }

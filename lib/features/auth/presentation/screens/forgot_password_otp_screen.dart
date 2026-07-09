@@ -329,7 +329,6 @@ class _ForgotPasswordOtpScreenState
                           style: AppTextStyles.bodyCompact.copyWith(
                             fontFamily: AppTextStyles.fontFamilyDisplay,
                             fontWeight: FontWeight.w600,
-
                           ),
                         ),
                       ),

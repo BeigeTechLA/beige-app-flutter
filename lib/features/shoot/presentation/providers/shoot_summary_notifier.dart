@@ -66,8 +66,9 @@ class ShootSummaryNotifier
     );
 
     state = state.copyWith(
-      status:
-          error != null ? ShootSummaryStatus.error : ShootSummaryStatus.loaded,
+      status: error != null
+          ? ShootSummaryStatus.error
+          : ShootSummaryStatus.loaded,
       shootDetails: details,
       timeline: timeline,
       errorMessage: error,
@@ -77,5 +78,5 @@ class ShootSummaryNotifier
 
 final shootSummaryNotifierProvider = NotifierProvider.autoDispose
     .family<ShootSummaryNotifier, ShootSummaryState, int>(
-  ShootSummaryNotifier.new,
-);
+      ShootSummaryNotifier.new,
+    );

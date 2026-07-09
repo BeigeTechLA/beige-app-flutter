@@ -58,7 +58,7 @@ class AppBookingCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(child: _BookingCardImage(imagePath: imagePath)),
-             // const Positioned.fill(child: _BookingCardTopGradient()),
+              // const Positioned.fill(child: _BookingCardTopGradient()),
               const Positioned.fill(child: _BookingCardBottomGradient()),
               Positioned(
                 left: AppSpacing.base,

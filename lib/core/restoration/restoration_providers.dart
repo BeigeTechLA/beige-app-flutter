@@ -7,8 +7,9 @@ import 'route_restoration_service.dart';
 import 'splash_restorer.dart';
 
 /// Long-lived [RouteRestorationService] backed by SharedPreferences.
-final routeRestorationServiceProvider =
-    Provider<RouteRestorationService>((ref) {
+final routeRestorationServiceProvider = Provider<RouteRestorationService>((
+  ref,
+) {
   final prefs = ref.watch(sharedPreferencesProvider);
   return RouteRestorationService(prefs);
 });

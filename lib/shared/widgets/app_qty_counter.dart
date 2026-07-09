@@ -21,10 +21,14 @@ class AppQtyCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayValue = formatValue?.call(value) ?? value.toString().padLeft(2, '0');
+    final displayValue =
+        formatValue?.call(value) ?? value.toString().padLeft(2, '0');
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         gradient: AppColors.counterGradient,
         borderRadius: AppRadii.mdAll,

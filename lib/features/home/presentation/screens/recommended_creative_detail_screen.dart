@@ -9,6 +9,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/features/creative/presentation/providers/creative_profile_notifier.dart';
 
 class RecommendedCreativeDetailScreen extends ConsumerStatefulWidget {
@@ -95,18 +96,25 @@ class _RecommendedCreativeDetailScreenState
                 /// TOP IMAGE + ACTIONS
                 Stack(
                   children: [
-                    Image.network(
-                      _imageUrl(creative?['profile_image_url']),
-                      height: 360,
-                      width: double.infinity,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => SvgPicture.asset(
-                        AppAssets.imagePlaceholder,
-                        height: 360,
-                        width: double.infinity,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
+                    _imageUrl(creative?['profile_image_url']).isNotEmpty
+                        ? Image.network(
+                            _imageUrl(creative?['profile_image_url']),
+                            height: 360,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => SvgPicture.asset(
+                              AppAssets.imagePlaceholder,
+                              height: 360,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : SvgPicture.asset(
+                            AppAssets.imagePlaceholder,
+                            height: 360,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                     Container(
                       height: 360,
                       decoration: BoxDecoration(
@@ -359,10 +367,7 @@ class _RecommendedCreativeDetailScreenState
               ],
             ),
           ),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
+          if (isLoading) const AppScreenLoader(),
         ],
       ),
     );

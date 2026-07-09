@@ -60,6 +60,4 @@ class HomeNotifier extends AutoDisposeNotifier<HomeState> {
 }
 
 final homeNotifierProvider =
-    NotifierProvider.autoDispose<HomeNotifier, HomeState>(
-  HomeNotifier.new,
-);
+    NotifierProvider.autoDispose<HomeNotifier, HomeState>(HomeNotifier.new);

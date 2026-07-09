@@ -56,10 +56,7 @@ class ProfileNotifier extends AutoDisposeNotifier<ProfileState> {
       ),
       (profile) {
         AnalyticsService.logEvent(AnalyticsEvents.profileViewed);
-        state = state.copyWith(
-          status: ProfileStatus.loaded,
-          profile: profile,
-        );
+        state = state.copyWith(status: ProfileStatus.loaded, profile: profile);
       },
     );
   }
@@ -67,5 +64,5 @@ class ProfileNotifier extends AutoDisposeNotifier<ProfileState> {
 
 final profileNotifierProvider =
     NotifierProvider.autoDispose<ProfileNotifier, ProfileState>(
-  ProfileNotifier.new,
-);
+      ProfileNotifier.new,
+    );

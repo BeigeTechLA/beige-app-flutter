@@ -1,4 +1,3 @@
-
 class HomeModel {
   final String name;
   final String location;
@@ -18,7 +17,8 @@ class HomeModel {
     required this.profileImageUrl,
     required this.specialties,
     required this.mainCreatives,
-    required this.featuredCreatives, required this.name,
+    required this.featuredCreatives,
+    required this.name,
     required this.yourBookings,
     this.continueBooking,
   });
@@ -59,11 +59,7 @@ class Specialty {
   final String name;
   final String? imageUrl;
 
-  Specialty({
-    required this.id,
-    required this.name,
-    this.imageUrl,
-  });
+  Specialty({required this.id, required this.name, this.imageUrl});
 
   factory Specialty.fromJson(Map<String, dynamic> json) {
     return Specialty(
@@ -160,9 +156,7 @@ class ContinueBooking {
           ? (json['progress'] as num).toDouble()
           : 0.0,
       resumeApi: json['resume_api'] ?? "",
-      flow: (json['flow'] as List? ?? [])
-          .map((e) => Flow.fromJson(e))
-          .toList(),
+      flow: (json['flow'] as List? ?? []).map((e) => Flow.fromJson(e)).toList(),
       contentType: json['content_type'],
     );
   }

@@ -141,20 +141,20 @@ class BookingDraft {
   final String? currentRoute;
 
   Map<String, dynamic> toJson() => {
-        if (contentTypeId != null) 'contentTypeId': contentTypeId,
-        if (shootTypeId != null) 'shootTypeId': shootTypeId,
-        if (bookingId != null) 'bookingId': bookingId,
-        if (value != null) 'value': value,
-        if (currentRoute != null) 'currentRoute': currentRoute,
-      };
+    if (contentTypeId != null) 'contentTypeId': contentTypeId,
+    if (shootTypeId != null) 'shootTypeId': shootTypeId,
+    if (bookingId != null) 'bookingId': bookingId,
+    if (value != null) 'value': value,
+    if (currentRoute != null) 'currentRoute': currentRoute,
+  };
 
   factory BookingDraft.fromJson(Map<String, dynamic> json) => BookingDraft(
-        contentTypeId: _asInt(json['contentTypeId']),
-        shootTypeId: _asInt(json['shootTypeId']),
-        bookingId: _asInt(json['bookingId']),
-        value: _asInt(json['value']),
-        currentRoute: json['currentRoute'] as String?,
-      );
+    contentTypeId: _asInt(json['contentTypeId']),
+    shootTypeId: _asInt(json['shootTypeId']),
+    bookingId: _asInt(json['bookingId']),
+    value: _asInt(json['value']),
+    currentRoute: json['currentRoute'] as String?,
+  );
 
   /// Convenience builder from the `state.extra` map shape used by the
   /// existing booking routes. Accepts both `shootTypeId` and the legacy
@@ -175,19 +175,19 @@ class BookingDraft {
 
   /// Re-emits as a route-extra map matching the keys current builders read.
   Map<String, dynamic> toRouteExtra() => {
-        if (contentTypeId != null) 'contentTypeId': contentTypeId,
-        if (shootTypeId != null) 'ShootTypeId': shootTypeId,
-        if (bookingId != null) 'bookingId': bookingId,
-        if (value != null) 'value': value,
-      };
+    if (contentTypeId != null) 'contentTypeId': contentTypeId,
+    if (shootTypeId != null) 'ShootTypeId': shootTypeId,
+    if (bookingId != null) 'bookingId': bookingId,
+    if (value != null) 'value': value,
+  };
 
   BookingDraft mergeOver(BookingDraft other) => BookingDraft(
-        contentTypeId: contentTypeId ?? other.contentTypeId,
-        shootTypeId: shootTypeId ?? other.shootTypeId,
-        bookingId: bookingId ?? other.bookingId,
-        value: value ?? other.value,
-        currentRoute: currentRoute ?? other.currentRoute,
-      );
+    contentTypeId: contentTypeId ?? other.contentTypeId,
+    shootTypeId: shootTypeId ?? other.shootTypeId,
+    bookingId: bookingId ?? other.bookingId,
+    value: value ?? other.value,
+    currentRoute: currentRoute ?? other.currentRoute,
+  );
 }
 
 @immutable
@@ -219,18 +219,18 @@ class ManageBookingDraft {
   final List<dynamic>? multiDays;
 
   Map<String, dynamic> toJson() => {
-        'bookingId': bookingId,
-        if (shootTypeId != null) 'shootTypeId': shootTypeId,
-        if (projectName != null) 'projectName': projectName,
-        if (eventDate != null) 'eventDate': eventDate,
-        if (startTime != null) 'startTime': startTime,
-        if (endTime != null) 'endTime': endTime,
-        if (durationHours != null) 'durationHours': durationHours,
-        if (location != null) 'location': location,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-        if (contentType != null) 'contentType': contentType,
-        if (multiDays != null) 'multiDays': multiDays,
-      };
+    'bookingId': bookingId,
+    if (shootTypeId != null) 'shootTypeId': shootTypeId,
+    if (projectName != null) 'projectName': projectName,
+    if (eventDate != null) 'eventDate': eventDate,
+    if (startTime != null) 'startTime': startTime,
+    if (endTime != null) 'endTime': endTime,
+    if (durationHours != null) 'durationHours': durationHours,
+    if (location != null) 'location': location,
+    if (imageUrl != null) 'imageUrl': imageUrl,
+    if (contentType != null) 'contentType': contentType,
+    if (multiDays != null) 'multiDays': multiDays,
+  };
 
   factory ManageBookingDraft.fromJson(Map<String, dynamic> json) =>
       ManageBookingDraft(
@@ -268,17 +268,17 @@ class ManageBookingDraft {
   }
 
   Map<String, dynamic> toRouteExtra() => {
-        if (shootTypeId != null) 'shootTypeId': shootTypeId,
-        if (projectName != null) 'projectName': projectName,
-        if (eventDate != null) 'eventDate': eventDate,
-        if (startTime != null) 'startTime': startTime,
-        if (endTime != null) 'endTime': endTime,
-        if (durationHours != null) 'durationHours': durationHours,
-        if (location != null) 'location': location,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-        if (contentType != null) 'contentType': contentType,
-        if (multiDays != null) 'multiDays': multiDays,
-      };
+    if (shootTypeId != null) 'shootTypeId': shootTypeId,
+    if (projectName != null) 'projectName': projectName,
+    if (eventDate != null) 'eventDate': eventDate,
+    if (startTime != null) 'startTime': startTime,
+    if (endTime != null) 'endTime': endTime,
+    if (durationHours != null) 'durationHours': durationHours,
+    if (location != null) 'location': location,
+    if (imageUrl != null) 'imageUrl': imageUrl,
+    if (contentType != null) 'contentType': contentType,
+    if (multiDays != null) 'multiDays': multiDays,
+  };
 }
 
 @immutable
@@ -306,16 +306,16 @@ class CancelBookingDraft {
   final String? imageUrl;
 
   Map<String, dynamic> toJson() => {
-        'bookingId': bookingId,
-        if (projectName != null) 'projectName': projectName,
-        if (eventDate != null) 'eventDate': eventDate,
-        if (startTime != null) 'startTime': startTime,
-        if (endTime != null) 'endTime': endTime,
-        if (durationHours != null) 'durationHours': durationHours,
-        if (location != null) 'location': location,
-        if (contentType != null) 'contentType': contentType,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-      };
+    'bookingId': bookingId,
+    if (projectName != null) 'projectName': projectName,
+    if (eventDate != null) 'eventDate': eventDate,
+    if (startTime != null) 'startTime': startTime,
+    if (endTime != null) 'endTime': endTime,
+    if (durationHours != null) 'durationHours': durationHours,
+    if (location != null) 'location': location,
+    if (contentType != null) 'contentType': contentType,
+    if (imageUrl != null) 'imageUrl': imageUrl,
+  };
 
   factory CancelBookingDraft.fromJson(Map<String, dynamic> json) =>
       CancelBookingDraft(
@@ -349,15 +349,15 @@ class CancelBookingDraft {
   }
 
   Map<String, dynamic> toRouteExtra() => {
-        if (projectName != null) 'projectName': projectName,
-        if (eventDate != null) 'eventDate': eventDate,
-        if (startTime != null) 'startTime': startTime,
-        if (endTime != null) 'endTime': endTime,
-        if (durationHours != null) 'durationHours': durationHours,
-        if (location != null) 'location': location,
-        if (contentType != null) 'contentType': contentType,
-        if (imageUrl != null) 'imageUrl': imageUrl,
-      };
+    if (projectName != null) 'projectName': projectName,
+    if (eventDate != null) 'eventDate': eventDate,
+    if (startTime != null) 'startTime': startTime,
+    if (endTime != null) 'endTime': endTime,
+    if (durationHours != null) 'durationHours': durationHours,
+    if (location != null) 'location': location,
+    if (contentType != null) 'contentType': contentType,
+    if (imageUrl != null) 'imageUrl': imageUrl,
+  };
 }
 
 int? _asInt(Object? value) {

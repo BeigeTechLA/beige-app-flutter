@@ -5,8 +5,9 @@ import '../../data/datasources/profile_remote_datasource.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 import '../../domain/repositories/profile_repository.dart';
 
-final _profileRemoteDataSourceProvider =
-    Provider<ProfileRemoteDataSource>((ref) {
+final _profileRemoteDataSourceProvider = Provider<ProfileRemoteDataSource>((
+  ref,
+) {
   final dioClient = ref.watch(dioClientProvider);
   return ProfileRemoteDataSource(dioClient);
 });

@@ -13,6 +13,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/features/shoot/presentation/providers/shoot_summary_notifier.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ShootSummaryScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -95,7 +96,6 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
     final days = multiDay?['days'] ?? [];
     final isMulti = event?['booking_type'] == "multi_day" && days.isNotEmpty;
     final image = _getFinalImage(bookingData);
-    final creativeName = (bookingData?['creative']?['name'] ?? "").toString();
     return Scaffold(
       body: Stack(
         children: [
@@ -157,14 +157,21 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                     Positioned(
                       top: 45,
                       left: 16,
-                      child: InkWell(
+                      child: GestureDetector(
                         onTap: _goBackToMyShoots,
-                        child: SvgPicture.asset(
-                          AppAssets.back,
-                          height: 24,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.white,
-                            BlendMode.srcIn,
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          alignment: Alignment.centerLeft,
+                          color: AppColors.transparent,
+                          child: SvgPicture.asset(
+                            AppAssets.back,
+                            height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.white,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),
@@ -356,10 +363,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
               ],
             ),
           ),
-          if (loading)
-            const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            ),
+          if (loading) const AppScreenLoader(),
         ],
       ),
 
@@ -566,7 +570,7 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                   /// BODY
                   Expanded(
                     child: loadingTimeline
-                        ? const Center(child: CircularProgressIndicator())
+                        ? const AppScreenLoader()
                         : timelineData.isEmpty
                         ? Center(
                             child: Text(

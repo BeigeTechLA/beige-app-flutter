@@ -5,8 +5,9 @@ import '../../data/datasources/payment_remote_datasource.dart';
 import '../../data/repositories/payment_repository_impl.dart';
 import '../../domain/repositories/payment_repository.dart';
 
-final _paymentRemoteDataSourceProvider =
-    Provider<PaymentRemoteDataSource>((ref) {
+final _paymentRemoteDataSourceProvider = Provider<PaymentRemoteDataSource>((
+  ref,
+) {
   final dioClient = ref.watch(dioClientProvider);
   return PaymentRemoteDataSource(dioClient);
 });

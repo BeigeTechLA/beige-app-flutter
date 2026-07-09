@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/restoration/restoration_providers.dart';
+import '../features/messages/presentation/providers/messages_repository_provider.dart';
 import '../shared/widgets/connectivity_listener.dart';
+import 'colors.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -38,6 +40,9 @@ class _AppState extends ConsumerState<App> {
   @override
   Widget build(BuildContext context) {
     final goRouter = ref.watch(routerProvider);
+    // Keeps the chat socket alive for the app session and ties its
+    // connect/disconnect to auth state.
+    ref.watch(chatSocketLifecycleProvider);
 
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,
@@ -46,7 +51,21 @@ class _AppState extends ConsumerState<App> {
       theme: AppTheme.dark(),
       routerConfig: goRouter,
       builder: (context, child) {
-        return ConnectivityListener(child: child ?? const SizedBox.shrink());
+        return GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.translucent,
+          child: MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.noScaling),
+            child: ColoredBox(
+              color: AppColors.background,
+              child: ConnectivityListener(
+                child: child ?? const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        );
       },
     );
   }

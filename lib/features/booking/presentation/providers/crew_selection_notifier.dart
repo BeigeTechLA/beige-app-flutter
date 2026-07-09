@@ -63,11 +63,14 @@ class CrewSelectionNotifier
     // --- Booking Analytics: Drop-off tracking for Step 6 ---
     ref.onDispose(() {
       if (!_stepCompleted) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': bookingId,
-          'last_step': 'crew_selection',
-          'step_number': 6,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': bookingId,
+            'last_step': 'crew_selection',
+            'step_number': 6,
+          },
+        );
       }
     });
     _fetchInitialData(bookingId);
@@ -93,21 +96,19 @@ class CrewSelectionNotifier
     Map<int, int> requiredCountByRole = {};
     Set<int> allowedRoleIds = {};
     final matchesFailed = matchesResult.fold(
-          (error) {
+      (error) {
         state = state.copyWith(
           status: CrewSelectionStatus.error,
           errorMessage: error.message,
         );
         return true;
       },
-          (data) {
-
+      (data) {
         /// 🔥 MAIN ITEMS
         final items = (data['items'] as List?) ?? [];
 
         /// 🔥 FALLBACK RANDOM CREATORS
-        final randomCreators =
-            (data['random_creators'] as List?) ?? [];
+        final randomCreators = (data['random_creators'] as List?) ?? [];
 
         /// 🔥 IF ITEMS EMPTY → USE RANDOM CREATORS
         crewMatches = items;
@@ -115,12 +116,10 @@ class CrewSelectionNotifier
         /// 🔥 DISTANCE WISE FILTER
         /// 🔥 LOCATION BASED CREATORS
         for (var item in crewMatches) {
-
           double distance = 0;
 
           if (item['distance_km'] != null) {
-            distance =
-                (item['distance_km'] as num?)?.toDouble() ?? 0;
+            distance = (item['distance_km'] as num?)?.toDouble() ?? 0;
           }
 
           if (distance > 0 && distance <= 100) {
@@ -132,26 +131,17 @@ class CrewSelectionNotifier
         other = randomCreators;
 
         /// ✅ REQUIREMENTS SAFE
-        final requirements =
-            (data['crew_requirements'] as List?) ?? [];
+        final requirements = (data['crew_requirements'] as List?) ?? [];
 
         allowedRoleIds = requirements
-            .map<int>(
-              (e) => int.tryParse(
-            e['role_id'].toString(),
-          ) ??
-              0,
-        )
+            .map<int>((e) => int.tryParse(e['role_id'].toString()) ?? 0)
             .where((id) => id != 0)
             .toSet();
 
         requiredCountByRole = {
           for (var r in requirements)
             (int.tryParse(r['role_id'].toString()) ?? 0):
-            (int.tryParse(
-              r['required_count'].toString(),
-            ) ??
-                0),
+                (int.tryParse(r['required_count'].toString()) ?? 0),
         };
 
         return false;
@@ -166,38 +156,29 @@ class CrewSelectionNotifier
     Map<String, dynamic> heldByRole = {};
 
     holdsResult.fold(
-          (error) {
+      (error) {
         /// Non-critical
       },
-          (data) {
-
+      (data) {
         /// ✅ SAFE CREATIVES
-        final creatives =
-            (data['creatives'] as List?) ?? [];
+        final creatives = (data['creatives'] as List?) ?? [];
 
         addedCrewUserIds = creatives
             .map<int>(
-              (e) => int.tryParse(
-            e['creative_user_id'].toString(),
-          ) ??
-              0,
-        )
+              (e) => int.tryParse(e['creative_user_id'].toString()) ?? 0,
+            )
             .where((id) => id != 0)
             .toSet();
 
         /// ✅ SAFE SUMMARY
-        final summary =
-        data['summary'] as Map<String, dynamic>?;
+        final summary = data['summary'] as Map<String, dynamic>?;
 
         if (summary != null) {
-
           requiredByRole = Map<String, dynamic>.from(
             summary['required_by_role'] ?? {},
           );
 
-          heldByRole = Map<String, dynamic>.from(
-            summary['held_by_role'] ?? {},
-          );
+          heldByRole = Map<String, dynamic>.from(summary['held_by_role'] ?? {});
         }
       },
     );
@@ -255,8 +236,8 @@ class CrewSelectionNotifier
     );
   }
 
-  /// Returns true if hold added successfully.
-  Future<bool> addHold({
+  /// Returns null on success, error message on failure.
+  Future<String?> addHold({
     required int bookingId,
     required int crewMemberId,
     required int roleId,
@@ -268,18 +249,15 @@ class CrewSelectionNotifier
       roleId: roleId,
     );
 
-    return result.fold(
-      (error) => false,
-      (data) {
-        final updated = Set<int>.from(state.addedCrewUserIds)..add(crewMemberId);
-        state = state.copyWith(addedCrewUserIds: updated);
-        return true;
-      },
-    );
+    return result.fold((error) => error.message, (data) {
+      final updated = Set<int>.from(state.addedCrewUserIds)..add(crewMemberId);
+      state = state.copyWith(addedCrewUserIds: updated);
+      return null;
+    });
   }
 
-  /// Returns true if hold removed successfully.
-  Future<bool> removeHold({
+  /// Returns null on success, error message on failure.
+  Future<String?> removeHold({
     required int bookingId,
     required int crewMemberId,
   }) async {
@@ -289,44 +267,75 @@ class CrewSelectionNotifier
       crewMemberId: crewMemberId,
     );
 
-    return result.fold(
-      (error) => false,
-      (data) {
-        final updated = Set<int>.from(state.addedCrewUserIds)..remove(crewMemberId);
-        state = state.copyWith(addedCrewUserIds: updated);
-        return true;
-      },
-    );
+    return result.fold((error) => error.message, (data) {
+      final updated = Set<int>.from(state.addedCrewUserIds)
+        ..remove(crewMemberId);
+      state = state.copyWith(addedCrewUserIds: updated);
+      return null;
+    });
   }
 
-  /// Refresh holds from backend.
+  /// Refresh holds from backend. Merges server ids with local state so
+  /// optimistic additions (already added via [addHold]) are not wiped when
+  /// the server response lags or uses a different id key.
   Future<void> refreshHolds(int bookingId) async {
     final repo = ref.read(bookingRepositoryProvider);
     final result = await repo.getHolds(bookingId: bookingId);
 
-    result.fold(
-      (_) {},
-      (data) {
-        final creatives = data['creatives'] as List? ?? [];
-        final addedIds = creatives
-            .map<int>((e) => e['creative_user_id'] as int)
-            .toSet();
+    result.fold((_) {}, (data) {
+      final creatives = data['creatives'] as List? ?? [];
+      final serverIds = creatives
+          .map(
+            (e) =>
+                (e as Map)['creative_user_id'] ??
+                e['crew_member_id'] ??
+                e['user_id'],
+          )
+          .whereType<num>()
+          .map((v) => v.toInt())
+          .toSet();
 
-        final summary = data['summary'] as Map<String, dynamic>?;
-        Map<String, dynamic> requiredByRole = {};
-        Map<String, dynamic> heldByRole = {};
-        if (summary != null) {
-          requiredByRole = Map<String, dynamic>.from(summary['required_by_role'] ?? {});
-          heldByRole = Map<String, dynamic>.from(summary['held_by_role'] ?? {});
-        }
+      final merged = <int>{...state.addedCrewUserIds, ...serverIds};
 
-        state = state.copyWith(
-          addedCrewUserIds: addedIds,
-          requiredByRole: requiredByRole,
-          heldByRole: heldByRole,
+      final summary = data['summary'] as Map<String, dynamic>?;
+      Map<String, dynamic> requiredByRole = state.requiredByRole;
+      Map<String, dynamic> heldByRole = state.heldByRole;
+      if (summary != null) {
+        requiredByRole = Map<String, dynamic>.from(
+          summary['required_by_role'] ?? {},
         );
-      },
-    );
+        heldByRole = Map<String, dynamic>.from(summary['held_by_role'] ?? {});
+      }
+
+      state = state.copyWith(
+        addedCrewUserIds: merged,
+        requiredByRole: requiredByRole,
+        heldByRole: heldByRole,
+      );
+    });
+  }
+
+  /// Refresh only the counter summary (required/held by role) from backend.
+  /// Never touches [CrewSelectionState.addedCrewUserIds] — used after
+  /// add/remove hold actions where the local set is already the source of truth.
+  Future<void> refreshHoldsSummary(int bookingId) async {
+    final repo = ref.read(bookingRepositoryProvider);
+    final result = await repo.getHolds(bookingId: bookingId);
+
+    result.fold((_) {}, (data) {
+      final summary = data['summary'] as Map<String, dynamic>?;
+      if (summary == null) return;
+      final requiredByRole = Map<String, dynamic>.from(
+        summary['required_by_role'] ?? {},
+      );
+      final heldByRole = Map<String, dynamic>.from(
+        summary['held_by_role'] ?? {},
+      );
+      state = state.copyWith(
+        requiredByRole: requiredByRole,
+        heldByRole: heldByRole,
+      );
+    });
   }
 
   void markStepCompleted() {
@@ -336,5 +345,5 @@ class CrewSelectionNotifier
 
 final crewSelectionNotifierProvider = NotifierProvider.autoDispose
     .family<CrewSelectionNotifier, CrewSelectionState, int>(
-  CrewSelectionNotifier.new,
-);
+      CrewSelectionNotifier.new,
+    );

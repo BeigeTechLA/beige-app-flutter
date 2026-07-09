@@ -5,8 +5,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
@@ -14,7 +12,9 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/crew_selection_notifier.dart';
-import 'package:beige/shared/widgets/loading.dart' show AppLoader;
+import 'package:beige/shared/widgets/loading.dart'
+    show AppLoader, AppSuccessAnimation;
+import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
 class CrewSelectionScreen extends ConsumerStatefulWidget {
@@ -128,6 +128,51 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     return 1; // default (kabhi 0 nahi)
   }
 
+  /// Robust role_id extraction from a match item.
+  /// Handles: List<int>, List<String>, List<Map>, int, String, null.
+  /// Falls back to role_name / contentTypeId derivation so we never send 0.
+  int _extractRoleId(Map item) {
+    int parseFromDynamic(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      if (v is Map) {
+        for (final k in const ['id', 'role_id', 'value']) {
+          final inner = v[k];
+          if (inner != null) {
+            final parsed = parseFromDynamic(inner);
+            if (parsed != 0) return parsed;
+          }
+        }
+      }
+      return int.tryParse(v.toString()) ?? 0;
+    }
+
+    for (final key in const ['role_id', 'role_ids', 'roles']) {
+      final raw = item[key];
+      if (raw == null) continue;
+      if (raw is List) {
+        for (final element in raw) {
+          final parsed = parseFromDynamic(element);
+          if (parsed != 0) return parsed;
+        }
+      } else {
+        final parsed = parseFromDynamic(raw);
+        if (parsed != 0) return parsed;
+      }
+    }
+
+    final roleName = (item['role_name'] ?? item['role'] ?? '').toString();
+    final derived = getRoleIdByContentType(widget.contentTypeId, roleName);
+    if (derived != 0) return derived;
+    debugPrint(
+      '[crew_selection] role_id extraction failed. keys=${item.keys.toList()} '
+      'role_id=${item['role_id']} role_name=${item['role_name']}',
+    );
+    return 0;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,7 +190,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     required int creativeUserId,
     required int roleId,
   }) async {
-    final success = await ref
+    final errorMessage = await ref
         .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
         .addHold(
           bookingId: widget.bookingId,
@@ -153,37 +198,37 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
           roleId: roleId,
         );
 
+    final success = errorMessage == null;
+
     if (!success && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Failed to add hold")));
+      TopMessage.show(context, errorMessage);
     }
 
     // Refresh holds to get updated summary
     if (success) {
       await ref
           .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
-          .refreshHolds(widget.bookingId);
+          .refreshHoldsSummary(widget.bookingId);
     }
 
     return success;
   }
 
   Future<bool> _removeHolds({required int creativeUserId}) async {
-    final success = await ref
+    final errorMessage = await ref
         .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
         .removeHold(bookingId: widget.bookingId, crewMemberId: creativeUserId);
 
+    final success = errorMessage == null;
+
     if (!success && mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Failed to remove hold")));
+      TopMessage.show(context, errorMessage);
     }
 
     if (success) {
       await ref
           .read(crewSelectionNotifierProvider(widget.bookingId).notifier)
-          .refreshHolds(widget.bookingId);
+          .refreshHoldsSummary(widget.bookingId);
     }
 
     return success;
@@ -449,10 +494,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                         final int userId = creativeUserId;
 
                         /// ✅ SAFE ROLE ID
-                        final roleData = item['role_id'];
-                        final int roleId = (roleData is List)
-                            ? int.tryParse(roleData.first.toString()) ?? 0
-                            : int.tryParse(roleData.toString()) ?? 0;
+                        final int roleId = _extractRoleId(
+                          item as Map<String, dynamic>,
+                        );
 
                         final bool isAdded = addedCrewUserIds.contains(
                           creativeUserId,
@@ -628,25 +672,27 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                       item['crew_member_id'] ??
                                                       0;
 
-                                                  final roleData =
-                                                      item['role_id'];
-
                                                   /// ✅ SAFE ROLE ID
                                                   final int roleId =
-                                                      (roleData is List)
-                                                      ? int.tryParse(
-                                                              roleData.first
-                                                                  .toString(),
-                                                            ) ??
-                                                            0
-                                                      : int.tryParse(
-                                                              roleData
-                                                                  .toString(),
-                                                            ) ??
-                                                            0;
+                                                      _extractRoleId(
+                                                        item as Map,
+                                                      );
 
-                                                  if (creativeUserId == 0)
+                                                  if (creativeUserId == 0) {
                                                     return;
+                                                  }
+                                                  if (roleId == 0) {
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                          'Missing role for this creator',
+                                                        ),
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
 
                                                   /// 🔴 REMOVE
                                                   if (addedCrewUserIds.contains(
@@ -671,7 +717,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                               widget.bookingId,
                                                             ).notifier,
                                                           )
-                                                          .refreshHolds(
+                                                          .refreshHoldsSummary(
                                                             widget.bookingId,
                                                           );
                                                     } else {
@@ -735,7 +781,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                             widget.bookingId,
                                                           ).notifier,
                                                         )
-                                                        .refreshHolds(
+                                                        .refreshHoldsSummary(
                                                           widget.bookingId,
                                                         );
                                                   } else {
@@ -792,9 +838,13 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             onTap: () {
                                               context.pushNamed(
                                                 RouteNames.recommendedDetails,
-                                                extra: {
-                                                  'id': item['crew_member_id'],
-                                                  'bookingId': widget.bookingId,
+                                                pathParameters: {
+                                                  'id': item['crew_member_id']
+                                                      .toString(),
+                                                },
+                                                queryParameters: {
+                                                  'bookingId': widget.bookingId
+                                                      .toString(),
                                                 },
                                               );
                                             },
@@ -835,6 +885,16 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  /// 🔥 ROLE COUNTER PILLS
+                  // if (!showLocationCard && requiredByRole.isNotEmpty)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(bottom: 12),
+                  //     child: _RoleCounterRow(
+                  //       requiredByRole: requiredByRole,
+                  //       heldByRole: heldByRole,
+                  //     ),
+                  //   ),
+
                   /// 🔥 SHOW ONLY WHEN NO LOCATION DATA
                   if (showLocationCard)
                     Padding(
@@ -885,11 +945,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                           if (matches.isEmpty) continue;
 
-                          final roleId =
-                              int.tryParse(
-                                matches.first['role_id'].toString(),
-                              ) ??
-                              0;
+                          final int roleId = _extractRoleId(
+                            matches.first as Map,
+                          );
+
+                          if (roleId == 0) continue;
 
                           await _addHolds(
                             creativeUserId: userId,
@@ -1434,12 +1494,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
               mainAxisSize: MainAxisSize.min, // 🔥 IMPORTANT
               children: [
                 /// 🔥 SMALL ICON / LOTTIE
-                SizedBox(
-                  child: Lottie.asset(
-                    AppAssets.lottieSuccess,
-                    height: 150,
-                    fit: BoxFit.cover,
-                  ),
+                const SizedBox(
+                  child: AppSuccessAnimation(height: 150, fit: BoxFit.cover),
                 ),
 
                 const SizedBox(height: 12),
@@ -1496,6 +1552,98 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _RoleCounterRow extends StatelessWidget {
+  final Map<String, dynamic> requiredByRole;
+  final Map<String, dynamic> heldByRole;
+
+  const _RoleCounterRow({
+    required this.requiredByRole,
+    required this.heldByRole,
+  });
+
+  static const Map<int, ({String label, String iconAsset})> _roleMeta = {
+    1: (label: 'Videographer(s)', iconAsset: AppAssets.videoCam),
+    2: (label: 'Photographer(s)', iconAsset: AppAssets.camera),
+  };
+
+  int _parseCount(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v?.toString() ?? '') ?? 0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = <MapEntry<int, int>>[];
+    for (final e in requiredByRole.entries) {
+      final id = int.tryParse(e.key.toString()) ?? 0;
+      if (id == 0) continue;
+      entries.add(MapEntry(id, _parseCount(e.value)));
+    }
+    if (entries.isEmpty) return const SizedBox.shrink();
+    entries.sort((a, b) => a.key.compareTo(b.key));
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (int i = 0; i < entries.length; i++) ...[
+          if (i > 0) const SizedBox(width: 8),
+          _RoleCounterPill(
+            roleId: entries[i].key,
+            required: entries[i].value,
+            held: _parseCount(heldByRole[entries[i].key.toString()]),
+            meta: _roleMeta[entries[i].key],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _RoleCounterPill extends StatelessWidget {
+  final int roleId;
+  final int required;
+  final int held;
+  final ({String label, String iconAsset})? meta;
+
+  const _RoleCounterPill({
+    required this.roleId,
+    required this.required,
+    required this.held,
+    required this.meta,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final label = meta?.label ?? 'Role $roleId';
+    final iconAsset = meta?.iconAsset;
+    final countStr =
+        '${held.toString().padLeft(2, '0')}/${required.toString().padLeft(2, '0')}';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceInput,
+        borderRadius: AppRadii.roundAll,
+        border: Border.all(color: AppColors.dividerDark),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (iconAsset != null) ...[
+            SvgPicture.asset(iconAsset, height: 14, width: 14),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            '$label : $countStr',
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.white70),
+          ),
+        ],
+      ),
     );
   }
 }

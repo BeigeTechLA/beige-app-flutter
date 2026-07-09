@@ -54,19 +54,33 @@ abstract class ExceptionHandler {
   static AppException _handleBadResponse(DioException error) {
     final statusCode = error.response?.statusCode;
     final data = error.response?.data;
-    final message = data is Map ? (data['message'] ?? data['error']) as String? : null;
+    final message = data is Map
+        ? (data['message'] ?? data['error']) as String?
+        : null;
 
     if (statusCode == null) {
-      return UnknownException(message: message ?? 'Bad response', originalError: error);
+      return UnknownException(
+        message: message ?? 'Bad response',
+        originalError: error,
+      );
     }
 
     switch (statusCode) {
       case 401:
-        return UnauthorizedException(message: message ?? 'Unauthorized access', originalError: error);
+        return UnauthorizedException(
+          message: message ?? 'Unauthorized access',
+          originalError: error,
+        );
       case 403:
-        return ForbiddenException(message: message ?? 'Access forbidden', originalError: error);
+        return ForbiddenException(
+          message: message ?? 'Access forbidden',
+          originalError: error,
+        );
       case 404:
-        return NotFoundException(message: message ?? 'Resource not found', originalError: error);
+        return NotFoundException(
+          message: message ?? 'Resource not found',
+          originalError: error,
+        );
       case 422:
         return ValidationException(
           message: message ?? 'Validation failed',
@@ -77,9 +91,15 @@ abstract class ExceptionHandler {
         return TooManyRequestsException(originalError: error);
       default:
         if (statusCode >= 500) {
-          return ServerException(message: message ?? 'Internal server error', originalError: error);
+          return ServerException(
+            message: message ?? 'Internal server error',
+            originalError: error,
+          );
         }
-        return UnknownException(message: message ?? 'Bad response', originalError: error);
+        return UnknownException(
+          message: message ?? 'Bad response',
+          originalError: error,
+        );
     }
   }
 
@@ -88,7 +108,9 @@ abstract class ExceptionHandler {
       return (data['errors'] as Map).map(
         (key, value) => MapEntry(
           key.toString(),
-          (value is List) ? value.map((e) => e.toString()).toList() : [value.toString()],
+          (value is List)
+              ? value.map((e) => e.toString()).toList()
+              : [value.toString()],
         ),
       );
     }

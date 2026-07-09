@@ -39,14 +39,12 @@ class DeleteAccountNotifier extends AutoDisposeNotifier<DeleteAccountState> {
         status: DeleteAccountStatus.error,
         errorMessage: error.message,
       ),
-      (_) => state = state.copyWith(
-        status: DeleteAccountStatus.success,
-      ),
+      (_) => state = state.copyWith(status: DeleteAccountStatus.success),
     );
   }
 }
 
 final deleteAccountNotifierProvider =
     NotifierProvider.autoDispose<DeleteAccountNotifier, DeleteAccountState>(
-  DeleteAccountNotifier.new,
-);
+      DeleteAccountNotifier.new,
+    );

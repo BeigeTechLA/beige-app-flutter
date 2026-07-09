@@ -60,11 +60,14 @@ class BookingReviewNotifier
     // --- Booking Analytics: Drop-off tracking for Step 7 ---
     ref.onDispose(() {
       if (!_stepCompleted) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': bookingId,
-          'last_step': 'review',
-          'step_number': 7,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': bookingId,
+            'last_step': 'review',
+            'step_number': 7,
+          },
+        );
       }
     });
     _fetchSummary(bookingId);
@@ -91,11 +94,14 @@ class BookingReviewNotifier
 
         // --- Booking Analytics: Step 7 — Review screen loaded ---
         final totalAmount = pricingData?['total_amount'] ?? 0;
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStepReview, params: {
-          'booking_id': bookingId,
-          'total_amount': totalAmount,
-          'step_number': 7,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStepReview,
+          params: {
+            'booking_id': bookingId,
+            'total_amount': totalAmount,
+            'step_number': 7,
+          },
+        );
 
         state = state.copyWith(
           status: BookingReviewStatus.loaded,
@@ -148,17 +154,18 @@ class BookingReviewNotifier
       },
       (data) {
         // --- Booking Analytics: Step 8 — Payment initiated ---
-        AnalyticsService.logEvent(AnalyticsEvents.paymentInitiated, params: {
-          'booking_id': bookingId,
-          'step_number': 8,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.paymentInitiated,
+          params: {'booking_id': bookingId, 'step_number': 8},
+        );
         final paymentSheet = data['payment_sheet'] as Map<String, dynamic>?;
         return paymentSheet;
       },
     );
-  }}
+  }
+}
 
-  /// Confirm payment with backend. Returns true on success.
+/// Confirm payment with backend. Returns true on success.
 /*  Future<bool> confirmPayment({
     required int bookingId,
     required String paymentIntentId,
@@ -210,5 +217,5 @@ class BookingReviewNotifier
 
 final bookingReviewNotifierProvider = NotifierProvider.autoDispose
     .family<BookingReviewNotifier, BookingReviewState, int>(
-  BookingReviewNotifier.new,
-);
+      BookingReviewNotifier.new,
+    );

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 /// Responsive utility to handle different screen sizes and breakpoints.
-/// 
+///
 /// Breakpoints:
 /// - Mobile: < 600
 /// - Tablet: 600 - 1200

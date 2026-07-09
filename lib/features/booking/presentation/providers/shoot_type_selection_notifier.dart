@@ -85,5 +85,5 @@ class ShootTypeSelectionNotifier
 
 final shootTypeSelectionNotifierProvider = NotifierProvider.autoDispose
     .family<ShootTypeSelectionNotifier, ShootTypeSelectionState, int>(
-  ShootTypeSelectionNotifier.new,
-);
+      ShootTypeSelectionNotifier.new,
+    );

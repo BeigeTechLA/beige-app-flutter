@@ -20,8 +20,7 @@ class FindCreativeScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<FindCreativeScreen> createState() =>
-      _FindCreativeScreenState();
+  ConsumerState<FindCreativeScreen> createState() => _FindCreativeScreenState();
 }
 
 class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
@@ -40,11 +39,14 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
     /// ⏱ Auto navigate after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      context.pushReplacementNamed(RouteNames.selectDreamTeam, extra: {
-        'bookingId': widget.bookingId,
-        'contentTypeId': widget.contentTypeId,
-        'shootTypeId': widget.ShootTypeId,
-      });
+      context.pushReplacementNamed(
+        RouteNames.selectDreamTeam,
+        extra: {
+          'bookingId': widget.bookingId,
+          'contentTypeId': widget.contentTypeId,
+          'shootTypeId': widget.ShootTypeId,
+        },
+      );
     });
   }
 
@@ -74,8 +76,9 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppColors.white
-                            .withValues(alpha: 0.35 * _controller.value),
+                        AppColors.white.withValues(
+                          alpha: 0.35 * _controller.value,
+                        ),
                         AppColors.transparent,
                       ],
                     ),
@@ -98,8 +101,6 @@ class _FindCreativeScreenState extends ConsumerState<FindCreativeScreen>
                       },
                     ),
                   ),
-
-
                 );
               },
             ),

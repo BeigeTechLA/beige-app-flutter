@@ -37,8 +37,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required File imageFile,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response =
-          await _remoteDataSource.uploadProfilePhoto(imageFile: imageFile);
+      final response = await _remoteDataSource.uploadProfilePhoto(
+        imageFile: imageFile,
+      );
       _assertNoError(response);
       return (response['message'] as String?) ?? 'Photo uploaded';
     });
@@ -58,8 +59,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required int creativeId,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response =
-          await _remoteDataSource.removeFavourite(creativeId: creativeId);
+      final response = await _remoteDataSource.removeFavourite(
+        creativeId: creativeId,
+      );
       _assertNoError(response);
       return (response['message'] as String?) ?? 'Removed from favourites';
     });
@@ -79,8 +81,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required String reason,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response =
-          await _remoteDataSource.requestDeleteAccount(reason: reason);
+      final response = await _remoteDataSource.requestDeleteAccount(
+        reason: reason,
+      );
       _assertNoError(response);
       return (response['message'] as String?) ?? 'OTP sent';
     });
@@ -91,8 +94,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required String otp,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response =
-          await _remoteDataSource.confirmDeleteAccount(otp: otp);
+      final response = await _remoteDataSource.confirmDeleteAccount(otp: otp);
       _assertNoError(response);
       return (response['message'] as String?) ?? 'Account deleted';
     });

@@ -108,42 +108,59 @@ GoRouter _buildTestRouter({
               onTap: navigationShell.goBranch,
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.camera), label: 'Book Shoot'),
-                BottomNavigationBarItem(icon: Icon(Icons.list), label: 'My Shoots'),
-                BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.camera),
+                  label: 'Book Shoot',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.list),
+                  label: 'My Shoots',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.message),
+                  label: 'Messages',
+                ),
               ],
             ),
           );
         },
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/',
-              name: RouteNames.home,
-              builder: (_, __) => const _TestScreen('HomeScreen'),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/book-shoot',
-              name: RouteNames.bookShoot,
-              builder: (_, __) => const _TestScreen('BookShootScreen'),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/my-shoots',
-              name: RouteNames.myShoots,
-              builder: (_, __) => const _TestScreen('MyShootsScreen'),
-            ),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/messages',
-              name: RouteNames.messages,
-              builder: (_, __) => const _TestScreen('MessagesScreen'),
-            ),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                name: RouteNames.home,
+                builder: (_, __) => const _TestScreen('HomeScreen'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/book-shoot',
+                name: RouteNames.bookShoot,
+                builder: (_, __) => const _TestScreen('BookShootScreen'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/my-shoots',
+                name: RouteNames.myShoots,
+                builder: (_, __) => const _TestScreen('MyShootsScreen'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/messages',
+                name: RouteNames.messages,
+                builder: (_, __) => const _TestScreen('MessagesScreen'),
+              ),
+            ],
+          ),
         ],
       ),
 
@@ -161,7 +178,9 @@ GoRouter _buildTestRouter({
         name: RouteNames.recommendedDetails,
         builder: (_, state) {
           final id = int.parse(state.pathParameters['id']!);
-          final bookingId = int.parse(state.uri.queryParameters['bookingId'] ?? '0');
+          final bookingId = int.parse(
+            state.uri.queryParameters['bookingId'] ?? '0',
+          );
           return _TestScreen('RecommendedDetailScreen:$id:$bookingId');
         },
       ),
@@ -250,7 +269,9 @@ GoRouter _buildTestRouter({
         builder: (_, state) {
           final bookingId = int.parse(state.pathParameters['bookingId']!);
           final data = state.extra as Map<String, dynamic>? ?? {};
-          return _TestScreen('PaymentSuccessScreen:$bookingId:${data['fullName']}');
+          return _TestScreen(
+            'PaymentSuccessScreen:$bookingId:${data['fullName']}',
+          );
         },
       ),
 
@@ -376,9 +397,7 @@ class _TestScreen extends StatelessWidget {
 
 /// Pump a GoRouter into a MaterialApp for testing.
 Future<void> _pumpRouter(WidgetTester tester, GoRouter router) async {
-  await tester.pumpWidget(
-    MaterialApp.router(routerConfig: router),
-  );
+  await tester.pumpWidget(MaterialApp.router(routerConfig: router));
   await tester.pumpAndSettle();
 }
 
@@ -386,20 +405,19 @@ void main() {
   // ── Auth Redirect Tests ───────────────────────────────────────────
 
   group('Auth redirect', () {
-    testWidgets('should show login when not authenticated and accessing /',
-        (tester) async {
-      final router = _buildTestRouter(
-        isLoggedIn: false,
-        initialLocation: '/',
-      );
+    testWidgets('should show login when not authenticated and accessing /', (
+      tester,
+    ) async {
+      final router = _buildTestRouter(isLoggedIn: false, initialLocation: '/');
 
       await _pumpRouter(tester, router);
 
       expect(find.text('LoginScreen'), findsOneWidget);
     });
 
-    testWidgets('should redirect to / when logged in and accessing /splash',
-        (tester) async {
+    testWidgets('should redirect to / when logged in and accessing /splash', (
+      tester,
+    ) async {
       final router = _buildTestRouter(
         isLoggedIn: true,
         initialLocation: '/splash',
@@ -410,8 +428,9 @@ void main() {
       expect(find.text('HomeScreen'), findsOneWidget);
     });
 
-    testWidgets('should redirect to / when logged in and accessing /login',
-        (tester) async {
+    testWidgets('should redirect to / when logged in and accessing /login', (
+      tester,
+    ) async {
       final router = _buildTestRouter(
         isLoggedIn: true,
         initialLocation: '/login',
@@ -422,8 +441,9 @@ void main() {
       expect(find.text('HomeScreen'), findsOneWidget);
     });
 
-    testWidgets('should allow unauthenticated access to public routes',
-        (tester) async {
+    testWidgets('should allow unauthenticated access to public routes', (
+      tester,
+    ) async {
       for (final route in [
         '/splash',
         '/onboarding',
@@ -448,71 +468,87 @@ void main() {
     });
 
     testWidgets(
-        'should redirect protected routes to /login when not authenticated',
-        (tester) async {
-      for (final route in [
-        '/profile',
-        '/edit-profile',
-        '/booking-history',
-        '/favourites',
-        '/app-preferences',
-        '/change-location',
-        '/shoot-updated',
-      ]) {
-        final router = _buildTestRouter(
-          isLoggedIn: false,
-          initialLocation: route,
-        );
+      'should redirect protected routes to /login when not authenticated',
+      (tester) async {
+        for (final route in [
+          '/profile',
+          '/edit-profile',
+          '/booking-history',
+          '/favourites',
+          '/app-preferences',
+          '/change-location',
+          '/shoot-updated',
+        ]) {
+          final router = _buildTestRouter(
+            isLoggedIn: false,
+            initialLocation: route,
+          );
 
-        await _pumpRouter(tester, router);
+          await _pumpRouter(tester, router);
 
-        expect(find.text('LoginScreen'), findsOneWidget,
-            reason: '$route should redirect to login');
-      }
-    });
+          expect(
+            find.text('LoginScreen'),
+            findsOneWidget,
+            reason: '$route should redirect to login',
+          );
+        }
+      },
+    );
   });
 
   // ── Public Route Resolution ────────────────────────────────────────
 
   group('Public routes resolve', () {
     testWidgets('splash', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/splash');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/splash',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('SplashScreen'), findsOneWidget);
     });
 
     testWidgets('onboarding', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/onboarding');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/onboarding',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('OnboardingScreen'), findsOneWidget);
     });
 
     testWidgets('login', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/login');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/login',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('LoginScreen'), findsOneWidget);
     });
 
     testWidgets('signup', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/signup');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/signup',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('SignUpScreen'), findsOneWidget);
     });
 
     testWidgets('forgot-password', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: false, initialLocation: '/forgot-password');
+        isLoggedIn: false,
+        initialLocation: '/forgot-password',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ForgotPasswordScreen'), findsOneWidget);
     });
 
     testWidgets('password-success', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: false, initialLocation: '/password-success');
+        isLoggedIn: false,
+        initialLocation: '/password-success',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('PasswordResetSuccessScreen'), findsOneWidget);
     });
@@ -528,22 +564,28 @@ void main() {
     });
 
     testWidgets('/book-shoot shows BookShootScreen', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/book-shoot');
+      final router = _buildTestRouter(
+        isLoggedIn: true,
+        initialLocation: '/book-shoot',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('BookShootScreen'), findsOneWidget);
     });
 
     testWidgets('/my-shoots shows MyShootsScreen', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/my-shoots');
+      final router = _buildTestRouter(
+        isLoggedIn: true,
+        initialLocation: '/my-shoots',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('MyShootsScreen'), findsOneWidget);
     });
 
     testWidgets('/messages shows MessagesScreen', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/messages');
+      final router = _buildTestRouter(
+        isLoggedIn: true,
+        initialLocation: '/messages',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('MessagesScreen'), findsOneWidget);
     });
@@ -587,73 +629,94 @@ void main() {
   group('Path parameter routes (authenticated)', () {
     testWidgets('/view-profile/:id parses id', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/view-profile/42');
+        isLoggedIn: true,
+        initialLocation: '/view-profile/42',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('CreativeProfileScreen:42'), findsOneWidget);
     });
 
     testWidgets('/recommended/:id parses id and query param', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true,
-          initialLocation: '/recommended/7?bookingId=99');
+        isLoggedIn: true,
+        initialLocation: '/recommended/7?bookingId=99',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('RecommendedDetailScreen:7:99'), findsOneWidget);
     });
 
     testWidgets('/payment-method/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/payment-method/55');
+        isLoggedIn: true,
+        initialLocation: '/payment-method/55',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('PaymentMethodScreen:55'), findsOneWidget);
     });
 
     testWidgets('/review-confirm/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/review-confirm/101');
+        isLoggedIn: true,
+        initialLocation: '/review-confirm/101',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ShootReviewScreen:101'), findsOneWidget);
     });
 
     testWidgets('/payment-success/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/payment-success/201');
+        isLoggedIn: true,
+        initialLocation: '/payment-success/201',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('PaymentSuccessScreen:201:null'), findsOneWidget);
     });
 
     testWidgets('/booking-summary/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/booking-summary/301');
+        isLoggedIn: true,
+        initialLocation: '/booking-summary/301',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ShootSummaryScreen:301'), findsOneWidget);
     });
 
     testWidgets('/manage-booking/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/manage-booking/401');
+        isLoggedIn: true,
+        initialLocation: '/manage-booking/401',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ManageShootScreen:401'), findsOneWidget);
     });
 
-    testWidgets('/booking-review-confirm/:bookingId parses bookingId',
-        (tester) async {
+    testWidgets('/booking-review-confirm/:bookingId parses bookingId', (
+      tester,
+    ) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/booking-review-confirm/501');
+        isLoggedIn: true,
+        initialLocation: '/booking-review-confirm/501',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ShootEditReviewScreen:501'), findsOneWidget);
     });
 
     testWidgets('/cancel-booking/:bookingId parses bookingId', (tester) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/cancel-booking/601');
+        isLoggedIn: true,
+        initialLocation: '/cancel-booking/601',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('CancelShootScreen:601'), findsOneWidget);
     });
 
-    testWidgets('/select-booking-type/:bookingId parses bookingId',
-        (tester) async {
+    testWidgets('/select-booking-type/:bookingId parses bookingId', (
+      tester,
+    ) async {
       final router = _buildTestRouter(
-          isLoggedIn: true, initialLocation: '/select-booking-type/701');
+        isLoggedIn: true,
+        initialLocation: '/select-booking-type/701',
+      );
       await _pumpRouter(tester, router);
       expect(find.text('ShootTypeSelectionScreen:701'), findsOneWidget);
     });
@@ -676,8 +739,10 @@ void main() {
 
     for (final entry in staticRoutes.entries) {
       testWidgets('${entry.key} shows ${entry.value}', (tester) async {
-        final router =
-            _buildTestRouter(isLoggedIn: true, initialLocation: entry.key);
+        final router = _buildTestRouter(
+          isLoggedIn: true,
+          initialLocation: entry.key,
+        );
         await _pumpRouter(tester, router);
         expect(find.text(entry.value), findsOneWidget);
       });
@@ -688,84 +753,87 @@ void main() {
 
   group('Extra-based routes via goNamed', () {
     testWidgets('forgot-otp receives email via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/login');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/login',
+      );
       await _pumpRouter(tester, router);
 
       router.goNamed(RouteNames.forgotOtp, extra: 'test@email.com');
       await tester.pumpAndSettle();
 
-      expect(find.text('ForgotPasswordOtpScreen:test@email.com'),
-          findsOneWidget);
+      expect(
+        find.text('ForgotPasswordOtpScreen:test@email.com'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('reset-password receives email+otp via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: false, initialLocation: '/login');
+      final router = _buildTestRouter(
+        isLoggedIn: false,
+        initialLocation: '/login',
+      );
       await _pumpRouter(tester, router);
 
-      router.goNamed(RouteNames.resetPassword,
-          extra: {'email': 'a@b.com', 'otp': '1234'});
+      router.goNamed(
+        RouteNames.resetPassword,
+        extra: {'email': 'a@b.com', 'otp': '1234'},
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('ResetPasswordScreen:a@b.com'), findsOneWidget);
     });
 
     testWidgets('content-type receives value via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
-      router.goNamed(RouteNames.contentType,
-          extra: {'value': 10});
+      router.goNamed(RouteNames.contentType, extra: {'value': 10});
       await tester.pumpAndSettle();
 
       expect(find.text('ContentTypeScreen:10'), findsOneWidget);
     });
 
     testWidgets('video-shoot-type receives data via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
-      router.goNamed(RouteNames.videoShootType,
-          extra: {'contentTypeId': 3, 'bookingId': 7});
+      router.goNamed(
+        RouteNames.videoShootType,
+        extra: {'contentTypeId': 3, 'bookingId': 7},
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('ShootTypeScreen:3'), findsOneWidget);
     });
 
-    testWidgets('finding-perfect receives booking data via extra',
-        (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+    testWidgets('finding-perfect receives booking data via extra', (
+      tester,
+    ) async {
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
-      router.goNamed(RouteNames.findingPerfect, extra: {
-        'bookingId': 42,
-        'ShootTypeId': 2,
-        'contentTypeId': 3,
-      });
+      router.goNamed(
+        RouteNames.findingPerfect,
+        extra: {'bookingId': 42, 'ShootTypeId': 2, 'contentTypeId': 3},
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('FindCreativeScreen:42'), findsOneWidget);
     });
 
     testWidgets('change-password receives email via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
       router.goNamed(RouteNames.changePassword, extra: 'user@test.com');
       await tester.pumpAndSettle();
 
-      expect(
-          find.text('ChangePasswordScreen:user@test.com'), findsOneWidget);
+      expect(find.text('ChangePasswordScreen:user@test.com'), findsOneWidget);
     });
 
     testWidgets('profile-otp receives email via extra', (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
       router.goNamed(RouteNames.profileOtp, extra: 'user@test.com');
@@ -774,18 +842,19 @@ void main() {
       expect(find.text('ProfileOtpScreen:user@test.com'), findsOneWidget);
     });
 
-    testWidgets('profile-new-password receives email+otp via extra',
-        (tester) async {
-      final router =
-          _buildTestRouter(isLoggedIn: true, initialLocation: '/');
+    testWidgets('profile-new-password receives email+otp via extra', (
+      tester,
+    ) async {
+      final router = _buildTestRouter(isLoggedIn: true, initialLocation: '/');
       await _pumpRouter(tester, router);
 
-      router.goNamed(RouteNames.profileNewPassword,
-          extra: {'email': 'x@y.com', 'otp': '9999'});
+      router.goNamed(
+        RouteNames.profileNewPassword,
+        extra: {'email': 'x@y.com', 'otp': '9999'},
+      );
       await tester.pumpAndSettle();
 
-      expect(
-          find.text('ProfileNewPasswordScreen:x@y.com'), findsOneWidget);
+      expect(find.text('ProfileNewPasswordScreen:x@y.com'), findsOneWidget);
     });
   });
 
@@ -837,8 +906,11 @@ void main() {
         RouteNames.deleteAccountOtp,
       ];
 
-      expect(names.toSet().length, names.length,
-          reason: 'Duplicate route names found');
+      expect(
+        names.toSet().length,
+        names.length,
+        reason: 'Duplicate route names found',
+      );
       expect(names.length, 41, reason: 'Expected 41 route names');
     });
 
@@ -889,8 +961,11 @@ void main() {
 
       final snakeCasePattern = RegExp(r'^[a-z][a-z0-9_]*$');
       for (final name in names) {
-        expect(snakeCasePattern.hasMatch(name), isTrue,
-            reason: '"$name" is not lowercase_snake_case');
+        expect(
+          snakeCasePattern.hasMatch(name),
+          isTrue,
+          reason: '"$name" is not lowercase_snake_case',
+        );
       }
     });
   });

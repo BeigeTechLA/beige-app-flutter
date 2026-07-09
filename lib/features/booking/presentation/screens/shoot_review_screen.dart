@@ -704,43 +704,60 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
                                     /// ================= PHOTO EDITS =================
                                     /// ================= PHOTO EDITS =================
-                                    if ((booking?['photo_edit_types'] ?? []).isNotEmpty) ...[
+                                    if ((booking?['photo_edit_types'] ?? [])
+                                        .isNotEmpty) ...[
                                       Padding(
-                                        padding: const EdgeInsets.only(bottom: 10),
+                                        padding: const EdgeInsets.only(
+                                          bottom: 10,
+                                        ),
                                         child: Text(
                                           "Photo Edits:",
-                                          style: AppTextStyles.bodySmall.copyWith(
-                                            color: AppColors.white,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(
+                                                color: AppColors.white,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                       ),
 
                                       Column(
                                         children: List.generate(
-                                          booking?['photo_edit_types'].length ?? 0,
-                                              (index) {
-                                            final item = booking?['photo_edit_types'][index];
+                                          booking?['photo_edit_types'].length ??
+                                              0,
+                                          (index) {
+                                            final item =
+                                                booking?['photo_edit_types'][index];
 
                                             return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                if ((item['cards'] ?? []).isNotEmpty)
+                                                if ((item['cards'] ?? [])
+                                                    .isNotEmpty)
                                                   Container(
-                                                    margin: const EdgeInsets.only(bottom: 14),
-                                                    padding: const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 8,
-                                                    ),
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                          bottom: 14,
+                                                        ),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 20,
+                                                          vertical: 8,
+                                                        ),
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.goldLight20,
-                                                      borderRadius: AppRadii.xsAll,
+                                                      color:
+                                                          AppColors.goldLight20,
+                                                      borderRadius:
+                                                          AppRadii.xsAll,
                                                     ),
                                                     child: Text(
                                                       "${item['cards'][0].toString().replaceAll("Includes ", "Edited Photos ").replaceAll(" free photo edits", " Included")} ${item['cards'][2].toString().replaceAll("+ ", "+")}",
-                                                      style: AppTextStyles.labelMedium.copyWith(
-                                                        color: AppColors.primary,
-                                                      ),
+                                                      style: AppTextStyles
+                                                          .labelMedium
+                                                          .copyWith(
+                                                            color: AppColors
+                                                                .primary,
+                                                          ),
                                                     ),
                                                   ),
                                               ],
@@ -750,10 +767,14 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                       ),
                                     ],
                                     Divider(
-                                      color: AppColors.white.withValues(alpha: 0.08),
+                                      color: AppColors.white.withValues(
+                                        alpha: 0.08,
+                                      ),
                                       height: 1,
                                     ),
-                                    if ((booking?['receive_text'] ?? "").toString().isNotEmpty)
+                                    if ((booking?['receive_text'] ?? "")
+                                        .toString()
+                                        .isNotEmpty)
                                       Container(
                                         width: double.infinity,
                                         margin: const EdgeInsets.only(top: 14),
@@ -762,19 +783,24 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                           vertical: 12,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.black.withValues(alpha: 0.22),
-                                          borderRadius: BorderRadius.circular(14),
+                                          color: AppColors.black.withValues(
+                                            alpha: 0.22,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                         ),
                                         child: Text(
                                           booking?['receive_text'] ?? "",
-                                          style: AppTextStyles.bodyMedium.copyWith(
-                                            color: AppColors.primary,
-                                            fontStyle: FontStyle.italic,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                          style: AppTextStyles.bodyMedium
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                                fontStyle: FontStyle.italic,
+                                                fontWeight: FontWeight.w700,
+                                              ),
                                         ),
                                       ),
-              ],
+                                  ],
                                 ),
                               ),
 

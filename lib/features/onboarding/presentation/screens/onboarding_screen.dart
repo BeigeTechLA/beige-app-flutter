@@ -26,14 +26,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     {
       "image": AppAssets.onboarding2,
       "title": "Book Your Dream\nShoot",
-      "description":
-      "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
+      "description": "Instantly book creatives for any shoot,\nanywhere. 🎥✨",
     },
     {
       "image": AppAssets.onboarding1,
       "title": "Find Video & Photo\nWork",
       "description":
-      "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
+          "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
     },
   ];
 
@@ -80,7 +79,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         const SizedBox(height: AppSpacing.sm),
 
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                          ),
                           child: Text(
                             pages[index]['description']!,
                             textAlign: TextAlign.center,
@@ -102,8 +103,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   pages.length,
-                      (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                  (index) => Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xxs,
+                    ),
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
@@ -180,25 +183,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           /// ---------------- SKIP BUTTON ----------------
           _currentPage != pages.length - 1
               ? SafeArea(
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.lg, right: AppSpacing.lg),
-                child: GestureDetector(
-                  onTap: () {
-                    ref.read(guestModeProvider.notifier).enter();
-                    context.goNamed(RouteNames.home);
-                  },
-                  child: Text(
-                    "Skip",
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.white,
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.lg,
+                        right: AppSpacing.lg,
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          ref.read(guestModeProvider.notifier).enter();
+                          context.goNamed(RouteNames.home);
+                        },
+                        child: Text(
+                          "Skip",
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-          )
+                )
               : const SizedBox(),
         ],
       ),

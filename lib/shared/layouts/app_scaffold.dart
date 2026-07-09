@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../features/app_drawer/screen/drawer_screen.dart';
+
 /// Shared scaffold wrapper with consistent SafeArea handling.
 ///
 /// [hasAppBar] — set true when screen uses AppBar (skips top SafeArea).
@@ -15,6 +17,8 @@ class AppScaffold extends StatelessWidget {
     this.floatingActionButton,
     this.backgroundColor,
     this.resizeToAvoidBottomInset = true,
+    this.drawer,
+    this.disableDrawer = false,
   });
 
   final Widget body;
@@ -25,21 +29,24 @@ class AppScaffold extends StatelessWidget {
   final Widget? floatingActionButton;
   final Color? backgroundColor;
   final bool resizeToAvoidBottomInset;
+  final bool disableDrawer;
+
+  /// OPTIONAL DRAWER
+  final Widget? drawer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      /// DEFAULT DRAWER
+      drawer: disableDrawer ? null : (drawer ?? const DrawerScreen()),
+
       appBar: appBar,
       backgroundColor: backgroundColor,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       bottomNavigationBar: bottomNavigationBar,
       floatingActionButton: floatingActionButton,
-      body: useSafeArea
-          ? SafeArea(
-              top: !hasAppBar,
-              child: body,
-            )
-          : body,
+
+      body: useSafeArea ? SafeArea(top: !hasAppBar, child: body) : body,
     );
   }
 }

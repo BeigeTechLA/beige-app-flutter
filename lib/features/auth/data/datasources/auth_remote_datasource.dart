@@ -53,17 +53,12 @@ class AuthRemoteDataSource {
         ),
     });
 
-    final response = await _dio.post(
-      ApiEndpoints.signup,
-      data: formData,
-    );
+    final response = await _dio.post(ApiEndpoints.signup, data: formData);
     return response.data as Map<String, dynamic>;
   }
 
   /// POST auth/forgot-password-check
-  Future<Map<String, dynamic>> forgotPassword({
-    required String email,
-  }) async {
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
     final response = await _dio.post(
       ApiEndpoints.forgotPassword,
       data: {'email': email},
@@ -103,9 +98,7 @@ class AuthRemoteDataSource {
   }
 
   /// POST auth/resend-otp
-  Future<Map<String, dynamic>> resendOtp({
-    required String email,
-  }) async {
+  Future<Map<String, dynamic>> resendOtp({required String email}) async {
     final response = await _dio.post(
       ApiEndpoints.resendOtp,
       data: {'email': email},

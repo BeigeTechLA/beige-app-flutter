@@ -11,7 +11,6 @@ import 'core/firebase/firebase_service.dart';
 import 'core/firebase/crashlytics_service.dart';
 import 'core/utils/install_marker.dart';
 
-
 Future<void> startApp(Environment environment) async {
   runZonedGuarded(
     () async {
@@ -33,9 +32,7 @@ Future<void> startApp(Environment environment) async {
 
       runApp(
         ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-          ],
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
           child: const App(),
         ),
       );

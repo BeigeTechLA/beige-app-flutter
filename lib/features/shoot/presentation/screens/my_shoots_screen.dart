@@ -14,7 +14,10 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
+import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/app_booking_card.dart';
+import 'package:beige/shared/widgets/app_main_toolbar.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
 class MyShootsScreen extends ConsumerStatefulWidget {
@@ -73,151 +76,172 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final completedShoots = shootsState.completedShoots;
     final isLoading = shootsState.status == MyShootsStatus.loading;
 
-    return Scaffold(
+    return AppScaffold(
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppSpacing.massive),
-
-                /// HEADER
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ScaleClampedText(
-                      child: Text(
-                        "My Shoots",
-                        style: AppTextStyles.titleSmall.copyWith(
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: AppSpacing.md),
-
-                /// TOGGLE
-                ClipRRect(
-                  borderRadius: AppRadii.lgAll,
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    // 🔥 blur power
-                    child: Container(
-                      height: 55,
-                      padding: const EdgeInsets.all(AppSpacing.xxs),
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withValues(alpha: 0.05),
-                        borderRadius: AppRadii.lgAll,
-                        border: Border.all(
-                          color: AppColors.white.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          /// 🔹 UPCOMING TAB
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isUpcomingSelected = true;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                                decoration: BoxDecoration(
-                                  gradient: isUpcomingSelected
-                                      ? AppColors.goldHorizontalGradient
-                                      : null,
-                                  borderRadius: AppRadii.mdAll,
-                                ),
-                                alignment: Alignment.center,
-                                child: ScaleClampedText(
-                                  child: Text(
-                                    "Upcoming",
-                                    style: AppTextStyles.buttonLarge.copyWith(
-                                      color: isUpcomingSelected
-                                          ? AppColors.black
-                                          : AppColors.white70,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          /// 🔹 COMPLETED TAB
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isUpcomingSelected = false;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                                decoration: BoxDecoration(
-                                  gradient: !isUpcomingSelected
-                                      ? AppColors.goldHorizontalGradient
-                                      : null,
-                                  borderRadius: AppRadii.mdAll,
-                                ),
-                                alignment: Alignment.center,
-                                child: ScaleClampedText(
-                                  child: Text(
-                                    "Completed",
-                                    style: AppTextStyles.buttonLarge.copyWith(
-                                      color: !isUpcomingSelected
-                                          ? AppColors.black
-                                          : AppColors.white70,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          Column(
+            children: [
+              const AppMainToolbar(title: 'My Shoots'),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
                   ),
-                ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// TOGGLE
+                      ClipRRect(
+                        borderRadius: AppRadii.lgAll,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                          // 🔥 blur power
+                          child: Container(
+                            height: 55,
+                            padding: const EdgeInsets.all(AppSpacing.xxs),
+                            decoration: BoxDecoration(
+                              color: AppColors.white.withValues(alpha: 0.05),
+                              borderRadius: AppRadii.lgAll,
+                              border: Border.all(
+                                color: AppColors.white.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                /// 🔹 UPCOMING TAB
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isUpcomingSelected = true;
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      decoration: BoxDecoration(
+                                        gradient: isUpcomingSelected
+                                            ? AppColors.goldHorizontalGradient
+                                            : null,
+                                        borderRadius: AppRadii.mdAll,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: ScaleClampedText(
+                                        child: Text(
+                                          "Upcoming",
+                                          style: AppTextStyles.buttonLarge
+                                              .copyWith(
+                                                color: isUpcomingSelected
+                                                    ? AppColors.black
+                                                    : AppColors.white70,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
 
-                /// LIST
-                Expanded(
-                  child: isUpcomingSelected
-                      ? isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : upcomingShoots.isEmpty
+                                /// 🔹 COMPLETED TAB
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isUpcomingSelected = false;
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                      decoration: BoxDecoration(
+                                        gradient: !isUpcomingSelected
+                                            ? AppColors.goldHorizontalGradient
+                                            : null,
+                                        borderRadius: AppRadii.mdAll,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: ScaleClampedText(
+                                        child: Text(
+                                          "Completed",
+                                          style: AppTextStyles.buttonLarge
+                                              .copyWith(
+                                                color: !isUpcomingSelected
+                                                    ? AppColors.black
+                                                    : AppColors.white70,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// LIST
+                      Expanded(
+                        child: isUpcomingSelected
+                            ? isLoading
+                                  ? const AppScreenLoader()
+                                  : upcomingShoots.isEmpty
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          /// 🔹 IMAGE
+                                          Image.asset(
+                                            AppAssets.upcomingNoData,
+                                            height: 150,
+                                            fit: BoxFit.contain,
+                                          ),
+                                          Text(
+                                            "No Booking Found",
+                                            style: AppTextStyles.titleSmall
+                                                .copyWith(
+                                                  color: AppColors.primary,
+                                                ),
+                                          ),
+
+                                          Text(
+                                            "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
+                                            textAlign: TextAlign.center,
+                                            style: AppTextStyles.bodyMedium
+                                                .copyWith(
+                                                  color: AppColors.white70,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding: const EdgeInsets.only(
+                                        top: AppSpacing.mld,
+                                        bottom:
+                                            AppSpacing.bottomNavHeight +
+                                            AppSpacing.massive +
+                                            AppSpacing.xxl,
+                                      ),
+                                      itemCount: upcomingShoots.length,
+                                      itemBuilder: (context, index) {
+                                        return upcomingBookingCard(
+                                          upcomingShoots[index],
+                                        );
+                                      },
+                                    )
+                            : isLoading
+                            ? const AppScreenLoader()
+                            : completedShoots.isEmpty
                             ? Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    /// 🔹 IMAGE
-                                    Image.asset(
-                                      AppAssets.upcomingNoData,
-                                      height: 150,
-                                      fit: BoxFit.contain,
-                                    ),
-                                    Text(
-                                      "No Booking Found",
-                                      style: AppTextStyles.titleSmall.copyWith(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-
-                                    Text(
-                                      "You haven’t made any bookings yet. Start exploring\n  creators to book your first shoot. ",
-                                      textAlign: TextAlign.center,
-                                      style: AppTextStyles.bodyMedium.copyWith(
-                                        color: AppColors.white70,
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  "No Completed Shoots",
+                                  style: AppTextStyles.titleSmall.copyWith(
+                                    color: AppColors.primary,
+                                  ),
                                 ),
                               )
                             : ListView.builder(
@@ -228,40 +252,19 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
                                       AppSpacing.massive +
                                       AppSpacing.xxl,
                                 ),
-                                itemCount: upcomingShoots.length,
+                                itemCount: completedShoots.length,
                                 itemBuilder: (context, index) {
-                                  return upcomingBookingCard(
-                                    upcomingShoots[index],
+                                  return completedBookingCard(
+                                    completedShoots[index],
                                   );
                                 },
-                              )
-                      : isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : completedShoots.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No Completed Shoots",
-                            style: AppTextStyles.titleSmall.copyWith(
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.only(
-                            top: AppSpacing.mld,
-                            bottom:
-                                AppSpacing.bottomNavHeight +
-                                AppSpacing.massive +
-                                AppSpacing.xxl,
-                          ),
-                          itemCount: completedShoots.length,
-                          itemBuilder: (context, index) {
-                            return completedBookingCard(completedShoots[index]);
-                          },
-                        ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           if (shootsState.status == MyShootsStatus.error)
             Center(

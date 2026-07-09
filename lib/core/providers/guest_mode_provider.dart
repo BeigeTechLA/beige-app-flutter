@@ -12,5 +12,6 @@ class GuestModeNotifier extends Notifier<bool> {
   void exit() => state = false;
 }
 
-final guestModeProvider =
-    NotifierProvider<GuestModeNotifier, bool>(GuestModeNotifier.new);
+final guestModeProvider = NotifierProvider<GuestModeNotifier, bool>(
+  GuestModeNotifier.new,
+);

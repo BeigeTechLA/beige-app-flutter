@@ -25,8 +25,16 @@ const _backNavPairs = [
   // Booking management back nav
   ('manage_booking_back', '/manage-booking/999', '/my-shoots'),
   ('cancel_booking_back', '/cancel-booking/999', '/manage-booking/999'),
-  ('booking_review_confirm_back', '/booking-review-confirm/999', '/manage-booking/999'),
-  ('select_booking_type_back', '/select-booking-type/999', '/manage-booking/999'),
+  (
+    'booking_review_confirm_back',
+    '/booking-review-confirm/999',
+    '/manage-booking/999',
+  ),
+  (
+    'select_booking_type_back',
+    '/select-booking-type/999',
+    '/manage-booking/999',
+  ),
 
   // Profile sub-screens back nav
   ('edit_profile_back', '/edit-profile', '/profile'),
@@ -45,7 +53,9 @@ const _backNavPairs = [
 void runBackNavTests(ReportBuilder report) {
   group('Back Navigation Tests', () {
     for (final (name, targetPath, previousPath) in _backNavPairs) {
-      testWidgets('$name — pop from $targetPath returns to $previousPath', (tester) async {
+      testWidgets('$name — pop from $targetPath returns to $previousPath', (
+        tester,
+      ) async {
         await pumpAppWithAuth(
           tester,
           isLoggedIn: true,
@@ -63,7 +73,8 @@ void runBackNavTests(ReportBuilder report) {
         expect(
           result.passed,
           isTrue,
-          reason: 'Back nav failed for $targetPath → $previousPath: ${result.error}',
+          reason:
+              'Back nav failed for $targetPath → $previousPath: ${result.error}',
         );
       });
     }

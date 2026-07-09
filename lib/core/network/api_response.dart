@@ -3,11 +3,7 @@ class ApiResponse<T> {
   final String? message;
   final bool success;
 
-  const ApiResponse({
-    this.data,
-    this.message,
-    this.success = true,
-  });
+  const ApiResponse({this.data, this.message, this.success = true});
 
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
@@ -16,10 +12,12 @@ class ApiResponse<T> {
     return ApiResponse(
       data: json['data'] != null ? fromJsonT(json['data']) : null,
       message: json['message'] as String?,
-      success: json['status'] == 'success' || (json['success'] as bool? ?? true),
+      success:
+          json['status'] == 'success' || (json['success'] as bool? ?? true),
     );
   }
 
   @override
-  String toString() => 'ApiResponse(success: $success, message: $message, data: $data)';
+  String toString() =>
+      'ApiResponse(success: $success, message: $message, data: $data)';
 }

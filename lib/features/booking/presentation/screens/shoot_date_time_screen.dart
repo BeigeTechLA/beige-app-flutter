@@ -15,6 +15,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_date_time_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/util/picker_theme.dart';
 
 import '../../../../app/assets.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
@@ -397,7 +398,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       return bookedHours * includedPhotosPerHour;
     }*/
 
- /* int getIncludedPhotoCount() {
+  /* int getIncludedPhotoCount() {
     final hours = getRoundedBookedHours();
 
     if (hours == 0) return 0;
@@ -419,6 +420,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     // ✅ Other = 25 per hour
     return isWeddingShoot ? hours * 50 : hours * 25;
   }
+
   int getTotalPhotos() {
     /// 🔥 VIDEO ONLY → NO PHOTOS
     if (widget.contentTypeId == 1) {
@@ -668,7 +670,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
     return true;
   }
-
 
   String getPhotoInclusionMessage() {
     final includedPhotos = getIncludedPhotoCount();
@@ -1346,32 +1347,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       picked = await showTimePicker(
         context: context,
         initialTime: initial,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: const ColorScheme.dark(
-                primary: AppColors.primary,
-                onPrimary: AppColors.white,
-                surface: AppColors.background,
-                onSurface: AppColors.white,
-              ),
-              timePickerTheme: const TimePickerThemeData(
-                backgroundColor: AppColors.surfaceGradientDark,
-                dialBackgroundColor: AppColors.surfaceGradientDark,
-                dialHandColor: AppColors.white,
-                dialTextColor: AppColors.neutralGrey,
-                hourMinuteColor: AppColors.primary,
-                hourMinuteTextColor: AppColors.black,
-                dayPeriodColor: AppColors.primary,
-                dayPeriodTextColor: AppColors.white,
-              ),
-              dialogTheme: DialogThemeData(
-                backgroundColor: AppColors.surfaceGradientDark,
-              ),
-            ),
-            child: child!,
-          );
-        },
+        builder: appTimePickerTheme,
       );
     }
 
@@ -3085,55 +3061,55 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                             ),
                           ),
                         ),
-                        /// 🔥 ADDED EXTRA BOX — shows only when count > 0
 
+                        /// 🔥 ADDED EXTRA BOX — shows only when count > 0
                       ],
                     ),
                   ),
 
                   /// 🔥 ADDED EXTRA BOX
                   // if (count > 0)
-                    Container(
-                      decoration: BoxDecoration(
-                        // color: Colors.green
-                        //color: AppColors.surfaceVariant,
-                        //borderRadius: AppRadii.xlAll,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.all(AppSpacing.mld),
-                          padding: const EdgeInsets.all(AppSpacing.mld),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
-                            borderRadius: AppRadii.xlAll,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.add,
-                                size: 12,
+                  Container(
+                    decoration: BoxDecoration(
+                      // color: Colors.green
+                      //color: AppColors.surfaceVariant,
+                      //borderRadius: AppRadii.xlAll,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.mld),
+                        padding: const EdgeInsets.all(AppSpacing.mld),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant,
+                          borderRadius: AppRadii.xlAll,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            Text(
+                              "$count Added Extra",
+                              style: const TextStyle(
+                                fontFamily: AppAssets.fontHelveticaNeue,
+
                                 color: AppColors.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                               ),
-
-                              const SizedBox(width: 8),
-
-                              Text(
-                                "$count Added Extra",
-                                style: const TextStyle(
-                                  fontFamily: AppAssets.fontHelveticaNeue,
-
-                                  color: AppColors.primary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
                   Container(height: 0.5, color: AppColors.dividerDark),
                 ],
               );

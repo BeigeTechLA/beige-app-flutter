@@ -11,8 +11,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
   PaymentRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<Either<AppException, Map<String, dynamic>>>
-      getSavedPaymentMethods() {
+  Future<Either<AppException, Map<String, dynamic>>> getSavedPaymentMethods() {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.getSavedPaymentMethods();
       _assertNoError(response);

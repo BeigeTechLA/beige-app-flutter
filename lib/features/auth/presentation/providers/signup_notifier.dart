@@ -42,7 +42,10 @@ class SignupNotifier extends AutoDisposeNotifier<SignupState> {
         errorMessage: error.message,
       ),
       (_) {
-        AnalyticsService.logEvent(AnalyticsEvents.signUp, params: {'method': 'email'});
+        AnalyticsService.logEvent(
+          AnalyticsEvents.signUp,
+          params: {'method': 'email'},
+        );
         state = state.copyWith(status: SignupStatus.success);
       },
     );
@@ -51,5 +54,5 @@ class SignupNotifier extends AutoDisposeNotifier<SignupState> {
 
 final signupNotifierProvider =
     NotifierProvider.autoDispose<SignupNotifier, SignupState>(
-  SignupNotifier.new,
-);
+      SignupNotifier.new,
+    );

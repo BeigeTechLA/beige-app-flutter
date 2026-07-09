@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/features/profile/presentation/providers/favourites_notifier.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -67,87 +68,86 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
             Expanded(
               child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const AppScreenLoader()
                   : favourites.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No Favourite Data",
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
+                  ? Center(
+                      child: Text(
+                        "No Favourite Data",
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.smd,
+                      ),
+                      itemCount: favourites.length,
+                      itemBuilder: (context, index) {
+                        final item = favourites[index];
+                        final int? creatorId = item['crew_member_id'];
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.smd,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: AppRadii.hugeAll,
+                            child: SizedBox(
+                              height: 220,
+                              child: Stack(
+                                children: [
+                                  /// IMAGE
+                                  (item['profile_image_url'] != null &&
+                                          item['profile_image_url']
+                                              .toString()
+                                              .isNotEmpty)
+                                      ? Image.network(
+                                          ApiEndpoints.imageUrl +
+                                              item['profile_image_url'],
+                                          width: double.infinity,
+                                          height: 220,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : SvgPicture.asset(
+                                          AppAssets.imagePlaceholder,
+                                          width: double.infinity,
+                                          height: 220,
+                                          fit: BoxFit.cover,
+                                        ),
+
+                                  /// REMOVE BUTTON
+                                  Positioned(
+                                    top: AppSpacing.smd,
+                                    right: AppSpacing.smd,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (creatorId != null) {
+                                          ref
+                                              .read(
+                                                favouritesNotifierProvider
+                                                    .notifier,
+                                              )
+                                              .removeFavourite(
+                                                creativeId: creatorId,
+                                                index: index,
+                                              );
+                                        }
+                                      },
+                                      child: SvgPicture.asset(
+                                        AppAssets.heartFilled,
+                                        height: 22,
+                                        width: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.smd),
-                          itemCount: favourites.length,
-                          itemBuilder: (context, index) {
-                            final item = favourites[index];
-                            final int? creatorId =
-                                item['crew_member_id'];
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: AppSpacing.smd),
-                              child: ClipRRect(
-                                borderRadius: AppRadii.hugeAll,
-                                child: SizedBox(
-                                  height: 220,
-                                  child: Stack(
-                                    children: [
-                                      /// IMAGE
-                                      (item['profile_image_url'] !=
-                                                  null &&
-                                              item['profile_image_url']
-                                                  .toString()
-                                                  .isNotEmpty)
-                                          ? Image.network(
-                                              ApiEndpoints.imageUrl +
-                                                  item[
-                                                      'profile_image_url'],
-                                              width: double.infinity,
-                                              height: 220,
-                                              fit: BoxFit.fill,
-                                            )
-                                          : SvgPicture.asset(
-                                              AppAssets.imagePlaceholder,
-                                              width: double.infinity,
-                                              height: 220,
-                                              fit: BoxFit.cover,
-                                            ),
-
-                                      /// REMOVE BUTTON
-                                      Positioned(
-                                        top: AppSpacing.smd,
-                                        right: AppSpacing.smd,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            if (creatorId != null) {
-                                              ref
-                                                  .read(
-                                                      favouritesNotifierProvider
-                                                          .notifier)
-                                                  .removeFavourite(
-                                                    creativeId:
-                                                        creatorId,
-                                                    index: index,
-                                                  );
-                                            }
-                                          },
-                                          child: SvgPicture.asset(
-                                            AppAssets.heartFilled,
-                                            height: 22,
-                                            width: 22,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -168,15 +168,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           color: AppColors.transparent,
           child: Container(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.base, vertical: AppSpacing.md),
+              horizontal: AppSpacing.base,
+              vertical: AppSpacing.md,
+            ),
             decoration: BoxDecoration(
               color: AppColors.surfaceStats,
               borderRadius: AppRadii.lgAll,
             ),
             child: Row(
               children: [
-                const Icon(Icons.favorite,
-                    color: AppColors.primary, size: 18),
+                const Icon(Icons.favorite, color: AppColors.primary, size: 18),
                 AppSpacing.gapHSmd,
                 Expanded(
                   child: Text(
@@ -189,8 +190,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ),
                 GestureDetector(
                   onTap: () => overlayEntry.remove(),
-                  child: const Icon(Icons.close,
-                      color: AppColors.white, size: 18),
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.white,
+                    size: 18,
+                  ),
                 ),
               ],
             ),

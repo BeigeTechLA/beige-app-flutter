@@ -49,14 +49,15 @@ class AppCard extends StatelessWidget {
   }
 
   Color get _defaultBackground => switch (variant) {
-        AppCardVariant.flat => AppColors.surface,
-        AppCardVariant.outlined => AppColors.transparent,
-        AppCardVariant.elevated => AppColors.surface,
-      };
+    AppCardVariant.flat => AppColors.surface,
+    AppCardVariant.outlined => AppColors.transparent,
+    AppCardVariant.elevated => AppColors.surface,
+  };
 
   Border? get _border => switch (variant) {
-        AppCardVariant.outlined =>
-          const Border.fromBorderSide(BorderSide(color: AppColors.borderLight)),
-        _ => null,
-      };
+    AppCardVariant.outlined => const Border.fromBorderSide(
+      BorderSide(color: AppColors.borderLight),
+    ),
+    _ => null,
+  };
 }

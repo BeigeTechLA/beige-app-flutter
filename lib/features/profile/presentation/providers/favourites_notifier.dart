@@ -65,13 +65,12 @@ class FavouritesNotifier extends AutoDisposeNotifier<FavouritesState> {
     final result = await repo.removeFavourite(creativeId: creativeId);
 
     result.fold(
-      (error) => state = state.copyWith(
-        errorMessage: error.message,
-      ),
+      (error) => state = state.copyWith(errorMessage: error.message),
       (_) {
-        AnalyticsService.logEvent(AnalyticsEvents.favouriteRemoved, params: {
-          'creative_id': creativeId,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.favouriteRemoved,
+          params: {'creative_id': creativeId},
+        );
         final updated = List<dynamic>.from(state.favourites)..removeAt(index);
         state = state.copyWith(
           favourites: updated,
@@ -88,5 +87,5 @@ class FavouritesNotifier extends AutoDisposeNotifier<FavouritesState> {
 
 final favouritesNotifierProvider =
     NotifierProvider.autoDispose<FavouritesNotifier, FavouritesState>(
-  FavouritesNotifier.new,
-);
+      FavouritesNotifier.new,
+    );

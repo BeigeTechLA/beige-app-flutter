@@ -21,11 +21,19 @@ class AppAssets {
   static const String topWords = 'assets/mock_data/top_words';
   static const String _mockCreatives = 'assets/mock_data/creatives';
 
+  static const String svgDrawer = 'assets/svg/drawer';
+
+  static const String svgMessage = 'assets/svg/message';
+
+  static const String svgMeeting = 'assets/svg/meeting';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const String back = '$_svg/back.svg';
+  static const String cancel = '$_svg/cancel.svg';
+  static const String rectangleProfile = '$_svg/rectangle_profile.svg';
+
   static const String filter = '$_svg/filter.svg';
   static const String search = '$_svg/search.svg';
   static const String notification = '$_svg/notification.svg';
@@ -38,6 +46,35 @@ class AppAssets {
   static const String cropImage = '$_svg/crop_image.svg';
   static const String zoomIn = '$_svg/zoom_in.svg';
   static const String zoomOut = '$_svg/zoom_out.svg';
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — Message
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String clipAttachment = '$svgMessage/clip_attachment.svg';
+
+  static const String microphone = '$svgMessage/microphone.svg';
+
+  static const String icGroupChat = '$svgMessage/ic_group_chat.svg';
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — Meeting
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String icMeetingDatetime = '$svgMeeting/ic_meeting_datetime.svg';
+  static const String icMeetingLink = '$svgMeeting/ic_meeting_link.svg';
+  static const String icRelatedShoot = '$svgMeeting/ic_related_shoot.svg';
+  static const String icGoogleMeet = '$svgMeeting/ic_google_meet.svg';
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SVG — drawer
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  static const String menu = '$svgDrawer/menu.svg';
+
+  static const String logoDrawer = '$svgDrawer/logo_drawer.svg';
+
+  static const String groupLogo = '$images/group_logo.png';
+  static const String userCircle = '$_svg/user_circle.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Icons & UI Elements
@@ -58,19 +95,21 @@ class AppAssets {
   static const String eyeOpen = '$_svg/eyes1.svg';
   static const String eyeClosed = '$_svg/eyes2.svg';
   static const String imagePlaceholder = '$_svg/image_placeholder.svg';
+  static const String arrow_right_ = '$_svg/arrow_right_.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Features & Booking
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  static const String aiMatchmaking = '$_svg/ai_matchmaking.svg';
-  static const String aiMatchmakingAlt = '$_svg/ai_matchmaking_alt.svg';
-  static const String aiPostProduction = '$_svg/ai_post_production.svg';
+  static const String aiMatchmaking = '$_svg/ic_ai_matching.svg';
+  static const String preProdcution = '$_svg/ic_pre_production.svg';
+  static const String production = '$_svg/ic_production.svg';
+  static const String aiPostProduction = '$_svg/ic_ai_post_production.svg';
   static const String allRawContent = '$_svg/all_raw_content.svg';
   static const String unlimitedUsage = '$_svg/unlimited_usage_rights.svg';
   static const String includeEdited = '$_svg/include_edited_deliverable.svg';
   static const String revisions = '$_svg/up_to_sets_revisions.svg';
-  static const String production = '$_svg/production.svg';
+
   static const String calndermark = '$_svg/calendar_mark.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -116,6 +155,13 @@ class AppAssets {
   static const String inactiveMyShoot = '$svgBottom/inactive_my_shoots.svg';
   static const String activeMessages = '$svgBottom/active_messages.svg';
   static const String inactiveMessages = '$svgBottom/inactive_messages.svg';
+  static const String active_file_manager =
+      '$svgBottom/active_file_manager.svg';
+
+  static const String inactive_filemanager =
+      '$svgBottom/inactive_filemanager.svg';
+  static const String active_meetings = '$svgBottom/active_meeting.svg';
+  static const String inactive_meetings = '$svgBottom/inactive_meetings.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Profile Menu
@@ -186,12 +232,15 @@ class AppAssets {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const String creativeAlecH = '$_mockCreatives/alec_h.png';
-  static const String creativeChristopherR = '$_mockCreatives/christopher_r.png';
+  static const String creativeBensonF = '$_mockCreatives/benson_f.png';
+  static const String creativeChristopherR =
+      '$_mockCreatives/christopher_r.png';
   static const String creativeCoreyB = '$_mockCreatives/corey_b.png';
   static const String creativeCorneliumM = '$_mockCreatives/cornelius_m.png';
   static const String creativeDanielA = '$_mockCreatives/daniel_a.png';
   static const String creativeDanielC = '$_mockCreatives/daniel_c.png';
   static const String creativeGaryAhmed = '$_mockCreatives/gary_ahmed.png';
+  static const String creativeJesseS = '$_mockCreatives/jesse_s.png';
   static const String creativeMikeyD = '$_mockCreatives/mikey_d.jpg';
   static const String creativeNathanGrant = '$_mockCreatives/nathan_grant.png';
 
@@ -228,6 +277,7 @@ class AppAssets {
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const String lottieLoader = '$_lottie/loader.json';
+  static const String lottieCircleLoader = '$_lottie/circleLoader.json';
   static const String lottieSpinner = '$_lottie/loading_spinner.json';
   static const String lottieSuccess = '$_lottie/success_animation.json';
 

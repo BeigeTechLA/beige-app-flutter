@@ -43,11 +43,14 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
     // --- Booking Analytics: Drop-off tracking for Step 1 ---
     ref.onDispose(() {
       if (!_stepCompleted && state.bookingId != null) {
-        AnalyticsService.logEvent(AnalyticsEvents.bookingAbandoned, params: {
-          'booking_id': state.bookingId!,
-          'last_step': 'content_type',
-          'step_number': 1,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingAbandoned,
+          params: {
+            'booking_id': state.bookingId!,
+            'last_step': 'content_type',
+            'step_number': 1,
+          },
+        );
       }
     });
     return const ContentTypeState();
@@ -106,17 +109,23 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
         final bookingId = data['data']?['booking_id'] as int?;
         _stepCompleted = true;
         // --- Booking Analytics: Step 1 — Booking started ---
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStarted, params: {
-          if (bookingId != null) 'booking_id': bookingId,
-          'content_type': contentType,
-          'step_number': 1,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStarted,
+          params: {
+            if (bookingId != null) 'booking_id': bookingId,
+            'content_type': contentType,
+            'step_number': 1,
+          },
+        );
         // --- Booking Analytics: Step 1 — Content type selected ---
-        AnalyticsService.logEvent(AnalyticsEvents.bookingStepContent, params: {
-          if (bookingId != null) 'booking_id': bookingId,
-          'content_type': contentType,
-          'step_number': 1,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.bookingStepContent,
+          params: {
+            if (bookingId != null) 'booking_id': bookingId,
+            'content_type': contentType,
+            'step_number': 1,
+          },
+        );
         state = state.copyWith(
           status: ContentTypeStatus.success,
           bookingId: bookingId,
@@ -129,5 +138,5 @@ class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
 
 final contentTypeNotifierProvider =
     NotifierProvider.autoDispose<ContentTypeNotifier, ContentTypeState>(
-  ContentTypeNotifier.new,
-);
+      ContentTypeNotifier.new,
+    );

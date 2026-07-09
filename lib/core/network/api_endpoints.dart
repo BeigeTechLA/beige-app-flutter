@@ -8,7 +8,8 @@ abstract class ApiEndpoints {
   static const String login = "auth/login";
   static const String signup = "auth/register";
   static const String forgotPassword = "auth/forgot-password-check";
-  static const String forgotPasswordVerifyOtp = "auth/forgot-password-verify-otp";
+  static const String forgotPasswordVerifyOtp =
+      "auth/forgot-password-verify-otp";
   static const String resetPassword = "auth/reset-password";
   static const String resendOtp = "auth/resend-otp";
 
@@ -40,6 +41,47 @@ abstract class ApiEndpoints {
   static const String paymentSetup = "payment/setup-intent";
   static const String paymentAttach = "stripe/confirm";
   static const String paymentSheet = "paymentsheet";
+
+  /// 💬 Chat (external-chat)
+  static const String chatRooms = 'external-chat/rooms';
+  static const String chatDirectory = 'external-chat/directory';
+  static String chatMessages(String roomId) => 'external-chat/messages/$roomId';
+  static String chatEditMessage(String messageId) =>
+      'external-chat/messages/$messageId/edit';
+  static String chatDeleteMessage(String messageId) =>
+      'external-chat/messages/$messageId/delete';
+  static String chatMessageReaction(String messageId) =>
+      'external-chat/messages/$messageId/reaction';
+  static String chatMarkRead(String roomId) =>
+      'external-chat/room/$roomId/mark-read';
+  static String chatRoomDetails(String roomId) =>
+      'external-chat/room/$roomId/details';
+  static String chatParticipants(String roomId) =>
+      'external-chat/participants/$roomId';
+
+  /// Multipart upload endpoint — final path TBD with backend. Reserved name
+  /// keeps the call site stable while the endpoint settles.
+  static String chatUpload(String roomId) =>
+      'external-chat/messages/$roomId/upload';
+
+  /// 📅 Meetings (external-meetings)
+  static const String meetings = 'external-meetings';
+  static const String externalMeetingsCreateEvent =
+      'external-meetings/create-event';
+
+  /// Project summaries for the create-meeting shoot picker. Returns
+  /// `{data: {stats, projects: [{project: {stream_project_booking_id, name,
+  /// ...}}]}}`.
+  static const String adminGetProjects = 'admin/get-projects';
+  static String meetingsByUser(String userId) =>
+      'external-meetings/user/$userId';
+  static String meetingById(String id) => 'external-meetings/$id';
+  static String meetingParticipants(String id) =>
+      'external-meetings/$id/participants';
+
+  /// POST `{ status: 'accepted' | 'declined' }` — records the signed-in
+  /// user's RSVP. Backend route name unconfirmed; swap if backend rejects.
+  static String meetingRespond(String id) => 'external-meetings/$id/respond';
 
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";

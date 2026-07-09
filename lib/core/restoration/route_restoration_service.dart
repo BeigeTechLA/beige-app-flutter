@@ -36,9 +36,7 @@ class RouteRestorationService {
     // Path uses :bookingId so we match by prefix below.
   };
 
-  static const List<String> _skipPathPrefixes = [
-    '/payment-success/',
-  ];
+  static const List<String> _skipPathPrefixes = ['/payment-success/'];
 
   /// Pure helper — true if [location] is eligible for persistence.
   ///
@@ -179,8 +177,10 @@ class RestoredLocation {
   String toUri() {
     if (query.isEmpty) return location;
     final qs = query.entries
-        .map((e) =>
-            '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeQueryComponent(e.key)}=${Uri.encodeQueryComponent(e.value)}',
+        )
         .join('&');
     return '$location?$qs';
   }

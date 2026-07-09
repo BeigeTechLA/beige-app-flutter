@@ -10,13 +10,18 @@ class CrashlyticsService {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
     };
-   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+      !kDebugMode,
+    );
     // await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   }
 
-  static Future<void> setUserContext({required int userId, required String email}) async {
+  static Future<void> setUserContext({
+    required int userId,
+    required String email,
+  }) async {
     await FirebaseCrashlytics.instance.setUserIdentifier(userId.toString());
-   // await FirebaseCrashlytics.instance.setCustomKey(CrashlyticsKeys.userEmail, email);
+    // await FirebaseCrashlytics.instance.setCustomKey(CrashlyticsKeys.userEmail, email);
   }
 
   static Future<void> setBuildMode() async {
@@ -28,14 +33,21 @@ class CrashlyticsService {
     } else if (kReleaseMode) {
       mode = 'Release';
     }
-    await FirebaseCrashlytics.instance.setCustomKey(CrashlyticsKeys.buildMode, mode);
+    await FirebaseCrashlytics.instance.setCustomKey(
+      CrashlyticsKeys.buildMode,
+      mode,
+    );
   }
 
   static Future<void> clearUserContext() async {
     await FirebaseCrashlytics.instance.setUserIdentifier('');
   }
 
-  static Future<void> recordError(Object error, StackTrace stack, {bool fatal = false}) async {
+  static Future<void> recordError(
+    Object error,
+    StackTrace stack, {
+    bool fatal = false,
+  }) async {
     await FirebaseCrashlytics.instance.recordError(error, stack, fatal: fatal);
   }
 }

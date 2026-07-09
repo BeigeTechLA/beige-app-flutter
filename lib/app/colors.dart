@@ -86,6 +86,8 @@ class AppColors {
   /// Dark text — for use on light/gold surfaces
   static const Color textDark = Color(0xFF4E4B44);
 
+  static const Color textDarkGolden = Color(0xFF898181);
+
   /// Heading text on dark backgrounds
   static const Color textHeading = Color(0xFF1D1D1B);
 
@@ -97,6 +99,9 @@ class AppColors {
 
   /// Light neutral text used in auth helper copy
   static const Color textLightNeutral = Color(0xFFD5D5D5);
+
+  /// Light grey text for profile names in capsules
+  static const Color textLightGrey = Color(0xFFC3C0C0);
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SEMANTIC COLORS
@@ -148,6 +153,7 @@ class AppColors {
   static const Color white24 = Color(0x3DFFFFFF);
   static const Color white15 = Color(0x26FFFFFF);
   static const Color white10 = Color(0x1AFFFFFF);
+  static const Color white6 = Color(0x0FFFFFFF);
 
   // — Black opacities —
   static const Color black = Color(0xFF000000);
@@ -167,6 +173,7 @@ class AppColors {
   static const Color goldLight20 = Color(0x33E8D5B5);
   static const Color goldOpacity40 = Color(0x66E9BE78);
   static const Color primary50 = Color(0x80E8D1AB);
+  static const Color primary20 = Color(0x33E8D1AB);
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // GRADIENT COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -238,6 +245,12 @@ class AppColors {
   /// Amber — star ratings, warnings
   static const Color amber = Color(0xFFFFC107);
 
+  /// Drawer & Header dark background
+  static const Color drawerHeader = Color(0xFF201F1F);
+
+  /// Abyss dark
+  static const Color surfaceAbyss = Color(0xFF111111);
+
   /// Grey 200 — light platform UI (image picker, sheets)
   static const Color greyShade200 = Color(0xFFEEEEEE);
 
@@ -261,10 +274,98 @@ class AppColors {
   static const Color statusArrived = Color(0xFF4CAF50);
   static const Color statusPending = Color(0xFFE53935);
 
+  // Booking lifecycle status colors (home booking card, shoot cards).
+  static const Color statusInitiated = Color(0xFFF29F3F);
+  static const Color statusPreProduction = Color(0xFFED70FD);
+  static const Color statusShootDay = Color(0xFF70C7FD);
+  static const Color statusPostProduction = Color(0xFFC686FF);
+  static const Color statusRevision = Color(0xFF88A0FF);
+  static const Color statusAssetsDelivered = Color(0xFFFFBA88);
+  static const Color statusPendingBright = Color(0xFFFFE83D);
+  static const Color statusCancelled = Color(0xFFFB6C6C);
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // MAP COLORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   static const Color mapBlue = Color(0xFF1A73E8);
   static const Color mapGrey = Color(0xFF757575);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MEETING STATUS COLORS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Soft mint background for completed-state badges.
+  static const Color softMint = Color(0xFFD8FDE6);
+
+  /// Bright green — accept toast, "Your Response: Accepted" line.
+  static const Color greenBright = Color(0xFF1DAA23);
+
+  /// Forest green — text on completed status pill.
+  static const Color greenForest = Color(0xFF2F855A);
+
+  /// Ice blue background for upcoming-state badges.
+  static const Color blueIce = Color(0xFFE0E7F8);
+
+  /// Royal blue text on upcoming status pill.
+  static const Color blueRoyal = Color(0xFF2D66D2);
+
+  /// Bright orange text on revision status pill.
+  static const Color orangeBright = Color(0xFFFF9D25);
+
+  /// Dark grey track for AppToggleSwitch off state.
+  static const Color surfaceFog = Color(0xFF4A4A4C);
+
+  /// Soft black drop shadow — 20% alpha.
+  static const Color black20 = Color(0x33000000);
+
+  // Meeting status pill palette (card + details sheet).
+  /// Pending / upcoming / scheduled — background.
+  static const Color meetingPendingBg = Color(0xFFFFF4C9);
+
+  /// Pending / upcoming / scheduled — foreground text.
+  static const Color meetingPendingFg = Color(0xFFBA6605);
+
+  /// Ongoing (initiated) — background.
+  static const Color meetingOngoingBg = Color(0xFFC3E7FD);
+
+  /// Ongoing (initiated) — foreground text.
+  static const Color meetingOngoingFg = Color(0xFF0575BA);
+
+  /// Completed — background.
+  static const Color meetingCompletedBg = Color(0xFFD4FFE4);
+
+  /// Completed — foreground text.
+  static const Color meetingCompletedFg = Color(0xFF16A34A);
+
+  /// Rescheduled / revision — background.
+  static const Color meetingRescheduledBg = Color(0xFFFFDDAD);
+
+  /// Rescheduled / revision — foreground text.
+  static const Color meetingRescheduledFg = Color(0xFFC07711);
+
+  /// Cancelled — background.
+  static const Color meetingCancelledBg = Color(0xFFFFD3D3);
+
+  /// Cancelled — foreground text.
+  static const Color meetingCancelledFg = Color(0xFFE44040);
+
+  /// Rejected RSVP marker + declined status text.
+  static const Color meetingRejected = Color(0xFFD33732);
+
+  /// Reject RSVP button — soft pink background.
+  static const Color meetingRejectSoftBg = Color(0xFFEECCC9);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // MISC TEXT TOKENS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Neutral off-white — participant tile name, subtle emphasis text.
+  static const Color textOffWhite = Color(0xFFCECECE);
+
+  /// Participant box background — 8% white opacity
+  static const Color participantBoxBg = Color(0x14FFFFFF);
+
+  /// Participant box border — 8% white opacity
+  static const Color participantBoxBorder = Color(0x14FFFFFF);
 }

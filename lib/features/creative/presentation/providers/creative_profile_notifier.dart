@@ -54,6 +54,7 @@ class CreativeProfileState {
     }
     return [];
   }
+
   Map<String, dynamic>? get reviews => data?['reviews'];
 }
 
@@ -75,9 +76,10 @@ class CreativeProfileNotifier
         errorMessage: error.message,
       ),
       (data) {
-        AnalyticsService.logEvent(AnalyticsEvents.creativeViewed, params: {
-          'creative_id': creativeId,
-        });
+        AnalyticsService.logEvent(
+          AnalyticsEvents.creativeViewed,
+          params: {'creative_id': creativeId},
+        );
         state = state.copyWith(
           status: CreativeProfileStatus.loaded,
           data: data,
@@ -89,5 +91,5 @@ class CreativeProfileNotifier
 
 final creativeProfileNotifierProvider = NotifierProvider.autoDispose
     .family<CreativeProfileNotifier, CreativeProfileState, int>(
-  CreativeProfileNotifier.new,
-);
+      CreativeProfileNotifier.new,
+    );

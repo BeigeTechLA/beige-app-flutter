@@ -4,8 +4,6 @@ import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
-
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/route_names.dart';
@@ -14,6 +12,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/loading.dart';
 
 class ShootTypeScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -110,7 +109,9 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(notifierState.errorMessage ?? "Something went wrong"),
+              content: Text(
+                notifierState.errorMessage ?? "Something went wrong",
+              ),
             ),
           );
         }
@@ -277,13 +278,8 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
                                   child: CachedNetworkImage(
                                     imageUrl: fullImageUrl,
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(
-                                      child: Lottie.asset(
-                                        AppAssets.lottieSpinner,
-                                        width: 60,
-                                        height: 60,
-                                      ),
-                                    ),
+                                    placeholder: (context, url) =>
+                                        const AppImageLoader(size: 60),
                                     errorWidget: (context, url, error) =>
                                         const Icon(
                                           Icons.broken_image,

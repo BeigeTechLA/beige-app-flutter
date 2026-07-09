@@ -54,10 +54,7 @@ class MyShootsNotifier extends AutoDisposeNotifier<MyShootsState> {
     List<dynamic> completed = state.completedShoots;
     String? error;
 
-    upcomingResult.fold(
-      (e) => error = e.message,
-      (data) => upcoming = data,
-    );
+    upcomingResult.fold((e) => error = e.message, (data) => upcoming = data);
 
     completedResult.fold(
       (e) => error ??= e.message,
@@ -75,5 +72,5 @@ class MyShootsNotifier extends AutoDisposeNotifier<MyShootsState> {
 
 final myShootsNotifierProvider =
     NotifierProvider.autoDispose<MyShootsNotifier, MyShootsState>(
-  MyShootsNotifier.new,
-);
+      MyShootsNotifier.new,
+    );

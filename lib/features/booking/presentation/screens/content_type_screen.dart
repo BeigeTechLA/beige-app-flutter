@@ -12,6 +12,8 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 
+import '../../../app_drawer/screen/drawer_screen.dart';
+
 class ContentTypeScreen extends ConsumerStatefulWidget {
   final int? value;
   final bool fromHome;
@@ -110,29 +112,53 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
     final isLoading = contentState.status == ContentTypeStatus.loading;
 
     return AppScaffold(
+      disableDrawer: widget.fromHome,
+      drawer: const DrawerScreen(),
+
       hasAppBar: true,
+
       appBar: AppBar(
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child:
-                  widget
-                      .fromHome // 👈 condition
-                  ? InkWell(
-                      onTap: () => context.pop(),
-                      child: SvgPicture.asset(AppAssets.back, height: 24),
-                    )
-                  : const SizedBox(), // 👈 hide
-            ),
+        titleSpacing: 0,
 
-            /// Center Title
-            Center(
+        title: Row(
+          children: [
+            /// MENU BUTTON
+            if (!widget.fromHome)
+              Builder(
+                builder: (context) {
+                  return IconButton(
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    icon: SvgPicture.asset(
+                      AppAssets.menu,
+                      height: 22,
+                      width: 22,
+                    ),
+                  );
+                },
+              ),
+
+            /// BACK BUTTON
+            if (widget.fromHome)
+              InkWell(
+                onTap: () => context.pop(),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: AppSpacing.base,
+                    right: AppSpacing.sm,
+                  ),
+                  child: SvgPicture.asset(AppAssets.back, height: 22),
+                ),
+              ),
+
+            /// TITLE CENTER
+            Expanded(
               child: Text(
                 "Create Project",
+                textAlign: TextAlign.center,
                 style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.white,
                   fontFamily: AppAssets.fontOutfit,
@@ -141,9 +167,9 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
               ),
             ),
 
-            /// Right Step Text
-            Align(
-              alignment: Alignment.centerRight,
+            /// STEP TEXT
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.md),
               child: Text(
                 "1/3",
                 style: AppTextStyles.titleSmall.copyWith(

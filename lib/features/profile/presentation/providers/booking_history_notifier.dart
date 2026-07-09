@@ -54,5 +54,5 @@ class BookingHistoryNotifier extends AutoDisposeNotifier<BookingHistoryState> {
 
 final bookingHistoryNotifierProvider =
     NotifierProvider.autoDispose<BookingHistoryNotifier, BookingHistoryState>(
-  BookingHistoryNotifier.new,
-);
+      BookingHistoryNotifier.new,
+    );

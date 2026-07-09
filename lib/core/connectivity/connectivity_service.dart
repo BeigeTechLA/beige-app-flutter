@@ -7,7 +7,7 @@ import 'connectivity_status.dart';
 
 class ConnectivityService {
   ConnectivityService({Connectivity? connectivity})
-      : _connectivity = connectivity ?? Connectivity();
+    : _connectivity = connectivity ?? Connectivity();
 
   final Connectivity _connectivity;
 
@@ -52,8 +52,9 @@ class ConnectivityService {
 
   Future<bool> _hasRealInternet() async {
     try {
-      final result = await InternetAddress.lookup(_reachabilityHost)
-          .timeout(_lookupTimeout);
+      final result = await InternetAddress.lookup(
+        _reachabilityHost,
+      ).timeout(_lookupTimeout);
       return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
     } on SocketException {
       return false;

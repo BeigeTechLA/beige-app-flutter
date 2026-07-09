@@ -15,5 +15,8 @@ sealed class AppException implements Exception {
 
 /// Fallback for unclassified errors
 class UnknownException extends AppException {
-  const UnknownException({super.message = 'An unexpected error occurred', super.originalError});
+  const UnknownException({
+    super.message = 'An unexpected error occurred',
+    super.originalError,
+  });
 }

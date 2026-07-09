@@ -44,7 +44,9 @@ const _guardedRoutes = [
 void runGuardTests(ReportBuilder report) {
   group('Auth Guard Tests — unauthenticated should redirect to /login', () {
     for (final (name, path) in _guardedRoutes) {
-      testWidgets('$name redirects unauthenticated user to /login', (tester) async {
+      testWidgets('$name redirects unauthenticated user to /login', (
+        tester,
+      ) async {
         // Pump app with logged-out state
         await pumpAppWithAuth(
           tester,
@@ -59,11 +61,7 @@ void runGuardTests(ReportBuilder report) {
         );
 
         // Record into report — guard only, no load result here
-        report.record(
-          route: path,
-          routeName: name,
-          guardResult: guardResult,
-        );
+        report.record(route: path, routeName: name, guardResult: guardResult);
 
         expect(
           guardResult.passed,
@@ -74,73 +72,80 @@ void runGuardTests(ReportBuilder report) {
     }
   });
 
-  group('Auth Guard Tests — authenticated user should NOT be redirected from protected routes', () {
-    const _authProtectedRoutes = [
-      ('home', '/'),
-      ('profile', '/profile'),
-      ('my_shoots', '/my-shoots'),
-      ('booking_history', '/booking-history'),
-    ];
+  group(
+    'Auth Guard Tests — authenticated user should NOT be redirected from protected routes',
+    () {
+      const _authProtectedRoutes = [
+        ('home', '/'),
+        ('profile', '/profile'),
+        ('my_shoots', '/my-shoots'),
+        ('booking_history', '/booking-history'),
+      ];
 
-    for (final (name, path) in _authProtectedRoutes) {
-      testWidgets('$name is accessible when authenticated', (tester) async {
-        await pumpAppWithAuth(
-          tester,
-          isLoggedIn: true,
-          extraOverrides: loggedInOverrides(),
-        );
+      for (final (name, path) in _authProtectedRoutes) {
+        testWidgets('$name is accessible when authenticated', (tester) async {
+          await pumpAppWithAuth(
+            tester,
+            isLoggedIn: true,
+            extraOverrides: loggedInOverrides(),
+          );
 
-        await navigateTo(tester, path);
-        final loadResult = await verifyScreenLoaded(tester, path);
+          await navigateTo(tester, path);
+          final loadResult = await verifyScreenLoaded(tester, path);
 
-        report.record(
-          route: path,
-          routeName: '${name}_auth_accessible',
-          loadResult: loadResult,
-        );
+          report.record(
+            route: path,
+            routeName: '${name}_auth_accessible',
+            loadResult: loadResult,
+          );
 
-        expect(
-          loadResult.passed,
-          isTrue,
-          reason: 'Authenticated user could not access $path: ${loadResult.error}',
-        );
-      });
-    }
-  });
+          expect(
+            loadResult.passed,
+            isTrue,
+            reason:
+                'Authenticated user could not access $path: ${loadResult.error}',
+          );
+        });
+      }
+    },
+  );
 
-  group('Auth Guard Tests — logged in user redirected away from public routes', () {
-    const _publicAuthRoutes = [
-      ('login', '/login'),
-      ('signup', '/signup'),
-      ('onboarding', '/onboarding'),
-    ];
+  group(
+    'Auth Guard Tests — logged in user redirected away from public routes',
+    () {
+      const _publicAuthRoutes = [
+        ('login', '/login'),
+        ('signup', '/signup'),
+        ('onboarding', '/onboarding'),
+      ];
 
-    for (final (name, path) in _publicAuthRoutes) {
-      testWidgets('$name redirects authenticated user to /', (tester) async {
-        await pumpAppWithAuth(
-          tester,
-          isLoggedIn: true,
-          extraOverrides: loggedInOverrides(),
-        );
+      for (final (name, path) in _publicAuthRoutes) {
+        testWidgets('$name redirects authenticated user to /', (tester) async {
+          await pumpAppWithAuth(
+            tester,
+            isLoggedIn: true,
+            extraOverrides: loggedInOverrides(),
+          );
 
-        final guardResult = await verifyAuthGuard(
-          tester,
-          path,
-          expectedRedirect: '/',
-        );
+          final guardResult = await verifyAuthGuard(
+            tester,
+            path,
+            expectedRedirect: '/',
+          );
 
-        report.record(
-          route: path,
-          routeName: '${name}_reverse_guard',
-          guardResult: guardResult,
-        );
+          report.record(
+            route: path,
+            routeName: '${name}_reverse_guard',
+            guardResult: guardResult,
+          );
 
-        expect(
-          guardResult.passed,
-          isTrue,
-          reason: 'Authenticated user was not redirected away from $path',
-        );
-      });
-    }
-  });
+          expect(
+            guardResult.passed,
+            isTrue,
+            reason: 'Authenticated user was not redirected away from $path',
+          );
+        });
+      }
+    },
+  );
 }

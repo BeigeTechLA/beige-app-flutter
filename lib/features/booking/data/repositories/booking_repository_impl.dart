@@ -144,9 +144,7 @@ class BookingRepositoryImpl implements BookingRepository {
     required int bookingId,
   }) {
     return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.getHolds(
-        bookingId: bookingId,
-      );
+      final response = await _remoteDataSource.getHolds(bookingId: bookingId);
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;
     });
@@ -181,6 +179,38 @@ class BookingRepositoryImpl implements BookingRepository {
       );
       _assertNoError(response);
       return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, List<dynamic>>> getBookingParticipants({
+    required int bookingId,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getBookingParticipants(
+        bookingId: bookingId,
+      );
+      _assertNoError(response);
+      final data = response['data'];
+      if (data is List) return data;
+      if (data is Map) {
+        final flat = <dynamic>[];
+        for (final key in const [
+          'staff',
+          'clients',
+          'creativePartners',
+          'cp',
+        ]) {
+          final v = data[key];
+          if (v is List) flat.addAll(v);
+        }
+        if (flat.isNotEmpty) return flat;
+      }
+      final users = response['users'];
+      if (users is List) return users;
+      final participants = response['participants'];
+      if (participants is List) return participants;
+      return <dynamic>[];
     });
   }
 

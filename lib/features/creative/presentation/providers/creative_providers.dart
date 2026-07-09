@@ -5,8 +5,9 @@ import '../../data/datasources/creative_remote_datasource.dart';
 import '../../data/repositories/creative_repository_impl.dart';
 import '../../domain/repositories/creative_repository.dart';
 
-final _creativeRemoteDataSourceProvider =
-    Provider<CreativeRemoteDataSource>((ref) {
+final _creativeRemoteDataSourceProvider = Provider<CreativeRemoteDataSource>((
+  ref,
+) {
   final dioClient = ref.watch(dioClientProvider);
   return CreativeRemoteDataSource(dioClient);
 });
