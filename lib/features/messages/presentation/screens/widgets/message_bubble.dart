@@ -458,8 +458,13 @@ class _SystemNotice extends StatelessWidget {
   const _SystemNotice({required this.text});
   final String text;
 
+  // Strip trailing " as <role>" from participant-change notices so the
+  // rendered text stays as "{user1} added {user2}" without role context.
+  static final RegExp _roleSuffix = RegExp(r'\s+as\s+.+$');
+
   @override
   Widget build(BuildContext context) {
+    final display = text.replaceFirst(_roleSuffix, '');
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenH,
@@ -467,7 +472,7 @@ class _SystemNotice extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          text,
+          display,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textTertiary,
           ),
