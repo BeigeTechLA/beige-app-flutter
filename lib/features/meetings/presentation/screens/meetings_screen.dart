@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
 import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
@@ -240,15 +241,19 @@ class _ListBody extends StatelessWidget {
       );
     }
     if (state.items.isEmpty) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: const [
-          SizedBox(height: 60),
-          AppEmptyState(
-            icon: Icons.event_outlined,
-            title: 'No meetings data found',
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: constraints.maxHeight,
+            child: const AppEmptyState(
+              svgAsset: AppAssets.meetingEmptyState,
+              iconSize: 120,
+              title: 'No meetings yet',
+              description: 'Scheduled meetings will appear here.',
+            ),
           ),
-        ],
+        ),
       );
     }
     return ListView.separated(

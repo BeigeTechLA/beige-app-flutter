@@ -57,6 +57,8 @@ class AppAssets {
 
   static const String icGroupChat = '$svgMessage/ic_group_chat.svg';
 
+  static const String msgEmptyState = '$svgMessage/msg_empty_state_svg.svg';
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Meeting
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -65,6 +67,7 @@ class AppAssets {
   static const String icMeetingLink = '$svgMeeting/ic_meeting_link.svg';
   static const String icRelatedShoot = '$svgMeeting/ic_related_shoot.svg';
   static const String icGoogleMeet = '$svgMeeting/ic_google_meet.svg';
+  static const String meetingEmptyState = '$svgMeeting/meeting_empty_state.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — drawer
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

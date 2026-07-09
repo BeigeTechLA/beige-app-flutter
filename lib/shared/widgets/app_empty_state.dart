@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/colors.dart';
 import '../../app/spacing.dart';
@@ -9,6 +10,8 @@ class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
     super.key,
     this.icon,
+    this.svgAsset,
+    this.iconSize = 56,
     required this.title,
     this.description,
     this.actionLabel,
@@ -16,6 +19,8 @@ class AppEmptyState extends StatelessWidget {
   });
 
   final IconData? icon;
+  final String? svgAsset;
+  final double iconSize;
   final String title;
   final String? description;
   final String? actionLabel;
@@ -29,8 +34,11 @@ class AppEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (icon != null) ...[
-              Icon(icon, size: 56, color: AppColors.textTertiary),
+            if (svgAsset != null) ...[
+              SvgPicture.asset(svgAsset!, height: iconSize),
+              AppSpacing.verticalMd,
+            ] else if (icon != null) ...[
+              Icon(icon, size: iconSize, color: AppColors.textTertiary),
               AppSpacing.verticalMd,
             ],
             Text(
