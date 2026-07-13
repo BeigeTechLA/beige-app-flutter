@@ -46,8 +46,7 @@ Future<bool> ensureLocationPermission(BuildContext context) async {
       title: 'Allow location access',
       message:
           'Beige uses your location to find nearby creators and set shoot locations faster.',
-      primaryLabel: 'Allow',
-      secondaryLabel: 'Not Now',
+      primaryLabel: 'Continue',
     );
 
     if (!shouldRequest) return false;
