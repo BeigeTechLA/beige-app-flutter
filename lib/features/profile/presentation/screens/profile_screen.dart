@@ -18,6 +18,8 @@ import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
+import '../../../home/presentation/widgets/common/home_section_divider.dart';
+
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
@@ -193,11 +195,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Divider(color: AppColors.dividerDark),
-            ),
-
+            const SizedBox(height: AppSpacing.lg),
+            const HomeSectionDivider(centerAlpha: 0.24),
             _profileMenuCard(),
 
             const SizedBox(height: 30),
@@ -229,6 +228,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ),
+          const SizedBox(height: AppSpacing.smd),
           Container(
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
@@ -250,11 +250,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.smd),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Divider(color: AppColors.dividerDark),
-          ),
+          const SizedBox(height: AppSpacing.xl),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
@@ -303,10 +299,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Divider(color: AppColors.dividerDark),
-          ),
+          const SizedBox(height: AppSpacing.xl),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
@@ -403,10 +396,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _divider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.base),
-      child: Divider(height: 1, color: AppColors.dividerDark),
-    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+      ),
+      child: Container(
+        height: 1,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.white.withValues(alpha: 0.09),
+              AppColors.white.withValues(alpha: 0.24),
+              AppColors.white.withValues(alpha: 0.09),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+      ),
+    );;
   }
 
   void _showLogoutBottomSheet() {

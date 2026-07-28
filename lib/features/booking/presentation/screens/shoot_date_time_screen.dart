@@ -552,7 +552,41 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }
 
   final ScrollController _dateScrollController = ScrollController();
+  final ScrollController _mainScrollController = ScrollController();
+  final GlobalKey _editsNeededKey = GlobalKey();
   List<DateTime> _allGeneratedDates = [];
+
+  void _scrollToEditOptions() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_mainScrollController.hasClients) return;
+      final targetContext = _editsNeededKey.currentContext;
+      if (targetContext == null) return;
+      final renderObject = targetContext.findRenderObject();
+      final scrollableBox =
+          _mainScrollController.position.context.notificationContext?.findRenderObject() as RenderBox?;
+      if (renderObject is RenderBox && scrollableBox != null) {
+        final offsetInScrollable =
+            renderObject.localToGlobal(Offset.zero, ancestor: scrollableBox).dy;
+        final targetOffset =
+            (_mainScrollController.offset + offsetInScrollable - 16.0).clamp(
+          0.0,
+          _mainScrollController.position.maxScrollExtent,
+        );
+        _mainScrollController.animateTo(
+          targetOffset,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+        );
+      } else {
+        Scrollable.ensureVisible(
+          targetContext,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
+          alignment: 0.0,
+        );
+      }
+    });
+  }
   DateTime? _currentHeaderMonth;
 
   void _onDateScroll() {
@@ -742,6 +776,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   void dispose() {
     _dateScrollController.removeListener(_onDateScroll);
     _dateScrollController.dispose();
+    _mainScrollController.dispose();
     startTimeController.dispose();
     endTimeController.dispose();
     dateController.dispose();
@@ -1554,6 +1589,8 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                 //////////////////////////////////////////////////////////////////////////
                 Expanded(
                   child: SingleChildScrollView(
+                    controller: _mainScrollController,
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
                     child: Column(
                       children: [
                         Row(
@@ -2386,8 +2423,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                           const SizedBox(height: 16),
                         ],
 
-                        SizedBox(height: 30),
+                        const SizedBox(height: 24),
                         Column(
+                          key: _editsNeededKey,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             /// 🔹 TITLE
@@ -2408,6 +2446,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     setState(() {
                                       isEditNeeded = true;
                                     });
+                                    _scrollToEditOptions();
                                   },
                                 ),
                                 const SizedBox(width: 24),

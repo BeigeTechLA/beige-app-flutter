@@ -75,7 +75,7 @@ class DrawerScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset(AppAssets.groupLogo),
+                      SvgPicture.asset(AppAssets.logoDrawer),
                       IconButton(
                         icon: const Icon(Icons.close, color: AppColors.white),
                         onPressed: () => Navigator.of(context).pop(),
@@ -117,7 +117,7 @@ class DrawerScreen extends ConsumerWidget {
                             loading: () => const CircleAvatar(
                               radius: 25,
                               backgroundColor: AppColors.surfaceVariant,
-                              child: const Center(
+                              child: Center(
                                 child: AppCircularLoader(
                                   size: 18,
                                   strokeWidth: 2,
