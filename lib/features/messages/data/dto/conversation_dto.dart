@@ -26,7 +26,18 @@ class ConversationDto {
     } else {
       final cpIds = _readParticipants(json['cp_ids']);
       final managerIds = _readParticipants(json['manager_ids']);
-      participantIds = [...cpIds, ...managerIds];
+      final productionIds = _readParticipants(json['production_ids']);
+      final clientId = _readParticipantIdFromObject(json['client_snapshot']);
+      final seen = <String>{};
+      participantIds = [
+        for (final id in [
+          ...cpIds,
+          ...managerIds,
+          ...productionIds,
+          ?clientId,
+        ])
+          if (seen.add(id)) id,
+      ];
     }
 
     final unreadMap = json['unread_counts'];
@@ -42,7 +53,9 @@ class ConversationDto {
       avatarUrl:
           _firstAvatar(json['participants']) ??
           _firstAvatar(json['cp_ids']) ??
-          _firstAvatar(json['manager_ids']),
+          _firstAvatar(json['manager_ids']) ??
+          _firstAvatar(json['production_ids']) ??
+          _avatarFromObject(json['client_snapshot']),
       lastMessage: _previewFromRoom(json),
       unreadCount: unread,
       isOnline: false,
@@ -51,6 +64,14 @@ class ConversationDto {
       participantIds: participantIds,
       updatedAt: _parseTs(json['updatedAt'] ?? json['updated_at']),
     );
+  }
+
+  static String? _readParticipantIdFromObject(Object? raw) {
+    if (raw is Map) {
+      final id = (raw['id'] ?? raw['_id'] ?? '').toString();
+      if (id.isNotEmpty) return id;
+    }
+    return null;
   }
 
   static DateTime? _parseTs(Object? raw) {
@@ -76,6 +97,17 @@ class ConversationDto {
         if (v is String && v.isNotEmpty) {
           return v.startsWith('http') ? v : '${Env.imageUrl}$v';
         }
+      }
+    }
+    return null;
+  }
+
+  static String? _avatarFromObject(Object? raw) {
+    if (raw is Map) {
+      final v =
+          raw['profileImage'] ?? raw['profile_image'] ?? raw['avatar_url'];
+      if (v is String && v.isNotEmpty) {
+        return v.startsWith('http') ? v : '${Env.imageUrl}$v';
       }
     }
     return null;

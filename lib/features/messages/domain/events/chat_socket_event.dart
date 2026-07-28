@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../entities/conversation.dart';
 import '../entities/message.dart';
 
 /// Sealed union of realtime events emitted by the messaging socket.
@@ -98,3 +99,9 @@ class ReactionUpdated extends ChatSocketEvent {
   final Map<String, Set<String>> reactions;
   const ReactionUpdated(this.conversationId, this.messageId, this.reactions);
 }
+
+class ChatRoomCreated extends ChatSocketEvent {
+  final Conversation conversation;
+  const ChatRoomCreated(this.conversation);
+}
+

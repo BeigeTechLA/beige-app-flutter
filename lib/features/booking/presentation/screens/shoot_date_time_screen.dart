@@ -551,10 +551,61 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     return selectedDate != null;
   }
 
+  final ScrollController _dateScrollController = ScrollController();
+  List<DateTime> _allGeneratedDates = [];
+  DateTime? _currentHeaderMonth;
+
+  void _onDateScroll() {
+    if (!_dateScrollController.hasClients || _allGeneratedDates.isEmpty) return;
+    const double itemWidth = 68.0;
+    final index = (_dateScrollController.offset / itemWidth)
+        .floor()
+        .clamp(0, _allGeneratedDates.length - 1);
+    if (index >= 0 && index < _allGeneratedDates.length) {
+      final date = _allGeneratedDates[index];
+      if (_currentHeaderMonth == null ||
+          date.month != _currentHeaderMonth!.month ||
+          date.year != _currentHeaderMonth!.year) {
+        setState(() {
+          _currentHeaderMonth = date;
+        });
+      }
+    }
+  }
+
+  void _scrollToEarliestSelectedDate() {
+    if (selectedDates.isEmpty ||
+        !_dateScrollController.hasClients ||
+        _allGeneratedDates.isEmpty) {
+      return;
+    }
+    final sorted = List<DateTime>.from(selectedDates)..sort();
+    final earliest = sorted.first;
+    final index = _allGeneratedDates.indexWhere(
+      (d) =>
+          d.year == earliest.year &&
+          d.month == earliest.month &&
+          d.day == earliest.day,
+    );
+    if (index != -1) {
+      const double itemWidth = 68.0;
+      final targetOffset = (index * itemWidth).clamp(
+        0.0,
+        _dateScrollController.position.maxScrollExtent,
+      );
+      _dateScrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   bool isLoading = true;
   @override
   void initState() {
     super.initState();
+    _dateScrollController.addListener(_onDateScroll);
   }
 
   String getFinalSummaryText() {
@@ -689,6 +740,8 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
   @override
   void dispose() {
+    _dateScrollController.removeListener(_onDateScroll);
+    _dateScrollController.dispose();
     startTimeController.dispose();
     endTimeController.dispose();
     dateController.dispose();
@@ -1240,6 +1293,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
         selectedDates = result;
         startTimes.clear();
         endTimes.clear();
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToEarliestSelectedDate();
       });
     }
   }
@@ -2630,22 +2686,28 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }) {
     DateTime today = DateTime.now();
 
-    /// ✅ Current month calculation (IMPORTANT FIX)
-    DateTime lastDay = DateTime(today.year, today.month + 1, 0);
-    int totalDays = lastDay.day;
-
-    /// ✅ Only current month dates
-    List<DateTime> allDates = List.generate(
-      totalDays - today.day + 1,
+    /// ✅ 180 Days (6 Months) Rolling Window from today
+    List<DateTime> generated = List.generate(
+      180,
       (index) => DateTime(today.year, today.month, today.day + index),
     );
+
+    /// ✅ Merge any selected dates outside 180 days
+    Set<DateTime> dateSet = generated.toSet();
+    for (final d in selectedDates) {
+      dateSet.add(DateTime(d.year, d.month, d.day));
+    }
+    List<DateTime> allDates = dateSet.toList()..sort();
+    _allGeneratedDates = allDates;
 
     bool isSameDate(DateTime a, DateTime b) {
       return a.year == b.year && a.month == b.month && a.day == b.day;
     }
 
     String getHeaderMonth() {
-      return DateTimeUtils.formatMonthYear(today);
+      final activeMonth = _currentHeaderMonth ??
+          (selectedDates.isNotEmpty ? selectedDates.first : today);
+      return DateTimeUtils.formatMonthYear(activeMonth);
     }
 
     return Container(
@@ -2689,6 +2751,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
           SizedBox(
             height: 64,
             child: ListView.builder(
+              controller: _dateScrollController,
               scrollDirection: Axis.horizontal,
               itemCount: allDates.length,
               itemBuilder: (context, index) {
@@ -2698,7 +2761,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                   (d) => isSameDate(d, date),
                 );
 
-                /// ✅ Disable past dates (optional but good)
                 final isPast = date.isBefore(
                   DateTime(today.year, today.month, today.day),
                 );
@@ -2716,9 +2778,6 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                           }
 
                           onChanged(updated);
-
-                          /// 🔥 UI refresh
-                          (context as Element).markNeedsBuild();
                         },
                   child: Container(
                     margin: const EdgeInsets.symmetric(

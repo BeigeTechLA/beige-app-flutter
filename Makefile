@@ -1,4 +1,4 @@
-.PHONY: build-dev build-dev-ios build-dev-android build-prod build-prod-ios build-prod-android clean pub
+.PHONY: build-dev build-dev-ios build-dev-android build-prod build-prod-ios build-prod-android build-prod-aab clean pub
 
 build-dev:
 	./scripts/build_dev.sh
@@ -17,6 +17,9 @@ build-prod-ios:
 
 build-prod-android:
 	flutter clean && flutter pub get && flutter build apk --flavor prod -t lib/main_prod.dart --release
+
+build-prod-aab:
+	flutter clean && flutter pub get && flutter build appbundle --flavor prod -t lib/main_prod.dart --release
 
 clean:
 	flutter clean
