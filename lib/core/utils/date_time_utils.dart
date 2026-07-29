@@ -354,25 +354,10 @@ class DateTimeUtils {
     List<DateTime> dates, {
     String fallback = "",
   }) {
-    try {
-      if (dates.isEmpty) return fallback;
-
-      dates.sort();
-
-      final days = dates
-          .map((date) => DateFormat(kDayOfMonthPattern).format(date))
-          .toList();
-      final lastDate = dates.last;
-      final month = DateFormat(kMonthShortPattern).format(lastDate);
-      final year = DateFormat(kYearPattern).format(lastDate);
-
-      return "$month ${_joinDays(days)}, $year";
-    } catch (_) {
-      return fallback;
-    }
+    return formatGroupedMonthDays(dates, fallback: fallback);
   }
 
-  /// ✅ Selected-days label → Selected Days: 19 & 20 May 2026
+  /// ✅ Selected-days label → Selected Days: Jul 31, 2026 • Aug 20 & 21, 2026
   ///
   /// Used in:
   /// - shoot_type_selection_screen.dart
@@ -380,26 +365,14 @@ class DateTimeUtils {
     List<DateTime> dates, {
     String fallback = "",
   }) {
-    try {
-      if (dates.isEmpty) return fallback;
-
-      dates.sort();
-
-      final days = dates
-          .map((date) => DateFormat(kDayOfMonthPattern).format(date))
-          .toList();
-      final monthYear = DateFormat(kMonthYearPattern).format(dates.last);
-
-      return "Selected Days: ${_joinDays(days)} $monthYear";
-    } catch (_) {
-      return fallback;
-    }
+    return formatGroupedSelectedDaysLabel(dates, fallback: fallback);
   }
 
-  /// ✅ Grouped selected-days label → Selected Days: 19 & 20 May 2026
+  /// ✅ Grouped selected-days label (TOP PLACE) → Selected Days: Jul 31, 2026 • Aug 20 & 21, 2026
   ///
   /// Used in:
   /// - shoot_date_time_screen.dart
+  /// - shoot_type_selection_screen.dart
   static String formatGroupedSelectedDaysLabel(
     List<DateTime> dates, {
     String fallback = "",
@@ -407,16 +380,17 @@ class DateTimeUtils {
     try {
       if (dates.isEmpty) return fallback;
 
-      return "Selected Days: ${_formatGroupedMonthDays(dates)}";
+      return "Selected Days: ${_formatGroupedMonthDays(dates, separator: " • ", useBullets: false)}";
     } catch (_) {
       return fallback;
     }
   }
 
-  /// ✅ Grouped compact summary → May 2026 19 & 20
+  /// ✅ Grouped compact summary (BELOW CARD PLACE) → Multiline bullet list per month change
   ///
   /// Used in:
   /// - shoot_date_time_screen.dart
+  /// - shoot_type_selection_screen.dart
   static String formatGroupedMonthDays(
     List<DateTime> dates, {
     String fallback = "",
@@ -424,7 +398,7 @@ class DateTimeUtils {
     try {
       if (dates.isEmpty) return fallback;
 
-      return _formatGroupedMonthDays(dates, monthFirst: true);
+      return _formatGroupedMonthDays(dates, separator: "\n", useBullets: true);
     } catch (_) {
       return fallback;
     }
@@ -505,27 +479,41 @@ class DateTimeUtils {
 
   static String _formatGroupedMonthDays(
     List<DateTime> dates, {
-    bool monthFirst = false,
+    String separator = " • ",
+    bool useBullets = false,
   }) {
+    if (dates.isEmpty) return "";
     dates.sort();
 
-    final monthMap = <String, List<int>>{};
+    final monthMap = <String, Map<String, dynamic>>{};
 
     for (final date in dates) {
-      final key = DateFormat(kMonthYearPattern).format(date);
-      monthMap.putIfAbsent(key, () => []);
-      monthMap[key]!.add(date.day);
+      final key = "${date.year}-${date.month}";
+      if (!monthMap.containsKey(key)) {
+        monthMap[key] = {
+          'month': DateFormat(kMonthShortPattern).format(date),
+          'year': DateFormat(kYearPattern).format(date),
+          'days': <int>[],
+        };
+      }
+      (monthMap[key]!['days'] as List<int>).add(date.day);
     }
 
     final result = <String>[];
+    final bool includeBullet = useBullets && monthMap.length > 1;
 
-    monthMap.forEach((month, days) {
+    monthMap.forEach((_, data) {
+      final days = data['days'] as List<int>;
       days.sort();
       final daysText = _joinDays(days.map((day) => "$day").toList());
-      result.add(monthFirst ? "$month $daysText" : "$daysText $month");
+      final month = data['month'] as String;
+      final year = data['year'] as String;
+
+      final bullet = includeBullet ? "• " : "";
+      result.add("$bullet$month $daysText, $year");
     });
 
-    return result.join(", ");
+    return result.join(separator);
   }
 
   static String _joinDays(List<String> days) {

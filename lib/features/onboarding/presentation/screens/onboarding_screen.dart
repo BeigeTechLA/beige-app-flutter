@@ -30,9 +30,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     },
     {
       "image": AppAssets.onboarding1,
-      "title": "Find Video & Photo\nWork",
+      "title": "Collaborate and Manage \nShoots Seamlessly",
       "description":
-          "Find local photo, video, and editing work.\nBook. Shoot. Earn. 📍⚡",
+          "Chat with your Creative Partner, share feedback, \nand keep everything in sync.📍⚡",
     },
   ];
 
@@ -181,7 +181,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
 
           /// ---------------- SKIP BUTTON ----------------
-          _currentPage != pages.length - 1
+          _currentPage != .length - 1
               ? SafeArea(
                   child: Align(
                     alignment: Alignment.topRight,

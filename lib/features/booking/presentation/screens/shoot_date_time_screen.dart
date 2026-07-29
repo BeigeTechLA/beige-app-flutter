@@ -679,15 +679,17 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   }
 
   String getDaysAndHours() {
+    final int days = selectedIndex == 1
+        ? (selectedDate != null ? 1 : 0)
+        : selectedDates.length;
+
     final totalMinutes = getTotalSelectedDurationInMinutes();
-
-    if (totalMinutes <= 0) return "0 Day • 0 Hour";
-
     final hours = (totalMinutes / 60).ceil();
-    final days = selectedDates.length;
 
-    return "$days ${days == 1 ? "Day" : "Days"} • "
-        "$hours ${hours == 1 ? "Hour" : "Hours"}";
+    final daysLabel = "$days ${days == 1 ? "Day" : "Days"}";
+    final hoursLabel = "$hours ${hours == 1 ? "Hour" : "Hours"}";
+
+    return "$daysLabel • $hoursLabel";
   }
 
   String formatSelectedDates(List<DateTime> dates) {
@@ -2249,6 +2251,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     ),
                                   ),
                                   child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       /// 📅 ICON
                                       SvgPicture.asset(AppAssets.calndermark),

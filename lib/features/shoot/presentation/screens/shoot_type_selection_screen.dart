@@ -168,11 +168,11 @@ class _ShootTypeSelectionScreenState
   bool _hasSynced = false;
 
   String formatDatesAlt(List<DateTime> dates) {
-    return DateTimeUtils.formatMonthDaysWithCommaYear(dates);
+    return DateTimeUtils.formatGroupedMonthDays(dates);
   }
 
   String formatSelectedDates(List<DateTime> dates) {
-    return DateTimeUtils.formatSelectedDaysWithLastMonthYear(dates);
+    return DateTimeUtils.formatGroupedSelectedDaysLabel(dates);
   }
 
   bool isEndTimeAfterStart(TimeOfDay start, TimeOfDay end) {
