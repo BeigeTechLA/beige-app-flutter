@@ -181,7 +181,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
 
           /// ---------------- SKIP BUTTON ----------------
-          _currentPage != .length - 1
+          _currentPage != pages.length - 1
               ? SafeArea(
                   child: Align(
                     alignment: Alignment.topRight,
