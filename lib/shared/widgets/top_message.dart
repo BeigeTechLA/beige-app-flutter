@@ -26,6 +26,12 @@ class TopMessage {
 
     late OverlayEntry overlayEntry;
 
+    void removeOverlayEntry() {
+      if (overlayEntry.mounted) {
+        overlayEntry.remove();
+      }
+    }
+
     overlayEntry = OverlayEntry(
       builder: (context) => Stack(
         children: [
@@ -62,7 +68,7 @@ class TopMessage {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => overlayEntry.remove(),
+                      onTap: removeOverlayEntry,
                       child: const Icon(Icons.close, color: AppColors.white),
                     ),
                   ],
@@ -77,7 +83,7 @@ class TopMessage {
     overlay.insert(overlayEntry);
 
     Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
+      removeOverlayEntry();
     });
   }
 }

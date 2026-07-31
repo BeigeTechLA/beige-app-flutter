@@ -75,38 +75,73 @@ class HomeServiceCard extends StatelessWidget {
                     color: AppColors.background,
                     borderRadius: BorderRadius.circular(AppRadii.xxl),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
+                  child: Stack(
                     children: [
-                      Flexible(
-                        child: Image.asset(
-                          imagePath,
-                          height: 36,
-                          width: 40,
-                          fit: BoxFit.contain,
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Image.asset(
+                                imagePath,
+                                height: 36,
+                                width: 40,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xxs),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  title,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.white.withValues(alpha: 0.6),
+                                    fontSize: 11,
+                                    height: 1.1,
+                                    fontFamily: AppAssets.fontHelveticaNeue,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            style: TextStyle(
+                      Positioned(
+                        top: 2,
+                        right: 2,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut,
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
                               color: isSelected
                                   ? AppColors.primary
-                                  : AppColors.white.withValues(alpha: 0.6),
-                              fontSize: 11,
-                              height: 1.1,
-                              fontFamily: AppAssets.fontHelveticaNeue,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
+                                  : AppColors.white.withValues(alpha: 0.3),
+                              width: 1.2,
                             ),
                           ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 11,
+                                  color: AppColors.background,
+                                )
+                              : null,
                         ),
                       ),
                     ],

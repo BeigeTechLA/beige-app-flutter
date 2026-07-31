@@ -12,6 +12,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/payment/presentation/providers/payment_method_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class PaymentMethodScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -66,9 +67,7 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
 
       if (paymentSheet == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to create payment sheet")),
-          );
+          TopMessage.show(context, "Failed to create payment sheet");
         }
         return;
       }
@@ -102,31 +101,27 @@ class _PaymentMethodScreenState extends ConsumerState<PaymentMethodScreen> {
 
       if (!confirmed) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Payment confirmation failed")),
-          );
+          TopMessage.show(context, "Payment confirmation failed");
         }
         return;
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(
+        TopMessage.show(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Payment Completed")));
+          "Payment Completed",
+          type: TopMessageType.success,
+        );
       }
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) return;
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
-        );
+        TopMessage.show(context, e.error.localizedMessage ?? "Payment failed");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        TopMessage.show(context, e.toString());
       }
     } finally {
       if (mounted) setState(() => isProcessing = false);

@@ -682,14 +682,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                     return;
                                                   }
                                                   if (roleId == 0) {
-                                                    ScaffoldMessenger.of(
+                                                    TopMessage.show(
                                                       context,
-                                                    ).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                          'Missing role for this creator',
-                                                        ),
-                                                      ),
+                                                      'Missing role for this creator',
                                                     );
                                                     return;
                                                   }
@@ -747,14 +742,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                                                   if (selectedCount >=
                                                       maxAllowed) {
-                                                    ScaffoldMessenger.of(
+                                                    TopMessage.show(
                                                       context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "You can add only $maxAllowed ${item['role_name']}",
-                                                        ),
-                                                      ),
+                                                      "You can add only $maxAllowed ${item['role_name']}",
                                                     );
 
                                                     return;

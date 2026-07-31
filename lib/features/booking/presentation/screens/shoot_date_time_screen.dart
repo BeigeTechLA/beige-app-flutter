@@ -19,6 +19,7 @@ import 'package:beige/shared/util/picker_theme.dart';
 
 import '../../../../app/assets.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ShootDateTimeScreen extends ConsumerStatefulWidget {
   final int ShootTypeId;
@@ -883,18 +884,14 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     if (selectedIndex == 1) {
       /// ✅ SAFETY CHECK
       if (selectedDate == null || startTime == null || endTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select date and time")),
-        );
+        TopMessage.show(context, "Please select date and time");
         setState(() => isSubmitting = false);
         return;
       }
 
       /// ✅ END > START CHECK
       if (!_isTimeAfter(startTime!, endTime!)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("End time must be after Start time")),
-        );
+        TopMessage.show(context, "End time must be after Start time");
         setState(() => isSubmitting = false);
         return;
       }
@@ -916,9 +913,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       List<Map<String, dynamic>> bookingDays = [];
 
       if (selectedDates.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Please select dates")));
+        TopMessage.show(context, "Please select dates");
         setState(() => isSubmitting = false);
         return;
       }
@@ -926,17 +921,13 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
       /// 🔹 SAME TIME FOR ALL
       if (istimingsame) {
         if (startTime == null || endTime == null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Please select time")));
+          TopMessage.show(context, "Please select time");
           setState(() => isSubmitting = false);
           return;
         }
 
         if (!isEndTimeAfterStart(startTime!, endTime!)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("End time must be after Start time")),
-          );
+          TopMessage.show(context, "End time must be after Start time");
           setState(() => isSubmitting = false);
           return;
         }
@@ -958,20 +949,14 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
 
           /// ❌ NULL CHECK
           if (start == null || end == null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Select time for all dates")),
-            );
+            TopMessage.show(context, "Select time for all dates");
             setState(() => isSubmitting = false);
             return;
           }
 
           /// ❌ VALIDATION
           if (!isEndTimeAfterStart(start, end)) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("End time must be after Start time"),
-              ),
-            );
+            TopMessage.show(context, "End time must be after Start time");
             setState(() => isSubmitting = false);
             return;
           }
@@ -1012,8 +997,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
         },
       );
     } else if (dtState.status == ShootDateTimeStatus.error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(dtState.errorMessage ?? "Something went wrong")),
+      TopMessage.show(
+        context,
+        dtState.errorMessage ?? "Something went wrong",
       );
     }
 
@@ -1389,9 +1375,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
     if (useCupertinoSheet && !isStartTime) {
       final selectedStart = dateKey == null ? startTime : startTimes[dateKey];
       if (selectedStart == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select start time first")),
-        );
+        TopMessage.show(context, "Please select start time first");
         return;
       }
     }
@@ -1459,9 +1443,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
         picked.minute,
       );
       if (pickedDT.isBefore(minAllowed)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Select time after 4 hours")),
-        );
+        TopMessage.show(context, "Select time after 4 hours");
         return;
       }
     }
@@ -2150,14 +2132,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                   readOnly: true,
                                   onTap: () {
                                     if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(
+                                      TopMessage.show(
                                         context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Please select date first",
-                                          ),
-                                        ),
+                                        "Please select date first",
                                       );
                                       return;
                                     }
@@ -2189,14 +2166,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                   readOnly: true,
                                   onTap: () {
                                     if (selectedDates.isEmpty) {
-                                      ScaffoldMessenger.of(
+                                      TopMessage.show(
                                         context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Please select date first",
-                                          ),
-                                        ),
+                                        "Please select date first",
                                       );
                                       return;
                                     }
@@ -2358,10 +2330,9 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                             readOnly: true,
                             onTap: () {
                               if (selectedDate == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Please select date first"),
-                                  ),
+                                TopMessage.show(
+                                  context,
+                                  "Please select date first",
                                 );
                                 return;
                               }
@@ -2389,20 +2360,16 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                             readOnly: true,
                             onTap: () {
                               if (selectedDate == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Please select date first"),
-                                  ),
+                                TopMessage.show(
+                                  context,
+                                  "Please select date first",
                                 );
                                 return;
                               }
                               if (startTime == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Please select start time first",
-                                    ),
-                                  ),
+                                TopMessage.show(
+                                  context,
+                                  "Please select start time first",
                                 );
                                 return;
                               }
@@ -3294,16 +3261,12 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
         GestureDetector(
           onTap: () {
             if (selectedIndex == 1 && selectedDate == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select date first")),
-              );
+              TopMessage.show(context, "Please select date first");
               return;
             }
 
             if (selectedIndex == 2 && selectedDates.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select date first")),
-              );
+              TopMessage.show(context, "Please select date first");
               return;
             }
 
@@ -3314,9 +3277,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
               });
             } else {
               if (selectedTime == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Please select start time first")),
-                );
+                TopMessage.show(context, "Please select start time first");
                 return;
               }
 

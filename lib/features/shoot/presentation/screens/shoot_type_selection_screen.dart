@@ -15,6 +15,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/assets.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
 import 'package:beige/shared/util/picker_theme.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ShootTypeSelectionScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -735,14 +736,9 @@ class _ShootTypeSelectionScreenState
                                 child: GestureDetector(
                                   onTap: () {
                                     if (isMultiLocked) {
-                                      ScaffoldMessenger.of(
+                                      TopMessage.show(
                                         context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "Multiple Day not allowed",
-                                          ),
-                                        ),
+                                        "Multiple Day not allowed",
                                       );
                                       return;
                                     }

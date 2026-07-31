@@ -9,6 +9,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/profile/presentation/providers/delete_account_notifier.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 import '../../../../app/assets.dart';
 
@@ -40,12 +41,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         context.pushNamed(RouteNames.deleteAccountOtp);
       } else if (next.status == DeleteAccountStatus.error &&
           next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        TopMessage.show(context, next.errorMessage!);
       }
     });
 
@@ -133,12 +129,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 ? null
                 : () {
                     if (selectedReason == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please select a reason"),
-                          backgroundColor: AppColors.error,
-                        ),
-                      );
+                      TopMessage.show(context, "Please select a reason");
                       return;
                     }
                     ref

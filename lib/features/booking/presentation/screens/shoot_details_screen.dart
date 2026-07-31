@@ -20,6 +20,7 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_details_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/app_qty_counter.dart';
 
@@ -151,10 +152,9 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
       setState(() {
         isSubmitting = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(detailsState.errorMessage ?? "Error saving details"),
-        ),
+      TopMessage.show(
+        context,
+        detailsState.errorMessage ?? "Error saving details",
       );
     } else {
       setState(() {
@@ -284,9 +284,9 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
         await getAddressFromLatLng(latLng);
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Location not found")));
+      if (mounted) {
+        TopMessage.show(context, "Location not found");
+      }
     }
   }
 

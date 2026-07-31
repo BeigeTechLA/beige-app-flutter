@@ -40,7 +40,7 @@ class Env {
         socketUrl = _socketOverride.isNotEmpty
             ? _socketOverride
             : 'https://api2.prod.beige.app';
-        stripePublishableKey = 'PLACE_HOLDER_LIVE_STRIPE_KEY';
+        stripePublishableKey = 'pk_live_51S5czd54hnPNgHXUeZUKeHnojWxW9CoV1cicTHDbn1upsPakN8GtwNgBNORQt3ghPlmJgtbcycT8tw8ctfxRz4a800NeVNgc5u';
     }
   }
 }

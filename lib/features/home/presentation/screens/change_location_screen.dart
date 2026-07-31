@@ -19,6 +19,7 @@ import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/profile_providers.dart';
 import 'package:beige/shared/widgets/location_permission_dialog.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ChangeLocationScreen extends ConsumerStatefulWidget {
   const ChangeLocationScreen({super.key});
@@ -137,12 +138,12 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
     if (!mounted) return;
 
     result.fold(
-      (error) => ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message))),
+      (error) => TopMessage.show(context, error.message),
       (_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Location updated successfully")),
+        TopMessage.show(
+          context,
+          "Location updated successfully",
+          type: TopMessageType.success,
         );
         context.pop(payload);
       },

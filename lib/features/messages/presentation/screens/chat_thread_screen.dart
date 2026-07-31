@@ -11,6 +11,7 @@ import '../../../../app/text_styles.dart';
 import '../../../../shared/util/conversation_title.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/loading.dart';
+import '../../../../shared/widgets/top_message.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/entities/participant.dart';
 import '../providers/chat_thread_providers.dart';
@@ -111,9 +112,7 @@ class _ChatThreadScreenState extends ConsumerState<ChatThreadScreen>
     ref.listen<ChatThreadState>(chatThreadProvider(familyArg), (prev, next) {
       if (next.errorMessage != null &&
           prev?.errorMessage != next.errorMessage) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+        TopMessage.show(context, next.errorMessage!);
         notifier.clearError();
       }
       _maybeScrollToLatest(next.messages.length);

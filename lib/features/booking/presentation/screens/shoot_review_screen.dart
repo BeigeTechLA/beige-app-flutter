@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
+import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
+import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -43,6 +45,40 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   bool isProcessing = false;
   bool _isPopping = false;
   bool _isNavigatingToPaymentMethod = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await SharedService.getUserData();
+    if (mounted) {
+      _populateIfEmpty(
+        name: userData['name']?.toString(),
+        email: userData['email']?.toString(),
+      );
+    }
+  }
+
+  void _populateIfEmpty({String? name, String? email, String? phone}) {
+    if (nameController.text.isEmpty && name != null && name.trim().isNotEmpty) {
+      nameController.text = name.trim();
+    }
+    if (emailController.text.isEmpty && email != null && email.trim().isNotEmpty) {
+      emailController.text = email.trim();
+    }
+    if (phoneController.text.isEmpty && phone != null && phone.trim().isNotEmpty) {
+      final digits = phone.replaceAll(RegExp(r'\D'), '');
+      final tenDigits = digits.length >= 10
+          ? digits.substring(digits.length - 10)
+          : digits;
+      if (tenDigits.isNotEmpty) {
+        phoneController.text = tenDigits;
+      }
+    }
+  }
 
   void _handleBack() {
     if (_isPopping) return;
@@ -115,10 +151,10 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   Future<void> _openStripeSheet() async {
     if (isProcessing) return;
 
-    if (nameController.text.isEmpty || phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill required fields")),
-      );
+    if (nameController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty) {
+      TopMessage.show(context, "Please fill required fields");
       return;
     }
 
@@ -142,9 +178,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
       if (!isSaved) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to save details")),
-          );
+          TopMessage.show(context, "Failed to save details");
         }
         return;
       }
@@ -156,9 +190,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
       if (paymentSheet == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to create payment sheet")),
-          );
+          TopMessage.show(context, "Failed to create payment sheet");
         }
         return;
       }
@@ -192,9 +224,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
       if (!confirmed) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Payment confirmation failed")),
-          );
+          TopMessage.show(context, "Payment confirmation failed");
         }
         return;
       }*/
@@ -215,15 +245,11 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       if (e.error.code == FailureCode.Canceled) return;
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.error.localizedMessage ?? "Payment failed")),
-        );
+        TopMessage.show(context, e.error.localizedMessage ?? "Payment failed");
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        TopMessage.show(context, e.toString());
       }
     } finally {
       if (mounted) setState(() => isProcessing = false);
@@ -291,8 +317,45 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     final reviewState = ref.watch(
       bookingReviewNotifierProvider(widget.bookingId),
     );
+    final profileState = ref.watch(profileNotifierProvider);
+
+    if (profileState.status == ProfileStatus.loaded &&
+        profileState.profile != null) {
+      final p = profileState.profile!;
+      final pName = p['name'] ?? p['full_name'];
+      final pEmail = p['email'];
+      final pPhone =
+          p['phone'] ?? p['phone_number'] ?? p['mobile'] ?? p['contact_number'];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _populateIfEmpty(
+            name: pName?.toString(),
+            email: pEmail?.toString(),
+            phone: pPhone?.toString(),
+          );
+        }
+      });
+    }
+
     final isLoading = reviewState.status == BookingReviewStatus.loading;
     final booking = reviewState.booking;
+
+    if (booking != null) {
+      final bName = booking['full_name'] ?? booking['name'];
+      final bEmail = booking['email'];
+      final bPhone =
+          booking['phone'] ?? booking['phone_number'] ?? booking['mobile'];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _populateIfEmpty(
+            name: bName?.toString(),
+            email: bEmail?.toString(),
+            phone: bPhone?.toString(),
+          );
+        }
+      });
+    }
+
     final pricing = reviewState.pricing;
     final crewSummary = reviewState.crewSummary;
     final hasSavedCard = reviewState.hasSavedCard;
@@ -848,20 +911,20 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                             SizedBox(height: 14),
                             // _buildField("Full Name*", nameController),
                             AppTextField(
-                              label: "Full Name",
+                              label: "Full Name*",
                               controller: nameController,
                             ),
                             const SizedBox(height: 15),
 
                             AppTextField(
-                              label: "Email ID",
+                              label: "Email ID*",
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                             ),
 
                             const SizedBox(height: 15),
                             AppTextField(
-                              label: "Phone Number",
+                              label: "Phone Number*",
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               textInputAction: TextInputAction.done,

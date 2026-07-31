@@ -50,9 +50,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final state = ref.read(createMeetingNotifierProvider);
     final shootId = state.shootId;
     if (shootId == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Select a shoot first')));
+      TopMessage.show(context, 'Select a shoot first');
       return;
     }
     await showModalBottomSheet<void>(
@@ -82,9 +80,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     final state = ref.read(createMeetingNotifierProvider);
     final date = state.date;
     if (date == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Select a date first')));
+      TopMessage.show(context, 'Select a date first');
       return;
     }
 
@@ -101,9 +97,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     } else {
       final s = state.startTime;
       if (s == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Select start time first')),
-        );
+        TopMessage.show(context, 'Select start time first');
         return;
       }
       lowerBound = DateTime(
@@ -116,14 +110,11 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
     }
     final upperBound = DateTime(date.year, date.month, date.day, 23, 59);
     if (!lowerBound.isBefore(upperBound)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            start
-                ? 'No available start time today (needs 2h buffer)'
-                : 'No available end time — pick a later date',
-          ),
-        ),
+      TopMessage.show(
+        context,
+        start
+            ? 'No available start time today (needs 2h buffer)'
+            : 'No available end time — pick a later date',
       );
       return;
     }
@@ -291,12 +282,7 @@ class _CreateMeetingScreenState extends ConsumerState<CreateMeetingScreen> {
           ref.read(meetingsListNotifierProvider.notifier).refresh();
           context.pushReplacementNamed(RouteNames.meetingScheduled);
         } else if (next.status == CreateMeetingSubmitStatus.error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(next.error ?? 'Could not create meeting'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          TopMessage.show(context, next.error ?? 'Could not create meeting');
         }
       }
 

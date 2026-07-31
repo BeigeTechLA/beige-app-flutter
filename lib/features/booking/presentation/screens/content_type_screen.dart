@@ -11,6 +11,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/features/booking/presentation/providers/content_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 import '../../../app_drawer/screen/drawer_screen.dart';
 
@@ -61,9 +62,7 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
 
   Future<void> _continueBooking() async {
     if (selectedContentTypeIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select content type")),
-      );
+      TopMessage.show(context, "Please select content type");
       return;
     }
 
@@ -95,8 +94,9 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
       }
     } else if (state.status == ContentTypeStatus.error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.errorMessage ?? "Something went wrong")),
+        TopMessage.show(
+          context,
+          state.errorMessage ?? "Something went wrong",
         );
       }
     }

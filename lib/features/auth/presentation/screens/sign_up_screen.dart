@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -13,7 +12,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:beige/app/colors.dart';
@@ -26,6 +24,7 @@ import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/signup_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/signup_state.dart';
 import 'package:beige/core/utils/google_config.dart';
+import 'package:beige/shared/widgets/app_image_cropper_sheet.dart';
 import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
@@ -129,299 +128,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       imageQuality: 90,
     );
 
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
 
-    openCustomCropSheet(File(picked.path)); // ✅ IMPORTANT
-  }
-
-  void openCustomCropSheet(File imageFile) {
-    Offset offset = Offset.zero;
-    double scale = 1.0;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.85,
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              padding: AppSpacing.cardInsets,
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      width: 35,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.white70,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Crop your Profile",
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: 18,
-                          fontFamily: AppTextStyles.fontFamilyBody,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-
-                      InkWell(
-                        onTap: () => context.pop(),
-                        borderRadius: AppRadii.hugeAll,
-                        child: Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Icon(
-                            Icons.close,
-                            color: AppColors.white,
-                            size: 22,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 20),
-
-                  Divider(color: AppColors.dividerDark),
-
-                  /// 🔥 CIRCULAR PREVIEW AREA
-                  Expanded(
-                    child: Center(
-                      child: GestureDetector(
-                        onScaleStart: (details) {
-                          startScale = scale;
-                          startOffset = offset;
-                        },
-                        onScaleUpdate: (details) {
-                          setSheetState(() {
-                            scale = (startScale * details.scale).clamp(
-                              1.0,
-                              4.0,
-                            );
-                            // offset = startOffset + details.focalPointDelta;
-                            offset += details.focalPointDelta;
-                          });
-                        },
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            /// IMAGE (NOW CLIPPED)
-                            ClipRect(
-                              child: SizedBox(
-                                width: 320,
-                                height: 320,
-                                child: ClipRect(
-                                  child: Transform(
-                                    alignment: Alignment.center,
-                                    transform: Matrix4.identity()
-                                      ..translate(offset.dx, offset.dy)
-                                      ..scale(scale),
-                                    child: Image.file(
-                                      imageFile,
-                                      width: 320,
-                                      height: 320,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            /// CIRCLE OVERLAY
-                            IgnorePointer(
-                              child: CustomPaint(
-                                size: const Size(320, 320),
-                                painter: CircleHolePainter(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// 🔥 ZOOM SLIDER
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      children: [
-                        /// 🔹 LEFT IMAGE ICON
-                        Image.asset(
-                          AppAssets.roleSelection, // 👈 your image
-
-                          height: 20,
-                          width: 20,
-                          /*  color: AppColors.white.withOpacity(0.7), */
-                          // optional
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        /// 🔹 SLIDER
-                        Expanded(
-                          child: SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 6,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 10,
-                              ),
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 14,
-                              ),
-                              activeTrackColor: AppColors.primary,
-                              inactiveTrackColor: AppColors.white30,
-                              thumbColor: AppColors.primary,
-                            ),
-                            child: Slider(
-                              min: 1,
-                              max: 5,
-                              value: scale,
-                              onChanged: (v) {
-                                setSheetState(() => scale = v);
-                              },
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        /// 🔹 RIGHT IMAGE ICON
-                        /// 🔹 LEFT IMAGE ICON
-                        Image.asset(
-                          AppAssets.roleSelection, // 👈 your image
-
-                          height: 24,
-                          width: 24,
-                          /*  color: AppColors.white.withOpacity(0.7), */
-                          // optional
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  /// 🔥 SAVE BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: AppRadii.lgAll,
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: () async {
-                        final cropped = await _cropImage(
-                          imageFile,
-                          scale,
-                          offset,
-                        );
-
-                        if (cropped != null) {
-                          setState(() {
-                            profileImage = cropped;
-                          });
-                        }
-
-                        context.pop();
-                      },
-                      child: Text(
-                        "Save",
-                        style: AppTextStyles.labelLarge.copyWith(
-                          fontFamily: AppAssets.fontUnbounded,
-                          color: AppColors.textHeading,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+    final cropped = await AppImageCropperSheet.show(
+      context,
+      imageFile: File(picked.path),
     );
-  }
 
-  Future<File?> _cropImage(File imageFile, double scale, Offset offset) async {
-    try {
-      final bytes = await imageFile.readAsBytes();
-      final codec = await ui.instantiateImageCodec(bytes);
-      final frame = await codec.getNextFrame();
-      final ui.Image image = frame.image;
-
-      // UI size (crop widget size)
-      const double uiSize = 360;
-      const double cropUI = 260; // jitna UI me crop box hai
-
-      final imgW = image.width.toDouble();
-      final imgH = image.height.toDouble();
-
-      // Ratio (safe for portrait + landscape)
-      final ratioX = imgW / uiSize;
-      final ratioY = imgH / uiSize;
-      final ratio = ratioX < ratioY ? ratioX : ratioY;
-
-      // Real image crop size
-      final cropSize = (cropUI * ratio) / scale;
-
-      // Center based crop
-      double dx = (imgW / 2) - (cropSize / 2) - (offset.dx * ratio);
-      double dy = (imgH / 2) - (cropSize / 2) - (offset.dy * ratio);
-
-      // Prevent overflow
-      dx = dx.clamp(0.0, imgW - cropSize);
-      dy = dy.clamp(0.0, imgH - cropSize);
-
-      // Canvas
-      final recorder = ui.PictureRecorder();
-      final canvas = Canvas(recorder);
-
-      final paint = Paint()
-        ..isAntiAlias = true
-        ..filterQuality = FilterQuality.high;
-
-      // ✅ NO CLIP — PURE RECTANGLE IMAGE
-      canvas.drawImageRect(
-        image,
-        Rect.fromLTWH(dx, dy, cropSize, cropSize),
-        Rect.fromLTWH(0, 0, cropSize, cropSize),
-        paint,
-      );
-
-      final pic = recorder.endRecording();
-      final cropped = await pic.toImage(cropSize.toInt(), cropSize.toInt());
-
-      final data = await cropped.toByteData(format: ui.ImageByteFormat.png);
-
-      final dir = await getTemporaryDirectory();
-      final file = File(
-        "${dir.path}/crop_${DateTime.now().millisecondsSinceEpoch}.png",
-      );
-
-      await file.writeAsBytes(data!.buffer.asUint8List());
-      return file;
-    } catch (e) {
-      debugPrint("❌ Crop failed: $e");
-      return null;
+    if (cropped != null && mounted) {
+      setState(() {
+        profileImage = cropped;
+      });
     }
   }
 

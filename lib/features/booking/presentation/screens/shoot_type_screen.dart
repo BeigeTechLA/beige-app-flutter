@@ -13,6 +13,7 @@ import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/features/booking/presentation/providers/shoot_type_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 import 'package:beige/shared/widgets/loading.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 class ShootTypeScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -47,9 +48,7 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
   Future<void> _selectShootType() async {
     if (_isNavigating) return;
     if (selectedShootTypeId == null || selectedShootTypeName == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please select shoot type")));
+      TopMessage.show(context, "Please select shoot type");
       return;
     }
 
@@ -107,12 +106,9 @@ class _ShootTypeScreenState extends ConsumerState<ShootTypeScreen> {
       } else if (notifierState.status == ShootTypeStatus.error) {
         _isNavigating = false;
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                notifierState.errorMessage ?? "Something went wrong",
-              ),
-            ),
+          TopMessage.show(
+            context,
+            notifierState.errorMessage ?? "Something went wrong",
           );
         }
       } else {

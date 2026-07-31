@@ -10,6 +10,7 @@ import '../../../../shared/util/picker_theme.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/loading.dart';
+import '../../../../shared/widgets/top_message.dart';
 import '../../domain/models/meeting_type.dart';
 import '../providers/create_meeting_state.dart' show TimeOfDayValue;
 import '../providers/edit_meeting_notifier.dart';
@@ -158,16 +159,13 @@ class _EditMeetingScreenState extends ConsumerState<EditMeetingScreen> {
             ref.invalidate(meetingDetailsProvider(widget.meetingId));
             ref.invalidate(meetingsListNotifierProvider);
             context.pop();
-            ScaffoldMessenger.of(
+            TopMessage.show(
               context,
-            ).showSnackBar(const SnackBar(content: Text('Meeting updated')));
-          case EditMeetingStatus.submitError:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(next.error ?? 'Could not save meeting'),
-                backgroundColor: AppColors.error,
-              ),
+              'Meeting updated',
+              type: TopMessageType.success,
             );
+          case EditMeetingStatus.submitError:
+            TopMessage.show(context, next.error ?? 'Could not save meeting');
           case _:
             break;
         }

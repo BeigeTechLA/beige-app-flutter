@@ -27,6 +27,7 @@ import 'package:beige/features/home/presentation/widgets/top_creatives/home_top_
 import 'package:beige/features/home/presentation/widgets/top_influencers/home_top_influencers_section.dart';
 import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
+import 'package:beige/shared/widgets/top_message.dart';
 
 import '../../../app_drawer/screen/drawer_screen.dart';
 
@@ -459,9 +460,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (!mounted) return;
 
     result.fold(
-      (error) => ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error.message))),
+      (error) => TopMessage.show(context, error.message),
       (response) async {
         if (response['error'] == false) {
           bookingId = response['data']?['booking_id'];
@@ -588,12 +587,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             });
                             playBorderAnimationOnce();
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("$title Coming Soon"),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
+                            TopMessage.show(context, "$title Coming Soon");
                           }
                         },
                       ),

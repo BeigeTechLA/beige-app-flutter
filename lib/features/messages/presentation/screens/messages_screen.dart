@@ -12,6 +12,7 @@ import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_empty_state.dart';
 import '../../../../shared/widgets/skeleton.dart';
 import '../../../../shared/widgets/app_main_toolbar.dart';
+import '../../../../shared/widgets/top_message.dart';
 import '../providers/conversation_list_providers.dart';
 import '../routes/messages_args.dart';
 import 'widgets/conversation_tile.dart';
@@ -59,9 +60,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
       if (next.errorMessage != null &&
           next.items.isNotEmpty &&
           prev?.errorMessage != next.errorMessage) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+        TopMessage.show(context, next.errorMessage!);
         notifier.clearError();
       }
     });
