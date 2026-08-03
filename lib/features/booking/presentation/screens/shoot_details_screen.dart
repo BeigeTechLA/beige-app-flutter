@@ -900,23 +900,6 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                                             horizontal: AppSpacing.lg,
                                             vertical: AppSpacing.lg,
                                           ),
-                                      suffixIcon: Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: AppSpacing.sm,
-                                        ),
-                                        child: SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: SvgPicture.asset(
-                                            AppAssets.locationPin,
-                                            colorFilter: const ColorFilter.mode(
-                                              AppColors.white,
-                                              BlendMode.srcIn,
-                                            ),
-                                            fit: BoxFit.none,
-                                          ),
-                                        ),
-                                      ),
                                     ),
                                     getPlaceDetailWithLatLng:
                                         (prediction) async {
