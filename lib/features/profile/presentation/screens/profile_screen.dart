@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/core/firebase/analytics_events.dart';
 import 'package:beige/core/firebase/analytics_service.dart';
 import 'package:beige/core/firebase/crashlytics_service.dart';
+import 'package:beige/core/utils/image_url_utils.dart';
 import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 import 'package:beige/shared/widgets/loading.dart';
@@ -33,10 +35,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final profileState = ref.watch(profileNotifierProvider);
     final myProfile = profileState.profile;
     final bust = ref.watch(profileImageBustProvider);
-    final rawImageUrl = profileState.profileImageUrl;
-    final profileImageUrl = rawImageUrl == null
+    final rawImage =
+        myProfile?['user_profile_image_url'] ?? myProfile?['profile_image_url'];
+    final profileImageUrl = (rawImage == null || rawImage.toString().isEmpty)
         ? null
-        : (bust > 0 ? '$rawImageUrl?v=$bust' : rawImageUrl);
+        : buildImageUrl(rawImage.toString(), bust: bust);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -113,30 +116,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         height: 96,
                                       ),
                                     )
-                                  : Image.network(
-                                      profileImageUrl,
+                                  : CachedNetworkImage(
+                                      imageUrl: profileImageUrl,
                                       width: 96,
                                       height: 96,
                                       fit: BoxFit.cover,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return const AppImageLoader(
-                                              size: 96,
-                                            );
-                                          },
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                            return Center(
-                                              child: SvgPicture.asset(
-                                                AppAssets.person,
-                                                width: 96,
-                                                height: 96,
-                                              ),
-                                            );
-                                          },
+                                      placeholder: (context, url) =>
+                                          const AppImageLoader(
+                                        size: 96,
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Center(
+                                        child: SvgPicture.asset(
+                                          AppAssets.person,
+                                          width: 96,
+                                          height: 96,
+                                        ),
+                                      ),
                                     ),
                             ),
                           ),
@@ -415,7 +411,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
       ),
-    );;
+    );
   }
 
   void _showLogoutBottomSheet() {

@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
-import '../../../../core/network/api_endpoints.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/image_url_utils.dart';
 import '../../../../core/utils/shared_service.dart';
 import '../../../app_drawer/providers/drawer_notifier.dart';
 import 'profile_notifier.dart';
@@ -49,15 +50,35 @@ class EditProfileState {
 
   String? get fullImageUrl {
     if (profileImageUrl == null || profileImageUrl!.isEmpty) return null;
-    return ApiEndpoints.imageUrl + profileImageUrl!;
+    return buildImageUrl(profileImageUrl);
   }
 }
 
 class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
   @override
   EditProfileState build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final name = prefs.getString('name');
+    final email = prefs.getString('email');
+    final image = prefs.getString('profile_image_url');
+
+    EditProfileState initialState =
+        const EditProfileState(status: EditProfileStatus.loading);
+
+    if (name != null && name.isNotEmpty) {
+      initialState = EditProfileState(
+        status: EditProfileStatus.loaded,
+        profile: {
+          'name': name,
+          'email': email ?? '',
+          'user_profile_image_url': image ?? '',
+        },
+        profileImageUrl: image,
+      );
+    }
+
     fetchProfile();
-    return const EditProfileState(status: EditProfileStatus.loading);
+    return initialState;
   }
 
   Future<void> fetchProfile() async {
@@ -69,11 +90,16 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
         status: EditProfileStatus.error,
         errorMessage: error.message,
       ),
-      (profile) => state = state.copyWith(
-        status: EditProfileStatus.loaded,
-        profile: profile,
-        profileImageUrl: profile['user_profile_image_url']?.toString(),
-      ),
+      (profile) {
+        final rawImage =
+            (profile['user_profile_image_url'] ?? profile['profile_image_url'])
+                ?.toString();
+        state = state.copyWith(
+          status: EditProfileStatus.loaded,
+          profile: profile,
+          profileImageUrl: rawImage,
+        );
+      },
     );
   }
 
@@ -90,11 +116,13 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
       ),
       (_) async {
         final userData = await SharedService.getUserData();
+        final rawImage =
+            state.profileImageUrl ?? userData['profile_image_url'];
 
         await SharedService.updateUserData(
           name: data['name'] ?? userData['name'],
           email: userData['email'],
-          profileImageUrl: userData['profile_image_url'],
+          profileImageUrl: rawImage,
         );
 
         ref.invalidate(drawerUserProvider);
@@ -124,14 +152,10 @@ class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
       ),
       (_) async {
         state = state.copyWith(isUploadingImage: false);
-        // Refresh from server so `state.profileImageUrl` reflects the new
-        // filename, then mirror it into SharedPreferences so the drawer
-        // reads the fresh URL. Finally bump the cache-bust token so
-        // CachedNetworkImage bypasses its stale cache for the same URL.
         await fetchProfile();
-        final newUrl = state.profileImageUrl;
-        if (newUrl != null && newUrl.isNotEmpty) {
-          await SharedService.updateUserData(profileImageUrl: newUrl);
+        final rawImage = state.profileImageUrl;
+        if (rawImage != null && rawImage.isNotEmpty) {
+          await SharedService.updateUserData(profileImageUrl: rawImage);
         }
         ref.invalidate(drawerUserProvider);
         ref.invalidate(profileNotifierProvider);

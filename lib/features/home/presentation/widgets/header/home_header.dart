@@ -6,7 +6,7 @@ import 'package:beige/app/assets.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
-import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/core/utils/image_url_utils.dart';
 import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
 import '../common/home_painters.dart';
@@ -148,6 +148,8 @@ class HomeNavigationHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bust = ref.watch(profileImageBustProvider);
+    final avatarUrl = buildImageUrl(profileImageUrl, bust: bust);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -239,10 +241,9 @@ class HomeNavigationHeader extends ConsumerWidget {
                   radius: 20,
                   backgroundColor: AppColors.transparent,
                   child: ClipOval(
-                    child:
-                        profileImageUrl != null && profileImageUrl!.isNotEmpty
+                    child: avatarUrl.isNotEmpty
                         ? Image.network(
-                            '${ApiEndpoints.imageUrl}${profileImageUrl!}${bust > 0 ? '?v=$bust' : ''}',
+                            avatarUrl,
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,

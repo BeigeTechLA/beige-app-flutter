@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
@@ -148,10 +150,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (_profileImage != null) {
       return FileImage(_profileImage!);
     }
-    final editState = ref.read(editProfileNotifierProvider);
-    final url = editState.fullImageUrl;
-    if (url != null && url.isNotEmpty) {
-      return NetworkImage(url);
+    final editState = ref.watch(editProfileNotifierProvider);
+    final bust = ref.watch(profileImageBustProvider);
+    final rawUrl = editState.fullImageUrl;
+    if (rawUrl != null && rawUrl.isNotEmpty) {
+      final url = bust > 0 ? '$rawUrl?v=$bust' : rawUrl;
+      return CachedNetworkImageProvider(url);
     }
     return null;
   }

@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
-import '../../../../core/network/api_endpoints.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/image_url_utils.dart';
 import 'profile_providers.dart';
 
 enum ProfileStatus { initial, loading, loaded, error }
@@ -32,17 +33,36 @@ class ProfileState {
 
   String? get profileImageUrl {
     if (profile == null) return null;
-    final image = profile!['user_profile_image_url'];
+    final image =
+        profile!['user_profile_image_url'] ?? profile!['profile_image_url'];
     if (image == null || image.toString().isEmpty) return null;
-    return ApiEndpoints.imageUrl + image.toString();
+    return buildImageUrl(image.toString());
   }
 }
 
 class ProfileNotifier extends AutoDisposeNotifier<ProfileState> {
   @override
   ProfileState build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final name = prefs.getString('name');
+    final email = prefs.getString('email');
+    final image = prefs.getString('profile_image_url');
+
+    ProfileState initialState = const ProfileState(status: ProfileStatus.loading);
+
+    if (name != null && name.isNotEmpty) {
+      initialState = ProfileState(
+        status: ProfileStatus.loaded,
+        profile: {
+          'name': name,
+          'email': email ?? '',
+          'user_profile_image_url': image ?? '',
+        },
+      );
+    }
+
     fetchProfile();
-    return const ProfileState(status: ProfileStatus.loading);
+    return initialState;
   }
 
   Future<void> fetchProfile() async {

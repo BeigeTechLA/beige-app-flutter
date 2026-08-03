@@ -10,7 +10,7 @@ import '../../../../../../app/radii.dart';
 import '../../../../../../app/route_names.dart';
 import '../../../../../../app/spacing.dart';
 import '../../../app/text_styles.dart';
-import '../../../core/network/api_endpoints.dart';
+import '../../../core/utils/image_url_utils.dart';
 import '../providers/drawer_notifier.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
@@ -100,9 +100,10 @@ class DrawerScreen extends ConsumerWidget {
                           userAsync.when(
                             data: (user) {
                               final image = user['profile_image_url'] ?? '';
-                              final avatarUrl = image.isEmpty
-                                  ? ''
-                                  : '${ApiEndpoints.imageUrl}$image${bust > 0 ? '?v=$bust' : ''}';
+                              final avatarUrl = buildImageUrl(
+                                image,
+                                bust: bust,
+                              );
                               return CircleAvatar(
                                 radius: 25,
                                 backgroundColor: AppColors.surfaceVariant,
