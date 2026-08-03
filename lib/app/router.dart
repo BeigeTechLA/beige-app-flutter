@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +40,7 @@ import '../features/profile/presentation/screens/delete_account_otp_screen.dart'
 import '../features/profile/presentation/screens/delete_account_screen.dart';
 import '../features/profile/presentation/screens/app_preferences_screen.dart';
 import '../features/profile/presentation/screens/change_password_screen.dart';
+import '../features/profile/presentation/screens/crop_image_screen.dart';
 import '../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../features/profile/presentation/screens/favorites_screen.dart';
 import '../features/profile/presentation/screens/profile_new_password_screen.dart';
@@ -666,6 +668,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         name: RouteNames.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/crop-image',
+        name: RouteNames.cropImage,
+        builder: (context, state) {
+          final file = state.extra as File;
+          return CropImageScreen(imageFile: file);
+        },
       ),
       GoRoute(
         path: '/edit-profile',

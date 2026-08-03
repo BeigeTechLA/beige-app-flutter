@@ -24,7 +24,6 @@ import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/auth/presentation/providers/signup_notifier.dart';
 import 'package:beige/features/auth/presentation/providers/signup_state.dart';
 import 'package:beige/core/utils/google_config.dart';
-import 'package:beige/shared/widgets/app_image_cropper_sheet.dart';
 import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
@@ -130,9 +129,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     if (picked == null || !mounted) return;
 
-    final cropped = await AppImageCropperSheet.show(
-      context,
-      imageFile: File(picked.path),
+    final cropped = await context.pushNamed<File?>(
+      RouteNames.cropImage,
+      extra: File(picked.path),
     );
 
     if (cropped != null && mounted) {

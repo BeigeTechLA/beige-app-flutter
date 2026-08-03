@@ -53,6 +53,7 @@ abstract class RouteNames {
 
   // Profile
   static const profile = 'profile';
+  static const cropImage = 'crop_image';
   static const editProfile = 'edit_profile';
   static const changePassword = 'change_password';
   static const profileOtp = 'profile_otp';

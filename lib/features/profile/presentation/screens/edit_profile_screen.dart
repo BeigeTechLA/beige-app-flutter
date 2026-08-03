@@ -22,7 +22,6 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/location/app_map_defaults.dart';
 import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
-import 'package:beige/shared/widgets/app_image_cropper_sheet.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 
@@ -67,11 +66,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   void _initControllersFromProfile(Map<String, dynamic> user) {
     if (_controllersInitialized) return;
-    _controllersInitialized = true;
 
-    nameController.text = user['name'] ?? '';
-    emailController.text = user['email'] ?? '';
-    locationController.text = user['location'] ?? '';
+    nameController.text = user['name'] ?? nameController.text;
+    emailController.text = user['email'] ?? emailController.text;
+
+    if (user['location'] != null && user['location'].toString().isNotEmpty) {
+      locationController.text = user['location'].toString();
+    }
 
     if (user['latitude'] != null && user['longitude'] != null) {
       final latLng = LatLng(
@@ -79,6 +80,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         double.parse(user['longitude'].toString()),
       );
       _updateMarker(latLng);
+    }
+
+    if (user.containsKey('id') || user.containsKey('location')) {
+      _controllersInitialized = true;
     }
   }
 
@@ -93,6 +98,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
       };
     });
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(latLng, 14),
+    );
   }
 
   Future<void> searchLocation(String query) async {
@@ -135,9 +143,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       imageQuality: 100,
     );
     if (pickedFile != null && mounted) {
-      final cropped = await AppImageCropperSheet.show(
-        context,
-        imageFile: File(pickedFile.path),
+      final cropped = await context.pushNamed<File?>(
+        RouteNames.cropImage,
+        extra: File(pickedFile.path),
       );
       if (cropped != null && mounted) {
         setState(() => _profileImage = cropped);

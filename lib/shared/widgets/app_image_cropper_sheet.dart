@@ -10,12 +10,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:beige/app/assets.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 
-/// Smooth profile image cropper bottom sheet.
-/// Allows full-range corner & edge panning inside circle cropper with smooth
-/// blurred image backdrop filling surrounding areas.
+/// Smooth profile image cropper screen helper.
 class AppImageCropperSheet extends StatefulWidget {
   const AppImageCropperSheet({
     super.key,
@@ -26,20 +25,15 @@ class AppImageCropperSheet extends StatefulWidget {
   final File imageFile;
   final int outputSize;
 
-  /// Helper static method to present the bottom sheet and return cropped [File].
+  /// Helper static method to present the crop screen and return cropped [File].
   static Future<File?> show(
     BuildContext context, {
     required File imageFile,
     int outputSize = 512,
   }) {
-    return showModalBottomSheet<File?>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      builder: (_) => AppImageCropperSheet(
-        imageFile: imageFile,
-        outputSize: outputSize,
-      ),
+    return context.pushNamed<File?>(
+      RouteNames.cropImage,
+      extra: imageFile,
     );
   }
 
