@@ -61,6 +61,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   String? selectedStudio;
   bool showMap = false;
+  bool _isMapLoading = true;
 
   GoogleMapController? mapController;
   LatLng? currentLatLng;
@@ -325,15 +326,21 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
     if (!mounted) return;
 
+    final latLng = LatLng(position.latitude, position.longitude);
+
     setState(() {
       _hasLocationPermission = true;
-      currentLatLng = LatLng(position.latitude, position.longitude);
+      currentLatLng = latLng;
+      showMap = true;
     });
+
+    await _updateLocationFromLatLng(latLng);
   }
 
   Future<void> _updateLocationFromLatLng(LatLng latLng) async {
     setState(() {
       currentLatLng = latLng;
+      locationError = null;
     });
 
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
@@ -1011,50 +1018,105 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                     if (showMap)
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
-                        child: SizedBox(
+                        child: Container(
                           height: 350,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF212121),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: GoogleMap(
-                              initialCameraPosition: CameraPosition(
-                                target:
-                                    currentLatLng ??
-                                    AppMapDefaults.fallbackCenter,
-                                zoom: currentLatLng == null
-                                    ? AppMapDefaults.fallbackZoom
-                                    : 14,
-                              ),
+                            child: Stack(
+                              children: [
+                                GoogleMap(
+                                  initialCameraPosition: CameraPosition(
+                                    target:
+                                        currentLatLng ??
+                                        AppMapDefaults.fallbackCenter,
+                                    zoom: currentLatLng == null
+                                        ? AppMapDefaults.fallbackZoom
+                                        : 14,
+                                  ),
 
-                              myLocationEnabled: _hasLocationPermission,
-                              myLocationButtonEnabled: _hasLocationPermission,
-                              zoomControlsEnabled: true,
-                              compassEnabled: false,
+                                  myLocationEnabled: _hasLocationPermission,
+                                  myLocationButtonEnabled: _hasLocationPermission,
+                                  zoomControlsEnabled: true,
+                                  compassEnabled: false,
 
-                              // 🔥 IMPORTANT FIX (touch enable)
-                              gestureRecognizers:
-                                  <Factory<OneSequenceGestureRecognizer>>{
-                                    Factory<OneSequenceGestureRecognizer>(
-                                      () => EagerGestureRecognizer(),
-                                    ),
+                                  // 🔥 IMPORTANT FIX (touch enable)
+                                  gestureRecognizers:
+                                      <Factory<OneSequenceGestureRecognizer>>{
+                                        Factory<OneSequenceGestureRecognizer>(
+                                          () => EagerGestureRecognizer(),
+                                        ),
+                                      },
+
+                                  onMapCreated: (controller) async {
+                                    mapController = controller;
+                                    await controller.setMapStyle(darkMapStyle);
+                                    if (mounted) {
+                                      setState(() {
+                                        _isMapLoading = false;
+                                      });
+                                    }
                                   },
 
-                              onMapCreated: (controller) {
-                                mapController = controller;
-                                controller.setMapStyle(darkMapStyle);
-                              },
+                                  markers: currentLatLng == null
+                                      ? const <Marker>{}
+                                      : {
+                                          Marker(
+                                            markerId: const MarkerId("selected"),
+                                            position: currentLatLng!,
+                                          ),
+                                        },
 
-                              markers: currentLatLng == null
-                                  ? const <Marker>{}
-                                  : {
-                                      Marker(
-                                        markerId: const MarkerId("selected"),
-                                        position: currentLatLng!,
+                                  onTap: (latLng) async {
+                                    await _updateLocationFromLatLng(latLng);
+                                  },
+                                ),
+
+                                // 🔥 Smooth Dark Loading Overlay
+                                IgnorePointer(
+                                  ignoring: !_isMapLoading,
+                                  child: AnimatedOpacity(
+                                    opacity: _isMapLoading ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOut,
+                                    child: Container(
+                                      color: const Color(0xFF212121),
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                      Color
+                                                    >(AppColors.primary),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            Text(
+                                              "Locating map...",
+                                              style: TextStyle(
+                                                color: AppColors.white70,
+                                                fontSize: 13,
+                                                fontFamily:
+                                                    AppAssets.fontOutfit,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    },
-
-                              onTap: (latLng) async {
-                                await _updateLocationFromLatLng(latLng);
-                              },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
