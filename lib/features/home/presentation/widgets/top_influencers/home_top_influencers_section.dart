@@ -43,133 +43,155 @@ class HomeTopInfluencersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.smd,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "Top ",
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: AppAssets.fontUnbounded,
-                ),
-              ),
-              AnimatedBuilder(
-                animation: animationController,
-                builder: (context, child) {
-                  double value = animationController
-                      .value; // Drives the rotating title word.
-                  int index = (value * words.length).floor() % words.length;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.hasBoundedWidth
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
 
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 500),
-                    // Use fade and slide together for a smooth word change.
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.3),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
+        final cardWidth = (availableWidth * 0.50).clamp(175.0, 220.0);
+        final cardHeight = cardWidth * 1.08;
+        final carouselHeight = cardHeight + 68.0;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.xs,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Top ",
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: AppAssets.fontUnbounded,
+                    ),
+                  ),
+                  AnimatedBuilder(
+                    animation: animationController,
+                    builder: (context, child) {
+                      double value = animationController
+                          .value; // Drives the rotating title word.
+                      int index = (value * words.length).floor() % words.length;
+
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        // Use fade and slide together for a smooth word change.
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.3),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Text(
+                          words[index],
+                          key: ValueKey<int>(index),
+                          // Text key keeps AnimatedSwitcher transitions stable.
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: AppAssets.fontUnbounded,
+                            height: 1.0,
+                          ),
                         ),
                       );
                     },
-                    child: Text(
-                      words[index],
-                      key: ValueKey<int>(index),
-                      // Text key keeps AnimatedSwitcher transitions stable.
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: AppAssets.fontUnbounded,
-                        height: 1.0,
-                      ),
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          SizedBox(
-            height: 340,
-            child: PageView.builder(
-              controller: pageController,
-              itemCount: 10000,
-              clipBehavior: Clip.none,
-              itemBuilder: (context, index) {
-                final realIndex = index % images.length;
+            ),
+            const SizedBox(height: 15),
+            SizedBox(
+              height: carouselHeight,
+              child: AnimatedBuilder(
+                animation: pageController,
+                builder: (context, child) {
+                  return PageView.builder(
+                    controller: pageController,
+                    itemCount: 10000,
+                    clipBehavior: Clip.none,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final realIndex = index % images.length;
 
-                return AnimatedBuilder(
-                  animation: pageController,
-                  builder: (context, child) {
-                    double value = 0;
-                    if (pageController.position.haveDimensions) {
-                      value = index - (pageController.page ?? 0);
-                    }
+                      double page = pageController.hasClients
+                          ? pageController.page ?? 1000.0
+                          : 1000.0;
+                      double difference = (index - page);
 
-                    final double perspective = 0.0015;
-                    double rotationValue = value.clamp(-1.0, 1.0);
-                    double angle = rotationValue * -0.6;
-                    double scale = (1 - (value.abs() * 0.15)).clamp(0.8, 1.0);
+                      double perspective = 0.0022;
+                      double rotation = (difference * 0.8).clamp(-0.8, 0.9);
+                      double scale = (1 - (difference.abs() * 0.10)).clamp(
+                        0.0,
+                        1.0,
+                      );
+                      double opacity = (1 - (difference.abs() * 0.10)).clamp(
+                        0.6,
+                        1.0,
+                      );
+                      double translateX =
+                          difference *
+                          -(availableWidth * 0.215).clamp(70.0, 100.0);
 
-                    return Transform(
-                      alignment: value < 0
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, perspective)
-                        ..rotateY(angle)
-                        ..scale(scale),
-                      child: Opacity(
-                        opacity: (1 - (value.abs() * 0.7)).clamp(0.4, 1.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 280, // Fixed width stabilizes the carousel.
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Influencer portrait.
-                                Container(
-                                  height: 240,
-                                  width: 230,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadii.massive,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.black.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                        blurRadius: 15,
-                                        offset: const Offset(0, 10),
+                      final detailsOpacity = (1.0 - (difference.abs() * 3.0))
+                          .clamp(0.0, 1.0);
+
+                      return Opacity(
+                        opacity: opacity,
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, perspective)
+                            ..translateByDouble(translateX, 0, 0, 1)
+                            ..rotateY(rotation)
+                            ..scaleByDouble(scale, scale, scale, 1),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              // Influencer portrait.
+                              Container(
+                                height: cardHeight,
+                                width: cardWidth,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.massive,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.black.withValues(
+                                        alpha: 0.4,
                                       ),
-                                    ],
-                                    image: DecorationImage(
-                                      image: AssetImage(images[realIndex]),
-                                      fit: BoxFit.cover,
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 10),
                                     ),
+                                  ],
+                                  image: DecorationImage(
+                                    image: AssetImage(images[realIndex]),
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                              ),
+                              const SizedBox(height: 10),
 
-                                // Influencer name.
-                                Column(
+                              // Influencer name & social follower links.
+                              Opacity(
+                                opacity: detailsOpacity,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
                                       names[realIndex],
@@ -181,7 +203,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                         fontFamily: AppAssets.fontOutfit,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 6),
 
                                     // Social follower links.
                                     Row(
@@ -207,7 +229,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                                   instagramFollowers[realIndex],
                                                   style: const TextStyle(
                                                     color: AppColors.white,
-                                                    fontSize: 13,
+                                                    fontSize: 12,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -220,7 +242,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                                 .isNotEmpty &&
                                             instagramFollowers[realIndex] !=
                                                 "-")
-                                          const SizedBox(width: 18),
+                                          const SizedBox(width: 14),
 
                                         // YouTube follower link.
                                         if (youtubeUrls[realIndex].isNotEmpty &&
@@ -239,7 +261,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                                   youtubeFollowers[realIndex],
                                                   style: const TextStyle(
                                                     color: AppColors.white,
-                                                    fontSize: 13,
+                                                    fontSize: 12,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -248,7 +270,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                           ),
                                         if (youtubeUrls[realIndex].isNotEmpty &&
                                             youtubeFollowers[realIndex] != "-")
-                                          const SizedBox(width: 18),
+                                          const SizedBox(width: 14),
 
                                         // TikTok follower link.
                                         if (tiktokUrls[realIndex].isNotEmpty &&
@@ -267,7 +289,7 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                                   tiktokFollowers[realIndex],
                                                   style: const TextStyle(
                                                     color: AppColors.white,
-                                                    fontSize: 13,
+                                                    fontSize: 12,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -278,19 +300,19 @@ class HomeTopInfluencersSection extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }
