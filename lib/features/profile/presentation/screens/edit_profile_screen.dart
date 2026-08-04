@@ -412,24 +412,42 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                 fontFamily: AppTextStyles.fontFamilyBody,
                                 fontSize: 15,
                               ),
-                              inputDecoration: const InputDecoration(
+                              inputDecoration: InputDecoration(
                                 filled: true,
                                 fillColor: AppColors.transparent,
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.lg,
-                                  vertical: AppSpacing.lg,
+                                contentPadding: const EdgeInsets.only(
+                                  left: AppSpacing.inputHorizontal,
+                                  right: AppSpacing.xs,
+                                  top: AppSpacing.inputVertical,
+                                  bottom: AppSpacing.inputVertical,
                                 ),
-                                suffixIcon: Padding(
-                                  padding: EdgeInsets.only(
-                                    right: AppSpacing.sm,
-                                  ),
-                                  child: Icon(
-                                    Icons.location_on_outlined,
-                                    color: AppColors.white,
-                                  ),
+                                suffixIcon: locationController.text.isNotEmpty
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          locationController.clear();
+                                          setState(() {
+                                            selectedAddress = "";
+                                            currentLatLng = null;
+                                          });
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.only(
+                                            right: AppSpacing.md,
+                                          ),
+                                          child: Icon(
+                                            Icons.close,
+                                            size: 18,
+                                            color: AppColors.white70,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                                suffixIconConstraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 24,
                                 ),
                               ),
                               getPlaceDetailWithLatLng: (prediction) async {
@@ -464,7 +482,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                                       ),
                                     );
                               },
-                              isCrossBtnShown: true,
+                              isCrossBtnShown: false,
                             ),
                           ),
                           Positioned(

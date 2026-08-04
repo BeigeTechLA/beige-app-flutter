@@ -895,11 +895,37 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                                       border: InputBorder.none,
                                       enabledBorder: InputBorder.none,
                                       focusedBorder: InputBorder.none,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            horizontal: AppSpacing.lg,
-                                            vertical: AppSpacing.lg,
-                                          ),
+                                      contentPadding: const EdgeInsets.only(
+                                        left: AppSpacing.inputHorizontal,
+                                        right: AppSpacing.xs,
+                                        top: AppSpacing.inputVertical,
+                                        bottom: AppSpacing.inputVertical,
+                                      ),
+                                      suffixIcon: searchController.text.isNotEmpty
+                                          ? GestureDetector(
+                                              onTap: () {
+                                                searchController.clear();
+                                                setState(() {
+                                                  selectedAddress = "";
+                                                  currentLatLng = null;
+                                                });
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.only(
+                                                  right: AppSpacing.md,
+                                                ),
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 18,
+                                                  color: AppColors.white70,
+                                                ),
+                                              ),
+                                            )
+                                          : null,
+                                      suffixIconConstraints: const BoxConstraints(
+                                        minWidth: 32,
+                                        minHeight: 24,
+                                      ),
                                     ),
                                     getPlaceDetailWithLatLng:
                                         (prediction) async {
@@ -951,7 +977,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
                                             ),
                                           );
                                     },
-                                    isCrossBtnShown: true,
+                                    isCrossBtnShown: false,
                                   ),
                                 ),
                                 Positioned(
