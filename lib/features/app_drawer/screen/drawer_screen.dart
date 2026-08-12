@@ -10,7 +10,9 @@ import '../../../../../../app/radii.dart';
 import '../../../../../../app/route_names.dart';
 import '../../../../../../app/spacing.dart';
 import '../../../app/text_styles.dart';
+import '../../../core/providers/guest_mode_provider.dart';
 import '../../../core/utils/image_url_utils.dart';
+import '../../../shared/widgets/login_dialog.dart';
 import '../providers/drawer_notifier.dart';
 import 'package:beige/shared/widgets/loading.dart';
 
@@ -62,6 +64,7 @@ class DrawerScreen extends ConsumerWidget {
     final currentRoute = GoRouterState.of(context).uri.path;
     final userAsync = ref.watch(drawerUserProvider);
     final bust = ref.watch(profileImageBustProvider);
+    final isGuest = ref.watch(guestModeProvider);
 
     return Drawer(
       backgroundColor: AppColors.surfaceAbyss,
@@ -87,7 +90,11 @@ class DrawerScreen extends ConsumerWidget {
                     borderRadius: AppRadii.xxlAll,
                     onTap: () {
                       Navigator.of(context).pop();
-                      context.pushNamed(RouteNames.profile);
+                      if (ref.read(guestModeProvider)) {
+                        showLoginDialog(context);
+                      } else {
+                        context.pushNamed(RouteNames.profile);
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
@@ -97,71 +104,113 @@ class DrawerScreen extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          userAsync.when(
-                            data: (user) {
-                              final image = user['profile_image_url'] ?? '';
-                              final avatarUrl = buildImageUrl(
-                                image,
-                                bust: bust,
-                              );
-                              return CircleAvatar(
-                                radius: 25,
-                                backgroundColor: AppColors.surfaceVariant,
-                                backgroundImage: avatarUrl.isNotEmpty
-                                    ? CachedNetworkImageProvider(avatarUrl)
-                                    : null,
-                                child: avatarUrl.isEmpty
-                                    ? SvgPicture.asset(AppAssets.userCircle)
-                                    : null,
-                              );
-                            },
-                            loading: () => const CircleAvatar(
-                              radius: 25,
-                              backgroundColor: AppColors.surfaceVariant,
-                              child: Center(
-                                child: AppCircularLoader(
-                                  size: 18,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            ),
-                            error: (_, __) => CircleAvatar(
+                          if (isGuest)
+                            CircleAvatar(
                               radius: 25,
                               backgroundColor: AppColors.surfaceVariant,
                               child: SvgPicture.asset(AppAssets.userCircle),
+                            )
+                          else
+                            userAsync.when(
+                              data: (user) {
+                                final image = user['profile_image_url'] ?? '';
+                                final avatarUrl = buildImageUrl(
+                                  image,
+                                  bust: bust,
+                                );
+                                return CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: AppColors.surfaceVariant,
+                                  backgroundImage: avatarUrl.isNotEmpty
+                                      ? CachedNetworkImageProvider(avatarUrl)
+                                      : null,
+                                  child: avatarUrl.isEmpty
+                                      ? SvgPicture.asset(AppAssets.userCircle)
+                                      : null,
+                                );
+                              },
+                              loading: () => const CircleAvatar(
+                                radius: 25,
+                                backgroundColor: AppColors.surfaceVariant,
+                                child: Center(
+                                  child: AppCircularLoader(
+                                    size: 18,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                              error: (_, __) => CircleAvatar(
+                                radius: 25,
+                                backgroundColor: AppColors.surfaceVariant,
+                                child: SvgPicture.asset(AppAssets.userCircle),
+                              ),
                             ),
-                          ),
                           AppSpacing.gapHMd,
                           Expanded(
-                            child: userAsync.when(
-                              data: (user) => Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user['name'] ?? '',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTextStyles.bodyMediumStrong
-                                        .copyWith(
+                            child: isGuest
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Guest',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.bodyMediumStrong
+                                            .copyWith(
                                           color: AppColors.black,
                                           fontWeight: FontWeight.bold,
                                         ),
+                                      ),
+                                      Text(
+                                        'Tap to login',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.bodySmallMedium
+                                            .copyWith(color: AppColors.black),
+                                      ),
+                                    ],
+                                  )
+                                : userAsync.when(
+                                    data: (user) {
+                                      final rawName =
+                                          (user['name'] ?? '').toString().trim();
+                                      final rawEmail =
+                                          (user['email'] ?? '').toString().trim();
+                                      final userName =
+                                          rawName.isNotEmpty ? rawName : 'No Name';
+                                      final userEmail =
+                                          rawEmail.isNotEmpty ? rawEmail : 'No Email';
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            userName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTextStyles.bodyMediumStrong
+                                                .copyWith(
+                                              color: AppColors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            userEmail,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: AppTextStyles.bodySmallMedium
+                                                .copyWith(color: AppColors.black),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                    loading: () => const AppCircularLoader(
+                                      size: 18,
+                                      strokeWidth: 2,
+                                    ),
+                                    error: (_, _) => const SizedBox.shrink(),
                                   ),
-                                  Text(
-                                    user['email'] ?? '',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTextStyles.bodySmallMedium
-                                        .copyWith(color: AppColors.black),
-                                  ),
-                                ],
-                              ),
-                              loading: () => const AppCircularLoader(
-                                size: 18,
-                                strokeWidth: 2,
-                              ),
-                              error: (_, _) => const SizedBox.shrink(),
-                            ),
                           ),
                           AppSpacing.gapHSm,
                           const Icon(
@@ -196,6 +245,10 @@ class DrawerScreen extends ConsumerWidget {
                     isActive: isActive,
                     onTap: () {
                       Navigator.pop(context);
+                      if (ref.read(guestModeProvider) && item.route != '/') {
+                        showLoginDialog(context);
+                        return;
+                      }
                       if (item.route == '/meetings') {
                         context.goNamed(RouteNames.meetings);
                       } else if (item.route == '/file-manager') {
