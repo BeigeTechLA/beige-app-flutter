@@ -76,6 +76,8 @@ const _publicRoutes = {
   '/onboarding',
   '/login',
   '/signup',
+  '/crop-image',
+  '/signup-crop-image',
   '/forgot-password',
   '/forgot-otp',
   '/reset-password',
@@ -90,6 +92,8 @@ const _guestAllowedRoutes = {
   '/onboarding',
   '/login',
   '/signup',
+  '/crop-image',
+  '/signup-crop-image',
   '/forgot-password',
   '/forgot-otp',
   '/reset-password',
@@ -670,17 +674,49 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
         path: '/crop-image',
         name: RouteNames.cropImage,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final file = state.extra as File;
-          return CropImageScreen(imageFile: file);
+          return MaterialPage(
+            key: ValueKey('crop_image_${file.path}_${state.pageKey.value}'),
+            child: CropImageScreen(imageFile: file),
+          );
         },
       ),
       GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/signup-crop-image',
+        name: RouteNames.cropImageSignup,
+        pageBuilder: (context, state) {
+          final file = state.extra as File;
+          return MaterialPage(
+            key: ValueKey('signup_crop_${file.path}_${state.pageKey.value}'),
+            child: CropImageScreen(imageFile: file),
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/profile-crop-image',
+        name: RouteNames.cropImageProfile,
+        pageBuilder: (context, state) {
+          final file = state.extra as File;
+          return MaterialPage(
+            key: ValueKey('profile_crop_${file.path}_${state.pageKey.value}'),
+            child: CropImageScreen(imageFile: file),
+          );
+        },
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
         path: '/edit-profile',
         name: RouteNames.editProfile,
-        builder: (context, state) => const EditProfileScreen(),
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: const EditProfileScreen(),
+        ),
       ),
       GoRoute(
         path: '/change-password',

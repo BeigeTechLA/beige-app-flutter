@@ -24,6 +24,7 @@ import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/features/profile/presentation/providers/edit_profile_notifier.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/shared/widgets/top_message.dart';
+import 'package:beige/shared/widgets/app_image_source_picker_sheet.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -138,18 +139,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 100,
-    );
-    if (pickedFile != null && mounted) {
-      final cropped = await context.pushNamed<File?>(
-        RouteNames.cropImage,
-        extra: File(pickedFile.path),
+    try {
+      final source = await AppImageSourcePickerSheet.show(context);
+      if (source == null || !mounted) return;
+
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 100,
       );
-      if (cropped != null && mounted) {
-        setState(() => _profileImage = cropped);
-        ref.read(editProfileNotifierProvider.notifier).uploadPhoto(cropped);
+      if (pickedFile != null && mounted) {
+        final cropped = await context.pushNamed<File?>(
+          RouteNames.cropImageProfile,
+          extra: File(pickedFile.path),
+        );
+        if (cropped != null && mounted) {
+          setState(() => _profileImage = cropped);
+          ref.read(editProfileNotifierProvider.notifier).uploadPhoto(cropped);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error picking profile image: $e");
+      if (mounted) {
+        TopMessage.show(
+          context,
+          "Could not access photos or camera. Please check app permissions.",
+        );
       }
     }
   }

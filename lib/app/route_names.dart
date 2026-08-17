@@ -51,9 +51,11 @@ abstract class RouteNames {
   static const selectBookingType = 'select_booking_type';
   static const shootUpdated = 'shoot_updated';
 
-  // Profile
+  // Profile & Auth Image Cropping
   static const profile = 'profile';
   static const cropImage = 'crop_image';
+  static const cropImageSignup = 'crop_image_signup';
+  static const cropImageProfile = 'crop_image_profile';
   static const editProfile = 'edit_profile';
   static const changePassword = 'change_password';
   static const profileOtp = 'profile_otp';

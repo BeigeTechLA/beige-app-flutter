@@ -27,6 +27,7 @@ import 'package:beige/core/utils/google_config.dart';
 import 'package:beige/shared/widgets/location_permission_dialog.dart';
 import 'package:beige/shared/widgets/top_message.dart';
 import 'package:beige/shared/widgets/loading.dart';
+import 'package:beige/shared/widgets/app_image_source_picker_sheet.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -122,22 +123,35 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 90,
-    );
+    try {
+      final source = await AppImageSourcePickerSheet.show(context);
+      if (source == null || !mounted) return;
 
-    if (picked == null || !mounted) return;
+      final picked = await _picker.pickImage(
+        source: source,
+        imageQuality: 90,
+      );
 
-    final cropped = await context.pushNamed<File?>(
-      RouteNames.cropImage,
-      extra: File(picked.path),
-    );
+      if (picked == null || !mounted) return;
 
-    if (cropped != null && mounted) {
-      setState(() {
-        profileImage = cropped;
-      });
+      final cropped = await context.pushNamed<File?>(
+        RouteNames.cropImageSignup,
+        extra: File(picked.path),
+      );
+
+      if (cropped != null && mounted) {
+        setState(() {
+          profileImage = cropped;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error picking profile image: $e");
+      if (mounted) {
+        TopMessage.show(
+          context,
+          "Could not access photos or camera. Please check app permissions.",
+        );
+      }
     }
   }
 
