@@ -368,4 +368,32 @@ class AppColors {
 
   /// Participant box border — 8% white opacity
   static const Color participantBoxBorder = Color(0x14FFFFFF);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // NOTIFICATION SETTINGS PALETTE
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /// Notification LED / accent tint for Android notification banners.
+  static const Color notificationAccent = Color(0xFFC49A45);
+
+  /// Push row icon — soft blue tile background.
+  static const Color notifBlueBg = Color(0xFFEBF3FF);
+
+  /// Push row icon glyph + info-card accent dot — blue.
+  static const Color notifBlue = Color(0xFF2563EB);
+
+  /// Email row icon + "Coming Soon" badge — soft purple background.
+  static const Color notifPurpleBg = Color(0xFFF3E8FF);
+
+  /// Email row icon glyph + "Coming Soon" text — purple.
+  static const Color notifPurple = Color(0xFF9333EA);
+
+  /// Smart Delivery info card — very light blue background / icon glyph.
+  static const Color notifInfoBg = Color(0xFFEFF6FF);
+
+  /// Smart Delivery info card — title text (dark blue).
+  static const Color notifInfoTitle = Color(0xFF1E40AF);
+
+  /// Smart Delivery info card — body text (dark blue).
+  static const Color notifInfoBody = Color(0xFF1E3A8A);
 }

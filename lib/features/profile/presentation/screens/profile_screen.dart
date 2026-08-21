@@ -325,6 +325,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 _divider(),
                 _menuRow(
+                  AppAssets.notification,
+                  "Notification Settings",
+                  onTap: () => context.pushNamed(RouteNames.notificationSettings),
+                ),
+                _divider(),
+                _menuRow(
                   AppAssets.profileLogout,
                   "Logout",
                   onTap: _showLogoutBottomSheet,

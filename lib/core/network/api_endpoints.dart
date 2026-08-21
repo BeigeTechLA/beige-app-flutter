@@ -83,6 +83,10 @@ abstract class ApiEndpoints {
   /// user's RSVP. Backend route name unconfirmed; swap if backend rejects.
   static String meetingRespond(String id) => 'external-meetings/$id/respond';
 
+  /// 🔔 Push Notifications
+  static const String pushTokens = "push-notifications/tokens";
+  static const String pushPreferences = "push-notifications/preferences";
+
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";
   static const String registerCrewRoles = "auth/crew-roles";

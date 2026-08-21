@@ -9,6 +9,9 @@
     <!-- Camera Permission -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- For Android 13+ Notification Permission -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <!-- For Android 13+ -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
@@ -24,9 +27,18 @@
         android:allowBackup="false"
         android:fullBackupContent="false">
 
+        <!-- FCM Default Notification Channel & Icon -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="beige_general_channel" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDAYO6R9fVnd-TlUOmgdzifvqwX9BanXzw"/>
+
 
         <meta-data
             android:name="google_analytics_automatic_screen_reporting_enabled"

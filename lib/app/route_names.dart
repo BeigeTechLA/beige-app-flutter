@@ -63,6 +63,7 @@ abstract class RouteNames {
   static const bookingHistory = 'booking_history';
   static const favourites = 'favourites';
   static const appPreferences = 'app_preferences';
+  static const notificationSettings = 'notification_settings';
   static const deleteAccount = 'delete_account';
   static const deleteAccountOtp = 'delete_account_otp';
 }

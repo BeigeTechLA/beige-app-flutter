@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/notifications/push_token_sync_provider.dart';
 import '../core/restoration/restoration_providers.dart';
 import '../features/messages/presentation/providers/messages_repository_provider.dart';
 import '../shared/widgets/connectivity_listener.dart';
@@ -43,6 +44,8 @@ class _AppState extends ConsumerState<App> {
     // Keeps the chat socket alive for the app session and ties its
     // connect/disconnect to auth state.
     ref.watch(chatSocketLifecycleProvider);
+    // Registers/deregisters the FCM token with the backend on auth changes.
+    ref.watch(pushTokenSyncProvider);
 
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,

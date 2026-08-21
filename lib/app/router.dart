@@ -39,6 +39,7 @@ import '../features/home/presentation/screens/recommended_creative_detail_screen
 import '../features/profile/presentation/screens/delete_account_otp_screen.dart';
 import '../features/profile/presentation/screens/delete_account_screen.dart';
 import '../features/profile/presentation/screens/app_preferences_screen.dart';
+import '../features/profile/presentation/screens/notification_settings_screen.dart';
 import '../features/profile/presentation/screens/change_password_screen.dart';
 import '../features/profile/presentation/screens/crop_image_screen.dart';
 import '../features/profile/presentation/screens/edit_profile_screen.dart';
@@ -759,6 +760,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/app-preferences',
         name: RouteNames.appPreferences,
         builder: (context, state) => const AppPreferencesScreen(),
+      ),
+      GoRoute(
+        path: '/notification-settings',
+        name: RouteNames.notificationSettings,
+        builder: (context, state) => const NotificationSettingsScreen(),
       ),
       GoRoute(
         path: '/delete-account',
