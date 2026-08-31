@@ -21,7 +21,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (kDebugMode) {
-    print('[PushNotificationService] Background message received: ${message.messageId}');
+    debugPrint('[PushNotificationService] Background message received: ${message.messageId}');
   }
 }
 
@@ -108,7 +108,7 @@ class PushNotificationService {
     final initialMessage = await _fcm.getInitialMessage();
     if (initialMessage != null) {
       if (kDebugMode) {
-        print('[PushNotificationService] App launched from terminated state via notification: ${initialMessage.data}');
+        debugPrint('[PushNotificationService] App launched from terminated state via notification: ${initialMessage.data}');
       }
       _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
     }
@@ -116,7 +116,7 @@ class PushNotificationService {
     // Handle background notification taps when app is resumed
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if (kDebugMode) {
-        print('[PushNotificationService] Notification opened from background: ${message.data}');
+        debugPrint('[PushNotificationService] Notification opened from background: ${message.data}');
       }
       final payload = NotificationPayload.fromRemoteMessage(message);
       handleNotificationClick(payload);
@@ -125,7 +125,7 @@ class PushNotificationService {
     // Handle foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (kDebugMode) {
-        print('[PushNotificationService] Foreground notification received: ${message.notification?.title}');
+        debugPrint('[PushNotificationService] Foreground notification received: ${message.notification?.title}');
       }
       _showForegroundNotification(message);
     });
@@ -163,7 +163,7 @@ class PushNotificationService {
     );
 
     if (kDebugMode) {
-      print('[PushNotificationService] Permission authorization status: ${settings.authorizationStatus}');
+      debugPrint('[PushNotificationService] Permission authorization status: ${settings.authorizationStatus}');
     }
 
     return settings;
@@ -193,7 +193,7 @@ class PushNotificationService {
             handleNotificationClick(payload);
           } catch (e) {
             if (kDebugMode) {
-              print('[PushNotificationService] Error parsing local notification payload: $e');
+              debugPrint('[PushNotificationService] Error parsing local notification payload: $e');
             }
           }
         }
@@ -316,14 +316,14 @@ class PushNotificationService {
 
     if (context == null) {
       if (kDebugMode) {
-        print('[PushNotificationService] Context not ready yet, queuing notification tap.');
+        debugPrint('[PushNotificationService] Context not ready yet, queuing notification tap.');
       }
       _pendingPayload = payload;
       return;
     }
 
     if (kDebugMode) {
-      print('[PushNotificationService] Redirecting for notification type: ${payload.type}');
+      debugPrint('[PushNotificationService] Redirecting for notification type: ${payload.type}');
     }
 
     final router = GoRouter.of(context);
