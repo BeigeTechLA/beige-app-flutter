@@ -11,6 +11,7 @@ import '../../app/colors.dart';
 import '../../app/navigator_key.dart';
 import '../../app/route_names.dart';
 import '../../firebase_options.dart';
+import '../firebase/crashlytics_service.dart';
 import 'notification_payload.dart';
 
 /// Top-level background message handler required by Firebase Messaging.
@@ -92,48 +93,59 @@ class PushNotificationService {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    // Set background message handler
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Push setup must never block app launch. Any failure here (plugin init,
+    // permission prompt, platform channel) is logged and swallowed so the app
+    // still renders — it just runs without push until the next launch.
+    try {
+      // Set background message handler
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // Setup multi-channel local notifications for Android & iOS
-    await _setupLocalNotifications();
+      // Setup multi-channel local notifications for Android & iOS
+      await _setupLocalNotifications();
 
-    // Request permissions on app open according to iOS & Android best practices
-    await requestPermissions();
+      // Request permissions on app open according to iOS & Android best practices
+      await requestPermissions();
 
-    // Fetch initial FCM token & listen for refreshes
-    _setupTokenManagement();
+      // Fetch initial FCM token & listen for refreshes
+      _setupTokenManagement();
 
-    // Handle initial notification tap if launched from terminated state
-    final initialMessage = await _fcm.getInitialMessage();
-    if (initialMessage != null) {
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] App launched from terminated state via notification: ${initialMessage.data}');
+      // Handle initial notification tap if launched from terminated state
+      final initialMessage = await _fcm.getInitialMessage();
+      if (initialMessage != null) {
+        if (kDebugMode) {
+          debugPrint('[PushNotificationService] App launched from terminated state via notification: ${initialMessage.data}');
+        }
+        _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
       }
-      _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
+
+      // Handle background notification taps when app is resumed
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        if (kDebugMode) {
+          debugPrint('[PushNotificationService] Notification opened from background: ${message.data}');
+        }
+        final payload = NotificationPayload.fromRemoteMessage(message);
+        handleNotificationClick(payload);
+      });
+
+      // Handle foreground notifications
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        if (kDebugMode) {
+          debugPrint('[PushNotificationService] Foreground notification received: ${message.notification?.title}');
+        }
+        _showForegroundNotification(message);
+      });
+
+      // NOTE: Pending payload is NOT dispatched here. During cold start the first
+      // frame is SplashScreen and the auth redirect is still resolving, so a push
+      // navigation would be overwritten. Instead the post-auth landing (HomeScreen)
+      // drains the queue via `processPendingNotification()` once it is safe to nav.
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] initialize failed (non-fatal): $e');
+      }
     }
-
-    // Handle background notification taps when app is resumed
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] Notification opened from background: ${message.data}');
-      }
-      final payload = NotificationPayload.fromRemoteMessage(message);
-      handleNotificationClick(payload);
-    });
-
-    // Handle foreground notifications
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] Foreground notification received: ${message.notification?.title}');
-      }
-      _showForegroundNotification(message);
-    });
-
-    // NOTE: Pending payload is NOT dispatched here. During cold start the first
-    // frame is SplashScreen and the auth redirect is still resolving, so a push
-    // navigation would be overwritten. Instead the post-auth landing (HomeScreen)
-    // drains the queue via `processPendingNotification()` once it is safe to nav.
   }
 
   /// Best Practice Push Notification Permission Request for iOS & Android (13+).
@@ -244,7 +256,7 @@ class PushNotificationService {
         debugPrint('[PushNotificationService] FCM Token: $_fcmToken');
       }
       if (token != null && token.isNotEmpty) {
-        onTokenRefreshed?.call(token);
+        unawaited(_notifyTokenRefreshed(token));
       }
     }).catchError((err) {
       if (kDebugMode) {
@@ -258,48 +270,72 @@ class PushNotificationService {
         debugPrint('[PushNotificationService] FCM Token refreshed: $_fcmToken');
       }
       if (newToken.isNotEmpty) {
-        onTokenRefreshed?.call(newToken);
+        unawaited(_notifyTokenRefreshed(newToken));
       }
     });
   }
 
+  /// Invokes the token-refresh callback (a backend sync) with its own guard so
+  /// a network failure never escapes as an unhandled future.
+  Future<void> _notifyTokenRefreshed(String token) async {
+    try {
+      await onTokenRefreshed?.call(token);
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Token sync callback failed: $e');
+      }
+    }
+  }
+
   /// Displays local notification banner using the channel corresponding to message type.
   Future<void> _showForegroundNotification(RemoteMessage message) async {
-    final payload = NotificationPayload.fromRemoteMessage(message);
-    final channel = _getChannelForType(payload.type);
+    // Runs inside the onMessage stream callback — guard so a platform/display
+    // failure surfaces as a logged error instead of an unhandled zone error.
+    try {
+      final payload = NotificationPayload.fromRemoteMessage(message);
+      final channel = _getChannelForType(payload.type);
 
-    final notification = message.notification;
-    final title = notification?.title ?? message.data['title'] ?? 'Notification';
-    final body = notification?.body ?? message.data['body'] ?? '';
+      final notification = message.notification;
+      final title = notification?.title ?? message.data['title'] ?? 'Notification';
+      final body = notification?.body ?? message.data['body'] ?? '';
 
-    final androidDetails = AndroidNotificationDetails(
-      channel.id,
-      channel.name,
-      channelDescription: channel.description,
-      importance: channel.importance,
-      priority: _getPriorityForImportance(channel.importance),
-      color: AppColors.notificationAccent,
-      icon: '@mipmap/ic_launcher',
-    );
+      final androidDetails = AndroidNotificationDetails(
+        channel.id,
+        channel.name,
+        channelDescription: channel.description,
+        importance: channel.importance,
+        priority: _getPriorityForImportance(channel.importance),
+        color: AppColors.notificationAccent,
+        icon: '@mipmap/ic_launcher',
+      );
 
-    const darwinDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+      const darwinDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
 
-    final notificationDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: darwinDetails,
-    );
+      final notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: darwinDetails,
+      );
 
-    await _localNotifications.show(
-      id: message.hashCode,
-      title: title,
-      body: body,
-      notificationDetails: notificationDetails,
-      payload: jsonEncode(message.data),
-    );
+      await _localNotifications.show(
+        id: message.hashCode,
+        title: title,
+        body: body,
+        notificationDetails: notificationDetails,
+        payload: jsonEncode(message.data),
+      );
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Failed to show foreground notification: $e');
+      }
+    }
   }
 
   /// Processes any pending notification payload captured during app startup.
@@ -323,88 +359,108 @@ class PushNotificationService {
       return;
     }
 
-    final router = GoRouter.of(context);
+    // Navigation is driven by server-controlled payloads (arbitrary types,
+    // route strings). Guard the whole dispatch so a bad payload or router state
+    // can never crash the app — on failure, log and fall back to Home.
+    try {
+      final router = GoRouter.of(context);
 
-    // Splash guard: while the app is still on splash the auth redirect has not
-    // settled yet. Re-queue and let the post-auth landing drain it, otherwise
-    // the redirect overwrites this navigation.
-    final currentLocation = router.routerDelegate.currentConfiguration.uri.path;
-    if (currentLocation == '/splash' || currentLocation.isEmpty) {
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] On splash, deferring notification tap.');
-      }
-      _pendingPayload = payload;
-      return;
-    }
-
-    if (kDebugMode) {
-      debugPrint('[PushNotificationService] Redirecting for notification type: ${payload.type}');
-    }
-
-    switch (payload.type) {
-      case NotificationType.chat:
-        if (payload.chatId != null && payload.chatId!.isNotEmpty) {
-          router.pushNamed(
-            RouteNames.chat,
-            extra: {'conversationId': payload.chatId, 'contactName': payload.title ?? 'Chat'},
-          );
-        } else {
-          router.goNamed(RouteNames.messages);
+      // Splash guard: while the app is still on splash the auth redirect has not
+      // settled yet. Re-queue and let the post-auth landing drain it, otherwise
+      // the redirect overwrites this navigation.
+      final currentLocation = router.routerDelegate.currentConfiguration.uri.path;
+      if (currentLocation == '/splash' || currentLocation.isEmpty) {
+        if (kDebugMode) {
+          debugPrint('[PushNotificationService] On splash, deferring notification tap.');
         }
-        break;
+        _pendingPayload = payload;
+        return;
+      }
 
-      case NotificationType.booking:
-        if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
-          final bookingId = int.tryParse(payload.bookingId!);
-          if (bookingId != null) {
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Redirecting for notification type: ${payload.type}');
+      }
+
+      switch (payload.type) {
+        case NotificationType.chat:
+          if (payload.chatId != null && payload.chatId!.isNotEmpty) {
             router.pushNamed(
-              RouteNames.manageBooking,
-              pathParameters: {'bookingId': bookingId.toString()},
+              RouteNames.chat,
+              extra: {'conversationId': payload.chatId, 'contactName': payload.title ?? 'Chat'},
             );
+          } else {
+            router.goNamed(RouteNames.messages);
+          }
+          break;
+
+        case NotificationType.booking:
+          if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
+            final bookingId = int.tryParse(payload.bookingId!);
+            if (bookingId != null) {
+              router.pushNamed(
+                RouteNames.manageBooking,
+                pathParameters: {'bookingId': bookingId.toString()},
+              );
+            } else {
+              router.goNamed(RouteNames.myShoots);
+            }
           } else {
             router.goNamed(RouteNames.myShoots);
           }
-        } else {
-          router.goNamed(RouteNames.myShoots);
-        }
-        break;
+          break;
 
-      case NotificationType.meeting:
-        if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
-          router.goNamed(
-            RouteNames.meetings,
-            queryParameters: {'meetingId': payload.meetingId!},
-          );
-        } else {
-          router.goNamed(RouteNames.meetings);
-        }
-        break;
+        case NotificationType.meeting:
+          if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
+            router.goNamed(
+              RouteNames.meetings,
+              queryParameters: {'meetingId': payload.meetingId!},
+            );
+          } else {
+            router.goNamed(RouteNames.meetings);
+          }
+          break;
 
-      case NotificationType.files:
-        // TODO: enable when File Manager screen is built.
-        // router.pushNamed(RouteNames.fileManager);
-        router.goNamed(RouteNames.home);
-        break;
-
-      case NotificationType.profile:
-        router.goNamed(RouteNames.profile);
-        break;
-
-      case NotificationType.deeplink:
-        if (payload.targetRoute != null && payload.targetRoute!.isNotEmpty) {
-          router.push(payload.targetRoute!);
-        } else {
+        case NotificationType.files:
+          // TODO: enable when File Manager screen is built.
+          // router.pushNamed(RouteNames.fileManager);
           router.goNamed(RouteNames.home);
-        }
-        break;
+          break;
 
-      case NotificationType.unknown:
-        if (payload.targetRoute != null && payload.targetRoute!.isNotEmpty) {
-          router.push(payload.targetRoute!);
-        } else {
-          router.goNamed(RouteNames.home);
-        }
-        break;
+        case NotificationType.profile:
+          router.goNamed(RouteNames.profile);
+          break;
+
+        case NotificationType.deeplink:
+        case NotificationType.unknown:
+          _pushTargetRouteOrHome(router, payload.targetRoute);
+          break;
+      }
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Navigation failed for ${payload.type}: $e');
+      }
+      _safeGoHome(context);
+    }
+  }
+
+  /// Pushes a server-provided deep-link route only if it looks like a valid
+  /// in-app path (starts with `/`); otherwise falls back to Home.
+  void _pushTargetRouteOrHome(GoRouter router, String? targetRoute) {
+    if (targetRoute != null && targetRoute.startsWith('/')) {
+      router.push(targetRoute);
+    } else {
+      router.goNamed(RouteNames.home);
+    }
+  }
+
+  /// Best-effort fallback navigation to Home; never throws.
+  void _safeGoHome(BuildContext context) {
+    try {
+      GoRouter.of(context).goNamed(RouteNames.home);
+    } catch (_) {
+      // Nothing more we can safely do.
     }
   }
 }

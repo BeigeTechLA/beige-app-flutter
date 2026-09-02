@@ -44,7 +44,11 @@ class _MeetingsScreenState extends ConsumerState<MeetingsScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || _detailsShown) return;
         _detailsShown = true;
-        showMeetingDetailsSheet(context, meetingId: id);
+        try {
+          showMeetingDetailsSheet(context, meetingId: id);
+        } catch (e) {
+          debugPrint('[MeetingsScreen] Failed to open meeting details sheet: $e');
+        }
       });
     }
   }
