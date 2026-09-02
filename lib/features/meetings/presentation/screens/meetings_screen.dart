@@ -22,8 +22,32 @@ import '../widgets/meeting_details_sheet.dart';
 import '../widgets/meeting_filter_sheet.dart';
 import '../widgets/meetings_tab_bar.dart';
 
-class MeetingsScreen extends ConsumerWidget {
-  const MeetingsScreen({super.key});
+class MeetingsScreen extends ConsumerStatefulWidget {
+  const MeetingsScreen({super.key, this.meetingId});
+
+  /// When set (via a `meetings?meetingId=...` push deep link), the meeting
+  /// details sheet is opened automatically on first frame.
+  final String? meetingId;
+
+  @override
+  ConsumerState<MeetingsScreen> createState() => _MeetingsScreenState();
+}
+
+class _MeetingsScreenState extends ConsumerState<MeetingsScreen> {
+  bool _detailsShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final id = widget.meetingId;
+    if (id != null && id.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _detailsShown) return;
+        _detailsShown = true;
+        showMeetingDetailsSheet(context, meetingId: id);
+      });
+    }
+  }
 
   Future<void> _openFilter(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(meetingsListNotifierProvider.notifier);
@@ -63,7 +87,7 @@ class MeetingsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final state = ref.watch(meetingsListNotifierProvider);
     final notifier = ref.read(meetingsListNotifierProvider.notifier);
 

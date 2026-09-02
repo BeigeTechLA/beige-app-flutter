@@ -788,7 +788,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/meetings',
         name: RouteNames.meetings,
-        builder: (context, state) => const MeetingsScreen(),
+        builder: (context, state) => MeetingsScreen(
+          meetingId: state.uri.queryParameters['meetingId'],
+        ),
       ),
 
       GoRoute(

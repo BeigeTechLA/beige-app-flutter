@@ -130,10 +130,10 @@ class PushNotificationService {
       _showForegroundNotification(message);
     });
 
-    // Dispatch pending payload once app UI frame is ready
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      processPendingNotification();
-    });
+    // NOTE: Pending payload is NOT dispatched here. During cold start the first
+    // frame is SplashScreen and the auth redirect is still resolving, so a push
+    // navigation would be overwritten. Instead the post-auth landing (HomeScreen)
+    // drains the queue via `processPendingNotification()` once it is safe to nav.
   }
 
   /// Best Practice Push Notification Permission Request for iOS & Android (13+).
@@ -221,6 +221,7 @@ class PushNotificationService {
         return _bookingChannel;
       case NotificationType.meeting:
         return _meetingChannel;
+      case NotificationType.files:
       case NotificationType.profile:
       case NotificationType.deeplink:
       case NotificationType.unknown:
@@ -322,11 +323,23 @@ class PushNotificationService {
       return;
     }
 
+    final router = GoRouter.of(context);
+
+    // Splash guard: while the app is still on splash the auth redirect has not
+    // settled yet. Re-queue and let the post-auth landing drain it, otherwise
+    // the redirect overwrites this navigation.
+    final currentLocation = router.routerDelegate.currentConfiguration.uri.path;
+    if (currentLocation == '/splash' || currentLocation.isEmpty) {
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] On splash, deferring notification tap.');
+      }
+      _pendingPayload = payload;
+      return;
+    }
+
     if (kDebugMode) {
       debugPrint('[PushNotificationService] Redirecting for notification type: ${payload.type}');
     }
-
-    final router = GoRouter.of(context);
 
     switch (payload.type) {
       case NotificationType.chat:
@@ -365,6 +378,12 @@ class PushNotificationService {
         } else {
           router.goNamed(RouteNames.meetings);
         }
+        break;
+
+      case NotificationType.files:
+        // TODO: enable when File Manager screen is built.
+        // router.pushNamed(RouteNames.fileManager);
+        router.goNamed(RouteNames.home);
         break;
 
       case NotificationType.profile:

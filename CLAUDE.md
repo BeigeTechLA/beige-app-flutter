@@ -5,6 +5,11 @@ This file provides guidance to Claude Code when working with code in this reposi
 ## Workflow Rules
 
 - **Always ask questions before writing a plan.** Before proposing or executing any plan, ask clarifying questions to understand scope, constraints, and preferences. Do not assume — confirm first, then plan.
+- **Never write code without approval.** Do not start implementation until the user explicitly approves the plan.
+- **Plan phase-wise in small chunks, in a table.** Break every plan into phases, each containing small, discrete tasks. Present phases as a table with scrum-style task IDs (Phase 1 → Task 1.1, Task 1.2; Phase 2 → Task 2.1, ...). End the full plan with a single manual test summary describing what the user should verify. Table columns: Task ID, Description, Files, Status.
+- **Track status in the plan.** Every task carries a status with a color indicator: 🔴 Not Started, 🟡 In Progress, 🟢 Completed.
+- **Reference impacted files in the plan.** For large-level changes or new functionality, list the files that will be changed or added in the plan file.
+- **Prompt for CLAUDE.md update after new features.** After completing a new feature, ask the user whether CLAUDE.md should be updated.
 
 ## Commands
 
