@@ -76,6 +76,13 @@ class NotificationPayload {
     );
   }
 
+  @override
+  String toString() {
+    return 'NotificationPayload(type: $type, title: $title, body: $body, '
+        'chatId: $chatId, bookingId: $bookingId, meetingId: $meetingId, '
+        'targetRoute: $targetRoute, rawMap: $rawMap)';
+  }
+
   /// Resolves the notification family from the server `type` event first, then
   /// falls back to the top-level `topic`. Uses family matching (not brittle
   /// exact strings) so new backend event names keep routing correctly.

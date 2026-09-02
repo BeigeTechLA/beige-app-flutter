@@ -295,6 +295,9 @@ class PushNotificationService {
     // failure surfaces as a logged error instead of an unhandled zone error.
     try {
       final payload = NotificationPayload.fromRemoteMessage(message);
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Foreground parsed payload → $payload');
+      }
       final channel = _getChannelForType(payload.type);
 
       final notification = message.notification;
@@ -378,7 +381,7 @@ class PushNotificationService {
       }
 
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Redirecting for notification type: ${payload.type}');
+        debugPrint('[PushNotificationService] Handling tap payload → $payload');
       }
 
       switch (payload.type) {
