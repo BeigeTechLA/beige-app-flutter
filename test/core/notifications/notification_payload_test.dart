@@ -156,6 +156,16 @@ void main() {
       expect(payload.chatId, 'conv_99');
     });
 
+    test('roomId (camelCase, real server key) maps to chatId', () {
+      final payload = NotificationPayload.fromMap({
+        'type': 'newMessage',
+        'topic': 'messages',
+        'roomId': '6a9809a2f2b74d221a8021b2',
+      });
+      expect(payload.type, NotificationType.chat);
+      expect(payload.chatId, '6a9809a2f2b74d221a8021b2');
+    });
+
     test('conversationId maps to chatId', () {
       final payload = NotificationPayload.fromMap(
         {'type': 'chat', 'conversationId': 'conv_1'},

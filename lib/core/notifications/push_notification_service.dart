@@ -183,7 +183,7 @@ class PushNotificationService {
 
   /// Setup flutter_local_notifications plugin and create dedicated Android channels.
   Future<void> _setupLocalNotifications() async {
-    const androidInitSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidInitSettings = AndroidInitializationSettings('ic_stat_notification');
     const darwinInitSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -296,7 +296,7 @@ class PushNotificationService {
     try {
       final payload = NotificationPayload.fromRemoteMessage(message);
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Foreground parsed payload → $payload');
+        debugPrint('[PushNotificationService] Foreground parsed payload =============>>> $payload');
       }
       final channel = _getChannelForType(payload.type);
 
@@ -311,7 +311,7 @@ class PushNotificationService {
         importance: channel.importance,
         priority: _getPriorityForImportance(channel.importance),
         color: AppColors.notificationAccent,
-        icon: '@mipmap/ic_launcher',
+        icon: 'ic_stat_notification',
       );
 
       const darwinDetails = DarwinNotificationDetails(

@@ -44,6 +44,7 @@ class NotificationPayload {
       chatId: _firstNonEmpty([
         data['chat_room_id'],
         data['room_id'],
+        data['roomId'],
         data['chatId'],
         data['chat_id'],
         data['conversationId'],
