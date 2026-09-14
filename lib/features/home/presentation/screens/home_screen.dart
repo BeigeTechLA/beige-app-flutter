@@ -16,6 +16,7 @@ import 'package:beige/features/home/presentation/widgets/bookings/home_bookings_
 import 'package:beige/features/home/presentation/widgets/common/home_section_divider.dart';
 import 'package:beige/features/home/presentation/widgets/common/home_section_title.dart';
 import 'package:beige/features/home/presentation/widgets/continue_booking/home_continue_booking_card.dart';
+// ignore: unused_import  (Section 5 hidden from UI — kept for future use)
 import 'package:beige/features/home/presentation/widgets/featured_creatives/home_featured_creatives_carousel.dart';
 import 'package:beige/features/home/presentation/widgets/header/home_header.dart';
 import 'package:beige/features/home/presentation/widgets/how_it_works/home_how_it_works_section.dart';
@@ -24,6 +25,7 @@ import 'package:beige/features/home/presentation/widgets/recommended_creatives/h
 import 'package:beige/features/home/presentation/widgets/services/home_services_row.dart';
 import 'package:beige/features/home/presentation/widgets/studios/home_studios_section.dart';
 import 'package:beige/features/home/presentation/widgets/top_creatives/home_top_creatives_stack.dart';
+// ignore: unused_import  (Section 10 hidden from UI — kept for future use)
 import 'package:beige/features/home/presentation/widgets/top_influencers/home_top_influencers_section.dart';
 import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
@@ -52,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late AnimationController _controller;
   late PageController _studioController;
   int _activeStudioIndex = 0;
+  // ignore: unused_field  (Section 10 Top Influencers hidden from UI — kept for future use)
   final PageController _featuredController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65,
@@ -65,6 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late AnimationController _swipeController;
   int _currentCreativeIndex = 0;
 
+  // ignore: unused_field  (Section 5 Featured Creatives hidden from UI — kept for future use)
   final int _initialPage = 1000;
 
   void scrollTo(GlobalKey key) {
@@ -303,6 +307,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     "4.8M",
   ];
 
+  // ignore: unused_field  (Section 5 Featured Creatives hidden from UI — kept for future use)
   final PageController _pageController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65,
@@ -684,6 +689,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         onFindCreative: () => scrollTo(topCreativeKey),
                       ),
                       const SizedBox(height: 20),
+                      // ── Section 5: Featured Creatives (HIDDEN — kept for future use) ──
+                      // Temporarily hidden from UI per request. Code retained as reference.
+                      // HomeSectionTitle title + HomeFeaturedCreativesCarousel (9 static creatives).
+                      /*
                       const HomeSectionDivider(centerAlpha: 0.24),
                       const SizedBox(height: 10),
                       // ── Section 5: Featured Creatives ──
@@ -698,7 +707,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         initialPage: _initialPage,
                       ),
                       const SizedBox(height: 10),
-
+                      */
                       const HomeSectionDivider(centerAlpha: 0.24),
                       const SizedBox(height: 10),
                       // ── Section 6: Studios ──
@@ -1014,6 +1023,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(height: 10),*/
                       // ── Section 9: How It Works ──
                       const HomeHowItWorksSection(),
+                      // ── Section 10: Top Influencers (HIDDEN — kept for future use) ──
+                      // Temporarily hidden from UI per request. Code retained as reference.
+                      // HomeTopInfluencersSection (9 static influencers).
+                      /*
                       const HomeSectionDivider(centerAlpha: 0.09),
                       const SizedBox(height: 10),
                       // ── Section 10: Top Influencers ──
@@ -1032,7 +1045,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         onOpenLink: openLink,
                       ),
                       const SizedBox(height: 20),
-
+                      */
                       const HomeSectionDivider(centerAlpha: 0.09),
                       const SizedBox(height: 20),
 
