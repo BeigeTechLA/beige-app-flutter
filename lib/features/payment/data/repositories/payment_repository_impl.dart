@@ -40,10 +40,10 @@ class PaymentRepositoryImpl implements PaymentRepository {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.createPaymentSheet(
         bookingId: bookingId,
+        data: {'payment_method': 'commas'},
       );
       _assertNoError(response);
-      final data = response['data'] as Map<String, dynamic>;
-      return CommasCheckout.fromJson(data);
+      return CommasCheckout.fromJson(response);
     });
   }
 

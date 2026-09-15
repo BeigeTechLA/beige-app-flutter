@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
+import 'package:beige/features/booking/presentation/screens/commas_checkout_screen.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/core/network/api_endpoints.dart';
@@ -281,7 +282,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       final isSaved = await notifier.savePaymentInfo(
         bookingId: widget.bookingId,
         data: {
-          "payment_method": getPaymentMethod(),
+          "payment_method": "commas",
           "full_name": nameController.text.trim(),
           "email": emailController.text.trim(),
           "phone": phoneController.text.trim(),
@@ -289,7 +290,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       );
 
       if (!isSaved) {
-        if (mounted) TopMessage.show(context, "Failed to save details");
+        final err = ref.read(bookingReviewNotifierProvider(widget.bookingId)).errorMessage;
+        if (mounted) TopMessage.show(context, err ?? "Failed to save details");
         return;
       }
 
@@ -298,27 +300,73 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         bookingId: widget.bookingId,
       );
 
-      if (checkout == null || !checkout.isValid) {
-        if (mounted) TopMessage.show(context, "Failed to start checkout");
+      if (checkout == null) {
+        final err = ref.read(bookingReviewNotifierProvider(widget.bookingId)).errorMessage;
+        if (mounted) TopMessage.show(context, err ?? "Failed to start checkout");
         return;
       }
 
-      // 3. Open embedded checkout in WebView, await completion signal
+      if (!checkout.isValid) {
+        if (mounted) {
+          TopMessage.show(
+            context,
+            "Incomplete checkout session details received from server",
+          );
+        }
+        return;
+      }
+
+      // 3. Open embedded checkout in WebView, await redirect outcome
       if (!mounted) return;
-      final completed = await context.pushNamed<bool>(
+      debugPrint("🔗 [Commas Checkout URL]: ${checkout.embeddedUrl}");
+      final result = await context.pushNamed<CommasCheckoutResult>(
         RouteNames.commasCheckout,
         pathParameters: {'bookingId': widget.bookingId.toString()},
         extra: {'checkoutUrl': checkout.embeddedUrl},
       );
 
-      // 4. STEP 4 STUB — verify payment against backend.
-      // TODO(commas): after the WebView closes, poll the backend payment
-      // status endpoint (webhook `payment.succeeded` is source of truth) and
-      // only navigate to success once the backend confirms. For now, trust
-      // the WebView completion flag.
-      if (completed != true) return;
+      // Commas failure callback — show failed, let user retry.
+      if (result == CommasCheckoutResult.failed) {
+        if (mounted) TopMessage.show(context, "Payment failed. Please retry.");
+        return;
+      }
+      // User dismissed the WebView without completing.
+      if (result != CommasCheckoutResult.success) return;
 
-      // 5. Navigate to success
+      // 4. Verify against backend — webhook (`payment.succeeded`) is the
+      // trusted source. Poll summary-details; retry a few times while pending
+      // to let the webhook land.
+      const maxAttempts = 5;
+      const retryDelay = Duration(seconds: 3);
+      CommasPaymentStatus status = CommasPaymentStatus.pending;
+
+      for (var attempt = 0; attempt < maxAttempts; attempt++) {
+        status = await notifier.checkCommasPaymentStatus(
+          bookingId: widget.bookingId,
+        );
+        if (status != CommasPaymentStatus.pending) break;
+        if (attempt == 0 && mounted) {
+          TopMessage.show(context, "Payment confirmation in progress…");
+        }
+        await Future.delayed(retryDelay);
+        if (!mounted) return;
+      }
+
+      if (status == CommasPaymentStatus.failed) {
+        if (mounted) TopMessage.show(context, "Payment failed");
+        return;
+      }
+      if (status == CommasPaymentStatus.pending) {
+        if (mounted) {
+          TopMessage.show(
+            context,
+            "Still confirming your payment. Check My Shoots shortly.",
+          );
+        }
+        return;
+      }
+
+      // 5. Paid — navigate to success
       if (mounted) {
         context.goNamed(
           RouteNames.paymentSuccess,
@@ -383,14 +431,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   }
 
   String getPaymentMethod() {
-    switch (selectedIndex) {
-      case 0:
-        return "1"; // Card
-      case 1:
-        return "2"; // Stripe
-      default:
-        return "1";
-    }
+    return "commas";
   }
 
   @override
