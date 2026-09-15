@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
+import '../../../payment/domain/entities/commas_checkout.dart';
 import '../../../payment/presentation/providers/payment_providers.dart';
 import '../../../shoot/presentation/providers/shoot_providers.dart';
 
@@ -160,6 +161,30 @@ class BookingReviewNotifier
         );
         final paymentSheet = data['payment_sheet'] as Map<String, dynamic>?;
         return paymentSheet;
+      },
+    );
+  }
+
+  /// Create a Commas embedded checkout session. Returns the checkout data
+  /// (used to build the WebView URL) or null on failure.
+  Future<CommasCheckout?> createCommasCheckout({
+    required int bookingId,
+  }) async {
+    final repo = ref.read(paymentRepositoryProvider);
+    final result = await repo.createCommasCheckout(bookingId: bookingId);
+
+    return result.fold(
+      (error) {
+        state = state.copyWith(errorMessage: error.message);
+        return null;
+      },
+      (checkout) {
+        // --- Booking Analytics: Step 8 — Payment initiated ---
+        AnalyticsService.logEvent(
+          AnalyticsEvents.paymentInitiated,
+          params: {'booking_id': bookingId, 'step_number': 8},
+        );
+        return checkout;
       },
     );
   }

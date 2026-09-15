@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/network/exceptions/exception_handler.dart';
+import '../../domain/entities/commas_checkout.dart';
 import '../../domain/repositories/payment_repository.dart';
 import '../datasources/payment_remote_datasource.dart';
 
@@ -29,6 +30,20 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;
+    });
+  }
+
+  @override
+  Future<Either<AppException, CommasCheckout>> createCommasCheckout({
+    required int bookingId,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.createPaymentSheet(
+        bookingId: bookingId,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>;
+      return CommasCheckout.fromJson(data);
     });
   }
 

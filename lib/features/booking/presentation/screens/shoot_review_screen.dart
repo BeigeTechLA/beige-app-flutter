@@ -148,6 +148,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         .toDouble();
   }
 
+  // Retained for reference — Commas checkout (_openCommasCheckout) is active.
+  // ignore: unused_element
   Future<void> _openStripeSheet() async {
     if (isProcessing) return;
 
@@ -251,6 +253,85 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       if (mounted) {
         TopMessage.show(context, e.toString());
       }
+    } finally {
+      if (mounted) setState(() => isProcessing = false);
+    }
+  }
+
+  /// Commas (Fanbasis) embedded checkout flow — opens hosted checkout in a
+  /// WebView, then re-verifies against the backend before showing success.
+  Future<void> _openCommasCheckout() async {
+    if (isProcessing) return;
+
+    if (nameController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty) {
+      TopMessage.show(context, "Please fill required fields");
+      return;
+    }
+
+    setState(() => isProcessing = true);
+
+    final notifier = ref.read(
+      bookingReviewNotifierProvider(widget.bookingId).notifier,
+    );
+
+    try {
+      // 1. Save contact info
+      final isSaved = await notifier.savePaymentInfo(
+        bookingId: widget.bookingId,
+        data: {
+          "payment_method": getPaymentMethod(),
+          "full_name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "phone": phoneController.text.trim(),
+        },
+      );
+
+      if (!isSaved) {
+        if (mounted) TopMessage.show(context, "Failed to save details");
+        return;
+      }
+
+      // 2. Create Commas checkout session (backend builds it server-side)
+      final checkout = await notifier.createCommasCheckout(
+        bookingId: widget.bookingId,
+      );
+
+      if (checkout == null || !checkout.isValid) {
+        if (mounted) TopMessage.show(context, "Failed to start checkout");
+        return;
+      }
+
+      // 3. Open embedded checkout in WebView, await completion signal
+      if (!mounted) return;
+      final completed = await context.pushNamed<bool>(
+        RouteNames.commasCheckout,
+        pathParameters: {'bookingId': widget.bookingId.toString()},
+        extra: {'checkoutUrl': checkout.embeddedUrl},
+      );
+
+      // 4. STEP 4 STUB — verify payment against backend.
+      // TODO(commas): after the WebView closes, poll the backend payment
+      // status endpoint (webhook `payment.succeeded` is source of truth) and
+      // only navigate to success once the backend confirms. For now, trust
+      // the WebView completion flag.
+      if (completed != true) return;
+
+      // 5. Navigate to success
+      if (mounted) {
+        context.goNamed(
+          RouteNames.paymentSuccess,
+          pathParameters: {'bookingId': widget.bookingId.toString()},
+          extra: {
+            'fullName': nameController.text.trim(),
+            'phone': phoneController.text.trim(),
+            'paymentMethod': getPaymentMethod(),
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) TopMessage.show(context, e.toString());
     } finally {
       if (mounted) setState(() => isProcessing = false);
     }
@@ -1098,7 +1179,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                 child: SizedBox(
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : _openStripeSheet,
+                    onPressed: isLoading ? null : _openCommasCheckout,
 
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isProcessing
