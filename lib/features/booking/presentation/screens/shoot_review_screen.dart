@@ -318,7 +318,6 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
 
       // 3. Open embedded checkout in WebView, await redirect outcome
       if (!mounted) return;
-      debugPrint("🔗 [Commas Checkout URL]: ${checkout.embeddedUrl}");
       final result = await context.pushNamed<CommasCheckoutResult>(
         RouteNames.commasCheckout,
         pathParameters: {'bookingId': widget.bookingId.toString()},
