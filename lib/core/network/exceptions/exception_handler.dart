@@ -26,6 +26,9 @@ abstract class ExceptionHandler {
 
   /// Maps [DioException] to our custom [AppException].
   /// Public so interceptors can reuse this logic.
+  static AppException mapDioException(DioException error, [StackTrace? st]) =>
+      mapDioError(error);
+
   static AppException mapDioError(DioException error) {
     if (error.error is AppException) {
       return error.error as AppException;

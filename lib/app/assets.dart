@@ -99,6 +99,9 @@ class AppAssets {
   static const String eyeClosed = '$_svg/eyes2.svg';
   static const String imagePlaceholder = '$_svg/image_placeholder.svg';
   static const String arrow_right_ = '$_svg/arrow_right_.svg';
+  static const String icFolder = '$_svg/ic_folder.svg';
+  static const String icLink = '$_svg/ic_link.svg';
+  static const String icUnlink = '$_svg/ic_unlink.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Features & Booking
