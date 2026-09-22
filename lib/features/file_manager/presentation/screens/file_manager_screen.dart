@@ -15,7 +15,6 @@ import '../providers/node_action_notifier.dart';
 import '../providers/node_action_state.dart';
 import '../routes/file_manager_args.dart';
 import '../widgets/fm_actions_sheet.dart';
-import '../widgets/fm_delete_confirm_dialog.dart';
 import '../widgets/fm_share_sheet.dart';
 import '../widgets/fm_empty_view.dart';
 import '../widgets/fm_error_view.dart';
@@ -59,18 +58,6 @@ class FileManagerScreen extends ConsumerWidget {
           trackingKey: folderPath,
           externalId: folder.id,
         );
-      case FmNodeAction.delete:
-        final ok = await showFmDeleteConfirmDialog(
-          context,
-          title: 'Delete folder?',
-          message: 'This will permanently delete "${folder.name}" and all its '
-              'contents. This cannot be undone.',
-        );
-        if (ok != true || !context.mounted) return;
-        final deleted = await actions.delete(filepath: folderPath);
-        if (deleted) {
-          ref.invalidate(fileManagerRootNotifierProvider);
-        }
     }
   }
 
@@ -124,10 +111,7 @@ class FileManagerScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.base),
-            FmTabBar(
-              selected: state.tab,
-              onChanged: notifier.selectTab,
-            ),
+            FmTabBar(selected: state.tab, onChanged: notifier.selectTab),
             const SizedBox(height: AppSpacing.sm),
             Expanded(
               child: _Body(

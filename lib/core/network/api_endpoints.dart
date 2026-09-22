@@ -93,6 +93,8 @@ abstract class ApiEndpoints {
       'file-manager/files/$id/download';
   static const String fileManagerShare = 'file-manager/share';
 
+  static const String fmWorkspaceAccess =
+      'external-file-manager/workspace-access';
   static const String fmWorkspaces = 'external-file-manager/workspaces';
   static String fmWorkspace(String extId) =>
       'external-file-manager/workspace/$extId';

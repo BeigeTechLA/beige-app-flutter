@@ -24,7 +24,6 @@ import '../providers/node_action_notifier.dart';
 import '../providers/node_action_state.dart';
 import '../routes/file_manager_args.dart';
 import '../widgets/fm_actions_sheet.dart';
-import '../widgets/fm_delete_confirm_dialog.dart';
 import '../widgets/fm_share_sheet.dart';
 import '../widgets/fm_empty_view.dart';
 import '../widgets/fm_error_view.dart';
@@ -49,7 +48,8 @@ class FolderContentsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<FolderContentsScreen> createState() => _FolderContentsScreenState();
+  ConsumerState<FolderContentsScreen> createState() =>
+      _FolderContentsScreenState();
 }
 
 class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
@@ -113,18 +113,6 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
           phase: key.phase,
           path: key.path.isEmpty ? null : key.path,
         );
-      case FmNodeAction.delete:
-        final ok = await showFmDeleteConfirmDialog(
-          context,
-          title: 'Delete folder?',
-          message: 'This will permanently delete "${folder.name}" and all its '
-              'contents. This cannot be undone.',
-        );
-        if (ok != true || !context.mounted) return;
-        final deleted = await actions.delete(filepath: folderPath);
-        if (deleted) {
-          ref.invalidate(folderContentsNotifierProvider(widget.folderKey));
-        }
     }
   }
 
@@ -160,18 +148,6 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
         await actions.shareFile(filepath: filepath, subject: file.name);
       case FmNodeAction.download:
         await actions.downloadFile(filepath);
-      case FmNodeAction.delete:
-        final ok = await showFmDeleteConfirmDialog(
-          context,
-          title: 'Delete file?',
-          message: 'This will permanently delete "${file.name}". '
-              'This cannot be undone.',
-        );
-        if (ok != true || !context.mounted) return;
-        final deleted = await actions.delete(filepath: filepath);
-        if (deleted) {
-          ref.invalidate(folderContentsNotifierProvider(widget.folderKey));
-        }
     }
   }
 
@@ -226,20 +202,24 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
     // Scan existing `VersionN` folders to pick the next N.
     var maxN = 0;
     for (final n in state.items.whereType<FmFolder>()) {
-      final m = RegExp(r'^Version(\d+)$', caseSensitive: false)
-          .firstMatch(n.name.trim());
+      final m = RegExp(
+        r'^Version(\d+)$',
+        caseSensitive: false,
+      ).firstMatch(n.name.trim());
       final v = m == null ? null : int.tryParse(m.group(1)!);
       if (v != null && v > maxN) maxN = v;
     }
     final nextName = 'Version${maxN + 1}';
 
     try {
-      await ref.read(folderBrowseRepositoryProvider).createFolder(
-        externalId: widget.folderKey.externalId,
-        phase: widget.folderKey.phase,
-        path: widget.folderKey.path,
-        folderName: nextName,
-      );
+      await ref
+          .read(folderBrowseRepositoryProvider)
+          .createFolder(
+            externalId: widget.folderKey.externalId,
+            phase: widget.folderKey.phase,
+            path: widget.folderKey.path,
+            folderName: nextName,
+          );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -304,7 +284,8 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
       RouteNames.filesSuccess,
       extra: <String, dynamic>{
         'title': 'Edits Request Sent',
-        'message': 'Your request for editing $count raw footage files has been sent to the production team.',
+        'message':
+            'Your request for editing $count raw footage files has been sent to the production team.',
         'ctaText': 'Open Edit Folder',
         'onCtaPressed': () {
           _toggleMultiSelectMode();
@@ -317,7 +298,9 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(folderContentsNotifierProvider(widget.folderKey));
-    final notifier = ref.read(folderContentsNotifierProvider(widget.folderKey).notifier);
+    final notifier = ref.read(
+      folderContentsNotifierProvider(widget.folderKey).notifier,
+    );
 
     ref.listen<FmActionSignal?>(
       nodeActionNotifierProvider.select((s) => s.lastSignal),
@@ -360,22 +343,33 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
                   const SizedBox(width: AppSpacing.sm),
                   Container(
                     height: 48,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceInput,
                       borderRadius: AppRadii.lgAll,
-                      border: Border.all(color: AppColors.dividerDark, width: 0.5),
+                      border: Border.all(
+                        color: AppColors.dividerDark,
+                        width: 0.5,
+                      ),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedVersionFilter,
                         dropdownColor: AppColors.surfaceInput,
-                        icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-                        items: _getVersionOptions(state.items).map((v) => DropdownMenuItem(
-                          value: v,
-                          child: Text(v),
-                        )).toList(),
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: AppColors.primary,
+                        ),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                        items: _getVersionOptions(state.items)
+                            .map(
+                              (v) => DropdownMenuItem(value: v, child: Text(v)),
+                            )
+                            .toList(),
                         onChanged: (val) {
                           setState(() {
                             _selectedVersionFilter = val ?? 'All';
@@ -419,8 +413,8 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
                   onPressed: _isMultiSelectMode
                       ? (_selectedFileIds.isEmpty ? null : _onRequestEdits)
                       : (_isRevisionsFolder
-                          ? _createNextVersionFolder
-                          : () => FmUploadSheet.show(
+                            ? _createNextVersionFolder
+                            : () => FmUploadSheet.show(
                                 context,
                                 widget.folderKey,
                                 widget.title,
@@ -428,13 +422,19 @@ class _FolderContentsScreenState extends ConsumerState<FolderContentsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.disabled,
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.md,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: Text(
                     _isMultiSelectMode
                         ? 'Request Edits (${_selectedFileIds.length})'
-                        : (_isRevisionsFolder ? 'Create Folder' : 'Upload Files'),
+                        : (_isRevisionsFolder
+                              ? 'Create Folder'
+                              : 'Upload Files'),
                     style: AppTextStyles.labelLarge.copyWith(
                       color: _isMultiSelectMode && _selectedFileIds.isEmpty
                           ? AppColors.textTertiary
@@ -578,7 +578,9 @@ class _FolderHeader extends StatelessWidget {
               ),
               padding: EdgeInsets.zero,
               icon: Icon(
-                isMultiSelectMode ? Icons.cancel_outlined : Icons.checklist_outlined,
+                isMultiSelectMode
+                    ? Icons.cancel_outlined
+                    : Icons.checklist_outlined,
                 color: AppColors.primary,
                 size: 24,
               ),
