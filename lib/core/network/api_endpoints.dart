@@ -83,6 +83,58 @@ abstract class ApiEndpoints {
   /// user's RSVP. Backend route name unconfirmed; swap if backend rejects.
   static String meetingRespond(String id) => 'external-meetings/$id/respond';
 
+  // ───── File Manager (FM7 real endpoints) ────────────────────────────────
+  static const String fileManagerRoot = 'file-manager/root';
+  static String fileManagerFolder(String id) => 'file-manager/folders/$id';
+  static String fileManagerFolderDelete(String id) =>
+      'file-manager/folders/$id';
+  static String fileManagerFileDelete(String id) => 'file-manager/files/$id';
+  static String fileManagerFileDownload(String id) =>
+      'file-manager/files/$id/download';
+  static const String fileManagerShare = 'file-manager/share';
+
+  static const String fmWorkspaceAccess =
+      'external-file-manager/workspace-access';
+  static const String fmWorkspaces = 'external-file-manager/workspaces';
+  static String fmWorkspace(String extId) =>
+      'external-file-manager/workspace/$extId';
+  static String fmWorkspaceFiles(String extId) =>
+      'external-file-manager/workspace/$extId/files';
+  static const String fmFolder = 'external-file-manager/folder';
+  static const String fmFolderDownloadUrl =
+      'external-file-manager/folder-download-url';
+  static const String fmUploadPolicies =
+      'external-file-manager/upload-policies/batch';
+  static const String fmFilesUploaded =
+      'external-file-manager/files-uploaded/batch';
+  static const String fmFileViewUrl = 'external-file-manager/file-view-url';
+  static const String fmFileDownloadUrl =
+      'external-file-manager/file-download-url';
+  static const String fmDelete = 'external-file-manager/delete';
+  static const String fmCopyFiles = 'external-file-manager/copy-files';
+  static const String fmRevisionReview =
+      'external-file-manager/revision-file/review';
+  static const String fmShare = 'external-file-manager/share';
+  static const String fmShareAccessLogs =
+      'external-file-manager/share/access-logs';
+  static const String fmShareRequestOtp =
+      'external-file-manager/share/request-otp';
+  static const String fmShareVerifyOtp =
+      'external-file-manager/share/verify-otp';
+  static String fmShareContent(String token) =>
+      'external-file-manager/share/$token/content';
+  static String fmShareViewUrl(String token) =>
+      'external-file-manager/share/$token/view-url';
+  static String fmShareDownloadUrl(String token) =>
+      'external-file-manager/share/$token/download-url';
+  static const String comments = 'comments';
+  static String commentReply(String id) => 'comments/$id/reply';
+  static String commentById(String id) => 'comments/$id';
+  static String fmCommonEvent(String extId) =>
+      'external-file-manager/common-events/$extId';
+  static String fmCommonEventCreatorFolder(String extId) =>
+      'external-file-manager/common-events/$extId/creator-folder';
+
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";
   static const String registerCrewRoles = "auth/crew-roles";

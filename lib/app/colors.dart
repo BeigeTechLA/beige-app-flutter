@@ -251,6 +251,12 @@ class AppColors {
   /// Abyss dark
   static const Color surfaceAbyss = Color(0xFF111111);
 
+  /// 0xFFCDC5C5 — Light grey text/metadata
+  static const Color lightGrey = Color(0xFFCDC5C5);
+
+  /// 0xFFC8E1FF — Soft light blue
+  static const Color softLightBlue = Color(0xFFC8E1FF);
+
   /// Grey 200 — light platform UI (image picker, sheets)
   static const Color greyShade200 = Color(0xFFEEEEEE);
 
