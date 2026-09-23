@@ -42,6 +42,7 @@ abstract class RouteNames {
   static const selectDreamTeam = 'select_dream_team';
   static const reviewConfirm = 'review_confirm';
   static const commasCheckout = 'commas_checkout';
+  static const paymentFailed = 'payment_failed';
   static const paymentSuccess = 'payment_success';
 
   // Booking Management

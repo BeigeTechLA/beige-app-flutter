@@ -28,6 +28,7 @@ import '../features/booking/presentation/screens/crew_selection_screen.dart';
 import '../features/booking/presentation/screens/crew_size_matching_screen.dart';
 import '../features/booking/presentation/screens/payment_method_screen.dart';
 import '../features/booking/presentation/screens/payment_success_screen.dart';
+import '../features/booking/presentation/screens/payment_failed_screen.dart';
 import '../features/booking/presentation/screens/shoot_date_time_screen.dart';
 import '../features/booking/presentation/screens/shoot_details_screen.dart';
 import '../features/booking/presentation/screens/shoot_review_screen.dart';
@@ -545,6 +546,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/payment-failed',
+        name: RouteNames.paymentFailed,
+        builder: (context, state) => const PaymentFailedScreen(),
+      ),
+      GoRoute(
         path: '/payment-success/:bookingId',
         name: RouteNames.paymentSuccess,
         builder: (context, state) {
@@ -726,10 +732,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/edit-profile',
         name: RouteNames.editProfile,
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const EditProfileScreen(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const EditProfileScreen()),
       ),
       GoRoute(
         path: '/change-password',

@@ -90,7 +90,7 @@ class _CommasCheckoutScreenState extends ConsumerState<CommasCheckoutScreen> {
         });
       },
       onPaid: () => _finish(CommasCheckoutResult.success),
-    )..start();
+    )..start()
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(AppColors.background)

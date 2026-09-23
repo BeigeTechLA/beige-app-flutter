@@ -324,9 +324,9 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         extra: {'checkoutUrl': checkout.embeddedUrl},
       );
 
-      // Commas failure callback — show failed, let user retry.
+      // Commas failure callback — show the payment failure page.
       if (result == CommasCheckoutResult.failed) {
-        if (mounted) TopMessage.show(context, "Payment failed. Please retry.");
+        if (mounted) context.goNamed(RouteNames.paymentFailed);
         return;
       }
       // User dismissed the WebView without completing.
@@ -352,7 +352,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
       }
 
       if (status == CommasPaymentStatus.failed) {
-        if (mounted) TopMessage.show(context, "Payment failed");
+        if (mounted) context.goNamed(RouteNames.paymentFailed);
         return;
       }
       if (status == CommasPaymentStatus.pending) {

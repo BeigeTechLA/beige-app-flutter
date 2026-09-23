@@ -282,6 +282,7 @@ class AppAssets {
   static const String lottieLoader = '$_lottie/loader.json';
   static const String lottieCircleLoader = '$_lottie/circleLoader.json';
   static const String lottieSpinner = '$_lottie/loading_spinner.json';
+  static const String lottieFailed = '$_lottie/failed_animation.json';
   static const String lottieSuccess = '$_lottie/success_animation.json';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
