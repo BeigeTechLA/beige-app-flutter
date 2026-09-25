@@ -14,16 +14,27 @@ import '../../firebase_options.dart';
 import '../firebase/crashlytics_service.dart';
 import 'notification_payload.dart';
 
+/// Logs the full SDK payload, including notification details and custom data.
+void _logRemoteMessage(String event, RemoteMessage message) {
+  if (!kDebugMode) return;
+
+  final details = <String, dynamic>{
+    'event': event,
+    'payload': message.toMap(),
+  };
+  for (final line in const JsonEncoder.withIndent('  ').convert(details).split('\n')) {
+    debugPrint('[PushNotificationService] $line', wrapWidth: 1000);
+  }
+}
+
 /// Top-level background message handler required by Firebase Messaging.
 /// Must be annotated with `@pragma('vm:entry-point')`.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  _logRemoteMessage('background_received', message);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if (kDebugMode) {
-    debugPrint('[PushNotificationService] Background message received: ${message.messageId}');
-  }
 }
 
 class PushNotificationService {
@@ -112,26 +123,20 @@ class PushNotificationService {
       // Handle initial notification tap if launched from terminated state
       final initialMessage = await _fcm.getInitialMessage();
       if (initialMessage != null) {
-        if (kDebugMode) {
-          debugPrint('[PushNotificationService] App launched from terminated state via notification: ${initialMessage.data}');
-        }
+        _logRemoteMessage('terminated_notification_opened', initialMessage);
         _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
       }
 
       // Handle background notification taps when app is resumed
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        if (kDebugMode) {
-          debugPrint('[PushNotificationService] Notification opened from background: ${message.data}');
-        }
+        _logRemoteMessage('background_notification_opened', message);
         final payload = NotificationPayload.fromRemoteMessage(message);
         handleNotificationClick(payload);
       });
 
       // Handle foreground notifications
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        if (kDebugMode) {
-          debugPrint('[PushNotificationService] Foreground notification received: ${message.notification?.title}');
-        }
+        _logRemoteMessage('foreground_received', message);
         _showForegroundNotification(message);
       });
 
