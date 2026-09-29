@@ -6,8 +6,6 @@ class AuthInterceptor extends QueuedInterceptor {
   final Future<String?> Function() getToken;
   final Future<void> Function()? onUnauthorized;
 
-  bool _handlingUnauthorized = false;
-
   AuthInterceptor({required this.getToken, this.onUnauthorized});
 
   @override
@@ -30,20 +28,27 @@ class AuthInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
-    final hadToken = err.requestOptions.extra['_hadAuthToken'] == true;
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
+    await _handleSessionError(response.data, response.requestOptions);
+    handler.next(response);
+  }
 
-    if (err.response?.statusCode == 401 &&
-        hadToken &&
-        onUnauthorized != null &&
-        !_handlingUnauthorized) {
-      _handlingUnauthorized = true;
-      try {
-        await onUnauthorized!();
-      } finally {
-        _handlingUnauthorized = false;
-      }
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    await _handleSessionError(err.response?.data, err.requestOptions);
+    handler.next(err);
+  }
+
+  Future<void> _handleSessionError(dynamic data, RequestOptions request) async {
+    final code = data is Map ? data['code']?.toString().toUpperCase() : null;
+    final sessionInvalid = code == 'SESSION_EXPIRED' || code == 'TOKEN_INVALID';
+    final hadToken = request.extra['_hadAuthToken'] == true;
+
+    // HTTP status alone (including 401) must never invalidate the session.
+    // Concurrent expiries are de-duplicated downstream by
+    // `AuthStateNotifier.expireSession` (one shared cleanup future).
+    if (sessionInvalid && hadToken && onUnauthorized != null) {
+      await onUnauthorized!();
     }
-    return handler.next(err);
   }
 }

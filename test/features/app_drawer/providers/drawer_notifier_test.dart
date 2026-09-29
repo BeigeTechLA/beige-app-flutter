@@ -28,14 +28,14 @@ void main() {
         expect(firstUser['email'], 'one@example.com');
 
         await prefs.clear();
-        container.read(authStateProvider.notifier).updateState(false);
+        await container.read(authStateProvider.notifier).logout();
 
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('user_id', '2');
         await prefs.setString('name', 'User Two');
         await prefs.setString('email', 'two@example.com');
         await prefs.setString('profile_image_url', 'user-two.jpg');
-        container.read(authStateProvider.notifier).updateState(true);
+        container.read(authStateProvider.notifier).markLoggedIn();
 
         final secondUser = await container.read(drawerUserProvider.future);
         expect(secondUser['name'], 'User Two');

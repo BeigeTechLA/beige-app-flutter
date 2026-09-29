@@ -1,15 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../app/navigator_key.dart';
-import '../../app/route_names.dart';
 import '../../config/env.dart';
-import '../firebase/crashlytics_service.dart';
 import '../network/dio_client.dart';
 import '../session/session_store.dart';
 import '../storage/secure_token_storage.dart';
-import '../utils/shared_service.dart';
 import 'auth_state_provider.dart';
 
 /// Provider for SharedPreferences instance.
@@ -33,27 +28,11 @@ final sessionStoreProvider = Provider<SessionStore>(
 final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient(
     getToken: () => SecureTokenStorage.read(),
-    onUnauthorized: () async {
-      // Token rejected by server (expired / revoked / stale after app update).
-      // Clear local session, flip auth state, force user to login.
-      await SharedService.logout();
-      CrashlyticsService.clearUserContext();
-
-      if (ref.read(authStateProvider)) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
-
-      final ctx = rootNavigatorKey.currentContext;
-      if (ctx == null) return;
-      // ignore: use_build_context_synchronously
-      final router = GoRouter.of(ctx);
-      final currentLocation =
-          router.routerDelegate.currentConfiguration.uri.path;
-      if (currentLocation != '/login') {
-        // ignore: use_build_context_synchronously
-        ctx.goNamed(RouteNames.login);
-      }
-    },
+    // Token rejected by server (expired / revoked / stale after app update).
+    // Shared session-expiry path: clears local session and flips auth state.
+    // The router observes auth state and redirects to Login.
+    onUnauthorized: () =>
+        ref.read(authStateProvider.notifier).expireSession(),
     isDevelopment: Env.current == Environment.dev,
   );
 });
