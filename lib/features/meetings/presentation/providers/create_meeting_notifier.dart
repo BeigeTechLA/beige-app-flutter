@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/session/session_store.dart';
 import '../../../booking/presentation/providers/booking_providers.dart';
@@ -240,9 +239,6 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
         status: CreateMeetingSubmitStatus.error,
         error: _messageFor(err),
       );
-      if (err is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_type.dart';
 import '../../domain/models/update_meeting_input.dart';
@@ -32,9 +31,6 @@ class EditMeetingNotifier
         status: EditMeetingStatus.loadError,
         error: _messageFor(err),
       );
-      if (err is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -74,9 +70,6 @@ class EditMeetingNotifier
         status: EditMeetingStatus.submitError,
         error: _messageFor(err),
       );
-      if (err is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 

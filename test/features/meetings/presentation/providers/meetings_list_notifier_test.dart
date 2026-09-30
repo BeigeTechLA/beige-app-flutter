@@ -129,7 +129,7 @@ void main() {
     expect(state.items.map((m) => m.id), ['a', 'b']);
   });
 
-  test('UnauthorizedException flips auth state to false', () async {
+  test('UnauthorizedException preserves auth state', () async {
     final repo = _FakeRepo(
       throws: const UnauthorizedException(message: 'expired'),
     );
@@ -144,7 +144,7 @@ void main() {
     final state = container.read(meetingsListNotifierProvider);
     expect(state.status, MeetingsListStatus.error);
     expect(state.error, 'expired');
-    expect(container.read(authStateProvider), false);
+    expect(container.read(authStateProvider), true);
   });
 
   test(
@@ -258,7 +258,7 @@ void main() {
     expect(container.read(meetingsListNotifierProvider).rsvpError, isNull);
   });
 
-  test('respond UnauthorizedException flips auth state to false', () async {
+  test('respond UnauthorizedException preserves auth state', () async {
     final repo = _FakeRepo(
       items: [_m('a')],
       respondThrows: const UnauthorizedException(message: 'expired'),
@@ -272,6 +272,6 @@ void main() {
     final notifier = container.read(meetingsListNotifierProvider.notifier);
     await notifier.respond('a', MeetingResponse.accepted);
 
-    expect(container.read(authStateProvider), false);
+    expect(container.read(authStateProvider), true);
   });
 }
