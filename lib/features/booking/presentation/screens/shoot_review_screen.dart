@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/shared/widgets/app_text_field.dart';
 import 'package:beige/features/booking/presentation/providers/booking_review_notifier.dart';
+import 'package:beige/features/booking/presentation/screens/commas_checkout_screen.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
 import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/core/network/api_endpoints.dart';
@@ -148,6 +149,8 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
         .toDouble();
   }
 
+  // Retained for reference — Commas checkout (_openCommasCheckout) is active.
+  // ignore: unused_element
   Future<void> _openStripeSheet() async {
     if (isProcessing) return;
 
@@ -256,6 +259,131 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
     }
   }
 
+  /// Commas (Fanbasis) embedded checkout flow — opens hosted checkout in a
+  /// WebView, then re-verifies against the backend before showing success.
+  Future<void> _openCommasCheckout() async {
+    if (isProcessing) return;
+
+    if (nameController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty) {
+      TopMessage.show(context, "Please fill required fields");
+      return;
+    }
+
+    setState(() => isProcessing = true);
+
+    final notifier = ref.read(
+      bookingReviewNotifierProvider(widget.bookingId).notifier,
+    );
+
+    try {
+      // 1. Save contact info
+      final isSaved = await notifier.savePaymentInfo(
+        bookingId: widget.bookingId,
+        data: {
+          "payment_method": "commas",
+          "full_name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "phone": phoneController.text.trim(),
+        },
+      );
+
+      if (!isSaved) {
+        final err = ref.read(bookingReviewNotifierProvider(widget.bookingId)).errorMessage;
+        if (mounted) TopMessage.show(context, err ?? "Failed to save details");
+        return;
+      }
+
+      // 2. Create Commas checkout session (backend builds it server-side)
+      final checkout = await notifier.createCommasCheckout(
+        bookingId: widget.bookingId,
+      );
+
+      if (checkout == null) {
+        final err = ref.read(bookingReviewNotifierProvider(widget.bookingId)).errorMessage;
+        if (mounted) TopMessage.show(context, err ?? "Failed to start checkout");
+        return;
+      }
+
+      if (!checkout.isValid) {
+        if (mounted) {
+          TopMessage.show(
+            context,
+            "Incomplete checkout session details received from server",
+          );
+        }
+        return;
+      }
+
+      // 3. Open embedded checkout in WebView, await redirect outcome
+      if (!mounted) return;
+      final result = await context.pushNamed<CommasCheckoutResult>(
+        RouteNames.commasCheckout,
+        pathParameters: {'bookingId': widget.bookingId.toString()},
+        extra: {'checkoutUrl': checkout.embeddedUrl},
+      );
+
+      // Commas failure callback — show the payment failure page.
+      if (result == CommasCheckoutResult.failed) {
+        if (mounted) context.goNamed(RouteNames.paymentFailed);
+        return;
+      }
+      // User dismissed the WebView without completing.
+      if (result != CommasCheckoutResult.success) return;
+
+      // 4. Verify against backend — webhook (`payment.succeeded`) is the
+      // trusted source. Poll summary-details; retry a few times while pending
+      // to let the webhook land.
+      const maxAttempts = 5;
+      const retryDelay = Duration(seconds: 3);
+      CommasPaymentStatus status = CommasPaymentStatus.pending;
+
+      for (var attempt = 0; attempt < maxAttempts; attempt++) {
+        status = await notifier.checkCommasPaymentStatus(
+          bookingId: widget.bookingId,
+        );
+        if (status != CommasPaymentStatus.pending) break;
+        if (attempt == 0 && mounted) {
+          TopMessage.show(context, "Payment confirmation in progress…");
+        }
+        await Future.delayed(retryDelay);
+        if (!mounted) return;
+      }
+
+      if (status == CommasPaymentStatus.failed) {
+        if (mounted) context.goNamed(RouteNames.paymentFailed);
+        return;
+      }
+      if (status == CommasPaymentStatus.pending) {
+        if (mounted) {
+          TopMessage.show(
+            context,
+            "Still confirming your payment. Check My Shoots shortly.",
+          );
+        }
+        return;
+      }
+
+      // 5. Paid — navigate to success
+      if (mounted) {
+        context.goNamed(
+          RouteNames.paymentSuccess,
+          pathParameters: {'bookingId': widget.bookingId.toString()},
+          extra: {
+            'fullName': nameController.text.trim(),
+            'phone': phoneController.text.trim(),
+            'paymentMethod': getPaymentMethod(),
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) TopMessage.show(context, e.toString());
+    } finally {
+      if (mounted) setState(() => isProcessing = false);
+    }
+  }
+
   String getContentTypeTitle(dynamic value) {
     if (value is int) {
       return _contentTypeLabelForId(value);
@@ -302,14 +430,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
   }
 
   String getPaymentMethod() {
-    switch (selectedIndex) {
-      case 0:
-        return "1"; // Card
-      case 1:
-        return "2"; // Stripe
-      default:
-        return "1";
-    }
+    return "commas";
   }
 
   @override
@@ -1098,7 +1219,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                 child: SizedBox(
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : _openStripeSheet,
+                    onPressed: isLoading ? null : _openCommasCheckout,
 
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isProcessing

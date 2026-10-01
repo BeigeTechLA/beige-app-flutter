@@ -99,6 +99,9 @@ class AppAssets {
   static const String eyeClosed = '$_svg/eyes2.svg';
   static const String imagePlaceholder = '$_svg/image_placeholder.svg';
   static const String arrow_right_ = '$_svg/arrow_right_.svg';
+  static const String icFolder = '$_svg/ic_folder.svg';
+  static const String icLink = '$_svg/ic_link.svg';
+  static const String icUnlink = '$_svg/ic_unlink.svg';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Features & Booking
@@ -282,6 +285,7 @@ class AppAssets {
   static const String lottieLoader = '$_lottie/loader.json';
   static const String lottieCircleLoader = '$_lottie/circleLoader.json';
   static const String lottieSpinner = '$_lottie/loading_spinner.json';
+  static const String lottieFailed = '$_lottie/failed_animation.json';
   static const String lottieSuccess = '$_lottie/success_animation.json';
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

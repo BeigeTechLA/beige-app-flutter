@@ -7,14 +7,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
-import 'package:beige/core/utils/shared_service.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
-import 'package:beige/core/firebase/analytics_events.dart';
-import 'package:beige/core/firebase/analytics_service.dart';
-import 'package:beige/core/firebase/crashlytics_service.dart';
 import 'package:beige/core/utils/image_url_utils.dart';
 import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
@@ -484,11 +480,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        AnalyticsService.logEvent(AnalyticsEvents.logout);
-                        CrashlyticsService.clearUserContext();
-                        await SharedService.logout();
+                        await ref.read(authStateProvider.notifier).logout();
                         if (!mounted) return;
-                        ref.read(authStateProvider.notifier).updateState(false);
                         context.goNamed(RouteNames.login);
                       },
                       style: ElevatedButton.styleFrom(

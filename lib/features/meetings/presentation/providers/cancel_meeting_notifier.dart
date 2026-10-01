@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../domain/repositories/meetings_repository.dart';
 import 'meetings_repository_provider.dart';
 
@@ -57,9 +56,6 @@ class CancelMeetingNotifier
         status: CancelMeetingStatus.error,
         error: _messageFor(err),
       );
-      if (err is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 

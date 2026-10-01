@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/env.dart';
 import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../domain/entities/message.dart';
 import '../../domain/entities/participant.dart';
@@ -275,9 +274,6 @@ class ChatThreadNotifier
         isLoading: false,
         errorMessage: 'Failed to load messages',
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -399,9 +395,6 @@ class ChatThreadNotifier
         ],
         errorMessage: 'Could not add reaction',
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -523,9 +516,6 @@ class ChatThreadNotifier
         ],
         errorMessage: 'Could not send message',
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -551,9 +541,6 @@ class ChatThreadNotifier
     } catch (e, st) {
       // Read receipts are best-effort — never bubble to UI.
       debugPrint('Mark read failed: $e\n$st');
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -627,9 +614,6 @@ class ChatThreadNotifier
         ],
         errorMessage: 'Could not send attachment',
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -647,9 +631,6 @@ class ChatThreadNotifier
     } catch (e, st) {
       debugPrint('Send audio failed: $e\n$st');
       state = state.copyWith(errorMessage: 'Could not send voice note');
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 

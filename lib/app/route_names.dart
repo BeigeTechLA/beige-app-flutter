@@ -19,6 +19,8 @@ abstract class RouteNames {
   static const myShoots = 'my_shoots';
   static const messages = 'messages';
   static const fileManager = 'file_manager';
+  static const filesFolder = 'files_folder';
+  static const filesSuccess = 'files_success';
   static const meetings = 'meetings';
   static const meetingCreate = 'meeting_create';
   static const meetingEdit = 'meeting_edit';
@@ -41,6 +43,8 @@ abstract class RouteNames {
   static const crewSizeMatching = 'crew_size_matching';
   static const selectDreamTeam = 'select_dream_team';
   static const reviewConfirm = 'review_confirm';
+  static const commasCheckout = 'commas_checkout';
+  static const paymentFailed = 'payment_failed';
   static const paymentSuccess = 'payment_success';
 
   // Booking Management

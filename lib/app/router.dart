@@ -17,7 +17,9 @@ import '../features/shoot/presentation/screens/shoot_edit_review_screen.dart';
 import '../features/shoot/presentation/screens/shoot_summary_screen.dart';
 import '../features/shoot/presentation/screens/shoot_type_selection_screen.dart';
 import '../features/shoot/presentation/screens/shoot_update_success_screen.dart';
+import '../features/booking/presentation/screens/commas_checkout_screen.dart';
 import '../features/booking/presentation/screens/content_type_screen.dart';
+import '../features/file_manager/presentation/routes/file_manager_routes.dart';
 import '../features/file_manager/presentation/screens/file_manager_screen.dart';
 import '../features/meetings/presentation/screens/create_meeting_screen.dart';
 import '../features/meetings/presentation/screens/edit_meeting_screen.dart';
@@ -27,6 +29,7 @@ import '../features/booking/presentation/screens/crew_selection_screen.dart';
 import '../features/booking/presentation/screens/crew_size_matching_screen.dart';
 import '../features/booking/presentation/screens/payment_method_screen.dart';
 import '../features/booking/presentation/screens/payment_success_screen.dart';
+import '../features/booking/presentation/screens/payment_failed_screen.dart';
 import '../features/booking/presentation/screens/shoot_date_time_screen.dart';
 import '../features/booking/presentation/screens/shoot_details_screen.dart';
 import '../features/booking/presentation/screens/shoot_review_screen.dart';
@@ -532,6 +535,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/commas-checkout/:bookingId',
+        name: RouteNames.commasCheckout,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          final data = state.extra as Map<String, dynamic>? ?? {};
+          return CommasCheckoutScreen(
+            bookingId: bookingId,
+            checkoutUrl: data['checkoutUrl'] as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/payment-failed',
+        name: RouteNames.paymentFailed,
+        builder: (context, state) => const PaymentFailedScreen(),
+      ),
+      GoRoute(
         path: '/payment-success/:bookingId',
         name: RouteNames.paymentSuccess,
         builder: (context, state) {
@@ -713,10 +733,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: '/edit-profile',
         name: RouteNames.editProfile,
-        pageBuilder: (context, state) => MaterialPage(
-          key: state.pageKey,
-          child: const EditProfileScreen(),
-        ),
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const EditProfileScreen()),
       ),
       GoRoute(
         path: '/change-password',
@@ -778,6 +796,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.fileManager,
         builder: (context, state) => const FileManagerScreen(),
       ),
+      ...fileManagerRoutes,
 
       GoRoute(
         path: '/meetings',

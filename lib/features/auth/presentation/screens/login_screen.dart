@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,13 +84,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       emailController.text = savedEmail;
       passwordController.text = savedPassword;
       setState(() => savePassword = true);
+      return;
+    }
+
+    if (kDebugMode) {
+      emailController.text = 'pranav+RPclientSmeet@revurge.com';
+      passwordController.text = 'password1';
+      setState(() {});
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _loadSavedCredentials();
+    if (kDebugMode) {
+      // Prefill development credentials only in debug builds.
+      emailController.text = 'pranav+RPclientSmeet@revurge.com';
+      passwordController.text = 'password1';
+    } else {
+      _loadSavedCredentials();
+    }
     emailController.addListener(_updateUI);
     passwordController.addListener(_updateUI);
   }

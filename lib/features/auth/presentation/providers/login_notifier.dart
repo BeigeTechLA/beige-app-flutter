@@ -61,7 +61,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
         }
 
         // Update auth state & clear guest flag.
-        ref.read(authStateProvider.notifier).updateState(true);
+        ref.read(authStateProvider.notifier).markLoggedIn();
         ref.read(guestModeProvider.notifier).exit();
 
         // Analytics & Crashlytics
