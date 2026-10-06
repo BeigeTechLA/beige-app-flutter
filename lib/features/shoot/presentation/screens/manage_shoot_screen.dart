@@ -27,6 +27,8 @@ class ManageShootScreen extends ConsumerStatefulWidget {
   final List<dynamic>? multiDays;
 
   final String? imageUrl;
+  final bool isDeferred;
+
   const ManageShootScreen({
     super.key,
     required this.bookingId,
@@ -40,6 +42,7 @@ class ManageShootScreen extends ConsumerStatefulWidget {
     this.contentType,
     required this.shootTypeId,
     this.multiDays,
+    this.isDeferred = false,
   });
 
   @override
@@ -310,17 +313,31 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                 }),
                               ] else ...[
                                 /// 🟢 SINGLE DAY
-                                infoRowBlack(
-                                  AppAssets.calendarDate,
-                                  DateTimeUtils.formatDate(widget.eventDate),
-                                ),
-
-                                const SizedBox(height: 8),
-                                infoRowBlack(
-                                  AppAssets.clock,
-                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
-                                  "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
-                                ),
+                                if (widget.isDeferred ||
+                                    widget.eventDate == null ||
+                                    widget.eventDate!.trim().isEmpty ||
+                                    widget.eventDate == '--') ...[
+                                  infoRowBlack(
+                                    AppAssets.calendarDate,
+                                    "Date To Be Decided",
+                                  ),
+                                  const SizedBox(height: 8),
+                                  infoRowBlack(
+                                    AppAssets.clock,
+                                    "Choose your date within 30 days",
+                                  ),
+                                ] else ...[
+                                  infoRowBlack(
+                                    AppAssets.calendarDate,
+                                    DateTimeUtils.formatDate(widget.eventDate),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  infoRowBlack(
+                                    AppAssets.clock,
+                                    "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
+                                    "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
+                                  ),
+                                ],
                               ],
                               const SizedBox(height: 8),
 

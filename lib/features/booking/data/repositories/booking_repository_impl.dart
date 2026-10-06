@@ -2,6 +2,17 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
 import '../../../../core/network/exceptions/exception_handler.dart';
+import '../../domain/entities/addon_catalogue_item.dart';
+import '../../domain/entities/booking_enums.dart';
+import '../../domain/entities/booking_review.dart';
+import '../../domain/entities/booking_summary.dart';
+import '../../domain/entities/creator_match.dart';
+import '../../domain/entities/edit_selection.dart';
+import '../../domain/entities/edit_type_option.dart';
+import '../../domain/entities/payment_review.dart';
+import '../../domain/entities/payment_sheet_config.dart';
+import '../../domain/entities/shoot_type_option.dart';
+import '../../domain/entities/submit_request.dart';
 import '../../domain/repositories/booking_repository.dart';
 import '../datasources/booking_remote_datasource.dart';
 
@@ -211,6 +222,163 @@ class BookingRepositoryImpl implements BookingRepository {
       final participants = response['participants'];
       if (participants is List) return participants;
       return <dynamic>[];
+    });
+  }
+
+  // ───── New Book-a-Shoot flow (api_flow.pdf) ──────────────────────────────
+
+  @override
+  Future<Either<AppException, List<ShootTypeOption>>> getShootTypeCatalogue() {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getShootTypesCatalogue();
+      _assertNoError(response);
+      return ShootTypeOption.listFrom(response);
+    });
+  }
+
+  @override
+  Future<Either<AppException, EditTypesCatalogue>> getEditTypesCatalogue({
+    required BookingContentType contentType,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getEditTypesByContentType(
+        contentType: contentType.wireValue,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return EditTypesCatalogue.fromData(data);
+    });
+  }
+
+  @override
+  Future<Either<AppException, List<AddonCatalogueItem>>> getAddonCatalogue() {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getAddons();
+      _assertNoError(response);
+      return AddonCatalogueItem.listFrom(response);
+    });
+  }
+
+  @override
+  Future<Either<AppException, Unit>> saveEdits({
+    required int bookingId,
+    required EditSelection selection,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.saveEdits(
+        bookingId: bookingId,
+        data: selection.toEditsPayload(),
+      );
+      _assertNoError(response);
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<AppException, CreatorMatchPage>> getCreatorMatches({
+    required int bookingId,
+    int page = 1,
+    int limit = 12,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getMatchesPaged(
+        bookingId: bookingId,
+        page: page,
+        limit: limit,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return CreatorMatchPage.fromData(data, page: page);
+    });
+  }
+
+  @override
+  Future<Either<AppException, BookingReview>> reviewBooking({
+    required int bookingId,
+    required List<Map<String, dynamic>> addOnItems,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.postReview(
+        bookingId: bookingId,
+        data: {'add_on_items': addOnItems},
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return BookingReview.fromData(data);
+    });
+  }
+
+  @override
+  Future<Either<AppException, Unit>> quoteBooking({
+    required int bookingId,
+    required List<Map<String, dynamic>> addOnItems,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.postQuote(
+        bookingId: bookingId,
+        data: {'add_on_items': addOnItems},
+      );
+      _assertNoError(response);
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<AppException, PaymentReview>> getPaymentReview({
+    required int bookingId,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getPaymentReview(
+        bookingId: bookingId,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return PaymentReview.fromData(data);
+    });
+  }
+
+  @override
+  Future<Either<AppException, Unit>> submitBooking({
+    required int bookingId,
+    required SubmitRequest request,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.submitBooking(
+        bookingId: bookingId,
+        data: request.toJson(),
+      );
+      _assertNoError(response);
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<AppException, PaymentSheetConfig>> createPaymentSheet({
+    required int bookingId,
+    required BookingPaymentMethod method,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.createPaymentSheet(
+        bookingId: bookingId,
+        paymentMethod: method.wireValue,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return PaymentSheetConfig.fromData(data, method: method);
+    });
+  }
+
+  @override
+  Future<Either<AppException, BookingSummary>> getBookingSummary({
+    required int bookingId,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getSummaryDetails(
+        bookingId: bookingId,
+      );
+      _assertNoError(response);
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return BookingSummary.fromData(data);
     });
   }
 

@@ -1,6 +1,17 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
+import '../entities/addon_catalogue_item.dart';
+import '../entities/booking_enums.dart';
+import '../entities/booking_review.dart';
+import '../entities/booking_summary.dart';
+import '../entities/creator_match.dart';
+import '../entities/edit_selection.dart';
+import '../entities/edit_type_option.dart';
+import '../entities/payment_review.dart';
+import '../entities/payment_sheet_config.dart';
+import '../entities/shoot_type_option.dart';
+import '../entities/submit_request.dart';
 
 /// Contract for booking-flow API operations.
 abstract class BookingRepository {
@@ -77,6 +88,66 @@ abstract class BookingRepository {
   /// booking (Client, assigned CP, crew). Used as the data source for the
   /// meeting-create participant picker.
   Future<Either<AppException, List<dynamic>>> getBookingParticipants({
+    required int bookingId,
+  });
+
+  // ───── New Book-a-Shoot flow (api_flow.pdf) ──────────────────────────────
+
+  /// GET bookings/shoot-types — shared catalogue (no content-type id).
+  Future<Either<AppException, List<ShootTypeOption>>> getShootTypeCatalogue();
+
+  /// GET bookings/edit-types?content_type=... — edit options for the content.
+  Future<Either<AppException, EditTypesCatalogue>> getEditTypesCatalogue({
+    required BookingContentType contentType,
+  });
+
+  /// GET bookings/addons — active add-on catalogue.
+  Future<Either<AppException, List<AddonCatalogueItem>>> getAddonCatalogue();
+
+  /// PUT bookings/{bookingId}/edits — save edit selection.
+  Future<Either<AppException, Unit>> saveEdits({
+    required int bookingId,
+    required EditSelection selection,
+  });
+
+  /// GET bookings/{bookingId}/matches?page=&limit=12 — paginated creators.
+  Future<Either<AppException, CreatorMatchPage>> getCreatorMatches({
+    required int bookingId,
+    int page = 1,
+    int limit = 12,
+  });
+
+  /// POST bookings/{bookingId}/review — review with current add-on items.
+  Future<Either<AppException, BookingReview>> reviewBooking({
+    required int bookingId,
+    required List<Map<String, dynamic>> addOnItems,
+  });
+
+  /// POST bookings/{bookingId}/quote — save quote with the same add-on items.
+  Future<Either<AppException, Unit>> quoteBooking({
+    required int bookingId,
+    required List<Map<String, dynamic>> addOnItems,
+  });
+
+  /// GET bookings/{bookingId}/payment-review — read-only final pricing.
+  Future<Either<AppException, PaymentReview>> getPaymentReview({
+    required int bookingId,
+  });
+
+  /// PUT bookings/{bookingId}/submit — final contact + matching fields.
+  Future<Either<AppException, Unit>> submitBooking({
+    required int bookingId,
+    required SubmitRequest request,
+  });
+
+  /// POST bookings/{bookingId}/paymentsheet — session config for a provider.
+  Future<Either<AppException, PaymentSheetConfig>> createPaymentSheet({
+    required int bookingId,
+    required BookingPaymentMethod method,
+  });
+
+  /// GET bookings/{bookingId}/summary-details — confirmed booking summary.
+  Future<Either<AppException, BookingSummary>> getBookingSummary({
     required int bookingId,
   });
 }

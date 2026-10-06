@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 import 'app/app.dart';
 import 'config/env.dart';
 import 'core/providers/core_providers.dart';
@@ -18,6 +19,10 @@ Future<void> startApp(Environment environment) async {
 
       Env.init(environment);
       Stripe.publishableKey = Env.stripePublishableKey;
+
+      // Load IANA timezone database — required before any tz.getLocation call
+      // (DateTimeUtils UTC → user-zone conversion).
+      tzdata.initializeTimeZones();
 
       await FirebaseService.initialize();
       await CrashlyticsService.initialize();

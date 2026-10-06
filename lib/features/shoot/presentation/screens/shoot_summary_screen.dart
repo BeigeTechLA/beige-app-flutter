@@ -251,21 +251,36 @@ class _ShootSummaryScreenState extends ConsumerState<ShootSummaryScreen> {
                           );
                         }),
                       ] else ...[
-                        /// ✅ SINGLE DAY
-                        if (event?['event_date'] != null)
+                        /// ✅ SINGLE DAY / DEFERRED
+                        if (bookingData?['confirm_later'] == true ||
+                            bookingData?['is_date_to_be_decided'] == true ||
+                            event?['confirm_later'] == true ||
+                            event?['is_date_to_be_decided'] == true ||
+                            (event?['event_date'] == null && !isMulti)) ...[
                           infoRow(
                             AppAssets.calendarDate,
-                            DateTimeUtils.formatDate(event?['event_date']),
+                            "Date To Be Decided",
                           ),
-
-                        if (event?['start_time'] != null &&
-                            event?['end_time'] != null)
                           infoRow(
                             AppAssets.clock,
-                            "${DateTimeUtils.formatTime(event?['start_time'])} - "
-                            "${DateTimeUtils.formatTime(event?['end_time'])} "
-                            "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
+                            "Choose your date within 30 days",
                           ),
+                        ] else ...[
+                          if (event?['event_date'] != null)
+                            infoRow(
+                              AppAssets.calendarDate,
+                              DateTimeUtils.formatDate(event?['event_date']),
+                            ),
+
+                          if (event?['start_time'] != null &&
+                              event?['end_time'] != null)
+                            infoRow(
+                              AppAssets.clock,
+                              "${DateTimeUtils.formatTime(event?['start_time'])} - "
+                              "${DateTimeUtils.formatTime(event?['end_time'])} "
+                              "(${DateTimeUtils.formatDuration((event?['duration_hours'] ?? 0).toDouble())})",
+                            ),
+                        ],
                       ],
 
                       /// 📍 LOCATION

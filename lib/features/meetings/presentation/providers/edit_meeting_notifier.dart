@@ -74,14 +74,19 @@ class EditMeetingNotifier
   }
 
   EditMeetingState _hydrate(Meeting m) {
-    final start = TimeOfDayValue(m.startAt.hour, m.startAt.minute);
-    final end = TimeOfDayValue(m.endAt.hour, m.endAt.minute);
+    // `startAt`/`endAt` are absolute UTC instants (DTO stores UTC). The edit
+    // write-flow builds/compares instants in device-local (`_buildPatch`),
+    // so prefill in device-local to keep the round-trip consistent.
+    final localStart = m.startAt.toLocal();
+    final localEnd = m.endAt.toLocal();
+    final start = TimeOfDayValue(localStart.hour, localStart.minute);
+    final end = TimeOfDayValue(localEnd.hour, localEnd.minute);
     return EditMeetingState(
       status: EditMeetingStatus.ready,
       original: m,
       title: m.title,
       description: m.description,
-      date: DateTime(m.startAt.year, m.startAt.month, m.startAt.day),
+      date: DateTime(localStart.year, localStart.month, localStart.day),
       startTime: start,
       endTime: end,
       link: m.link,
@@ -106,8 +111,15 @@ class EditMeetingNotifier
     String? description = state.description.trim() == base.description
         ? null
         : state.description.trim();
-    DateTime? startAt = newStart == base.startAt ? null : newStart;
-    DateTime? endAt = newEnd == base.endAt ? null : newEnd;
+    // `base.startAt`/`endAt` are UTC instants; `newStart`/`newEnd` are
+    // device-local. Compare as absolute instants, not via DateTime `==`
+    // (which also checks the isUtc flag).
+    DateTime? startAt = newStart.toUtc().isAtSameMomentAs(base.startAt)
+        ? null
+        : newStart;
+    DateTime? endAt = newEnd.toUtc().isAtSameMomentAs(base.endAt)
+        ? null
+        : newEnd;
     String? link = state.link.trim() == base.link ? null : state.link.trim();
     int? reminder = state.reminderMinutes == base.reminderMinutes
         ? null

@@ -10,6 +10,7 @@ import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/providers/guest_mode_provider.dart';
 import '../../../../core/storage/secure_token_storage.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/utils/shared_service.dart';
 import '../../../app_drawer/providers/drawer_notifier.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
@@ -53,11 +54,19 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
           user.designation,
           user.department,
           user.departmentId,
+          user.timezone,
         );
 
         if (savePassword) {
           await prefs.setString("email", email);
           await prefs.setString("password", password);
+        }
+
+        // Apply the user's timezone immediately so zoned date/time formatters
+        // reflect it without an app restart. SharedPreferences writes do not
+        // re-trigger the resolve provider, so set it directly here.
+        if (user.timezone.isNotEmpty) {
+          DateTimeUtils.setActiveTimezone(user.timezone);
         }
 
         // Update auth state & clear guest flag.
@@ -114,6 +123,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     String designation,
     String department,
     String departmentId,
+    String timezone,
   ) async {
     await SecureTokenStorage.write(token);
     await prefs.setString('user_id', userId);
@@ -125,6 +135,9 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     await prefs.setString('designation', designation);
     await prefs.setString('department', department);
     await prefs.setString('department_id', departmentId);
+    if (timezone.isNotEmpty) {
+      await prefs.setString('user_timezone', timezone);
+    }
     await prefs.setBool('isLoggedIn', true);
   }
 }

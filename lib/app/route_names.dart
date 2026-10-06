@@ -47,6 +47,22 @@ abstract class RouteNames {
   static const paymentFailed = 'payment_failed';
   static const paymentSuccess = 'payment_success';
 
+  // Book-a-Shoot v4 flow (api_flow.pdf). Route names are the stable step keys;
+  // screens land across Phases 2-6. When & Where is a sheet inside
+  // [bookingSchedule], not its own route.
+  static const bookingContent = 'booking_content';
+  static const bookingShootType = 'booking_shoot_type';
+  static const bookingSchedule = 'booking_schedule';
+  static const bookingDetails = 'booking_details';
+  static const bookingMatchingChoice = 'booking_matching_choice';
+  static const bookingCrewCount = 'booking_crew_count';
+  static const bookingEdits = 'booking_edits';
+  static const bookingCreatorSelection = 'booking_creator_selection';
+  static const bookingAddons = 'booking_addons';
+  static const bookingReviewContact = 'booking_review_contact';
+  static const bookingConfirmPay = 'booking_confirm_pay';
+  static const bookingConfirmation = 'booking_confirmation';
+
   // Booking Management
   static const bookingEventSummary = 'booking_event_summary';
   static const manageBooking = 'manage_booking';

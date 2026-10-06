@@ -71,7 +71,7 @@ void main() {
       expect(m.platform, MeetingPlatform.zoom);
     });
 
-    test('UTC time round-trip → local', () {
+    test('UTC time preserved as absolute UTC instant', () {
       final m = MeetingDto.fromRestJson({
         'id': '1',
         'meeting_title': 'T',
@@ -81,9 +81,10 @@ void main() {
         'meetLink': 'https://meet.google.com/x',
       });
 
-      // Stored as local; the parsed instant must equal the UTC instant given.
-      expect(m.startAt.toUtc().toIso8601String(), '2026-06-11T13:00:00.000Z');
-      expect(m.startAt.isUtc, false);
+      // Stored as the absolute UTC instant; the display layer converts to the
+      // user's timezone via DateTimeUtils.
+      expect(m.startAt.toIso8601String(), '2026-06-11T13:00:00.000Z');
+      expect(m.startAt.isUtc, true);
     });
 
     test('falls back to _id when id absent', () {

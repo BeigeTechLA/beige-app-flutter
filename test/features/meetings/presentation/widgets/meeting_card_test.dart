@@ -3,9 +3,11 @@ import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_participant.dart';
 import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
 import 'package:beige/features/meetings/domain/models/meeting_status.dart';
+import 'package:beige/core/utils/date_time_utils.dart';
 import 'package:beige/features/meetings/presentation/widgets/meeting_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 
 import '../../../../helpers/pump_app.dart';
 
@@ -22,8 +24,8 @@ Meeting _meeting({
     description: '',
     project: 'Cover Story',
     platform: platform,
-    startAt: DateTime(2026, 6, 11, 13),
-    endAt: DateTime(2026, 6, 11, 14),
+    startAt: DateTime.utc(2026, 6, 11, 13),
+    endAt: DateTime.utc(2026, 6, 11, 14),
     link: 'https://meet.google.com/x',
     reminderMinutes: 15,
     status: status,
@@ -37,6 +39,13 @@ Meeting _meeting({
 }
 
 void main() {
+  setUpAll(() {
+    // Deterministic timezone so zoned formatters render UTC wall-clock
+    // regardless of the machine's local zone.
+    tzdata.initializeTimeZones();
+    DateTimeUtils.setActiveTimezone('UTC');
+  });
+
   testWidgets('renders title, date label, time range, status, platform', (
     tester,
   ) async {

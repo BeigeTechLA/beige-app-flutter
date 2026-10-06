@@ -24,6 +24,8 @@ class SharedService {
     final String designation = userData['designation'] ?? '';
     final String department = userData['department'] ?? '';
     final String departmentId = userData['department_id'] ?? '';
+    final String timezone =
+        userData['timezone'] ?? data['timezone'] ?? '';
 
     await SecureTokenStorage.write(token);
     await prefs.setString('user_id', userId);
@@ -36,6 +38,9 @@ class SharedService {
     await prefs.setString('designation', designation);
     await prefs.setString('department', department);
     await prefs.setString('department_id', departmentId);
+    if (timezone.isNotEmpty) {
+      await prefs.setString('user_timezone', timezone);
+    }
     await prefs.setBool('isLoggedIn', true);
 
     debugPrint("✅ Login details saved");
@@ -55,6 +60,7 @@ class SharedService {
     final String folder = prefs.getString('folder') ?? '';
     final String email = prefs.getString('email') ?? '';
     final String profileImageUrl = prefs.getString('profile_image_url') ?? '';
+    final String timezone = prefs.getString('user_timezone') ?? '';
 
     debugPrint("========== USER DATA ==========");
     debugPrint("NAME  => $name");
@@ -74,6 +80,7 @@ class SharedService {
       'token': token,
       'environmentId': environmentId,
       'folder': folder,
+      'timezone': timezone,
     };
   }
 

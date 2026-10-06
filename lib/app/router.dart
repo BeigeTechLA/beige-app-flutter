@@ -34,6 +34,18 @@ import '../features/booking/presentation/screens/shoot_date_time_screen.dart';
 import '../features/booking/presentation/screens/shoot_details_screen.dart';
 import '../features/booking/presentation/screens/shoot_review_screen.dart';
 import '../features/booking/presentation/screens/shoot_type_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_addons_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_confirm_pay_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_confirmation_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_content_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_creator_selection_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_crew_count_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_details_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_edits_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_matching_choice_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_review_contact_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_schedule_screen.dart';
+import '../features/booking/presentation/screens/v4/booking_shoot_type_screen.dart';
 import '../features/home/presentation/screens/change_location_screen.dart';
 import '../features/home/presentation/screens/creative_profile_screen.dart';
 import '../features/home/presentation/screens/find_creative_screen.dart';
@@ -59,6 +71,7 @@ import '../features/auth/presentation/screens/password_reset_success_screen.dart
 import '../features/auth/presentation/screens/reset_password_screen.dart';
 import '../features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../core/connectivity/connectivity_providers.dart';
 import '../core/connectivity/connectivity_status.dart';
 import '../core/providers/auth_state_provider.dart';
@@ -198,10 +211,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     observers: [
-      FirebaseAnalyticsObserver(
-        analytics: FirebaseAnalytics.instance,
-        nameExtractor: (settings) => settings.name ?? 'unknown',
-      ),
+      if (Firebase.apps.isNotEmpty)
+        FirebaseAnalyticsObserver(
+          analytics: FirebaseAnalytics.instance,
+          nameExtractor: (settings) => settings.name ?? 'unknown',
+        ),
     ],
     refreshListenable: refreshListenable,
     redirect: (context, state) {
@@ -355,14 +369,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // Tab 1: Book Shoot
+          // Tab 1: Book Shoot (v4 flow entry)
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/book-shoot',
                 name: RouteNames.bookShoot,
                 builder: (context, state) =>
-                    const ContentTypeScreen(fromHome: false),
+                    const BookingContentScreen(),
               ),
             ],
           ),
@@ -462,10 +476,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/content-type',
         name: RouteNames.contentType,
-        builder: (context, state) {
-          final draft = bookingDraftFor(state, '/content-type');
-          return ContentTypeScreen(fromHome: true, value: draft.value);
-        },
+        builder: (context, state) => const BookingContentScreen(),
       ),
       GoRoute(
         path: '/video-shoot-type',
@@ -566,6 +577,74 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // ── Book-a-Shoot v4 flow (api_flow.pdf) ────────────────────────
+      // Parallel to the legacy flow above; state lives in
+      // bookingFlowControllerProvider, not state.extra. Entry cutover is a
+      // later phase — these are reachable by name for building/testing.
+      GoRoute(
+        path: '/book/content',
+        name: RouteNames.bookingContent,
+        builder: (context, state) => const BookingContentScreen(),
+      ),
+      GoRoute(
+        path: '/book/shoot-type',
+        name: RouteNames.bookingShootType,
+        builder: (context, state) => const BookingShootTypeScreen(),
+      ),
+      GoRoute(
+        path: '/book/schedule',
+        name: RouteNames.bookingSchedule,
+        builder: (context, state) => const BookingScheduleScreen(),
+      ),
+      GoRoute(
+        path: '/book/details',
+        name: RouteNames.bookingDetails,
+        builder: (context, state) => const BookingDetailsScreen(),
+      ),
+      GoRoute(
+        path: '/book/matching',
+        name: RouteNames.bookingMatchingChoice,
+        builder: (context, state) => const BookingMatchingChoiceScreen(),
+      ),
+      GoRoute(
+        path: '/book/crew-count',
+        name: RouteNames.bookingCrewCount,
+        builder: (context, state) => const BookingCrewCountScreen(),
+      ),
+      GoRoute(
+        path: '/book/edits',
+        name: RouteNames.bookingEdits,
+        builder: (context, state) => const BookingEditsScreen(),
+      ),
+      GoRoute(
+        path: '/book/creator-selection',
+        name: RouteNames.bookingCreatorSelection,
+        builder: (context, state) => const BookingCreatorSelectionScreen(),
+      ),
+      GoRoute(
+        path: '/book/addons',
+        name: RouteNames.bookingAddons,
+        builder: (context, state) => const BookingAddonsScreen(),
+      ),
+      GoRoute(
+        path: '/book/review',
+        name: RouteNames.bookingReviewContact,
+        builder: (context, state) => const BookingReviewContactScreen(),
+      ),
+      GoRoute(
+        path: '/book/confirm-pay',
+        name: RouteNames.bookingConfirmPay,
+        builder: (context, state) => const BookingConfirmPayScreen(),
+      ),
+      GoRoute(
+        path: '/book/confirmation/:bookingId',
+        name: RouteNames.bookingConfirmation,
+        builder: (context, state) {
+          final bookingId = int.parse(state.pathParameters['bookingId']!);
+          return BookingConfirmationScreen(bookingId: bookingId);
+        },
+      ),
+
       // ── Booking Management ─────────────────────────────────────────
       GoRoute(
         path: '/booking-summary/:bookingId',
@@ -632,6 +711,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             imageUrl: draft.imageUrl,
             contentType: draft.contentType,
             multiDays: draft.multiDays,
+            isDeferred: extra?['isDeferred'] as bool? ?? false,
           );
         },
       ),

@@ -27,6 +27,7 @@ class PaymentRepositoryImpl implements PaymentRepository {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.createPaymentSheet(
         bookingId: bookingId,
+        data: {'payment_method': 'stripe'},
       );
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;

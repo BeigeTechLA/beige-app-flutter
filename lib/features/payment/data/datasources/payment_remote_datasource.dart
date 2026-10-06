@@ -20,7 +20,7 @@ class PaymentRemoteDataSource {
   }) async {
     final response = await _dioClient.dio.post(
       '${ApiEndpoints.bookings}/$bookingId/paymentsheet',
-      data: data ?? {'payment_method': 'commas'},
+      data: data ?? {'payment_method': 'stripe'},
     );
     return response.data as Map<String, dynamic>;
   }

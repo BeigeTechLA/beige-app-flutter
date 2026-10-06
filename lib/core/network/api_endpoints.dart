@@ -31,6 +31,49 @@ abstract class ApiEndpoints {
   static const String bookingSpecialties = "bookings/specialties";
   static const String bookingShootTypes = "bookings/shoot-types/";
 
+  /// 📅 New Book-a-Shoot flow (api_flow.pdf).
+  ///
+  /// Shared across every content type — no content-type/shoot-type id in the
+  /// path. The legacy [bookingShootTypes] (with trailing id) stays for the
+  /// pre-migration screens.
+  static const String bookingShootTypesCatalogue = "bookings/shoot-types";
+
+  /// GET `bookings/edit-types?content_type=photographer|videographer|
+  /// photographer,videographer`. Replaces the shoot-type-based edit lookup.
+  static String bookingEditTypes(String contentType) =>
+      "bookings/edit-types?content_type=$contentType";
+
+  /// GET `bookings/addons` — active web-v4 add-on catalogue.
+  static const String bookingAddons = "bookings/addons";
+
+  /// PUT `bookings/:id/edits` — save edit selections.
+  static String bookingEdits(int bookingId) => "bookings/$bookingId/edits";
+
+  /// GET `bookings/:id/matches?page=&limit=` — paginated creator cards.
+  static String bookingMatches(int bookingId, {int page = 1, int limit = 12}) =>
+      "bookings/$bookingId/matches?page=$page&limit=$limit";
+
+  /// POST `bookings/:id/review` — review with current add-on items.
+  static String bookingReview(int bookingId) => "bookings/$bookingId/review";
+
+  /// POST `bookings/:id/quote` — save quote with same add-on items.
+  static String bookingQuote(int bookingId) => "bookings/$bookingId/quote";
+
+  /// GET `bookings/:id/payment-review` — read-only final pricing.
+  static String bookingPaymentReview(int bookingId) =>
+      "bookings/$bookingId/payment-review";
+
+  /// PUT `bookings/:id/submit` — final contact + matching fields.
+  static String bookingSubmit(int bookingId) => "bookings/$bookingId/submit";
+
+  /// POST `bookings/:id/paymentsheet` — stripe or commas session config.
+  static String bookingPaymentSheet(int bookingId) =>
+      "bookings/$bookingId/paymentsheet";
+
+  /// GET `bookings/:id/summary-details` — confirmed booking summary.
+  static String bookingSummaryDetails(int bookingId) =>
+      "bookings/$bookingId/summary-details";
+
   /// 🎨 Creatives
   static const String creatives = "creatives";
   static const String addFavourite = "creatives/favourites";

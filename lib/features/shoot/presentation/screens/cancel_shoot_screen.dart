@@ -303,19 +303,31 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                   );
                                 }),
                               ] else ...[
-                                /// 🟢 SINGLE DAY
-                                infoRowBlack(
-                                  AppAssets.calendarDate,
-                                  DateTimeUtils.formatDate(widget.eventDate),
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                infoRowBlack(
-                                  AppAssets.clock,
-                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
-                                  "(${widget.durationHours ?? 0}h)",
-                                ),
+                                /// 🟢 SINGLE DAY / DEFERRED
+                                if (widget.eventDate == null ||
+                                    widget.eventDate!.trim().isEmpty ||
+                                    widget.eventDate == '--') ...[
+                                  infoRowBlack(
+                                    AppAssets.calendarDate,
+                                    "Date To Be Decided",
+                                  ),
+                                  const SizedBox(height: 8),
+                                  infoRowBlack(
+                                    AppAssets.clock,
+                                    "Choose within 30 days",
+                                  ),
+                                ] else ...[
+                                  infoRowBlack(
+                                    AppAssets.calendarDate,
+                                    DateTimeUtils.formatDate(widget.eventDate),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  infoRowBlack(
+                                    AppAssets.clock,
+                                    "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
+                                    "(${widget.durationHours ?? 0}h)",
+                                  ),
+                                ],
                               ],
 
                               const SizedBox(height: 8),

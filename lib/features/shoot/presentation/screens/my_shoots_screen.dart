@@ -433,20 +433,71 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
     final String contentType = shoot['content_type'] ?? '';
     final String creativeName = _creativeName(shoot);
 
+    final bool isDeferred = shoot['confirm_later'] == true ||
+        shoot['is_date_to_be_decided'] == true ||
+        shoot['schedule_mode'] == 'deferred' ||
+        shoot['schedule_mode'] == 'confirm_later' ||
+        shoot['booking_type'] == 'confirm_later' ||
+        (eventDate.trim().isEmpty && shoot['booking_type'] != 'multi_day');
+
+    final Widget? badge = isDeferred
+        ? Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.smd,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.black.withValues(alpha: 0.8),
+              borderRadius: AppRadii.roundAll,
+              border: Border.all(
+                color: AppColors.primary,
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("🗓️", style: TextStyle(fontSize: 12)),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  "Date To Be Decided",
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          )
+        : null;
+
+    final String? cardSubtitle = isDeferred
+        ? "Paid & Confirmed • Choose date within 30 days"
+        : _bookingSubtitle(
+            date: DateTimeUtils.formatCardDateRange(eventDate),
+            startTime: cardStartTime,
+            endTime: cardEndTime,
+            duration: durationText,
+          );
+
     return AppBookingCard(
       imagePath: finalImage,
+      badge: badge,
       title: _bookingTitle(
         creativeName: creativeName,
         projectName: projectName,
         contentType: contentType,
       ),
-      subtitle: _bookingSubtitle(
-        date: DateTimeUtils.formatCardDateRange(eventDate),
-        startTime: cardStartTime,
-        endTime: cardEndTime,
-        duration: durationText,
-      ),
-      actionLabel: "Shoot Details",
+      subtitle: cardSubtitle,
+      actionLabel: isDeferred ? "View Details" : "Shoot Details",
       onTap: () {
         context.pushNamed(
           RouteNames.bookingEventSummary,
@@ -461,7 +512,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
           extra: {
             'projectName': projectName,
             'contentType': contentType,
-            'eventDate': eventDate,
+            'eventDate': isDeferred ? '' : eventDate,
             'startTime': startTimeRaw,
             'endTime': endTimeRaw,
             'multiDays': shoot['multi_day']?['days'] ?? [],
@@ -469,6 +520,7 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             'location': shoot['location'] ?? '',
             'imageUrl': finalImage,
             'shootTypeId': shootTypeId,
+            'isDeferred': isDeferred,
           },
         );
       },

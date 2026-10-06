@@ -127,7 +127,13 @@ class BookingDraft {
     this.bookingId,
     this.value,
     this.currentRoute,
+    this.draftVersion = currentDraftVersion,
+    this.flow,
   });
+
+  /// Bump when the draft shape changes incompatibly. v1 = legacy drafts that
+  /// predate the new flow (no `draftVersion`/`flow` keys).
+  static const int currentDraftVersion = 2;
 
   final int? contentTypeId;
   final int? shootTypeId;
@@ -140,21 +146,42 @@ class BookingDraft {
   /// the wizard at the right step.
   final String? currentRoute;
 
+  /// Draft schema version of the persisted payload.
+  final int draftVersion;
+
+  /// Serialized `BookingFlowState` for the new Book-a-Shoot flow. Null for
+  /// legacy drafts and before the new flow starts. Never holds payment
+  /// secrets.
+  final Map<String, dynamic>? flow;
+
   Map<String, dynamic> toJson() => {
+    'draftVersion': draftVersion,
     if (contentTypeId != null) 'contentTypeId': contentTypeId,
     if (shootTypeId != null) 'shootTypeId': shootTypeId,
     if (bookingId != null) 'bookingId': bookingId,
     if (value != null) 'value': value,
     if (currentRoute != null) 'currentRoute': currentRoute,
+    if (flow != null) 'flow': flow,
   };
 
-  factory BookingDraft.fromJson(Map<String, dynamic> json) => BookingDraft(
-    contentTypeId: _asInt(json['contentTypeId']),
-    shootTypeId: _asInt(json['shootTypeId']),
-    bookingId: _asInt(json['bookingId']),
-    value: _asInt(json['value']),
-    currentRoute: json['currentRoute'] as String?,
-  );
+  factory BookingDraft.fromJson(Map<String, dynamic> json) {
+    // Legacy drafts have no `draftVersion`; treat them as v1 and drop any
+    // `flow` (none existed) so a stale/incompatible flow is never restored.
+    final version = _asInt(json['draftVersion']) ?? 1;
+    final rawFlow = json['flow'];
+    final flow = version >= currentDraftVersion && rawFlow is Map<String, dynamic>
+        ? rawFlow
+        : null;
+    return BookingDraft(
+      contentTypeId: _asInt(json['contentTypeId']),
+      shootTypeId: _asInt(json['shootTypeId']),
+      bookingId: _asInt(json['bookingId']),
+      value: _asInt(json['value']),
+      currentRoute: json['currentRoute'] as String?,
+      draftVersion: currentDraftVersion,
+      flow: flow,
+    );
+  }
 
   /// Convenience builder from the `state.extra` map shape used by the
   /// existing booking routes. Accepts both `shootTypeId` and the legacy
@@ -187,6 +214,25 @@ class BookingDraft {
     bookingId: bookingId ?? other.bookingId,
     value: value ?? other.value,
     currentRoute: currentRoute ?? other.currentRoute,
+    draftVersion: currentDraftVersion,
+    flow: flow ?? other.flow,
+  );
+
+  BookingDraft copyWith({
+    int? contentTypeId,
+    int? shootTypeId,
+    int? bookingId,
+    int? value,
+    String? currentRoute,
+    Map<String, dynamic>? flow,
+  }) => BookingDraft(
+    contentTypeId: contentTypeId ?? this.contentTypeId,
+    shootTypeId: shootTypeId ?? this.shootTypeId,
+    bookingId: bookingId ?? this.bookingId,
+    value: value ?? this.value,
+    currentRoute: currentRoute ?? this.currentRoute,
+    draftVersion: currentDraftVersion,
+    flow: flow ?? this.flow,
   );
 }
 
