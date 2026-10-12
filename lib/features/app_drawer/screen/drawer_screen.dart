@@ -10,6 +10,7 @@ import '../../../../../../app/radii.dart';
 import '../../../../../../app/route_names.dart';
 import '../../../../../../app/spacing.dart';
 import '../../../app/text_styles.dart';
+import '../../../app/booking_navigation.dart';
 import '../../../core/providers/guest_mode_provider.dart';
 import '../../../core/utils/image_url_utils.dart';
 import '../../../shared/widgets/login_dialog.dart';
@@ -248,7 +249,9 @@ class DrawerScreen extends ConsumerWidget {
                         showLoginDialog(context);
                         return;
                       }
-                      if (item.route == '/meetings') {
+                      if (item.route == '/book-shoot') {
+                        startNewBooking(context);
+                      } else if (item.route == '/meetings') {
                         context.goNamed(RouteNames.meetings);
                       } else if (item.route == '/file-manager') {
                         context.goNamed(RouteNames.fileManager);

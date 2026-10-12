@@ -102,12 +102,13 @@ class MeetingDto {
     return out;
   }
 
-  /// Server emits ISO 8601 UTC with `Z` suffix. Convert to local for display
-  /// layer consistency (UI formatters assume local time).
+  /// Server emits ISO 8601 UTC with `Z` suffix. Keep the absolute UTC instant;
+  /// the display layer converts to the user's timezone via
+  /// `DateTimeUtils.formatZoned*` / `DateTimeUtils.toUserZone`.
   static DateTime _parseUtc(Object? raw) {
     if (raw is! String || raw.isEmpty) {
-      return DateTime.fromMillisecondsSinceEpoch(0);
+      return DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
     }
-    return DateTime.parse(raw).toLocal();
+    return DateTime.parse(raw).toUtc();
   }
 }

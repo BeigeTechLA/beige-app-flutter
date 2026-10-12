@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'booking_navigation.dart';
 
 import '../features/app_drawer/screen/drawer_screen.dart';
 import '../features/messages/presentation/routes/messages_args.dart';
@@ -370,6 +371,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 // Book tab now enters the v2 flow (Milestone C flip). Draft
                 // values enable cold-start resume of an in-progress booking.
                 builder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>?;
+                  final newBooking = extra?['newBooking'] as String?;
+                  if (newBooking != null) {
+                    return ContentTypeV2Screen(key: ValueKey(newBooking));
+                  }
                   final draft = bookingDraftFor(state, '/book-shoot');
                   return ContentTypeV2Screen(
                     bookingId: draft.bookingId,
@@ -1036,6 +1042,10 @@ class _MainShell extends ConsumerWidget {
                       showLoginDialog(context);
                       return;
                     }
+                    if (index == 1) {
+                      startNewBooking(context);
+                      return;
+                    }
                     navigationShell.goBranch(
                       index,
                       initialLocation: index == navigationShell.currentIndex,
@@ -1123,6 +1133,10 @@ class _MainShell extends ConsumerWidget {
         final isGuest = ref.read(guestModeProvider);
         if (isGuest && index != 0) {
           showLoginDialog(context);
+          return;
+        }
+        if (index == 1) {
+          startNewBooking(context);
           return;
         }
         navigationShell.goBranch(

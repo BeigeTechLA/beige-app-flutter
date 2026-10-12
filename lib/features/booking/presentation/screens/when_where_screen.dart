@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +10,7 @@ import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/providers/timezone_provider.dart';
 import '../../../../core/utils/date_time_utils.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/top_message.dart';
@@ -17,6 +20,7 @@ import '../../domain/entities/shoot_time_payload.dart';
 import '../../domain/entities/time_slot_rules.dart';
 import '../providers/shoot_time_v2_notifier.dart';
 import '../widgets/create_project_app_bar.dart';
+import '../widgets/booking_time_sheet.dart';
 import '../widgets/gradient_radio.dart';
 import '../widgets/location_picker_field.dart';
 import '../widgets/schedule_choice_sheet.dart';
@@ -103,8 +107,12 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
 
   DateTime _norm(DateTime d) => DateTime(d.year, d.month, d.day);
 
+  /// Active IANA zone for the booking schedule payload.
+  /// Resolved chain (app-root already resolved it): login `user_timezone`
+  /// pref → device IANA → UTC, with a last-resort constant fallback.
   String _timeZone() =>
-      ref.read(sharedPreferencesProvider).getString('user_timezone') ??
+      ref.read(resolvedTimezoneProvider).valueOrNull ??
+      ref.read(sharedPreferencesProvider).getString(kUserTimezonePrefKey) ??
       _fallbackTimeZone;
 
   // ── Single-day handlers ──────────────────────────────────────────────
@@ -140,7 +148,11 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
       TopMessage.show(context, 'Please select a date first');
       return;
     }
-    final slot = await _pickTime(date: date, isStart: true);
+    final slot = await _pickTime(
+      date: date,
+      isStart: true,
+      currentValue: _startTime,
+    );
     if (slot == null) return;
     setState(() {
       _startTime = slot;
@@ -159,7 +171,12 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
       TopMessage.show(context, 'Please select a start time first');
       return;
     }
-    final slot = await _pickTime(date: date, isStart: false, startBound: start);
+    final slot = await _pickTime(
+      date: date,
+      isStart: false,
+      startBound: start,
+      currentValue: _endTime,
+    );
     if (slot == null) return;
     setState(() => _endTime = slot);
   }
@@ -186,7 +203,11 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
   Future<void> _pickMultiStart({DateTime? perDay}) async {
     final date = perDay ?? _earliestSelected();
     if (date == null) return;
-    final slot = await _pickTime(date: date, isStart: true);
+    final slot = await _pickTime(
+      date: date,
+      isStart: true,
+      currentValue: perDay == null ? _sharedStart : _perDayStart[_norm(perDay)],
+    );
     if (slot == null) return;
     setState(() {
       if (perDay == null) {
@@ -212,7 +233,12 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
       TopMessage.show(context, 'Please select a start time first');
       return;
     }
-    final slot = await _pickTime(date: date, isStart: false, startBound: start);
+    final slot = await _pickTime(
+      date: date,
+      isStart: false,
+      startBound: start,
+      currentValue: perDay == null ? _sharedEnd : _perDayEnd[_norm(perDay)],
+    );
     if (slot == null) return;
     setState(() {
       if (perDay == null) {
@@ -232,6 +258,7 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
     required DateTime date,
     required bool isStart,
     TimeOfDay? startBound,
+    TimeOfDay? currentValue,
   }) async {
     final slots = TimeSlotRules.buildSlots(
       date: date,
@@ -243,60 +270,14 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
       TopMessage.show(context, 'No available times for this day');
       return null;
     }
-    return showModalBottomSheet<TimeOfDay>(
+    return showCupertinoModalPopup<TimeOfDay>(
       context: context,
-      showDragHandle: false,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xxl)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppSpacing.verticalBase,
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.white24,
-                  borderRadius: AppRadii.smAll,
-                ),
-              ),
-              AppSpacing.verticalBase,
-              Text(
-                isStart ? 'Select Start Time' : 'Select End Time',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              AppSpacing.verticalSm,
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: slots.length,
-                  itemBuilder: (context, index) {
-                    final slot = slots[index];
-                    return ListTile(
-                      title: Text(
-                        DateTimeUtils.formatTimeOfDay(sheetContext, slot),
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.white,
-                        ),
-                      ),
-                      onTap: () => Navigator.of(sheetContext).pop(slot),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+      builder: (sheetContext) => BookingTimeSheet(
+        isStart: isStart,
+        slots: slots,
+        currentValue: currentValue,
+        formatSlot: DateTimeUtils.formatTimeOfDayShort,
+        isSameTime: (a, b) => a.hour == b.hour && a.minute == b.minute,
       ),
     );
   }

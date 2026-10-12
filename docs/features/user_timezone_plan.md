@@ -1,8 +1,13 @@
 # Feature Plan — User Timezone (IANA) Display
 
-**Date:** 2026-10-05
-**Branch:** `feature-booking-flow-change`
+**Date:** 2026-10-05 (original) · 2026-10-12 (rebuild on v2)
+**Original branch:** `feature-booking-flow-change` (built there, bundled with v4 flow)
+**Rebuild branch:** `feature-bokking-flowchange-v2` — **NOT built here yet; rebuilding fresh**
 **Goal:** Capture user's IANA timezone from login response, store it, and render all shoot/meeting datetimes in that timezone via the existing `DateTimeUtils` common functions.
+
+> **Status (2026-10-12):** This feature was developed on `feature-booking-flow-change` (alongside the v4 booking flow). The current branch `feature-bokking-flowchange-v2` is a fresh book-a-shoot rebuild and does NOT contain the timezone setup. Reference the original impl, rebuild per this branch's code. Checklist below reset to unbuilt.
+>
+> **v2-branch starting state (verified):** `shoot_time_payload` already sends `time_zone`; `when_where_screen` already reads the `user_timezone` pref; `shoot_date_time_screen` has hardcoded `"Asia/Calcutta"` placeholders. Login never populates the pref yet.
 
 ---
 
@@ -139,16 +144,21 @@ Switch shoot + meeting display call sites to the tz-aware variants. Device-local
 - **Meeting edit/create input flow** stays device-local (write round-trip): prefill hydrates from `.toLocal()`, patch diff compares instants with `isAtSameMomentAs`. Future: make input flow user-zone aware.
 - Provider named `resolvedTimezoneProvider` / `userTimezonePrefProvider` (`kUserTimezonePrefKey`); kept pure — active tz pushed via `ref.listen` in `app.dart` + direct set on login.
 
-## File Change Checklist
-- [x] `pubspec.yaml` — add `timezone`, `flutter_timezone`
-- [x] `lib/main.dart` — `initializeTimeZones()`
-- [x] `lib/features/auth/domain/entities/user_entity.dart` — `timezone` field
-- [x] `lib/features/auth/data/repositories/auth_repository_impl.dart` — map `timezone`
+## File Change Checklist (REBUILT on `feature-bokking-flowchange-v2` — 2026-10-12)
+- [x] `pubspec.yaml` — add `timezone ^0.9.4`, `flutter_timezone ^3.0.1`
+- [x] `lib/main.dart` — `tzdata.initializeTimeZones()` before runApp
+- [x] `lib/features/auth/domain/entities/user_entity.dart` — `timezone` field (default `''`)
+- [x] `lib/features/auth/data/repositories/auth_repository_impl.dart` — map `userData['timezone']`
 - [x] `lib/core/utils/shared_service.dart` — persist/read `user_timezone`
-- [x] `lib/core/providers/timezone_provider.dart` — new provider + device fallback
-- [x] `lib/core/utils/date_time_utils.dart` — tz-aware converter + variants
-- [x] App-start (`app.dart`) / login (`login_notifier.dart`) wiring → `setActiveTimezone()`
-- [x] Scoped meeting call sites → tz-aware methods (shoot wall-clock left as-is by design)
-- [x] `lib/features/profile/presentation/screens/profile_screen.dart` — read-only timezone row
-- [x] Tests — `test/core/utils/date_time_utils_test.dart` (11 pass); updated meeting dto + card tests
+- [x] `lib/core/providers/timezone_provider.dart` — `userTimezonePrefProvider` + `resolvedTimezoneProvider` (device fallback)
+- [x] `lib/core/utils/date_time_utils.dart` — tz converter, `setActiveTimezone`, `formatZoned*`, `toUserZone`, timeline→user-zone
+- [x] App-start (`app.dart` `ref.listen`) / login (`login_notifier.dart`) wiring → `setActiveTimezone()`
+- [x] Meeting call sites → `formatZoned*` (meeting_dto stores UTC instant; edit flow prefill `.toLocal()` + diff `isAtSameMomentAs`); shoot wall-clock left as-is
+- [x] `lib/features/profile/presentation/screens/profile_screen.dart` — read-only timezone row (Settings section)
+- [x] Tests — `test/core/utils/date_time_utils_test.dart` (11 pass); meeting dto + card tests updated to UTC-instant world
+- [x] **v2-specific:** replaced hardcoded `"Asia/Calcutta"` in `shoot_date_time_screen.dart` + routed `when_where_screen` + `shoot_date_time_screen` tz through `resolvedTimezoneProvider`
 - [ ] (opt, deferred) refresh `user_timezone` pref from `getProfile` if key present
+
+> **Verification (2026-10-12):** `flutter analyze` — no new errors/warnings in touched files. `flutter test test/core/utils/date_time_utils_test.dart` — 11/11 pass. Meetings suite net-zero regression (2 failures — `edit_meeting_notifier` no-op + `create_meeting` setShoot — are pre-existing on HEAD, unrelated `meetingType` baseline issue).
+>
+> **Pre-existing issue noted (NOT tz):** `_hydrate` forces `meetingType ?? MeetingType.postProduction`; baseline meetings with null `meetingType` always diff → spurious update. Pre-dates this work.
