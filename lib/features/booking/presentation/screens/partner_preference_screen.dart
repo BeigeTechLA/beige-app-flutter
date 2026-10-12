@@ -42,16 +42,16 @@ class PartnerPreferenceScreen extends ConsumerStatefulWidget {
 
 class _PartnerPreferenceScreenState
     extends ConsumerState<PartnerPreferenceScreen> {
-  MatchingMethod? _selected;
+  late MatchingMethod _selected;
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.initialMethod;
+    _selected = widget.initialMethod ?? MatchingMethod.beigeMatch;
   }
 
-  /// Info-card copy adapts to the choice (Figma 05 vs 05a). Manual (or no
-  /// selection yet) explains browsing; beigeMatch explains the AI match.
+  /// Info-card copy adapts to the choice (Figma 05 vs 05a). Manual explains
+  /// browsing; beigeMatch explains the AI match.
   String _infoCopy() {
     if (_selected == MatchingMethod.beigeMatch) {
       return "We'll find the right Creative Partner for your event and make "
@@ -62,7 +62,7 @@ class _PartnerPreferenceScreenState
   }
 
   void _continue() {
-    final method = _selected!;
+    final method = _selected;
     context.pushNamed(
       RouteNames.creativeTeam,
       extra: {
@@ -120,7 +120,7 @@ class _PartnerPreferenceScreenState
       ),
       bottomNavigationBar: WizardBottomBar(
         onBack: () => context.pop(),
-        onContinue: _selected == null ? null : _continue,
+        onContinue: _continue,
       ),
     );
   }

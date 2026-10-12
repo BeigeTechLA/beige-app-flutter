@@ -24,8 +24,7 @@ import '../widgets/wizard_bottom_bar.dart';
 /// offers the hybrid "Photo + Video" creator. Saves `role_counts` (every key,
 /// 0 for unselected) via `PUT /bookings/:id/crew`.
 ///
-/// Per-hour rates shown in Figma are server-owned and have no client endpoint,
-/// so they are intentionally not rendered here (the app never computes money).
+/// Base hourly rates are display-only; final pricing comes from the server.
 class CreativeTeamScreen extends ConsumerStatefulWidget {
   const CreativeTeamScreen({
     super.key,
@@ -56,15 +55,40 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
     _kHybrid: 0,
   };
 
+  @override
+  void initState() {
+    super.initState();
+    final contentType = widget.contentType ?? '';
+    for (final role in [_kPhotographer, _kVideographer]) {
+      if (contentType.contains(role)) {
+        _counts[role] = 1;
+      }
+    }
+  }
+
   List<_RoleRow> get _rows {
     final content = widget.contentType ?? '';
     final hasPhoto = content.contains('photographer');
     final hasVideo = content.contains('videographer');
     return [
-      if (hasPhoto) const _RoleRow(key: _kPhotographer, label: 'Photographer'),
-      if (hasVideo) const _RoleRow(key: _kVideographer, label: 'Videographer'),
+      if (hasPhoto)
+        const _RoleRow(
+          key: _kPhotographer,
+          label: 'Photographer',
+          rate: r'$250.00/hr',
+        ),
+      if (hasVideo)
+        const _RoleRow(
+          key: _kVideographer,
+          label: 'Videographer',
+          rate: r'$350.00/hr',
+        ),
       if (hasPhoto && hasVideo)
-        const _RoleRow(key: _kHybrid, label: 'Hybrid Shooter (Photo + Video)'),
+        const _RoleRow(
+          key: _kHybrid,
+          label: 'Hybrid Shooter (Photo + Video)',
+          rate: r'$375.00/hr',
+        ),
     ];
   }
 
@@ -126,7 +150,7 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
             ),
             AppSpacing.verticalBase,
             Container(
-              padding: const EdgeInsets.all(AppSpacing.base),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: AppRadii.xlAll,
@@ -190,7 +214,7 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
   Widget _roleTile(_RoleRow row) {
     final count = _counts[row.key] ?? 0;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
       child: Row(
         children: [
           Checkbox(
@@ -203,11 +227,36 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
                 setState(() => _counts[row.key] = selected == true ? 1 : 0),
           ),
           Expanded(
-            child: Text(
-              row.label,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.white),
+            child: InkWell(
+              onTap: () => setState(() => _counts[row.key] = count > 0 ? 0 : 1),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 48),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        row.label,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.white,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        row.rate,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
+          AppSpacing.gapHSm,
           AppQtyCounter(
             value: count,
             onIncrement: () =>
@@ -234,9 +283,10 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
 }
 
 class _RoleRow {
-  const _RoleRow({required this.key, required this.label});
+  const _RoleRow({required this.key, required this.label, required this.rate});
   final String key;
   final String label;
+  final String rate;
 }
 
 String _countInWords(int count) {

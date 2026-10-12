@@ -165,7 +165,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
             if (_editsNeeded) ...[
               AppSpacing.verticalBase,
               _infoCard(
-                'Editing includes color grading, sound mixing, thoughtful '
+                'Color grading, sound mixing, thoughtful '
                 'pacing, and delivery optimized for your selected content.',
               ),
               if (state.status == EditingStatus.loading)
@@ -177,6 +177,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                 if (_hasPhoto && state.photoEditTypes.isNotEmpty)
                   _editSection(
                     title: 'Photo Edits',
+                    showIncludedPhotos: true,
                     options: state.photoEditTypes,
                     counts: _photoCounts,
                     open: _photoOpen,
@@ -211,6 +212,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
     required bool open,
     required VoidCallback onToggle,
     required int step,
+    bool showIncludedPhotos = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(top: AppSpacing.base),
@@ -234,20 +236,59 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                   top: Radius.circular(AppRadii.xl),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.bodyLargeMedium.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTextStyles.bodyLargeMedium.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Icon(
+                        open
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: AppColors.white,
+                      ),
+                    ],
+                  ),
+                  if (showIncludedPhotos)
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: AppSpacing.md),
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        border: Border.all(color: AppColors.white15),
+                        borderRadius: AppRadii.smAll,
+                      ),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Includes 100 free photo edits for your\n',
+                            ),
+                            TextSpan(
+                              text: '4 Hours',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.white,
+                                decoration: TextDecoration.underline,
+                                decorationColor: AppColors.white,
+                              ),
+                            ),
+                            const TextSpan(text: ' Duration'),
+                          ],
+                        ),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
-                  ),
-                  Icon(
-                    open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                    color: AppColors.white,
-                  ),
                 ],
               ),
             ),
@@ -315,27 +356,28 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
     );
   }
 
-  Widget _infoCard(String text) => Container(
-    padding: const EdgeInsets.all(AppSpacing.base),
-    decoration: BoxDecoration(
-      color: AppColors.surfaceVariant,
-      borderRadius: AppRadii.lgAll,
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.info_outline, size: 18, color: AppColors.white54),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            text,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
+  Widget _infoCard(String text) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          const Icon(Icons.info_outline, size: 22, color: AppColors.white),
+          AppSpacing.gapHMd,
+          Text(
+            'Editing includes',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.white,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ],
-    ),
+        ],
+      ),
+      AppSpacing.verticalMd,
+      Text(
+        text,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+      ),
+    ],
   );
 
   Widget _radio({

@@ -26,7 +26,6 @@ class WizardBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final enabled = onContinue != null;
     return SafeArea(
       bottom: true,
       child: Padding(
@@ -61,14 +60,8 @@ class WizardBottomBar extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: enabled
-                      ? AppColors.primary
-                      : AppColors.goldGradientLight,
-                  foregroundColor: enabled
-                      ? AppColors.black
-                      : AppColors.greyShade400,
-                  disabledBackgroundColor: AppColors.goldGradientLight,
-                  disabledForegroundColor: AppColors.greyShade400,
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.black,
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.mld),
                   shape: RoundedRectangleBorder(borderRadius: AppRadii.lgAll),
                 ),

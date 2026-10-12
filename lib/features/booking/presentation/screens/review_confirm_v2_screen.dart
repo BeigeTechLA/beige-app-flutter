@@ -11,6 +11,7 @@ import '../../../../shared/layouts/app_scaffold.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/top_message.dart';
+import '../../../profile/presentation/providers/profile_notifier.dart';
 import '../../domain/entities/booking_flow_enums.dart';
 import '../../domain/entities/booking_wizard_step.dart';
 import '../providers/review_v2_notifier.dart';
@@ -72,6 +73,30 @@ class _ReviewConfirmV2ScreenState extends ConsumerState<ReviewConfirmV2Screen> {
     _emailController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  void _populateContactIfEmpty(Map<String, dynamic> contact) {
+    final name = (contact['name'] ?? contact['full_name'])?.toString().trim();
+    final email = contact['email']?.toString().trim();
+    final phone =
+        (contact['phone'] ??
+                contact['phone_number'] ??
+                contact['mobile'] ??
+                contact['contact_number'])
+            ?.toString();
+    if (_nameController.text.isEmpty && name != null && name.isNotEmpty) {
+      _nameController.text = name;
+    }
+    if (_emailController.text.isEmpty && email != null && email.isNotEmpty) {
+      _emailController.text = email;
+    }
+    if (_phoneController.text.isEmpty && phone != null) {
+      // Match the previous booking flow's phone normalization.
+      final digits = phone.replaceAll(RegExp(r'\D'), '');
+      _phoneController.text = digits.length >= 10
+          ? digits.substring(digits.length - 10)
+          : digits;
+    }
   }
 
   // ── Pay chain ────────────────────────────────────────────────────────
@@ -171,6 +196,14 @@ class _ReviewConfirmV2ScreenState extends ConsumerState<ReviewConfirmV2Screen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(reviewV2NotifierProvider);
+    final profileState = ref.watch(profileNotifierProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (profileState.profile != null) {
+        _populateContactIfEmpty(profileState.profile!);
+      }
+      _populateContactIfEmpty(_asMap(state.review?['contact']));
+    });
 
     return AppScaffold(
       hasAppBar: true,
