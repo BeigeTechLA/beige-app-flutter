@@ -6,5 +6,7 @@ import '../../../../core/network/exceptions/app_exception.dart';
 abstract class CreativeRepository {
   Future<Either<AppException, Map<String, dynamic>>> getCreativeProfile({
     required int creativeId,
+    double? latitude,
+    double? longitude,
   });
 }

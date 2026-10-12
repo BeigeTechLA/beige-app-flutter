@@ -7,12 +7,18 @@ class CreativeRemoteDataSource {
 
   CreativeRemoteDataSource(this._dioClient);
 
-  /// GET creatives/{id}/profile
+  /// GET creatives/{id}/profile — optional lat/lng to compute distance_km.
   Future<Map<String, dynamic>> getCreativeProfile({
     required int creativeId,
+    double? latitude,
+    double? longitude,
   }) async {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.creatives}/$creativeId/profile',
+      queryParameters: {
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
+      },
     );
     return response.data as Map<String, dynamic>;
   }

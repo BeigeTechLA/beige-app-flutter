@@ -79,4 +79,58 @@ abstract class BookingRepository {
   Future<Either<AppException, List<dynamic>>> getBookingParticipants({
     required int bookingId,
   });
+
+  // ── Book-a-Shoot v2 flow ─────────────────────────────────────────────
+
+  /// GET bookings/shoot-types — v2 catalogue (content-type agnostic).
+  Future<Either<AppException, List<dynamic>>> getShootTypesV2();
+
+  /// PUT bookings/{bookingId}/crew — total creators required by role.
+  Future<Either<AppException, Map<String, dynamic>>> updateCrew({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// GET bookings/edit-types?content_type=… — photo/video edit options.
+  Future<Either<AppException, Map<String, dynamic>>> getEditTypesV2({
+    required String contentType,
+  });
+
+  /// PUT bookings/{bookingId}/edits — selected edit keys.
+  Future<Either<AppException, Map<String, dynamic>>> updateEdits({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// GET bookings/addons — active v4 add-on catalogue.
+  Future<Either<AppException, List<dynamic>>> getAddons();
+
+  /// POST bookings/{bookingId}/review — server-calculated review payload.
+  Future<Either<AppException, Map<String, dynamic>>> getReview({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// POST bookings/{bookingId}/quote — persist the quote before payment.
+  Future<Either<AppException, Map<String, dynamic>>> saveQuote({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// PUT bookings/{bookingId}/submit — contact info + selected creator IDs.
+  Future<Either<AppException, Map<String, dynamic>>> submitBooking({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// POST bookings/{bookingId}/paymentsheet — open Stripe/Commas payment.
+  Future<Either<AppException, Map<String, dynamic>>> openPaymentSheet({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  });
+
+  /// GET bookings/{bookingId}/summary-details — final booking summary.
+  Future<Either<AppException, Map<String, dynamic>>> getSummaryDetails({
+    required int bookingId,
+  });
 }
