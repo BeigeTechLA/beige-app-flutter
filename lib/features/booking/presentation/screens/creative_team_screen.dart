@@ -125,8 +125,8 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dedicatedCount = _counts[_kPhotographer]! + _counts[_kVideographer]!;
-    final hybridCount = _counts[_kHybrid]!;
+    final creativeCount = _total;
+    final hasHybridOption = _rows.any((row) => row.key == _kHybrid);
     final saving =
         ref.watch(creativeTeamNotifierProvider).status ==
         CreativeTeamStatus.saving;
@@ -158,21 +158,10 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
               child: Column(
                 children: [
                   for (final row in _rows) _roleTile(row),
-                  if (dedicatedCount > 0) ...[
-                    AppSpacing.verticalSm,
-                    _infoCard(
-                      'You’re all set! ${_countInWords(dedicatedCount)} Creative '
-                      '${dedicatedCount == 1 ? 'Partner is' : 'Partners are'} '
-                      'a great fit for '
-                      'covering your event.',
-                    ),
-                  ],
-                  if (hybridCount > 0) ...[
+                  if (hasHybridOption) ...[
                     AppSpacing.verticalMd,
                     _infoCard(
-                      '${_countInWords(hybridCount)} Creative '
-                      '${hybridCount == 1 ? 'Partner captures' : 'Partners capture'} '
-                      'both photo and video, so '
+                      'One Creative Partner captures both photo and video, so '
                       'fewer moments can be captured at once. For full coverage, '
                       'book a dedicated Photographer and Videographer.',
                     ),
@@ -180,6 +169,15 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
                 ],
               ),
             ),
+            if (creativeCount > 0) ...[
+              AppSpacing.verticalBase,
+              _infoCard(
+                'You’re all set! ${_countInWords(creativeCount)} Creative '
+                '${creativeCount == 1 ? 'Partner is' : 'Partners are'} '
+                'a great fit for covering your event.',
+                isConfirmation: true,
+              ),
+            ],
           ],
         ),
       ),
@@ -190,21 +188,40 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
     );
   }
 
-  Widget _infoCard(String message) => Container(
-    padding: const EdgeInsets.all(AppSpacing.md),
+  Widget _infoCard(String message, {bool isConfirmation = false}) => Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.base,
+      vertical: AppSpacing.md,
+    ),
     decoration: BoxDecoration(
-      color: AppColors.background,
-      borderRadius: AppRadii.smAll,
+      color: isConfirmation
+          ? AppColors.primary.withValues(alpha: 0.04)
+          : AppColors.surfaceDark,
+      borderRadius: isConfirmation ? AppRadii.lgAll : AppRadii.smAll,
+      border: isConfirmation
+          ? Border.all(color: AppColors.primary.withValues(alpha: 0.25))
+          : null,
     ),
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: isConfirmation
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.info_outline, size: 20, color: AppColors.primary),
+        Padding(
+          padding: EdgeInsets.only(top: isConfirmation ? 0 : AppSpacing.xxs),
+          child: Icon(
+            Icons.info_outline,
+            size: 20,
+            color: isConfirmation ? AppColors.primary : AppColors.white,
+          ),
+        ),
         AppSpacing.gapHMd,
         Expanded(
           child: Text(
             message,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
+            style: AppTextStyles.bodySmall.copyWith(
+              color: isConfirmation ? AppColors.primary : AppColors.white,
+            ),
           ),
         ),
       ],
@@ -259,8 +276,13 @@ class _CreativeTeamScreenState extends ConsumerState<CreativeTeamScreen> {
           AppSpacing.gapHSm,
           AppQtyCounter(
             value: count,
-            onIncrement: () =>
-                setState(() => _counts[row.key] = (_counts[row.key] ?? 0) + 1),
+            onIncrement: row.key == _kHybrid && count >= 1
+                ? null
+                : () => setState(() {
+                    final current = _counts[row.key] ?? 0;
+                    if (row.key == _kHybrid && current >= 1) return;
+                    _counts[row.key] = current + 1;
+                  }),
             onDecrement: () {
               final current = _counts[row.key] ?? 0;
               if (current == 1) {
