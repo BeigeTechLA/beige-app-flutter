@@ -23,6 +23,8 @@ void main() {
 
   test('happy path — load parses photo + video edit options', () async {
     final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer((_) async => const Right({'duration_hours': 1}));
     when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
         .thenAnswer(
       (_) async => const Right({
@@ -38,13 +40,88 @@ void main() {
 
     await c
         .read(editingNotifierProvider.notifier)
-        .load(contentType: 'photographer,videographer');
+        .load(bookingId: 7, contentType: 'photographer,videographer');
 
     final state = c.read(editingNotifierProvider);
     expect(state.status, EditingStatus.loaded);
     expect(state.photoEditTypes.single.key, 'retouch');
     expect(state.photoEditTypes.single.note, '+25 per set');
     expect(state.videoEditTypes.single.value, 'Color Grading');
+  });
+
+  test('duration — top-level duration_hours drives included count', () async {
+    final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer((_) async => const Right({'duration_hours': 1}));
+    when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
+        .thenAnswer((_) async => const Right({'photo_edit_types': []}));
+    final c = _container(repo);
+
+    await c
+        .read(editingNotifierProvider.notifier)
+        .load(bookingId: 7, contentType: 'photographer');
+
+    expect(c.read(editingNotifierProvider).durationHours, 1);
+  });
+
+  test('duration — computed from start/end times, rounded up', () async {
+    final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer(
+      (_) async => const Right({
+        'start_time': '09:00:00',
+        'end_time': '12:30:00',
+      }),
+    );
+    when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
+        .thenAnswer((_) async => const Right({'photo_edit_types': []}));
+    final c = _container(repo);
+
+    await c
+        .read(editingNotifierProvider.notifier)
+        .load(bookingId: 7, contentType: 'photographer');
+
+    // 3.5h → ceil → 4
+    expect(c.read(editingNotifierProvider).durationHours, 4);
+  });
+
+  test('duration — sums booking_days durations', () async {
+    final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer(
+      (_) async => const Right({
+        'booking_days': [
+          {'duration_hours': 2},
+          {'duration_hours': 3},
+        ],
+      }),
+    );
+    when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
+        .thenAnswer((_) async => const Right({'photo_edit_types': []}));
+    final c = _container(repo);
+
+    await c
+        .read(editingNotifierProvider.notifier)
+        .load(bookingId: 7, contentType: 'photographer');
+
+    expect(c.read(editingNotifierProvider).durationHours, 5);
+  });
+
+  test('duration — booking time failure is non-fatal (0 hours)', () async {
+    final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer((_) async => Left(UnknownException(message: 'no time')));
+    when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
+        .thenAnswer((_) async => const Right({'photo_edit_types': []}));
+    final c = _container(repo);
+
+    await c
+        .read(editingNotifierProvider.notifier)
+        .load(bookingId: 7, contentType: 'photographer');
+
+    final state = c.read(editingNotifierProvider);
+    expect(state.status, EditingStatus.loaded);
+    expect(state.durationHours, 0);
   });
 
   test('edge case — edits_needed false sends empty key arrays', () async {
@@ -100,13 +177,17 @@ void main() {
 
   test('error case — load failure surfaces message', () async {
     final repo = MockBookingRepository();
+    when(() => repo.getBookingTime(bookingId: any(named: 'bookingId')))
+        .thenAnswer((_) async => const Right({'duration_hours': 1}));
     when(() => repo.getEditTypesV2(contentType: any(named: 'contentType')))
         .thenAnswer(
       (_) async => Left(UnknownException(message: 'edits failed')),
     );
     final c = _container(repo);
 
-    await c.read(editingNotifierProvider.notifier).load(contentType: 'x');
+    await c
+        .read(editingNotifierProvider.notifier)
+        .load(bookingId: 7, contentType: 'x');
 
     final state = c.read(editingNotifierProvider);
     expect(state.status, EditingStatus.error);

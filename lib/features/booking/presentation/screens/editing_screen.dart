@@ -46,6 +46,10 @@ class EditingScreen extends ConsumerStatefulWidget {
 class _EditingScreenState extends ConsumerState<EditingScreen> {
   static const int _photoSetSize = 25;
 
+  /// Free edited photos included per booked hour (server rule mirrored
+  /// client-side for display; the final count is server-confirmed on Review).
+  static const int _includedPhotosPerHour = 50;
+
   bool _editsNeeded = true;
   bool _photoOpen = true;
   bool _videoOpen = true;
@@ -63,7 +67,10 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
     Future.microtask(
       () => ref
           .read(editingNotifierProvider.notifier)
-          .load(contentType: widget.contentType ?? ''),
+          .load(
+            bookingId: widget.bookingId,
+            contentType: widget.contentType ?? '',
+          ),
     );
   }
 
@@ -130,6 +137,11 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
     final state = ref.watch(editingNotifierProvider);
     final busy = state.status == EditingStatus.saving;
 
+    // Included free photos = 50 × booked hours; extra = chosen add-on sets.
+    final includedPhotos = _includedPhotosPerHour * state.durationHours;
+    final extraPhotos = _photoCounts.values.fold<int>(0, (sum, c) => sum + c);
+    final totalPhotos = includedPhotos + extraPhotos;
+
     return AppScaffold(
       hasAppBar: true,
       useSafeArea: true,
@@ -174,16 +186,20 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                   child: Center(child: AppImageLoader(size: 48)),
                 )
               else ...[
-                if (_hasPhoto && state.photoEditTypes.isNotEmpty)
+                if (_hasPhoto && state.photoEditTypes.isNotEmpty) ...[
                   _editSection(
                     title: 'Photo Edits',
                     showIncludedPhotos: true,
+                    includedPhotos: includedPhotos,
+                    durationHours: state.durationHours,
                     options: state.photoEditTypes,
                     counts: _photoCounts,
                     open: _photoOpen,
                     onToggle: () => setState(() => _photoOpen = !_photoOpen),
                     step: _photoSetSize,
                   ),
+                  if (totalPhotos > 0) _youllReceivePill(totalPhotos),
+                ],
                 if (_hasVideo && state.videoEditTypes.isNotEmpty)
                   _editSection(
                     title: 'Video Edits',
@@ -213,6 +229,8 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
     required VoidCallback onToggle,
     required int step,
     bool showIncludedPhotos = false,
+    int includedPhotos = 0,
+    int durationHours = 0,
   }) {
     return Container(
       margin: const EdgeInsets.only(top: AppSpacing.base),
@@ -257,7 +275,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                       ),
                     ],
                   ),
-                  if (showIncludedPhotos)
+                  if (showIncludedPhotos && includedPhotos > 0)
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.only(top: AppSpacing.md),
@@ -270,11 +288,13 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                       child: Text.rich(
                         TextSpan(
                           children: [
-                            const TextSpan(
-                              text: 'Includes 100 free photo edits for your\n',
+                            TextSpan(
+                              text:
+                                  'Includes $includedPhotos free photo edits '
+                                  'for your ',
                             ),
                             TextSpan(
-                              text: '4 Hours',
+                              text: _durationLabel(durationHours),
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.white,
                                 decoration: TextDecoration.underline,
@@ -293,13 +313,72 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
               ),
             ),
           ),
-          if (open)
+          if (open) ...[
+            Padding(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.base,
+                right: AppSpacing.base,
+                top: AppSpacing.base,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Do you want more?',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
             for (var i = 0; i < options.length; i++)
               _optionRow(options[i], i, counts, step),
+          ],
         ],
       ),
     );
   }
+
+  /// `1 Hour` / `N Hours` label for the included-photos banner.
+  String _durationLabel(int hours) => '$hours ${hours == 1 ? 'Hour' : 'Hours'}';
+
+  /// Beige pill summarising the total photos the client will receive
+  /// (included free edits + chosen add-on sets).
+  Widget _youllReceivePill(int totalPhotos) => Container(
+    margin: const EdgeInsets.only(top: AppSpacing.base),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.base,
+      vertical: AppSpacing.md,
+    ),
+    decoration: BoxDecoration(
+      color: AppColors.primary,
+      borderRadius: AppRadii.xlAll,
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            color: AppColors.background,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.auto_awesome,
+            size: 18,
+            color: AppColors.primary,
+          ),
+        ),
+        AppSpacing.gapHMd,
+        Text(
+          "You'll Receive $totalPhotos Photos",
+          style: AppTextStyles.bodyLargeMedium.copyWith(
+            color: AppColors.background,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
+  );
 
   Widget _optionRow(
     EditOption option,
