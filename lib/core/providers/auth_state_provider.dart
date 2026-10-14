@@ -5,9 +5,11 @@ import '../firebase/analytics_events.dart';
 import '../firebase/analytics_service.dart';
 import '../firebase/crashlytics_service.dart';
 import '../restoration/restoration_providers.dart';
+import '../utils/date_time_utils.dart';
 import '../utils/shared_service.dart';
 import 'core_providers.dart';
 import 'current_user_provider.dart';
+import 'timezone_provider.dart';
 
 /// Boolean derived from session presence — single source of truth for
 /// "is the user logged in?". Router redirect reads it; login/logout flows
@@ -46,6 +48,12 @@ class AuthStateNotifier extends Notifier<bool> {
     await _cleanUp('session', () => SharedService.logout());
     ref.invalidate(currentUserProvider);
     ref.invalidate(currentUserIdProvider);
+    // Reset timezone so the next user doesn't inherit this session's zone.
+    // `prefs.clear()` wipes the `user_timezone` key, but the in-memory active
+    // zone and the cached resolve providers must be reset explicitly.
+    DateTimeUtils.setActiveTimezone('');
+    ref.invalidate(userTimezonePrefProvider);
+    ref.invalidate(resolvedTimezoneProvider);
     await _cleanUp(
       'route restoration',
       () => ref.read(routeRestorationServiceProvider).clearAll(),

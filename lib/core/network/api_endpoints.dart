@@ -31,6 +31,20 @@ abstract class ApiEndpoints {
   static const String bookingSpecialties = "bookings/specialties";
   static const String bookingShootTypes = "bookings/shoot-types/";
 
+  /// 📅 Bookings — v2 flow (Book-a-Shoot redesign). Shoot-type catalogue is
+  /// content-type agnostic, edit-types + add-ons are query/param driven.
+  /// See docs/features/bookings/booking_flow_v2_implementation_plan.md.
+  static const String bookingShootTypesV2 = "bookings/shoot-types";
+  static const String bookingEditTypes = "bookings/edit-types";
+  static const String bookingAddons = "bookings/addons";
+  static String bookingCrew(int id) => "bookings/$id/crew";
+  static String bookingEdits(int id) => "bookings/$id/edits";
+  static String bookingReview(int id) => "bookings/$id/review";
+  static String bookingQuote(int id) => "bookings/$id/quote";
+  static String bookingSubmit(int id) => "bookings/$id/submit";
+  static String bookingPaymentSheet(int id) => "bookings/$id/paymentsheet";
+  static String bookingSummaryDetails(int id) => "bookings/$id/summary-details";
+
   /// 🎨 Creatives
   static const String creatives = "creatives";
   static const String addFavourite = "creatives/favourites";

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'booking_navigation.dart';
 
 import '../features/app_drawer/screen/drawer_screen.dart';
 import '../features/messages/presentation/routes/messages_args.dart';
@@ -19,6 +20,17 @@ import '../features/shoot/presentation/screens/shoot_type_selection_screen.dart'
 import '../features/shoot/presentation/screens/shoot_update_success_screen.dart';
 import '../features/booking/presentation/screens/commas_checkout_screen.dart';
 import '../features/booking/presentation/screens/content_type_screen.dart';
+import '../features/booking/presentation/screens/content_type_v2_screen.dart';
+import '../features/booking/presentation/screens/shoot_type_v2_screen.dart';
+import '../features/booking/presentation/screens/when_where_screen.dart';
+import '../features/booking/presentation/screens/creative_brief_screen.dart';
+import '../features/booking/presentation/screens/partner_preference_screen.dart';
+import '../features/booking/presentation/screens/creative_team_screen.dart';
+import '../features/booking/presentation/screens/editing_screen.dart';
+import '../features/booking/presentation/screens/partner_selection_screen.dart';
+import '../features/booking/presentation/screens/add_ons_screen.dart';
+import '../features/booking/presentation/screens/review_confirm_v2_screen.dart';
+import '../features/booking/domain/entities/booking_flow_enums.dart';
 import '../features/file_manager/presentation/routes/file_manager_routes.dart';
 import '../features/file_manager/presentation/screens/file_manager_screen.dart';
 import '../features/meetings/presentation/screens/create_meeting_screen.dart';
@@ -157,16 +169,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     }
     final hydrated = previous;
     if (hydrated.currentRoute != routeName) {
+      // copyWith preserves the v2 fields (contentType, scheduleMode,
+      // matchingMethod, edits, roleCounts, …) that a manual field-by-field
+      // rebuild would silently drop on cold-start route changes.
       // ignore: discarded_futures
-      draftStore.writeBookingDraft(
-        BookingDraft(
-          contentTypeId: hydrated.contentTypeId,
-          shootTypeId: hydrated.shootTypeId,
-          bookingId: hydrated.bookingId,
-          value: hydrated.value,
-          currentRoute: routeName,
-        ),
-      );
+      draftStore.writeBookingDraft(hydrated.copyWith(currentRoute: routeName));
     }
     return hydrated;
   }
@@ -361,8 +368,20 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/book-shoot',
                 name: RouteNames.bookShoot,
-                builder: (context, state) =>
-                    const ContentTypeScreen(fromHome: false),
+                // Book tab now enters the v2 flow (Milestone C flip). Draft
+                // values enable cold-start resume of an in-progress booking.
+                builder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>?;
+                  final newBooking = extra?['newBooking'] as String?;
+                  if (newBooking != null) {
+                    return ContentTypeV2Screen(key: ValueKey(newBooking));
+                  }
+                  final draft = bookingDraftFor(state, '/book-shoot');
+                  return ContentTypeV2Screen(
+                    bookingId: draft.bookingId,
+                    contentType: draft.contentType,
+                  );
+                },
               ),
             ],
           ),
@@ -467,6 +486,142 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ContentTypeScreen(fromHome: true, value: draft.value);
         },
       ),
+
+      // ── Book-a-Shoot v2 flow (redesign) ──────────────────────────────
+      // New screens live alongside the v1 routes above; the Book tab keeps
+      // pointing at v1 until the v2 flow is fully wired (Milestone C).
+      GoRoute(
+        path: '/content-type-v2',
+        name: RouteNames.contentTypeV2,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/content-type-v2');
+          return ContentTypeV2Screen(
+            bookingId: draft.bookingId,
+            contentType: draft.contentType,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/shoot-type-v2',
+        name: RouteNames.shootTypeV2,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/shoot-type-v2');
+          return ShootTypeV2Screen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/when-where',
+        name: RouteNames.whenWhere,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/when-where');
+          return WhenWhereScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/creative-brief',
+        name: RouteNames.creativeBrief,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/creative-brief');
+          return CreativeBriefScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/partner-preference',
+        name: RouteNames.partnerPreference,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/partner-preference');
+          return PartnerPreferenceScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            initialMethod: draft.matchingMethod == null
+                ? null
+                : MatchingMethod.fromName(draft.matchingMethod),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/creative-team',
+        name: RouteNames.creativeTeam,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/creative-team');
+          return CreativeTeamScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            matchingMethod: MatchingMethod.fromName(draft.matchingMethod),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/editing',
+        name: RouteNames.editing,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/editing');
+          return EditingScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            matchingMethod: MatchingMethod.fromName(draft.matchingMethod),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/partner-selection',
+        name: RouteNames.partnerSelection,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/partner-selection');
+          return PartnerSelectionScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            roleCounts: draft.roleCounts ?? const {},
+          );
+        },
+      ),
+      GoRoute(
+        path: '/add-ons',
+        name: RouteNames.addOns,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/add-ons');
+          final extra = state.extra as Map<String, dynamic>?;
+          return AddOnsScreen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            matchingMethod: MatchingMethod.fromName(draft.matchingMethod),
+            selectedCrewIds: _intList(extra?['selectedCrewIds']),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/review-confirm-v2',
+        name: RouteNames.reviewConfirmV2,
+        builder: (context, state) {
+          final draft = bookingDraftFor(state, '/review-confirm-v2');
+          final extra = state.extra as Map<String, dynamic>?;
+          return ReviewConfirmV2Screen(
+            bookingId: draft.bookingId ?? 0,
+            contentType: draft.contentType,
+            shootTypeName: draft.shootTypeName,
+            matchingMethod: MatchingMethod.fromName(draft.matchingMethod),
+            selectedCrewIds: _intList(extra?['selectedCrewIds']),
+            addOnItems: _mapList(extra?['addOnItems']),
+          );
+        },
+      ),
+
       GoRoute(
         path: '/video-shoot-type',
         name: RouteNames.videoShootType,
@@ -887,6 +1042,10 @@ class _MainShell extends ConsumerWidget {
                       showLoginDialog(context);
                       return;
                     }
+                    if (index == 1) {
+                      startNewBooking(context);
+                      return;
+                    }
                     navigationShell.goBranch(
                       index,
                       initialLocation: index == navigationShell.currentIndex,
@@ -974,6 +1133,10 @@ class _MainShell extends ConsumerWidget {
         final isGuest = ref.read(guestModeProvider);
         if (isGuest && index != 0) {
           showLoginDialog(context);
+          return;
+        }
+        if (index == 1) {
+          startNewBooking(context);
           return;
         }
         navigationShell.goBranch(
@@ -1078,4 +1241,23 @@ class _MainShell extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Coerces a route-extra value into a `List<int>` of crew member IDs.
+List<int> _intList(dynamic value) {
+  if (value is! List) return const [];
+  return value
+      .map((e) => e is int ? e : int.tryParse('$e') ?? 0)
+      .where((e) => e != 0)
+      .toList();
+}
+
+/// Coerces a route-extra value into a `List<Map<String, dynamic>>`
+/// (e.g. `add_on_items: [{slug, quantity}]`).
+List<Map<String, dynamic>> _mapList(dynamic value) {
+  if (value is! List) return const [];
+  return value
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 }

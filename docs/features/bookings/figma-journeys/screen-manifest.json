@@ -1,0 +1,668 @@
+{
+  "01-with-date": [
+    {
+      "file": "01-content-type.png",
+      "node_id": "7343:65551",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "02-shoot-type.png",
+      "node_id": "7343:69157",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03-date-time-location.png",
+      "node_id": "7343:69081",
+      "category": "primary",
+      "width": 375,
+      "height": 1213
+    },
+    {
+      "file": "04-inspiration-and-details.png",
+      "node_id": "7343:65730",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "05-choose-my-creative-partner.png",
+      "node_id": "12820:7282",
+      "category": "primary",
+      "width": 375,
+      "height": 1210
+    },
+    {
+      "file": "06-your-creative-team.png",
+      "node_id": "7343:67364",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "07-editing.png",
+      "node_id": "13348:4100",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08-select-creative-partners.png",
+      "node_id": "7343:69483",
+      "category": "primary",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "09-optional-add-ons.png",
+      "node_id": "12820:27140",
+      "category": "primary",
+      "width": 375,
+      "height": 1303
+    },
+    {
+      "file": "10-review-confirm-and-pay.png",
+      "node_id": "7343:69621",
+      "category": "primary",
+      "width": 375,
+      "height": 2155
+    },
+    {
+      "file": "11-payment-success.png",
+      "node_id": "7343:69800",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03a-i-have-a-date.png",
+      "node_id": "12815:5106",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-single-day-empty.png",
+      "node_id": "7343:65680",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03c-multiple-days-same-time.png",
+      "node_id": "7356:1912",
+      "category": "supporting",
+      "width": 375,
+      "height": 1552
+    },
+    {
+      "file": "03d-multiple-days-individual-times.png",
+      "node_id": "7365:4304",
+      "category": "supporting",
+      "width": 375,
+      "height": 1760
+    },
+    {
+      "file": "05a-let-beige-match-me-alternative.png",
+      "node_id": "7343:69005",
+      "category": "supporting",
+      "width": 375,
+      "height": 1021
+    },
+    {
+      "file": "08a-partner-search-loading.png",
+      "node_id": "7343:69228",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08b-partners-unselected.png",
+      "node_id": "7343:69236",
+      "category": "supporting",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "08c-partner-profile.png",
+      "node_id": "7343:70002",
+      "category": "supporting",
+      "width": 375,
+      "height": 1978
+    },
+    {
+      "file": "state-no-partner-found.png",
+      "node_id": "7343:69374",
+      "category": "supporting",
+      "width": 375,
+      "height": 1153
+    },
+    {
+      "file": "state-sales-request-received.png",
+      "node_id": "7343:70202",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-content-type-empty.png",
+      "node_id": "7343:65494",
+      "category": "supporting",
+      "width": 1125,
+      "height": 2436
+    },
+    {
+      "file": "state-login-required.png",
+      "node_id": "9085:5251",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-payment-failed.png",
+      "node_id": "13276:2869",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "post-booking-summary.png",
+      "node_id": "7633:4956",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    }
+  ],
+  "02-choose-date-later": [
+    {
+      "file": "01-content-type.png",
+      "node_id": "7343:65551",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "02-shoot-type.png",
+      "node_id": "7343:69157",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03-date-time-location.png",
+      "node_id": "12815:5353",
+      "category": "primary",
+      "width": 375,
+      "height": 962
+    },
+    {
+      "file": "04-inspiration-and-details.png",
+      "node_id": "7343:65730",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "05-choose-my-creative-partner.png",
+      "node_id": "12820:7282",
+      "category": "primary",
+      "width": 375,
+      "height": 1210
+    },
+    {
+      "file": "06-your-creative-team.png",
+      "node_id": "7343:67364",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "07-editing.png",
+      "node_id": "13348:4100",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08-select-creative-partners.png",
+      "node_id": "7343:69483",
+      "category": "primary",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "09-optional-add-ons.png",
+      "node_id": "12820:27140",
+      "category": "primary",
+      "width": 375,
+      "height": 1303
+    },
+    {
+      "file": "10-review-confirm-and-pay.png",
+      "node_id": "7343:69621",
+      "category": "primary",
+      "width": 375,
+      "height": 2155
+    },
+    {
+      "file": "11-payment-success.png",
+      "node_id": "7343:69800",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03a-choose-date-later.png",
+      "node_id": "12815:5260",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-date-later-location-only.png",
+      "node_id": "12815:5353",
+      "category": "supporting",
+      "width": 375,
+      "height": 962
+    },
+    {
+      "file": "05a-let-beige-match-me-alternative.png",
+      "node_id": "7343:69005",
+      "category": "supporting",
+      "width": 375,
+      "height": 1021
+    },
+    {
+      "file": "08a-partner-search-loading.png",
+      "node_id": "7343:69228",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08b-partners-unselected.png",
+      "node_id": "7343:69236",
+      "category": "supporting",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "08c-partner-profile.png",
+      "node_id": "7343:70002",
+      "category": "supporting",
+      "width": 375,
+      "height": 1978
+    },
+    {
+      "file": "state-no-partner-found.png",
+      "node_id": "7343:69374",
+      "category": "supporting",
+      "width": 375,
+      "height": 1153
+    },
+    {
+      "file": "state-sales-request-received.png",
+      "node_id": "7343:70202",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-content-type-empty.png",
+      "node_id": "7343:65494",
+      "category": "supporting",
+      "width": 1125,
+      "height": 2436
+    },
+    {
+      "file": "state-login-required.png",
+      "node_id": "9085:5251",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-payment-failed.png",
+      "node_id": "13276:2869",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "post-booking-summary.png",
+      "node_id": "7633:4956",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    }
+  ],
+  "03-let-beige-match-me": [
+    {
+      "file": "01-content-type.png",
+      "node_id": "7343:65551",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "02-shoot-type.png",
+      "node_id": "7343:69157",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03-date-time-location.png",
+      "node_id": "7343:69081",
+      "category": "primary",
+      "width": 375,
+      "height": 1213
+    },
+    {
+      "file": "04-inspiration-and-details.png",
+      "node_id": "7343:65730",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "05-let-beige-match-me.png",
+      "node_id": "7343:69005",
+      "category": "primary",
+      "width": 375,
+      "height": 1021
+    },
+    {
+      "file": "06-your-creative-team.png",
+      "node_id": "7343:67364",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "07-editing.png",
+      "node_id": "13348:4100",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08-optional-add-ons.png",
+      "node_id": "12820:27140",
+      "category": "primary",
+      "width": 375,
+      "height": 1303
+    },
+    {
+      "file": "09-review-confirm-and-pay.png",
+      "node_id": "7343:69621",
+      "category": "primary",
+      "width": 375,
+      "height": 2155
+    },
+    {
+      "file": "10-payment-success.png",
+      "node_id": "7343:69800",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03a-i-have-a-date.png",
+      "node_id": "12815:5106",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-single-day-empty.png",
+      "node_id": "7343:65680",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03c-multiple-days-same-time.png",
+      "node_id": "7356:1912",
+      "category": "supporting",
+      "width": 375,
+      "height": 1552
+    },
+    {
+      "file": "03d-multiple-days-individual-times.png",
+      "node_id": "7365:4304",
+      "category": "supporting",
+      "width": 375,
+      "height": 1760
+    },
+    {
+      "file": "03a-choose-date-later.png",
+      "node_id": "12815:5260",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-date-later-location-only.png",
+      "node_id": "12815:5353",
+      "category": "supporting",
+      "width": 375,
+      "height": 962
+    },
+    {
+      "file": "state-content-type-empty.png",
+      "node_id": "7343:65494",
+      "category": "supporting",
+      "width": 1125,
+      "height": 2436
+    },
+    {
+      "file": "state-login-required.png",
+      "node_id": "9085:5251",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-payment-failed.png",
+      "node_id": "13276:2869",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "post-booking-summary.png",
+      "node_id": "7633:4956",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    }
+  ],
+  "04-choose-my-creative-partner": [
+    {
+      "file": "01-content-type.png",
+      "node_id": "7343:65551",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "02-shoot-type.png",
+      "node_id": "7343:69157",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03-date-time-location.png",
+      "node_id": "7343:69081",
+      "category": "primary",
+      "width": 375,
+      "height": 1213
+    },
+    {
+      "file": "04-inspiration-and-details.png",
+      "node_id": "7343:65730",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "05-choose-my-creative-partner.png",
+      "node_id": "12820:7282",
+      "category": "primary",
+      "width": 375,
+      "height": 1210
+    },
+    {
+      "file": "06-your-creative-team.png",
+      "node_id": "7343:67364",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "07-editing.png",
+      "node_id": "13348:4100",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08-select-creative-partners.png",
+      "node_id": "7343:69483",
+      "category": "primary",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "09-optional-add-ons.png",
+      "node_id": "12820:27140",
+      "category": "primary",
+      "width": 375,
+      "height": 1303
+    },
+    {
+      "file": "10-review-confirm-and-pay.png",
+      "node_id": "7343:69621",
+      "category": "primary",
+      "width": 375,
+      "height": 2155
+    },
+    {
+      "file": "11-payment-success.png",
+      "node_id": "7343:69800",
+      "category": "primary",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03a-i-have-a-date.png",
+      "node_id": "12815:5106",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-single-day-empty.png",
+      "node_id": "7343:65680",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03c-multiple-days-same-time.png",
+      "node_id": "7356:1912",
+      "category": "supporting",
+      "width": 375,
+      "height": 1552
+    },
+    {
+      "file": "03d-multiple-days-individual-times.png",
+      "node_id": "7365:4304",
+      "category": "supporting",
+      "width": 375,
+      "height": 1760
+    },
+    {
+      "file": "03a-choose-date-later.png",
+      "node_id": "12815:5260",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "03b-date-later-location-only.png",
+      "node_id": "12815:5353",
+      "category": "supporting",
+      "width": 375,
+      "height": 962
+    },
+    {
+      "file": "08a-partner-search-loading.png",
+      "node_id": "7343:69228",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "08b-partners-unselected.png",
+      "node_id": "7343:69236",
+      "category": "supporting",
+      "width": 375,
+      "height": 1374
+    },
+    {
+      "file": "08c-partner-profile.png",
+      "node_id": "7343:70002",
+      "category": "supporting",
+      "width": 375,
+      "height": 1978
+    },
+    {
+      "file": "state-no-partner-found.png",
+      "node_id": "7343:69374",
+      "category": "supporting",
+      "width": 375,
+      "height": 1153
+    },
+    {
+      "file": "state-sales-request-received.png",
+      "node_id": "7343:70202",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-content-type-empty.png",
+      "node_id": "7343:65494",
+      "category": "supporting",
+      "width": 1125,
+      "height": 2436
+    },
+    {
+      "file": "state-login-required.png",
+      "node_id": "9085:5251",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "state-payment-failed.png",
+      "node_id": "13276:2869",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    },
+    {
+      "file": "post-booking-summary.png",
+      "node_id": "7633:4956",
+      "category": "supporting",
+      "width": 375,
+      "height": 812
+    }
+  ]
+}

@@ -11,7 +11,8 @@ import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
-import 'package:beige/features/home/presentation/providers/home_providers.dart';
+import 'package:beige/features/booking/domain/entities/booking_flow_enums.dart';
+import 'package:beige/features/booking/presentation/providers/content_type_v2_notifier.dart';
 import 'package:beige/features/home/presentation/widgets/bookings/home_bookings_stack.dart';
 import 'package:beige/features/home/presentation/widgets/common/home_section_divider.dart';
 import 'package:beige/features/home/presentation/widgets/common/home_section_title.dart';
@@ -45,7 +46,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   final GlobalKey featuredKey = GlobalKey();
   final GlobalKey topCreativeKey = GlobalKey();
   int? contentTypeId;
-  int? bookingId;
   int _currentCard = 0;
 
   HomeModel? get homeData => ref.read(homeNotifierProvider).homeData;
@@ -455,32 +455,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AppColors.primary,
     AppColors.white70,
   ];
-  Future<void> _continueBooking(int contentType) async {
-    final repo = ref.read(homeRepositoryProvider);
-    final result = await repo.createBooking(
-      contentType: contentType,
-      bookingId: bookingId,
-    );
+  Future<void> _continueBooking(ContentTypeV2 contentType) async {
+    if (ref.read(contentTypeV2NotifierProvider).status ==
+        ContentTypeV2Status.loading) {
+      return;
+    }
+
+    await ref
+        .read(contentTypeV2NotifierProvider.notifier)
+        .submit(contentType: contentType);
 
     if (!mounted) return;
-
-    result.fold(
-      (error) => TopMessage.show(context, error.message),
-      (response) async {
-        if (response['error'] == false) {
-          bookingId = response['data']?['booking_id'];
-
-          final navResult = await context.pushNamed<int>(
-            RouteNames.videoShootType,
-            extra: {'bookingId': bookingId!, 'contentTypeId': contentType},
-          );
-
-          if (navResult != null) {
-            bookingId = navResult;
-          }
-        }
-      },
-    );
+    final state = ref.read(contentTypeV2NotifierProvider);
+    if (state.status == ContentTypeV2Status.success &&
+        state.bookingId != null) {
+      await context.pushNamed(
+        RouteNames.shootTypeV2,
+        extra: {'bookingId': state.bookingId, 'contentType': state.contentType},
+      );
+    } else {
+      TopMessage.show(context, state.errorMessage ?? 'Unable to start booking');
+    }
   }
 
   @override
@@ -542,6 +537,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
     });
 
+    final isStartingBooking =
+        ref.watch(contentTypeV2NotifierProvider).status ==
+        ContentTypeV2Status.loading;
     final isGuest = ref.watch(guestModeProvider);
     final homeState = ref.watch(homeNotifierProvider);
     final homeData = homeState.homeData;
@@ -609,22 +607,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           child: SizedBox(
                             height: 56,
                             child: ElevatedButton(
-                              onPressed: () {
-                                if (selectedIndices.isEmpty) return;
-                                final hasPhoto = selectedIndices.contains(0);
-                                final hasVideo = selectedIndices.contains(1);
+                              onPressed: isStartingBooking
+                                  ? null
+                                  : () {
+                                      if (selectedIndices.isEmpty) return;
+                                      final hasPhoto = selectedIndices.contains(
+                                        0,
+                                      );
+                                      final hasVideo = selectedIndices.contains(
+                                        1,
+                                      );
 
-                                if (hasPhoto && hasVideo) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(3);
-                                } else if (hasPhoto) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(2);
-                                } else if (hasVideo) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(1);
-                                }
-                              },
+                                      if (hasPhoto && hasVideo) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(ContentTypeV2.both);
+                                      } else if (hasPhoto) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(
+                                          ContentTypeV2.photographer,
+                                        );
+                                      } else if (hasVideo) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(
+                                          ContentTypeV2.videographer,
+                                        );
+                                      }
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: AppColors.onPrimary,
@@ -680,10 +688,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         },
                         onBookShoot: () {
                           if (_blockIfGuest()) return;
-                          context.pushNamed(
-                            RouteNames.contentType,
-                            extra: {'fromHome': true},
-                          );
+                          context.pushNamed(RouteNames.contentTypeV2);
                         },
                         onExploreCreatives: () => scrollTo(featuredKey),
                         onFindCreative: () => scrollTo(topCreativeKey),
@@ -753,10 +758,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         }),
                         onBookShoot: () {
                           if (_blockIfGuest()) return;
-                          context.pushNamed(
-                            RouteNames.contentType,
-                            extra: {'fromHome': true},
-                          );
+                          context.pushNamed(RouteNames.contentTypeV2);
                         },
                         onCardTap: (booking) {
                           context.pushNamed(

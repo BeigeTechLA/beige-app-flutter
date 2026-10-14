@@ -1,7 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class DateTimeUtils {
+  // ───────────────────────────────────────────────────────────────
+  // Timezone — API datetimes are UTC; display converts to the user's
+  // IANA zone. Set once at app start / login via [setActiveTimezone].
+  // ───────────────────────────────────────────────────────────────
+
+  /// Active IANA timezone name (e.g. `America/Los_Angeles`). Empty means
+  /// "fall back to UTC". Updated by [setActiveTimezone].
+  static String _activeIana = '';
+
+  /// Set the active IANA timezone used by the tz-aware display methods.
+  /// Safe to call repeatedly (login, app start, future profile override).
+  static void setActiveTimezone(String iana) => _activeIana = iana;
+
+  /// Current active IANA timezone name, empty when unset.
+  static String get activeTimezone => _activeIana;
+
+  /// Resolve the active zone to a tz [tz.Location], never throwing.
+  /// Falls back to UTC for empty/unknown names.
+  static tz.Location _activeLocation() {
+    if (_activeIana.isEmpty) return tz.UTC;
+    try {
+      return tz.getLocation(_activeIana);
+    } catch (_) {
+      return tz.UTC;
+    }
+  }
+
+  /// Parse a UTC datetime string and convert it to the active user zone.
+  /// A naive string (no `Z`/offset) is treated as UTC. Returns `null` on
+  /// empty/invalid input.
+  static tz.TZDateTime? _toUserZone(String? utcIso) {
+    if (utcIso == null || utcIso.isEmpty) return null;
+    final parsed = DateTime.tryParse(utcIso);
+    if (parsed == null) return null;
+    final utc = parsed.isUtc
+        ? parsed
+        : DateTime.utc(
+            parsed.year,
+            parsed.month,
+            parsed.day,
+            parsed.hour,
+            parsed.minute,
+            parsed.second,
+            parsed.millisecond,
+            parsed.microsecond,
+          );
+    return tz.TZDateTime.from(utc, _activeLocation());
+  }
+
   // ───────────────────────────────────────────────────────────────
   // Format pattern constants (single source of truth).
   // ───────────────────────────────────────────────────────────────
@@ -131,8 +181,50 @@ class DateTimeUtils {
     try {
       if (isoTime == null || isoTime.isEmpty) return fallback;
 
-      final parsed = DateTime.parse(isoTime).toLocal();
-      return DateFormat(kTimelineDateTimePattern).format(parsed);
+      // ISO timestamp is an absolute UTC instant — render in the user's zone.
+      final zoned = _toUserZone(isoTime);
+      if (zoned == null) return fallback;
+      return DateFormat(kTimelineDateTimePattern).format(zoned);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────
+  // Zoned formatters — accept an absolute instant (UTC or any DateTime)
+  // and render it in the active user timezone. Use for server UTC
+  // timestamps (meeting start/end, timeline events). Do NOT use for
+  // wall-clock booking fields (date-only / time-only), which are
+  // zone-agnostic appointment values.
+  // ───────────────────────────────────────────────────────────────
+
+  /// Convert any absolute [DateTime] instant into the active user zone.
+  /// Public — used where wall-clock fields (hour/day) must be read in the
+  /// user's zone, e.g. prefilling an edit form from a UTC meeting instant.
+  static tz.TZDateTime toUserZone(DateTime instant) =>
+      tz.TZDateTime.from(instant.toUtc(), _activeLocation());
+
+  static tz.TZDateTime _instantToUserZone(DateTime instant) =>
+      toUserZone(instant);
+
+  /// ✅ Zoned date (meeting listing/details) → May 19,2026
+  static String formatZonedMeetingDate(DateTime? instant,
+      {String fallback = "--"}) {
+    try {
+      if (instant == null) return fallback;
+      return DateFormat(kMeetingDatePattern)
+          .format(_instantToUserZone(instant));
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  /// ✅ Zoned time → 09:00 AM
+  static String formatZonedTime(DateTime? instant, {String fallback = "--"}) {
+    try {
+      if (instant == null) return fallback;
+      return DateFormat(kTime12HourPattern)
+          .format(_instantToUserZone(instant));
     } catch (_) {
       return fallback;
     }

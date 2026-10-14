@@ -13,10 +13,14 @@ class CreativeRepositoryImpl implements CreativeRepository {
   @override
   Future<Either<AppException, Map<String, dynamic>>> getCreativeProfile({
     required int creativeId,
+    double? latitude,
+    double? longitude,
   }) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.getCreativeProfile(
         creativeId: creativeId,
+        latitude: latitude,
+        longitude: longitude,
       );
       _assertNoError(response);
       return response['data'] as Map<String, dynamic>;

@@ -176,4 +176,77 @@ void main() {
       expect(store.readCancelBookingDraft(), isNull);
     });
   });
+
+  group('BookingDraft v2 fields', () {
+    const draftV2 = BookingDraft(
+      bookingId: 10,
+      scheduleMode: 'dated',
+      matchingMethod: 'manual',
+      shootTypeName: 'Wedding',
+      editsNeeded: true,
+      videoEditTypes: ['highlight_video_4_7', 'feature_video_10_20'],
+      photoEditTypes: ['edited_photos'],
+      roleCounts: {'photographer': 1, 'videographer': 1, 'photoVideoCreator': 0},
+    );
+
+    test('happy path — JSON round-trip preserves every v2 field', () {
+      final restored = BookingDraft.fromJson(draftV2.toJson());
+      expect(restored.scheduleMode, 'dated');
+      expect(restored.matchingMethod, 'manual');
+      expect(restored.shootTypeName, 'Wedding');
+      expect(restored.editsNeeded, true);
+      expect(restored.videoEditTypes, ['highlight_video_4_7', 'feature_video_10_20']);
+      expect(restored.photoEditTypes, ['edited_photos']);
+      expect(restored.roleCounts, {
+        'photographer': 1,
+        'videographer': 1,
+        'photoVideoCreator': 0,
+      });
+    });
+
+    test('route-extra round-trip carries v2 fields through the draft merge', () {
+      final fromExtra = BookingDraft.fromRouteExtra(draftV2.toRouteExtra());
+      expect(fromExtra.scheduleMode, 'dated');
+      expect(fromExtra.matchingMethod, 'manual');
+      expect(fromExtra.editsNeeded, true);
+      expect(fromExtra.photoEditTypes, ['edited_photos']);
+      expect(fromExtra.roleCounts?['photographer'], 1);
+    });
+
+    test('edge case — absent v2 fields serialize to nothing and read as null', () {
+      const bare = BookingDraft(bookingId: 1);
+      expect(bare.toJson().containsKey('scheduleMode'), false);
+      expect(bare.toJson().containsKey('roleCounts'), false);
+      final restored = BookingDraft.fromJson(bare.toJson());
+      expect(restored.scheduleMode, isNull);
+      expect(restored.videoEditTypes, isNull);
+      expect(restored.roleCounts, isNull);
+    });
+
+    test('error case — malformed roleCounts/list values are coerced safely', () {
+      final restored = BookingDraft.fromJson({
+        'bookingId': 2,
+        'roleCounts': {'photographer': '3', 'bad': 'x'},
+        'videoEditTypes': [1, 'two'],
+      });
+      // string-numeric coerced, non-numeric dropped
+      expect(restored.roleCounts, {'photographer': 3});
+      expect(restored.videoEditTypes, ['1', 'two']);
+    });
+
+    test('copyWith overwrites a single field, leaving others intact', () {
+      final updated = draftV2.copyWith(matchingMethod: 'beigeMatch');
+      expect(updated.matchingMethod, 'beigeMatch');
+      expect(updated.scheduleMode, 'dated');
+      expect(updated.shootTypeName, 'Wedding');
+    });
+
+    test('mergeOver does not overwrite an existing v2 value', () {
+      const partial = BookingDraft(matchingMethod: 'manual');
+      const stored = BookingDraft(matchingMethod: 'beigeMatch', scheduleMode: 'deferred');
+      final merged = partial.mergeOver(stored);
+      expect(merged.matchingMethod, 'manual'); // kept
+      expect(merged.scheduleMode, 'deferred'); // filled
+    });
+  });
 }
