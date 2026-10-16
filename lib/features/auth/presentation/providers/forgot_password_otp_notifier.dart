@@ -4,7 +4,7 @@ import 'auth_providers.dart';
 import 'forgot_password_otp_state.dart';
 
 class ForgotPasswordOtpNotifier
-    extends AutoDisposeNotifier<ForgotPasswordOtpState> {
+    extends Notifier<ForgotPasswordOtpState> {
   @override
   ForgotPasswordOtpState build() => const ForgotPasswordOtpState();
 

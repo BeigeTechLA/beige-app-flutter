@@ -10,13 +10,16 @@ import 'folder_contents_state.dart';
 /// [FolderBrowseRepository]. Current API returns a single unpaginated
 /// page per folder — [loadMore] is a no-op until the endpoint adds
 /// paging, and [refresh] is the only way to re-fetch.
-class FolderContentsNotifier
-    extends AutoDisposeFamilyNotifier<FolderContentsState, FmFolderKey> {
+class FolderContentsNotifier extends Notifier<FolderContentsState> {
   late FolderBrowseRepository _repo;
   late FmFolderKey _key;
 
+  FolderContentsNotifier(this.key);
+
+  final FmFolderKey key;
+
   @override
-  FolderContentsState build(FmFolderKey key) {
+  FolderContentsState build() {
     _repo = ref.watch(folderBrowseRepositoryProvider);
     _key = key;
     Future.microtask(_loadFirst);
@@ -60,7 +63,7 @@ class FolderContentsNotifier
   }
 }
 
-final folderContentsNotifierProvider = AutoDisposeNotifierProvider
+final folderContentsNotifierProvider = NotifierProvider.autoDispose
     .family<FolderContentsNotifier, FolderContentsState, FmFolderKey>(
       FolderContentsNotifier.new,
     );

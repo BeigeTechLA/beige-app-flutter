@@ -17,7 +17,7 @@ import '../../domain/repositories/meetings_repository.dart';
 import 'create_meeting_state.dart';
 import 'meetings_repository_provider.dart';
 
-class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
+class CreateMeetingNotifier extends Notifier<CreateMeetingState> {
   late final MeetingsRepository _repo;
   late final SessionStore _session;
 
@@ -308,6 +308,6 @@ class CreateMeetingNotifier extends AutoDisposeNotifier<CreateMeetingState> {
 }
 
 final createMeetingNotifierProvider =
-    AutoDisposeNotifierProvider<CreateMeetingNotifier, CreateMeetingState>(
+    NotifierProvider.autoDispose<CreateMeetingNotifier, CreateMeetingState>(
       CreateMeetingNotifier.new,
     );

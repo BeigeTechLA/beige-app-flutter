@@ -35,7 +35,7 @@ class ContentTypeState {
   }
 }
 
-class ContentTypeNotifier extends AutoDisposeNotifier<ContentTypeState> {
+class ContentTypeNotifier extends Notifier<ContentTypeState> {
   bool _stepCompleted = false;
 
   @override

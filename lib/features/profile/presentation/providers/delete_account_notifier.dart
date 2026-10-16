@@ -24,7 +24,7 @@ class DeleteAccountState {
   }
 }
 
-class DeleteAccountNotifier extends AutoDisposeNotifier<DeleteAccountState> {
+class DeleteAccountNotifier extends Notifier<DeleteAccountState> {
   @override
   DeleteAccountState build() => const DeleteAccountState();
 

@@ -6,7 +6,7 @@ import '../../../../core/firebase/analytics_service.dart';
 import 'auth_providers.dart';
 import 'forgot_password_state.dart';
 
-class ForgotPasswordNotifier extends AutoDisposeNotifier<ForgotPasswordState> {
+class ForgotPasswordNotifier extends Notifier<ForgotPasswordState> {
   @override
   ForgotPasswordState build() => const ForgotPasswordState();
 

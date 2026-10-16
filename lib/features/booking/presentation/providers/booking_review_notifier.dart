@@ -55,12 +55,15 @@ class BookingReviewState {
   }
 }
 
-class BookingReviewNotifier
-    extends AutoDisposeFamilyNotifier<BookingReviewState, int> {
+class BookingReviewNotifier extends Notifier<BookingReviewState> {
   bool _stepCompleted = false;
 
+  BookingReviewNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  BookingReviewState build(int bookingId) {
+  BookingReviewState build() {
     // --- Booking Analytics: Drop-off tracking for Step 7 ---
     ref.onDispose(() {
       if (!_stepCompleted) {

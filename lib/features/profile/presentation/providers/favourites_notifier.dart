@@ -34,7 +34,7 @@ class FavouritesState {
   }
 }
 
-class FavouritesNotifier extends AutoDisposeNotifier<FavouritesState> {
+class FavouritesNotifier extends Notifier<FavouritesState> {
   @override
   FavouritesState build() {
     fetchFavourites();

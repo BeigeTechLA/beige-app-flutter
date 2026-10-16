@@ -60,7 +60,7 @@ class EditingState {
 /// `PUT /bookings/:id/edits`. Edit keys are sent verbatim; the app never
 /// renames or invents them, and never computes included-photo counts (those are
 /// server-calculated and surfaced on the Review screen).
-class EditingNotifier extends AutoDisposeNotifier<EditingState> {
+class EditingNotifier extends Notifier<EditingState> {
   @override
   EditingState build() => const EditingState();
 

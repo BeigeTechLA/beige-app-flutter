@@ -31,7 +31,7 @@ class DeleteAccountOtpState {
 }
 
 class DeleteAccountOtpNotifier
-    extends AutoDisposeNotifier<DeleteAccountOtpState> {
+    extends Notifier<DeleteAccountOtpState> {
   @override
   DeleteAccountOtpState build() => const DeleteAccountOtpState();
 

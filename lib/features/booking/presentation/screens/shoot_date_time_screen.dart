@@ -50,7 +50,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   /// Active IANA zone for the booking payload. Resolved chain (app-root
   /// already resolved it): login `user_timezone` pref → device IANA → UTC.
   String _timeZone() =>
-      ref.read(resolvedTimezoneProvider).valueOrNull ??
+      ref.read(resolvedTimezoneProvider).value ??
       ref.read(sharedPreferencesProvider).getString(kUserTimezonePrefKey) ??
       'UTC';
 

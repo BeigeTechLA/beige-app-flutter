@@ -30,7 +30,7 @@ class CancelShootState {
   }
 }
 
-class CancelShootNotifier extends AutoDisposeNotifier<CancelShootState> {
+class CancelShootNotifier extends Notifier<CancelShootState> {
   @override
   CancelShootState build() {
     return const CancelShootState();

@@ -122,7 +122,7 @@ class PartnerMatchesState {
 /// dual-role [CrewAssignment] (pure logic lives in `crew_assignment.dart`), and
 /// exposes the flat `selectedCrewIds` submitted later on `PUT /submit`.
 class PartnerMatchesNotifier
-    extends AutoDisposeNotifier<PartnerMatchesState> {
+    extends Notifier<PartnerMatchesState> {
   @override
   PartnerMatchesState build() => const PartnerMatchesState();
 

@@ -32,12 +32,15 @@ class CancelMeetingState {
 /// Wraps `MeetingsRepository.delete` with a status enum so the UI can show a
 /// loading state on the Cancel button + react to success / error via
 /// `ref.listen`. Family-keyed by meetingId so two cancel flows don't collide.
-class CancelMeetingNotifier
-    extends AutoDisposeFamilyNotifier<CancelMeetingState, String> {
+class CancelMeetingNotifier extends Notifier<CancelMeetingState> {
   late final MeetingsRepository _repo;
 
+  CancelMeetingNotifier(this.meetingId);
+
+  final String meetingId;
+
   @override
-  CancelMeetingState build(String meetingId) {
+  CancelMeetingState build() {
     _repo = ref.watch(meetingsRepositoryProvider);
     return const CancelMeetingState();
   }
@@ -49,7 +52,7 @@ class CancelMeetingNotifier
       clearError: true,
     );
     try {
-      await _repo.delete(arg);
+      await _repo.delete(meetingId);
       state = state.copyWith(status: CancelMeetingStatus.done);
     } catch (err) {
       state = state.copyWith(

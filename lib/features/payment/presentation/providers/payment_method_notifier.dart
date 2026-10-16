@@ -36,10 +36,13 @@ class PaymentMethodState {
   }
 }
 
-class PaymentMethodNotifier
-    extends AutoDisposeFamilyNotifier<PaymentMethodState, int> {
+class PaymentMethodNotifier extends Notifier<PaymentMethodState> {
+  PaymentMethodNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  PaymentMethodState build(int bookingId) {
+  PaymentMethodState build() {
     _fetchPaymentMethods();
     return const PaymentMethodState(status: PaymentMethodStatus.loading);
   }

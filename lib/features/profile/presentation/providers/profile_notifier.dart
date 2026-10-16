@@ -40,7 +40,7 @@ class ProfileState {
   }
 }
 
-class ProfileNotifier extends AutoDisposeNotifier<ProfileState> {
+class ProfileNotifier extends Notifier<ProfileState> {
   @override
   ProfileState build() {
     final prefs = ref.watch(sharedPreferencesProvider);

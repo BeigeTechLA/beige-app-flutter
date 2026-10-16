@@ -37,7 +37,7 @@ class ReviewV2State {
 /// Pricing is never computed in the app — the review payload is rendered
 /// verbatim. The screen owns navigation (WebView push + success route); this
 /// notifier only performs the transport steps and tracks status.
-class ReviewV2Notifier extends AutoDisposeNotifier<ReviewV2State> {
+class ReviewV2Notifier extends Notifier<ReviewV2State> {
   @override
   ReviewV2State build() => const ReviewV2State();
 

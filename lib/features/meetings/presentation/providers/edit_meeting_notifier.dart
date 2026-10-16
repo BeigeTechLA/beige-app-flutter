@@ -11,12 +11,15 @@ import 'meetings_repository_provider.dart';
 
 /// Loads an existing meeting, hydrates the form, builds the `UpdateMeetingInput`
 /// diff on submit. Family-keyed by `meetingId` so two edits don't share state.
-class EditMeetingNotifier
-    extends AutoDisposeFamilyNotifier<EditMeetingState, String> {
+class EditMeetingNotifier extends Notifier<EditMeetingState> {
   late final MeetingsRepository _repo;
 
+  EditMeetingNotifier(this.meetingId);
+
+  final String meetingId;
+
   @override
-  EditMeetingState build(String meetingId) {
+  EditMeetingState build() {
     _repo = ref.watch(meetingsRepositoryProvider);
     _load(meetingId);
     return const EditMeetingState(status: EditMeetingStatus.loading);
@@ -37,7 +40,7 @@ class EditMeetingNotifier
   Future<void> retryLoad() async {
     if (state.original != null) return;
     state = const EditMeetingState(status: EditMeetingStatus.loading);
-    await _load(arg);
+    await _load(meetingId);
   }
 
   void setTitle(String v) => state = state.copyWith(title: v);
@@ -63,7 +66,7 @@ class EditMeetingNotifier
       clearError: true,
     );
     try {
-      await _repo.update(arg, patch);
+      await _repo.update(meetingId, patch);
       state = state.copyWith(status: EditMeetingStatus.saved);
     } catch (err) {
       state = state.copyWith(

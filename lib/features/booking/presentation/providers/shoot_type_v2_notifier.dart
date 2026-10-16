@@ -31,7 +31,7 @@ class ShootTypeV2State {
 
 /// Screen 2 — Shoot Type. Loads the content-agnostic catalogue and saves the
 /// selected shoot type by NAME (`shoot_type`), never by id, per contract.
-class ShootTypeV2Notifier extends AutoDisposeNotifier<ShootTypeV2State> {
+class ShootTypeV2Notifier extends Notifier<ShootTypeV2State> {
   @override
   ShootTypeV2State build() => const ShootTypeV2State();
 

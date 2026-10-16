@@ -26,7 +26,7 @@ typedef _PreviewKey = ({
 });
 
 /// Value-based keys reuse state even when a refreshed listing recreates FmFile.
-AutoDisposeFutureProvider<String?> fileImagePreviewProvider(FmFile file) =>
+FutureProvider<String?> fileImagePreviewProvider(FmFile file) =>
     _imagePreviewProvider((
       cacheKey: fileImageCacheKey(file),
       isImage:

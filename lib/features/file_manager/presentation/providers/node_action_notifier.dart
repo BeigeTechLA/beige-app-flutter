@@ -16,7 +16,7 @@ import 'node_action_state.dart';
 /// State is keyed by the resource's `filepath` (or fallback id for
 /// dummy nodes). Widgets read `isSharing / isDownloading / isDeleting`
 /// on the same string they pass into the command.
-class NodeActionNotifier extends AutoDisposeNotifier<NodeActionState> {
+class NodeActionNotifier extends Notifier<NodeActionState> {
   late FileOpsRepository _repo;
 
   @override
@@ -258,6 +258,6 @@ class NodeActionNotifier extends AutoDisposeNotifier<NodeActionState> {
 }
 
 final nodeActionNotifierProvider =
-    AutoDisposeNotifierProvider<NodeActionNotifier, NodeActionState>(
+    NotifierProvider.autoDispose<NodeActionNotifier, NodeActionState>(
       NodeActionNotifier.new,
     );

@@ -145,12 +145,15 @@ class ChatThreadState {
   }
 }
 
-class ChatThreadNotifier
-    extends AutoDisposeFamilyNotifier<ChatThreadState, String> {
+class ChatThreadNotifier extends Notifier<ChatThreadState> {
   StreamSubscription<ChatSocketEvent>? _eventsSub;
 
+  ChatThreadNotifier(this.arg);
+
+  final String arg;
+
   @override
-  ChatThreadState build(String arg) {
+  ChatThreadState build() {
     final repo = ref.read(messagesRepositoryProvider);
     // Publish this thread as the active room so the conversation-list
     // notifier skips bumping its badge on inbound socket events. Deferred
@@ -638,7 +641,7 @@ class ChatThreadNotifier
 }
 
 final chatThreadProvider =
-    AutoDisposeNotifierProviderFamily<
+    NotifierProvider.autoDispose.family<
       ChatThreadNotifier,
       ChatThreadState,
       String

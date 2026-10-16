@@ -19,7 +19,7 @@ import '../../../profile/presentation/providers/profile_providers.dart';
 import 'auth_providers.dart';
 import 'login_state.dart';
 
-class LoginNotifier extends AutoDisposeNotifier<LoginState> {
+class LoginNotifier extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginState();
 

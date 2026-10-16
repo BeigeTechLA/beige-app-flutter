@@ -25,7 +25,7 @@ class CreativeBriefState {
 /// Screen 4 — Creative Brief. Saves the optional narrative + inspiration links
 /// via `PUT /bookings/:id/details`. Transport-only: the screen assembles the
 /// `additional_details` string and `reference_links` array.
-class CreativeBriefNotifier extends AutoDisposeNotifier<CreativeBriefState> {
+class CreativeBriefNotifier extends Notifier<CreativeBriefState> {
   @override
   CreativeBriefState build() => const CreativeBriefState();
 

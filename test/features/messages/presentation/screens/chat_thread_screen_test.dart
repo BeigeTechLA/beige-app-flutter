@@ -9,10 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 class MockChatThreadNotifier extends ChatThreadNotifier {
   final ChatThreadState _mockState;
 
-  MockChatThreadNotifier(this._mockState);
+  MockChatThreadNotifier(this._mockState) : super('mock-conversation');
 
   @override
-  ChatThreadState build(String arg) {
+  ChatThreadState build() {
     return _mockState;
   }
 

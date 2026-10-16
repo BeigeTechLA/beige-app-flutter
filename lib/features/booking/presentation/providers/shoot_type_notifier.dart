@@ -36,11 +36,15 @@ class ShootTypeState {
   }
 }
 
-class ShootTypeNotifier extends AutoDisposeFamilyNotifier<ShootTypeState, int> {
+class ShootTypeNotifier extends Notifier<ShootTypeState> {
   bool _stepCompleted = false;
 
+  ShootTypeNotifier(this.contentTypeId);
+
+  final int contentTypeId;
+
   @override
-  ShootTypeState build(int contentTypeId) {
+  ShootTypeState build() {
     // --- Booking Analytics: Drop-off tracking for Step 2 ---
     ref.onDispose(() {
       if (!_stepCompleted && state.bookingId != null) {

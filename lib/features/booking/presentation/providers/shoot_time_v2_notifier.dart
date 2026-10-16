@@ -25,7 +25,7 @@ class ShootTimeV2State {
 /// Screen 3 — saves the When & Where selection via `PUT /bookings/:id/time`.
 /// The payload is assembled by [ShootTimePayload] in the screen and passed in
 /// whole, so this notifier stays transport-only.
-class ShootTimeV2Notifier extends AutoDisposeNotifier<ShootTimeV2State> {
+class ShootTimeV2Notifier extends Notifier<ShootTimeV2State> {
   @override
   ShootTimeV2State build() => const ShootTimeV2State();
 

@@ -30,7 +30,7 @@ class HomeState {
   }
 }
 
-class HomeNotifier extends AutoDisposeNotifier<HomeState> {
+class HomeNotifier extends Notifier<HomeState> {
   @override
   HomeState build() {
     final isGuest = ref.read(guestModeProvider);

@@ -9,13 +9,16 @@ import 'comments_repository_provider.dart';
 /// mutations (post/reply/delete) update the state in place after the
 /// server round-trip so consumers see the new comment immediately without
 /// a full re-fetch.
-class CommentsNotifier
-    extends AutoDisposeFamilyAsyncNotifier<List<FmComment>, String> {
+class CommentsNotifier extends AsyncNotifier<List<FmComment>> {
   late CommentsRepository _repo;
   late String _fileMetaId;
 
+  CommentsNotifier(this.fileMetaId);
+
+  final String fileMetaId;
+
   @override
-  Future<List<FmComment>> build(String fileMetaId) async {
+  Future<List<FmComment>> build() async {
     _repo = ref.watch(commentsRepositoryProvider);
     _fileMetaId = fileMetaId;
     return _repo.list(fileMetaId);
@@ -109,7 +112,7 @@ class CommentsNotifier
   }
 }
 
-final commentsNotifierProvider = AutoDisposeAsyncNotifierProvider
+final commentsNotifierProvider = AsyncNotifierProvider.autoDispose
     .family<CommentsNotifier, List<FmComment>, String>(
       CommentsNotifier.new,
     );

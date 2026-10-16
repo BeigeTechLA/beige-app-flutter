@@ -36,7 +36,7 @@ class ContentTypeV2State {
 /// Screen 1 — Content Type. Creates (or continues) the draft booking with the
 /// `content_type` string. Changing content type on an existing booking resets
 /// shoot type / crew / edits server-side, so the UI restarts from Screen 2.
-class ContentTypeV2Notifier extends AutoDisposeNotifier<ContentTypeV2State> {
+class ContentTypeV2Notifier extends Notifier<ContentTypeV2State> {
   @override
   ContentTypeV2State build() => const ContentTypeV2State();
 

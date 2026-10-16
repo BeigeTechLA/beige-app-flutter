@@ -111,7 +111,7 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
   /// Resolved chain (app-root already resolved it): login `user_timezone`
   /// pref → device IANA → UTC, with a last-resort constant fallback.
   String _timeZone() =>
-      ref.read(resolvedTimezoneProvider).valueOrNull ??
+      ref.read(resolvedTimezoneProvider).value ??
       ref.read(sharedPreferencesProvider).getString(kUserTimezonePrefKey) ??
       _fallbackTimeZone;
 
