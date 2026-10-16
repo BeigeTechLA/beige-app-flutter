@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
@@ -48,12 +47,10 @@ class MeetingCard extends StatefulWidget {
 }
 
 class _MeetingCardState extends State<MeetingCard> {
-  static final _time = DateFormat('hh:mm a');
-
   String get _dateLabel =>
-      DateTimeUtils.formatMeetingDate(widget.meeting.startAt);
+      DateTimeUtils.formatZonedMeetingDate(widget.meeting.startAt);
   String get _timeLabel =>
-      '${_time.format(widget.meeting.startAt)} to ${_time.format(widget.meeting.endAt)}';
+      '${DateTimeUtils.formatZonedTime(widget.meeting.startAt)} to ${DateTimeUtils.formatZonedTime(widget.meeting.endAt)}';
 
   bool get _showRsvp {
     debugPrint(

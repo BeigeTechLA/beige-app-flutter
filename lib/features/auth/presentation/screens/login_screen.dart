@@ -84,6 +84,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       emailController.text = savedEmail;
       passwordController.text = savedPassword;
       setState(() => savePassword = true);
+      return;
+    }
+
+    if (kDebugMode) {
+      emailController.text = 'pranav+RPclientSmeet@revurge.com';
+      passwordController.text = 'password1';
+      setState(() {});
     }
   }
 

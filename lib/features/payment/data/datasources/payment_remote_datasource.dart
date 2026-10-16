@@ -16,10 +16,11 @@ class PaymentRemoteDataSource {
   /// POST bookings/{bookingId}/paymentsheet
   Future<Map<String, dynamic>> createPaymentSheet({
     required int bookingId,
+    Map<String, dynamic>? data,
   }) async {
     final response = await _dioClient.dio.post(
       '${ApiEndpoints.bookings}/$bookingId/paymentsheet',
-      data: {},
+      data: data ?? {'payment_method': 'commas'},
     );
     return response.data as Map<String, dynamic>;
   }

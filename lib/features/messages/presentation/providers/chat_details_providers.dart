@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../domain/entities/chat_details.dart';
 import 'messages_repository_provider.dart';
 
@@ -12,14 +10,7 @@ final chatDetailsProvider =
       ref,
       conversationId,
     ) async {
-      try {
-        return await ref
-            .read(messagesRepositoryProvider)
-            .fetchDetails(conversationId);
-      } catch (e) {
-        if (e is UnauthorizedException) {
-          ref.read(authStateProvider.notifier).updateState(false);
-        }
-        rethrow;
-      }
+      return await ref
+          .read(messagesRepositoryProvider)
+          .fetchDetails(conversationId);
     });

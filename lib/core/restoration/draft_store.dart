@@ -127,6 +127,14 @@ class BookingDraft {
     this.bookingId,
     this.value,
     this.currentRoute,
+    this.contentType,
+    this.scheduleMode,
+    this.matchingMethod,
+    this.shootTypeName,
+    this.editsNeeded,
+    this.videoEditTypes,
+    this.photoEditTypes,
+    this.roleCounts,
   });
 
   final int? contentTypeId;
@@ -140,12 +148,47 @@ class BookingDraft {
   /// the wizard at the right step.
   final String? currentRoute;
 
+  // ── Book-a-Shoot v2 fields ──────────────────────────────────────────
+  // Enums are stored as raw strings so `core/` stays free of feature
+  // imports; the booking feature maps them to ScheduleMode / MatchingMethod.
+
+  /// API `content_type` string, e.g. `'photographer,videographer'`. v2 submits
+  /// this string (the legacy [contentTypeId] int is kept for the v1 flow).
+  final String? contentType;
+
+  /// `'dated'` | `'deferred'` (ScheduleMode.name).
+  final String? scheduleMode;
+
+  /// `'beigeMatch'` | `'manual'` (MatchingMethod.name).
+  final String? matchingMethod;
+
+  /// Shoot type is submitted by NAME in v2 (not id), e.g. `'Wedding'`.
+  final String? shootTypeName;
+
+  final bool? editsNeeded;
+
+  /// Expanded, payload-ready edit keys from `GET /bookings/edit-types`.
+  final List<String>? videoEditTypes;
+  final List<String>? photoEditTypes;
+
+  /// Total creators required by role, e.g.
+  /// `{'photographer': 1, 'videographer': 1, 'photoVideoCreator': 0}`.
+  final Map<String, int>? roleCounts;
+
   Map<String, dynamic> toJson() => {
     if (contentTypeId != null) 'contentTypeId': contentTypeId,
     if (shootTypeId != null) 'shootTypeId': shootTypeId,
     if (bookingId != null) 'bookingId': bookingId,
     if (value != null) 'value': value,
     if (currentRoute != null) 'currentRoute': currentRoute,
+    if (contentType != null) 'contentType': contentType,
+    if (scheduleMode != null) 'scheduleMode': scheduleMode,
+    if (matchingMethod != null) 'matchingMethod': matchingMethod,
+    if (shootTypeName != null) 'shootTypeName': shootTypeName,
+    if (editsNeeded != null) 'editsNeeded': editsNeeded,
+    if (videoEditTypes != null) 'videoEditTypes': videoEditTypes,
+    if (photoEditTypes != null) 'photoEditTypes': photoEditTypes,
+    if (roleCounts != null) 'roleCounts': roleCounts,
   };
 
   factory BookingDraft.fromJson(Map<String, dynamic> json) => BookingDraft(
@@ -154,6 +197,14 @@ class BookingDraft {
     bookingId: _asInt(json['bookingId']),
     value: _asInt(json['value']),
     currentRoute: json['currentRoute'] as String?,
+    contentType: json['contentType'] as String?,
+    scheduleMode: json['scheduleMode'] as String?,
+    matchingMethod: json['matchingMethod'] as String?,
+    shootTypeName: json['shootTypeName'] as String?,
+    editsNeeded: json['editsNeeded'] as bool?,
+    videoEditTypes: _asStringList(json['videoEditTypes']),
+    photoEditTypes: _asStringList(json['photoEditTypes']),
+    roleCounts: _asIntMap(json['roleCounts']),
   );
 
   /// Convenience builder from the `state.extra` map shape used by the
@@ -170,6 +221,14 @@ class BookingDraft {
       bookingId: _asInt(map['bookingId']),
       value: _asInt(map['value']),
       currentRoute: currentRoute,
+      contentType: map['contentType'] as String?,
+      scheduleMode: map['scheduleMode'] as String?,
+      matchingMethod: map['matchingMethod'] as String?,
+      shootTypeName: map['shootTypeName'] as String?,
+      editsNeeded: map['editsNeeded'] as bool?,
+      videoEditTypes: _asStringList(map['videoEditTypes']),
+      photoEditTypes: _asStringList(map['photoEditTypes']),
+      roleCounts: _asIntMap(map['roleCounts']),
     );
   }
 
@@ -179,6 +238,14 @@ class BookingDraft {
     if (shootTypeId != null) 'ShootTypeId': shootTypeId,
     if (bookingId != null) 'bookingId': bookingId,
     if (value != null) 'value': value,
+    if (contentType != null) 'contentType': contentType,
+    if (scheduleMode != null) 'scheduleMode': scheduleMode,
+    if (matchingMethod != null) 'matchingMethod': matchingMethod,
+    if (shootTypeName != null) 'shootTypeName': shootTypeName,
+    if (editsNeeded != null) 'editsNeeded': editsNeeded,
+    if (videoEditTypes != null) 'videoEditTypes': videoEditTypes,
+    if (photoEditTypes != null) 'photoEditTypes': photoEditTypes,
+    if (roleCounts != null) 'roleCounts': roleCounts,
   };
 
   BookingDraft mergeOver(BookingDraft other) => BookingDraft(
@@ -187,6 +254,46 @@ class BookingDraft {
     bookingId: bookingId ?? other.bookingId,
     value: value ?? other.value,
     currentRoute: currentRoute ?? other.currentRoute,
+    contentType: contentType ?? other.contentType,
+    scheduleMode: scheduleMode ?? other.scheduleMode,
+    matchingMethod: matchingMethod ?? other.matchingMethod,
+    shootTypeName: shootTypeName ?? other.shootTypeName,
+    editsNeeded: editsNeeded ?? other.editsNeeded,
+    videoEditTypes: videoEditTypes ?? other.videoEditTypes,
+    photoEditTypes: photoEditTypes ?? other.photoEditTypes,
+    roleCounts: roleCounts ?? other.roleCounts,
+  );
+
+  /// Non-null overwrite copy. Unlike [mergeOver] (fills only missing fields),
+  /// this lets a screen update a field to a fresh value as the user advances.
+  BookingDraft copyWith({
+    int? contentTypeId,
+    int? shootTypeId,
+    int? bookingId,
+    int? value,
+    String? currentRoute,
+    String? contentType,
+    String? scheduleMode,
+    String? matchingMethod,
+    String? shootTypeName,
+    bool? editsNeeded,
+    List<String>? videoEditTypes,
+    List<String>? photoEditTypes,
+    Map<String, int>? roleCounts,
+  }) => BookingDraft(
+    contentTypeId: contentTypeId ?? this.contentTypeId,
+    shootTypeId: shootTypeId ?? this.shootTypeId,
+    bookingId: bookingId ?? this.bookingId,
+    value: value ?? this.value,
+    currentRoute: currentRoute ?? this.currentRoute,
+    contentType: contentType ?? this.contentType,
+    scheduleMode: scheduleMode ?? this.scheduleMode,
+    matchingMethod: matchingMethod ?? this.matchingMethod,
+    shootTypeName: shootTypeName ?? this.shootTypeName,
+    editsNeeded: editsNeeded ?? this.editsNeeded,
+    videoEditTypes: videoEditTypes ?? this.videoEditTypes,
+    photoEditTypes: photoEditTypes ?? this.photoEditTypes,
+    roleCounts: roleCounts ?? this.roleCounts,
   );
 }
 
@@ -365,5 +472,24 @@ int? _asInt(Object? value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   if (value is String) return int.tryParse(value);
+  return null;
+}
+
+List<String>? _asStringList(Object? value) {
+  if (value is List) {
+    return value.map((e) => e.toString()).toList(growable: false);
+  }
+  return null;
+}
+
+Map<String, int>? _asIntMap(Object? value) {
+  if (value is Map) {
+    final out = <String, int>{};
+    value.forEach((k, v) {
+      final i = _asInt(v);
+      if (i != null) out[k.toString()] = i;
+    });
+    return out;
+  }
   return null;
 }

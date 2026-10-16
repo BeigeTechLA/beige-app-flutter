@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../app/assets.dart';
 import '../../../../app/colors.dart';
@@ -147,10 +146,8 @@ class _DetailsBody extends ConsumerWidget {
   final ScrollController scrollController;
   final bool isOwner;
 
-  static final _timeFmt = DateFormat('hh:mm a');
-
   String get _dateTimeLabel =>
-      '${DateTimeUtils.formatMeetingDate(meeting.startAt)} ${_timeFmt.format(meeting.startAt)} - ${_timeFmt.format(meeting.endAt)}';
+      '${DateTimeUtils.formatZonedMeetingDate(meeting.startAt)} ${DateTimeUtils.formatZonedTime(meeting.startAt)} - ${DateTimeUtils.formatZonedTime(meeting.endAt)}';
 
   /// Current user's RSVP — precomputed at the DTO boundary from the
   /// meeting-level `participant_responses[]` array against the session id.

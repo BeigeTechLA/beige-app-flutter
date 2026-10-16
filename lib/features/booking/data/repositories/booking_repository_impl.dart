@@ -214,6 +214,154 @@ class BookingRepositoryImpl implements BookingRepository {
     });
   }
 
+  // ── Book-a-Shoot v2 flow ─────────────────────────────────────────────
+
+  @override
+  Future<Either<AppException, List<dynamic>>> getShootTypesV2() {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getShootTypesV2();
+      _assertNoError(response);
+      final data = response['data'];
+      if (data is List) return data;
+      return <dynamic>[];
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> updateCrew({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.updateCrew(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> getEditTypesV2({
+    required String contentType,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getEditTypesV2(
+        contentType: contentType,
+      );
+      _assertNoError(response);
+      return response['data'] as Map<String, dynamic>;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> updateEdits({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.updateEdits(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, List<dynamic>>> getAddons() {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getAddons();
+      _assertNoError(response);
+      final data = response['data'];
+      if (data is List) return data;
+      if (data is Map) {
+        for (final key in const ['items', 'addons', 'add_ons', 'add_on_items']) {
+          if (data[key] is List) return data[key] as List<dynamic>;
+        }
+      }
+      for (final key in const ['items', 'addons', 'add_ons', 'add_on_items']) {
+        if (response[key] is List) return response[key] as List<dynamic>;
+      }
+      return <dynamic>[];
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> getReview({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getReview(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response['data'] as Map<String, dynamic>;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> saveQuote({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.saveQuote(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> submitBooking({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.submitBooking(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> openPaymentSheet({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.openPaymentSheet(
+        bookingId: bookingId,
+        data: data,
+      );
+      _assertNoError(response);
+      return response;
+    });
+  }
+
+  @override
+  Future<Either<AppException, Map<String, dynamic>>> getSummaryDetails({
+    required int bookingId,
+  }) {
+    return ExceptionHandler.guardAsync(() async {
+      final response = await _remoteDataSource.getSummaryDetails(
+        bookingId: bookingId,
+      );
+      _assertNoError(response);
+      return response['data'] as Map<String, dynamic>;
+    });
+  }
+
   void _assertNoError(Map<String, dynamic> response) {
     if (response['error'] == true) {
       throw UnknownException(

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
+import '../entities/commas_checkout.dart';
 
 /// Contract for payment-related API operations.
 abstract class PaymentRepository {
@@ -9,6 +10,12 @@ abstract class PaymentRepository {
 
   /// POST bookings/{bookingId}/paymentsheet — create Stripe payment sheet.
   Future<Either<AppException, Map<String, dynamic>>> createPaymentSheet({
+    required int bookingId,
+  });
+
+  /// POST bookings/{bookingId}/paymentsheet — create a Commas embedded
+  /// checkout session (same endpoint; backend returns Commas fields).
+  Future<Either<AppException, CommasCheckout>> createCommasCheckout({
     required int bookingId,
   });
 

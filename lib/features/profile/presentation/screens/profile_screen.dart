@@ -7,14 +7,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
-import 'package:beige/core/utils/shared_service.dart';
+import 'package:beige/core/providers/timezone_provider.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/radii.dart';
-import 'package:beige/core/firebase/analytics_events.dart';
-import 'package:beige/core/firebase/analytics_service.dart';
-import 'package:beige/core/firebase/crashlytics_service.dart';
 import 'package:beige/core/utils/image_url_utils.dart';
 import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/features/profile/presentation/providers/profile_notifier.dart';
@@ -324,6 +321,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   onTap: () => context.pushNamed(RouteNames.appPreferences),
                 ),
                 _divider(),
+                _timezoneRow(),
+                _divider(),
                 _menuRow(
                   AppAssets.notification,
                   "Notification Settings",
@@ -393,6 +392,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Read-only timezone row. Value comes from the `user_timezone` pref
+  /// captured at login. No selection/override (see user_timezone_plan.md).
+  Widget _timezoneRow() {
+    final timezone = ref.watch(userTimezonePrefProvider);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.base,
+        vertical: AppSpacing.lg,
+      ),
+      child: Row(
+        children: [
+          Container(
+            height: 44,
+            width: 44,
+            decoration: const BoxDecoration(
+              color: AppColors.shimmerHighlight,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                AppAssets.profilePreferences,
+                height: 22,
+                width: 22,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.base),
+          Expanded(
+            child: Text(
+              "Timezone",
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.white,
+              ),
+            ),
+          ),
+          Text(
+            timezone.isEmpty ? "Not set" : timezone,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.white60,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -490,11 +539,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        AnalyticsService.logEvent(AnalyticsEvents.logout);
-                        CrashlyticsService.clearUserContext();
-                        await SharedService.logout();
+                        await ref.read(authStateProvider.notifier).logout();
                         if (!mounted) return;
-                        ref.read(authStateProvider.notifier).updateState(false);
                         context.goNamed(RouteNames.login);
                       },
                       style: ElevatedButton.styleFrom(

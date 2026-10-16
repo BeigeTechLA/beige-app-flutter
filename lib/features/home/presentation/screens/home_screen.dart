@@ -12,11 +12,13 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/core/notifications/push_notification_service.dart';
 import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
-import 'package:beige/features/home/presentation/providers/home_providers.dart';
+import 'package:beige/features/booking/domain/entities/booking_flow_enums.dart';
+import 'package:beige/features/booking/presentation/providers/content_type_v2_notifier.dart';
 import 'package:beige/features/home/presentation/widgets/bookings/home_bookings_stack.dart';
 import 'package:beige/features/home/presentation/widgets/common/home_section_divider.dart';
 import 'package:beige/features/home/presentation/widgets/common/home_section_title.dart';
 import 'package:beige/features/home/presentation/widgets/continue_booking/home_continue_booking_card.dart';
+// ignore: unused_import  (Section 5 hidden from UI — kept for future use)
 import 'package:beige/features/home/presentation/widgets/featured_creatives/home_featured_creatives_carousel.dart';
 import 'package:beige/features/home/presentation/widgets/header/home_header.dart';
 import 'package:beige/features/home/presentation/widgets/how_it_works/home_how_it_works_section.dart';
@@ -25,6 +27,7 @@ import 'package:beige/features/home/presentation/widgets/recommended_creatives/h
 import 'package:beige/features/home/presentation/widgets/services/home_services_row.dart';
 import 'package:beige/features/home/presentation/widgets/studios/home_studios_section.dart';
 import 'package:beige/features/home/presentation/widgets/top_creatives/home_top_creatives_stack.dart';
+// ignore: unused_import  (Section 10 hidden from UI — kept for future use)
 import 'package:beige/features/home/presentation/widgets/top_influencers/home_top_influencers_section.dart';
 import 'package:beige/shared/widgets/loading.dart';
 import 'package:beige/shared/widgets/login_dialog.dart';
@@ -44,7 +47,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   final GlobalKey featuredKey = GlobalKey();
   final GlobalKey topCreativeKey = GlobalKey();
   int? contentTypeId;
-  int? bookingId;
   int _currentCard = 0;
 
   HomeModel? get homeData => ref.read(homeNotifierProvider).homeData;
@@ -53,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late AnimationController _controller;
   late PageController _studioController;
   int _activeStudioIndex = 0;
+  // ignore: unused_field  (Section 10 Top Influencers hidden from UI — kept for future use)
   final PageController _featuredController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65,
@@ -66,6 +69,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late AnimationController _swipeController;
   int _currentCreativeIndex = 0;
 
+  // ignore: unused_field  (Section 5 Featured Creatives hidden from UI — kept for future use)
   final int _initialPage = 1000;
 
   void scrollTo(GlobalKey key) {
@@ -304,6 +308,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     "4.8M",
   ];
 
+  // ignore: unused_field  (Section 5 Featured Creatives hidden from UI — kept for future use)
   final PageController _pageController = PageController(
     initialPage: 1000,
     viewportFraction: 0.65,
@@ -451,32 +456,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     AppColors.primary,
     AppColors.white70,
   ];
-  Future<void> _continueBooking(int contentType) async {
-    final repo = ref.read(homeRepositoryProvider);
-    final result = await repo.createBooking(
-      contentType: contentType,
-      bookingId: bookingId,
-    );
+  Future<void> _continueBooking(ContentTypeV2 contentType) async {
+    if (ref.read(contentTypeV2NotifierProvider).status ==
+        ContentTypeV2Status.loading) {
+      return;
+    }
+
+    await ref
+        .read(contentTypeV2NotifierProvider.notifier)
+        .submit(contentType: contentType);
 
     if (!mounted) return;
-
-    result.fold(
-      (error) => TopMessage.show(context, error.message),
-      (response) async {
-        if (response['error'] == false) {
-          bookingId = response['data']?['booking_id'];
-
-          final navResult = await context.pushNamed<int>(
-            RouteNames.videoShootType,
-            extra: {'bookingId': bookingId!, 'contentTypeId': contentType},
-          );
-
-          if (navResult != null) {
-            bookingId = navResult;
-          }
-        }
-      },
-    );
+    final state = ref.read(contentTypeV2NotifierProvider);
+    if (state.status == ContentTypeV2Status.success &&
+        state.bookingId != null) {
+      await context.pushNamed(
+        RouteNames.shootTypeV2,
+        extra: {'bookingId': state.bookingId, 'contentType': state.contentType},
+      );
+    } else {
+      TopMessage.show(context, state.errorMessage ?? 'Unable to start booking');
+    }
   }
 
   @override
@@ -544,6 +544,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }
     });
 
+    final isStartingBooking =
+        ref.watch(contentTypeV2NotifierProvider).status ==
+        ContentTypeV2Status.loading;
     final isGuest = ref.watch(guestModeProvider);
     final homeState = ref.watch(homeNotifierProvider);
     final homeData = homeState.homeData;
@@ -611,22 +614,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           child: SizedBox(
                             height: 56,
                             child: ElevatedButton(
-                              onPressed: () {
-                                if (selectedIndices.isEmpty) return;
-                                final hasPhoto = selectedIndices.contains(0);
-                                final hasVideo = selectedIndices.contains(1);
+                              onPressed: isStartingBooking
+                                  ? null
+                                  : () {
+                                      if (selectedIndices.isEmpty) return;
+                                      final hasPhoto = selectedIndices.contains(
+                                        0,
+                                      );
+                                      final hasVideo = selectedIndices.contains(
+                                        1,
+                                      );
 
-                                if (hasPhoto && hasVideo) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(3);
-                                } else if (hasPhoto) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(2);
-                                } else if (hasVideo) {
-                                  if (_blockIfGuest()) return;
-                                  _continueBooking(1);
-                                }
-                              },
+                                      if (hasPhoto && hasVideo) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(ContentTypeV2.both);
+                                      } else if (hasPhoto) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(
+                                          ContentTypeV2.photographer,
+                                        );
+                                      } else if (hasVideo) {
+                                        if (_blockIfGuest()) return;
+                                        _continueBooking(
+                                          ContentTypeV2.videographer,
+                                        );
+                                      }
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: AppColors.onPrimary,
@@ -682,15 +695,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         },
                         onBookShoot: () {
                           if (_blockIfGuest()) return;
-                          context.pushNamed(
-                            RouteNames.contentType,
-                            extra: {'fromHome': true},
-                          );
+                          context.pushNamed(RouteNames.contentTypeV2);
                         },
                         onExploreCreatives: () => scrollTo(featuredKey),
                         onFindCreative: () => scrollTo(topCreativeKey),
                       ),
                       const SizedBox(height: 20),
+                      // ── Section 5: Featured Creatives (HIDDEN — kept for future use) ──
+                      // Temporarily hidden from UI per request. Code retained as reference.
+                      // HomeSectionTitle title + HomeFeaturedCreativesCarousel (9 static creatives).
+                      /*
                       const HomeSectionDivider(centerAlpha: 0.24),
                       const SizedBox(height: 10),
                       // ── Section 5: Featured Creatives ──
@@ -705,7 +719,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         initialPage: _initialPage,
                       ),
                       const SizedBox(height: 10),
-
+                      */
                       const HomeSectionDivider(centerAlpha: 0.24),
                       const SizedBox(height: 10),
                       // ── Section 6: Studios ──
@@ -751,10 +765,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         }),
                         onBookShoot: () {
                           if (_blockIfGuest()) return;
-                          context.pushNamed(
-                            RouteNames.contentType,
-                            extra: {'fromHome': true},
-                          );
+                          context.pushNamed(RouteNames.contentTypeV2);
                         },
                         onCardTap: (booking) {
                           context.pushNamed(
@@ -1021,6 +1032,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(height: 10),*/
                       // ── Section 9: How It Works ──
                       const HomeHowItWorksSection(),
+                      // ── Section 10: Top Influencers (HIDDEN — kept for future use) ──
+                      // Temporarily hidden from UI per request. Code retained as reference.
+                      // HomeTopInfluencersSection (9 static influencers).
+                      /*
                       const HomeSectionDivider(centerAlpha: 0.09),
                       const SizedBox(height: 10),
                       // ── Section 10: Top Influencers ──
@@ -1039,7 +1054,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         onOpenLink: openLink,
                       ),
                       const SizedBox(height: 20),
-
+                      */
                       const HomeSectionDivider(centerAlpha: 0.09),
                       const SizedBox(height: 20),
 

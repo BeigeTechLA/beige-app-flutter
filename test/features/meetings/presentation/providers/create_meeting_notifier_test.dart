@@ -175,7 +175,7 @@ void main() {
     expect(container.read(createMeetingNotifierProvider).isValid, false);
   });
 
-  test('UnauthorizedException flips auth state + error status', () async {
+  test('UnauthorizedException preserves auth state and reports error', () async {
     final repo = _FakeRepo(
       throws: const UnauthorizedException(message: 'expired'),
     );
@@ -190,7 +190,7 @@ void main() {
       container.read(createMeetingNotifierProvider).status,
       CreateMeetingSubmitStatus.error,
     );
-    expect(container.read(authStateProvider), false);
+    expect(container.read(authStateProvider), true);
   });
 
   test('setParticipants dedupes by id, preserving order', () async {

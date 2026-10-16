@@ -41,6 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
         designation: (userData['designation'] as String?) ?? '',
         department: (userData['department'] as String?) ?? '',
         departmentId: (userData['department_id']?.toString()) ?? '',
+        timezone: (userData['timezone'] as String?) ?? '',
       );
     });
   }

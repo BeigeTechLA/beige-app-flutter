@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/exceptions/app_exception.dart';
-import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/current_user_provider.dart';
 import '../../domain/models/meeting.dart';
 import '../../domain/models/meeting_filter.dart';
@@ -48,9 +47,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
         status: MeetingsListStatus.error,
         error: _messageFor(e),
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
     }
   }
 
@@ -126,9 +122,6 @@ class MeetingsListNotifier extends AutoDisposeNotifier<MeetingsListState> {
         pendingRsvpIds: state.pendingRsvpIds.difference({meetingId}),
         rsvpError: _messageFor(e),
       );
-      if (e is UnauthorizedException) {
-        ref.read(authStateProvider.notifier).updateState(false);
-      }
       return false;
     }
   }

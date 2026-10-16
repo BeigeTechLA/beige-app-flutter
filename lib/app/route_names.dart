@@ -19,6 +19,8 @@ abstract class RouteNames {
   static const myShoots = 'my_shoots';
   static const messages = 'messages';
   static const fileManager = 'file_manager';
+  static const filesFolder = 'files_folder';
+  static const filesSuccess = 'files_success';
   static const meetings = 'meetings';
   static const meetingCreate = 'meeting_create';
   static const meetingEdit = 'meeting_edit';
@@ -41,7 +43,23 @@ abstract class RouteNames {
   static const crewSizeMatching = 'crew_size_matching';
   static const selectDreamTeam = 'select_dream_team';
   static const reviewConfirm = 'review_confirm';
+  static const commasCheckout = 'commas_checkout';
+  static const paymentFailed = 'payment_failed';
   static const paymentSuccess = 'payment_success';
+
+  // Book-a-Shoot v2 flow (redesign). Shared steps 1–7, then branches by
+  // matching method. See booking_flow_v2_implementation_plan.md.
+  static const contentTypeV2 = 'content_type_v2';
+  static const shootTypeV2 = 'shoot_type_v2';
+  static const whenWhere = 'when_where';
+  static const creativeBrief = 'creative_brief';
+  static const partnerPreference = 'partner_preference';
+  static const creativeTeam = 'creative_team';
+  static const editing = 'editing';
+  static const addOns = 'add_ons';
+  static const partnerSelection = 'partner_selection';
+  static const reviewConfirmV2 = 'review_confirm_v2';
+  static const bookingSummaryDetails = 'booking_summary_details';
 
   // Booking Management
   static const bookingEventSummary = 'booking_event_summary';

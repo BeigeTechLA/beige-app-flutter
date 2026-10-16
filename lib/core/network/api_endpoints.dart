@@ -31,6 +31,20 @@ abstract class ApiEndpoints {
   static const String bookingSpecialties = "bookings/specialties";
   static const String bookingShootTypes = "bookings/shoot-types/";
 
+  /// 📅 Bookings — v2 flow (Book-a-Shoot redesign). Shoot-type catalogue is
+  /// content-type agnostic, edit-types + add-ons are query/param driven.
+  /// See docs/features/bookings/booking_flow_v2_implementation_plan.md.
+  static const String bookingShootTypesV2 = "bookings/shoot-types";
+  static const String bookingEditTypes = "bookings/edit-types";
+  static const String bookingAddons = "bookings/addons";
+  static String bookingCrew(int id) => "bookings/$id/crew";
+  static String bookingEdits(int id) => "bookings/$id/edits";
+  static String bookingReview(int id) => "bookings/$id/review";
+  static String bookingQuote(int id) => "bookings/$id/quote";
+  static String bookingSubmit(int id) => "bookings/$id/submit";
+  static String bookingPaymentSheet(int id) => "bookings/$id/paymentsheet";
+  static String bookingSummaryDetails(int id) => "bookings/$id/summary-details";
+
   /// 🎨 Creatives
   static const String creatives = "creatives";
   static const String addFavourite = "creatives/favourites";
@@ -86,6 +100,58 @@ abstract class ApiEndpoints {
   /// 🔔 Push Notifications
   static const String pushTokens = "push-notifications/tokens";
   static const String pushPreferences = "push-notifications/preferences";
+
+  // ───── File Manager (FM7 real endpoints) ────────────────────────────────
+  static const String fileManagerRoot = 'file-manager/root';
+  static String fileManagerFolder(String id) => 'file-manager/folders/$id';
+  static String fileManagerFolderDelete(String id) =>
+      'file-manager/folders/$id';
+  static String fileManagerFileDelete(String id) => 'file-manager/files/$id';
+  static String fileManagerFileDownload(String id) =>
+      'file-manager/files/$id/download';
+  static const String fileManagerShare = 'file-manager/share';
+
+  static const String fmWorkspaceAccess =
+      'external-file-manager/workspace-access';
+  static const String fmWorkspaces = 'external-file-manager/workspaces';
+  static String fmWorkspace(String extId) =>
+      'external-file-manager/workspace/$extId';
+  static String fmWorkspaceFiles(String extId) =>
+      'external-file-manager/workspace/$extId/files';
+  static const String fmFolder = 'external-file-manager/folder';
+  static const String fmFolderDownloadUrl =
+      'external-file-manager/folder-download-url';
+  static const String fmUploadPolicies =
+      'external-file-manager/upload-policies/batch';
+  static const String fmFilesUploaded =
+      'external-file-manager/files-uploaded/batch';
+  static const String fmFileViewUrl = 'external-file-manager/file-view-url';
+  static const String fmFileDownloadUrl =
+      'external-file-manager/file-download-url';
+  static const String fmDelete = 'external-file-manager/delete';
+  static const String fmCopyFiles = 'external-file-manager/copy-files';
+  static const String fmRevisionReview =
+      'external-file-manager/revision-file/review';
+  static const String fmShare = 'external-file-manager/share';
+  static const String fmShareAccessLogs =
+      'external-file-manager/share/access-logs';
+  static const String fmShareRequestOtp =
+      'external-file-manager/share/request-otp';
+  static const String fmShareVerifyOtp =
+      'external-file-manager/share/verify-otp';
+  static String fmShareContent(String token) =>
+      'external-file-manager/share/$token/content';
+  static String fmShareViewUrl(String token) =>
+      'external-file-manager/share/$token/view-url';
+  static String fmShareDownloadUrl(String token) =>
+      'external-file-manager/share/$token/download-url';
+  static const String comments = 'comments';
+  static String commentReply(String id) => 'comments/$id/reply';
+  static String commentById(String id) => 'comments/$id';
+  static String fmCommonEvent(String extId) =>
+      'external-file-manager/common-events/$extId';
+  static String fmCommonEventCreatorFolder(String extId) =>
+      'external-file-manager/common-events/$extId/creator-folder';
 
   /// 👔 Crew Registration
   static const String registerCrewStep1 = "auth/register-crew-step1";

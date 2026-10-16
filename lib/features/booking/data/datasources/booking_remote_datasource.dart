@@ -146,4 +146,115 @@ class BookingRemoteDataSource {
     );
     return response.data as Map<String, dynamic>;
   }
+
+  // ── Book-a-Shoot v2 flow ─────────────────────────────────────────────
+  // Catalogue is content-type agnostic; edit-types + add-ons are
+  // query/param driven. Pricing is server-calculated — the review/quote
+  // responses are rendered as-is, never recomputed in the app.
+
+  /// GET bookings/shoot-types — v2 catalogue (same list for every content type).
+  Future<Map<String, dynamic>> getShootTypesV2() async {
+    final response = await _dioClient.dio.get(ApiEndpoints.bookingShootTypesV2);
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// PUT bookings/{bookingId}/crew — total creators required by role.
+  Future<Map<String, dynamic>> updateCrew({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.put(
+      ApiEndpoints.bookingCrew(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// GET bookings/edit-types?content_type=… — photo/video edit options.
+  Future<Map<String, dynamic>> getEditTypesV2({
+    required String contentType,
+  }) async {
+    final response = await _dioClient.dio.get(
+      ApiEndpoints.bookingEditTypes,
+      queryParameters: {'content_type': contentType},
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// PUT bookings/{bookingId}/edits — selected edit keys (server-owned keys).
+  Future<Map<String, dynamic>> updateEdits({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.put(
+      ApiEndpoints.bookingEdits(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// GET bookings/addons — active v4 add-on catalogue.
+  Future<Map<String, dynamic>> getAddons() async {
+    final response = await _dioClient.dio.get(ApiEndpoints.bookingAddons);
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// POST bookings/{bookingId}/review — server-calculated review payload.
+  /// Call on screen open and again only when add-ons change.
+  Future<Map<String, dynamic>> getReview({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.post(
+      ApiEndpoints.bookingReview(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// POST bookings/{bookingId}/quote — persist the quote before payment.
+  Future<Map<String, dynamic>> saveQuote({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.post(
+      ApiEndpoints.bookingQuote(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// PUT bookings/{bookingId}/submit — contact info + selected creator IDs.
+  Future<Map<String, dynamic>> submitBooking({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.put(
+      ApiEndpoints.bookingSubmit(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// POST bookings/{bookingId}/paymentsheet — open Stripe/Commas payment.
+  Future<Map<String, dynamic>> openPaymentSheet({
+    required int bookingId,
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await _dioClient.dio.post(
+      ApiEndpoints.bookingPaymentSheet(bookingId),
+      data: data,
+    );
+    return response.data as Map<String, dynamic>;
+  }
+
+  /// GET bookings/{bookingId}/summary-details — final booking summary.
+  Future<Map<String, dynamic>> getSummaryDetails({
+    required int bookingId,
+  }) async {
+    final response = await _dioClient.dio.get(
+      ApiEndpoints.bookingSummaryDetails(bookingId),
+    );
+    return response.data as Map<String, dynamic>;
+  }
 }

@@ -7,7 +7,7 @@ import 'package:beige/app/text_styles.dart';
 
 class AppQtyCounter extends StatelessWidget {
   final int value;
-  final VoidCallback onIncrement;
+  final VoidCallback? onIncrement;
   final VoidCallback onDecrement;
   final String Function(int)? formatValue;
 
@@ -21,8 +21,7 @@ class AppQtyCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayValue =
-        formatValue?.call(value) ?? value.toString().padLeft(2, '0');
+    final displayValue = formatValue?.call(value) ?? value.toString();
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -57,9 +56,15 @@ class AppQtyCounter extends StatelessWidget {
           GestureDetector(
             onTap: onIncrement,
             behavior: HitTestBehavior.opaque,
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
-              child: Icon(Icons.add, size: 14, color: AppColors.black),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+              child: Icon(
+                Icons.add,
+                size: 14,
+                color: onIncrement == null
+                    ? AppColors.black38
+                    : AppColors.black,
+              ),
             ),
           ),
         ],

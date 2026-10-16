@@ -9,7 +9,9 @@ import '../../../../core/firebase/crashlytics_service.dart';
 import '../../../../core/providers/auth_state_provider.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/providers/guest_mode_provider.dart';
+import '../../../../core/providers/timezone_provider.dart';
 import '../../../../core/storage/secure_token_storage.dart';
+import '../../../../core/utils/date_time_utils.dart';
 import '../../../../core/utils/shared_service.dart';
 import '../../../app_drawer/providers/drawer_notifier.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
@@ -53,7 +55,22 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
           user.designation,
           user.department,
           user.departmentId,
+          user.timezone,
         );
+
+        // Re-resolve the active timezone now that the pref is written.
+        // SharedPreferences isn't reactive, so invalidate the chain to force
+        // a fresh read: a non-empty account tz wins; empty → device fallback.
+        // Without this, switching to an empty-tz account would keep the
+        // previous account's zone. The app-root listener re-pushes the result
+        // into DateTimeUtils.
+        ref.invalidate(userTimezonePrefProvider);
+        ref.invalidate(resolvedTimezoneProvider);
+        if (user.timezone.isNotEmpty) {
+          // Immediate sync so post-login screens render without waiting for
+          // the async resolve to re-run.
+          DateTimeUtils.setActiveTimezone(user.timezone);
+        }
 
         if (savePassword) {
           await prefs.setString("email", email);
@@ -61,7 +78,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
         }
 
         // Update auth state & clear guest flag.
-        ref.read(authStateProvider.notifier).updateState(true);
+        ref.read(authStateProvider.notifier).markLoggedIn();
         ref.read(guestModeProvider.notifier).exit();
 
         // Analytics & Crashlytics
@@ -114,6 +131,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     String designation,
     String department,
     String departmentId,
+    String timezone,
   ) async {
     await SecureTokenStorage.write(token);
     await prefs.setString('user_id', userId);
@@ -125,6 +143,7 @@ class LoginNotifier extends AutoDisposeNotifier<LoginState> {
     await prefs.setString('designation', designation);
     await prefs.setString('department', department);
     await prefs.setString('department_id', departmentId);
+    await prefs.setString(kUserTimezonePrefKey, timezone);
     await prefs.setBool('isLoggedIn', true);
   }
 }
