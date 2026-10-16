@@ -37,9 +37,9 @@ class NodeActionNotifier extends AutoDisposeNotifier<NodeActionState> {
     );
     try {
       final signed = await _repo.viewUrl(filepath);
-      // share_plus 10.x — `subject` not supported on `shareUri`; the
-      // system share sheet uses the URL as its subject on iOS.
-      await Share.shareUri(Uri.parse(signed.url));
+      // share_plus 13 — `Share.shareUri` deprecated; use the instance API.
+      // The system share sheet uses the URL as its subject on iOS.
+      await SharePlus.instance.share(ShareParams(uri: Uri.parse(signed.url)));
       state = state.copyWith(
         sharingIds: state.sharingIds.difference({filepath}),
         lastSignal: const FmActionSignal(

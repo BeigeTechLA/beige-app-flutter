@@ -84,12 +84,18 @@ Bumped minors/patches, verified green:
 > ℹ️ iOS build surfaced non-blocking warnings: UIScene lifecycle migration (future iOS), and 4 plugins lack SPM support (flutter_secure_storage, flutter_timezone, geocoding_ios, google_maps_flutter_ios) — CocoaPods path still works.
 
 ## Phase 3 — Medium-risk isolated plugins (1–6 files each)
-Do one at a time, **ascending file count** (least impact first), migrate + verify after each:
-- [ ] **package_info_plus 9→10 + geolocator 14.0→14.1** (bump together) — package_info: `app_preferences_screen.dart`, minor API check. geolocator 14.1 pulls package_info ^10 transitively (deferred from Phase 2), so do both at once; verify location fetch still works.
+Do one at a time, **ascending file count** (least impact first), migrate + verify after each.
+
+> ⚠️ **win32 ^6 cluster coupling discovered:** `package_info_plus 10`, `geolocator 14.1`, `file_picker 13`, `flutter_secure_storage 11`, and `share_plus 13` all transitively require `win32 ^6` (older versions pin `win32 ^5`). The resolver refuses a mixed state, so these **5 bumped together in one commit** — not individually isolatable. Tasks 1/3/4/5 collapsed into this single bump.
+
+- [x] **win32 cluster — package_info_plus 9→10 · geolocator 14.0→14.1 · file_picker 11→13 · flutter_secure_storage 9→11 · share_plus 10→13** ✅ (2026-10-16)
+  - `secure_token_storage.dart`: dropped removed `AndroidOptions(encryptedSharedPreferences: true)` → `AndroidOptions()` (AES-256 GCM is the v11 default backend).
+  - `file_picker 13`: `pickFiles()` now returns `List<PlatformFile>` directly (empty on cancel; no `FilePickerResult`, no `.files`, no `allowMultiple`/`withData`). `PlatformFile` lost sync `.size` → use `await f.xFile.length()`. Single-file picks → new `pickFile()` returning `PlatformFile?`. Fixed `fm_upload_sheet.dart` + `app_filepicker_service.dart`.
+  - `share_plus 13`: `Share.shareUri(...)` → `SharePlus.instance.share(ShareParams(uri: ...))` in `node_action_notifier.dart`.
+  - `geolocator 14.1`: `desiredAccuracy:` now deprecated → migrated 3 sites (`change_location_screen`, `sign_up_screen`, `shoot_details_screen`) to `locationSettings: LocationSettings(accuracy: ...)`.
+  - `package_info_plus 10`: `fromPlatform()`/`.version`/`.buildNumber` unchanged — no code change.
+  - **Exit gate:** analyze 0 errors (203 lint) · test 332✅/4❌ (baseline) · iOS build ✓ 95.8MB. `flutter_secure_storage` now SPM-capable (`_darwin`).
 - [ ] **connectivity_plus 6→7** (1) — `lib/core/connectivity/connectivity_service.dart`. API now returns `List<ConnectivityResult>`; adjust single→list handling.
-- [ ] **flutter_secure_storage 9→11** (1) — `lib/core/storage/secure_token_storage.dart`. `_macos` pkg folded into `_darwin` (auto). Verify read/write API unchanged; test token persistence.
-- [ ] **file_picker 11→13** (2) — `fm_upload_sheet.dart`, `app_filepicker_service.dart`. Platform packages split; check `FilePicker.platform.pickFiles` result shape.
-- [ ] **share_plus 10→13** (3) — 3 files in `file_manager/`. `Share.share(...)` → `SharePlus.instance.share(ShareParams(...))`.
 - [ ] **timezone 0.9→0.11 / flutter_timezone 3→5** (3) — `timezone_provider.dart`, `date_time_utils.dart`, `main.dart`. tz database update + init API; verify DST/offset logic in date utils.
 - [ ] **geocoding 2→5** (5) — 5 files. `geocoding_ios`→`geocoding_darwin`; verify `placemarkFromCoordinates` / `locationFromAddress` signatures.
 - [ ] **socket_io_client 2→3** (~6) — `messages/*` + `messages_socket_source.dart`. Options builder + event API changes; test chat connect/emit/receive.

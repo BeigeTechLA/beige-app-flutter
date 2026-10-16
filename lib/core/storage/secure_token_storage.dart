@@ -14,7 +14,9 @@ class SecureTokenStorage {
   static const _tokenKey = 'auth_token';
 
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    // v11+: EncryptedSharedPreferences (AES-256 GCM) is the default backend;
+    // the explicit `encryptedSharedPreferences` flag was removed.
+    aOptions: AndroidOptions(),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
     ),

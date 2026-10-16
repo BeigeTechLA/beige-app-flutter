@@ -71,7 +71,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       LatLng latLng = LatLng(position.latitude, position.longitude);

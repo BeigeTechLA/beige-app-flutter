@@ -204,7 +204,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     );
 
     if (!mounted) return;
