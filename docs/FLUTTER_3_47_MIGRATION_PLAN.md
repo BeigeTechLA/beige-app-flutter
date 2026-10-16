@@ -104,12 +104,14 @@ Do one at a time, **ascending file count** (least impact first), migrate + verif
 ### ✅ Phase 3 exit gate (2026-10-16)
 analyze **0 errors** (203 lint) · test **332✅/4❌** (baseline, no new) · iOS build ✓ `Runner.app` 96.1MB. Only `google_maps_flutter_ios` still lacks SPM (secure_storage/timezone/geocoding all gained it).
 
-## Phase 4 — 🔴 flutter_stripe 12→14
+## Phase 4 — 🔴 flutter_stripe 12→14 ✅ (2026-10-16, device test pending)
 - 13 files. Native min-version bumps (iOS deploy target, Android compileSdk/Kotlin).
-- [ ] Review changelog 13 + 14 for `PaymentSheet` / `CardField` / `presentPaymentSheet` API changes.
-- [ ] Update iOS deploy target if Stripe 14 demands (likely ≥15, already met).
-- [ ] Test payment flow on device (sheet present, confirm, failure route per existing payment-failed route).
-- [ ] **Checkpoint commit.**
+- [x] Reviewed API surface — only `Stripe.publishableKey`, `initPaymentSheet(SetupPaymentSheetParameters(...))`, `presentPaymentSheet()` used (2 screens + main.dart). No `CardField`. Params (`paymentIntentClientSecret`/`customerId`/`customerEphemeralKeySecret`/`merchantDisplayName`) unchanged in 14 → **no Dart code change**.
+- [x] iOS deploy target 15.0 already met (Stripe 14 needs 13+). Android: Kotlin 2.3.10 + flutter compileSdk — no bump needed.
+- [ ] ⚠️ **Still TODO (needs real device + live keys):** payment flow device test — sheet present, confirm success, failure route.
+- [ ] ⚠️ **Android Stripe native unverified** — APK build blocked by unrelated AGP DSL issue; iOS native validated via build.
+- [x] **Exit gate:** analyze 0 errors · test 332✅/4❌ (baseline) · iOS build ✓ 98.1MB (stripe-ios-spm native linked).
+- [x] **Checkpoint commit.**
 
 ## Phase 5 — 🔴🔴 Big migrations (highest risk — isolate, one at a time)
 
