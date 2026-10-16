@@ -18,6 +18,13 @@
 | iOS min target | 15.0 | re-confirm (Stripe 14 / Firebase may raise floor) |
 | CocoaPods | 1.16.2 | fine |
 
+### ✅ Per-phase exit gate (MANDATORY — every phase)
+**No phase is "done" until the build compiles.** At the end of EVERY phase run, in order, all must pass before checkpoint commit:
+1. `flutter analyze` → 0 errors (warnings/info may grow, note them).
+2. `flutter test` → no NEW failures beyond the 4 pre-existing baseline failures.
+3. **Build must succeed:** `flutter build ios --flavor prod -t lib/main_prod.dart --release --no-codesign`
+   (Android APK build currently blocked by unrelated AGP DSL issue — iOS build is the authoritative gate until that's fixed.)
+
 ### 🚧 Hard blocker
 Building against **iOS 27 SDK requires Xcode 27**. Machine has 26.4. Install Xcode 27 before Phase 6. Everything else (Flutter upgrade, plugin bumps, Riverpod/go_router migration) proceeds without it.
 
@@ -62,19 +69,23 @@ What actually changes in source, per plugin. **Ordered least-impact first** (fil
   4. `test/widget_test.dart` — "App loads test"
 - `flutter pub get`: 126 packages have newer versions behind current constraints (expected — that's the Phase 2+ work).
 
-## Phase 2 — Safe-tier plugin bumps (low risk, do first, verify green)
-Bump minors/patches, run analyze+test after:
-- firebase_core 4.9→4.15, firebase_analytics 12.4→12.6, firebase_crashlytics 5.2→5.4
-- dio 5.9→5.11 · flutter_svg 2.2→2.3 · google_maps_flutter 2.17→2.19
-- geolocator 14.0→14.1 · image_picker 1.2.2→1.2.4 · lottie 3.3→3.6
-- url_launcher · shared_preferences · path_provider · intl 0.19→0.20 (check DateFormat usages)
-- flutter_lints 5→6 (expect new lint warnings; fix or baseline)
-- cupertino_icons 1→2 (grep CupertinoIcons.* for renamed/removed glyphs)
+## Phase 2 — Safe-tier plugin bumps ✅ (2026-10-16)
+Bumped minors/patches, verified green:
+- [x] firebase_core 4.9→4.15, firebase_analytics 12.4→12.6, firebase_crashlytics 5.2→5.4
+- [x] dio 5.9→5.11 · flutter_svg 2.2→2.3 · google_maps_flutter 2.17→2.19
+- [x] image_picker 1.2.2→1.2.4 · lottie 3.1→3.6
+- [x] url_launcher 6.2→6.3.3 · shared_preferences 2.5.3→2.5.6 · path_provider 2.1.2→2.1.6 · intl 0.19→0.20 (DateFormat usages in 7 files OK, 0 errors)
+- [x] flutter_lints 5→6 (+85 info lints, mostly `unnecessary_underscores`/`use_null_aware_elements` — baselined, not fixed)
+- [x] cupertino_icons 1→2 (only usage `CupertinoIcons.xmark` — valid in v2)
+- ⚠️ **geolocator 14.0→14.1 DEFERRED to Phase 3**: 14.1 requires `package_info_plus ^10` (transitive via geolocator_linux), which is itself a Phase 3 bump. Kept at 14.0.2 to keep Phase 2 zero-code. Bump both together in Phase 3.
+- **Exit gate:** analyze 0 errors (121→206 lint), test 332✅/4❌ (baseline, no new fails), iOS build ✓ `Runner.app` 98.5MB.
 - **Checkpoint commit.**
+
+> ℹ️ iOS build surfaced non-blocking warnings: UIScene lifecycle migration (future iOS), and 4 plugins lack SPM support (flutter_secure_storage, flutter_timezone, geocoding_ios, google_maps_flutter_ios) — CocoaPods path still works.
 
 ## Phase 3 — Medium-risk isolated plugins (1–6 files each)
 Do one at a time, **ascending file count** (least impact first), migrate + verify after each:
-- [ ] **package_info_plus 9→10** (1) — `app_preferences_screen.dart`. Minor API check only.
+- [ ] **package_info_plus 9→10 + geolocator 14.0→14.1** (bump together) — package_info: `app_preferences_screen.dart`, minor API check. geolocator 14.1 pulls package_info ^10 transitively (deferred from Phase 2), so do both at once; verify location fetch still works.
 - [ ] **connectivity_plus 6→7** (1) — `lib/core/connectivity/connectivity_service.dart`. API now returns `List<ConnectivityResult>`; adjust single→list handling.
 - [ ] **flutter_secure_storage 9→11** (1) — `lib/core/storage/secure_token_storage.dart`. `_macos` pkg folded into `_darwin` (auto). Verify read/write API unchanged; test token persistence.
 - [ ] **file_picker 11→13** (2) — `fm_upload_sheet.dart`, `app_filepicker_service.dart`. Platform packages split; check `FilePicker.platform.pickFiles` result shape.
