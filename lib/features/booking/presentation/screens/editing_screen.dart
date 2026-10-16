@@ -8,7 +8,6 @@ import '../../../../app/route_names.dart';
 import '../../../../app/spacing.dart';
 import '../../../../app/text_styles.dart';
 import '../../../../shared/layouts/app_scaffold.dart';
-import '../../../../shared/widgets/app_qty_counter.dart';
 import '../../../../shared/widgets/loading.dart';
 import '../../../../shared/widgets/top_message.dart';
 import '../../domain/entities/booking_flow_enums.dart';
@@ -52,7 +51,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
 
   bool _editsNeeded = true;
   bool _photoOpen = true;
-  bool _videoOpen = true;
+  bool _videoOpen = false;
 
   // Keyed by option index → quantity (photo = photo count in multiples of 25).
   final Map<int, int> _photoCounts = {};
@@ -198,7 +197,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                     onToggle: () => setState(() => _photoOpen = !_photoOpen),
                     step: _photoSetSize,
                   ),
-                  if (totalPhotos > 0) _youllReceivePill(totalPhotos),
+                  _youllReceivePill(totalPhotos),
                 ],
                 if (_hasVideo && state.videoEditTypes.isNotEmpty)
                   _editSection(
@@ -234,6 +233,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
   }) {
     return Container(
       margin: const EdgeInsets.only(top: AppSpacing.base),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.white30, width: 0.5),
         borderRadius: AppRadii.xlAll,
@@ -264,7 +264,8 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                         title,
                         style: AppTextStyles.bodyLargeMedium.copyWith(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
                         ),
                       ),
                       Icon(
@@ -281,8 +282,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                       margin: const EdgeInsets.only(top: AppSpacing.md),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.background,
-                        border: Border.all(color: AppColors.white15),
+                        color: AppColors.iconBackground,
                         borderRadius: AppRadii.smAll,
                       ),
                       child: Text.rich(
@@ -295,7 +295,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                             ),
                             TextSpan(
                               text: _durationLabel(durationHours),
-                              style: AppTextStyles.bodySmall.copyWith(
+                              style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.white,
                                 decoration: TextDecoration.underline,
                                 decorationColor: AppColors.white,
@@ -304,7 +304,7 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
                             const TextSpan(text: ' Duration'),
                           ],
                         ),
-                        style: AppTextStyles.bodySmall.copyWith(
+                        style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.primary,
                         ),
                       ),
@@ -314,22 +314,6 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
             ),
           ),
           if (open) ...[
-            Padding(
-              padding: const EdgeInsets.only(
-                left: AppSpacing.base,
-                right: AppSpacing.base,
-                top: AppSpacing.base,
-              ),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Do you want more?',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-            ),
             for (var i = 0; i < options.length; i++)
               _optionRow(options[i], i, counts, step),
           ],
@@ -369,11 +353,13 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
           ),
         ),
         AppSpacing.gapHMd,
-        Text(
-          "You'll Receive $totalPhotos Photos",
-          style: AppTextStyles.bodyLargeMedium.copyWith(
-            color: AppColors.background,
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Text(
+            "You'll Receive $totalPhotos Photos",
+            style: AppTextStyles.bodyLargeMedium.copyWith(
+              color: AppColors.background,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
@@ -417,46 +403,65 @@ class _EditingScreenState extends ConsumerState<EditingScreen> {
               ],
             ),
           ),
-          AppQtyCounter(
-            value: count ~/ step,
-            formatValue: (v) => v.toString(),
-            onIncrement: () => setState(() => counts[index] = count + step),
-            onDecrement: () => setState(() {
-              final next = count - step;
-              if (next <= 0) {
-                counts.remove(index);
-              } else {
-                counts[index] = next;
-              }
-            }),
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.counterGradient,
+              borderRadius: AppRadii.mdAll,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  tooltip: 'Remove ${option.value}',
+                  onPressed: () => setState(() {
+                    final next = count - step;
+                    if (next <= 0) {
+                      counts.remove(index);
+                    } else {
+                      counts[index] = next;
+                    }
+                  }),
+                  icon: const Icon(Icons.remove, color: AppColors.background),
+                ),
+                Text(
+                  '${count ~/ step}',
+                  style: AppTextStyles.bodyLargeMedium.copyWith(
+                    color: AppColors.background,
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Add ${option.value}',
+                  onPressed: () => setState(() => counts[index] = count + step),
+                  icon: const Icon(Icons.add, color: AppColors.background),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _infoCard(String text) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const Icon(Icons.info_outline, size: 22, color: AppColors.white),
-          AppSpacing.gapHMd,
-          Text(
-            'Editing includes',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.white,
-              fontWeight: FontWeight.w500,
-            ),
+  Widget _infoCard(String text) => Container(
+    padding: const EdgeInsets.all(AppSpacing.base),
+    decoration: BoxDecoration(
+      color: AppColors.surfaceMid,
+      border: Border.all(color: AppColors.borderGold, width: 0.5),
+      borderRadius: AppRadii.xlAll,
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.info_outline, size: 24, color: AppColors.primary),
+        AppSpacing.gapHMd,
+        Expanded(
+          child: Text(
+            'Editing includes $text',
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
           ),
-        ],
-      ),
-      AppSpacing.verticalMd,
-      Text(
-        text,
-        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-      ),
-    ],
+        ),
+      ],
+    ),
   );
 
   Widget _radio({

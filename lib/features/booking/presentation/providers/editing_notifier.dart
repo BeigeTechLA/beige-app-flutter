@@ -22,13 +22,14 @@ class EditOption {
 }
 
 class EditingState {
+  static const int defaultDurationHours = 1;
   final EditingStatus status;
   final List<EditOption> photoEditTypes;
   final List<EditOption> videoEditTypes;
 
   /// Whole-hour booked duration (rounded up) derived from the booking's time
   /// data. Drives the included free-photo count (50/hour) and the duration
-  /// label. 0 for the deferred journey (no date/time yet).
+  /// label. Defaults to one hour until booking time is available.
   final int durationHours;
   final String? errorMessage;
 
@@ -36,7 +37,7 @@ class EditingState {
     this.status = EditingStatus.initial,
     this.photoEditTypes = const [],
     this.videoEditTypes = const [],
-    this.durationHours = 0,
+    this.durationHours = defaultDurationHours,
     this.errorMessage,
   });
 
@@ -64,12 +65,15 @@ class EditingNotifier extends AutoDisposeNotifier<EditingState> {
   @override
   EditingState build() => const EditingState();
 
-  Future<void> load({required int bookingId, required String contentType}) async {
+  Future<void> load({
+    required int bookingId,
+    required String contentType,
+  }) async {
     state = state.copyWith(status: EditingStatus.loading);
     final repo = ref.read(bookingRepositoryProvider);
 
     // Booked duration drives the included free-photo count (50/hour). Fetched
-    // alongside the edit catalogue; a failure here is non-fatal (duration 0).
+    // alongside the edit catalogue; missing time uses a one-hour estimate.
     final timeResult = await repo.getBookingTime(bookingId: bookingId);
     final durationHours = timeResult.fold(
       (_) => 0,
@@ -87,7 +91,9 @@ class EditingNotifier extends AutoDisposeNotifier<EditingState> {
           status: EditingStatus.loaded,
           photoEditTypes: _parse(data['photo_edit_types']),
           videoEditTypes: _parse(data['video_edit_types']),
-          durationHours: durationHours,
+          durationHours: durationHours > 0
+              ? durationHours
+              : EditingState.defaultDurationHours,
         );
       },
     );
@@ -107,9 +113,7 @@ class EditingNotifier extends AutoDisposeNotifier<EditingState> {
       for (final d in days) {
         if (d is! Map) continue;
         final dh = _asDouble(d['duration_hours']);
-        hours += dh > 0
-            ? dh
-            : _hoursBetween(d['start_time'], d['end_time']);
+        hours += dh > 0 ? dh : _hoursBetween(d['start_time'], d['end_time']);
       }
       return hours.ceil();
     }
