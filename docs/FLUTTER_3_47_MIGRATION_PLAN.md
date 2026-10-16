@@ -115,13 +115,13 @@ analyze **0 errors** (203 lint) · test **332✅/4❌** (baseline, no new) · iO
 
 ## Phase 5 — 🔴🔴 Big migrations (highest risk — isolate, one at a time)
 
-### 5a. go_router 14→18 (75 files)
-- [ ] Read changelog 15→16→17→18 breaking notes.
-- [ ] Focus: `lib/app/router.dart` (redirect signature, `StatefulShellRoute.indexedStack`, `GoRouterState` accessors), `route_names.dart`.
-- [ ] Verify `redirect` async signature + auth guard still compiles.
-- [ ] Sweep `context.goNamed`/`pushNamed`/`state.extra` call sites.
-- [ ] Run integration nav tests (`integration_test/navigation_test.dart`) + manual tab/deep-link check.
-- [ ] **Checkpoint commit.**
+### 5a. go_router 14→18 (69 files) ✅ (2026-10-16)
+- [x] Bumped 14.8.1→18.1.0. **Result: ZERO code change needed** — app already used the modern go_router 14 API (`StatefulShellRoute.indexedStack`, `goBranch`, `redirect: (context, state)`, `state.extra`/`pathParameters`/`uri`, `routerDelegate.currentConfiguration.fullPath`), all stable through 18.
+- [x] `router.dart` redirect/auth-guard/shell compiles clean; no deprecations flagged.
+- [x] 69 `goNamed`/`pushNamed`/`state.extra` call sites — no breakage (analyze 0 errors).
+- [ ] ⚠️ **Deferred:** `integration_test/navigation_test.dart` not run (needs device/sim; per CLAUDE.md still unwired). `router_test.dart` (widget) passes in `flutter test`.
+- [x] **Exit gate:** analyze 0 errors (203 lint) · test 332✅/4❌ (baseline) · iOS build ✓ 98.1MB.
+- [x] **Checkpoint commit.**
 
 ### 5b. flutter_riverpod 2.6→3 (178 files — dominant work)
 - [ ] Read Riverpod 3 migration guide. Key breaks: `StateProvider`/`StateNotifierProvider` deprecated path, `Ref` unification, `.autoDispose` behavior, retry/mutation changes.
