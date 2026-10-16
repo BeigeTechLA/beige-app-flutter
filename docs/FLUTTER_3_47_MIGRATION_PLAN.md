@@ -95,11 +95,14 @@ Do one at a time, **ascending file count** (least impact first), migrate + verif
   - `geolocator 14.1`: `desiredAccuracy:` now deprecated → migrated 3 sites (`change_location_screen`, `sign_up_screen`, `shoot_details_screen`) to `locationSettings: LocationSettings(accuracy: ...)`.
   - `package_info_plus 10`: `fromPlatform()`/`.version`/`.buildNumber` unchanged — no code change.
   - **Exit gate:** analyze 0 errors (203 lint) · test 332✅/4❌ (baseline) · iOS build ✓ 95.8MB. `flutter_secure_storage` now SPM-capable (`_darwin`).
-- [ ] **connectivity_plus 6→7** (1) — `lib/core/connectivity/connectivity_service.dart`. API now returns `List<ConnectivityResult>`; adjust single→list handling.
-- [ ] **timezone 0.9→0.11 / flutter_timezone 3→5** (3) — `timezone_provider.dart`, `date_time_utils.dart`, `main.dart`. tz database update + init API; verify DST/offset logic in date utils.
-- [ ] **geocoding 2→5** (5) — 5 files. `geocoding_ios`→`geocoding_darwin`; verify `placemarkFromCoordinates` / `locationFromAddress` signatures.
-- [ ] **socket_io_client 2→3** (~6) — `messages/*` + `messages_socket_source.dart`. Options builder + event API changes; test chat connect/emit/receive.
-- [ ] **Checkpoint commit per plugin.**
+- [x] **connectivity_plus 6→7** ✅ — no code change; `connectivity_service.dart` already consumed `List<ConnectivityResult>` (v6 was already list-based).
+- [x] **timezone 0.9→0.11 / flutter_timezone 3→5** ✅ — flutter_timezone 5 `getLocalTimezone()` now returns `TimezoneInfo`; use `.identifier` (`timezone_provider.dart`). timezone 0.11 tz-DB/`initializeTimeZones`/`TZDateTime` API unchanged — no change in `date_time_utils.dart`/`main.dart`.
+- [x] **geocoding 2→5** ✅ — geocoding 3+ **removed** top-level `placemarkFromCoordinates`/`locationFromAddress`; now instance methods. Prefixed all 10 call sites across 5 files with `Geocoding().`. `geocoding_ios`→`geocoding_darwin` (now SPM-capable).
+- [x] **socket_io_client 2→3** ✅ — no code change; v3 API-compatible with existing OptionBuilder/`io.io`/`forceNew` map/event usage in `messages_socket_source.dart`.
+- [x] **Checkpoint commit per plugin.** (win32 cluster = 1 commit; connectivity/timezone/geocoding/socket = 1 each.)
+
+### ✅ Phase 3 exit gate (2026-10-16)
+analyze **0 errors** (203 lint) · test **332✅/4❌** (baseline, no new) · iOS build ✓ `Runner.app` 96.1MB. Only `google_maps_flutter_ios` still lacks SPM (secure_storage/timezone/geocoding all gained it).
 
 ## Phase 4 — 🔴 flutter_stripe 12→14
 - 13 files. Native min-version bumps (iOS deploy target, Android compileSdk/Kotlin).
