@@ -7,6 +7,18 @@
 **Decisions:** build against iOS 27 SDK · upgrade ALL plugins to latest · include Riverpod 3 + go_router 18 now.
 
 ---
+## ⏸️ RESUME HERE (paused 2026-10-17, continuing tomorrow)
+**Done & pushed:** Phases 1, 2, 3, 4, 5a, **5b** — ALL plugin + framework upgrades complete. Every phase green at exit gate (analyze 0 errors · test 332✅/4❌ unchanged baseline · iOS build ✓). Branch `feature-flutter-upgrade` pushed through `efaf8b2`.
+
+**Left to do:**
+- **Phase 6** — iOS 27 SDK build. **GATED on Xcode 27 install** (machine has 26.4). External blocker.
+- **Phase 7** — Final verification: Android APK release build (currently blocked by unrelated AGP `android.newDsl` issue — needs its own look), full device smoke per QA checklist, update CLAUDE.md stack table.
+- **Deferred verifications carried forward:** Stripe payment device test (needs live keys); Android native builds for Stripe/all (AGP blocker); `integration_test/navigation_test.dart` (unwired/needs sim); Riverpod 3 retry-default behavior check during smoke.
+
+> Everything landed is **behavior-preserving** — the pre-existing test suite still passes identically (332✅, same 4 baseline fails). No new regressions introduced by any upgrade.
+---
+
+---
 
 ## 0. Starting state
 
@@ -123,12 +135,18 @@ analyze **0 errors** (203 lint) · test **332✅/4❌** (baseline, no new) · iO
 - [x] **Exit gate:** analyze 0 errors (203 lint) · test 332✅/4❌ (baseline) · iOS build ✓ 98.1MB.
 - [x] **Checkpoint commit.**
 
-### 5b. flutter_riverpod 2.6→3 (178 files — dominant work)
-- [ ] Read Riverpod 3 migration guide. Key breaks: `StateProvider`/`StateNotifierProvider` deprecated path, `Ref` unification, `.autoDispose` behavior, retry/mutation changes.
-- [ ] Decide: auto-migration tooling (`riverpod` CLI / dart fix) vs manual per-feature.
-- [ ] Migrate feature-by-feature (auth → booking → home → profile → shoot → messages → file_manager), analyze+test after each.
-- [ ] Update test overrides (`ProviderScope` / `overrideWith`) in `test/`.
-- [ ] **Checkpoint commit per feature group.**
+### 5b. flutter_riverpod 2.6→3 ✅ (2026-10-17)
+- [x] Bumped 2.6.1→3.4.3. Migrated whole-tree in one pass (changes were mechanical + interdependent, so per-feature commits weren't practical). **Behavior-preserving — test suite unchanged (332✅/4❌ baseline).**
+- [x] **Real breaking changes hit (not the 177-file fear — app already on modern Notifier API):**
+  - `AutoDisposeNotifier`/`AutoDisposeAsyncNotifier` base classes **removed** → `Notifier`/`AsyncNotifier` (autoDispose now lives on the provider, not the class).
+  - **`FamilyNotifier`/`FamilyAsyncNotifier` removed** → extend `Notifier<State>`/`AsyncNotifier<State>`; family arg injected via **constructor** (`Class(this.arg); final A arg;`), `build()` becomes zero-arg. `Class.new` matches v3's `NotifierT Function(ArgT)` create fn. **17 family notifiers** migrated via scripted transform (`scratchpad/riverpod_family_migrate.py`).
+  - Provider constructors: `AutoDisposeNotifierProvider<…>(…)` → `NotifierProvider.autoDispose<…>(…)`; family → `.autoDispose.family<…>`; async → `AsyncNotifierProvider.autoDispose…`; future family → `FutureProvider.autoDispose.family`.
+  - `StateProvider` (3 providers: active_chat_room, profileImageBust, useDummyFileManager) moved to `package:flutter_riverpod/legacy.dart` — **identical runtime behavior**, just relocated. Kept as-is (not converted to Notifier) to minimize churn.
+  - `AsyncValue.valueOrNull` **removed** → `.value` (same nullable semantics). 2 sites.
+  - `Override` type moved to `package:flutter_riverpod/misc.dart` — added import in test/integration helpers + fixed `MockChatThreadNotifier` (ctor `super('mock-conversation')` + zero-arg `build()`).
+- [x] **Exit gate:** analyze 0 errors (206 lint) · test 332✅/4❌ (baseline, NO new) · iOS build ✓ 98.2MB.
+- [x] Committed `efaf8b2` (63 files).
+- [ ] ⚠️ **Manual-QA watch item (behavior):** Riverpod 3 changed some defaults (automatic provider **retry on error**, `provider.future` skipping persisted state). Logic unchanged in our code, but verify error/loading flows during the Phase-7 device smoke — see QA checklist.
 
 ## Phase 6 — iOS 27 SDK (GATED on Xcode 27)
 - [ ] Install Xcode 27, `sudo xcode-select -s`, accept license.
