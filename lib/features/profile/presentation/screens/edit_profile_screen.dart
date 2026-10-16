@@ -106,7 +106,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Future<void> searchLocation(String query) async {
     try {
-      List<Location> locations = await locationFromAddress(query);
+      List<Location> locations = await Geocoding().locationFromAddress(query);
       if (locations.isNotEmpty) {
         final loc = locations.first;
         final latLng = LatLng(loc.latitude, loc.longitude);
@@ -122,7 +122,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );

@@ -269,7 +269,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   Future<void> searchLocation(String query) async {
     try {
-      List<Location> locations = await locationFromAddress(query);
+      List<Location> locations = await Geocoding().locationFromAddress(query);
 
       if (locations.isNotEmpty) {
         final loc = locations.first;
@@ -293,7 +293,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
@@ -346,7 +346,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
 
     try {
-      final placemarks = await placemarkFromCoordinates(
+      final placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );

@@ -159,7 +159,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     if (query.isEmpty) return;
 
     try {
-      List<Location> locations = await locationFromAddress(query);
+      List<Location> locations = await Geocoding().locationFromAddress(query);
 
       setState(() {
         searchResults = locations; // 👈 dropdown data
@@ -171,7 +171,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
@@ -226,7 +226,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
 
     try {
-      final placemarks = await placemarkFromCoordinates(
+      final placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
