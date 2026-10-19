@@ -118,16 +118,6 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     return 1;
   }
 
-  /// 🔥 ROLE NAME → ROLE ID mapping
-  int _mapRoleName(String roleName) {
-    final name = roleName.toLowerCase();
-
-    if (name.contains("video")) return 1;
-    if (name.contains("photo")) return 2;
-
-    return 1; // default (kabhi 0 nahi)
-  }
-
   /// Robust role_id extraction from a match item.
   /// Handles: `List<int>`, `List<String>`, `List<Map>`, int, String, null.
   /// Falls back to role_name / contentTypeId derivation so we never send 0.
