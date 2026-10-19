@@ -10,11 +10,11 @@ import 'home_empty_booking_card.dart';
 /// supplied [swipeController].
 class HomeBookingsStack extends StatelessWidget {
   final AnimationController swipeController;
-  final List<Your_Booking> bookings;
+  final List<YourBooking> bookings;
   final int currentIndex;
   final VoidCallback onAdvance;
   final VoidCallback onBookShoot;
-  final Function(Your_Booking) onCardTap;
+  final Function(YourBooking) onCardTap;
 
   const HomeBookingsStack({
     super.key,

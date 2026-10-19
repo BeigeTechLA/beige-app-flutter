@@ -12,7 +12,7 @@ import 'package:beige/shared/widgets/scale_clamped_text.dart';
 
 /// One booking tile inside the Your Bookings swipe stack.
 class HomeBookingCard extends StatelessWidget {
-  final Your_Booking booking;
+  final YourBooking booking;
   final bool isBackCard;
   final VoidCallback? onTap;
 
