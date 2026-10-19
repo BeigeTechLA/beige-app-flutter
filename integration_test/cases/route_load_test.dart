@@ -136,7 +136,7 @@ void runRouteLoadTests(ReportBuilder report) {
           extraOverrides: loggedOutOverrides(),
         );
 
-        final navResult = await navigateTo(tester, path, extra: extra);
+        await navigateTo(tester, path, extra: extra);
         final loadResult = await verifyScreenLoaded(tester, path);
 
         report.record(route: path, routeName: name, loadResult: loadResult);
@@ -159,7 +159,7 @@ void runRouteLoadTests(ReportBuilder report) {
           extraOverrides: loggedInOverrides(),
         );
 
-        final navResult = await navigateTo(tester, path, extra: extra);
+        await navigateTo(tester, path, extra: extra);
         final loadResult = await verifyScreenLoaded(tester, path);
 
         report.record(route: path, routeName: name, loadResult: loadResult);

@@ -277,14 +277,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       crewSelectionNotifierProvider(widget.bookingId),
     );
     final crewMatches = crewState.crewMatches;
-    final nearbyCreators = crewState.nearbyCreators;
     final otherCreators = crewState.otherCreators;
 
     final isLoading = crewState.status == CrewSelectionStatus.loading;
 
     final addedCrewUserIds = crewState.addedCrewUserIds;
-    final heldByRole = crewState.heldByRole;
-    final requiredByRole = crewState.requiredByRole;
 
     /// 🔥 CHECK LOCATION BASED CREATORS
     final bool hasLocationCreators = crewMatches.isNotEmpty;
