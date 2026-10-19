@@ -124,8 +124,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           .where((e) => e.isNotEmpty)
           .toList(),
     };
-    print(" UPDATE BOOKING DETAILS API");
-    print(" PAYLOAD = $payload");
+    debugPrint(" UPDATE BOOKING DETAILS API");
+    debugPrint(" PAYLOAD = $payload");
 
     await ref
         .read(shootDetailsNotifierProvider(widget.bookingId).notifier)

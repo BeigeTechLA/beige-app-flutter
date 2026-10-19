@@ -64,14 +64,14 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     final rr = ref
         .read(crewSelectionNotifierProvider(widget.bookingId))
         .requiredByRole;
-    return rr[roleId.toString()] ?? rr[roleId] ?? 0;
+    return rr[roleId.toString()] ?? 0;
   }
 
   int getHeld(int roleId) {
     final hr = ref
         .read(crewSelectionNotifierProvider(widget.bookingId))
         .heldByRole;
-    return hr[roleId.toString()] ?? hr[roleId] ?? 0;
+    return hr[roleId.toString()] ?? 0;
   }
 
   int currentStep = 1;
@@ -129,7 +129,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
   }
 
   /// Robust role_id extraction from a match item.
-  /// Handles: List<int>, List<String>, List<Map>, int, String, null.
+  /// Handles: `List<int>`, `List<String>`, `List<Map>`, int, String, null.
   /// Falls back to role_name / contentTypeId derivation so we never send 0.
   int _extractRoleId(Map item) {
     int parseFromDynamic(dynamic v) {
@@ -734,9 +734,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                                                   /// 🔥 MAIN FIX
                                                   final int maxAllowed =
-                                                      (getRequired(roleId) ??
-                                                              0) ==
-                                                          0
+                                                      getRequired(roleId) == 0
                                                       ? 10
                                                       : getRequired(roleId);
 
