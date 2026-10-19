@@ -1079,8 +1079,7 @@ class _ShootTypeSelectionScreenState
                                                             ),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
-                                                          color:
-                                                              AppColors.white,
+                                                          colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                                         ),
                                                       ),
                                                     ),
@@ -1107,8 +1106,7 @@ class _ShootTypeSelectionScreenState
                                                             ),
                                                         child: SvgPicture.asset(
                                                           AppAssets.clock,
-                                                          color:
-                                                              AppColors.white,
+                                                          colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                                         ),
                                                       ),
                                                     ),
@@ -1173,7 +1171,7 @@ class _ShootTypeSelectionScreenState
                                       ),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
-                                        color: AppColors.white,
+                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                         width: 20,
                                         height: 20,
                                       ),
@@ -1204,7 +1202,7 @@ class _ShootTypeSelectionScreenState
                                       ),
                                       child: SvgPicture.asset(
                                         AppAssets.clock,
-                                        color: AppColors.white,
+                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                         width: 20,
                                         height: 20,
                                       ),
@@ -1306,7 +1304,7 @@ class _ShootTypeSelectionScreenState
                                   AppAssets.clock,
                                   width: 20,
                                   height: 20,
-                                  color: AppColors.white,
+                                  colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                 ),
                               ),
                             ),
@@ -1334,7 +1332,7 @@ class _ShootTypeSelectionScreenState
                                   AppAssets.clock,
                                   width: 20,
                                   height: 20,
-                                  color: AppColors.white,
+                                  colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                 ),
                               ),
                             ),

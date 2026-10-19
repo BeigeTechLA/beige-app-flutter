@@ -838,7 +838,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             },
                                             child: SvgPicture.asset(
                                               AppAssets.homeViewProfile,
-                                              color: AppColors.white,
+                                              colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                               height: 36,
                                             ),
                                           ),

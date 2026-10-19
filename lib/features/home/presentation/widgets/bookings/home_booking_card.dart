@@ -124,7 +124,7 @@ class HomeBookingCard extends StatelessWidget {
                   children: [
                     SvgPicture.asset(
                       AppAssets.calendarDate,
-                      color: AppColors.white,
+                      colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -141,7 +141,7 @@ class HomeBookingCard extends StatelessWidget {
                 // Event time.
                 Row(
                   children: [
-                    SvgPicture.asset(AppAssets.clock, color: AppColors.white),
+                    SvgPicture.asset(AppAssets.clock, colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn)),
                     const SizedBox(width: 6),
                     Text(
                       "${DateTimeUtils.formatTime(booking.startTime, fallback: "")} - ${DateTimeUtils.formatTime(booking.endTime, fallback: "")}",
@@ -217,7 +217,7 @@ class HomeBookingCard extends StatelessWidget {
                       child: SvgPicture.asset(
                         AppAssets.homeViewProfile,
                         height: 43,
-                        color: AppColors.white,
+                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                       ),
                     ),
                   ),
