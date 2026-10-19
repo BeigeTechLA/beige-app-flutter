@@ -92,7 +92,7 @@ class ContentTypeNotifier extends Notifier<ContentTypeState> {
 
     // Step 2: Create booking
     final body = <String, dynamic>{
-      if (existingBookingId != null) 'booking_id': existingBookingId,
+      'booking_id': ?existingBookingId,
       'content_type': contentType,
       if (contentType != 3 && shootTypeIds.isNotEmpty)
         'shoot_type_id': shootTypeIds.first,
@@ -112,7 +112,7 @@ class ContentTypeNotifier extends Notifier<ContentTypeState> {
         AnalyticsService.logEvent(
           AnalyticsEvents.bookingStarted,
           params: {
-            if (bookingId != null) 'booking_id': bookingId,
+            'booking_id': ?bookingId,
             'content_type': contentType,
             'step_number': 1,
           },
@@ -121,7 +121,7 @@ class ContentTypeNotifier extends Notifier<ContentTypeState> {
         AnalyticsService.logEvent(
           AnalyticsEvents.bookingStepContent,
           params: {
-            if (bookingId != null) 'booking_id': bookingId,
+            'booking_id': ?bookingId,
             'content_type': contentType,
             'step_number': 1,
           },

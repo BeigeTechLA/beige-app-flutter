@@ -882,12 +882,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                               final uri = Uri.parse(
                                                 "https://beige.app/terms-and-conditions",
                                               );
-                                              if (await canLaunchUrl(uri))
+                                              if (await canLaunchUrl(uri)) {
                                                 launchUrl(
                                                   uri,
                                                   mode: LaunchMode
                                                       .externalApplication,
                                                 );
+                                              }
                                             },
                                         ),
                                         const TextSpan(
@@ -916,12 +917,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                               final uri = Uri.parse(
                                                 "https://beige.app/privacy-policy",
                                               );
-                                              if (await canLaunchUrl(uri))
+                                              if (await canLaunchUrl(uri)) {
                                                 launchUrl(
                                                   uri,
                                                   mode: LaunchMode
                                                       .externalApplication,
                                                 );
+                                              }
                                             },
                                         ),
                                         const TextSpan(

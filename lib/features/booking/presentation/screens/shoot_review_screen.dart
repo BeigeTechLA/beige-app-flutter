@@ -613,7 +613,7 @@ class _ShootReviewScreenState extends ConsumerState<ShootReviewScreen> {
                                                   .cover, // 🔥 proper crop
                                               alignment: Alignment
                                                   .center, // 🔥 center focus
-                                              errorBuilder: (_, __, ___) {
+                                              errorBuilder: (_, _, _) {
                                                 return SvgPicture.asset(
                                                   AppAssets.imagePlaceholder,
 

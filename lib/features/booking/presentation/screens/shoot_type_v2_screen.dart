@@ -168,8 +168,8 @@ class _ShootTypeV2ScreenState extends ConsumerState<ShootTypeV2Screen> {
                 child: CachedNetworkImage(
                   imageUrl: _imageUrl(_imagePath(item)),
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => const AppImageLoader(size: 60),
-                  errorWidget: (_, __, ___) => const Icon(
+                  placeholder: (_, _) => const AppImageLoader(size: 60),
+                  errorWidget: (_, _, _) => const Icon(
                     Icons.broken_image,
                     color: AppColors.neutralGrey,
                   ),

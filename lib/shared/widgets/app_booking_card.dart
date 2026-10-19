@@ -186,14 +186,14 @@ class _BookingCardImage extends StatelessWidget {
       return Image.asset(
         source,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(),
+        errorBuilder: (_, _, _) => _placeholder(),
       );
     }
 
     return Image.network(
       source,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => _placeholder(),
+      errorBuilder: (_, _, _) => _placeholder(),
     );
   }
 

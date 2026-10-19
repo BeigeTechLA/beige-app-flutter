@@ -17,7 +17,6 @@ import 'package:beige/features/meetings/presentation/providers/meetings_reposito
 import 'package:beige/features/meetings/presentation/widgets/meeting_details_sheet.dart';
 import 'package:beige/shared/widgets/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../../helpers/pump_app.dart';

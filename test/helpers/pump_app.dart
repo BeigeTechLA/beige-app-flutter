@@ -64,7 +64,7 @@ extension PumpProviderApp on WidgetTester {
     final router = GoRouter(
       initialLocation: '/',
       routes: [
-        GoRoute(path: '/', builder: (_, __) => widget),
+        GoRoute(path: '/', builder: (_, _) => widget),
         ...routes,
       ],
     );

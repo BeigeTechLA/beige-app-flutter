@@ -738,7 +738,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                                               0) ==
                                                           0
                                                       ? 10
-                                                      : getRequired(roleId)!;
+                                                      : getRequired(roleId);
 
                                                   if (selectedCount >=
                                                       maxAllowed) {
@@ -853,7 +853,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

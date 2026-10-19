@@ -84,7 +84,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                       height: 360,
                       width: double.infinity,
                       fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) => SvgPicture.asset(
+                      errorBuilder: (_, _, _) => SvgPicture.asset(
                         AppAssets.imagePlaceholder,
                         height: 360,
                         width: double.infinity,
@@ -271,7 +271,7 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
                                       child: Image.network(
                                         imageUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
+                                        errorBuilder: (_, _, _) =>
                                             SvgPicture.asset(
                                               AppAssets.imagePlaceholder,
                                               fit: BoxFit.cover,

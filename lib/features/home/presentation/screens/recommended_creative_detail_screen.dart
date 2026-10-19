@@ -102,7 +102,7 @@ class _RecommendedCreativeDetailScreenState
                             height: 360,
                             width: double.infinity,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => SvgPicture.asset(
+                            errorBuilder: (_, _, _) => SvgPicture.asset(
                               AppAssets.imagePlaceholder,
                               height: 360,
                               width: double.infinity,
@@ -287,7 +287,7 @@ class _RecommendedCreativeDetailScreenState
                                               child: Image.network(
                                                 imageUrl,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) =>
+                                                errorBuilder: (_, _, _) =>
                                                     SvgPicture.asset(
                                                       AppAssets
                                                           .imagePlaceholder,

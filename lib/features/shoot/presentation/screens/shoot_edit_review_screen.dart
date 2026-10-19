@@ -197,7 +197,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                                   height: 144,
                                                   width: 126,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (_, __, ___) {
+                                                  errorBuilder: (_, _, _) {
                                                     return SvgPicture.asset(
                                                       AppAssets
                                                           .imagePlaceholder,
@@ -224,7 +224,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             children: [
                                               SizedBox(height: AppSpacing.xs),
                                               Text(
-                                                booking?['project_name'] ?? '',
+                                                booking['project_name'] ?? '',
                                                 style: AppTextStyles.labelLarge
                                                     .copyWith(
                                                       color: AppColors.white,
@@ -234,7 +234,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                               ),
                                               SizedBox(height: AppSpacing.xxxs),
                                               Text(
-                                                booking?['shoot_type_name'] ??
+                                                booking['shoot_type_name'] ??
                                                     '',
                                                 style: AppTextStyles.bodySmall
                                                     .copyWith(
@@ -302,11 +302,11 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                       child: Column(
                                         children: [
                                           /// 🔥 CHECK MULTI OR SINGLE
-                                          if ((booking?['booking_days'] ?? [])
+                                          if ((booking['booking_days'] ?? [])
                                               .isNotEmpty) ...[
                                             /// ✅ MULTI DAY
                                             ...List.generate(
-                                              booking!['booking_days'].length,
+                                              booking['booking_days'].length,
                                               (index) {
                                                 var day =
                                                     booking['booking_days'][index];
@@ -339,8 +339,8 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             /// ✅ SINGLE DAY (🔥 IMPORTANT FIX)
                                             infoRowBlack(
                                               AppAssets.clock,
-                                              "${DateTimeUtils.formatTime(booking?['start_time'], fallback: "")} to ${DateTimeUtils.formatTime(booking?['end_time'], fallback: "")}"
-                                              " (${booking?['duration_hours']}h)",
+                                              "${DateTimeUtils.formatTime(booking['start_time'], fallback: "")} to ${DateTimeUtils.formatTime(booking['end_time'], fallback: "")}"
+                                              " (${booking['duration_hours']}h)",
                                             ),
                                             const SizedBox(
                                               height: AppSpacing.sm,
@@ -348,7 +348,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             infoRowBlack(
                                               AppAssets.calendarDate,
                                               DateTimeUtils.formatWeekdayDate(
-                                                booking?['event_date'],
+                                                booking['event_date'],
                                                 fallback: "",
                                               ),
                                             ),
@@ -358,7 +358,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           const SizedBox(height: AppSpacing.sm),
                                           infoRowBlack(
                                             AppAssets.location,
-                                            booking?['event_location'] ?? "",
+                                            booking['event_location'] ?? "",
                                           ),
                                         ],
                                       ),
@@ -397,9 +397,9 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if ((booking?['video_edit_types'] ?? [])
+                                  if ((booking['video_edit_types'] ?? [])
                                           .isNotEmpty ||
-                                      (booking?['photo_edit_types'] ?? [])
+                                      (booking['photo_edit_types'] ?? [])
                                           .isNotEmpty) ...[
                                     Row(
                                       mainAxisAlignment:
@@ -429,7 +429,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           /// ================= VIDEO EDITS =================
-                                          if ((booking?['video_edit_types'] ??
+                                          if ((booking['video_edit_types'] ??
                                                   [])
                                               .isNotEmpty) ...[
                                             Padding(
@@ -447,12 +447,12 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                                             Column(
                                               children: List.generate(
-                                                booking?['video_edit_types']
+                                                booking['video_edit_types']
                                                         .length ??
                                                     0,
                                                 (index) {
                                                   final item =
-                                                      booking?['video_edit_types'][index];
+                                                      booking['video_edit_types'][index];
 
                                                   return Align(
                                                     alignment:
@@ -495,7 +495,7 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
                                           ],
 
                                           /// ================= PHOTO EDITS =================
-                                          if ((booking?['photo_edit_types'] ??
+                                          if ((booking['photo_edit_types'] ??
                                                   [])
                                               .isNotEmpty) ...[
                                             Padding(
@@ -513,12 +513,12 @@ class _ShootEditReviewScreenState extends ConsumerState<ShootEditReviewScreen> {
 
                                             Column(
                                               children: List.generate(
-                                                booking?['photo_edit_types']
+                                                booking['photo_edit_types']
                                                         .length ??
                                                     0,
                                                 (index) {
                                                   final item =
-                                                      booking?['photo_edit_types'][index];
+                                                      booking['photo_edit_types'][index];
 
                                                   return Align(
                                                     alignment:

@@ -240,11 +240,11 @@ class _PartnerSelectionScreenState
             child: CachedNetworkImage(
               imageUrl: _imageUrl(match.photoPath),
               fit: BoxFit.cover,
-              placeholder: (_, __) => const ColoredBox(
+              placeholder: (_, _) => const ColoredBox(
                 color: AppColors.surfaceVariant,
                 child: Center(child: AppImageLoader(size: 48)),
               ),
-              errorWidget: (_, __, ___) => const ColoredBox(
+              errorWidget: (_, _, _) => const ColoredBox(
                 color: AppColors.surfaceVariant,
                 child: Icon(
                   Icons.person,

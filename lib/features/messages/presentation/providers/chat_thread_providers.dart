@@ -58,8 +58,9 @@ String? _resolveSelfId({
     }
     for (final m in messages) {
       if (m.senderId.isEmpty) continue;
-      if (m.senderName.trim().toLowerCase() == normalizedName)
+      if (m.senderName.trim().toLowerCase() == normalizedName) {
         return m.senderId;
+      }
     }
   }
   // Last-resort id elimination: backend `participants.items` often lists only

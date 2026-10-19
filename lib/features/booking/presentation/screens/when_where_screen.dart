@@ -708,7 +708,7 @@ class _WhenWhereScreenState extends ConsumerState<WhenWhereScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: dates.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
           final date = dates[index];
           final selected = _selectedDates.any((d) => _sameDay(d, date));

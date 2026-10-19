@@ -265,7 +265,7 @@ class _ListBody extends StatelessWidget {
         AppSpacing.xs,
       ),
       itemCount: state.items.length,
-      separatorBuilder: (_, __) => AppSpacing.verticalMd,
+      separatorBuilder: (_, _) => AppSpacing.verticalMd,
       itemBuilder: (context, i) {
         final m = state.items[i];
         return MeetingCard(

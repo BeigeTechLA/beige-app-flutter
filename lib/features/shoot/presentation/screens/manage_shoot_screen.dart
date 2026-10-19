@@ -79,7 +79,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                     ? Image.network(
                         _getFullImageUrl(),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) {
+                        errorBuilder: (_, _, _) {
                           return SvgPicture.asset(
                             AppAssets.imagePlaceholder,
                             fit: BoxFit.cover,
@@ -197,7 +197,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                             );
                                           },
 
-                                      errorBuilder: (_, __, ___) {
+                                      errorBuilder: (_, _, _) {
                                         return SvgPicture.asset(
                                           AppAssets.imagePlaceholder,
                                           height: 144,

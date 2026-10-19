@@ -234,7 +234,7 @@ class _ProfileNewPasswordScreenState
       barrierDismissible: false,
       barrierColor: AppColors.black.withValues(alpha: 0.3),
       transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) {
+      pageBuilder: (_, _, _) {
         Future.delayed(const Duration(seconds: 2), () {
           if (!mounted) return;
           context.goNamed(RouteNames.home);

@@ -48,7 +48,7 @@ class ContentTypeV2Notifier extends Notifier<ContentTypeV2State> {
 
     final repo = ref.read(bookingRepositoryProvider);
     final body = <String, dynamic>{
-      if (existingBookingId != null) 'booking_id': existingBookingId,
+      'booking_id': ?existingBookingId,
       'content_type': contentType.apiValue,
     };
 
