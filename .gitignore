@@ -33,6 +33,8 @@ testing/
 .pub/
 /build/
 /coverage/
+pubspec.lock
+ios/Podfile.lock
 
 # Symbolication related
 app.*.symbols
