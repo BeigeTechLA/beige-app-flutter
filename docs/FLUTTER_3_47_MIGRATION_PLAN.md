@@ -8,51 +8,41 @@
 **Decisions:** build against iOS 27 SDK · upgrade ALL plugins to latest · include Riverpod 3 + go_router 18 now.
 
 ---
-## ⏸️ RESUME HERE (re-audited 2026-10-29)
+## ✅ STATUS: CODE-COMPLETE (2026-10-29) — only device/runtime QA remains
 
-Verified this pass: `xcodebuild -version` → **Xcode 27.1 (`27A9275`)**; `xcodebuild -showsdks` → **iOS 27.1 SDK** present & selected; `flutter --version` → **3.47.0 / Dart 3.13.0**; `git status`; `flutter pub outdated`. Tests/analyzer/build **not rerun** this pass (last recorded iOS build 2026-10-29 ✓ 102.3MB, no UIScene warning).
+All code, build, toolchain, and dependency work is done and committed on `feature-flutter-upgrade`. The app builds against the iOS 27.1 SDK and the Android release toolchain with the full upgraded plugin set. Nothing code-side is open; the remaining items are human device/runtime QA that need a real device + live Stripe keys.
+
+**This session's commits (2026-10-29):**
+- `d4c7222` `chore(ios): adopt UIScene lifecycle for iOS 27 SDK` (+ untrack `pubspec.lock`/`ios/Podfile.lock`, drop stale `swiftpm/Package.resolved` ×2)
+- `ec65b90` `chore(deps): gitignore lock files; regen plugin registrants`
+- `d29b0db` `docs: sync migration plan + CLAUDE.md`
+- plus `chore(git): gitignore all build/ dirs`
+
+**Last verified gate (2026-10-29, post Tier A sweep):** `flutter analyze` → **0 errors** (57 info/warning, baselined) · `flutter test` → **332 pass / 4 pre-existing baseline fails** (editing_screen, 2× meetings notifier, widget_test — no regressions) · iOS release build ✓ 102.3MB vs SDK 27.1 · Android release APK ✓ 99.4MB.
 
 ### ✅ COMPLETED
-- **Framework/plugins (Phases 1–5):** Flutter 3.47.0, Riverpod 3, go_router 18, Stripe 14, + all Phase 2/3 plugin bumps — committed, analyze 0 errors, test 332✓/4 baseline-fail.
-- **iOS 27 toolchain (Phase 6):** Xcode 27.1 installed/selected, iOS 27.1 SDK, deploy target 15.0 confirmed, `pod install` clean (49 pods), release build ✓ 102.3MB against SDK 27.1.
-- **iOS 27 UIScene lifecycle migration** (required when building vs iOS 27 SDK — Flutter docs: https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
+- **Framework/plugins (Phases 1–5):** Flutter 3.47.0 / Dart 3.13.0, Riverpod 3, go_router 18, Stripe 14, + all Phase 2/3 plugin bumps.
+- **iOS 27 toolchain (Phase 6):** Xcode 27.1 (`27A9275`) installed/selected, iOS 27.1 SDK, deploy target 15.0 confirmed, `pod install` clean (49 pods), release build ✓ 102.3MB.
+- **iOS 27 UIScene lifecycle migration** (required when building vs iOS 27 SDK — https://docs.flutter.dev/release/breaking-changes/uiscenedelegate):
   - `AppDelegate.swift` → adopts `FlutterImplicitEngineDelegate`; plugin registration moved to `didInitializeImplicitFlutterEngine`; GMS key init kept in `didFinishLaunchingWithOptions`.
   - `Info.plist` → added `UIApplicationSceneManifest` / `FlutterSceneDelegate`.
   - `project.pbxproj` → added `[CP] Embed Pods Frameworks` build phase.
-  - Release build passed with no UIScene warning; built plist contains the scene manifest.
-  - ⚠️ These edits are **uncommitted** (see Remaining → commit).
+  - Release build passed with no UIScene warning; built plist contains the scene manifest. **Committed `d4c7222`.**
+- **Tier A plugin patch sweep** (within existing `^` constraints — `flutter pub upgrade`, gate re-verified green): file_picker 13.1→13.3, go_router 18.1.0→18.1.1, lottie 3.6.1→3.7.0, flutter_svg 2.3.0→2.3.2, geocoding 5.0.0→5.0.1, geolocator 14.1.1→14.1.2, firebase patch trio (core 4.15.2 / analytics 12.6.1 / crashlytics 5.4.1), + ~40 transitive patches. Zero majors.
+- **Git hygiene:** `pubspec.lock` + `ios/Podfile.lock` untracked + gitignored (team decision — versions governed by `pubspec.yaml` `^` + Podfile); `**/build/` gitignored.
 - **Android regression:** release APK ✓ 99.4MB (Gradle 8.14.3).
 
-### ⏳ REMAINING
-
-**Must-do to close migration:**
-- [ ] **Commit pending iOS changes** (currently uncommitted working tree): `ios/Runner/AppDelegate.swift`, `ios/Runner/Info.plist`, `ios/Runner.xcodeproj/project.pbxproj`, `ios/Podfile.lock`, and the **deletion** of both tracked `swiftpm/Package.resolved` files (SPM→CocoaPods path; confirm intentional before committing). Plan `.md` also uncommitted.
-- [ ] **Synchronize `CLAUDE.md`** — its "Phase 6 GATED on Xcode 27" blocker and "integration tests still unwired" notes are stale.
-
-**Device/runtime QA (human — needs real device + live Stripe keys):**
+### ⏳ REMAINING — device/runtime QA only (human, needs real device + live Stripe keys)
 - [ ] **UIScene runtime QA** — cold launch, background→resume, deep links on iOS 27 after lifecycle migration.
-- [ ] **Full device QA** — record results in Manual QA Checklist (all rows blank for iOS 26 / 27 / Android).
+- [ ] **Full device QA** — record results in Manual QA Checklist below (all rows blank for iOS 26 / 27 / Android).
 - [ ] **Stripe runtime QA** — payment sheet present / success / failure (only native compilation verified).
 - [ ] **Riverpod 3 runtime QA** — automatic retry-on-error + loading/error UX + recovery after connectivity loss.
 
-**iOS 27 compatibility — no further code fix found this pass.** UIScene is the only iOS-27-SDK-required source change; it is done. No iOS 27 SDK deprecation/API errors in the build. Remaining iOS-27 risk is purely runtime (covered by QA above).
+**iOS 27 compatibility:** UIScene was the only iOS-27-SDK-required source change and it is done. No iOS 27 SDK deprecation/API errors in the build. Remaining iOS-27 risk is purely runtime (covered by QA above).
 
-### 📦 Plugin currency audit (2026-10-29 `flutter pub outdated`)
+### 📦 Plugin currency — Tier A DONE, Tier B deferred
 
-**Tier A — safe now, within existing `^` constraints (no pubspec edit; `flutter pub upgrade` + re-run gate). Recommended.**
-| Package | Current → Resolvable |
-|---------|----------------------|
-| file_picker | 13.1.0 → 13.3.0 |
-| firebase_core | 4.15.0 → 4.15.2 |
-| firebase_analytics | 12.6.0 → 12.6.1 |
-| firebase_crashlytics | 5.4.0 → 5.4.1 |
-| flutter_svg | 2.3.0 → 2.3.2 |
-| geocoding | 5.0.0 → 5.0.1 |
-| geolocator | 14.1.1 → 14.1.2 |
-| go_router | 18.1.0 → 18.1.1 |
-| lottie | 3.6.1 → 3.7.0 |
-
-Plus ~40 transitive patches (sqflite, webview_flutter_*, url_launcher_*, path_provider_*, image_picker_* platforms, etc.).
+**Tier A (patch/minor within `^` constraints) — ✅ applied this session.** See COMPLETED above.
 
 **Tier B — behind a MAJOR; needs pubspec edit + migration review. Out of scope for the 3.47 upgrade; schedule separately.**
 | Package | Current → Latest | Notes |
@@ -60,12 +50,12 @@ Plus ~40 transitive patches (sqflite, webview_flutter_*, url_launcher_*, path_pr
 | firebase_core | 4 → **5** | major; coupled with analytics/crashlytics majors + Firebase CocoaPods-deprecation note (post-Oct-2026). Bump as a set. |
 | firebase_analytics | 12 → **13** | major |
 | firebase_crashlytics | 5 → **6** | major |
-| cached_network_image | 3.4.1 → **4.0.5** | major |
+| cached_network_image | 3.x → **4.0.5** | major |
 | calendar_date_picker2 | 2.0.1 → **4.0.0** | two majors — review date-picker API drift |
 
-**Recommendation:** run Tier A patch sweep now (low risk, keeps the gate green); defer Tier B majors (esp. the Firebase 5/6 set) to a scoped follow-up after device QA — they carry native pod + breaking-API cost unrelated to the 3.47 goal.
+**Recommendation:** defer Tier B (esp. the Firebase 5/6 set) to a scoped follow-up after device QA — native pod + breaking-API cost unrelated to the 3.47 goal.
 
-**Deferred / non-blocking (unchanged):**
+**Deferred / non-blocking:**
 - Navigation integration suite — helpers pump real `App` + mock-auth prefs + route extras; device/sim run + fixture coverage unverified. Run `flutter test integration_test/navigation_test.dart`.
 - 4 pre-existing baseline test failures (Phase 1 list) — baseline debt, not regressions.
 - Toolchain chore: Gradle ≥9.1 / AGP ≥9 / Kotlin ≥2.3.20 (Flutter soft-deprecation warnings).

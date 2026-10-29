@@ -259,8 +259,8 @@ Custom slash commands for repetitive feature development patterns. Located in `.
 
 ## Remaining Work
 
-### Flutter 3.47 + plugins + Riverpod 3 + go_router 18 upgrade (NEARLY DONE)
-Full plan/log: `docs/FLUTTER_3_47_MIGRATION_PLAN.md` (resume banner at top). On branch `feature-flutter-upgrade`.
+### Flutter 3.47 + plugins + Riverpod 3 + go_router 18 upgrade (CODE-COMPLETE — only device QA left)
+Full plan/log: `docs/FLUTTER_3_47_MIGRATION_PLAN.md` (resume banner at top). On branch `feature-flutter-upgrade`. All code work committed as of 2026-10-29 (`d4c7222` iOS UIScene + lock deletions, `ec65b90` gitignore locks + regen registrants, `d29b0db` docs sync). Nothing code-side remains; the only open items are human device/runtime QA.
 - [x] Flutter already on 3.47.0 / Dart 3.13.0; all plugins bumped to latest (firebase, dio, maps, stripe 14, file_picker 13, geocoding 5, timezone, socket_io 3, connectivity 7, etc.).
 - [x] Riverpod 2.6→3 (`AutoDispose*`/`FamilyNotifier` removed → `Notifier`/`AsyncNotifier` + ctor-injected family arg; StateProvider → `flutter_riverpod/legacy.dart`; `valueOrNull`→`.value`).
 - [x] go_router 14→18 (no code change — modern API).
@@ -273,7 +273,7 @@ Full plan/log: `docs/FLUTTER_3_47_MIGRATION_PLAN.md` (resume banner at top). On 
 - [ ] Tier B plugin majors DEFERRED (separate scoped work): firebase_core 5 / analytics 13 / crashlytics 6 (bump as a set — native pod + Firebase CocoaPods-deprecation), cached_network_image 4, calendar_date_picker2 4.
 - [ ] Optional future chore: Gradle ≥9.1 / AGP ≥9 / Kotlin ≥2.3.20 (Flutter soft-deprecation warnings only).
 
-> **Lock files are gitignored** (team decision 2026-10-29): `pubspec.lock` and `ios/Podfile.lock` are NOT committed — versions governed by `pubspec.yaml` `^` constraints + Podfile. Both files still exist locally; don't be alarmed by `D`/`??` git states.
+> **Git hygiene (team decision 2026-10-29):** `pubspec.lock` and `ios/Podfile.lock` are gitignored / NOT committed — versions governed by `pubspec.yaml` `^` constraints + Podfile (both files still exist locally; don't be alarmed by `D`/`??` git states). `**/build/` is also gitignored (covers `android/build/`).
 
 ### Lint (206 → 57, pass 1 done)
 - [x] 149 issues fixed, all behavior-preserving (dart fix, SVG `color`→`colorFilter`, dead code, print→debugPrint, etc.).
