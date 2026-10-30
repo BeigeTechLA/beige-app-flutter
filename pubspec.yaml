@@ -115,6 +115,7 @@ flutter:
     - assets/svg/drawer/
     - assets/svg/message/
     - assets/svg/meeting/
+    - assets/svg/notification/
 
 
 
