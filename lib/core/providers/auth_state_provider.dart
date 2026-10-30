@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../firebase/analytics_events.dart';
 import '../firebase/analytics_service.dart';
 import '../firebase/crashlytics_service.dart';
+import '../notifications/push_notification_service.dart';
+import '../notifications/push_session_id.dart';
+import '../notifications/push_token_sync_provider.dart';
 import '../restoration/restoration_providers.dart';
 import '../utils/date_time_utils.dart';
 import '../utils/shared_service.dart';
@@ -43,6 +46,32 @@ class AuthStateNotifier extends Notifier<bool> {
       _endingSession ??= _endSession(emitLogoutEvent: true);
 
   Future<void> _endSession({required bool emitLogoutEvent}) async {
+    // Deregister the FCM token BEFORE `SharedService.logout()` wipes the JWT
+    // from `SecureTokenStorage` and `push_session_id` from `SharedPreferences`.
+    // Only attempt network DELETE on explicit logout (when the JWT is still
+    // valid), not on 401 session expiry (which would fail with 401 again).
+    final pushService = PushNotificationService.instance;
+    pushService.onTokenRefreshed = null;
+    final sessionId = pushService.lastSessionId ?? await PushSessionId.peek();
+    pushService.clearSession();
+    if (emitLogoutEvent && sessionId != null && sessionId.isNotEmpty) {
+      await _cleanUp('push token', () async {
+        final result = await ref
+            .read(pushTokenRepositoryProvider)
+            .removeToken(sessionId: sessionId);
+        if (kDebugMode) {
+          result.fold(
+            (err) => debugPrint(
+              '[AuthStateNotifier] Push token removal failed: ${err.message}',
+            ),
+            (_) => debugPrint(
+              '[AuthStateNotifier] Push token removed for ended session.',
+            ),
+          );
+        }
+      });
+    }
+
     // Revoke access immediately, even if storage or telemetry cleanup fails.
     state = false;
     await _cleanUp('session', () => SharedService.logout());

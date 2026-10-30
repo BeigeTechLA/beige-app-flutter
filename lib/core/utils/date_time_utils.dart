@@ -614,4 +614,14 @@ class DateTimeUtils {
 
     return "${days.sublist(0, days.length - 1).join(', ')} & ${days.last}";
   }
+
+  /// Format a DateTime for notifications: `October 11 • 09:20AM`
+  static String formatNotificationDate(DateTime? date, {String fallback = "--"}) {
+    try {
+      if (date == null) return fallback;
+      return DateFormat('MMMM dd • hh:mma').format(date.toLocal());
+    } catch (_) {
+      return fallback;
+    }
+  }
 }

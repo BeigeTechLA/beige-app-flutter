@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../network/api_endpoints.dart';
 import '../../network/dio_client.dart';
 import '../domain/notification_preferences.dart';
@@ -16,6 +18,12 @@ class PushPreferencesRemoteDataSource {
       ApiEndpoints.pushPreferences,
       queryParameters: {'session_id': sessionId},
     );
+    if (kDebugMode) {
+      debugPrint(
+        '[PushPreferencesRemoteDataSource] GET ${ApiEndpoints.pushPreferences} '
+        'status=${response.statusCode}',
+      );
+    }
     return _asMap(response.data);
   }
 
@@ -31,6 +39,12 @@ class PushPreferencesRemoteDataSource {
         'notification_preferences': preferences.toJson(),
       },
     );
+    if (kDebugMode) {
+      debugPrint(
+        '[PushPreferencesRemoteDataSource] PATCH ${ApiEndpoints.pushPreferences} '
+        'status=${response.statusCode} push_enabled=${preferences.pushEnabled}',
+      );
+    }
     return _asMap(response.data);
   }
 

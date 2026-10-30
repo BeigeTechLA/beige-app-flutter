@@ -22,12 +22,15 @@ class NotificationCategoryItem {
 }
 
 class NotificationCategoriesBottomSheet extends StatefulWidget {
-  /// Shared, mutable list owned by the caller. The sheet toggles items in place
-  /// so the caller sees the changes after the sheet is dismissed. Returns
-  /// `true` when the user taps Save, `null`/`false` otherwise.
+  /// List owned by the caller. Local edits are only committed back to
+  /// [categories] when the user taps Save (returns `true`). Dismissing via
+  /// close or swipe leaves the caller's list untouched.
   final List<NotificationCategoryItem> categories;
 
-  const NotificationCategoriesBottomSheet({super.key, required this.categories});
+  const NotificationCategoriesBottomSheet({
+    super.key,
+    required this.categories,
+  });
 
   static Future<bool?> show(
     BuildContext context,
@@ -49,7 +52,22 @@ class NotificationCategoriesBottomSheet extends StatefulWidget {
 
 class _NotificationCategoriesBottomSheetState
     extends State<NotificationCategoriesBottomSheet> {
-  List<NotificationCategoryItem> get _categories => widget.categories;
+  late final Map<String, bool> _draftStates;
+
+  @override
+  void initState() {
+    super.initState();
+    _draftStates = {
+      for (final item in widget.categories) item.id: item.isEnabled,
+    };
+  }
+
+  void _commitDraftAndClose() {
+    for (final item in widget.categories) {
+      item.isEnabled = _draftStates[item.id] ?? item.isEnabled;
+    }
+    Navigator.of(context).pop(true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +119,7 @@ class _NotificationCategoriesBottomSheetState
                   ),
                 ),
                 IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(context).pop(false),
                   icon: const Icon(
                     Icons.close,
                     color: AppColors.white,
@@ -126,11 +144,11 @@ class _NotificationCategoriesBottomSheetState
                 horizontal: AppSpacing.base,
                 vertical: AppSpacing.md,
               ),
-              itemCount: _categories.length,
+              itemCount: widget.categories.length,
               separatorBuilder: (context, index) =>
                   const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
-                final category = _categories[index];
+                final category = widget.categories[index];
                 return _buildCategoryRow(category);
               },
             ),
@@ -148,9 +166,7 @@ class _NotificationCategoriesBottomSheetState
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
+                onPressed: _commitDraftAndClose,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
@@ -176,6 +192,7 @@ class _NotificationCategoriesBottomSheetState
   }
 
   Widget _buildCategoryRow(NotificationCategoryItem category) {
+    final isEnabled = _draftStates[category.id] ?? category.isEnabled;
     return Row(
       children: [
         /// Icon container
@@ -224,10 +241,10 @@ class _NotificationCategoriesBottomSheetState
 
         /// Switch Toggle
         AppToggleSwitch(
-          value: category.isEnabled,
+          value: isEnabled,
           onChanged: (val) {
             setState(() {
-              category.isEnabled = val;
+              _draftStates[category.id] = val;
             });
           },
         ),

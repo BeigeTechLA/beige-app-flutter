@@ -47,6 +47,9 @@ class AppColors {
   /// Mid surface - distinct from surfaceVariant
   static const Color surfaceMid = Color(0xFF282828);
 
+  /// Dim surface - used for read notification cards
+  static const Color surfaceDim = Color(0xFF2E2E2E);
+
   /// Icon/circle backgrounds
   static const Color iconBackground = Color(0xFF171717);
 

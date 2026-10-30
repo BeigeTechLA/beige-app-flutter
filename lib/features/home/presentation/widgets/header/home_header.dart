@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:beige/app/assets.dart';
 import 'package:beige/app/colors.dart';
 import 'package:beige/app/radii.dart';
+import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
+import 'package:beige/core/notifications/presentation/providers/notification_list_providers.dart';
 import 'package:beige/core/utils/image_url_utils.dart';
 import 'package:beige/features/app_drawer/providers/drawer_notifier.dart';
 import 'package:beige/shared/widgets/scale_clamped_text.dart';
@@ -19,6 +22,7 @@ class HomeHeader extends StatelessWidget {
   final bool isGuest;
   final Future<void> Function() onLocationTap;
   final Future<void> Function() onProfileTap;
+  final Future<void> Function()? onNotificationTap;
 
   const HomeHeader({
     super.key,
@@ -28,6 +32,7 @@ class HomeHeader extends StatelessWidget {
     required this.isGuest,
     required this.onLocationTap,
     required this.onProfileTap,
+    this.onNotificationTap,
   });
 
   @override
@@ -48,6 +53,7 @@ class HomeHeader extends StatelessWidget {
         isGuest: isGuest,
         onLocationTap: onLocationTap,
         onProfileTap: onProfileTap,
+        onNotificationTap: onNotificationTap,
       ),
     );
   }
@@ -134,6 +140,7 @@ class HomeNavigationHeader extends ConsumerWidget {
   final bool isGuest;
   final Future<void> Function() onLocationTap;
   final Future<void> Function() onProfileTap;
+  final Future<void> Function()? onNotificationTap;
 
   const HomeNavigationHeader({
     super.key,
@@ -143,12 +150,17 @@ class HomeNavigationHeader extends ConsumerWidget {
     required this.isGuest,
     required this.onLocationTap,
     required this.onProfileTap,
+    this.onNotificationTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bust = ref.watch(profileImageBustProvider);
     final avatarUrl = buildImageUrl(profileImageUrl, bust: bust);
+    final unreadCount = isGuest
+        ? 0
+        : (ref.watch(notificationCountProvider).value?.totalUnread ?? 0);
+    final hasUnread = unreadCount > 0;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,9 +243,37 @@ class HomeNavigationHeader extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
-                child: SvgPicture.asset(AppAssets.notification),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  if (onNotificationTap != null) {
+                    onNotificationTap!();
+                  } else {
+                    context.pushNamed(RouteNames.notificationList);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.smd),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SvgPicture.asset(AppAssets.notification),
+                      if (hasUnread)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
               GestureDetector(
                 onTap: onProfileTap,

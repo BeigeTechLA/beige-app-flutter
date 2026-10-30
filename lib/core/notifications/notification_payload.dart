@@ -31,15 +31,26 @@ class NotificationPayload {
     required this.rawMap,
   });
 
-  factory NotificationPayload.fromMap(Map<String, dynamic> data, {String? title, String? body}) {
-    final typeString = (data['type'] ?? data['notification_type'] ?? '').toString().toLowerCase();
-    final topicString = (data['topic'] ?? '').toString().toLowerCase();
+  factory NotificationPayload.fromMap(
+    Map<String, dynamic> data, {
+    String? title,
+    String? body,
+  }) {
+    final typeString =
+        (data['type'] ?? data['notification_type'] ?? '').toString().toLowerCase();
+    final topicString =
+        (data['topic'] ?? data['category'] ?? '').toString().toLowerCase();
 
     final type = _resolveType(typeString, topicString);
 
     return NotificationPayload(
       type: type,
-      title: title ?? data['title']?.toString(),
+      title: title ??
+          _firstNonEmpty([
+            data['title'],
+            data['sender_name'],
+            data['senderName'],
+          ]),
       body: body ?? data['body']?.toString(),
       chatId: _firstNonEmpty([
         data['chat_room_id'],
@@ -79,14 +90,17 @@ class NotificationPayload {
 
   @override
   String toString() {
-    return 'NotificationPayload(type: $type, title: $title, body: $body, '
+    return 'NotificationPayload(type: $type, '
+        'topic: ${rawMap['topic'] ?? rawMap['category']}, '
+        'eventType: ${rawMap['type'] ?? rawMap['notification_type']}, '
         'chatId: $chatId, bookingId: $bookingId, meetingId: $meetingId, '
-        'targetRoute: $targetRoute, rawMap: $rawMap)';
+        'targetRoute: $targetRoute)';
   }
 
   /// Resolves the notification family from the server `type` event first, then
-  /// falls back to the top-level `topic`. Uses family matching (not brittle
-  /// exact strings) so new backend event names keep routing correctly.
+  /// falls back to the top-level `topic` / `category`. Uses family matching
+  /// (not brittle exact strings) so new backend event names keep routing
+  /// correctly.
   static NotificationType _resolveType(String typeString, String topicString) {
     // 1. Match against the specific `type` event name.
     if (typeString.isNotEmpty) {
@@ -100,11 +114,13 @@ class NotificationPayload {
       }
     }
 
-    // 2. Fall back to the top-level `topic`.
+    // 2. Fall back to the top-level `topic` or `category`.
     switch (topicString) {
       case 'messages':
+      case 'chat':
         return NotificationType.chat;
       case 'shoots':
+      case 'bookings':
         return NotificationType.booking;
       case 'meetings':
         return NotificationType.meeting;
@@ -121,7 +137,9 @@ class NotificationPayload {
   static bool _isChatType(String type) {
     return type == 'chat' ||
         type == 'message' ||
-        type.contains('message') || // direct_message, new_message, messaging_initiated
+        type == 'messaging_initiated' ||
+        type.contains('message') ||
+        type.contains('messaging') ||
         type == 'mention';
   }
 
@@ -138,8 +156,11 @@ class NotificationPayload {
         type == 'edited_files_delivered' ||
         type == 'new_version_uploaded' ||
         type == 'files_selected_for_editing' ||
+        type == 'revision_requested_on_edit' ||
+        type == 'revision_comment_added' ||
         type == 'final_files_approved' ||
         type.startsWith('files_') ||
+        type.startsWith('revision_') ||
         type.contains('_files_');
   }
 

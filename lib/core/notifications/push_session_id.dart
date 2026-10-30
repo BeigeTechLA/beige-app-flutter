@@ -13,6 +13,14 @@ class PushSessionId {
 
   static const String _key = 'push_session_id';
 
+  /// Returns the persisted session id without creating a new one if absent.
+  static Future<String?> peek() async {
+    final prefs = await SharedPreferences.getInstance();
+    final existing = prefs.getString(_key);
+    if (existing != null && existing.isNotEmpty) return existing;
+    return null;
+  }
+
   /// Returns the persisted session id, generating and storing one on first use.
   static Future<String> getOrCreate() async {
     final prefs = await SharedPreferences.getInstance();

@@ -1142,6 +1142,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 await context.pushNamed(RouteNames.profile);
                 ref.read(homeNotifierProvider.notifier).fetchHomeData();
               },
+              onNotificationTap: () async {
+                if (_blockIfGuest()) return;
+                await context.pushNamed(RouteNames.notificationList);
+              },
             ),
           ),
           if (isLoading) const AppLoadingOverlay(),

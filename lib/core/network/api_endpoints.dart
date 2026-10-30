@@ -98,8 +98,20 @@ abstract class ApiEndpoints {
   static String meetingRespond(String id) => 'external-meetings/$id/respond';
 
   /// 🔔 Push Notifications
-  static const String pushTokens = "push-notifications/tokens";
-  static const String pushPreferences = "push-notifications/preferences";
+  static const String pushTokens = 'push-notifications/tokens';
+  static const String pushPreferences = 'push-notifications/preferences';
+  static String notificationsSettingsFlags(String sessionId) =>
+      'notification-preferences/settings?session_id=$sessionId';
+  static String pushNotificationsPreferences(String sessionId) =>
+      'push-notifications/preferences?session_id=$sessionId';
+  static const String emailPreferences = 'notification-preferences/email';
+  static String emailNotificationsPreferences(String sessionId) =>
+      'notification-preferences/email?session_id=$sessionId';
+
+  // ───── Notification Center ─────────────────────────────────────────────────
+  static const String notifications = 'app-notifications';
+  static const String notificationCounts = 'app-notifications/counts';
+  static const String notificationsReadAll = 'app-notifications/read-all';
 
   // ───── File Manager (FM7 real endpoints) ────────────────────────────────
   static const String fileManagerRoot = 'file-manager/root';

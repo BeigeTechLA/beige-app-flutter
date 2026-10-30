@@ -26,6 +26,19 @@ class AppAssets {
   static const String svgMessage = 'assets/svg/message';
 
   static const String svgMeeting = 'assets/svg/meeting';
+  static const String svgNotification = 'assets/svg/notification';
+
+  // SVG — Notifications
+  static const String notificationCategoryShoots = '$svgNotification/Shoots (2).svg';
+  static const String notificationCategoryPayments = '$svgNotification/Payments.svg';
+  static const String notificationCategoryMessages = '$svgNotification/Messages (2).svg';
+  static const String notificationCategoryMeetings = '$svgNotification/Meetings.svg';
+  static const String notificationCategoryProposals = '$svgNotification/Proposals.svg';
+  static const String notificationCategoryFiles = '$svgNotification/Files.svg';
+  static const String notificationCategorySystem = '$svgNotification/System.svg';
+  static const String notificationEmptyState = '$svgNotification/notification empty state.svg';
+  static const String icPushNotification = '$svgNotification/notifications_phone.svg';
+  static const String icEmailNotification = '$svgNotification/ic_email_notification.svg';
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // SVG — Navigation & Actions
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

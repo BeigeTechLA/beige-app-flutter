@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -14,27 +15,65 @@ import '../../firebase_options.dart';
 import '../firebase/crashlytics_service.dart';
 import 'notification_payload.dart';
 
-/// Logs the full SDK payload, including notification details and custom data.
+/// Masks an FCM token for privacy-safe diagnostic logging.
+String _maskToken(String? token) {
+  if (token == null || token.isEmpty) return '<empty>';
+  if (token.length <= 10) return '<masked:${token.length}>';
+  return '<len:${token.length}, suffix:...${token.substring(token.length - 6)}>';
+}
+
+/// Logs push notification metadata in a privacy-safe manner (never logs full
+/// tokens or private message content).
 void _logRemoteMessage(String event, RemoteMessage message) {
   if (!kDebugMode) return;
 
+  final data = message.data;
   final details = <String, dynamic>{
     'event': event,
-    'payload': message.toMap(),
+    'messageId': message.messageId,
+    'hasNotificationBlock': message.notification != null,
+    'topic': data['topic'],
+    'category': data['category'],
+    'type': data['type'] ?? data['notification_type'],
+    'booking_id': data['booking_id'] ?? data['shoot_id'] ?? data['project_id'],
+    'chat_room_id': data['chat_room_id'] ?? data['room_id'] ?? data['roomId'],
+    'meeting_id': data['meeting_id'] ?? data['meetingId'],
+    'dataKeys': data.keys.toList(),
   };
-  for (final line in const JsonEncoder.withIndent('  ').convert(details).split('\n')) {
-    debugPrint('[PushNotificationService] $line', wrapWidth: 1000);
-  }
+  debugPrint('[PushNotificationService] ${jsonEncode(details)}');
 }
 
 /// Top-level background message handler required by Firebase Messaging.
 /// Must be annotated with `@pragma('vm:entry-point')`.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    if (Firebase.apps.isEmpty) {
+      try {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      } catch (_) {
+        await Firebase.initializeApp();
+      }
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint(
+        '[PushNotificationService] Background Firebase init error: $e',
+      );
+    }
+  }
+
   _logRemoteMessage('background_received', message);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  // When the backend sends a notification+data payload, the OS displays the
+  // notification tray item automatically. When the backend sends a data-only
+  // payload (`message.notification == null`), display a local notification so
+  // background/terminated pushes are never silently dropped.
+  if (message.notification == null && message.data.isNotEmpty) {
+    await PushNotificationService.showBackgroundDataNotification(message);
+  }
 }
 
 class PushNotificationService {
@@ -42,43 +81,48 @@ class PushNotificationService {
   static final PushNotificationService instance = PushNotificationService._();
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   // ── Dedicated Android Notification Channels ──────────────────────────────
-  static const AndroidNotificationChannel _chatChannel = AndroidNotificationChannel(
-    'beige_chat_channel',
-    'Chat Messages',
-    description: 'Instant messages and chat activity alerts',
-    importance: Importance.max,
-    playSound: true,
-    enableVibration: true,
-  );
+  static const AndroidNotificationChannel _chatChannel =
+      AndroidNotificationChannel(
+        'beige_chat_channel',
+        'Chat Messages',
+        description: 'Instant messages and chat activity alerts',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      );
 
-  static const AndroidNotificationChannel _bookingChannel = AndroidNotificationChannel(
-    'beige_booking_channel',
-    'Booking Updates',
-    description: 'Updates regarding your shoot bookings and status',
-    importance: Importance.high,
-    playSound: true,
-    enableVibration: true,
-  );
+  static const AndroidNotificationChannel _bookingChannel =
+      AndroidNotificationChannel(
+        'beige_booking_channel',
+        'Booking Updates',
+        description: 'Updates regarding your shoot bookings and status',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      );
 
-  static const AndroidNotificationChannel _meetingChannel = AndroidNotificationChannel(
-    'beige_meeting_channel',
-    'Meeting Reminders',
-    description: 'Reminders and notifications for scheduled meetings',
-    importance: Importance.high,
-    playSound: true,
-    enableVibration: true,
-  );
+  static const AndroidNotificationChannel _meetingChannel =
+      AndroidNotificationChannel(
+        'beige_meeting_channel',
+        'Meeting Reminders',
+        description: 'Reminders and notifications for scheduled meetings',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      );
 
-  static const AndroidNotificationChannel _generalChannel = AndroidNotificationChannel(
-    'beige_general_channel',
-    'General Updates',
-    description: 'General announcements and app notifications',
-    importance: Importance.defaultImportance,
-    playSound: true,
-  );
+  static const AndroidNotificationChannel _generalChannel =
+      AndroidNotificationChannel(
+        'beige_general_channel',
+        'General Updates',
+        description: 'General announcements and app notifications',
+        importance: Importance.defaultImportance,
+        playSound: true,
+      );
 
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
@@ -97,6 +141,7 @@ class PushNotificationService {
 
   NotificationPayload? _pendingPayload;
   bool _isInitialized = false;
+  Future<String?>? _pendingTokenFetch;
 
   /// Initializes FCM listeners, multi-channel setup, permission prompts,
   /// and notification tap callbacks on app startup.
@@ -109,7 +154,9 @@ class PushNotificationService {
     // still renders — it just runs without push until the next launch.
     try {
       // Set background message handler
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
 
       // Setup multi-channel local notifications for Android & iOS
       await _setupLocalNotifications();
@@ -125,6 +172,31 @@ class PushNotificationService {
       if (initialMessage != null) {
         _logRemoteMessage('terminated_notification_opened', initialMessage);
         _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
+      } else {
+        // Also check if the app was launched by tapping a local notification
+        // shown by `_firebaseMessagingBackgroundHandler` for a data-only push.
+        final launchDetails = await _localNotifications
+            .getNotificationAppLaunchDetails();
+        final responsePayload = launchDetails?.notificationResponse?.payload;
+        if ((launchDetails?.didNotificationLaunchApp ?? false) &&
+            responsePayload != null &&
+            responsePayload.isNotEmpty) {
+          try {
+            final Map<String, dynamic> data = jsonDecode(responsePayload);
+            _pendingPayload = NotificationPayload.fromMap(data);
+            if (kDebugMode) {
+              debugPrint(
+                '[PushNotificationService] Captured terminated local notification launch: $_pendingPayload',
+              );
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              debugPrint(
+                '[PushNotificationService] Failed to parse launch local notification payload: $e',
+              );
+            }
+          }
+        }
       }
 
       // Handle background notification taps when app is resumed
@@ -140,15 +212,16 @@ class PushNotificationService {
         _showForegroundNotification(message);
       });
 
-      // NOTE: Pending payload is NOT dispatched here. During cold start the first
-      // frame is SplashScreen and the auth redirect is still resolving, so a push
-      // navigation would be overwritten. Instead the post-auth landing (HomeScreen)
-      // drains the queue via `processPendingNotification()` once it is safe to nav.
+      if (kDebugMode) {
+        debugPrint('[PushNotificationService] Initialized successfully.');
+      }
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] initialize failed (non-fatal): $e');
+        debugPrint(
+          '[PushNotificationService] initialize failed (non-fatal): $e',
+        );
       }
     }
   }
@@ -167,20 +240,29 @@ class PushNotificationService {
 
     // 2. Request Android 13+ (API 33+) POST_NOTIFICATIONS runtime permission
     final androidImplementation = _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    bool? androidGranted;
     if (androidImplementation != null) {
-      await androidImplementation.requestNotificationsPermission();
+      androidGranted = await androidImplementation
+          .requestNotificationsPermission();
     }
 
-    // 3. Configure iOS foreground notification presentation options
+    // 3. Configure iOS foreground notification presentation options.
+    // Disable system alert/sound in foreground because `_showForegroundNotification`
+    // displays the banner via `flutter_local_notifications` (preventing duplicate
+    // foreground banners on iOS and allowing active-chat suppression).
     await _fcm.setForegroundNotificationPresentationOptions(
-      alert: true,
+      alert: false,
       badge: true,
-      sound: true,
+      sound: false,
     );
 
     if (kDebugMode) {
-      debugPrint('[PushNotificationService] Permission authorization status: ${settings.authorizationStatus}');
+      debugPrint(
+        '[PushNotificationService] Permission status: fcm=${settings.authorizationStatus}, androidGranted=$androidGranted',
+      );
     }
 
     return settings;
@@ -188,7 +270,9 @@ class PushNotificationService {
 
   /// Setup flutter_local_notifications plugin and create dedicated Android channels.
   Future<void> _setupLocalNotifications() async {
-    const androidInitSettings = AndroidInitializationSettings('ic_stat_notification');
+    const androidInitSettings = AndroidInitializationSettings(
+      'ic_stat_notification',
+    );
     const darwinInitSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -207,10 +291,17 @@ class PushNotificationService {
           try {
             final Map<String, dynamic> data = jsonDecode(response.payload!);
             final payload = NotificationPayload.fromMap(data);
+            if (kDebugMode) {
+              debugPrint(
+                '[PushNotificationService] Local notification tapped: $payload',
+              );
+            }
             handleNotificationClick(payload);
           } catch (e) {
             if (kDebugMode) {
-              debugPrint('[PushNotificationService] Error parsing local notification payload: $e');
+              debugPrint(
+                '[PushNotificationService] Error parsing local notification payload: $e',
+              );
             }
           }
         }
@@ -219,7 +310,9 @@ class PushNotificationService {
 
     // Create all 4 dedicated Android Notification Channels
     final androidImplementation = _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
       await androidImplementation.createNotificationChannel(_chatChannel);
@@ -230,7 +323,7 @@ class PushNotificationService {
   }
 
   /// Map payload type to the appropriate Android notification channel.
-  AndroidNotificationChannel _getChannelForType(NotificationType type) {
+  static AndroidNotificationChannel _getChannelForType(NotificationType type) {
     switch (type) {
       case NotificationType.chat:
         return _chatChannel;
@@ -246,38 +339,88 @@ class PushNotificationService {
     }
   }
 
-  Priority _getPriorityForImportance(Importance importance) {
+  static Priority _getPriorityForImportance(Importance importance) {
     if (importance == Importance.max || importance == Importance.high) {
       return Priority.high;
     }
     return Priority.defaultPriority;
   }
 
-  /// Fetch and listen for FCM Token updates.
-  void _setupTokenManagement() {
-    _fcm.getToken().then((token) {
+  /// Ensures an FCM token is available, fetching it from Firebase if it was
+  /// not yet cached at startup (e.g. due to network/APNs warmup).
+  Future<String?> ensureToken() {
+    if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+      return Future.value(_fcmToken);
+    }
+    return _pendingTokenFetch ??= _fetchTokenInternal().whenComplete(() {
+      _pendingTokenFetch = null;
+    });
+  }
+
+  Future<String?> _fetchTokenInternal() async {
+    try {
+      if (!kIsWeb && Platform.isIOS) {
+        String? apnsToken = await _fcm.getAPNSToken();
+        for (int i = 0; i < 3 && apnsToken == null; i++) {
+          await Future<void>.delayed(const Duration(seconds: 1));
+          apnsToken = await _fcm.getAPNSToken();
+        }
+        if (apnsToken == null) {
+          if (kDebugMode) {
+            debugPrint(
+              '[PushNotificationService] APNs token not yet available on iOS.',
+            );
+          }
+          return null;
+        }
+      }
+
+      final token = await _fcm.getToken();
       _fcmToken = token;
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] FCM Token: $_fcmToken');
+        debugPrint(
+          '[PushNotificationService] FCM token fetched: ${_maskToken(token)}',
+        );
       }
-      if (token != null && token.isNotEmpty) {
-        unawaited(_notifyTokenRefreshed(token));
-      }
-    }).catchError((err) {
+      return token;
+    } catch (err) {
       if (kDebugMode) {
         debugPrint('[PushNotificationService] Error fetching FCM token: $err');
       }
-    });
+      return null;
+    }
+  }
 
-    _fcm.onTokenRefresh.listen((newToken) {
-      _fcmToken = newToken;
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] FCM Token refreshed: $_fcmToken');
-      }
-      if (newToken.isNotEmpty) {
-        unawaited(_notifyTokenRefreshed(newToken));
-      }
-    });
+  /// Fetch and listen for FCM Token updates.
+  void _setupTokenManagement() {
+    unawaited(
+      ensureToken().then((token) {
+        if (token != null && token.isNotEmpty) {
+          unawaited(_notifyTokenRefreshed(token));
+        }
+      }),
+    );
+
+    _fcm.onTokenRefresh.listen(
+      (newToken) {
+        _fcmToken = newToken;
+        if (kDebugMode) {
+          debugPrint(
+            '[PushNotificationService] FCM token refreshed: ${_maskToken(newToken)}',
+          );
+        }
+        if (newToken.isNotEmpty) {
+          unawaited(_notifyTokenRefreshed(newToken));
+        }
+      },
+      onError: (Object err) {
+        if (kDebugMode) {
+          debugPrint(
+            '[PushNotificationService] onTokenRefresh stream error: $err',
+          );
+        }
+      },
+    );
   }
 
   /// Invokes the token-refresh callback (a backend sync) with its own guard so
@@ -294,6 +437,26 @@ class PushNotificationService {
     }
   }
 
+  /// Checks whether the user is currently viewing the exact chat room for [chatId]
+  /// so we don't show a duplicate banner over an active conversation.
+  bool _isViewingSameChatRoom(String? chatId) {
+    if (chatId == null || chatId.isEmpty) return false;
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return false;
+    try {
+      final router = GoRouter.of(context);
+      final config = router.routerDelegate.currentConfiguration;
+      if (config.uri.path != '/chat') return false;
+      final extra = config.extra;
+      if (extra is Map && extra['conversationId']?.toString() == chatId) {
+        return true;
+      }
+    } catch (_) {
+      return false;
+    }
+    return false;
+  }
+
   /// Displays local notification banner using the channel corresponding to message type.
   Future<void> _showForegroundNotification(RemoteMessage message) async {
     // Runs inside the onMessage stream callback — guard so a platform/display
@@ -301,13 +464,34 @@ class PushNotificationService {
     try {
       final payload = NotificationPayload.fromRemoteMessage(message);
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Foreground parsed payload =============>>> $payload');
+        debugPrint(
+          '[PushNotificationService] Foreground parsed payload: $payload',
+        );
       }
+
+      if (payload.type == NotificationType.chat &&
+          _isViewingSameChatRoom(payload.chatId)) {
+        if (kDebugMode) {
+          debugPrint(
+            '[PushNotificationService] Suppressing foreground banner for active chat room ${payload.chatId}.',
+          );
+        }
+        return;
+      }
+
       final channel = _getChannelForType(payload.type);
 
       final notification = message.notification;
-      final title = notification?.title ?? message.data['title'] ?? 'Notification';
-      final body = notification?.body ?? message.data['body'] ?? '';
+      final title =
+          notification?.title ??
+          message.data['title']?.toString() ??
+          message.data['sender_name']?.toString() ??
+          'Notification';
+      final body =
+          notification?.body ??
+          message.data['body']?.toString() ??
+          message.data['message']?.toString() ??
+          '';
 
       final androidDetails = AndroidNotificationDetails(
         channel.id,
@@ -317,6 +501,7 @@ class PushNotificationService {
         priority: _getPriorityForImportance(channel.importance),
         color: AppColors.notificationAccent,
         icon: 'ic_stat_notification',
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
       );
 
       const darwinDetails = DarwinNotificationDetails(
@@ -330,18 +515,122 @@ class PushNotificationService {
         iOS: darwinDetails,
       );
 
+      final localPayloadMap = <String, dynamic>{
+        ...message.data,
+        if (title.isNotEmpty) 'title': title,
+        if (body.isNotEmpty) 'body': body,
+      };
+
       await _localNotifications.show(
-        id: message.hashCode,
+        id: message.messageId?.hashCode ?? message.hashCode,
         title: title,
         body: body,
         notificationDetails: notificationDetails,
-        payload: jsonEncode(message.data),
+        payload: jsonEncode(localPayloadMap),
       );
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Foreground local notification displayed (channel: ${channel.id}, type: ${payload.type}).',
+        );
+      }
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Failed to show foreground notification: $e');
+        debugPrint(
+          '[PushNotificationService] Failed to show foreground notification: $e',
+        );
+      }
+    }
+  }
+
+  /// Displays a local notification from the background isolate when a data-only
+  /// FCM message arrives (`message.notification == null`).
+  static Future<void> showBackgroundDataNotification(
+    RemoteMessage message,
+  ) async {
+    try {
+      final payload = NotificationPayload.fromRemoteMessage(message);
+      final title =
+          message.data['title']?.toString() ??
+          message.data['sender_name']?.toString() ??
+          'Beige';
+      final body =
+          message.data['body']?.toString() ??
+          message.data['message']?.toString() ??
+          '';
+      if (title.isEmpty &&
+          body.isEmpty &&
+          payload.type == NotificationType.unknown) {
+        return;
+      }
+
+      final plugin = FlutterLocalNotificationsPlugin();
+      const androidInitSettings = AndroidInitializationSettings(
+        'ic_stat_notification',
+      );
+      const darwinInitSettings = DarwinInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+      );
+      await plugin.initialize(
+        settings: const InitializationSettings(
+          android: androidInitSettings,
+          iOS: darwinInitSettings,
+        ),
+      );
+
+      final channel = _getChannelForType(payload.type);
+      final androidPlugin = plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (androidPlugin != null) {
+        await androidPlugin.createNotificationChannel(channel);
+      }
+
+      final localPayloadMap = <String, dynamic>{
+        ...message.data,
+        if (title.isNotEmpty) 'title': title,
+        if (body.isNotEmpty) 'body': body,
+      };
+
+      await plugin.show(
+        id: message.messageId?.hashCode ?? message.hashCode,
+        title: title,
+        body: body,
+        notificationDetails: NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: channel.description,
+            importance: channel.importance,
+            priority: _getPriorityForImportance(channel.importance),
+            color: AppColors.notificationAccent,
+            icon: 'ic_stat_notification',
+            largeIcon: const DrawableResourceAndroidBitmap(
+              '@mipmap/ic_launcher',
+            ),
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        payload: jsonEncode(localPayloadMap),
+      );
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Background data-only notification displayed (channel: ${channel.id}, type: ${payload.type}).',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Failed to show background data notification: $e',
+        );
       }
     }
   }
@@ -361,7 +650,9 @@ class PushNotificationService {
 
     if (context == null) {
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Context not ready yet, queuing notification tap.');
+        debugPrint(
+          '[PushNotificationService] Context not ready yet, queuing notification tap: $payload',
+        );
       }
       _pendingPayload = payload;
       return;
@@ -376,17 +667,22 @@ class PushNotificationService {
       // Splash guard: while the app is still on splash the auth redirect has not
       // settled yet. Re-queue and let the post-auth landing drain it, otherwise
       // the redirect overwrites this navigation.
-      final currentLocation = router.routerDelegate.currentConfiguration.uri.path;
+      final currentLocation =
+          router.routerDelegate.currentConfiguration.uri.path;
       if (currentLocation == '/splash' || currentLocation.isEmpty) {
         if (kDebugMode) {
-          debugPrint('[PushNotificationService] On splash, deferring notification tap.');
+          debugPrint(
+            '[PushNotificationService] On splash, deferring notification tap: $payload',
+          );
         }
         _pendingPayload = payload;
         return;
       }
 
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Handling tap payload → $payload');
+        debugPrint(
+          '[PushNotificationService] Navigating for notification tap: $payload',
+        );
       }
 
       switch (payload.type) {
@@ -394,7 +690,10 @@ class PushNotificationService {
           if (payload.chatId != null && payload.chatId!.isNotEmpty) {
             router.pushNamed(
               RouteNames.chat,
-              extra: {'conversationId': payload.chatId, 'contactName': payload.title ?? 'Chat'},
+              extra: {
+                'conversationId': payload.chatId,
+                'contactName': payload.title ?? 'Chat',
+              },
             );
           } else {
             router.goNamed(RouteNames.messages);
@@ -405,9 +704,27 @@ class PushNotificationService {
           if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
             final bookingId = int.tryParse(payload.bookingId!);
             if (bookingId != null) {
+              final extraData = <String, dynamic>{
+                if (payload.title != null) 'projectName': payload.title,
+                if (payload.rawMap['project_name'] != null)
+                  'projectName': payload.rawMap['project_name'],
+                if (payload.rawMap['image_url'] != null)
+                  'imageUrl': payload.rawMap['image_url'],
+                if (payload.rawMap['location'] != null)
+                  'location': payload.rawMap['location'],
+                if (payload.rawMap['event_date'] != null)
+                  'eventDate': payload.rawMap['event_date'],
+                if (payload.rawMap['start_time'] != null)
+                  'startTime': payload.rawMap['start_time'],
+                if (payload.rawMap['end_time'] != null)
+                  'endTime': payload.rawMap['end_time'],
+                if (payload.rawMap['content_type'] != null)
+                  'contentType': payload.rawMap['content_type'],
+              };
               router.pushNamed(
                 RouteNames.manageBooking,
                 pathParameters: {'bookingId': bookingId.toString()},
+                extra: extraData.isNotEmpty ? extraData : null,
               );
             } else {
               router.goNamed(RouteNames.myShoots);
@@ -423,15 +740,24 @@ class PushNotificationService {
               RouteNames.meetings,
               queryParameters: {'meetingId': payload.meetingId!},
             );
+          } else if (payload.bookingId != null &&
+              int.tryParse(payload.bookingId!) != null) {
+            router.pushNamed(
+              RouteNames.manageBooking,
+              pathParameters: {'bookingId': payload.bookingId!},
+            );
           } else {
             router.goNamed(RouteNames.meetings);
           }
           break;
 
         case NotificationType.files:
-          // TODO: enable when File Manager screen is built.
-          // router.pushNamed(RouteNames.fileManager);
-          router.goNamed(RouteNames.home);
+          if (payload.targetRoute != null &&
+              payload.targetRoute!.startsWith('/file-manager')) {
+            router.push(payload.targetRoute!);
+          } else {
+            router.pushNamed(RouteNames.fileManager);
+          }
           break;
 
         case NotificationType.profile:
@@ -447,7 +773,9 @@ class PushNotificationService {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
       if (kDebugMode) {
-        debugPrint('[PushNotificationService] Navigation failed for ${payload.type}: $e');
+        debugPrint(
+          '[PushNotificationService] Navigation failed for ${payload.type}: $e',
+        );
       }
       _safeGoHome(context);
     }

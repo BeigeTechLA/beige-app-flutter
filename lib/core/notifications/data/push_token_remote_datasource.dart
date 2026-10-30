@@ -1,13 +1,20 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
 import '../../network/api_endpoints.dart';
 import '../../network/dio_client.dart';
 
 /// Raw API calls for FCM token registration.
-///
-/// `device_type` is injected globally by [DioClient], so it is not sent here.
 class PushTokenRemoteDataSource {
   final DioClient _dioClient;
 
   PushTokenRemoteDataSource(this._dioClient);
+
+  static String get _deviceType {
+    if (kIsWeb) return 'web';
+    return Platform.isIOS ? 'ios' : 'android';
+  }
 
   /// POST push-notifications/tokens
   Future<Map<String, dynamic>> saveToken({
@@ -16,8 +23,18 @@ class PushTokenRemoteDataSource {
   }) async {
     final response = await _dioClient.dio.post(
       ApiEndpoints.pushTokens,
-      data: {'fcm_token': fcmToken, 'session_id': sessionId},
+      data: {
+        'fcm_token': fcmToken,
+        'session_id': sessionId,
+        'device_type': _deviceType,
+      },
     );
+    if (kDebugMode) {
+      debugPrint(
+        '[PushTokenRemoteDataSource] POST ${ApiEndpoints.pushTokens} '
+        'status=${response.statusCode} device_type=$_deviceType',
+      );
+    }
     return _asMap(response.data);
   }
 
@@ -27,6 +44,12 @@ class PushTokenRemoteDataSource {
       ApiEndpoints.pushTokens,
       data: {'session_id': sessionId},
     );
+    if (kDebugMode) {
+      debugPrint(
+        '[PushTokenRemoteDataSource] DELETE ${ApiEndpoints.pushTokens} '
+        'status=${response.statusCode}',
+      );
+    }
     return _asMap(response.data);
   }
 

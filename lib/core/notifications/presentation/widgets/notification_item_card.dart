@@ -1,0 +1,287 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../app/colors.dart';
+import '../../../../app/radii.dart';
+import '../../../../app/spacing.dart';
+import '../../../../app/text_styles.dart';
+import '../../../../core/utils/date_time_utils.dart';
+import '../../domain/models/notification_item.dart';
+
+class NotificationItemCard extends StatefulWidget {
+  const NotificationItemCard({
+    super.key,
+    required this.item,
+    this.onTap,
+    this.onActionTap,
+    this.isBackCard = false,
+  });
+
+  final NotificationItem item;
+  final VoidCallback? onTap;
+  final VoidCallback? onActionTap;
+  final bool isBackCard;
+
+  @override
+  State<NotificationItemCard> createState() => _NotificationItemCardState();
+}
+
+class _NotificationItemCardState extends State<NotificationItemCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String? _resolveActionLabel() {
+    final explicit = widget.item.actionLabel;
+    if (explicit != null && explicit.trim().isNotEmpty) {
+      return explicit.trim();
+    }
+
+    final typeStr = (widget.item.type ?? '').toLowerCase();
+    if (typeStr.contains('cancelled') ||
+        typeStr.contains('canceled') ||
+        typeStr.contains('reassigned')) {
+      return null;
+    }
+
+    if (typeStr.contains('updated') ||
+        typeStr.contains('rescheduled') ||
+        typeStr.contains('revision')) {
+      return 'Review Changes';
+    }
+
+    final categoryStr = (widget.item.category ?? '').toLowerCase();
+    final titleStr = widget.item.title.toLowerCase();
+    final msgStr = widget.item.message.toLowerCase();
+    if (categoryStr == 'messages' ||
+        categoryStr == 'chat' ||
+        typeStr.contains('message') ||
+        typeStr.contains('chat') ||
+        typeStr == 'mention' ||
+        titleStr.contains('message') ||
+        titleStr.contains('chat') ||
+        msgStr.contains('admin:')) {
+      return 'View Message Details';
+    }
+
+    return 'View Details';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String senderFallback = 'Notification';
+    if (widget.item.title.isNotEmpty) {
+      senderFallback = widget.item.title;
+    } else if (widget.item.category != null && widget.item.category!.isNotEmpty) {
+      final t = widget.item.category!;
+      senderFallback = t[0].toUpperCase() + t.substring(1);
+    }
+    
+    final senderName = widget.item.senderName ?? senderFallback;
+    final timestampText = DateTimeUtils.formatNotificationDate(widget.item.createdAt);
+    final cardBgColor = widget.isBackCard ? AppColors.surfaceDim : AppColors.surfaceMid;
+    final avatarUrl = widget.item.avatarUrl;
+    final actionLabel = _resolveActionLabel();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.smd),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: widget.onTap != null ? (_) => _controller.forward() : null,
+        onTapUp: widget.onTap != null ? (_) {
+          _controller.reverse();
+          widget.onTap!();
+        } : null,
+        onTapCancel: widget.onTap != null ? () => _controller.reverse() : null,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: AppRadii.lgAll,
+              border: Border.all(color: AppColors.white.withValues(alpha: 0.08)),
+            ),
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top User Info & Action Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Circular Avatar Container
+                    Container(
+                      width: AppSpacing.huge,
+                      height: AppSpacing.huge,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary20,
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: avatarUrl != null && avatarUrl.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: avatarUrl,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => _buildFallbackInitial(senderName),
+                            )
+                          : _buildFallbackInitial(senderName),
+                    ),
+                    AppSpacing.gapHSm,
+                    // Sender Name & Timestamp
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            senderName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w400,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            timestampText,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.white54,
+                              height: 1.8,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Top-right Action Button (View Message Details / View Details / Review Changes)
+                    if (!widget.isBackCard &&
+                        widget.onActionTap != null &&
+                        actionLabel != null) ...[
+                      AppSpacing.gapHSm,
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: widget.onActionTap,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.smd,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: AppRadii.mdAll,
+                          ),
+                          child: Text(
+                            actionLabel,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.onPrimary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                AppSpacing.verticalSm,
+
+                // Inner Dark Message Container
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.smd,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.textHeading,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFE2E2E3).withValues(alpha: 0.1),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Builder(
+                    builder: (context) {
+                      final msg = widget.item.message;
+                      final colonIndex = msg.indexOf(':');
+                      
+                      if (colonIndex == -1) {
+                        return Text(
+                          msg,
+                          maxLines: widget.isBackCard ? 1 : null,
+                          overflow: widget.isBackCard ? TextOverflow.ellipsis : null,
+                          style: AppTextStyles.bodyCompact.copyWith(
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w400,
+                            height: 1.45,
+                          ),
+                        );
+                      }
+
+                      final prefix = msg.substring(0, colonIndex + 1);
+                      final rest = msg.substring(colonIndex + 1);
+
+                      return Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: prefix,
+                              style: AppTextStyles.bodyCompact.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            TextSpan(
+                              text: rest,
+                              style: AppTextStyles.bodyCompact.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                        maxLines: widget.isBackCard ? 1 : null,
+                        overflow: widget.isBackCard ? TextOverflow.ellipsis : null,
+                        style: const TextStyle(height: 1.35),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFallbackInitial(String senderName) {
+    return Center(
+      child: Text(
+        senderName.isNotEmpty ? senderName[0].toUpperCase() : 'A',
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}

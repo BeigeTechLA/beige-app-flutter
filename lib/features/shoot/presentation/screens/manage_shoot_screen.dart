@@ -13,6 +13,7 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
+import '../providers/shoot_summary_notifier.dart';
 
 class ManageShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -56,8 +57,8 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
     context.goNamed(RouteNames.myShoots);
   }
 
-  String _getFullImageUrl() {
-    final url = widget.imageUrl ?? "";
+  String _getFullImageUrl([String? rawUrl]) {
+    final url = rawUrl ?? widget.imageUrl ?? "";
     if (url.isEmpty) return "";
     if (url.startsWith("http")) return url;
     return '${ApiEndpoints.imageUrl}$url';
@@ -65,6 +66,88 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final summaryState = widget.bookingId > 0
+        ? ref.watch(shootSummaryNotifierProvider(widget.bookingId))
+        : null;
+    final bookingData = summaryState?.shootDetails;
+    final rawEvent = bookingData?['event'];
+    final event = rawEvent is Map ? Map<String, dynamic>.from(rawEvent) : null;
+
+    final rawCreative = bookingData?['creative'];
+    final creative = rawCreative is Map ? Map<String, dynamic>.from(rawCreative) : null;
+
+    final rawShootType = event?['shoot_type'];
+    String? shootTypeName;
+    if (rawShootType is Map) {
+      shootTypeName = rawShootType['name']?.toString();
+    } else if (rawShootType is List && rawShootType.isNotEmpty) {
+      final first = rawShootType.first;
+      if (first is Map) {
+        shootTypeName = first['name']?.toString();
+      } else if (first != null) {
+        shootTypeName = first.toString();
+      }
+    } else if (rawShootType is String) {
+      shootTypeName = rawShootType;
+    }
+
+    final String? resolvedRawImage = (widget.imageUrl != null && widget.imageUrl!.isNotEmpty)
+        ? widget.imageUrl
+        : (creative?['profile_image_url']?.toString() ??
+            event?['image_url']?.toString());
+    final String fullImageUrl = _getFullImageUrl(resolvedRawImage);
+
+    final String resolvedProjectName = (widget.projectName != null &&
+            widget.projectName!.isNotEmpty &&
+            widget.projectName != 'N/A')
+        ? widget.projectName!
+        : (event?['project_name']?.toString() ??
+            event?['title']?.toString() ??
+            creative?['name']?.toString() ??
+            (summaryState?.status == ShootSummaryStatus.loading ? 'Loading...' : 'N/A'));
+
+    final String resolvedContentType = (widget.contentType != null && widget.contentType!.isNotEmpty)
+        ? widget.contentType!
+        : (event?['content_type']?.toString() ??
+            event?['type']?.toString() ??
+            shootTypeName ??
+            '');
+
+    final String? resolvedEventDate = (widget.eventDate != null && widget.eventDate!.isNotEmpty)
+        ? widget.eventDate
+        : (event?['event_date']?.toString() ??
+            event?['date']?.toString() ??
+            event?['start_time']?.toString());
+
+    final String? resolvedStartTime = (widget.startTime != null && widget.startTime!.isNotEmpty)
+        ? widget.startTime
+        : event?['start_time']?.toString();
+
+    final String? resolvedEndTime = (widget.endTime != null && widget.endTime!.isNotEmpty)
+        ? widget.endTime
+        : event?['end_time']?.toString();
+
+    final double resolvedDurationHours = widget.durationHours ??
+        (event?['duration_hours'] as num?)?.toDouble() ??
+        0.0;
+
+    final String resolvedLocation = (widget.location != null &&
+            widget.location!.isNotEmpty &&
+            widget.location != 'Location not available')
+        ? widget.location!
+        : (event?['location']?.toString() ??
+            event?['address']?.toString() ??
+            'Location not available');
+
+    final rawMulti = event?['multi_day'];
+    final List<dynamic>? resolvedMultiDays = widget.multiDays ??
+        (rawMulti is Map && rawMulti['days'] is List
+            ? (rawMulti['days'] as List)
+            : null);
+
+    final bool isInitialLoading = summaryState?.status == ShootSummaryStatus.loading &&
+        (widget.projectName == null || widget.projectName == 'N/A' || widget.projectName!.isEmpty);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -75,9 +158,9 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
               fit: StackFit.expand,
               children: [
                 /// 🔹 FULL IMAGE
-                _getFullImageUrl().isNotEmpty
+                fullImageUrl.isNotEmpty
                     ? Image.network(
-                        _getFullImageUrl(),
+                        fullImageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) {
                           return SvgPicture.asset(
@@ -170,33 +253,41 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                      if (isInitialLoading)
+                        const SizedBox(
+                          height: 220,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
+                      else ...[
                         /// 🔹 TOP PROFILE ROW
                         Row(
                           children: [
                             ClipRRect(
                               borderRadius: AppRadii.xlAll,
-                              child: _getFullImageUrl().isNotEmpty
+                              child: fullImageUrl.isNotEmpty
                                   ? Image(
                                       image: ResizeImage(
-                                        NetworkImage(_getFullImageUrl()),
+                                        NetworkImage(fullImageUrl),
                                         width: 400,
                                       ),
                                       height: 144,
                                       width: 126,
                                       fit: BoxFit.cover,
-
                                       frameBuilder:
                                           (context, child, frame, wasLoaded) {
-                                            if (wasLoaded) return child;
-                                            return AnimatedOpacity(
-                                              opacity: frame == null ? 0 : 1,
-                                              duration: const Duration(
-                                                milliseconds: 250,
-                                              ),
-                                              child: child,
-                                            );
-                                          },
-
+                                        if (wasLoaded) return child;
+                                        return AnimatedOpacity(
+                                          opacity: frame == null ? 0 : 1,
+                                          duration: const Duration(
+                                            milliseconds: 250,
+                                          ),
+                                          child: child,
+                                        );
+                                      },
                                       errorBuilder: (_, __, ___) {
                                         return SvgPicture.asset(
                                           AppAssets.imagePlaceholder,
@@ -222,21 +313,22 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                 children: [
                                   AppSpacing.verticalXs,
                                   Text(
-                                    widget.projectName ?? "N/A",
+                                    resolvedProjectName,
                                     style: AppTextStyles.labelLarge.copyWith(
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.white,
                                     ),
                                   ),
-                                  AppSpacing.verticalXxxs,
-                                  Text(
-                                    widget.contentType ?? '',
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: AppColors.white70,
-                                      fontWeight: FontWeight.w400,
+                                  if (resolvedContentType.isNotEmpty) ...[
+                                    AppSpacing.verticalXxxs,
+                                    Text(
+                                      resolvedContentType,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.white70,
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
-                                  ),
-
+                                  ],
                                   AppSpacing.verticalSmd,
                                 ],
                               ),
@@ -284,26 +376,26 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              /// 🔵 MULTI DAY (comma detect)
-                              if (widget.multiDays != null &&
-                                  widget.multiDays!.isNotEmpty) ...[
-                                /// 🔵 REAL MULTI DAY
-                                ...widget.multiDays!.map((day) {
+                              /// 🔵 MULTI DAY
+                              if (resolvedMultiDays != null &&
+                                  resolvedMultiDays.isNotEmpty) ...[
+                                ...resolvedMultiDays.map((day) {
+                                  if (day is! Map) return const SizedBox.shrink();
+                                  final dayMap = Map<String, dynamic>.from(day);
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       infoRowBlack(
                                         AppAssets.calendarDate,
-                                        DateTimeUtils.formatDate(day['date']),
+                                        DateTimeUtils.formatDate(dayMap['date']?.toString()),
                                       ),
-
+                                      const SizedBox(height: 8),
                                       infoRowBlack(
                                         AppAssets.clock,
-                                        "${DateTimeUtils.formatTime(day['start_time'])} to ${DateTimeUtils.formatTime(day['end_time'])} "
-                                        "(${DateTimeUtils.formatDuration((day['duration_hours'] ?? 0).toDouble())}))",
+                                        "${DateTimeUtils.formatTime(dayMap['start_time']?.toString())} to ${DateTimeUtils.formatTime(dayMap['end_time']?.toString())} "
+                                        "(${DateTimeUtils.formatDuration((dayMap['duration_hours'] as num?)?.toDouble() ?? 0.0)})",
                                       ),
-
                                       const SizedBox(height: 8),
                                     ],
                                   );
@@ -312,14 +404,13 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                 /// 🟢 SINGLE DAY
                                 infoRowBlack(
                                   AppAssets.calendarDate,
-                                  DateTimeUtils.formatDate(widget.eventDate),
+                                  DateTimeUtils.formatDate(resolvedEventDate),
                                 ),
-
                                 const SizedBox(height: 8),
                                 infoRowBlack(
                                   AppAssets.clock,
-                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
-                                  "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
+                                  "${DateTimeUtils.formatTime(resolvedStartTime)} to ${DateTimeUtils.formatTime(resolvedEndTime)} "
+                                  "(${DateTimeUtils.formatDuration(resolvedDurationHours)})",
                                 ),
                               ],
                               const SizedBox(height: 8),
@@ -327,11 +418,12 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                               /// 📍 LOCATION
                               infoRowBlack(
                                 AppAssets.location,
-                                widget.location ?? "Location not available",
+                                resolvedLocation,
                               ),
                             ],
                           ),
                         ),
+                      ],
 
                         // Reschedule is intentionally hidden for now.
                         //

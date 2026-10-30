@@ -245,14 +245,13 @@ class _NotificationSettingsScreenState
                           const SizedBox(width: AppSpacing.sm),
                           AppToggleSwitch(
                             value: _pushEnabled,
-                            onChanged: (val) {
+                            onChanged: (val) async {
                               setState(() {
                                 _pushEnabled = val;
                               });
-                              if (val) {
-                                _openCategories();
-                              } else {
-                                _savePreferences();
+                              await _savePreferences();
+                              if (val && mounted) {
+                                await _openCategories();
                               }
                             },
                           ),

@@ -82,6 +82,8 @@ abstract class RouteNames {
   static const favourites = 'favourites';
   static const appPreferences = 'app_preferences';
   static const notificationSettings = 'notification_settings';
+  static const notificationList = 'notification_list';
+  static const notificationSectionList = 'notification_section_list';
   static const deleteAccount = 'delete_account';
   static const deleteAccountOtp = 'delete_account_otp';
 }
