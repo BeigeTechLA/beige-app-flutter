@@ -22,6 +22,19 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    // AGP 9 disables resValues by default; flavors below use resValue() for app_name.
+    buildFeatures {
+        resValues = true
+    }
+
+    // AGP 9 runs lintVitalAnalyzeRelease on release builds. The stripe_android
+    // plugin's lint classpath pulls an unresolvable play-services-tapandpay
+    // artifact (issuing/push-provisioning — unused). Lint is static analysis
+    // only; skipping release lint does not affect the shipped binary.
+    lint {
+        checkReleaseBuilds = false
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
