@@ -52,11 +52,13 @@ All code, build, toolchain, and dependency work is done and committed on `featur
 - **Android:** stale `GeneratedPluginRegistrant.java` cache caused a `cannot find symbol` on first APK build; `flutter clean` + rebuild resolved (plugin class still exists at same package path, now `.kt`).
 - **Gate re-verified green:** analyze 0 errors · test 332 pass / 4 baseline fails · iOS release ✓ 103.0MB · Android release APK ✓ 99.9MB.
 
-**Remaining Tier B — still deferred (schedule separately):**
-| Package | Current → Latest | Notes |
-|---------|------------------|-------|
-| cached_network_image | 3.x → **4.0.5** | major |
-| calendar_date_picker2 | 2.0.1 → **4.0.0** | two majors — review date-picker API drift |
+**✅ cached_network_image 3→4.0.6 + calendar_date_picker2 2→4.0.0 bumped (2026-11-02).**
+- **cached_network_image 4.0.6** — zero source edits; `CachedNetworkImage(imageUrl/placeholder/errorWidget)` + `CachedNetworkImageProvider` API unchanged (major was internal: cache_manager/octo_image/minSdk). Used in 12 files.
+- **calendar_date_picker2 4.0.0** (two majors) — zero source edits; the `DayBuilder` named-param signature `{required DateTime date, TextStyle?, BoxDecoration?, bool? isSelected/isDisabled/isToday}` and `CalendarDatePicker2Config`/`value`/`onValueChanged` are identical across 2→4. Used in 2 booking screens (multi-select date pickers).
+- **New test:** `test/features/booking/calendar_date_picker_test.dart` (3 cases: renders custom dayBuilder cells · multi-select accumulates future dates · dayBuilder isSelected flag). **Gotcha:** calendar_date_picker2 v4 depends on `material_ui` and its `debugCheckHasMaterial` resolves against `material_ui`'s Material — a `flutter/material.dart` Scaffold does NOT satisfy it in widget tests. Test host must `import 'package:material_ui/material_ui.dart'`; added `material_ui` to `dev_dependencies`.
+- **Gate green:** analyze 0 errors / 57 baseline · test 335 pass (was 332, +3) / 4 baseline fails · iOS release ✓ 103.2MB · Android release APK ✓ 100.7MB.
+
+**All Tier B now cleared.** Only remaining branch work is human device/runtime QA (see above).
 
 **Deferred / non-blocking:**
 - Navigation integration suite — helpers pump real `App` + mock-auth prefs + route extras; device/sim run + fixture coverage unverified. Run `flutter test integration_test/navigation_test.dart`.
