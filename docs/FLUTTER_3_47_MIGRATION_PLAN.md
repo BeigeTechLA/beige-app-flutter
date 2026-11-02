@@ -219,6 +219,8 @@ Automated results are historical. Later lint cleanup records 57 issues; no analy
 ---
 
 ## Manual QA Checklist
+> **For the device pass, use the standalone fill-in doc: `docs/FLUTTER_3_47_DEVICE_QA_CHECKLIST.md`** (expanded steps, P0/P1 priority, upgrade-specific watch items, per-target sign-off). The condensed table below is kept for reference.
+
 Run on device after Phase 5 (Android/iOS 26) and again after Phase 6 (iOS 27). **All results below remain unrecorded.** Record the test date, device/OS, environment, outcome, and any issue references when completing QA.
 
 | # | Area | Flow to verify | Touches plugin | iOS 26 | iOS 27 | Android |
