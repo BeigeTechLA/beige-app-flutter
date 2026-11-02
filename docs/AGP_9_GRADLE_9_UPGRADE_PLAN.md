@@ -116,6 +116,39 @@ That is the whole code change. No app-level `build.gradle.kts` edit required (co
 
 C1/C2 are the only realistic surprises. Both are single-line patch bumps if needed, no API change.
 
+> **Post-execution note:** C1/C2 did **not** surface — google-services 4.4.2 and crashlytics-gradle 3.0.3 built clean under AGP 9. No bump needed.
+
+---
+
+## Plugin AGP-9 compatibility audit (2026-10-30, post-execution)
+
+Audited all **23 Android-native plugins** resolved for the build. Method: enumerate from `.flutter-plugins-dependencies`, inspect each plugin's `android/build.gradle(.kts)` for AGP-9 risk signals (missing `namespace`, self-applied KGP, stale `compileSdk`), then reconcile against Flutter's own build-time detector.
+
+### Result: 0 plugins incompatible with AGP 9
+
+Proof by construction — the release build of all 23 plugins compiled on AGP 9.0.1 (both flavors, 99.9MB APK). Nothing failed to resolve; nothing namespace-broke.
+
+| Signal | Count | Verdict |
+|--------|-------|---------|
+| Compiles on AGP 9.0.1 | **23 / 23** | ✅ |
+| Missing `namespace` (hard AGP-9 break) | **0** | ✅ geolocator_android uses a conditional `namespace("com.baseflow.geolocator")` guard — resolves fine |
+| Manifest `package=` attr present | several | ✅ harmless — matches namespace; AGP 8 would already have errored otherwise |
+| Stale `compileSdk` | 0 blocking | ✅ most inherit Flutter's 36; a few pin 35/36 — all ≥ AGP-9 min (35) |
+
+### The one forward-looking flag — Flutter Built-in-Kotlin (NOT an AGP-9 issue)
+
+Flutter 3.47's build output warns that **3 plugins** apply the Kotlin Gradle Plugin (KGP):
+```
+firebase_analytics · firebase_core · firebase_crashlytics
+```
+- **Soft warning only.** Breaks on a *future* Flutter release that mandates Built-in Kotlin — not AGP 9, not Flutter 3.47. Build passes clean today.
+- Held in check by `android.builtInKotlin=false` (Flutter migrator flag, intentionally kept — see "Migration surface is clean").
+- **Fix is already queued** = the deferred **Tier B firebase major bump** in CLAUDE.md (`firebase_core 5 / analytics 13 / crashlytics 6`). Those majors adopt Built-in Kotlin, so this warning resolves when Tier B lands. No separate work item.
+- Other KGP-appliers (stripe_android, flutter_timezone, share_plus, package_info_plus, android_file_picker) already apply KGP via AGP-9-aware `pluginManager.apply`/`plugins.withId` guards — Flutter did **not** flag them.
+
+### Bottom line
+Nothing blocks AGP 9. No plugin needs a version change for this upgrade. Only future-facing item (firebase trio → Built-in Kotlin) is already covered by the planned Tier B firebase bump.
+
 ---
 
 ## Verification gate (must all pass before commit)
