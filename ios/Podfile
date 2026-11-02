@@ -1,6 +1,11 @@
 # Uncomment this line to define a global platform for your project
 platform :ios, '15.0'
 
+# Firebase stopped publishing to CocoaPods in Oct 2026. firebase_core 5.x pins the
+# native Firebase SDK at 12.19.3, but Analytics/Crashlytics only shipped up to 12.19.0
+# on the CocoaPods CDN. Override to the last version published across all three pods.
+$FirebaseSDKVersion = '12.19.0'
+
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 

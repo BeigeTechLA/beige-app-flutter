@@ -40,20 +40,23 @@ All code, build, toolchain, and dependency work is done and committed on `featur
 
 **iOS 27 compatibility:** UIScene was the only iOS-27-SDK-required source change and it is done. No iOS 27 SDK deprecation/API errors in the build. Remaining iOS-27 risk is purely runtime (covered by QA above).
 
-### 📦 Plugin currency — Tier A DONE, Tier B deferred
+### 📦 Plugin currency — Tier A DONE, Firebase Tier B DONE, rest deferred
 
 **Tier A (patch/minor within `^` constraints) — ✅ applied this session.** See COMPLETED above.
 
-**Tier B — behind a MAJOR; needs pubspec edit + migration review. Out of scope for the 3.47 upgrade; schedule separately.**
+**Tier B — behind a MAJOR; needs pubspec edit + migration review.**
+
+**✅ Firebase set bumped (2026-11-02) — firebase_core 4→5.1.0, firebase_analytics 12→13.0.1, firebase_crashlytics 5→6.0.1.**
+- Dart API surface unchanged — the three service wrappers (`FirebaseService`, `AnalyticsService`, `CrashlyticsService`) use only stable methods; zero source edits needed.
+- **Firebase CocoaPods-deprecation landmine hit & resolved:** firebase_core 5.x pins the native Firebase SDK at `12.19.3`, but Firebase stopped publishing to CocoaPods in **Oct 2026** — only `FirebaseCore`/`Firebase` umbrella reached 12.19.3; `FirebaseAnalytics`/`FirebaseCrashlytics` capped at `12.19.0`. Fix: added `$FirebaseSDKVersion = '12.19.0'` override to `ios/Podfile` (last version published across all three pods). `pod install` now clean (48 pods). Deprecation notice ("FirebaseCore deprecated in favor of SPM") is informational — CocoaPods installs remain functional.
+- **Android:** stale `GeneratedPluginRegistrant.java` cache caused a `cannot find symbol` on first APK build; `flutter clean` + rebuild resolved (plugin class still exists at same package path, now `.kt`).
+- **Gate re-verified green:** analyze 0 errors · test 332 pass / 4 baseline fails · iOS release ✓ 103.0MB · Android release APK ✓ 99.9MB.
+
+**Remaining Tier B — still deferred (schedule separately):**
 | Package | Current → Latest | Notes |
 |---------|------------------|-------|
-| firebase_core | 4 → **5** | major; coupled with analytics/crashlytics majors + Firebase CocoaPods-deprecation note (post-Oct-2026). Bump as a set. |
-| firebase_analytics | 12 → **13** | major |
-| firebase_crashlytics | 5 → **6** | major |
 | cached_network_image | 3.x → **4.0.5** | major |
 | calendar_date_picker2 | 2.0.1 → **4.0.0** | two majors — review date-picker API drift |
-
-**Recommendation:** defer Tier B (esp. the Firebase 5/6 set) to a scoped follow-up after device QA — native pod + breaking-API cost unrelated to the 3.47 goal.
 
 **Deferred / non-blocking:**
 - Navigation integration suite — helpers pump real `App` + mock-auth prefs + route extras; device/sim run + fixture coverage unverified. Run `flutter test integration_test/navigation_test.dart`.
