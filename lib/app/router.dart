@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'booking_navigation.dart';
+import 'material_go_route.dart';
 
 import '../features/app_drawer/screen/drawer_screen.dart';
 import '../features/messages/presentation/routes/messages_args.dart';
@@ -250,17 +251,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       // ── Auth & Onboarding (outside shell) ──────────────────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/splash',
         name: RouteNames.splash,
         builder: (context, state) => const SplashScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/onboarding',
         name: RouteNames.onboarding,
         builder: (context, state) => const OnboardingScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/login',
         name: RouteNames.login,
         pageBuilder: (context, state) => CustomTransitionPage<void>(
@@ -290,17 +291,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           },
         ),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/signup',
         name: RouteNames.signup,
         builder: (context, state) => const SignUpScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/forgot-password',
         name: RouteNames.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/forgot-otp',
         name: RouteNames.forgotOtp,
         builder: (context, state) {
@@ -308,7 +309,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ForgotPasswordOtpScreen(email: email);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/reset-password',
         name: RouteNames.resetPassword,
         builder: (context, state) {
@@ -319,7 +320,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/password-success',
         name: RouteNames.passwordSuccess,
         builder: (context, state) => const PasswordResetSuccessScreen(),
@@ -355,7 +356,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Tab 0: Home
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/',
                 name: RouteNames.home,
                 builder: (context, state) => const HomeScreen(),
@@ -365,7 +366,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Tab 1: Book Shoot
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/book-shoot',
                 name: RouteNames.bookShoot,
                 // Book tab now enters the v2 flow (Milestone C flip). Draft
@@ -388,7 +389,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Tab 2: My Shoots
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/my-shoots',
                 name: RouteNames.myShoots,
                 builder: (context, state) => const MyShootsScreen(),
@@ -398,7 +399,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Tab 3: Messages
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/messages',
                 name: RouteNames.messages,
                 builder: (context, state) => const MessagesScreen(),
@@ -409,7 +410,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           /*  // Tab 4: File Manager
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/file-manager',
                 name: RouteNames.fileManager,
                 builder: (context, state) =>
@@ -420,7 +421,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Tab 5: Meetings
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              MaterialGoRoute(
                 path: '/meetings',
                 name: RouteNames.meetings,
                 builder: (context, state) =>
@@ -432,7 +433,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Home Sub-Screens (pushed on top, no bottom nav) ────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/view-profile/:id',
         name: RouteNames.viewProfile,
         builder: (context, state) {
@@ -440,7 +441,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return CreativeProfileScreen(id: id);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/recommended/:id',
         name: RouteNames.recommendedDetails,
         builder: (context, state) {
@@ -451,12 +452,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           return RecommendedCreativeDetailScreen(id: id, bookingId: bookingId);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/change-location',
         name: RouteNames.changeLocation,
         builder: (context, state) => const ChangeLocationScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/finding-perfect',
         name: RouteNames.findingPerfect,
         builder: (context, state) {
@@ -468,7 +469,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/payment-method/:bookingId',
         name: RouteNames.paymentMethod,
         builder: (context, state) {
@@ -478,7 +479,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── New Booking Flow ───────────────────────────────────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/content-type',
         name: RouteNames.contentType,
         builder: (context, state) {
@@ -490,7 +491,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Book-a-Shoot v2 flow (redesign) ──────────────────────────────
       // New screens live alongside the v1 routes above; the Book tab keeps
       // pointing at v1 until the v2 flow is fully wired (Milestone C).
-      GoRoute(
+      MaterialGoRoute(
         path: '/content-type-v2',
         name: RouteNames.contentTypeV2,
         builder: (context, state) {
@@ -501,7 +502,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/shoot-type-v2',
         name: RouteNames.shootTypeV2,
         builder: (context, state) {
@@ -512,7 +513,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/when-where',
         name: RouteNames.whenWhere,
         builder: (context, state) {
@@ -524,7 +525,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/creative-brief',
         name: RouteNames.creativeBrief,
         builder: (context, state) {
@@ -536,7 +537,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/partner-preference',
         name: RouteNames.partnerPreference,
         builder: (context, state) {
@@ -551,7 +552,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/creative-team',
         name: RouteNames.creativeTeam,
         builder: (context, state) {
@@ -564,7 +565,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/editing',
         name: RouteNames.editing,
         builder: (context, state) {
@@ -577,7 +578,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/partner-selection',
         name: RouteNames.partnerSelection,
         builder: (context, state) {
@@ -590,7 +591,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/add-ons',
         name: RouteNames.addOns,
         builder: (context, state) {
@@ -605,7 +606,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/review-confirm-v2',
         name: RouteNames.reviewConfirmV2,
         builder: (context, state) {
@@ -622,7 +623,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      GoRoute(
+      MaterialGoRoute(
         path: '/video-shoot-type',
         name: RouteNames.videoShootType,
         builder: (context, state) {
@@ -633,7 +634,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/shoot-date-time',
         name: RouteNames.shootDateTime,
         builder: (context, state) {
@@ -645,7 +646,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/more-details',
         name: RouteNames.moreDetails,
         builder: (context, state) {
@@ -657,7 +658,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/crew-size-matching',
         name: RouteNames.crewSizeMatching,
         builder: (context, state) {
@@ -669,7 +670,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/select-dream-team',
         name: RouteNames.selectDreamTeam,
         builder: (context, state) {
@@ -681,7 +682,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/review-confirm/:bookingId',
         name: RouteNames.reviewConfirm,
         builder: (context, state) {
@@ -689,7 +690,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ShootReviewScreen(bookingId: bookingId);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/commas-checkout/:bookingId',
         name: RouteNames.commasCheckout,
         builder: (context, state) {
@@ -701,12 +702,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/payment-failed',
         name: RouteNames.paymentFailed,
         builder: (context, state) => const PaymentFailedScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/payment-success/:bookingId',
         name: RouteNames.paymentSuccess,
         builder: (context, state) {
@@ -722,7 +723,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ── Booking Management ─────────────────────────────────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/booking-summary/:bookingId',
         name: RouteNames.bookingEventSummary,
         builder: (context, state) {
@@ -735,7 +736,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/chat',
         name: RouteNames.chat,
         builder: (context, state) {
@@ -746,7 +747,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
         routes: [
-          GoRoute(
+          MaterialGoRoute(
             path: 'details',
             name: RouteNames.chatDetails,
             builder: (context, state) {
@@ -758,7 +759,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/manage-booking/:bookingId',
         name: RouteNames.manageBooking,
         builder: (context, state) {
@@ -790,7 +791,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/booking-review-confirm/:bookingId',
         name: RouteNames.bookingReviewConfirm,
         builder: (context, state) {
@@ -798,7 +799,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ShootEditReviewScreen(bookingId: bookingId);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/cancel-booking/:bookingId',
         name: RouteNames.cancelBooking,
         builder: (context, state) {
@@ -828,7 +829,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/select-booking-type/:bookingId',
         name: RouteNames.selectBookingType,
         builder: (context, state) {
@@ -836,19 +837,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ShootTypeSelectionScreen(bookingId: bookingId);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/shoot-updated',
         name: RouteNames.shootUpdated,
         builder: (context, state) => const ShootUpdateSuccessScreen(),
       ),
 
       // ── Profile ────────────────────────────────────────────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/profile',
         name: RouteNames.profile,
         builder: (context, state) => const ProfileScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/crop-image',
         name: RouteNames.cropImage,
@@ -860,7 +861,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/signup-crop-image',
         name: RouteNames.cropImageSignup,
@@ -872,7 +873,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/profile-crop-image',
         name: RouteNames.cropImageProfile,
@@ -884,14 +885,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: '/edit-profile',
         name: RouteNames.editProfile,
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const EditProfileScreen()),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/change-password',
         name: RouteNames.changePassword,
         builder: (context, state) {
@@ -899,7 +900,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ChangePasswordScreen(email: email);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/profile-otp',
         name: RouteNames.profileOtp,
         builder: (context, state) {
@@ -907,7 +908,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ProfileOtpScreen(email: email);
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/profile-new-password',
         name: RouteNames.profileNewPassword,
         builder: (context, state) {
@@ -918,27 +919,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/booking-history',
         name: RouteNames.bookingHistory,
         builder: (context, state) => const ShootHistoryScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/favourites',
         name: RouteNames.favourites,
         builder: (context, state) => const FavoritesScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/app-preferences',
         name: RouteNames.appPreferences,
         builder: (context, state) => const AppPreferencesScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/delete-account',
         name: RouteNames.deleteAccount,
         builder: (context, state) => const DeleteAccountScreen(),
       ),
-      GoRoute(
+      MaterialGoRoute(
         path: '/delete-account-otp',
         name: RouteNames.deleteAccountOtp,
         builder: (context, state) => const DeleteAccountOtpScreen(),
@@ -946,33 +947,33 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       ///
       // ── Drawer ────────────────────────────────────────────────────
-      GoRoute(
+      MaterialGoRoute(
         path: '/file-manager',
         name: RouteNames.fileManager,
         builder: (context, state) => const FileManagerScreen(),
       ),
       ...fileManagerRoutes,
 
-      GoRoute(
+      MaterialGoRoute(
         path: '/meetings',
         name: RouteNames.meetings,
         builder: (context, state) => const MeetingsScreen(),
       ),
 
-      GoRoute(
+      MaterialGoRoute(
         path: '/meeting/create',
         name: RouteNames.meetingCreate,
         builder: (context, state) => const CreateMeetingScreen(),
       ),
 
-      GoRoute(
+      MaterialGoRoute(
         path: '/meeting/edit/:id',
         name: RouteNames.meetingEdit,
         builder: (context, state) =>
             EditMeetingScreen(meetingId: state.pathParameters['id']!),
       ),
 
-      GoRoute(
+      MaterialGoRoute(
         path: '/meeting/scheduled',
         name: RouteNames.meetingScheduled,
         builder: (context, state) => const MeetingScheduledScreen(),
