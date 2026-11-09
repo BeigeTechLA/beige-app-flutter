@@ -54,6 +54,7 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/home/presentation/screens/recommended_creative_detail_screen.dart';
 import '../features/profile/presentation/screens/delete_account_otp_screen.dart';
 import '../features/profile/presentation/screens/delete_account_screen.dart';
+import '../features/profile/presentation/screens/delete_account_success_screen.dart';
 import '../features/profile/presentation/screens/app_preferences_screen.dart';
 import '../features/profile/presentation/screens/change_password_screen.dart';
 import '../features/profile/presentation/screens/crop_image_screen.dart';
@@ -943,6 +944,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/delete-account-otp',
         name: RouteNames.deleteAccountOtp,
         builder: (context, state) => const DeleteAccountOtpScreen(),
+      ),
+      MaterialGoRoute(
+        path: '/delete-account-success',
+        name: RouteNames.deleteAccountSuccess,
+        builder: (context, state) => const DeleteAccountSuccessScreen(),
       ),
 
       ///

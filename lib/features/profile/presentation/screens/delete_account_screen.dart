@@ -1,205 +1,228 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/route_names.dart';
+import '../../../../app/text_styles.dart';
+import '../widgets/delete_flow_widgets.dart';
 
-import 'package:beige/app/route_names.dart';
-import 'package:beige/app/colors.dart';
-import 'package:beige/app/radii.dart';
-import 'package:beige/app/spacing.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/features/profile/presentation/providers/delete_account_notifier.dart';
-import 'package:beige/shared/widgets/top_message.dart';
-
-import '../../../../app/assets.dart';
-
-class DeleteAccountScreen extends ConsumerStatefulWidget {
+class DeleteAccountScreen extends StatelessWidget {
   const DeleteAccountScreen({super.key});
 
   @override
-  ConsumerState<DeleteAccountScreen> createState() =>
-      _DeleteAccountScreenState();
-}
-
-class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
-  String? selectedReason;
-
-  final List<String> reasons = [
-    "What's the reason for deleting your account?",
-    "Help us understand why you're leaving",
-    "I'm not using the app anymore",
-    "Others",
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final deleteState = ref.watch(deleteAccountNotifierProvider);
-    final isLoading = deleteState.status == DeleteAccountStatus.loading;
-
-    ref.listen<DeleteAccountState>(deleteAccountNotifierProvider, (prev, next) {
-      if (next.status == DeleteAccountStatus.success) {
-        context.pushNamed(RouteNames.deleteAccountOtp);
-      } else if (next.status == DeleteAccountStatus.error &&
-          next.errorMessage != null) {
-        TopMessage.show(context, next.errorMessage!);
-      }
-    });
-
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.base),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: AppColors.background,
+    body: SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
             children: [
-              /// BACK BUTTON
-              InkWell(
-                onTap: () => context.pop(),
-                child: SvgPicture.asset(
-                  AppAssets.back,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.white,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-              AppSpacing.verticalBase,
-
-              /// TITLE
+              const DeleteFlowBack(),
+              const SizedBox(height: 8),
               Text(
-                "Delete Account",
+                'Before You Delete Your Account',
                 style: AppTextStyles.titleSmall.copyWith(
-                  fontFamily: AppTextStyles.fontFamilyDisplay,
-                  fontWeight: FontWeight.w600,
                   color: AppColors.white,
                 ),
               ),
-              AppSpacing.verticalXl,
+              const SizedBox(height: 10),
               Text(
-                "This action will permanently delete your account and all associated data. If you need help or have questions, please contact us at support@beige.com",
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.white70,
-                  height: 1.5,
-                  fontWeight: FontWeight.w400,
-                ),
+                'Deleting your Beige account will deactivate your access to the platform and start the account deletion process.',
+                style: DeleteFlowStyle.body,
               ),
-              AppSpacing.verticalXl,
+              const SizedBox(height: 24),
               Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: AppRadii.lgAll,
+                  color: DeleteFlowStyle.warning.withValues(alpha: .1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: DeleteFlowStyle.warning, width: .5),
                 ),
-                child: Column(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          "Why do you wish to leave Beige?",
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: DeleteFlowStyle.warning.withValues(alpha: .2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/svg/delete_flow_warning.svg',
+                          width: 16,
+                          height: 16,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Please let us know the reason for deleting your account.",
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.white70,
-                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    ...reasons.map((reason) => _buildReasonOption(reason)),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Once data is permanently deleted, it may not be possible to recover it.',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'If you have ongoing bookings, shoots, payments, or disputes, please contact Beige Support before proceeding.',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.white70,
+                              fontSize: 10,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
+              ),
+              const SizedBox(height: 13),
+              const _InfoCard(
+                icon: 'user',
+                title: 'Account access',
+                description:
+                    'You will no longer be able to access your account or use its features.',
+              ),
+              const _InfoCard(
+                icon: 'profile',
+                title: 'Profile and Personal Information',
+                description:
+                    'Eligible personal data will be scheduled for deletion.',
+              ),
+              const _InfoCard(
+                icon: 'calendar',
+                title: 'Bookings and assignments',
+                description:
+                    'You may lose access to your booking history, shoot details, assignments, and related conversations.',
+              ),
+              const _InfoCard(
+                icon: 'folder',
+                title: 'Files and Media',
+                description:
+                    'Your access to uploaded briefs, portfolios, and other files may be removed. Some files may be retained or handled separately where necessary.',
+              ),
+              const _InfoCard(
+                icon: 'dollar',
+                title: 'Payments and Records',
+                description:
+                    'Certain invoices, payment records, contracts, and dispute records may need to be retained as required by law.',
+              ),
+              const _InfoCard(
+                icon: 'hourglass',
+                title: '60-day Grace Period',
+                description:
+                    'Your eligible data will be scheduled for deletion after ',
+                highlighted: '60 days.',
+                suffix:
+                    ' You can cancel your request during this period by completing the required verification',
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: SizedBox(
-          height: 52,
-          child: ElevatedButton(
-            onPressed: isLoading
-                ? null
-                : () {
-                    if (selectedReason == null) {
-                      TopMessage.show(context, "Please select a reason");
-                      return;
-                    }
-                    ref
-                        .read(deleteAccountNotifierProvider.notifier)
-                        .requestDelete(selectedReason!);
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
-            ),
-            child: Text(
-              "Continue",
-              style: AppTextStyles.labelLarge.copyWith(
-                fontFamily: AppTextStyles.fontFamilyDisplay,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textHeading,
-              ),
+    ),
+    bottomNavigationBar: SafeArea(
+      top: false,
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            child: DeleteFlowButton(
+              label: 'Continue & Proceed to Verification',
+              // TODO(delete-account-api): Request a challenge before navigation.
+              onPressed: () => context.pushNamed(RouteNames.deleteAccountOtp),
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildReasonOption(String reason) {
-    final bool isSelected = selectedReason == reason;
-
-    return InkWell(
-      onTap: () => setState(() => selectedReason = reason),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.white70,
-                ),
-              ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    )
-                  : null,
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    this.highlighted,
+    this.suffix,
+  });
+  final String icon, title, description;
+  final String? highlighted, suffix;
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: AppColors.iconBackground,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: DeleteFlowStyle.border, width: .5),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: .2),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Center(
+            child: SvgPicture.asset(
+              'assets/svg/delete_flow_$icon.svg',
+              width: switch (icon) {
+                'user' => 12.25,
+                'profile' => 13.5,
+                'calendar' => 12.875,
+                _ => 15,
+              },
+              height: switch (icon) {
+                'user' || 'calendar' => 13.5,
+                'profile' => 12.25,
+                _ => 15,
+              },
             ),
-            const SizedBox(width: AppSpacing.mld),
-            Expanded(
-              child: Text(
-                reason,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.white70,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
+        const SizedBox(height: 10),
+        Text(
+          title,
+          style: AppTextStyles.bodyMediumStrong.copyWith(
+            color: AppColors.white,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text.rich(
+          TextSpan(
+            text: description,
+            children: [
+              if (highlighted != null)
+                TextSpan(
+                  text: highlighted,
+                  style: const TextStyle(color: AppColors.primary),
+                ),
+              if (suffix != null) TextSpan(text: suffix),
+            ],
+          ),
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.white60,
+            fontWeight: FontWeight.w500,
+            height: 1.2,
+          ),
+        ),
+      ],
+    ),
+  );
 }

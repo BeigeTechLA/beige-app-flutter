@@ -83,4 +83,5 @@ abstract class RouteNames {
   static const appPreferences = 'app_preferences';
   static const deleteAccount = 'delete_account';
   static const deleteAccountOtp = 'delete_account_otp';
+  static const deleteAccountSuccess = 'delete_account_success';
 }

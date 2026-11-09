@@ -1,283 +1,251 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/colors.dart';
+import '../../../../app/route_names.dart';
+import '../../../../app/text_styles.dart';
+import '../widgets/delete_flow_widgets.dart';
 
-import 'package:beige/app/route_names.dart';
-import 'package:beige/core/providers/auth_state_provider.dart';
-import 'package:beige/app/colors.dart';
-import 'package:beige/app/radii.dart';
-import 'package:beige/app/spacing.dart';
-import 'package:beige/app/text_styles.dart';
-import 'package:beige/shared/widgets/top_message.dart';
-import 'package:beige/features/profile/presentation/providers/delete_account_otp_notifier.dart';
-
-import '../../../../app/assets.dart';
-
-class DeleteAccountOtpScreen extends ConsumerStatefulWidget {
+/// UI-only preview. No entered code is sent or treated as verified.
+/// TODO(delete-account-api): Backend contract pending for challenge IDs,
+/// OTP expiry, resend cooldown, invalid/expired-code errors, and submission.
+/// Any six digits currently open the success preview; replace that navigation
+/// with server-confirmed verification before enabling real account deletion.
+class DeleteAccountOtpScreen extends StatefulWidget {
   const DeleteAccountOtpScreen({super.key});
-
   @override
-  ConsumerState<DeleteAccountOtpScreen> createState() =>
-      _DeleteAccountOtpScreenState();
+  State<DeleteAccountOtpScreen> createState() => _DeleteAccountOtpScreenState();
 }
 
-class _DeleteAccountOtpScreenState
-    extends ConsumerState<DeleteAccountOtpScreen> {
-  int seconds = 59;
-  Timer? timer;
-  bool isOtpFilled = false;
-
-  List<FocusNode> focusNodes = List.generate(6, (index) => FocusNode());
-  List<TextEditingController> controllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-
-  String get enteredOtp => controllers.map((c) => c.text).join();
-
-  void startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      if (seconds > 0) {
-        setState(() => seconds--);
-      } else {
-        timer!.cancel();
-      }
-    });
-  }
-
-  void resetTimer() {
-    setState(() => seconds = 59);
-    startTimer();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    startTimer();
-    for (var node in focusNodes) {
-      node.addListener(() => setState(() {}));
-    }
-  }
+class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
+  final _controllers = List.generate(6, (_) => TextEditingController());
+  final _focus = List.generate(6, (_) => FocusNode());
+  bool get _complete => _controllers.every((c) => c.text.length == 1);
 
   @override
   void dispose() {
-    timer?.cancel();
-    for (var node in focusNodes) {
-      node.dispose();
+    for (final c in _controllers) {
+      c.dispose();
     }
-    for (var ctrl in controllers) {
-      ctrl.dispose();
+    for (final f in _focus) {
+      f.dispose();
     }
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final otpState = ref.watch(deleteAccountOtpNotifierProvider);
-    final isLoading = otpState.confirmStatus == DeleteOtpStatus.loading;
-
-    ref.listen<DeleteAccountOtpState>(deleteAccountOtpNotifierProvider, (
-      prev,
-      next,
-    ) {
-      /// CONFIRM SUCCESS → logout + login
-      if (next.confirmStatus == DeleteOtpStatus.success) {
-        _handleAccountDeleted();
-      } else if (next.confirmStatus == DeleteOtpStatus.error &&
-          next.errorMessage != null) {
-        TopMessage.show(context, next.errorMessage!);
-      }
-
-      /// RESEND SUCCESS → reset timer
-      if (next.resendStatus == DeleteOtpStatus.success) {
-        TopMessage.show(context, "OTP sent successfully");
-        timer?.cancel();
-        resetTimer();
-      } else if (next.resendStatus == DeleteOtpStatus.error &&
-          next.errorMessage != null) {
-        TopMessage.show(context, next.errorMessage!);
+  void _changed(int index, String value) {
+    setState(() {
+      if (value.length > 1) {
+        // Support pasting/autofilling the entire code from any cell.
+        final start = value.length == 6 ? 0 : index;
+        final count = value.length.clamp(0, 6 - start);
+        for (var i = 0; i < count; i++) {
+          _controllers[start + i].text = value[i];
+        }
+        _focus[(start + count).clamp(0, 5)].requestFocus();
+      } else if (value.isNotEmpty && index < 5) {
+        _focus[index + 1].requestFocus();
+      } else if (value.isEmpty && index > 0) {
+        _focus[index - 1].requestFocus();
       }
     });
+  }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.base),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// BACK BUTTON
-              InkWell(
-                onTap: () => context.pop(),
-                child: SvgPicture.asset(
-                  AppAssets.back,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.white,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-              AppSpacing.verticalBase,
-
-              /// TITLE
-              Text(
-                "Delete Account",
-                style: AppTextStyles.titleSmall.copyWith(
-                  fontFamily: AppTextStyles.fontFamilyDisplay,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.white,
-                ),
-              ),
-              AppSpacing.verticalXl,
-              Text(
-                "Please note this is permanent and can't be undone. To confirm deleting your account, please enter your Email ID below.",
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.white70,
-                  height: 1.5,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              AppSpacing.verticalXl,
-
-              /// OTP BOXES
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(6, (index) {
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Container(
-                        height: 60,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: AppRadii.lgAll,
-                          border: Border.all(
-                            color:
-                                (focusNodes[index].hasFocus ||
-                                    controllers[index].text.isNotEmpty)
-                                ? AppColors.primary
-                                : AppColors.white60,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: TextField(
-                          controller: controllers[index],
-                          focusNode: focusNodes[index],
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          maxLength: 1,
-                          style: AppTextStyles.otpDigit,
-                          decoration: const InputDecoration(
-                            counterText: "",
-                            filled: false,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              isOtpFilled = controllers.every(
-                                (c) => c.text.trim().isNotEmpty,
-                              );
-                            });
-                            if (value.isNotEmpty && index < 5) {
-                              FocusScope.of(context).nextFocus();
-                            }
-                            if (value.isEmpty && index > 0) {
-                              FocusScope.of(context).previousFocus();
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-
-              AppSpacing.verticalSmd,
-              Row(
-                children: [
-                  Text(
-                    "00:${seconds.toString().padLeft(2, '0')}",
-                    style: AppTextStyles.buttonLarge.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.white60,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.verticalXl,
-
-              /// RESEND OTP
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                    onTap: seconds == 0
-                        ? () => ref
-                              .read(deleteAccountOtpNotifierProvider.notifier)
-                              .resendOtp()
-                        : null,
-                    child: Text(
-                      "Resend OTP",
-                      style: AppTextStyles.linkMedium.copyWith(
-                        color: AppColors.white60,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.verticalXl,
-
-              /// CONFIRM BUTTON
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: (isOtpFilled && !isLoading)
-                      ? () => ref
-                            .read(deleteAccountOtpNotifierProvider.notifier)
-                            .confirmDelete(enteredOtp)
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isOtpFilled
-                        ? AppColors.primary
-                        : AppColors.goldOpacity40,
-                    shape: RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
-                  ),
-                  child: Text(
-                    "Continue",
-                    style: AppTextStyles.titleMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isOtpFilled
-                          ? AppColors.textHeading
-                          : AppColors.black38,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+  void _resend() {
+    // TODO(delete-account-api): Wire challenge resend and backend cooldown.
+    setState(() {
+      for (final c in _controllers) {
+        c.clear();
+      }
+    });
+    _focus.first.requestFocus();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'UI preview: fields reset. No verification email was sent.',
         ),
       ),
     );
   }
 
-  Future<void> _handleAccountDeleted() async {
-    await ref.read(authStateProvider.notifier).logout();
-    if (!mounted) return;
-    context.goNamed(RouteNames.login);
-  }
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: AppColors.background,
+    body: SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 20).clamp(
+                    0,
+                    double.infinity,
+                  ),
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const DeleteFlowBack(),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Verify Your Identity',
+                        style: AppTextStyles.titleSmall.copyWith(
+                          color: AppColors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text.rich(
+                        TextSpan(
+                          text:
+                              "For your security, please verify your identity before submitting your account deletion request. We've sent a verification code to your registered ",
+                          children: [
+                            TextSpan(
+                              text: 'email address.',
+                              style: AppTextStyles.bodyMediumStrong.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        style: DeleteFlowStyle.body,
+                      ),
+                      const SizedBox(height: 26),
+                      AutofillGroup(
+                        child: Row(
+                          children: List.generate(
+                            6,
+                            (index) => Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  right: index == 5 ? 0 : 7,
+                                ),
+                                child: Focus(
+                                  onKeyEvent: (_, event) {
+                                    if (event is KeyDownEvent &&
+                                        event.logicalKey ==
+                                            LogicalKeyboardKey.backspace &&
+                                        _controllers[index].text.isEmpty &&
+                                        index > 0) {
+                                      _focus[index - 1].requestFocus();
+                                      return KeyEventResult.handled;
+                                    }
+                                    return KeyEventResult.ignored;
+                                  },
+                                  child: TextField(
+                                    key: ValueKey('deletion-otp-$index'),
+                                    controller: _controllers[index],
+                                    focusNode: _focus[index],
+                                    autofocus: index == 0,
+                                    cursorColor: AppColors.primary,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    autofillHints: index == 0
+                                        ? const [AutofillHints.oneTimeCode]
+                                        : null,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(6),
+                                    ],
+                                    style: AppTextStyles.bodyLarge.copyWith(
+                                      color: AppColors.white,
+                                      height: 1.25,
+                                    ),
+                                    decoration: InputDecoration(
+                                      semanticCounterText:
+                                          'Digit ${index + 1} of 6',
+                                      filled:
+                                          _controllers[index].text.isNotEmpty,
+                                      fillColor: DeleteFlowStyle.filledInput,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 17,
+                                          ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color:
+                                              _controllers[index].text.isEmpty
+                                              ? AppColors.white60
+                                              : AppColors.primary,
+                                          width: .5,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: const BorderSide(
+                                          color: AppColors.primary,
+                                          width: .5,
+                                        ),
+                                      ),
+                                    ),
+                                    onTap: () => _controllers[index].selection =
+                                        TextSelection(
+                                          baseOffset: 0,
+                                          extentOffset:
+                                              _controllers[index].text.length,
+                                        ),
+                                    onChanged: (value) =>
+                                        _changed(index, value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'The code will expire in 10 minutes.',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.white60,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Spacer(),
+                      Center(
+                        child: TextButton(
+                          onPressed: _resend,
+                          child: Text(
+                            'Resend OTP',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      DeleteFlowButton(
+                        label: 'Verify & Delete my Account',
+                        onPressed: _complete
+                            ? () {
+                                FocusScope.of(context).unfocus();
+                                // TODO(delete-account-api): Replace preview navigation with verified
+                                // server response, including its scheduled deletion date.
+                                context.pushNamed(
+                                  RouteNames.deleteAccountSuccess,
+                                );
+                              }
+                            : null,
+                      ),
+                      const DeleteFlowPreviewNotice(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
