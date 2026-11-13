@@ -18,7 +18,16 @@ import '../widgets/wizard_bottom_bar.dart';
 
 /// Screen 1 of the Book-a-Shoot v2 flow — pick the content type.
 class ContentTypeV2Screen extends ConsumerStatefulWidget {
-  const ContentTypeV2Screen({super.key, this.bookingId, this.contentType});
+  const ContentTypeV2Screen({
+    super.key,
+    this.bookingId,
+    this.contentType,
+    this.isTabRoot = false,
+  });
+
+  /// True when hosted as the Book tab root: header shows the drawer menu
+  /// instead of a back arrow.
+  final bool isTabRoot;
 
   /// Existing draft booking (when re-entering / editing the content type).
   final int? bookingId;
@@ -98,7 +107,10 @@ class _ContentTypeV2ScreenState extends ConsumerState<ContentTypeV2Screen> {
     return AppScaffold(
       hasAppBar: true,
       useSafeArea: true,
-      appBar: const CreateProjectAppBar(step: BookingWizardStep.contentType),
+      appBar: CreateProjectAppBar(
+        step: BookingWizardStep.contentType,
+        showMenu: widget.isTabRoot,
+      ),
       body: AbsorbPointer(
         absorbing: isLoading,
         child: Opacity(

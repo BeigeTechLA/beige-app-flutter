@@ -72,268 +72,323 @@ class _CreativeProfileScreenState extends ConsumerState<CreativeProfileScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// TOP IMAGE + ACTIONS
-                Stack(
-                  children: [
-                    Image.network(
-                      _imageUrl(creative?['profile_image_url']),
-                      height: 360,
-                      width: double.infinity,
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, _, _) => SvgPicture.asset(
-                        AppAssets.imagePlaceholder,
-                        height: 360,
-                        width: double.infinity,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    Container(
-                      height: 360,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            AppColors.black.withValues(alpha: 0.5),
-                            AppColors.transparent,
-                            AppColors.black.withValues(alpha: 0.85),
-                          ],
+          CustomScrollView(
+            slivers: [
+              SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final expandedHeight =
+                      (360 - MediaQuery.paddingOf(context).top).clamp(
+                        kToolbarHeight,
+                        360.0,
+                      );
+                  final isCollapsed =
+                      constraints.scrollOffset >=
+                      expandedHeight - kToolbarHeight;
+
+                  return SliverAppBar(
+                    pinned: true,
+                    automaticallyImplyLeading: false,
+                    backgroundColor: AppColors.background,
+                    surfaceTintColor: AppColors.transparent,
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    expandedHeight: expandedHeight,
+                    centerTitle: false,
+                    title: isCollapsed
+                        ? Text(
+                            creative?['name'] ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.bodyLarge.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.white,
+                            ),
+                          )
+                        : null,
+                    leadingWidth: AppSpacing.sm + kMinInteractiveDimension,
+                    leading: Padding(
+                      padding: const EdgeInsets.only(left: AppSpacing.sm),
+                      child: IconButton(
+                        constraints: const BoxConstraints.tightFor(
+                          width: kMinInteractiveDimension,
+                          height: kMinInteractiveDimension,
+                        ),
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).backButtonTooltip,
+                        onPressed: () => context.pop(),
+                        icon: SvgPicture.asset(
+                          AppAssets.back,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.white,
+                            BlendMode.srcIn,
+                          ),
+                          height: 24,
+                          width: 24,
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 40,
-                      left: AppSpacing.base,
-                      right: AppSpacing.base,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    flexibleSpace: FlexibleSpaceBar(
+                      collapseMode: CollapseMode.parallax,
+                      background: Stack(
                         children: [
-                          InkWell(
-                            onTap: () => context.pop(),
-                            child: SvgPicture.asset(AppAssets.back, height: 24),
+                          Image.network(
+                            _imageUrl(creative?['profile_image_url']),
+                            height: 360,
+                            width: double.infinity,
+                            fit: BoxFit.fill,
+                            errorBuilder: (_, _, _) => SvgPicture.asset(
+                              AppAssets.imagePlaceholder,
+                              height: 360,
+                              width: double.infinity,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          Container(
+                            height: 360,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  AppColors.black.withValues(alpha: 0.5),
+                                  AppColors.transparent,
+                                  AppColors.black.withValues(alpha: 0.85),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: AppSpacing.base,
+                            bottom: AppSpacing.xxl,
+                            right: AppSpacing.base,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      creative?['name'] ?? "",
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.white,
+                                      ),
+                                    ),
+                                    AppSpacing.verticalXs,
+                                    Text(
+                                      creative?['primary_title'] ?? "",
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        color: AppColors.white70,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    Positioned(
-                      left: AppSpacing.base,
-                      bottom: AppSpacing.xxl,
-                      right: AppSpacing.base,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                creative?['name'] ?? "",
-                                style: AppTextStyles.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.white,
-                                ),
-                              ),
-                              AppSpacing.verticalXs,
-                              Text(
-                                creative?['primary_title'] ?? "",
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                /// INFO STATS
-                Padding(
-                  padding: AppSpacing.insetsHBase,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      _infoCard(
-                        icon: Icons.group_outlined,
-                        value: "${stats?['clients_count'] ?? 0}",
-                        title: "Clients",
-                      ),
-                      _infoCard(
-                        icon: Icons.verified_outlined,
-                        value: "${stats?['years_experience'] ?? 0} yrs",
-                        title: "Experience",
-                      ),
-                    ],
-                  ),
-                ),
-
-                AppSpacing.verticalXl,
-                _divider(),
-
-                /// ABOUT
-                _sectionTitle("About Creator"),
-                _sectionText(about?['bio'] ?? "No information available"),
-                AppSpacing.verticalXl,
-                _divider(),
-
-                /// PORTFOLIO
-                _sectionTitle("Portfolio"),
-                Column(
+                  );
+                },
+              ),
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 260,
-                      child: portfolio.isEmpty
-                          ? Center(
-                              child: SvgPicture.asset(
-                                AppAssets.imagePlaceholder,
-                              ),
-                            )
-                          : PageView.builder(
-                              controller: _portfolioController,
-                              itemCount: 10000,
-                              physics: const BouncingScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                final realIndex = index % portfolio.length;
-                                final item = portfolio[realIndex];
+                    /// INFO STATS
+                    Padding(
+                      padding: AppSpacing.insetsHBase,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          _infoCard(
+                            icon: Icons.group_outlined,
+                            value: "${stats?['clients_count'] ?? 0}",
+                            title: "Clients",
+                          ),
+                          _infoCard(
+                            icon: Icons.verified_outlined,
+                            value: "${stats?['years_experience'] ?? 0} yrs",
+                            title: "Experience",
+                          ),
+                        ],
+                      ),
+                    ),
 
-                                final imageUrl = _imageUrl(
-                                  item["file_path"] ?? "",
-                                );
+                    AppSpacing.verticalXl,
+                    _divider(),
 
-                                return AnimatedBuilder(
-                                  animation: _portfolioController,
-                                  builder: (context, child) {
-                                    double value = 0;
+                    /// ABOUT
+                    _sectionTitle("About Creator"),
+                    _sectionText(about?['bio'] ?? "No information available"),
+                    AppSpacing.verticalXl,
+                    _divider(),
 
-                                    if (_portfolioController.hasClients &&
-                                        _portfolioController
-                                            .position
-                                            .haveDimensions) {
-                                      value =
-                                          (_portfolioController.page ?? 0) -
-                                          index;
-                                    }
+                    /// PORTFOLIO
+                    _sectionTitle("Portfolio"),
+                    Column(
+                      children: [
+                        SizedBox(
+                          height: 260,
+                          child: portfolio.isEmpty
+                              ? Center(
+                                  child: SvgPicture.asset(
+                                    AppAssets.imagePlaceholder,
+                                  ),
+                                )
+                              : PageView.builder(
+                                  controller: _portfolioController,
+                                  itemCount: 10000,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final realIndex = index % portfolio.length;
+                                    final item = portfolio[realIndex];
 
-                                    double scale = (1 - (value.abs() * 0.2))
-                                        .clamp(0.8, 1.0);
-                                    double angle = value * -0.5;
+                                    final imageUrl = _imageUrl(
+                                      item["file_path"] ?? "",
+                                    );
 
-                                    return Transform(
-                                      alignment: value > 0
-                                          ? Alignment.centerLeft
-                                          : Alignment.centerRight,
-                                      transform: Matrix4.identity()
-                                        ..setEntry(3, 2, 0.001)
-                                        ..rotateY(angle)
-                                        ..scaleByDouble(scale, scale, scale, 1),
-                                      child: Opacity(
-                                        opacity: (1 - value.abs()).clamp(
-                                          0.5,
-                                          1.0,
+                                    return AnimatedBuilder(
+                                      animation: _portfolioController,
+                                      builder: (context, child) {
+                                        double value = 0;
+
+                                        if (_portfolioController.hasClients &&
+                                            _portfolioController
+                                                .position
+                                                .haveDimensions) {
+                                          value =
+                                              (_portfolioController.page ?? 0) -
+                                              index;
+                                        }
+
+                                        double scale = (1 - (value.abs() * 0.2))
+                                            .clamp(0.8, 1.0);
+                                        double angle = value * -0.5;
+
+                                        return Transform(
+                                          alignment: value > 0
+                                              ? Alignment.centerLeft
+                                              : Alignment.centerRight,
+                                          transform: Matrix4.identity()
+                                            ..setEntry(3, 2, 0.001)
+                                            ..rotateY(angle)
+                                            ..scaleByDouble(
+                                              scale,
+                                              scale,
+                                              scale,
+                                              1,
+                                            ),
+                                          child: Opacity(
+                                            opacity: (1 - value.abs()).clamp(
+                                              0.5,
+                                              1.0,
+                                            ),
+                                            child: Center(
+                                              child: SizedBox(
+                                                height: 240,
+                                                width:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.width *
+                                                    0.7,
+                                                child: child,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                          horizontal: AppSpacing.xs,
                                         ),
-                                        child: Center(
-                                          child: SizedBox(
-                                            height: 240,
-                                            width:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                0.7,
-                                            child: child,
+                                        decoration: BoxDecoration(
+                                          borderRadius: AppRadii.portfolioAll,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.black.withValues(
+                                                alpha: 0.4,
+                                              ),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: AppRadii.portfolioAll,
+                                          child: Image.network(
+                                            imageUrl,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, _, _) =>
+                                                SvgPicture.asset(
+                                                  AppAssets.imagePlaceholder,
+                                                  fit: BoxFit.cover,
+                                                ),
                                           ),
                                         ),
                                       ),
                                     );
                                   },
-                                  child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.xs,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: AppRadii.portfolioAll,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.black.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 6),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: AppRadii.portfolioAll,
-                                      child: Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, _, _) =>
-                                            SvgPicture.asset(
-                                              AppAssets.imagePlaceholder,
-                                              fit: BoxFit.cover,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                                ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    _divider(),
+
+                    /// WEEKLY AVAILABILITY
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.base,
+                        AppSpacing.xxl,
+                        AppSpacing.base,
+                        AppSpacing.sm,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (weeklyAvailability.isNotEmpty) ...[
+                            Text(
+                              "Weekly Availability",
+                              style: AppTextStyles.titleMedium.copyWith(
+                                fontFamily: AppAssets.fontOutfit,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.white,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.mld),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.mld),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceVariant,
+                                borderRadius: AppRadii.hugeAll,
+                              ),
+                              child: Column(
+                                children: weekDaysOrder.map((day) {
+                                  bool isActive = weeklyAvailability.contains(
+                                    day,
+                                  );
+                                  return _availabilityRow(
+                                    day,
+                                    isActive,
+                                    "10:00 am - 10:00 pm",
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.massive),
                   ],
                 ),
-                _divider(),
-
-                /// WEEKLY AVAILABILITY
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.base,
-                    AppSpacing.xxl,
-                    AppSpacing.base,
-                    AppSpacing.sm,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (weeklyAvailability.isNotEmpty) ...[
-                        Text(
-                          "Weekly Availability",
-                          style: AppTextStyles.titleMedium.copyWith(
-                            fontFamily: AppAssets.fontOutfit,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.white,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.mld),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.mld),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceVariant,
-                            borderRadius: AppRadii.hugeAll,
-                          ),
-                          child: Column(
-                            children: weekDaysOrder.map((day) {
-                              bool isActive = weeklyAvailability.contains(day);
-                              return _availabilityRow(
-                                day,
-                                isActive,
-                                "10:00 am - 10:00 pm",
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.massive),
-              ],
-            ),
+              ),
+            ],
           ),
           if (isLoading) const AppScreenLoader(),
         ],

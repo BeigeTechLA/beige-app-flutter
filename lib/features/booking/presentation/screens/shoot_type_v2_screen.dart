@@ -25,10 +25,15 @@ class ShootTypeV2Screen extends ConsumerStatefulWidget {
     super.key,
     required this.bookingId,
     this.contentType,
+    this.initialShootTypeName,
   });
 
   final int bookingId;
   final String? contentType;
+
+  /// Shoot type to preselect by name (e.g. "Book Again" from a completed
+  /// shoot, or re-entering the step from a draft). Matched case-insensitively.
+  final String? initialShootTypeName;
 
   @override
   ConsumerState<ShootTypeV2Screen> createState() => _ShootTypeV2ScreenState();
@@ -69,12 +74,24 @@ class _ShootTypeV2ScreenState extends ConsumerState<ShootTypeV2Screen> {
     return '${ApiEndpoints.imageUrl}$path';
   }
 
+  /// User's pick, else the [ShootTypeV2Screen.initialShootTypeName] match,
+  /// else -1. Pure — derived on every build once the catalogue has loaded.
+  int _effectiveIndex(List<Map<String, dynamic>> shootTypes) {
+    if (_selectedIndex >= 0) return _selectedIndex;
+    final initial = widget.initialShootTypeName?.trim().toLowerCase();
+    if (initial == null || initial.isEmpty) return -1;
+    return shootTypes.indexWhere(
+      (t) => t['name']?.toString().trim().toLowerCase() == initial,
+    );
+  }
+
   Future<void> _continue(List<Map<String, dynamic>> shootTypes) async {
-    if (_selectedIndex < 0 || _selectedIndex >= shootTypes.length) {
+    final index = _effectiveIndex(shootTypes);
+    if (index < 0 || index >= shootTypes.length) {
       TopMessage.show(context, 'Please select shoot type');
       return;
     }
-    final name = shootTypes[_selectedIndex]['name']?.toString() ?? '';
+    final name = shootTypes[index]['name']?.toString() ?? '';
 
     final ok = await ref
         .read(shootTypeV2NotifierProvider.notifier)
@@ -100,6 +117,7 @@ class _ShootTypeV2ScreenState extends ConsumerState<ShootTypeV2Screen> {
   Widget build(BuildContext context) {
     final state = ref.watch(shootTypeV2NotifierProvider);
     final shootTypes = state.shootTypes;
+    final selectedIndex = _effectiveIndex(shootTypes);
     final isBusy =
         state.status == ShootTypeV2Status.loading ||
         state.status == ShootTypeV2Status.saving;
@@ -130,7 +148,7 @@ class _ShootTypeV2ScreenState extends ConsumerState<ShootTypeV2Screen> {
                       itemCount: shootTypes.length,
                       padding: const EdgeInsets.only(top: AppSpacing.md),
                       itemBuilder: (context, index) =>
-                          _card(shootTypes[index], index),
+                          _card(shootTypes[index], index, selectedIndex),
                     ),
             ),
           ],
@@ -138,20 +156,20 @@ class _ShootTypeV2ScreenState extends ConsumerState<ShootTypeV2Screen> {
       ),
       bottomNavigationBar: WizardBottomBar(
         onBack: () => context.pop(),
-        onContinue: (_selectedIndex >= 0 && !isBusy)
+        onContinue: (selectedIndex >= 0 && !isBusy)
             ? () => _continue(shootTypes)
             : null,
       ),
     );
   }
 
-  Widget _card(Map<String, dynamic> item, int index) {
+  Widget _card(Map<String, dynamic> item, int index, int selectedIndex) {
     final description = [
       item['description']?.toString().trim(),
       (item['tags'] as List?)?.join(' , ').trim(),
       item['subtitle']?.toString().trim(),
     ].whereType<String>().where((text) => text.isNotEmpty).firstOrNull;
-    final selected = _selectedIndex == index;
+    final selected = selectedIndex == index;
 
     return GestureDetector(
       behavior: HitTestBehavior.translucent,

@@ -116,84 +116,76 @@ class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
                       const SizedBox(height: 26),
                       AutofillGroup(
                         child: Row(
+                          spacing: 7,
                           children: List.generate(
                             6,
                             (index) => Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  right: index == 5 ? 0 : 7,
-                                ),
-                                child: Focus(
-                                  onKeyEvent: (_, event) {
-                                    if (event is KeyDownEvent &&
-                                        event.logicalKey ==
-                                            LogicalKeyboardKey.backspace &&
-                                        _controllers[index].text.isEmpty &&
-                                        index > 0) {
-                                      _focus[index - 1].requestFocus();
-                                      return KeyEventResult.handled;
-                                    }
-                                    return KeyEventResult.ignored;
-                                  },
-                                  child: TextField(
-                                    key: ValueKey('deletion-otp-$index'),
-                                    controller: _controllers[index],
-                                    focusNode: _focus[index],
-                                    autofocus: index == 0,
-                                    cursorColor: AppColors.primary,
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    autofillHints: index == 0
-                                        ? const [AutofillHints.oneTimeCode]
-                                        : null,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(6),
-                                    ],
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                      color: AppColors.white,
-                                      height: 1.25,
-                                    ),
-                                    decoration: InputDecoration(
-                                      semanticCounterText:
-                                          'Digit ${index + 1} of 6',
-                                      filled:
-                                          _controllers[index].text.isNotEmpty,
-                                      fillColor: DeleteFlowStyle.filledInput,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                            vertical: 17,
-                                          ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(
-                                          color:
-                                              _controllers[index].text.isEmpty
-                                              ? AppColors.white60
-                                              : AppColors.primary,
-                                          width: .5,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: AppColors.primary,
-                                          width: .5,
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: () => _controllers[index].selection =
-                                        TextSelection(
-                                          baseOffset: 0,
-                                          extentOffset:
-                                              _controllers[index].text.length,
-                                        ),
-                                    onChanged: (value) =>
-                                        _changed(index, value),
+                              child: Focus(
+                                onKeyEvent: (_, event) {
+                                  if (event is KeyDownEvent &&
+                                      event.logicalKey ==
+                                          LogicalKeyboardKey.backspace &&
+                                      _controllers[index].text.isEmpty &&
+                                      index > 0) {
+                                    _focus[index - 1].requestFocus();
+                                    return KeyEventResult.handled;
+                                  }
+                                  return KeyEventResult.ignored;
+                                },
+                                child: TextField(
+                                  key: ValueKey('deletion-otp-$index'),
+                                  controller: _controllers[index],
+                                  focusNode: _focus[index],
+                                  autofocus: index == 0,
+                                  cursorColor: AppColors.primary,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  autofillHints: index == 0
+                                      ? const [AutofillHints.oneTimeCode]
+                                      : null,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(6),
+                                  ],
+                                  style: AppTextStyles.bodyLarge.copyWith(
+                                    color: AppColors.white,
+                                    height: 1.25,
                                   ),
+                                  decoration: InputDecoration(
+                                    semanticCounterText:
+                                        'Digit ${index + 1} of 6',
+                                    filled: _controllers[index].text.isNotEmpty,
+                                    fillColor: DeleteFlowStyle.filledInput,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 17,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: _controllers[index].text.isEmpty
+                                            ? AppColors.white60
+                                            : AppColors.primary,
+                                        width: .5,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.primary,
+                                        width: .5,
+                                      ),
+                                    ),
+                                  ),
+                                  onTap: () => _controllers[index].selection =
+                                      TextSelection(
+                                        baseOffset: 0,
+                                        extentOffset:
+                                            _controllers[index].text.length,
+                                      ),
+                                  onChanged: (value) => _changed(index, value),
                                 ),
                               ),
                             ),

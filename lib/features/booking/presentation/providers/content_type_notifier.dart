@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
 import '../../../home/presentation/providers/home_providers.dart';
+import '../../domain/entities/booking_flow_enums.dart';
 import 'booking_providers.dart';
 
 enum ContentTypeStatus { initial, loading, success, error }
@@ -93,7 +94,9 @@ class ContentTypeNotifier extends Notifier<ContentTypeState> {
     // Step 2: Create booking
     final body = <String, dynamic>{
       'booking_id': ?existingBookingId,
-      'content_type': contentType,
+      // API expects the string value (e.g. 'videographer'), not the v1 id.
+      'content_type':
+          ContentTypeV2.fromLegacyId(contentType)?.apiValue ?? contentType,
       if (contentType != 3 && shootTypeIds.isNotEmpty)
         'shoot_type_id': shootTypeIds.first,
     };

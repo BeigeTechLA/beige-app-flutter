@@ -21,6 +21,15 @@ enum ContentTypeV2 {
     ContentTypeV2.both => 'photographer,videographer',
   };
 
+  /// Maps the legacy numeric content-type id used by the v1 booking screens
+  /// (1 = videography, 2 = photography, 3 = both / "Select All").
+  static ContentTypeV2? fromLegacyId(int id) => switch (id) {
+    1 => ContentTypeV2.videographer,
+    2 => ContentTypeV2.photographer,
+    3 => ContentTypeV2.both,
+    _ => null,
+  };
+
   /// Parses the API `content_type` string back into an enum.
   static ContentTypeV2? fromApiValue(String? value) {
     switch (value) {

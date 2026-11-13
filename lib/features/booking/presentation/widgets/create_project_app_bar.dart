@@ -25,7 +25,12 @@ class CreateProjectAppBar extends StatelessWidget
     this.title = 'Create Project',
     this.onBack,
     this.showBack = true,
+    this.showMenu = false,
   });
+
+  /// Tab-root mode (Book tab): replaces the back arrow with the drawer menu
+  /// icon, matching the main-tab toolbars (e.g. My Shoots).
+  final bool showMenu;
 
   /// The logical step this screen represents — drives the `X/N` badge.
   final BookingWizardStep step;
@@ -71,8 +76,28 @@ class CreateProjectAppBar extends StatelessWidget
                 child: Row(
                   children: [
                     SizedBox(
-                      width: 24,
-                      child: showBack
+                      width: showMenu ? 26 : 24,
+                      child: showMenu
+                          ? Builder(
+                              builder: (ctx) => GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: Scaffold.of(ctx).openDrawer,
+                                child: Semantics(
+                                  button: true,
+                                  label: 'Open menu',
+                                  child: SvgPicture.asset(
+                                    AppAssets.menu,
+                                    width: 26,
+                                    height: 26,
+                                    colorFilter: const ColorFilter.mode(
+                                      AppColors.textPrimary,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : showBack
                           ? GestureDetector(
                               behavior: HitTestBehavior.opaque,
                               onTap:

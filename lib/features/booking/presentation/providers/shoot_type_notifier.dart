@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/firebase/analytics_events.dart';
 import '../../../../core/firebase/analytics_service.dart';
+import '../../domain/entities/booking_flow_enums.dart';
 import 'booking_providers.dart';
 
 enum ShootTypeStatus { initial, loading, loaded, saving, success, error }
@@ -101,7 +102,9 @@ class ShootTypeNotifier extends Notifier<ShootTypeState> {
     final repo = ref.read(bookingRepositoryProvider);
     final body = {
       'project_name': shootTypeName,
-      'content_type': contentTypeId,
+      // API expects the string value (e.g. 'videographer'), not the v1 id.
+      'content_type':
+          ContentTypeV2.fromLegacyId(contentTypeId)?.apiValue ?? contentTypeId,
       'shoot_type_id': shootTypeId,
     };
 

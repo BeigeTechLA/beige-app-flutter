@@ -1,4 +1,5 @@
 import 'package:beige/app/app.dart';
+import 'package:beige/config/env.dart';
 import 'package:beige/core/providers/core_providers.dart';
 import 'package:beige/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,10 +27,33 @@ class NavResult {
 
 bool _firebaseInitialized = false;
 
+/// Bounded replacement for `pumpAndSettle`. Screens backed by the live API
+/// can show a spinner/Lottie forever (e.g. fake test token → request fails or
+/// never resolves), so an unbounded settle hangs the whole suite. Pump for at
+/// most [max], then let the caller inspect whatever rendered.
+Future<void> settle(
+  WidgetTester tester, {
+  Duration max = const Duration(seconds: 5),
+}) async {
+  try {
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      max,
+    );
+  } on FlutterError {
+    // Still animating after [max] — the screen is mounted; carry on.
+  }
+}
+
 /// Ensures Firebase is initialized once for the test session.
 /// Required because [routerProvider] uses [AnalyticsService.observer].
 Future<void> ensureFirebaseInitialized() async {
   if (_firebaseInitialized) return;
+  // firebase_options.dart and the app read Env.current for per-environment
+  // config. The real entry points call this in startApp(); the test harness
+  // pumps App() directly, so init it here (dev) before touching Firebase.
+  Env.init(Environment.dev);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   _firebaseInitialized = true;
 }
@@ -63,7 +87,7 @@ Future<void> pumpAppWithAuth(
       child: const App(),
     ),
   );
-  await tester.pumpAndSettle(const Duration(seconds: 3));
+  await settle(tester);
 }
 
 /// Navigates to [path] using GoRouter and waits for settle.
@@ -75,7 +99,7 @@ Future<NavResult> navigateTo(
   try {
     final context = tester.element(find.byType(Router).first);
     GoRouter.of(context).go(path, extra: extra);
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    await settle(tester);
     return NavResult(route: path, checkType: 'navigate', passed: true);
   } catch (e) {
     return NavResult(
@@ -129,7 +153,7 @@ Future<NavResult> verifyAuthGuard(
   try {
     final context = tester.element(find.byType(Router).first);
     GoRouter.of(context).go(protectedPath);
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    await settle(tester);
 
     final router = GoRouter.of(context);
     final currentLocation = router.routerDelegate.currentConfiguration.uri
@@ -162,7 +186,7 @@ Future<NavResult> verifyDeepLink(
   try {
     final context = tester.element(find.byType(Router).first);
     GoRouter.of(context).go(deepLinkUri);
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    await settle(tester);
 
     final hasError = find.byType(ErrorWidget).evaluate().isNotEmpty;
     return NavResult(
@@ -192,13 +216,13 @@ Future<NavResult> verifyBackNav(
     final context = tester.element(find.byType(Router).first);
 
     GoRouter.of(context).go(previousPath);
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await settle(tester);
 
     GoRouter.of(context).push(path);
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await settle(tester);
 
     GoRouter.of(context).pop();
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await settle(tester);
 
     final hasScaffold = find.byType(Scaffold).evaluate().isNotEmpty;
     return NavResult(

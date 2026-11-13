@@ -58,9 +58,29 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
 
   String _getFullImageUrl() {
     final url = widget.imageUrl ?? "";
-    if (url.isEmpty) return "";
+    // Empty, or a local asset path (older callers / restored drafts passed the
+    // placeholder asset) → no network image.
+    if (url.isEmpty || url.startsWith("assets/")) return "";
     if (url.startsWith("http")) return url;
     return '${ApiEndpoints.imageUrl}$url';
+  }
+
+  /// Dark tile with the placeholder icon at its natural size — the icon is a
+  /// small transparent SVG, so `BoxFit.cover` would blow it up into a blank
+  /// white/grey block.
+  Widget _thumbnailPlaceholder() {
+    return Container(
+      height: 144,
+      width: 126,
+      color: AppColors.surface,
+      alignment: Alignment.center,
+      child: SvgPicture.asset(
+        AppAssets.imagePlaceholder,
+        height: 56,
+        width: 56,
+        fit: BoxFit.contain,
+      ),
+    );
   }
 
   @override
@@ -74,22 +94,16 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                /// 🔹 FULL IMAGE
+                /// 🔹 FULL IMAGE — plain dark backdrop when there is no image
+                /// (the small placeholder icon must not be stretched to cover).
                 _getFullImageUrl().isNotEmpty
                     ? Image.network(
                         _getFullImageUrl(),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) {
-                          return SvgPicture.asset(
-                            AppAssets.imagePlaceholder,
-                            fit: BoxFit.cover,
-                          );
-                        },
+                        errorBuilder: (_, _, _) =>
+                            const ColoredBox(color: AppColors.background),
                       )
-                    : SvgPicture.asset(
-                        AppAssets.imagePlaceholder,
-                        fit: BoxFit.cover,
-                      ),
+                    : const ColoredBox(color: AppColors.background),
 
                 /// 🔹 BLUR EFFECT
                 BackdropFilter(
@@ -197,21 +211,10 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                             );
                                           },
 
-                                      errorBuilder: (_, _, _) {
-                                        return SvgPicture.asset(
-                                          AppAssets.imagePlaceholder,
-                                          height: 144,
-                                          width: 126,
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
+                                      errorBuilder: (_, _, _) =>
+                                          _thumbnailPlaceholder(),
                                     )
-                                  : SvgPicture.asset(
-                                      AppAssets.imagePlaceholder,
-                                      height: 144,
-                                      width: 126,
-                                      fit: BoxFit.cover,
-                                    ),
+                                  : _thumbnailPlaceholder(),
                             ),
 
                             const SizedBox(width: AppSpacing.mld),

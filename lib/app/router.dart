@@ -149,6 +149,9 @@ final routerProvider = Provider<GoRouter>((ref) {
   // routes) so the user can still back-pop through already-loaded screens
   // but cannot push forward into routes that would need a network fetch.
   final visitedOnlineLocations = <String>{};
+
+  // `newBooking` tokens whose fresh draft has already been written.
+  final consumedNewBookingTokens = <String>{};
   String? lastOnlineLocation;
 
   final restorationService = ref.read(routeRestorationServiceProvider);
@@ -376,12 +379,30 @@ final routerProvider = Provider<GoRouter>((ref) {
                   final extra = state.extra as Map<String, dynamic>?;
                   final newBooking = extra?['newBooking'] as String?;
                   if (newBooking != null) {
-                    return ContentTypeV2Screen(key: ValueKey(newBooking));
+                    // A new booking starts from a fresh draft holding only the
+                    // optional prefill (e.g. "Book Again" from a completed
+                    // shoot), so stale fields from an earlier booking never
+                    // leak in. Written once per token — builders can re-run.
+                    final prefill = BookingDraft(
+                      currentRoute: '/book-shoot',
+                      contentType: extra?['contentType'] as String?,
+                      shootTypeName: extra?['shootTypeName'] as String?,
+                    );
+                    if (consumedNewBookingTokens.add(newBooking)) {
+                      // ignore: discarded_futures
+                      draftStore.writeBookingDraft(prefill);
+                    }
+                    return ContentTypeV2Screen(
+                      key: ValueKey(newBooking),
+                      contentType: prefill.contentType,
+                      isTabRoot: true,
+                    );
                   }
                   final draft = bookingDraftFor(state, '/book-shoot');
                   return ContentTypeV2Screen(
                     bookingId: draft.bookingId,
                     contentType: draft.contentType,
+                    isTabRoot: true,
                   );
                 },
               ),
@@ -511,6 +532,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return ShootTypeV2Screen(
             bookingId: draft.bookingId ?? 0,
             contentType: draft.contentType,
+            initialShootTypeName: draft.shootTypeName,
           );
         },
       ),
