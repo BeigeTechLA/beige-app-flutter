@@ -1,3 +1,4 @@
+import '../../../../core/providers/account_status_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -125,7 +126,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen(loginNotifierProvider, (prev, next) {
       if (next.status == LoginStatus.success) {
         TextInput.finishAutofillContext();
-        context.goNamed(RouteNames.home);
+        context.goNamed(
+          next.user?.accountStatus == AccountStatus.deletionPending
+              ? RouteNames.accountDeletionPending
+              : RouteNames.home,
+        );
       }
       if (next.status == LoginStatus.error && next.errorMessage != null) {
         if (emailController.text.isEmpty && _lastSubmittedEmail.isNotEmpty) {

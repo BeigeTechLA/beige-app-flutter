@@ -1,3 +1,6 @@
+import '../core/providers/account_status_provider.dart';
+import '../features/account_deletion/presentation/deletion_provider.dart';
+import '../features/account_deletion/presentation/account_recovery_screens.dart';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -121,6 +124,10 @@ const _guestAllowedRoutes = {
 /// for redirect logic.
 final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ValueNotifier<bool>(ref.read(authStateProvider));
+  final accountNotifier = ValueNotifier<AccountStatus>(
+    ref.read(accountStatusProvider),
+  );
+  ref.listen(accountStatusProvider, (_, next) => accountNotifier.value = next);
   final guestNotifier = ValueNotifier<bool>(ref.read(guestModeProvider));
   final connNotifier = ValueNotifier<ConnectivityStatus>(
     ref.read(connectivityStatusProvider),
@@ -140,6 +147,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   final refreshListenable = Listenable.merge([
     authNotifier,
+    accountNotifier,
     guestNotifier,
     connNotifier,
   ]);
@@ -202,6 +210,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(() {
     router.routerDelegate.removeListener(persistOnChange);
     authNotifier.dispose();
+    accountNotifier.dispose();
     guestNotifier.dispose();
     connNotifier.dispose();
   });
@@ -223,6 +232,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       final isPublicRoute = _publicRoutes.contains(location);
+
+      final accountRedirect = accountStatusRedirect(
+        authenticated: isLoggedIn,
+        status: accountNotifier.value,
+        location: location,
+        cancellationComplete: ref.read(deletionProvider).cancelled,
+        confirmedReceipt: ref.read(deletionReceiptProvider) != null,
+      );
+      if (accountRedirect != null) return accountRedirect;
+      // A just-confirmed receipt is public after automatic session cleanup.
+      if (location == '/delete-account-success') return null;
+      if (isLoggedIn && accountNotifier.value != AccountStatus.active) {
+        return null;
+      }
 
       // Auth gate first — runs regardless of connectivity.
       if (isLoggedIn && isPublicRoute) {
@@ -956,6 +979,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/app-preferences',
         name: RouteNames.appPreferences,
         builder: (context, state) => const AppPreferencesScreen(),
+      ),
+      MaterialGoRoute(
+        path: '/account-deletion-pending',
+        name: RouteNames.accountDeletionPending,
+        builder: (_, _) => const AccountDeletionPendingScreen(),
+      ),
+      MaterialGoRoute(
+        path: '/cancel-account-deletion',
+        name: RouteNames.cancelAccountDeletion,
+        builder: (_, _) => const CancelAccountDeletionScreen(),
       ),
       MaterialGoRoute(
         path: '/delete-account',

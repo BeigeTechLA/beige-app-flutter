@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../account_deletion/presentation/deletion_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/colors.dart';
@@ -6,11 +8,11 @@ import '../../../../app/route_names.dart';
 import '../../../../app/text_styles.dart';
 import '../widgets/delete_flow_widgets.dart';
 
-class DeleteAccountScreen extends StatelessWidget {
+class DeleteAccountScreen extends ConsumerWidget {
   const DeleteAccountScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     backgroundColor: AppColors.background,
     body: SafeArea(
       child: Center(
@@ -118,12 +120,9 @@ class DeleteAccountScreen extends StatelessWidget {
               ),
               const _InfoCard(
                 icon: 'hourglass',
-                title: '60-day Grace Period',
+                title: 'Grace Period',
                 description:
-                    'Your eligible data will be scheduled for deletion after ',
-                highlighted: '60 days.',
-                suffix:
-                    ' You can cancel your request during this period by completing the required verification',
+                    'Your eligible data will be scheduled for deletion. You can cancel your request before the scheduled deletion date.',
               ),
             ],
           ),
@@ -139,9 +138,29 @@ class DeleteAccountScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
             child: DeleteFlowButton(
-              label: 'Continue & Proceed to Verification',
-              // TODO(delete-account-api): Request a challenge before navigation.
-              onPressed: () => context.pushNamed(RouteNames.deleteAccountOtp),
+              label: ref.watch(deletionProvider).busy
+                  ? 'Sending code…'
+                  : 'Continue & Proceed to Verification',
+              onPressed: ref.watch(deletionProvider).busy
+                  ? null
+                  : () async {
+                      final sent = await ref
+                          .read(deletionProvider.notifier)
+                          .requestOtp();
+                      if (!context.mounted) return;
+                      if (sent) {
+                        context.pushNamed(RouteNames.deleteAccountOtp);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              ref.read(deletionProvider).error ??
+                                  'Unable to send code. Please try again.',
+                            ),
+                          ),
+                        );
+                      }
+                    },
             ),
           ),
         ),
@@ -155,11 +174,8 @@ class _InfoCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.description,
-    this.highlighted,
-    this.suffix,
   });
   final String icon, title, description;
-  final String? highlighted, suffix;
   @override
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 10),
@@ -205,17 +221,7 @@ class _InfoCard extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text.rich(
-          TextSpan(
-            text: description,
-            children: [
-              if (highlighted != null)
-                TextSpan(
-                  text: highlighted,
-                  style: const TextStyle(color: AppColors.primary),
-                ),
-              if (suffix != null) TextSpan(text: suffix),
-            ],
-          ),
+          TextSpan(text: description),
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.white60,
             fontWeight: FontWeight.w500,

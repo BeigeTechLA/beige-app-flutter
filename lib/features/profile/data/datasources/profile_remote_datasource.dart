@@ -67,26 +67,4 @@ class ProfileRemoteDataSource {
     final response = await _dio.get(ApiEndpoints.myBookings);
     return response.data as Map<String, dynamic>;
   }
-
-  /// POST auth/user/delete-account/request
-  Future<Map<String, dynamic>> requestDeleteAccount({
-    required String reason,
-  }) async {
-    final response = await _dio.post(
-      ApiEndpoints.deleteAccountRequest,
-      data: {'delete_reason': reason},
-    );
-    return response.data as Map<String, dynamic>;
-  }
-
-  /// POST auth/user/delete-account/confirm
-  Future<Map<String, dynamic>> confirmDeleteAccount({
-    required String otp,
-  }) async {
-    final response = await _dio.post(
-      ApiEndpoints.deleteAccountConfirm,
-      data: {'otp': otp},
-    );
-    return response.data as Map<String, dynamic>;
-  }
 }

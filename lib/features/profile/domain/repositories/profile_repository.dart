@@ -29,14 +29,4 @@ abstract class ProfileRepository {
 
   /// Fetches booking history.
   Future<Either<AppException, List<dynamic>>> getBookingHistory();
-
-  /// Requests account deletion (sends OTP).
-  Future<Either<AppException, String>> requestDeleteAccount({
-    required String reason,
-  });
-
-  /// Confirms account deletion with OTP.
-  Future<Either<AppException, String>> confirmDeleteAccount({
-    required String otp,
-  });
 }

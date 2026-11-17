@@ -19,6 +19,10 @@ abstract class ApiEndpoints {
   static const String changeLocation = "auth/profile";
   static const String deleteAccountRequest = "auth/user/delete-account/request";
   static const String deleteAccountConfirm = "auth/user/delete-account/confirm";
+  static const String deleteAccountStatus =
+      "auth/user/delete-account/requests/me";
+  static const String deleteAccountCancel =
+      "auth/user/delete-account/requests/me/cancel";
   static const String myFavourites = "auth/my-favourites";
   static const String myBookings = "auth/bookings/history";
 

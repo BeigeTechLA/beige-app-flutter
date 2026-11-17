@@ -1,4 +1,6 @@
 import 'dart:async';
+import '../../../../core/providers/account_status_provider.dart';
+import '../../../account_deletion/presentation/deletion_provider.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +43,22 @@ class LoginNotifier extends Notifier<LoginState> {
         );
       },
       (user) async {
+        if (user.accountStatus == AccountStatus.deleted ||
+            user.accountStatus == AccountStatus.unknown ||
+            user.token.isEmpty) {
+          state = state.copyWith(
+            status: LoginStatus.error,
+            errorMessage: user.accountStatus == AccountStatus.deleted
+                ? 'This account has been deleted.'
+                : 'Unable to access this account. Please contact Beige Support.',
+          );
+          return;
+        }
+        ref.invalidate(deletionProvider);
+        ref.invalidate(deletionReceiptProvider);
+        await ref
+            .read(accountStatusProvider.notifier)
+            .setStatus(user.accountStatus);
         // Save login details to SharedPreferences
         final prefs = ref.read(sharedPreferencesProvider);
         await _saveLoginDetails(
@@ -95,7 +113,9 @@ class LoginNotifier extends Notifier<LoginState> {
         // Login response omits `profile_image_url` — fire a profile fetch
         // so the drawer avatar hydrates on first open without waiting for
         // the user to visit Edit Profile.
-        unawaited(_hydrateProfileImage());
+        if (user.accountStatus == AccountStatus.active) {
+          unawaited(_hydrateProfileImage());
+        }
 
         state = state.copyWith(status: LoginStatus.success, user: user);
       },

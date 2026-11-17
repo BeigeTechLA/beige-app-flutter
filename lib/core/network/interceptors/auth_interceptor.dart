@@ -5,8 +5,13 @@ import 'package:dio/dio.dart';
 class AuthInterceptor extends QueuedInterceptor {
   final Future<String?> Function() getToken;
   final Future<void> Function()? onUnauthorized;
+  final Future<void> Function()? onDeletionPending;
 
-  AuthInterceptor({required this.getToken, this.onUnauthorized});
+  AuthInterceptor({
+    required this.getToken,
+    this.onUnauthorized,
+    this.onDeletionPending,
+  });
 
   @override
   void onRequest(
@@ -41,6 +46,10 @@ class AuthInterceptor extends QueuedInterceptor {
 
   Future<void> _handleSessionError(dynamic data, RequestOptions request) async {
     final code = data is Map ? data['code']?.toString().toUpperCase() : null;
+    if (code == 'ACCOUNT_DELETION_IN_PROGRESS' &&
+        request.extra['_hadAuthToken'] == true) {
+      await onDeletionPending?.call();
+    }
     final sessionInvalid = code == 'SESSION_EXPIRED' || code == 'TOKEN_INVALID';
     final hadToken = request.extra['_hadAuthToken'] == true;
 

@@ -32,6 +32,9 @@ class RouteRestorationService {
     '/profile-new-password',
     '/change-password',
     '/delete-account-otp',
+    '/delete-account-success',
+    '/account-deletion-pending',
+    '/cancel-account-deletion',
     // Terminal — landing here on restore makes no sense.
     // Path uses :bookingId so we match by prefix below.
   };

@@ -1,6 +1,9 @@
+import '../../../../core/session/account_status.dart';
+
 /// Pure domain entity for an authenticated user.
 /// No dependencies on any package — only plain Dart.
 class UserEntity {
+  final AccountStatus accountStatus;
   final String id;
   final String token;
   final int environmentId;
@@ -15,6 +18,7 @@ class UserEntity {
   final String timezone;
 
   const UserEntity({
+    this.accountStatus = AccountStatus.active,
     required this.id,
     required this.token,
     required this.environmentId,

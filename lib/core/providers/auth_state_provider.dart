@@ -8,6 +8,8 @@ import '../restoration/restoration_providers.dart';
 import '../utils/date_time_utils.dart';
 import '../utils/shared_service.dart';
 import 'core_providers.dart';
+import 'account_status_provider.dart';
+import '../../features/account_deletion/presentation/deletion_provider.dart';
 import 'current_user_provider.dart';
 import 'timezone_provider.dart';
 
@@ -46,6 +48,8 @@ class AuthStateNotifier extends Notifier<bool> {
     // Revoke access immediately, even if storage or telemetry cleanup fails.
     state = false;
     await _cleanUp('session', () => SharedService.logout());
+    ref.invalidate(accountStatusProvider);
+    ref.invalidate(deletionProvider);
     ref.invalidate(currentUserProvider);
     ref.invalidate(currentUserIdProvider);
     // Reset timezone so the next user doesn't inherit this session's zone.

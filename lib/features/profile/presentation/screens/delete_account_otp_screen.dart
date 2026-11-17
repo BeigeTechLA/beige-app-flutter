@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../account_deletion/presentation/deletion_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/colors.dart';
@@ -6,18 +8,16 @@ import '../../../../app/route_names.dart';
 import '../../../../app/text_styles.dart';
 import '../widgets/delete_flow_widgets.dart';
 
-/// UI-only preview. No entered code is sent or treated as verified.
-/// TODO(delete-account-api): Backend contract pending for challenge IDs,
-/// OTP expiry, resend cooldown, invalid/expired-code errors, and submission.
-/// Any six digits currently open the success preview; replace that navigation
-/// with server-confirmed verification before enabling real account deletion.
-class DeleteAccountOtpScreen extends StatefulWidget {
+class DeleteAccountOtpScreen extends ConsumerStatefulWidget {
   const DeleteAccountOtpScreen({super.key});
   @override
-  State<DeleteAccountOtpScreen> createState() => _DeleteAccountOtpScreenState();
+  ConsumerState<DeleteAccountOtpScreen> createState() =>
+      _DeleteAccountOtpScreenState();
 }
 
-class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
+class _DeleteAccountOtpScreenState
+    extends ConsumerState<DeleteAccountOtpScreen> {
+  bool _resent = false;
   final _controllers = List.generate(6, (_) => TextEditingController());
   final _focus = List.generate(6, (_) => FocusNode());
   bool get _complete => _controllers.every((c) => c.text.length == 1);
@@ -51,21 +51,26 @@ class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
     });
   }
 
-  void _resend() {
-    // TODO(delete-account-api): Wire challenge resend and backend cooldown.
-    setState(() {
-      for (final c in _controllers) {
-        c.clear();
-      }
-    });
-    _focus.first.requestFocus();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'UI preview: fields reset. No verification email was sent.',
-        ),
-      ),
-    );
+  Future<void> _resend() async {
+    final sent = await ref.read(deletionProvider.notifier).requestOtp();
+    if (!mounted) return;
+    if (sent) {
+      setState(() {
+        _resent = true;
+        for (final c in _controllers) {
+          c.clear();
+        }
+      });
+      _focus.first.requestFocus();
+    }
+  }
+
+  Future<void> _confirm() async {
+    FocusScope.of(context).unfocus();
+    final confirmed = await ref
+        .read(deletionProvider.notifier)
+        .confirm(_controllers.map((c) => c.text).join());
+    if (mounted && confirmed) context.goNamed(RouteNames.deleteAccountSuccess);
   }
 
   @override
@@ -194,7 +199,9 @@ class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'The code will expire in 10 minutes.',
+                        _resent
+                            ? 'A new verification code has been sent.'
+                            : 'Enter the latest code sent to your registered email.',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.white60,
                           fontWeight: FontWeight.w500,
@@ -204,7 +211,9 @@ class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
                       const Spacer(),
                       Center(
                         child: TextButton(
-                          onPressed: _resend,
+                          onPressed: ref.watch(deletionProvider).busy
+                              ? null
+                              : _resend,
                           child: Text(
                             'Resend OTP',
                             style: AppTextStyles.bodyMedium.copyWith(
@@ -217,19 +226,22 @@ class _DeleteAccountOtpScreenState extends State<DeleteAccountOtpScreen> {
                         ),
                       ),
                       DeleteFlowButton(
-                        label: 'Verify & Delete my Account',
-                        onPressed: _complete
-                            ? () {
-                                FocusScope.of(context).unfocus();
-                                // TODO(delete-account-api): Replace preview navigation with verified
-                                // server response, including its scheduled deletion date.
-                                context.pushNamed(
-                                  RouteNames.deleteAccountSuccess,
-                                );
-                              }
+                        label: ref.watch(deletionProvider).busy
+                            ? 'Please wait…'
+                            : 'Verify & Delete my Account',
+                        onPressed:
+                            _complete &&
+                                !ref.watch(deletionProvider).busy &&
+                                ref.watch(deletionProvider).otpSent
+                            ? _confirm
                             : null,
                       ),
-                      const DeleteFlowPreviewNotice(),
+                      if (ref.watch(deletionProvider).error
+                          case final String error)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(error, style: DeleteFlowStyle.body),
+                        ),
                     ],
                   ),
                 ),
