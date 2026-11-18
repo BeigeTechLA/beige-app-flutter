@@ -124,8 +124,8 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
           .where((e) => e.isNotEmpty)
           .toList(),
     };
-    print(" UPDATE BOOKING DETAILS API");
-    print(" PAYLOAD = $payload");
+    debugPrint(" UPDATE BOOKING DETAILS API");
+    debugPrint(" PAYLOAD = $payload");
 
     await ref
         .read(shootDetailsNotifierProvider(widget.bookingId).notifier)
@@ -269,7 +269,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   Future<void> searchLocation(String query) async {
     try {
-      List<Location> locations = await locationFromAddress(query);
+      List<Location> locations = await Geocoding().locationFromAddress(query);
 
       if (locations.isNotEmpty) {
         final loc = locations.first;
@@ -293,7 +293,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
 
   Future<void> getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );
@@ -321,7 +321,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     }
 
     Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     );
 
     if (!mounted) return;
@@ -346,7 +346,7 @@ class _ShootDetailsScreenState extends ConsumerState<ShootDetailsScreen> {
     mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 14));
 
     try {
-      final placemarks = await placemarkFromCoordinates(
+      final placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );

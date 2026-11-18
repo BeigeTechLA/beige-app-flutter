@@ -6,7 +6,7 @@ import '../../../../core/firebase/analytics_service.dart';
 import 'auth_providers.dart';
 import 'reset_password_state.dart';
 
-class ResetPasswordNotifier extends AutoDisposeNotifier<ResetPasswordState> {
+class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
   @override
   ResetPasswordState build() => const ResetPasswordState();
 

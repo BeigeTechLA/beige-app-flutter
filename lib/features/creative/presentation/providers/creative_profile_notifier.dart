@@ -58,10 +58,13 @@ class CreativeProfileState {
   Map<String, dynamic>? get reviews => data?['reviews'];
 }
 
-class CreativeProfileNotifier
-    extends AutoDisposeFamilyNotifier<CreativeProfileState, int> {
+class CreativeProfileNotifier extends Notifier<CreativeProfileState> {
+  CreativeProfileNotifier(this.creativeId);
+
+  final int creativeId;
+
   @override
-  CreativeProfileState build(int creativeId) {
+  CreativeProfileState build() {
     fetchProfile(creativeId);
     return const CreativeProfileState(status: CreativeProfileStatus.loading);
   }

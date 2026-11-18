@@ -16,8 +16,8 @@ class CreativeRemoteDataSource {
     final response = await _dioClient.dio.get(
       '${ApiEndpoints.creatives}/$creativeId/profile',
       queryParameters: {
-        if (latitude != null) 'latitude': latitude,
-        if (longitude != null) 'longitude': longitude,
+        'latitude': ?latitude,
+        'longitude': ?longitude,
       },
     );
     return response.data as Map<String, dynamic>;

@@ -16,7 +16,7 @@ ProviderContainer _container(BookingRepository repo) {
   );
   addTearDown(c.dispose);
   // Keep the autoDispose notifier alive across async calls.
-  c.listen(contentTypeV2NotifierProvider, (_, __) {});
+  c.listen(contentTypeV2NotifierProvider, (_, _) {});
   return c;
 }
 

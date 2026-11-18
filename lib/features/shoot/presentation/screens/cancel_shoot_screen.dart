@@ -88,7 +88,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                     ? Image.network(
                         _getFullImageUrl(),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) {
+                        errorBuilder: (_, _, _) {
                           return SvgPicture.asset(
                             AppAssets.imagePlaceholder,
 
@@ -193,7 +193,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
                                       height: 144,
                                       width: 126,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) {
+                                      errorBuilder: (_, _, _) {
                                         return SvgPicture.asset(
                                           AppAssets.imagePlaceholder,
                                           height: 144,
@@ -414,7 +414,7 @@ class _CancelShootScreenState extends ConsumerState<CancelShootScreen> {
       barrierLabel: "Schedule Updated",
       barrierColor: AppColors.black.withValues(alpha: 0.35),
       transitionDuration: const Duration(milliseconds: 250),
-      pageBuilder: (_, __, ___) {
+      pageBuilder: (_, _, _) {
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // 🔥 BLUR STRENGTH
           child: Center(

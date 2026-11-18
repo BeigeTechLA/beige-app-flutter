@@ -32,10 +32,13 @@ class ShootSummaryState {
   }
 }
 
-class ShootSummaryNotifier
-    extends AutoDisposeFamilyNotifier<ShootSummaryState, int> {
+class ShootSummaryNotifier extends Notifier<ShootSummaryState> {
+  ShootSummaryNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  ShootSummaryState build(int bookingId) {
+  ShootSummaryState build() {
     fetchShootSummary(bookingId);
     return const ShootSummaryState(status: ShootSummaryStatus.loading);
   }

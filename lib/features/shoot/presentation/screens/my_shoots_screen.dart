@@ -12,7 +12,10 @@ import 'package:beige/app/route_names.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
+import 'package:beige/core/restoration/draft_store.dart';
+import 'package:beige/core/restoration/restoration_providers.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
+import 'package:beige/features/booking/domain/entities/booking_flow_enums.dart';
 import 'package:beige/features/shoot/presentation/providers/my_shoots_notifier.dart';
 import 'package:beige/shared/layouts/app_scaffold.dart';
 import 'package:beige/shared/widgets/loading.dart';
@@ -32,6 +35,27 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
 
   String? selectedPayment;
   int selectedIndex = 0;
+
+  /// Parses a shoot's `content_type` — an API value (`videographer`) or a
+  /// display label (`videography & photography`). Null when unknown.
+  ContentTypeV2? _contentTypeFromShoot(String contentType) {
+    final parsed = ContentTypeV2.fromApiValue(contentType.trim());
+    if (parsed != null) return parsed;
+    final value = contentType.toLowerCase();
+    final hasVideo = value.contains('video');
+    final hasPhoto = value.contains('photo');
+    if (hasVideo && hasPhoto) return ContentTypeV2.both;
+    if (hasVideo) return ContentTypeV2.videographer;
+    if (hasPhoto) return ContentTypeV2.photographer;
+    return null;
+  }
+
+  /// `shoot_type` arrives either as a name string or as `{name: ...}`.
+  String? _shootTypeName(Map shoot) {
+    final raw = shoot['shoot_type'];
+    final name = (raw is Map ? raw['name'] : raw)?.toString().trim();
+    return (name == null || name.isEmpty) ? null : name;
+  }
 
   String _imageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
@@ -467,7 +491,9 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
             'multiDays': shoot['multi_day']?['days'] ?? [],
             'durationHours': (shoot['duration_hours'] ?? 0).toDouble(),
             'location': shoot['location'] ?? '',
-            'imageUrl': finalImage,
+            // Network URL only — the local placeholder asset path must not be
+            // forwarded, ManageShootScreen would prefix it with the CDN host.
+            'imageUrl': finalImage == fallbackImage ? '' : finalImage,
             'shootTypeId': shootTypeId,
           },
         );
@@ -533,9 +559,33 @@ class _MyShootsScreenState extends ConsumerState<MyShootsScreen> {
       ),
       actionLabel: "Book Again",
       actionStyle: AppBookingCardActionStyle.outline,
-      onActionTap: () {
-        context.pushNamed(RouteNames.contentType, extra: {'fromHome': true});
-      },
+      // Book Again: same new Book-a-Shoot flow as the Book tab, prefilled
+      // with this shoot's content type and shoot type.
+      onActionTap: () => _bookAgain(
+        _contentTypeFromShoot(contentType),
+        _shootTypeName(shoot),
+      ),
+    );
+  }
+
+  /// Book Again: pushes the v2 flow from step 1 (Content Type) as a root
+  /// route — no bottom bar, no tab switch — prefilled with this shoot's
+  /// content type; its shoot type is preselected on step 2.
+  Future<void> _bookAgain(ContentTypeV2? type, String? shootTypeName) async {
+    // Fresh draft so stale fields from an earlier booking never leak in.
+    await ref
+        .read(draftStoreProvider)
+        .writeBookingDraft(
+          BookingDraft(
+            currentRoute: '/content-type-v2',
+            contentType: type?.apiValue,
+            shootTypeName: shootTypeName,
+          ),
+        );
+    if (!mounted) return;
+    context.pushNamed(
+      RouteNames.contentTypeV2,
+      extra: {'contentType': ?type?.apiValue, 'shootTypeName': ?shootTypeName},
     );
   }
 

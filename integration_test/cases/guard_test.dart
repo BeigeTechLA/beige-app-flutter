@@ -75,14 +75,14 @@ void runGuardTests(ReportBuilder report) {
   group(
     'Auth Guard Tests — authenticated user should NOT be redirected from protected routes',
     () {
-      const _authProtectedRoutes = [
+      const authProtectedRoutes = [
         ('home', '/'),
         ('profile', '/profile'),
         ('my_shoots', '/my-shoots'),
         ('booking_history', '/booking-history'),
       ];
 
-      for (final (name, path) in _authProtectedRoutes) {
+      for (final (name, path) in authProtectedRoutes) {
         testWidgets('$name is accessible when authenticated', (tester) async {
           await pumpAppWithAuth(
             tester,
@@ -113,13 +113,13 @@ void runGuardTests(ReportBuilder report) {
   group(
     'Auth Guard Tests — logged in user redirected away from public routes',
     () {
-      const _publicAuthRoutes = [
+      const publicAuthRoutes = [
         ('login', '/login'),
         ('signup', '/signup'),
         ('onboarding', '/onboarding'),
       ];
 
-      for (final (name, path) in _publicAuthRoutes) {
+      for (final (name, path) in publicAuthRoutes) {
         testWidgets('$name redirects authenticated user to /', (tester) async {
           await pumpAppWithAuth(
             tester,

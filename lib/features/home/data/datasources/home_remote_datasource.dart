@@ -21,7 +21,7 @@ class HomeRemoteDataSource {
     final body = <String, dynamic>{
       'content_type': contentType,
       'shoot_type_id': 2,
-      if (bookingId != null) 'booking_id': bookingId,
+      'booking_id': ?bookingId,
     };
     final response = await _dioClient.dio.post(
       ApiEndpoints.bookings,

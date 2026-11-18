@@ -56,9 +56,8 @@ class AppFilePickerService {
 
   static Future<File?> pickDocument() async {
     try {
-      final FilePickerResult? result = await FilePicker.pickFiles(
+      final PlatformFile? result = await FilePicker.pickFile(
         type: FileType.custom,
-
         allowedExtensions: [
           'pdf',
           'doc',
@@ -71,11 +70,11 @@ class AppFilePickerService {
         ],
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result?.path == null) {
         return null;
       }
 
-      return File(result.files.single.path!);
+      return File(result!.path!);
     } catch (e) {
       return null;
     }
@@ -87,15 +86,15 @@ class AppFilePickerService {
 
   static Future<File?> pickAudio() async {
     try {
-      final FilePickerResult? result = await FilePicker.pickFiles(
+      final PlatformFile? result = await FilePicker.pickFile(
         type: FileType.audio,
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result?.path == null) {
         return null;
       }
 
-      return File(result.files.single.path!);
+      return File(result!.path!);
     } catch (e) {
       return null;
     }
@@ -127,13 +126,13 @@ class AppFilePickerService {
 
   static Future<File?> pickAnyFile() async {
     try {
-      final FilePickerResult? result = await FilePicker.pickFiles();
+      final PlatformFile? result = await FilePicker.pickFile();
 
-      if (result == null || result.files.single.path == null) {
+      if (result?.path == null) {
         return null;
       }
 
-      return File(result.files.single.path!);
+      return File(result!.path!);
     } catch (e) {
       return null;
     }

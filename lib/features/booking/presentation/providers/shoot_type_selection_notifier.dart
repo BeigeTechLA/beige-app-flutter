@@ -28,10 +28,13 @@ class ShootTypeSelectionState {
   }
 }
 
-class ShootTypeSelectionNotifier
-    extends AutoDisposeFamilyNotifier<ShootTypeSelectionState, int> {
+class ShootTypeSelectionNotifier extends Notifier<ShootTypeSelectionState> {
+  ShootTypeSelectionNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  ShootTypeSelectionState build(int bookingId) {
+  ShootTypeSelectionState build() {
     _fetchBookingTime(bookingId);
     return const ShootTypeSelectionState(
       status: ShootTypeSelectionStatus.loading,

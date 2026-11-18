@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import '../../config/env.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
-import 'interceptors/logging_interceptor.dart';
 import 'interceptors/retry_interceptor.dart';
 
 class DioClient {
@@ -18,6 +17,7 @@ class DioClient {
   DioClient({
     required Future<String?> Function() getToken,
     Future<void> Function()? onUnauthorized,
+    Future<void> Function()? onDeletionPending,
     bool isDevelopment = false,
   }) {
     _dio = Dio(
@@ -36,7 +36,11 @@ class DioClient {
 
     // 🛡️ Setup Interceptor Chain
     _dio.interceptors.addAll([
-      AuthInterceptor(getToken: getToken, onUnauthorized: onUnauthorized),
+      AuthInterceptor(
+        getToken: getToken,
+        onUnauthorized: onUnauthorized,
+        onDeletionPending: onDeletionPending,
+      ),
       RetryInterceptor(dio: _dio),
       ErrorInterceptor(),
       //    if (isDevelopment) LoggingInterceptor(),

@@ -139,7 +139,7 @@ class DrawerScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              error: (_, __) => CircleAvatar(
+                              error: (_, _) => CircleAvatar(
                                 radius: 25,
                                 backgroundColor: AppColors.surfaceVariant,
                                 child: SvgPicture.asset(AppAssets.userCircle),

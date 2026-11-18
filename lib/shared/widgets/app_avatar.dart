@@ -57,8 +57,9 @@ class _AppAvatarState extends State<AppAvatar> {
     final name = widget.name;
     if (name == null || name.isEmpty) return '?';
     final parts = name.trim().split(' ');
-    if (parts.length >= 2)
+    if (parts.length >= 2) {
       return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
     return parts.first[0].toUpperCase();
   }
 

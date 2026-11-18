@@ -23,7 +23,9 @@ final resolvedTimezoneProvider = FutureProvider<String>((ref) async {
   final fromPref = ref.watch(userTimezonePrefProvider);
   if (fromPref.isNotEmpty) return fromPref;
   try {
-    final device = await FlutterTimezone.getLocalTimezone();
+    // flutter_timezone 5: getLocalTimezone returns TimezoneInfo; the IANA
+    // name is on `.identifier`.
+    final device = (await FlutterTimezone.getLocalTimezone()).identifier;
     if (device.isNotEmpty) return device;
   } catch (e) {
     debugPrint('resolvedTimezoneProvider device lookup failed: $e');

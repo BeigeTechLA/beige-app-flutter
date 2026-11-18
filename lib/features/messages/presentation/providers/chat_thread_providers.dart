@@ -58,8 +58,9 @@ String? _resolveSelfId({
     }
     for (final m in messages) {
       if (m.senderId.isEmpty) continue;
-      if (m.senderName.trim().toLowerCase() == normalizedName)
+      if (m.senderName.trim().toLowerCase() == normalizedName) {
         return m.senderId;
+      }
     }
   }
   // Last-resort id elimination: backend `participants.items` often lists only
@@ -145,12 +146,15 @@ class ChatThreadState {
   }
 }
 
-class ChatThreadNotifier
-    extends AutoDisposeFamilyNotifier<ChatThreadState, String> {
+class ChatThreadNotifier extends Notifier<ChatThreadState> {
   StreamSubscription<ChatSocketEvent>? _eventsSub;
 
+  ChatThreadNotifier(this.arg);
+
+  final String arg;
+
   @override
-  ChatThreadState build(String arg) {
+  ChatThreadState build() {
     final repo = ref.read(messagesRepositoryProvider);
     // Publish this thread as the active room so the conversation-list
     // notifier skips bumping its badge on inbound socket events. Deferred
@@ -638,7 +642,7 @@ class ChatThreadNotifier
 }
 
 final chatThreadProvider =
-    AutoDisposeNotifierProviderFamily<
+    NotifierProvider.autoDispose.family<
       ChatThreadNotifier,
       ChatThreadState,
       String

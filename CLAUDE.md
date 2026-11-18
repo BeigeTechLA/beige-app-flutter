@@ -264,16 +264,28 @@ Custom slash commands for repetitive feature development patterns. Located in `.
 
 ## Remaining Work
 
-### Phase 5 — Cleanup (IN PROGRESS)
-- [ ] Replace 111 `.withOpacity()` calls with `.withValues()` (deprecated API)
-- [ ] Replace 1 remaining `print()` with `debugPrint()` (`shoot_date_time_screen.dart`)
-- [ ] Fix 22 warnings from `flutter analyze` (unused vars, dead code, unused imports)
-- [ ] Fix 191 info-level lint issues
-- [ ] Clean up `docs/` planning files (many are now obsolete post-migration)
+### Flutter 3.47 + plugins + Riverpod 3 + go_router 18 upgrade (CODE-COMPLETE — only device QA left)
+Full plan/log: `docs/FLUTTER_3_47_MIGRATION_PLAN.md` (resume banner at top). On branch `feature-flutter-upgrade`. All code work committed as of 2026-10-29 (`d4c7222` iOS UIScene + lock deletions, `ec65b90` gitignore locks + regen registrants, `d29b0db` docs sync). Nothing code-side remains; the only open items are human device/runtime QA.
+- [x] Flutter already on 3.47.0 / Dart 3.13.0; all plugins bumped to latest (firebase, dio, maps, stripe 14, file_picker 13, geocoding 5, timezone, socket_io 3, connectivity 7, etc.).
+- [x] Riverpod 2.6→3 (`AutoDispose*`/`FamilyNotifier` removed → `Notifier`/`AsyncNotifier` + ctor-injected family arg; StateProvider → `flutter_riverpod/legacy.dart`; `valueOrNull`→`.value`).
+- [x] go_router 14→18 (no code change — modern API).
+- [x] Android APK release build unblocked (Gradle wrapper → 8.14.3).
+- [x] Gate green: `flutter analyze` 0 errors · `flutter test` 332 pass / **4 pre-existing baseline fails** (editing_screen, 2× meetings notifier, widget_test — NOT regressions) · iOS + Android release builds ✓.
+- [x] **Phase 6 — iOS 27 SDK build DONE**: Xcode 27.1 installed/selected, iOS 27.1 SDK, deploy target 15.0 confirmed, release build ✓ 102.3MB. No SDK deprecation errors.
+- [x] **iOS 27 UIScene lifecycle migration DONE** (required when building vs iOS 27 SDK): `AppDelegate` adopts `FlutterImplicitEngineDelegate` (plugin registration in `didInitializeImplicitFlutterEngine`); `Info.plist` adds `UIApplicationSceneManifest`/`FlutterSceneDelegate`; pbxproj adds `[CP] Embed Pods Frameworks`. Build passed, no UIScene warning.
+- [x] Tier A plugin patch sweep (within `^` constraints): file_picker 13.3.0, go_router 18.1.1, lottie 3.7.0, flutter_svg 2.3.2, geocoding 5.0.1, geolocator 14.1.2, firebase patch trio + ~40 transitive patches. Gate re-verified green.
+- [ ] On-device manual smoke (needs real device + live Stripe keys): login, book, payment, messages/socket, maps, file upload/share. Confirm Riverpod 3 retry-default doesn't change error/loading UX. Also UIScene runtime QA (cold launch, background/resume, deep links) on iOS 27.
+- [x] **Firebase Tier B set DONE (2026-11-02)** — firebase_core 4→5.1.0, firebase_analytics 12→13.0.1, firebase_crashlytics 5→6.0.1. Zero Dart source edits (service wrappers use stable APIs only). Hit the Firebase CocoaPods-deprecation landmine: firebase_core 5.x pins native SDK `12.19.3` but Analytics/Crashlytics only reached `12.19.0` on CocoaPods (Firebase stopped publishing Oct 2026) → added `$FirebaseSDKVersion = '12.19.0'` override to `ios/Podfile`. Android needed `flutter clean` (stale registrant cache). Gate green (analyze 0 err · test 332/4 baseline · iOS ✓ 103.0MB · Android APK ✓ 99.9MB).
+- [x] **Tier B fully cleared (2026-11-02)** — cached_network_image 3→4.0.6 (zero source edits, API stable) + calendar_date_picker2 2→4.0.0 (two majors, zero source edits — `DayBuilder`/`CalendarDatePicker2Config` signatures identical). Added `test/features/booking/calendar_date_picker_test.dart` (3 cases). Gotcha: calendar_date_picker2 v4 checks for a `material_ui` Material ancestor — widget-test hosts must `import 'package:material_ui/material_ui.dart'` (flutter/material Scaffold fails `debugCheckHasMaterial`); `material_ui` added to dev_dependencies. Gate green (analyze 0 err · test 335/4 · iOS ✓ 103.2MB · Android APK ✓ 100.7MB).
+- [x] **AGP 9 / Gradle 9.1 / Kotlin 2.3.20 bump DONE (2026-10-30)** — now matches Flutter 3.47's recommended (`DependencyVersionChecker` warn) targets; cleared 3 deprecation warnings. Gradle 8.14.3→9.1.0, AGP 8.11.1→9.0.1, Kotlin 2.3.10→2.3.20. Two AGP-9 default changes needed `android/app/build.gradle.kts` opt-ins: `buildFeatures { resValues = true }` (flavor `resValue()` app_name) + `lint { checkReleaseBuilds = false }` (stripe_android lint-vital pulls unresolvable play-services-tapandpay). Gate green (prod+dev APK ✓, analyze/test baseline). Device QA folds into Flutter 3.47 QA. Full plan: `docs/AGP_9_GRADLE_9_UPGRADE_PLAN.md`.
 
-### Phase 6 — Testing (NOT STARTED)
-- [ ] Wire up navigation integration tests (see pending wiring above)
-- [ ] Add unit tests for all Notifiers
-- [ ] Add widget tests for screens
-- [ ] Target: 70%+ coverage
-- [ ] Testing patterns in `docs/guides/FLUTTER_TESTING_GUIDELINES.md`
+> **Git hygiene (team decision 2026-10-29):** `pubspec.lock` and `ios/Podfile.lock` are gitignored / NOT committed — versions governed by `pubspec.yaml` `^` constraints + Podfile (both files still exist locally; don't be alarmed by `D`/`??` git states). `**/build/` is also gitignored (covers `android/build/`).
+
+### Lint (206 → 57, pass 1 done)
+- [x] 149 issues fixed, all behavior-preserving (dart fix, SVG `color`→`colorFilter`, dead code, print→debugPrint, etc.).
+- [ ] 57 remaining **intentionally left**: 40 cosmetic naming (`constant_identifier_names`/`non_constant_identifier_names` — user opted to ignore) + 17 behavior/UI-sensitive (`use_build_context_synchronously`, `setMapStyle`→declarative, Radio `groupValue`/`onChanged`, `Container`/`Expanded` layout, cascade-risk dead widgets, `cacheExtent` no-3.47-replacement). Don't touch without explicit ask.
+
+### Testing (NOT STARTED)
+- [ ] Navigation integration suite: helpers now pump the real `App`, mock auth via SharedPreferences, and supply route extras (the old "still unwired" note was stale). Device/sim run + fixture coverage still unverified — run `flutter test integration_test/navigation_test.dart` on a configured target.
+- [ ] Add unit tests for all Notifiers; widget tests for screens. Target 70%+ coverage.
+- [ ] Testing patterns in `docs/guides/FLUTTER_TESTING_GUIDELINES.md`.

@@ -32,7 +32,7 @@ class MyShootsState {
   }
 }
 
-class MyShootsNotifier extends AutoDisposeNotifier<MyShootsState> {
+class MyShootsNotifier extends Notifier<MyShootsState> {
   @override
   MyShootsState build() {
     fetchAll();

@@ -50,7 +50,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   int _currentCard = 0;
 
   HomeModel? get homeData => ref.read(homeNotifierProvider).homeData;
-  List<Your_Booking> get bookingList => homeData?.yourBookings ?? [];
+  List<YourBooking> get bookingList => homeData?.yourBookings ?? [];
 
   late AnimationController _controller;
   late PageController _studioController;

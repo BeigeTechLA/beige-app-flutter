@@ -68,8 +68,7 @@ class MeetingsRemoteSource {
           'page': page,
           'limit': limit,
           'sortBy': sortBy,
-          if (meetingTimeStatus != null)
-            'meeting_time_status': meetingTimeStatus,
+          'meeting_time_status': ?meetingTimeStatus,
         },
       );
       final raw = resp.data;
@@ -123,7 +122,7 @@ class MeetingsRemoteSource {
         'description': input.description,
         'meetLink': input.link,
         'cp_ids': cpIds,
-        if (adminId != null) 'admin_id': adminId,
+        'admin_id': ?adminId,
         'participants': participantIds,
         'send_notification': false,
         'reminder_minutes': input.reminderMinutes,

@@ -32,7 +32,10 @@ testing/
 .pub-cache/
 .pub/
 /build/
+**/build/
 /coverage/
+pubspec.lock
+ios/Podfile.lock
 
 # Symbolication related
 app.*.symbols

@@ -150,7 +150,7 @@ class _LocationPickerFieldState extends State<LocationPickerField> {
 
     try {
       final placemarks =
-          await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+          await Geocoding().placemarkFromCoordinates(latLng.latitude, latLng.longitude);
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
         final parts = <String>[

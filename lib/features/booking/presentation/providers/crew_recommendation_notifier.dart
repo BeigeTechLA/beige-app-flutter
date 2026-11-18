@@ -30,12 +30,15 @@ class CrewRecommendationState {
   }
 }
 
-class CrewRecommendationNotifier
-    extends AutoDisposeFamilyNotifier<CrewRecommendationState, int> {
+class CrewRecommendationNotifier extends Notifier<CrewRecommendationState> {
   bool _stepCompleted = false;
 
+  CrewRecommendationNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  CrewRecommendationState build(int bookingId) {
+  CrewRecommendationState build() {
     // --- Booking Analytics: Drop-off tracking for Step 5 ---
     ref.onDispose(() {
       if (!_stepCompleted) {

@@ -54,7 +54,7 @@ class EditProfileState {
   }
 }
 
-class EditProfileNotifier extends AutoDisposeNotifier<EditProfileState> {
+class EditProfileNotifier extends Notifier<EditProfileState> {
   @override
   EditProfileState build() {
     final prefs = ref.watch(sharedPreferencesProvider);

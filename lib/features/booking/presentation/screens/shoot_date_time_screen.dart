@@ -50,7 +50,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
   /// Active IANA zone for the booking payload. Resolved chain (app-root
   /// already resolved it): login `user_timezone` pref → device IANA → UTC.
   String _timeZone() =>
-      ref.read(resolvedTimezoneProvider).valueOrNull ??
+      ref.read(resolvedTimezoneProvider).value ??
       ref.read(sharedPreferencesProvider).getString(kUserTimezonePrefKey) ??
       'UTC';
 
@@ -2063,7 +2063,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                                           ),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
-                                                        color: AppColors.white,
+                                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                                       ),
                                                     ),
                                                   ),
@@ -2097,7 +2097,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                                           ),
                                                       child: SvgPicture.asset(
                                                         AppAssets.clock,
-                                                        color: AppColors.white,
+                                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                                       ),
                                                     ),
                                                   ),
@@ -2162,7 +2162,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     ),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
-                                      color: AppColors.white,
+                                      colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                       width: 20,
                                       height: 20,
                                     ),
@@ -2196,7 +2196,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                                     ),
                                     child: SvgPicture.asset(
                                       AppAssets.clock,
-                                      color: AppColors.white,
+                                      colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                       width: 20,
                                       height: 20,
                                     ),
@@ -2358,7 +2358,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,
-                                color: AppColors.white,
+                                colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                 width: 20,
                                 height: 20,
                               ),
@@ -2395,7 +2395,7 @@ class _ShootDateTimeScreenState extends ConsumerState<ShootDateTimeScreen> {
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: SvgPicture.asset(
                                 AppAssets.clock,
-                                color: AppColors.white,
+                                colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                 width: 20,
                                 height: 20,
                               ),

@@ -64,14 +64,14 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     final rr = ref
         .read(crewSelectionNotifierProvider(widget.bookingId))
         .requiredByRole;
-    return rr[roleId.toString()] ?? rr[roleId] ?? 0;
+    return rr[roleId.toString()] ?? 0;
   }
 
   int getHeld(int roleId) {
     final hr = ref
         .read(crewSelectionNotifierProvider(widget.bookingId))
         .heldByRole;
-    return hr[roleId.toString()] ?? hr[roleId] ?? 0;
+    return hr[roleId.toString()] ?? 0;
   }
 
   int currentStep = 1;
@@ -118,18 +118,8 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
     return 1;
   }
 
-  /// 🔥 ROLE NAME → ROLE ID mapping
-  int _mapRoleName(String roleName) {
-    final name = roleName.toLowerCase();
-
-    if (name.contains("video")) return 1;
-    if (name.contains("photo")) return 2;
-
-    return 1; // default (kabhi 0 nahi)
-  }
-
   /// Robust role_id extraction from a match item.
-  /// Handles: List<int>, List<String>, List<Map>, int, String, null.
+  /// Handles: `List<int>`, `List<String>`, `List<Map>`, int, String, null.
   /// Falls back to role_name / contentTypeId derivation so we never send 0.
   int _extractRoleId(Map item) {
     int parseFromDynamic(dynamic v) {
@@ -277,14 +267,11 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
       crewSelectionNotifierProvider(widget.bookingId),
     );
     final crewMatches = crewState.crewMatches;
-    final nearbyCreators = crewState.nearbyCreators;
     final otherCreators = crewState.otherCreators;
 
     final isLoading = crewState.status == CrewSelectionStatus.loading;
 
     final addedCrewUserIds = crewState.addedCrewUserIds;
-    final heldByRole = crewState.heldByRole;
-    final requiredByRole = crewState.requiredByRole;
 
     /// 🔥 CHECK LOCATION BASED CREATORS
     final bool hasLocationCreators = crewMatches.isNotEmpty;
@@ -734,11 +721,9 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
 
                                                   /// 🔥 MAIN FIX
                                                   final int maxAllowed =
-                                                      (getRequired(roleId) ??
-                                                              0) ==
-                                                          0
+                                                      getRequired(roleId) == 0
                                                       ? 10
-                                                      : getRequired(roleId)!;
+                                                      : getRequired(roleId);
 
                                                   if (selectedCount >=
                                                       maxAllowed) {
@@ -840,7 +825,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                                             },
                                             child: SvgPicture.asset(
                                               AppAssets.homeViewProfile,
-                                              color: AppColors.white,
+                                              colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
                                               height: 36,
                                             ),
                                           ),
@@ -853,7 +838,7 @@ class _CrewSelectionScreenState extends ConsumerState<CrewSelectionScreen> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

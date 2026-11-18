@@ -4,7 +4,7 @@ class HomeModel {
   final String latitude;
   final String longitude;
   final String profileImageUrl;
-  final List<Your_Booking> yourBookings;
+  final List<YourBooking> yourBookings;
   final List<Specialty> specialties;
   final List<Creative> mainCreatives;
   final List<Creative> featuredCreatives;
@@ -43,7 +43,7 @@ class HomeModel {
           .map((e) => Creative.fromJson(e))
           .toList(),
       yourBookings: (json['your_bookings'] as List? ?? [])
-          .map((e) => Your_Booking.fromJson(e))
+          .map((e) => YourBooking.fromJson(e))
           .toList(),
       continueBooking: json['continue_booking'] != null
           ? ContinueBooking.fromJson(json['continue_booking'])
@@ -187,7 +187,7 @@ class Flow {
 }
 //////
 
-class Your_Booking {
+class YourBooking {
   final int bookingId;
   final String title;
   final String? imageUrl;
@@ -198,7 +198,7 @@ class Your_Booking {
   final String statusLabel;
   final String cta;
 
-  Your_Booking({
+  YourBooking({
     required this.bookingId,
     required this.title,
     this.imageUrl,
@@ -210,8 +210,8 @@ class Your_Booking {
     required this.cta,
   });
 
-  factory Your_Booking.fromJson(Map<String, dynamic> json) {
-    return Your_Booking(
+  factory YourBooking.fromJson(Map<String, dynamic> json) {
+    return YourBooking(
       bookingId: json['booking_id'] ?? 0,
       title: json['title'] ?? "",
       imageUrl: json['image_url'],

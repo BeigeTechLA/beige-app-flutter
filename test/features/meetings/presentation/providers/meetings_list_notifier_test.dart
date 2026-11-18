@@ -120,7 +120,7 @@ void main() {
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     // Future.microtask in build → drain
     await Future<void>.delayed(Duration.zero);
 
@@ -136,7 +136,7 @@ void main() {
     final container = await _buildContainer(repo: repo, loggedIn: true);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     // Drive the load directly through refresh() instead of relying on the
     // build-time microtask — keeps the notifier's ref alive across awaits.
     await container.read(meetingsListNotifierProvider.notifier).refresh();
@@ -159,7 +159,7 @@ void main() {
       final container = await _buildContainer(repo: repo);
       addTearDown(container.dispose);
 
-      container.listen(meetingsListNotifierProvider, (_, __) {});
+      container.listen(meetingsListNotifierProvider, (_, _) {});
       final notifier = container.read(meetingsListNotifierProvider.notifier);
       await Future<void>.delayed(Duration.zero);
       expect(repo.listCalls, 1);
@@ -179,7 +179,7 @@ void main() {
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     final notifier = container.read(meetingsListNotifierProvider.notifier);
     await Future<void>.delayed(Duration.zero);
 
@@ -200,7 +200,7 @@ void main() {
       final container = await _buildContainer(repo: repo);
       addTearDown(container.dispose);
 
-      container.listen(meetingsListNotifierProvider, (_, __) {});
+      container.listen(meetingsListNotifierProvider, (_, _) {});
       await Future<void>.delayed(Duration.zero);
 
       final notifier = container.read(meetingsListNotifierProvider.notifier);
@@ -223,7 +223,7 @@ void main() {
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     await Future<void>.delayed(Duration.zero);
 
     final notifier = container.read(meetingsListNotifierProvider.notifier);
@@ -243,7 +243,7 @@ void main() {
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     await Future<void>.delayed(Duration.zero);
 
     final notifier = container.read(meetingsListNotifierProvider.notifier);
@@ -266,7 +266,7 @@ void main() {
     final container = await _buildContainer(repo: repo);
     addTearDown(container.dispose);
 
-    container.listen(meetingsListNotifierProvider, (_, __) {});
+    container.listen(meetingsListNotifierProvider, (_, _) {});
     await Future<void>.delayed(Duration.zero);
 
     final notifier = container.read(meetingsListNotifierProvider.notifier);

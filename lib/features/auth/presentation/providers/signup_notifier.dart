@@ -8,7 +8,7 @@ import '../../../../core/firebase/analytics_service.dart';
 import 'auth_providers.dart';
 import 'signup_state.dart';
 
-class SignupNotifier extends AutoDisposeNotifier<SignupState> {
+class SignupNotifier extends Notifier<SignupState> {
   @override
   SignupState build() => const SignupState();
 

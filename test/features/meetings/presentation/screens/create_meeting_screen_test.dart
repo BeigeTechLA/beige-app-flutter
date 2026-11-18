@@ -1,9 +1,7 @@
 import 'package:beige/features/meetings/domain/models/create_meeting_input.dart';
 import 'package:beige/features/meetings/domain/models/generate_meet_link_input.dart';
 import 'package:beige/features/meetings/domain/models/meeting.dart';
-import 'package:beige/features/meetings/domain/models/meeting_category.dart';
 import 'package:beige/features/meetings/domain/models/meeting_filter.dart';
-import 'package:beige/features/meetings/domain/models/meeting_platform.dart';
 import 'package:beige/features/meetings/domain/models/meeting_response.dart';
 import 'package:beige/features/meetings/domain/models/meetings_tab.dart';
 import 'package:beige/features/meetings/domain/models/update_meeting_input.dart';

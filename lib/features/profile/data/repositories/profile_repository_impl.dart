@@ -76,30 +76,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
     });
   }
 
-  @override
-  Future<Either<AppException, String>> requestDeleteAccount({
-    required String reason,
-  }) {
-    return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.requestDeleteAccount(
-        reason: reason,
-      );
-      _assertNoError(response);
-      return (response['message'] as String?) ?? 'OTP sent';
-    });
-  }
-
-  @override
-  Future<Either<AppException, String>> confirmDeleteAccount({
-    required String otp,
-  }) {
-    return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.confirmDeleteAccount(otp: otp);
-      _assertNoError(response);
-      return (response['message'] as String?) ?? 'Account deleted';
-    });
-  }
-
   void _assertNoError(Map<String, dynamic> response) {
     if (response['error'] == true) {
       throw UnknownException(

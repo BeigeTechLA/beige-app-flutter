@@ -45,7 +45,7 @@ void main() {
             final dio = Dio()
               ..httpClientAdapter = _ResponseAdapter(status, {
                 'error': true,
-                if (code != null) 'code': code,
+                'code': ?code,
                 'message': 'Request failed',
               })
               ..interceptors.add(

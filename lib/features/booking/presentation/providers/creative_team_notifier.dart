@@ -25,7 +25,7 @@ class CreativeTeamState {
 /// Screen 6 — Your Creative Team. Saves the total creators required per role
 /// via `PUT /bookings/:id/crew`. `photoVideoCreator` is the hybrid shooter;
 /// every role key is sent (0 for roles the client didn't pick).
-class CreativeTeamNotifier extends AutoDisposeNotifier<CreativeTeamState> {
+class CreativeTeamNotifier extends Notifier<CreativeTeamState> {
   @override
   CreativeTeamState build() => const CreativeTeamState();
 

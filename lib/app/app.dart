@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/providers/timezone_provider.dart';
 import '../core/notifications/push_token_sync_provider.dart';
+import '../core/restoration/app_lifecycle_observer.dart';
 import '../core/restoration/restoration_providers.dart';
 import '../core/utils/date_time_utils.dart';
 import '../features/messages/presentation/providers/messages_repository_provider.dart';
@@ -28,15 +29,18 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
+  // Cached in initState: Riverpod 3 forbids `ref` access inside dispose().
+  late final AppLifecycleObserver _lifecycleObserver;
+
   @override
   void initState() {
     super.initState();
-    ref.read(appLifecycleObserverProvider).attach();
+    _lifecycleObserver = ref.read(appLifecycleObserverProvider)..attach();
   }
 
   @override
   void dispose() {
-    ref.read(appLifecycleObserverProvider).detach();
+    _lifecycleObserver.detach();
     super.dispose();
   }
 

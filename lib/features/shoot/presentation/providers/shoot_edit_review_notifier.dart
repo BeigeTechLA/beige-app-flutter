@@ -39,10 +39,13 @@ class ShootEditReviewState {
   }
 }
 
-class ShootEditReviewNotifier
-    extends AutoDisposeFamilyNotifier<ShootEditReviewState, int> {
+class ShootEditReviewNotifier extends Notifier<ShootEditReviewState> {
+  ShootEditReviewNotifier(this.bookingId);
+
+  final int bookingId;
+
   @override
-  ShootEditReviewState build(int bookingId) {
+  ShootEditReviewState build() {
     fetchSummary(bookingId);
     return const ShootEditReviewState(status: ShootEditReviewStatus.loading);
   }

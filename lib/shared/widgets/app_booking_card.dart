@@ -120,28 +120,6 @@ class AppBookingCard extends StatelessWidget {
   }
 }
 
-class _BookingCardTopGradient extends StatelessWidget {
-  const _BookingCardTopGradient();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          stops: const [0.5, 0.75, 1],
-          colors: [
-            AppColors.transparent,
-            AppColors.surfaceDeep.withValues(alpha: 0.6),
-            AppColors.surfaceDeep,
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _BookingCardBottomGradient extends StatelessWidget {
   const _BookingCardBottomGradient();
 
@@ -186,14 +164,14 @@ class _BookingCardImage extends StatelessWidget {
       return Image.asset(
         source,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _placeholder(),
+        errorBuilder: (_, _, _) => _placeholder(),
       );
     }
 
     return Image.network(
       source,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => _placeholder(),
+      errorBuilder: (_, _, _) => _placeholder(),
     );
   }
 

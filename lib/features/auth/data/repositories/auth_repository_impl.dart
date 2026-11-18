@@ -1,4 +1,5 @@
 import 'dart:io';
+import '../../../../core/session/account_status.dart';
 
 import 'package:dartz/dartz.dart';
 
@@ -33,6 +34,11 @@ class AuthRepositoryImpl implements AuthRepository {
           {};
 
       return UserEntity(
+        accountStatus: AccountStatus.parse(
+          response['account_status'] ??
+              data['account_status'] ??
+              userData['account_status'],
+        ),
         id: userData['id']?.toString() ?? '',
         token: (data['token'] as String?) ?? '',
         environmentId: (userData['environment_id'] as int?) ?? -1,

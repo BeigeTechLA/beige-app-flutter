@@ -54,27 +54,27 @@ GoRouter _buildTestRouter({
       GoRoute(
         path: '/splash',
         name: RouteNames.splash,
-        builder: (_, __) => const _TestScreen('SplashScreen'),
+        builder: (_, _) => const _TestScreen('SplashScreen'),
       ),
       GoRoute(
         path: '/onboarding',
         name: RouteNames.onboarding,
-        builder: (_, __) => const _TestScreen('OnboardingScreen'),
+        builder: (_, _) => const _TestScreen('OnboardingScreen'),
       ),
       GoRoute(
         path: '/login',
         name: RouteNames.login,
-        builder: (_, __) => const _TestScreen('LoginScreen'),
+        builder: (_, _) => const _TestScreen('LoginScreen'),
       ),
       GoRoute(
         path: '/signup',
         name: RouteNames.signup,
-        builder: (_, __) => const _TestScreen('SignUpScreen'),
+        builder: (_, _) => const _TestScreen('SignUpScreen'),
       ),
       GoRoute(
         path: '/forgot-password',
         name: RouteNames.forgotPassword,
-        builder: (_, __) => const _TestScreen('ForgotPasswordScreen'),
+        builder: (_, _) => const _TestScreen('ForgotPasswordScreen'),
       ),
       GoRoute(
         path: '/forgot-otp',
@@ -95,7 +95,7 @@ GoRouter _buildTestRouter({
       GoRoute(
         path: '/password-success',
         name: RouteNames.passwordSuccess,
-        builder: (_, __) => const _TestScreen('PasswordResetSuccessScreen'),
+        builder: (_, _) => const _TestScreen('PasswordResetSuccessScreen'),
       ),
 
       // Main Shell (simplified for testing — no SVG icons)
@@ -130,7 +130,7 @@ GoRouter _buildTestRouter({
               GoRoute(
                 path: '/',
                 name: RouteNames.home,
-                builder: (_, __) => const _TestScreen('HomeScreen'),
+                builder: (_, _) => const _TestScreen('HomeScreen'),
               ),
             ],
           ),
@@ -139,7 +139,7 @@ GoRouter _buildTestRouter({
               GoRoute(
                 path: '/book-shoot',
                 name: RouteNames.bookShoot,
-                builder: (_, __) => const _TestScreen('BookShootScreen'),
+                builder: (_, _) => const _TestScreen('BookShootScreen'),
               ),
             ],
           ),
@@ -148,7 +148,7 @@ GoRouter _buildTestRouter({
               GoRoute(
                 path: '/my-shoots',
                 name: RouteNames.myShoots,
-                builder: (_, __) => const _TestScreen('MyShootsScreen'),
+                builder: (_, _) => const _TestScreen('MyShootsScreen'),
               ),
             ],
           ),
@@ -157,7 +157,7 @@ GoRouter _buildTestRouter({
               GoRoute(
                 path: '/messages',
                 name: RouteNames.messages,
-                builder: (_, __) => const _TestScreen('MessagesScreen'),
+                builder: (_, _) => const _TestScreen('MessagesScreen'),
               ),
             ],
           ),
@@ -187,7 +187,7 @@ GoRouter _buildTestRouter({
       GoRoute(
         path: '/change-location',
         name: RouteNames.changeLocation,
-        builder: (_, __) => const _TestScreen('ChangeLocationScreen'),
+        builder: (_, _) => const _TestScreen('ChangeLocationScreen'),
       ),
       GoRoute(
         path: '/finding-perfect',
@@ -319,19 +319,19 @@ GoRouter _buildTestRouter({
       GoRoute(
         path: '/shoot-updated',
         name: RouteNames.shootUpdated,
-        builder: (_, __) => const _TestScreen('ShootUpdateSuccessScreen'),
+        builder: (_, _) => const _TestScreen('ShootUpdateSuccessScreen'),
       ),
 
       // Profile
       GoRoute(
         path: '/profile',
         name: RouteNames.profile,
-        builder: (_, __) => const _TestScreen('ProfileScreen'),
+        builder: (_, _) => const _TestScreen('ProfileScreen'),
       ),
       GoRoute(
         path: '/edit-profile',
         name: RouteNames.editProfile,
-        builder: (_, __) => const _TestScreen('EditProfileScreen'),
+        builder: (_, _) => const _TestScreen('EditProfileScreen'),
       ),
       GoRoute(
         path: '/change-password',
@@ -360,27 +360,27 @@ GoRouter _buildTestRouter({
       GoRoute(
         path: '/booking-history',
         name: RouteNames.bookingHistory,
-        builder: (_, __) => const _TestScreen('ShootHistoryScreen'),
+        builder: (_, _) => const _TestScreen('ShootHistoryScreen'),
       ),
       GoRoute(
         path: '/favourites',
         name: RouteNames.favourites,
-        builder: (_, __) => const _TestScreen('FavoritesScreen'),
+        builder: (_, _) => const _TestScreen('FavoritesScreen'),
       ),
       GoRoute(
         path: '/app-preferences',
         name: RouteNames.appPreferences,
-        builder: (_, __) => const _TestScreen('AppPreferencesScreen'),
+        builder: (_, _) => const _TestScreen('AppPreferencesScreen'),
       ),
       GoRoute(
         path: '/delete-account',
         name: RouteNames.deleteAccount,
-        builder: (_, __) => const _TestScreen('DeleteAccountScreen'),
+        builder: (_, _) => const _TestScreen('DeleteAccountScreen'),
       ),
       GoRoute(
         path: '/delete-account-otp',
         name: RouteNames.deleteAccountOtp,
-        builder: (_, __) => const _TestScreen('DeleteAccountOtpScreen'),
+        builder: (_, _) => const _TestScreen('DeleteAccountOtpScreen'),
       ),
     ],
   );

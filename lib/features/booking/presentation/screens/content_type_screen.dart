@@ -32,7 +32,8 @@ class _ContentTypeScreenState extends ConsumerState<ContentTypeScreen> {
   void initState() {
     super.initState();
     if (widget.value != null) {
-      selectedContentTypeIds = [widget.value!];
+      // 3 = both; selection state models "both" as [1, 2] (see isSelectAll).
+      selectedContentTypeIds = widget.value == 3 ? [1, 2] : [widget.value!];
     }
   }
 

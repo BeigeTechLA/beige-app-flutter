@@ -71,7 +71,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
 
       LatLng latLng = LatLng(position.latitude, position.longitude);
@@ -91,7 +91,7 @@ class _ChangeLocationScreenState extends ConsumerState<ChangeLocationScreen> {
   // ================= ADDRESS FROM LAT LNG =================
   Future<void> _getAddressFromLatLng(LatLng latLng) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         latLng.latitude,
         latLng.longitude,
       );

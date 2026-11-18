@@ -51,7 +51,7 @@ class ConversationListState {
 }
 
 class ConversationListNotifier
-    extends AutoDisposeNotifier<ConversationListState>
+    extends Notifier<ConversationListState>
     with WidgetsBindingObserver {
   Timer? _debounce;
   Timer? _refreshThrottle;
@@ -435,7 +435,7 @@ class ConversationListNotifier
 }
 
 final conversationListProvider =
-    AutoDisposeNotifierProvider<
+    NotifierProvider.autoDispose<
       ConversationListNotifier,
       ConversationListState
     >(ConversationListNotifier.new);

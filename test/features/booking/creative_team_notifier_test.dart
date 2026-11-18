@@ -14,7 +14,7 @@ ProviderContainer _container(BookingRepository repo) {
     overrides: [bookingRepositoryProvider.overrideWithValue(repo)],
   );
   addTearDown(c.dispose);
-  c.listen(creativeTeamNotifierProvider, (_, __) {});
+  c.listen(creativeTeamNotifierProvider, (_, _) {});
   return c;
 }
 

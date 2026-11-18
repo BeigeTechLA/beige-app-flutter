@@ -6,6 +6,7 @@ import '../network/dio_client.dart';
 import '../session/session_store.dart';
 import '../storage/secure_token_storage.dart';
 import 'auth_state_provider.dart';
+import 'account_status_provider.dart';
 
 /// Provider for SharedPreferences instance.
 /// Must be initialized in main() via:
@@ -31,8 +32,14 @@ final dioClientProvider = Provider<DioClient>((ref) {
     // Token rejected by server (expired / revoked / stale after app update).
     // Shared session-expiry path: clears local session and flips auth state.
     // The router observes auth state and redirects to Login.
-    onUnauthorized: () =>
-        ref.read(authStateProvider.notifier).expireSession(),
+    onUnauthorized: () => ref.read(authStateProvider.notifier).expireSession(),
+    onDeletionPending: () async {
+      if (ref.read(authStateProvider)) {
+        await ref
+            .read(accountStatusProvider.notifier)
+            .setStatus(AccountStatus.deletionPending);
+      }
+    },
     isDevelopment: Env.current == Environment.dev,
   );
 });

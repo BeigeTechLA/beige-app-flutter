@@ -68,7 +68,7 @@ class AddOnsState {
 /// Screen 9 — Optional Add-ons. Loads the catalogue (`GET /bookings/addons`).
 /// Selected quantities live in the screen's state and are only submitted later
 /// in `/review` and `/quote` as `add_on_items: [{slug, quantity}]`.
-class AddOnsNotifier extends AutoDisposeNotifier<AddOnsState> {
+class AddOnsNotifier extends Notifier<AddOnsState> {
   @override
   AddOnsState build() => const AddOnsState();
 

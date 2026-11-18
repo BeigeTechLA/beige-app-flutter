@@ -28,7 +28,7 @@ class BookingHistoryState {
   }
 }
 
-class BookingHistoryNotifier extends AutoDisposeNotifier<BookingHistoryState> {
+class BookingHistoryNotifier extends Notifier<BookingHistoryState> {
   @override
   BookingHistoryState build() {
     fetchBookings();
