@@ -5,7 +5,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 ## Workflow Rules
 
 - **Always ask questions before writing a plan.** Before proposing or executing any plan, ask clarifying questions to understand scope, constraints, and preferences. Do not assume — confirm first, then plan.
-- **Never write code without approval.** Do not start implementation until the user explicitly approves the plan.
+- **Never write code without explicit approval — NO EXCEPTIONS.** Do not start implementation until the user explicitly approves the plan. This applies to EVERY code change, including ones that seem obviously required: fixing a compile/build error, bumping a dependency version in `pubspec.yaml`, creating a missing/referenced file, or any edit needed to "make it build/run." If a build or run is blocked, STOP, report the exact blocker, and ask for approval before touching any `.dart`, `pubspec.yaml`, Gradle, or config file. The only edits allowed without approval are to this `CLAUDE.md` / docs when the user asks for them.
 - **Plan phase-wise in small chunks, in a table.** Break every plan into phases, each containing small, discrete tasks. Present phases as a table with scrum-style task IDs (Phase 1 → Task 1.1, Task 1.2; Phase 2 → Task 2.1, ...). End the full plan with a single manual test summary describing what the user should verify. Table columns: Task ID, Description, Files, Status.
 - **Track status in the plan.** Every task carries a status with a color indicator: 🔴 Not Started, 🟡 In Progress, 🟢 Completed.
 - **Reference impacted files in the plan.** For large-level changes or new functionality, list the files that will be changed or added in the plan file.
