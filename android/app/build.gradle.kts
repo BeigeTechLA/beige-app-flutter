@@ -19,7 +19,10 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.app.beige"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_local_notifications 23.x is built against compileSdk 37; Flutter 3.47
+    // defaults flutter.compileSdkVersion to 36, which fails the AGP "compile against
+    // 37 or later" dependency check. Pin to 37 until the Flutter default catches up.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     // AGP 9 disables resValues by default; flavors below use resValue() for app_name.

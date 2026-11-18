@@ -40,7 +40,7 @@ dependencies:
   firebase_analytics: ^13.0.1
   firebase_crashlytics: ^6.0.1
   firebase_messaging: ^17.1.0
-  flutter_local_notifications: ^22.3.0
+  flutter_local_notifications: ^23.0.2
   # Functional programming (Either type for error handling)
   dartz: ^0.10.1
   calendar_date_picker2: ^4.0.0
