@@ -1,4 +1,3 @@
-import 'dart:io';
 import '../../../core/network/api_endpoints.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,15 +9,11 @@ class AccountDeletionRepository {
   AccountDeletionRepository(this._dio);
   final Dio _dio;
 
-  Options get _options => Options(
-    headers: {
-      'device-type': Platform.isAndroid ? 'android' : 'ios',
-      'user-type': 3,
-      'user-type-name': 'client',
-    },
-    // An ambiguous timeout must not automatically repeat a destructive action.
-    extra: {'skipRetry': true},
-  );
+  // Identity headers (device_type / user_type / user_type_name) come from the
+  // global DioClient base options, same as every other endpoint. Only the
+  // destructive-retry guard is local: an ambiguous timeout must not
+  // automatically repeat a delete.
+  Options get _options => Options(extra: {'skipRetry': true});
 
   Future<Map<String, dynamic>> _call(
     String path,
