@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/colors.dart';
 import '../../app/navigator_key.dart';
@@ -76,9 +77,38 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+/// Background-isolate tap handler for local notifications shown while the app
+/// is backgrounded or terminated.
+///
+/// Runs in a separate isolate with no UI, so it cannot navigate. It persists
+/// the tapped payload so the main isolate can drain it on next launch/resume
+/// (see `PushNotificationService._drainPersistedTap`). Belt-and-suspenders for
+/// the `getNotificationAppLaunchDetails` capture, and the only path that
+/// receives notification action-button responses.
+@pragma('vm:entry-point')
+Future<void> _onDidReceiveBackgroundNotificationResponse(
+  NotificationResponse response,
+) async {
+  final payload = response.payload;
+  if (payload == null || payload.isEmpty) return;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      PushNotificationService.pendingTapPrefsKey,
+      payload,
+    );
+  } catch (_) {
+    // Best-effort — the foreground launch-details path is the primary capture.
+  }
+}
+
 class PushNotificationService {
   PushNotificationService._();
   static final PushNotificationService instance = PushNotificationService._();
+
+  /// SharedPreferences key under which the background isolate persists a tapped
+  /// local-notification payload for the main isolate to drain on next launch.
+  static const String pendingTapPrefsKey = 'pending_notification_tap_payload';
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -100,7 +130,7 @@ class PushNotificationService {
         'beige_booking_channel',
         'Booking Updates',
         description: 'Updates regarding your shoot bookings and status',
-        importance: Importance.max,
+        importance: Importance.high,
         playSound: true,
         enableVibration: true,
       );
@@ -110,7 +140,7 @@ class PushNotificationService {
         'beige_meeting_channel',
         'Meeting Reminders',
         description: 'Reminders and notifications for scheduled meetings',
-        importance: Importance.max,
+        importance: Importance.high,
         playSound: true,
         enableVibration: true,
       );
@@ -120,19 +150,8 @@ class PushNotificationService {
         'beige_general_channel',
         'General Updates',
         description: 'General announcements and app notifications',
-        importance: Importance.max,
+        importance: Importance.defaultImportance,
         playSound: true,
-        enableVibration: true,
-      );
-
-  static const AndroidNotificationChannel _generalChannelV2 =
-      AndroidNotificationChannel(
-        'beige_general_channel_v2',
-        'General Updates',
-        description: 'General announcements and app notifications',
-        importance: Importance.max,
-        playSound: true,
-        enableVibration: true,
       );
 
   String? _fcmToken;
@@ -151,9 +170,8 @@ class PushNotificationService {
   void clearSession() => _lastSessionId = null;
 
   NotificationPayload? _pendingPayload;
-  bool get hasPendingNotification => _pendingPayload != null;
-  NotificationPayload? get pendingPayload => _pendingPayload;
   bool _isInitialized = false;
+  bool _drainRetryScheduled = false;
   Future<String?>? _pendingTokenFetch;
 
   /// Initializes FCM listeners, multi-channel setup, permission prompts,
@@ -162,25 +180,84 @@ class PushNotificationService {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    // Push setup must never block app launch. Any failure here (plugin init,
-    // permission prompt, platform channel) is logged and swallowed so the app
-    // still renders — it just runs without push until the next launch.
+    // Push setup must never block app launch, AND a failure in local-notif init
+    // or the permission prompt must never prevent background/terminated taps
+    // from routing. Each step runs in its own guard so an early throw cannot
+    // skip the redirect listeners (which are therefore registered FIRST).
+
+    // ── 1. Register FCM redirect listeners (cheap, non-throwing) ─────────────
     try {
-      // Set background message handler
+      // Background message handler (also shows local notif for data-only pushes).
       FirebaseMessaging.onBackgroundMessage(
         _firebaseMessagingBackgroundHandler,
       );
 
-      // Setup multi-channel local notifications for Android & iOS
+      // Handle background notification taps when app is resumed.
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        _logRemoteMessage('background_notification_opened', message);
+        final payload = NotificationPayload.fromRemoteMessage(message);
+        handleNotificationClick(payload);
+      });
+
+      // Handle foreground notifications.
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _logRemoteMessage('foreground_received', message);
+        _showForegroundNotification(message);
+      });
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Listener registration failed: $e',
+        );
+      }
+    }
+
+    // ── 2. Local notification plugin + Android channels ─────────────────────
+    try {
       await _setupLocalNotifications();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Local notification setup failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Request permissions on app open according to iOS & Android best practices
+    // ── 3. Permission prompt (iOS + Android 13+) ────────────────────────────
+    try {
       await requestPermissions();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Permission request failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Fetch initial FCM token & listen for refreshes
+    // ── 4. Token fetch + refresh wiring ─────────────────────────────────────
+    try {
       _setupTokenManagement();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Token management setup failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Handle initial notification tap if launched from terminated state
+    // ── 5. Capture the launch notification (terminated → tapped) ────────────
+    // Runs after local-notif init so the data-only local-launch fallback can
+    // read launch details. The redirect listeners above are already wired, so
+    // a throw here can never skip redirection setup.
+    try {
       final initialMessage = await _fcm.getInitialMessage();
       if (initialMessage != null) {
         _logRemoteMessage('terminated_notification_opened', initialMessage);
@@ -195,10 +272,7 @@ class PushNotificationService {
             responsePayload != null &&
             responsePayload.isNotEmpty) {
           try {
-            final decoded = jsonDecode(responsePayload);
-            final Map<String, dynamic> data = decoded is Map
-                ? Map<String, dynamic>.from(decoded)
-                : <String, dynamic>{};
+            final Map<String, dynamic> data = jsonDecode(responsePayload);
             _pendingPayload = NotificationPayload.fromMap(data);
             if (kDebugMode) {
               debugPrint(
@@ -214,29 +288,46 @@ class PushNotificationService {
           }
         }
       }
-
-      // Handle background notification taps when app is resumed
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        _logRemoteMessage('background_notification_opened', message);
-        final payload = NotificationPayload.fromRemoteMessage(message);
-        handleNotificationClick(payload);
-      });
-
-      // Handle foreground notifications
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        _logRemoteMessage('foreground_received', message);
-        _showForegroundNotification(message);
-      });
-
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] Initialized successfully.');
-      }
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
       if (kDebugMode) {
         debugPrint(
-          '[PushNotificationService] initialize failed (non-fatal): $e',
+          '[PushNotificationService] Launch message capture failed (non-fatal): $e',
+        );
+      }
+    }
+
+    // ── 6. Drain a tap captured by the background-isolate response handler ────
+    await _drainPersistedTap();
+
+    if (kDebugMode) {
+      debugPrint('[PushNotificationService] Initialized successfully.');
+    }
+  }
+
+  /// Reads (and clears) any tapped payload the background isolate persisted via
+  /// `_onDidReceiveBackgroundNotificationResponse`. Only adopts it when the FCM
+  /// `getInitialMessage` / launch-details capture didn't already set a pending
+  /// payload, so a single tap never routes twice.
+  Future<void> _drainPersistedTap() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(pendingTapPrefsKey);
+      if (stored == null || stored.isEmpty) return;
+      await prefs.remove(pendingTapPrefsKey);
+      if (_pendingPayload != null) return;
+      final Map<String, dynamic> data = jsonDecode(stored);
+      _pendingPayload = NotificationPayload.fromMap(data);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Captured persisted background tap: $_pendingPayload',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Failed to drain persisted background tap: $e',
         );
       }
     }
@@ -305,10 +396,7 @@ class PushNotificationService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         if (response.payload != null && response.payload!.isNotEmpty) {
           try {
-            final decoded = jsonDecode(response.payload!);
-            final Map<String, dynamic> data = decoded is Map
-                ? Map<String, dynamic>.from(decoded)
-                : <String, dynamic>{};
+            final Map<String, dynamic> data = jsonDecode(response.payload!);
             final payload = NotificationPayload.fromMap(data);
             if (kDebugMode) {
               debugPrint(
@@ -325,6 +413,8 @@ class PushNotificationService {
           }
         }
       },
+      onDidReceiveBackgroundNotificationResponse:
+          _onDidReceiveBackgroundNotificationResponse,
     );
 
     // Create all 4 dedicated Android Notification Channels
@@ -338,7 +428,6 @@ class PushNotificationService {
       await androidImplementation.createNotificationChannel(_bookingChannel);
       await androidImplementation.createNotificationChannel(_meetingChannel);
       await androidImplementation.createNotificationChannel(_generalChannel);
-      await androidImplementation.createNotificationChannel(_generalChannelV2);
     }
   }
 
@@ -361,7 +450,7 @@ class PushNotificationService {
 
   static Priority _getPriorityForImportance(Importance importance) {
     if (importance == Importance.max || importance == Importance.high) {
-      return Priority.max;
+      return Priority.high;
     }
     return Priority.defaultPriority;
   }
@@ -518,12 +607,10 @@ class PushNotificationService {
         channel.name,
         channelDescription: channel.description,
         importance: channel.importance,
-        priority: Priority.max,
+        priority: _getPriorityForImportance(channel.importance),
         color: AppColors.notificationAccent,
         icon: 'ic_stat_notification',
         largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-        playSound: true,
-        enableVibration: true,
       );
 
       const darwinDetails = DarwinNotificationDetails(
@@ -601,6 +688,8 @@ class PushNotificationService {
           android: androidInitSettings,
           iOS: darwinInitSettings,
         ),
+        onDidReceiveBackgroundNotificationResponse:
+            _onDidReceiveBackgroundNotificationResponse,
       );
 
       final channel = _getChannelForType(payload.type);
@@ -628,14 +717,12 @@ class PushNotificationService {
             channel.name,
             channelDescription: channel.description,
             importance: channel.importance,
-            priority: Priority.max,
+            priority: _getPriorityForImportance(channel.importance),
             color: AppColors.notificationAccent,
             icon: 'ic_stat_notification',
             largeIcon: const DrawableResourceAndroidBitmap(
               '@mipmap/ic_launcher',
             ),
-            playSound: true,
-            enableVibration: true,
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
@@ -659,58 +746,44 @@ class PushNotificationService {
     }
   }
 
-  /// Processes any pending notification payload captured during app startup.
+  /// Processes any pending notification payload captured during app startup or
+  /// re-queued because the navigator wasn't ready.
+  ///
+  /// Safe to call from multiple drain triggers (Home mount, app resume, auth
+  /// landing): the payload is cleared BEFORE dispatch, so a concurrent second
+  /// call sees null and no-ops — no double navigation.
   void processPendingNotification() {
-    if (_pendingPayload != null) {
-      final payload = _pendingPayload!;
-      _pendingPayload = null;
-      handleNotificationClick(payload);
-    }
-  }
-
-  /// Consumes and clears the pending notification payload atomically.
-  NotificationPayload? consumePendingPayload() {
     final payload = _pendingPayload;
+    if (payload == null) return;
     _pendingPayload = null;
-    return payload;
+    handleNotificationClick(payload);
   }
 
-  /// Directly executes navigation for a notification payload with the given BuildContext.
-  void dispatchPayload(BuildContext context, NotificationPayload payload) {
-    try {
-      final router = GoRouter.of(context);
-      _executeNavigation(router, payload);
-    } catch (e, st) {
-      // ignore: discarded_futures
-      CrashlyticsService.recordError(e, st);
-      if (kDebugMode) {
-        debugPrint(
-          '[PushNotificationService] Direct dispatch failed for ${payload.type}: $e',
-        );
-      }
-      _safeGoHome(context);
-    }
+  /// Schedules a single next-frame drain attempt for a payload queued because
+  /// the navigator wasn't ready yet. One-shot per queue — if the context is
+  /// still null after the frame, the lifecycle / auth / Home-mount drains take
+  /// over, so this never busy-loops.
+  void _scheduleDrainRetry() {
+    if (_drainRetryScheduled) return;
+    _drainRetryScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drainRetryScheduled = false;
+      processPendingNotification();
+    });
   }
 
   /// Main handler to execute redirection based on notification payload type.
   void handleNotificationClick(NotificationPayload payload) {
     final context = rootNavigatorKey.currentContext;
 
-    if (context == null || !context.mounted) {
+    if (context == null) {
       if (kDebugMode) {
         debugPrint(
           '[PushNotificationService] Context not ready yet, queuing notification tap: $payload',
         );
       }
       _pendingPayload = payload;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        processPendingNotification();
-      });
-      Future.delayed(const Duration(milliseconds: 200), () {
-        if (_pendingPayload != null) {
-          processPendingNotification();
-        }
-      });
+      _scheduleDrainRetry();
       return;
     }
 
@@ -725,21 +798,106 @@ class PushNotificationService {
       // the redirect overwrites this navigation.
       final currentLocation =
           router.routerDelegate.currentConfiguration.uri.path;
-      if (currentLocation == '/splash') {
+      if (currentLocation == '/splash' || currentLocation.isEmpty) {
         if (kDebugMode) {
           debugPrint(
             '[PushNotificationService] On splash, deferring notification tap: $payload',
           );
         }
         _pendingPayload = payload;
-        // Auto-retry once router transitions away from splash
-        Future.delayed(const Duration(milliseconds: 250), () {
-          processPendingNotification();
-        });
         return;
       }
 
-      _executeNavigation(router, payload);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Navigating for notification tap: $payload',
+        );
+      }
+
+      switch (payload.type) {
+        case NotificationType.chat:
+          if (payload.chatId != null && payload.chatId!.isNotEmpty) {
+            router.pushNamed(
+              RouteNames.chat,
+              extra: {
+                'conversationId': payload.chatId,
+                'contactName': payload.title ?? 'Chat',
+              },
+            );
+          } else {
+            router.goNamed(RouteNames.messages);
+          }
+          break;
+
+        case NotificationType.booking:
+          if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
+            final bookingId = int.tryParse(payload.bookingId!);
+            if (bookingId != null) {
+              final extraData = <String, dynamic>{
+                if (payload.title != null) 'projectName': payload.title,
+                if (payload.rawMap['project_name'] != null)
+                  'projectName': payload.rawMap['project_name'],
+                if (payload.rawMap['image_url'] != null)
+                  'imageUrl': payload.rawMap['image_url'],
+                if (payload.rawMap['location'] != null)
+                  'location': payload.rawMap['location'],
+                if (payload.rawMap['event_date'] != null)
+                  'eventDate': payload.rawMap['event_date'],
+                if (payload.rawMap['start_time'] != null)
+                  'startTime': payload.rawMap['start_time'],
+                if (payload.rawMap['end_time'] != null)
+                  'endTime': payload.rawMap['end_time'],
+                if (payload.rawMap['content_type'] != null)
+                  'contentType': payload.rawMap['content_type'],
+              };
+              router.pushNamed(
+                RouteNames.manageBooking,
+                pathParameters: {'bookingId': bookingId.toString()},
+                extra: extraData.isNotEmpty ? extraData : null,
+              );
+            } else {
+              router.goNamed(RouteNames.myShoots);
+            }
+          } else {
+            router.goNamed(RouteNames.myShoots);
+          }
+          break;
+
+        case NotificationType.meeting:
+          if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
+            router.goNamed(
+              RouteNames.meetings,
+              queryParameters: {'meetingId': payload.meetingId!},
+            );
+          } else if (payload.bookingId != null &&
+              int.tryParse(payload.bookingId!) != null) {
+            router.pushNamed(
+              RouteNames.manageBooking,
+              pathParameters: {'bookingId': payload.bookingId!},
+            );
+          } else {
+            router.goNamed(RouteNames.meetings);
+          }
+          break;
+
+        case NotificationType.files:
+          if (payload.targetRoute != null &&
+              payload.targetRoute!.startsWith('/file-manager')) {
+            router.push(payload.targetRoute!);
+          } else {
+            router.pushNamed(RouteNames.fileManager);
+          }
+          break;
+
+        case NotificationType.profile:
+          router.goNamed(RouteNames.profile);
+          break;
+
+        case NotificationType.deeplink:
+        case NotificationType.unknown:
+          _pushTargetRouteOrHome(router, payload.targetRoute);
+          break;
+      }
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
@@ -750,168 +908,6 @@ class PushNotificationService {
       }
       _safeGoHome(context);
     }
-  }
-
-  /// Executes route redirection for the specified payload.
-  void _executeNavigation(GoRouter router, NotificationPayload payload) {
-    if (kDebugMode) {
-      debugPrint(
-        '[PushNotificationService] Executing navigation for notification: $payload',
-      );
-    }
-
-    switch (payload.type) {
-      case NotificationType.chat:
-        final contactName = _resolveChatContactName(payload);
-        if (payload.chatId != null && payload.chatId!.isNotEmpty) {
-          router.pushNamed(
-            RouteNames.chat,
-            queryParameters: {
-              'conversationId': payload.chatId!,
-              if (contactName.isNotEmpty) 'contactName': contactName,
-            },
-            extra: {
-              'conversationId': payload.chatId,
-              'contactName': contactName,
-            },
-          );
-        } else {
-          router.goNamed(RouteNames.messages);
-        }
-        break;
-
-      case NotificationType.booking:
-        if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
-          final bookingId = int.tryParse(payload.bookingId!);
-          if (bookingId != null) {
-            final raw = payload.rawMap;
-            final resolvedImg =
-                raw['image_url'] ??
-                raw['cover_image'] ??
-                raw['avatar_url'] ??
-                raw['profile_image_url'] ??
-                raw['image'];
-            final extraData = <String, dynamic>{
-              if (payload.title != null) 'projectName': payload.title,
-              if (raw['project_name'] != null)
-                'projectName': raw['project_name'],
-              if (raw['name'] != null) 'projectName': raw['name'],
-              if (resolvedImg != null) 'imageUrl': resolvedImg.toString(),
-              if (raw['location'] != null) 'location': raw['location'],
-              if (raw['event_date'] != null) 'eventDate': raw['event_date'],
-              if (raw['date'] != null) 'eventDate': raw['date'],
-              if (raw['start_time'] != null) 'startTime': raw['start_time'],
-              if (raw['end_time'] != null) 'endTime': raw['end_time'],
-              if (raw['content_type'] != null)
-                'contentType': raw['content_type'],
-            };
-            router.pushNamed(
-              RouteNames.manageBooking,
-              pathParameters: {'bookingId': bookingId.toString()},
-              extra: extraData.isNotEmpty ? extraData : null,
-            );
-          } else {
-            router.goNamed(RouteNames.myShoots);
-          }
-        } else {
-          router.goNamed(RouteNames.myShoots);
-        }
-        break;
-
-      case NotificationType.meeting:
-        if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
-          router.goNamed(
-            RouteNames.meetings,
-            queryParameters: {'meetingId': payload.meetingId!},
-          );
-        } else if (payload.bookingId != null &&
-            int.tryParse(payload.bookingId!) != null) {
-          router.pushNamed(
-            RouteNames.manageBooking,
-            pathParameters: {'bookingId': payload.bookingId!},
-          );
-        } else {
-          router.goNamed(RouteNames.meetings);
-        }
-        break;
-
-      case NotificationType.files:
-        if (payload.targetRoute != null &&
-            payload.targetRoute!.startsWith('/file-manager')) {
-          router.push(payload.targetRoute!);
-        } else {
-          router.pushNamed(RouteNames.fileManager);
-        }
-        break;
-
-      case NotificationType.profile:
-        router.goNamed(RouteNames.profile);
-        break;
-
-      case NotificationType.deeplink:
-        _pushTargetRouteOrHome(router, payload.targetRoute);
-        break;
-
-      case NotificationType.unknown:
-        if (payload.targetRoute != null && payload.targetRoute!.isNotEmpty) {
-          _pushTargetRouteOrHome(router, payload.targetRoute);
-        } else if (payload.chatId != null && payload.chatId!.isNotEmpty) {
-          final contactName = _resolveChatContactName(payload);
-          router.pushNamed(
-            RouteNames.chat,
-            queryParameters: {
-              'conversationId': payload.chatId!,
-              if (contactName.isNotEmpty) 'contactName': contactName,
-            },
-            extra: {
-              'conversationId': payload.chatId,
-              'contactName': contactName,
-            },
-          );
-        } else if (payload.bookingId != null &&
-            int.tryParse(payload.bookingId!) != null) {
-          router.pushNamed(
-            RouteNames.manageBooking,
-            pathParameters: {'bookingId': payload.bookingId!},
-          );
-        } else {
-          router.goNamed(RouteNames.home);
-        }
-        break;
-    }
-  }
-
-  /// Resolves the room or contact display name from chat notification payload.
-  String _resolveChatContactName(NotificationPayload payload) {
-    final raw = payload.rawMap;
-    final candidates = [
-      raw['room_name'],
-      raw['roomName'],
-      raw['room_title'],
-      raw['roomTitle'],
-      raw['contactName'],
-      raw['contact_name'],
-      raw['displayName'],
-      raw['display_name'],
-      raw['sender_name'],
-      raw['senderName'],
-      raw['name'],
-    ];
-    for (final c in candidates) {
-      if (c != null && c.toString().trim().isNotEmpty) {
-        return c.toString().trim();
-      }
-    }
-    final title = payload.title ?? '';
-    final match = RegExp(
-      r'^(?:New message in|Message from)\s*(.+)$',
-      caseSensitive: false,
-    ).firstMatch(title);
-    if (match != null && match.group(1) != null) {
-      final extracted = match.group(1)!.trim();
-      if (extracted.isNotEmpty) return extracted;
-    }
-    return title.isNotEmpty ? title : 'Chat';
   }
 
   /// Pushes a server-provided deep-link route only if it looks like a valid
