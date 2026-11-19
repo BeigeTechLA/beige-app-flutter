@@ -13,6 +13,8 @@ import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/network/api_endpoints.dart';
 import 'package:beige/core/utils/date_time_utils.dart';
+import 'package:beige/shared/widgets/loading.dart';
+import '../providers/shoot_summary_notifier.dart';
 
 class ManageShootScreen extends ConsumerStatefulWidget {
   final int bookingId;
@@ -56,13 +58,18 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
     context.goNamed(RouteNames.myShoots);
   }
 
-  String _getFullImageUrl() {
-    final url = widget.imageUrl ?? "";
+  String _getFullImageUrl([String? fallbackUrl]) {
+    final url = (widget.imageUrl != null && widget.imageUrl!.isNotEmpty)
+        ? widget.imageUrl!
+        : (fallbackUrl ?? "");
     // Empty, or a local asset path (older callers / restored drafts passed the
     // placeholder asset) → no network image.
     if (url.isEmpty || url.startsWith("assets/")) return "";
-    if (url.startsWith("http")) return url;
-    return '${ApiEndpoints.imageUrl}$url';
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    final base = ApiEndpoints.imageUrl;
+    final cleanBase = base.endsWith('/') ? base : '$base/';
+    final cleanPath = url.startsWith('/') ? url.substring(1) : url;
+    return '$cleanBase$cleanPath';
   }
 
   /// Dark tile with the placeholder icon at its natural size — the icon is a
@@ -85,6 +92,64 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final summaryState = widget.bookingId > 0
+        ? ref.watch(shootSummaryNotifierProvider(widget.bookingId))
+        : null;
+    final bookingData = summaryState?.shootDetails;
+    final event = bookingData?['event'] as Map<String, dynamic>?;
+    final creative = bookingData?['creative'] as Map<String, dynamic>?;
+
+    final profileImageRaw = creative?['profile_image_url']?.toString() ??
+        creative?['profile_photo']?.toString() ??
+        '';
+    final eventImageRaw = event?['image_url']?.toString() ??
+        event?['cover_image']?.toString() ??
+        bookingData?['image_url']?.toString() ??
+        '';
+    final fallbackImageUrl = profileImageRaw.isNotEmpty ? profileImageRaw : eventImageRaw;
+    final fullImageUrl = _getFullImageUrl(fallbackImageUrl);
+
+    final resolvedProjectName = (widget.projectName != null &&
+            widget.projectName!.isNotEmpty &&
+            widget.projectName != 'Booking confirmed' &&
+            widget.projectName != 'N/A')
+        ? widget.projectName!
+        : (event?['title']?.toString() ??
+            event?['name']?.toString() ??
+            widget.projectName ??
+            "N/A");
+
+    String resolvedContentType = widget.contentType ?? '';
+    if (resolvedContentType.isEmpty) {
+      final rawShootType = event?['shoot_type'];
+      if (rawShootType is Map) {
+        resolvedContentType = rawShootType['name']?.toString() ?? '';
+      } else if (rawShootType is String) {
+        resolvedContentType = rawShootType;
+      }
+    }
+
+    final resolvedEventDate = widget.eventDate ??
+        event?['event_date']?.toString() ??
+        event?['date']?.toString();
+    final resolvedStartTime = widget.startTime ?? event?['start_time']?.toString();
+    final resolvedEndTime = widget.endTime ?? event?['end_time']?.toString();
+    final resolvedDuration = widget.durationHours ??
+        (event?['duration_hours'] is num
+            ? (event!['duration_hours'] as num).toDouble()
+            : null);
+    final resolvedLocation = (widget.location != null && widget.location!.isNotEmpty)
+        ? widget.location!
+        : (event?['location']?.toString() ?? "Location not available");
+
+    final rawMultiDays = widget.multiDays ??
+        (event?['multi_day'] is Map && event!['multi_day']['days'] is List
+            ? event!['multi_day']['days'] as List
+            : null);
+
+    final isLoading =
+        summaryState?.status == ShootSummaryStatus.loading && bookingData == null;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -96,10 +161,18 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
               children: [
                 /// 🔹 FULL IMAGE — plain dark backdrop when there is no image
                 /// (the small placeholder icon must not be stretched to cover).
-                _getFullImageUrl().isNotEmpty
+                fullImageUrl.isNotEmpty
                     ? Image.network(
-                        _getFullImageUrl(),
+                        fullImageUrl,
                         fit: BoxFit.cover,
+                        frameBuilder: (context, child, frame, wasLoaded) {
+                          if (wasLoaded) return child;
+                          return AnimatedOpacity(
+                            opacity: frame == null ? 0 : 1,
+                            duration: const Duration(milliseconds: 300),
+                            child: child,
+                          );
+                        },
                         errorBuilder: (_, _, _) =>
                             const ColoredBox(color: AppColors.background),
                       )
@@ -189,10 +262,10 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: AppRadii.xlAll,
-                              child: _getFullImageUrl().isNotEmpty
+                              child: fullImageUrl.isNotEmpty
                                   ? Image(
                                       image: ResizeImage(
-                                        NetworkImage(_getFullImageUrl()),
+                                        NetworkImage(fullImageUrl),
                                         width: 400,
                                       ),
                                       height: 144,
@@ -202,8 +275,21 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                       frameBuilder:
                                           (context, child, frame, wasLoaded) {
                                             if (wasLoaded) return child;
+                                            if (frame == null) {
+                                              return Container(
+                                                height: 144,
+                                                width: 126,
+                                                color: AppColors.surface,
+                                                alignment: Alignment.center,
+                                                child: const AppCircularLoader(
+                                                  size: 24,
+                                                  color: AppColors.primary,
+                                                  strokeWidth: 2.5,
+                                                ),
+                                              );
+                                            }
                                             return AnimatedOpacity(
-                                              opacity: frame == null ? 0 : 1,
+                                              opacity: 1,
                                               duration: const Duration(
                                                 milliseconds: 250,
                                               ),
@@ -225,7 +311,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                 children: [
                                   AppSpacing.verticalXs,
                                   Text(
-                                    widget.projectName ?? "N/A",
+                                    resolvedProjectName,
                                     style: AppTextStyles.labelLarge.copyWith(
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.white,
@@ -233,7 +319,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                   ),
                                   AppSpacing.verticalXxxs,
                                   Text(
-                                    widget.contentType ?? '',
+                                    resolvedContentType,
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.white70,
                                       fontWeight: FontWeight.w400,
@@ -288,10 +374,10 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               /// 🔵 MULTI DAY (comma detect)
-                              if (widget.multiDays != null &&
-                                  widget.multiDays!.isNotEmpty) ...[
+                              if (rawMultiDays != null &&
+                                  rawMultiDays.isNotEmpty) ...[
                                 /// 🔵 REAL MULTI DAY
-                                ...widget.multiDays!.map((day) {
+                                ...rawMultiDays.map((day) {
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -315,14 +401,14 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                                 /// 🟢 SINGLE DAY
                                 infoRowBlack(
                                   AppAssets.calendarDate,
-                                  DateTimeUtils.formatDate(widget.eventDate),
+                                  DateTimeUtils.formatDate(resolvedEventDate),
                                 ),
 
                                 const SizedBox(height: 8),
                                 infoRowBlack(
                                   AppAssets.clock,
-                                  "${DateTimeUtils.formatTime(widget.startTime)} to ${DateTimeUtils.formatTime(widget.endTime)} "
-                                  "(${DateTimeUtils.formatDuration((widget.durationHours ?? 0).toDouble())})",
+                                  "${DateTimeUtils.formatTime(resolvedStartTime)} to ${DateTimeUtils.formatTime(resolvedEndTime)} "
+                                  "(${DateTimeUtils.formatDuration((resolvedDuration ?? 0).toDouble())})",
                                 ),
                               ],
                               const SizedBox(height: 8),
@@ -330,7 +416,7 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
                               /// 📍 LOCATION
                               infoRowBlack(
                                 AppAssets.location,
-                                widget.location ?? "Location not available",
+                                resolvedLocation,
                               ),
                             ],
                           ),
@@ -376,6 +462,27 @@ class _ManageShootScreenState extends ConsumerState<ManageShootScreen> {
               ),
             ),
           ),
+
+          /// 🔹 LOADING OVERLAY (Single Scaffold, Senior Pattern)
+          if (isLoading)
+            Positioned.fill(
+              child: ColoredBox(
+                color: AppColors.background,
+                child: Stack(
+                  children: [
+                    SafeArea(
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: AppColors.white),
+                        onPressed: _goBackToMyShoots,
+                      ),
+                    ),
+                    const Center(
+                      child: AppLoader(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

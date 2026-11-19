@@ -9,6 +9,7 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/route_names.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/firebase/analytics_service.dart';
+import 'package:beige/core/notifications/push_notification_service.dart';
 import 'package:beige/core/providers/auth_state_provider.dart';
 import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/core/restoration/restoration_keys.dart';
@@ -43,8 +44,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     // ✅ Context safe hai yahan, aur sirf ek baar chalega
     if (!_precacheDone) {
       _precacheDone = true;
-      _precacheAndStart();
+      if (PushNotificationService.instance.hasPendingNotification) {
+        _handleNotificationLaunch();
+      } else {
+        _precacheAndStart();
+      }
     }
+  }
+
+  void _handleNotificationLaunch() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final isLoggedIn = ref.read(authStateProvider);
+      if (!isLoggedIn) {
+        context.goNamed(RouteNames.onboarding);
+        return;
+      }
+
+      ref.read(draftStoreProvider).clearAll();
+      FirebaseCrashlytics.instance.log('notification.launch.fast_track');
+
+      // Fast-track directly to Home; HomeScreen.initState drains _pendingPayload
+      // via processPendingNotification() so the target screen is displayed directly.
+      context.goNamed(RouteNames.home);
+    });
   }
 
   Future<void> _precacheAndStart() async {
@@ -83,13 +106,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           final restorer = ref.read(splashRestorerProvider);
           final restored = service.readRestorable();
 
-          final shouldRestore = restorer.shouldRestore(
-            isEnabled: kRestorationEnabled,
-            isLoggedIn: isLoggedIn,
-            isGuest: isGuest,
-            hasDeepLink: _hasDeepLink(),
-            persistedRoute: restored?.location,
-          );
+          final hasNotification =
+              PushNotificationService.instance.hasPendingNotification;
+
+          final shouldRestore = !hasNotification &&
+              restorer.shouldRestore(
+                isEnabled: kRestorationEnabled,
+                isLoggedIn: isLoggedIn,
+                isGuest: isGuest,
+                hasDeepLink: _hasDeepLink(),
+                persistedRoute: restored?.location,
+              );
 
           if (shouldRestore && restored != null) {
             FirebaseCrashlytics.instance.log(
@@ -116,6 +143,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           ref.read(draftStoreProvider).clearAll();
 
           FirebaseCrashlytics.instance.log('restoration.skipped');
+
           context.goNamed(RouteNames.home);
         });
       }

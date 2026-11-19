@@ -82,6 +82,8 @@ class _NotificationSectionScreenState
       if (item.type != null) 'type': item.type,
       if (item.category != null) 'category': item.category,
       if (item.senderName != null) 'sender_name': item.senderName,
+      if (item.avatarUrl != null) 'avatar_url': item.avatarUrl,
+      if (item.avatarUrl != null) 'image_url': item.avatarUrl,
       if (item.payload != null) ...item.payload!,
     };
 

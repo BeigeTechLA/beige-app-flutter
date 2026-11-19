@@ -788,10 +788,27 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/chat',
         name: RouteNames.chat,
         builder: (context, state) {
-          final args = ChatArgs.fromExtra(state.extra as Map<String, dynamic>);
+          final extraMap = state.extra is Map
+              ? Map<String, dynamic>.from(state.extra as Map)
+              : const <String, dynamic>{};
+          final args = state.extra is ChatArgs
+              ? state.extra as ChatArgs
+              : ChatArgs.fromExtra(extraMap);
+          final queryId = state.uri.queryParameters['conversationId'] ??
+              state.uri.queryParameters['roomId'] ??
+              state.uri.queryParameters['chatId'] ??
+              state.uri.queryParameters['id'];
+          final queryName = state.uri.queryParameters['contactName'] ??
+              state.uri.queryParameters['name'];
+          final resolvedId = args.conversationId.isNotEmpty
+              ? args.conversationId
+              : (queryId ?? '');
+          final resolvedName = (args.contactName != null && args.contactName!.isNotEmpty)
+              ? args.contactName
+              : queryName;
           return ChatThreadScreen(
-            conversationId: args.conversationId,
-            contactName: args.contactName,
+            conversationId: resolvedId,
+            contactName: resolvedName,
           );
         },
         routes: [
@@ -799,9 +816,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'details',
             name: RouteNames.chatDetails,
             builder: (context, state) {
-              final args = ChatDetailsArgs.fromExtra(
-                state.extra as Map<String, dynamic>,
-              );
+              final extraMap = state.extra is Map
+                  ? Map<String, dynamic>.from(state.extra as Map)
+                  : const <String, dynamic>{};
+              final args = state.extra is ChatDetailsArgs
+                  ? state.extra as ChatDetailsArgs
+                  : ChatDetailsArgs.fromExtra(extraMap);
               return ChatDetailsScreen(conversationId: args.conversationId);
             },
           ),

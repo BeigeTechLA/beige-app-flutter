@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../notifications/push_notification_service.dart';
 import 'route_restoration_service.dart';
 
 /// Stamps `lastActiveTs` whenever the app leaves the foreground so the
@@ -27,6 +28,7 @@ class AppLifecycleObserver with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         _service.stampLastActive();
       case AppLifecycleState.resumed:
+        PushNotificationService.instance.processPendingNotification();
         break;
     }
   }

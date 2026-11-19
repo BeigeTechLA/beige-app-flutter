@@ -5,9 +5,9 @@ import '../../app/radii.dart';
 import '../../app/spacing.dart';
 import '../../app/text_styles.dart';
 
-/// Pill-shaped segmented tab selector. Equal-width segments inside a rounded
-/// track; the active segment fills with the gold [AppColors.primary] pill.
-///
+/// Segmented tab selector matching the Figma spec:
+/// Outer track: height 53, color #282828, border radius 12, padding 4.
+/// Selected indicator: rounded rectangle radius 10 with gold gradient/color.
 /// Stateless — caller owns [selectedIndex] and reacts to [onValueChanged].
 class AppSegmentedControl extends StatelessWidget {
   const AppSegmentedControl({
@@ -15,13 +15,21 @@ class AppSegmentedControl extends StatelessWidget {
     required this.items,
     required this.selectedIndex,
     required this.onValueChanged,
-    this.height = 44,
+    this.height = 53,
+    this.trackColor = AppColors.surfaceMid,
+    this.borderRadius = const BorderRadius.all(Radius.circular(12)),
+    this.indicatorRadius = const BorderRadius.all(Radius.circular(10)),
+    this.padding = const EdgeInsets.all(4),
   });
 
   final List<String> items;
   final int selectedIndex;
   final ValueChanged<int> onValueChanged;
   final double height;
+  final Color trackColor;
+  final BorderRadius borderRadius;
+  final BorderRadius indicatorRadius;
+  final EdgeInsetsGeometry padding;
 
   static const Duration _kDuration = Duration(milliseconds: 180);
 
@@ -29,10 +37,10 @@ class AppSegmentedControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      padding: const EdgeInsets.all(AppSpacing.xxs),
+      padding: padding,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: AppRadii.fullAll,
+        color: trackColor,
+        borderRadius: borderRadius,
       ),
       child: Row(
         children: List.generate(items.length, (index) {
@@ -46,13 +54,15 @@ class AppSegmentedControl extends StatelessWidget {
                 curve: Curves.easeOut,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.primary : null,
-                  borderRadius: AppRadii.fullAll,
+                  gradient: selected ? AppColors.goldHorizontalGradient : null,
+                  color: selected ? AppColors.primary : Colors.transparent,
+                  borderRadius: indicatorRadius,
                 ),
                 child: Text(
                   items[index],
                   style: AppTextStyles.labelLarge.copyWith(
-                    color: selected ? AppColors.onPrimary : AppColors.white60,
+                    color: selected ? AppColors.onPrimary : AppColors.white70,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ),

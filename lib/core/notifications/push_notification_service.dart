@@ -100,7 +100,7 @@ class PushNotificationService {
         'beige_booking_channel',
         'Booking Updates',
         description: 'Updates regarding your shoot bookings and status',
-        importance: Importance.high,
+        importance: Importance.max,
         playSound: true,
         enableVibration: true,
       );
@@ -110,7 +110,7 @@ class PushNotificationService {
         'beige_meeting_channel',
         'Meeting Reminders',
         description: 'Reminders and notifications for scheduled meetings',
-        importance: Importance.high,
+        importance: Importance.max,
         playSound: true,
         enableVibration: true,
       );
@@ -120,8 +120,19 @@ class PushNotificationService {
         'beige_general_channel',
         'General Updates',
         description: 'General announcements and app notifications',
-        importance: Importance.defaultImportance,
+        importance: Importance.max,
         playSound: true,
+        enableVibration: true,
+      );
+
+  static const AndroidNotificationChannel _generalChannelV2 =
+      AndroidNotificationChannel(
+        'beige_general_channel_v2',
+        'General Updates',
+        description: 'General announcements and app notifications',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
       );
 
   String? _fcmToken;
@@ -140,6 +151,8 @@ class PushNotificationService {
   void clearSession() => _lastSessionId = null;
 
   NotificationPayload? _pendingPayload;
+  bool get hasPendingNotification => _pendingPayload != null;
+  NotificationPayload? get pendingPayload => _pendingPayload;
   bool _isInitialized = false;
   Future<String?>? _pendingTokenFetch;
 
@@ -182,7 +195,10 @@ class PushNotificationService {
             responsePayload != null &&
             responsePayload.isNotEmpty) {
           try {
-            final Map<String, dynamic> data = jsonDecode(responsePayload);
+            final decoded = jsonDecode(responsePayload);
+            final Map<String, dynamic> data = decoded is Map
+                ? Map<String, dynamic>.from(decoded)
+                : <String, dynamic>{};
             _pendingPayload = NotificationPayload.fromMap(data);
             if (kDebugMode) {
               debugPrint(
@@ -289,7 +305,10 @@ class PushNotificationService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         if (response.payload != null && response.payload!.isNotEmpty) {
           try {
-            final Map<String, dynamic> data = jsonDecode(response.payload!);
+            final decoded = jsonDecode(response.payload!);
+            final Map<String, dynamic> data = decoded is Map
+                ? Map<String, dynamic>.from(decoded)
+                : <String, dynamic>{};
             final payload = NotificationPayload.fromMap(data);
             if (kDebugMode) {
               debugPrint(
@@ -319,6 +338,7 @@ class PushNotificationService {
       await androidImplementation.createNotificationChannel(_bookingChannel);
       await androidImplementation.createNotificationChannel(_meetingChannel);
       await androidImplementation.createNotificationChannel(_generalChannel);
+      await androidImplementation.createNotificationChannel(_generalChannelV2);
     }
   }
 
@@ -341,7 +361,7 @@ class PushNotificationService {
 
   static Priority _getPriorityForImportance(Importance importance) {
     if (importance == Importance.max || importance == Importance.high) {
-      return Priority.high;
+      return Priority.max;
     }
     return Priority.defaultPriority;
   }
@@ -498,10 +518,12 @@ class PushNotificationService {
         channel.name,
         channelDescription: channel.description,
         importance: channel.importance,
-        priority: _getPriorityForImportance(channel.importance),
+        priority: Priority.max,
         color: AppColors.notificationAccent,
         icon: 'ic_stat_notification',
         largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+        playSound: true,
+        enableVibration: true,
       );
 
       const darwinDetails = DarwinNotificationDetails(
@@ -606,12 +628,14 @@ class PushNotificationService {
             channel.name,
             channelDescription: channel.description,
             importance: channel.importance,
-            priority: _getPriorityForImportance(channel.importance),
+            priority: Priority.max,
             color: AppColors.notificationAccent,
             icon: 'ic_stat_notification',
             largeIcon: const DrawableResourceAndroidBitmap(
               '@mipmap/ic_launcher',
             ),
+            playSound: true,
+            enableVibration: true,
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
@@ -644,17 +668,49 @@ class PushNotificationService {
     }
   }
 
+  /// Consumes and clears the pending notification payload atomically.
+  NotificationPayload? consumePendingPayload() {
+    final payload = _pendingPayload;
+    _pendingPayload = null;
+    return payload;
+  }
+
+  /// Directly executes navigation for a notification payload with the given BuildContext.
+  void dispatchPayload(BuildContext context, NotificationPayload payload) {
+    try {
+      final router = GoRouter.of(context);
+      _executeNavigation(router, payload);
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Direct dispatch failed for ${payload.type}: $e',
+        );
+      }
+      _safeGoHome(context);
+    }
+  }
+
   /// Main handler to execute redirection based on notification payload type.
   void handleNotificationClick(NotificationPayload payload) {
     final context = rootNavigatorKey.currentContext;
 
-    if (context == null) {
+    if (context == null || !context.mounted) {
       if (kDebugMode) {
         debugPrint(
           '[PushNotificationService] Context not ready yet, queuing notification tap: $payload',
         );
       }
       _pendingPayload = payload;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        processPendingNotification();
+      });
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (_pendingPayload != null) {
+          processPendingNotification();
+        }
+      });
       return;
     }
 
@@ -669,106 +725,21 @@ class PushNotificationService {
       // the redirect overwrites this navigation.
       final currentLocation =
           router.routerDelegate.currentConfiguration.uri.path;
-      if (currentLocation == '/splash' || currentLocation.isEmpty) {
+      if (currentLocation == '/splash') {
         if (kDebugMode) {
           debugPrint(
             '[PushNotificationService] On splash, deferring notification tap: $payload',
           );
         }
         _pendingPayload = payload;
+        // Auto-retry once router transitions away from splash
+        Future.delayed(const Duration(milliseconds: 250), () {
+          processPendingNotification();
+        });
         return;
       }
 
-      if (kDebugMode) {
-        debugPrint(
-          '[PushNotificationService] Navigating for notification tap: $payload',
-        );
-      }
-
-      switch (payload.type) {
-        case NotificationType.chat:
-          if (payload.chatId != null && payload.chatId!.isNotEmpty) {
-            router.pushNamed(
-              RouteNames.chat,
-              extra: {
-                'conversationId': payload.chatId,
-                'contactName': payload.title ?? 'Chat',
-              },
-            );
-          } else {
-            router.goNamed(RouteNames.messages);
-          }
-          break;
-
-        case NotificationType.booking:
-          if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
-            final bookingId = int.tryParse(payload.bookingId!);
-            if (bookingId != null) {
-              final extraData = <String, dynamic>{
-                if (payload.title != null) 'projectName': payload.title,
-                if (payload.rawMap['project_name'] != null)
-                  'projectName': payload.rawMap['project_name'],
-                if (payload.rawMap['image_url'] != null)
-                  'imageUrl': payload.rawMap['image_url'],
-                if (payload.rawMap['location'] != null)
-                  'location': payload.rawMap['location'],
-                if (payload.rawMap['event_date'] != null)
-                  'eventDate': payload.rawMap['event_date'],
-                if (payload.rawMap['start_time'] != null)
-                  'startTime': payload.rawMap['start_time'],
-                if (payload.rawMap['end_time'] != null)
-                  'endTime': payload.rawMap['end_time'],
-                if (payload.rawMap['content_type'] != null)
-                  'contentType': payload.rawMap['content_type'],
-              };
-              router.pushNamed(
-                RouteNames.manageBooking,
-                pathParameters: {'bookingId': bookingId.toString()},
-                extra: extraData.isNotEmpty ? extraData : null,
-              );
-            } else {
-              router.goNamed(RouteNames.myShoots);
-            }
-          } else {
-            router.goNamed(RouteNames.myShoots);
-          }
-          break;
-
-        case NotificationType.meeting:
-          if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
-            router.goNamed(
-              RouteNames.meetings,
-              queryParameters: {'meetingId': payload.meetingId!},
-            );
-          } else if (payload.bookingId != null &&
-              int.tryParse(payload.bookingId!) != null) {
-            router.pushNamed(
-              RouteNames.manageBooking,
-              pathParameters: {'bookingId': payload.bookingId!},
-            );
-          } else {
-            router.goNamed(RouteNames.meetings);
-          }
-          break;
-
-        case NotificationType.files:
-          if (payload.targetRoute != null &&
-              payload.targetRoute!.startsWith('/file-manager')) {
-            router.push(payload.targetRoute!);
-          } else {
-            router.pushNamed(RouteNames.fileManager);
-          }
-          break;
-
-        case NotificationType.profile:
-          router.goNamed(RouteNames.profile);
-          break;
-
-        case NotificationType.deeplink:
-        case NotificationType.unknown:
-          _pushTargetRouteOrHome(router, payload.targetRoute);
-          break;
-      }
+      _executeNavigation(router, payload);
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
@@ -779,6 +750,168 @@ class PushNotificationService {
       }
       _safeGoHome(context);
     }
+  }
+
+  /// Executes route redirection for the specified payload.
+  void _executeNavigation(GoRouter router, NotificationPayload payload) {
+    if (kDebugMode) {
+      debugPrint(
+        '[PushNotificationService] Executing navigation for notification: $payload',
+      );
+    }
+
+    switch (payload.type) {
+      case NotificationType.chat:
+        final contactName = _resolveChatContactName(payload);
+        if (payload.chatId != null && payload.chatId!.isNotEmpty) {
+          router.pushNamed(
+            RouteNames.chat,
+            queryParameters: {
+              'conversationId': payload.chatId!,
+              if (contactName.isNotEmpty) 'contactName': contactName,
+            },
+            extra: {
+              'conversationId': payload.chatId,
+              'contactName': contactName,
+            },
+          );
+        } else {
+          router.goNamed(RouteNames.messages);
+        }
+        break;
+
+      case NotificationType.booking:
+        if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
+          final bookingId = int.tryParse(payload.bookingId!);
+          if (bookingId != null) {
+            final raw = payload.rawMap;
+            final resolvedImg =
+                raw['image_url'] ??
+                raw['cover_image'] ??
+                raw['avatar_url'] ??
+                raw['profile_image_url'] ??
+                raw['image'];
+            final extraData = <String, dynamic>{
+              if (payload.title != null) 'projectName': payload.title,
+              if (raw['project_name'] != null)
+                'projectName': raw['project_name'],
+              if (raw['name'] != null) 'projectName': raw['name'],
+              if (resolvedImg != null) 'imageUrl': resolvedImg.toString(),
+              if (raw['location'] != null) 'location': raw['location'],
+              if (raw['event_date'] != null) 'eventDate': raw['event_date'],
+              if (raw['date'] != null) 'eventDate': raw['date'],
+              if (raw['start_time'] != null) 'startTime': raw['start_time'],
+              if (raw['end_time'] != null) 'endTime': raw['end_time'],
+              if (raw['content_type'] != null)
+                'contentType': raw['content_type'],
+            };
+            router.pushNamed(
+              RouteNames.manageBooking,
+              pathParameters: {'bookingId': bookingId.toString()},
+              extra: extraData.isNotEmpty ? extraData : null,
+            );
+          } else {
+            router.goNamed(RouteNames.myShoots);
+          }
+        } else {
+          router.goNamed(RouteNames.myShoots);
+        }
+        break;
+
+      case NotificationType.meeting:
+        if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
+          router.goNamed(
+            RouteNames.meetings,
+            queryParameters: {'meetingId': payload.meetingId!},
+          );
+        } else if (payload.bookingId != null &&
+            int.tryParse(payload.bookingId!) != null) {
+          router.pushNamed(
+            RouteNames.manageBooking,
+            pathParameters: {'bookingId': payload.bookingId!},
+          );
+        } else {
+          router.goNamed(RouteNames.meetings);
+        }
+        break;
+
+      case NotificationType.files:
+        if (payload.targetRoute != null &&
+            payload.targetRoute!.startsWith('/file-manager')) {
+          router.push(payload.targetRoute!);
+        } else {
+          router.pushNamed(RouteNames.fileManager);
+        }
+        break;
+
+      case NotificationType.profile:
+        router.goNamed(RouteNames.profile);
+        break;
+
+      case NotificationType.deeplink:
+        _pushTargetRouteOrHome(router, payload.targetRoute);
+        break;
+
+      case NotificationType.unknown:
+        if (payload.targetRoute != null && payload.targetRoute!.isNotEmpty) {
+          _pushTargetRouteOrHome(router, payload.targetRoute);
+        } else if (payload.chatId != null && payload.chatId!.isNotEmpty) {
+          final contactName = _resolveChatContactName(payload);
+          router.pushNamed(
+            RouteNames.chat,
+            queryParameters: {
+              'conversationId': payload.chatId!,
+              if (contactName.isNotEmpty) 'contactName': contactName,
+            },
+            extra: {
+              'conversationId': payload.chatId,
+              'contactName': contactName,
+            },
+          );
+        } else if (payload.bookingId != null &&
+            int.tryParse(payload.bookingId!) != null) {
+          router.pushNamed(
+            RouteNames.manageBooking,
+            pathParameters: {'bookingId': payload.bookingId!},
+          );
+        } else {
+          router.goNamed(RouteNames.home);
+        }
+        break;
+    }
+  }
+
+  /// Resolves the room or contact display name from chat notification payload.
+  String _resolveChatContactName(NotificationPayload payload) {
+    final raw = payload.rawMap;
+    final candidates = [
+      raw['room_name'],
+      raw['roomName'],
+      raw['room_title'],
+      raw['roomTitle'],
+      raw['contactName'],
+      raw['contact_name'],
+      raw['displayName'],
+      raw['display_name'],
+      raw['sender_name'],
+      raw['senderName'],
+      raw['name'],
+    ];
+    for (final c in candidates) {
+      if (c != null && c.toString().trim().isNotEmpty) {
+        return c.toString().trim();
+      }
+    }
+    final title = payload.title ?? '';
+    final match = RegExp(
+      r'^(?:New message in|Message from)\s*(.+)$',
+      caseSensitive: false,
+    ).firstMatch(title);
+    if (match != null && match.group(1) != null) {
+      final extracted = match.group(1)!.trim();
+      if (extracted.isNotEmpty) return extracted;
+    }
+    return title.isNotEmpty ? title : 'Chat';
   }
 
   /// Pushes a server-provided deep-link route only if it looks like a valid

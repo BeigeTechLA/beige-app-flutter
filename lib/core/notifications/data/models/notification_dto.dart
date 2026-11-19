@@ -1,3 +1,4 @@
+import '../../../utils/image_url_utils.dart';
 import '../../domain/models/notification_item.dart';
 
 class NotificationListResponseDto {
@@ -111,6 +112,28 @@ class NotificationItemDto {
     this.payload,
   });
 
+  static String? _resolveAvatarUrl(Map<String, dynamic> json) {
+    final raw = json['sender']?['profile_image_url'] ??
+        json['sender']?['profile_photo'] ??
+        json['sender']?['avatar_url'] ??
+        json['sender']?['image'] ??
+        json['avatar_url'] ??
+        json['avatar'] ??
+        json['image_url'] ??
+        json['image'] ??
+        (json['payload'] is Map
+            ? (json['payload']['avatar_url'] ??
+                json['payload']['profile_image_url'] ??
+                json['payload']['image_url'] ??
+                json['payload']['image'])
+            : null);
+    if (raw == null) return null;
+    final str = raw.toString().trim();
+    if (str.isEmpty) return null;
+    final built = buildImageUrl(str);
+    return built.isNotEmpty ? built : null;
+  }
+
   factory NotificationItemDto.fromJson(dynamic raw) {
     if (raw is! Map) {
       return NotificationItemDto(
@@ -128,7 +151,7 @@ class NotificationItemDto {
       isRead: json['is_read'] == 1 || json['is_read'] == true || json['read_at'] != null || json['status'] == 'read',
       type: json['type']?.toString(),
       senderName: json['sender']?['name']?.toString() ?? json['sender_name']?.toString() ?? (json['payload'] is Map ? json['payload']['sender_name']?.toString() : null),
-      avatarUrl: json['sender']?['profile_image_url']?.toString() ?? json['avatar_url']?.toString(),
+      avatarUrl: _resolveAvatarUrl(json),
       actionLabel: json['action_label']?.toString(),
       category: json['category']?.toString(),
       payload: json['payload'] is Map ? Map<String, dynamic>.from(json['payload'] as Map) : null,

@@ -36,46 +36,107 @@ class NotificationPayload {
     String? title,
     String? body,
   }) {
-    final typeString =
-        (data['type'] ?? data['notification_type'] ?? '').toString().toLowerCase();
-    final topicString =
-        (data['topic'] ?? data['category'] ?? '').toString().toLowerCase();
+    // Check top-level data as well as optional nested payload/data map
+    final nested = (data['payload'] is Map)
+        ? data['payload'] as Map<dynamic, dynamic>
+        : (data['data'] is Map ? data['data'] as Map<dynamic, dynamic> : null);
 
-    final type = _resolveType(typeString, topicString);
+    String? find(List<String> keys) {
+      for (final k in keys) {
+        final v = data[k] ?? nested?[k];
+        if (v != null) {
+          if (v is Map) {
+            final inner = v['id'] ??
+                v['roomId'] ??
+                v['room_id'] ??
+                v['chat_room_id'] ??
+                v['chatRoomId'] ??
+                v['chat_id'] ??
+                v['conversationId'] ??
+                v['booking_id'] ??
+                v['bookingId'] ??
+                v['shoot_id'];
+            if (inner != null && inner.toString().trim().isNotEmpty) {
+              return inner.toString().trim();
+            }
+          } else if (v.toString().trim().isNotEmpty) {
+            return v.toString().trim();
+          }
+        }
+      }
+      return null;
+    }
+
+    final typeString =
+        (find(['type', 'notification_type', 'notificationType', 'eventType', 'event']) ?? '').toLowerCase();
+    final topicString =
+        (find(['topic', 'category']) ?? '').toLowerCase();
+
+    final bookingId = find([
+      'booking_id',
+      'bookingId',
+      'shoot_id',
+      'shootId',
+      'project_id',
+      'projectId',
+      'order_id',
+      'orderId',
+    ]);
+    String? chatId = find([
+      'chat_room_id',
+      'chatRoomId',
+      'room_id',
+      'roomId',
+      'chatId',
+      'chat_id',
+      'conversationId',
+      'conversation_id',
+      'channel_id',
+      'channelId',
+      'group_id',
+      'groupId',
+      'room',
+    ]);
+    final meetingId = find(['meeting_id', 'meetingId']);
+    final targetRoute = find(['targetRoute', 'route', 'filepath']);
+
+    final resolvedTitle = title ?? find(['title', 'sender_name', 'senderName']);
+    final resolvedBody = body ?? find(['body', 'message']);
+
+    // Title fallback heuristic for chat room (e.g. "New message in corporate_harsh_#4646")
+    if (chatId == null || chatId.isEmpty) {
+      final t = resolvedTitle ?? '';
+      final match = RegExp(
+        r'^(?:New message in|Message from)\s*(.+)$',
+        caseSensitive: false,
+      ).firstMatch(t);
+      if (match != null) {
+        final extracted = match.group(1)?.trim();
+        if (extracted != null && extracted.isNotEmpty) {
+          chatId = extracted;
+        }
+      }
+    }
+
+    final type = _resolveType(
+      typeString,
+      topicString,
+      bookingId: bookingId,
+      chatId: chatId,
+      meetingId: meetingId,
+      targetRoute: targetRoute,
+      title: resolvedTitle,
+      body: resolvedBody,
+    );
 
     return NotificationPayload(
       type: type,
-      title: title ??
-          _firstNonEmpty([
-            data['title'],
-            data['sender_name'],
-            data['senderName'],
-          ]),
-      body: body ?? data['body']?.toString(),
-      chatId: _firstNonEmpty([
-        data['chat_room_id'],
-        data['room_id'],
-        data['roomId'],
-        data['chatId'],
-        data['chat_id'],
-        data['conversationId'],
-      ]),
-      bookingId: _firstNonEmpty([
-        data['booking_id'],
-        data['bookingId'],
-        data['shoot_id'],
-        data['project_id'],
-        data['order_id'],
-      ]),
-      meetingId: _firstNonEmpty([
-        data['meeting_id'],
-        data['meetingId'],
-      ]),
-      targetRoute: _firstNonEmpty([
-        data['targetRoute'],
-        data['route'],
-        data['filepath'],
-      ]),
+      title: resolvedTitle,
+      body: resolvedBody,
+      chatId: chatId,
+      bookingId: bookingId,
+      meetingId: meetingId,
+      targetRoute: targetRoute,
       rawMap: Map<String, dynamic>.from(data),
     );
   }
@@ -98,10 +159,17 @@ class NotificationPayload {
   }
 
   /// Resolves the notification family from the server `type` event first, then
-  /// falls back to the top-level `topic` / `category`. Uses family matching
-  /// (not brittle exact strings) so new backend event names keep routing
-  /// correctly.
-  static NotificationType _resolveType(String typeString, String topicString) {
+  /// falls back to the top-level `topic` / `category`, then to payload data keys.
+  static NotificationType _resolveType(
+    String typeString,
+    String topicString, {
+    String? bookingId,
+    String? chatId,
+    String? meetingId,
+    String? targetRoute,
+    String? title,
+    String? body,
+  }) {
     // 1. Match against the specific `type` event name.
     if (typeString.isNotEmpty) {
       if (_isChatType(typeString)) return NotificationType.chat;
@@ -129,6 +197,41 @@ class NotificationPayload {
       case 'profile':
       case 'account':
         return NotificationType.profile;
+      case 'deeplink':
+        return NotificationType.deeplink;
+    }
+
+    // 3. Fall back to payload key hints.
+    if (chatId != null && chatId.isNotEmpty) {
+      return NotificationType.chat;
+    }
+    if (bookingId != null && bookingId.isNotEmpty) {
+      return NotificationType.booking;
+    }
+    if (meetingId != null && meetingId.isNotEmpty) {
+      return NotificationType.meeting;
+    }
+    if (targetRoute != null && targetRoute.isNotEmpty) {
+      return NotificationType.deeplink;
+    }
+
+    // 4. Fall back to textual hints in title or body.
+    final tLower = (title ?? '').toLowerCase();
+    final bLower = (body ?? '').toLowerCase();
+    if (tLower.contains('message') ||
+        tLower.contains('chat') ||
+        bLower.contains('message') ||
+        bLower.contains('chat')) {
+      return NotificationType.chat;
+    }
+    if (tLower.contains('booking') ||
+        tLower.contains('shoot') ||
+        bLower.contains('booking') ||
+        bLower.contains('shoot')) {
+      return NotificationType.booking;
+    }
+    if (tLower.contains('meeting') || bLower.contains('meeting')) {
+      return NotificationType.meeting;
     }
 
     return NotificationType.unknown;
@@ -140,6 +243,7 @@ class NotificationPayload {
         type == 'messaging_initiated' ||
         type.contains('message') ||
         type.contains('messaging') ||
+        type.contains('chat') ||
         type == 'mention';
   }
 
@@ -148,7 +252,10 @@ class NotificationPayload {
         type == 'shoot' ||
         type == 'order' ||
         type.startsWith('booking_') ||
-        type.startsWith('shoot_');
+        type.startsWith('shoot_') ||
+        type.contains('booking') ||
+        type.contains('shoot') ||
+        type.contains('assigned');
   }
 
   static bool _isFilesType(String type) {

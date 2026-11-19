@@ -39,7 +39,7 @@ class ShootSummaryNotifier extends Notifier<ShootSummaryState> {
 
   @override
   ShootSummaryState build() {
-    fetchShootSummary(bookingId);
+    Future.microtask(() => fetchShootSummary(bookingId));
     return const ShootSummaryState(status: ShootSummaryStatus.loading);
   }
 
