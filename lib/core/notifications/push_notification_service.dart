@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/colors.dart';
 import '../../app/navigator_key.dart';
@@ -76,9 +77,38 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+/// Background-isolate tap handler for local notifications shown while the app
+/// is backgrounded or terminated.
+///
+/// Runs in a separate isolate with no UI, so it cannot navigate. It persists
+/// the tapped payload so the main isolate can drain it on next launch/resume
+/// (see `PushNotificationService._drainPersistedTap`). Belt-and-suspenders for
+/// the `getNotificationAppLaunchDetails` capture, and the only path that
+/// receives notification action-button responses.
+@pragma('vm:entry-point')
+Future<void> _onDidReceiveBackgroundNotificationResponse(
+  NotificationResponse response,
+) async {
+  final payload = response.payload;
+  if (payload == null || payload.isEmpty) return;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      PushNotificationService.pendingTapPrefsKey,
+      payload,
+    );
+  } catch (_) {
+    // Best-effort — the foreground launch-details path is the primary capture.
+  }
+}
+
 class PushNotificationService {
   PushNotificationService._();
   static final PushNotificationService instance = PushNotificationService._();
+
+  /// SharedPreferences key under which the background isolate persists a tapped
+  /// local-notification payload for the main isolate to drain on next launch.
+  static const String pendingTapPrefsKey = 'pending_notification_tap_payload';
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications =
@@ -141,6 +171,7 @@ class PushNotificationService {
 
   NotificationPayload? _pendingPayload;
   bool _isInitialized = false;
+  bool _drainRetryScheduled = false;
   Future<String?>? _pendingTokenFetch;
 
   /// Initializes FCM listeners, multi-channel setup, permission prompts,
@@ -149,25 +180,84 @@ class PushNotificationService {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    // Push setup must never block app launch. Any failure here (plugin init,
-    // permission prompt, platform channel) is logged and swallowed so the app
-    // still renders — it just runs without push until the next launch.
+    // Push setup must never block app launch, AND a failure in local-notif init
+    // or the permission prompt must never prevent background/terminated taps
+    // from routing. Each step runs in its own guard so an early throw cannot
+    // skip the redirect listeners (which are therefore registered FIRST).
+
+    // ── 1. Register FCM redirect listeners (cheap, non-throwing) ─────────────
     try {
-      // Set background message handler
+      // Background message handler (also shows local notif for data-only pushes).
       FirebaseMessaging.onBackgroundMessage(
         _firebaseMessagingBackgroundHandler,
       );
 
-      // Setup multi-channel local notifications for Android & iOS
+      // Handle background notification taps when app is resumed.
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        _logRemoteMessage('background_notification_opened', message);
+        final payload = NotificationPayload.fromRemoteMessage(message);
+        handleNotificationClick(payload);
+      });
+
+      // Handle foreground notifications.
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _logRemoteMessage('foreground_received', message);
+        _showForegroundNotification(message);
+      });
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Listener registration failed: $e',
+        );
+      }
+    }
+
+    // ── 2. Local notification plugin + Android channels ─────────────────────
+    try {
       await _setupLocalNotifications();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Local notification setup failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Request permissions on app open according to iOS & Android best practices
+    // ── 3. Permission prompt (iOS + Android 13+) ────────────────────────────
+    try {
       await requestPermissions();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Permission request failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Fetch initial FCM token & listen for refreshes
+    // ── 4. Token fetch + refresh wiring ─────────────────────────────────────
+    try {
       _setupTokenManagement();
+    } catch (e, st) {
+      // ignore: discarded_futures
+      CrashlyticsService.recordError(e, st);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Token management setup failed (non-fatal): $e',
+        );
+      }
+    }
 
-      // Handle initial notification tap if launched from terminated state
+    // ── 5. Capture the launch notification (terminated → tapped) ────────────
+    // Runs after local-notif init so the data-only local-launch fallback can
+    // read launch details. The redirect listeners above are already wired, so
+    // a throw here can never skip redirection setup.
+    try {
       final initialMessage = await _fcm.getInitialMessage();
       if (initialMessage != null) {
         _logRemoteMessage('terminated_notification_opened', initialMessage);
@@ -198,29 +288,46 @@ class PushNotificationService {
           }
         }
       }
-
-      // Handle background notification taps when app is resumed
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        _logRemoteMessage('background_notification_opened', message);
-        final payload = NotificationPayload.fromRemoteMessage(message);
-        handleNotificationClick(payload);
-      });
-
-      // Handle foreground notifications
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        _logRemoteMessage('foreground_received', message);
-        _showForegroundNotification(message);
-      });
-
-      if (kDebugMode) {
-        debugPrint('[PushNotificationService] Initialized successfully.');
-      }
     } catch (e, st) {
       // ignore: discarded_futures
       CrashlyticsService.recordError(e, st);
       if (kDebugMode) {
         debugPrint(
-          '[PushNotificationService] initialize failed (non-fatal): $e',
+          '[PushNotificationService] Launch message capture failed (non-fatal): $e',
+        );
+      }
+    }
+
+    // ── 6. Drain a tap captured by the background-isolate response handler ────
+    await _drainPersistedTap();
+
+    if (kDebugMode) {
+      debugPrint('[PushNotificationService] Initialized successfully.');
+    }
+  }
+
+  /// Reads (and clears) any tapped payload the background isolate persisted via
+  /// `_onDidReceiveBackgroundNotificationResponse`. Only adopts it when the FCM
+  /// `getInitialMessage` / launch-details capture didn't already set a pending
+  /// payload, so a single tap never routes twice.
+  Future<void> _drainPersistedTap() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(pendingTapPrefsKey);
+      if (stored == null || stored.isEmpty) return;
+      await prefs.remove(pendingTapPrefsKey);
+      if (_pendingPayload != null) return;
+      final Map<String, dynamic> data = jsonDecode(stored);
+      _pendingPayload = NotificationPayload.fromMap(data);
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Captured persisted background tap: $_pendingPayload',
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint(
+          '[PushNotificationService] Failed to drain persisted background tap: $e',
         );
       }
     }
@@ -306,6 +413,8 @@ class PushNotificationService {
           }
         }
       },
+      onDidReceiveBackgroundNotificationResponse:
+          _onDidReceiveBackgroundNotificationResponse,
     );
 
     // Create all 4 dedicated Android Notification Channels
@@ -579,6 +688,8 @@ class PushNotificationService {
           android: androidInitSettings,
           iOS: darwinInitSettings,
         ),
+        onDidReceiveBackgroundNotificationResponse:
+            _onDidReceiveBackgroundNotificationResponse,
       );
 
       final channel = _getChannelForType(payload.type);
@@ -635,13 +746,30 @@ class PushNotificationService {
     }
   }
 
-  /// Processes any pending notification payload captured during app startup.
+  /// Processes any pending notification payload captured during app startup or
+  /// re-queued because the navigator wasn't ready.
+  ///
+  /// Safe to call from multiple drain triggers (Home mount, app resume, auth
+  /// landing): the payload is cleared BEFORE dispatch, so a concurrent second
+  /// call sees null and no-ops — no double navigation.
   void processPendingNotification() {
-    if (_pendingPayload != null) {
-      final payload = _pendingPayload!;
-      _pendingPayload = null;
-      handleNotificationClick(payload);
-    }
+    final payload = _pendingPayload;
+    if (payload == null) return;
+    _pendingPayload = null;
+    handleNotificationClick(payload);
+  }
+
+  /// Schedules a single next-frame drain attempt for a payload queued because
+  /// the navigator wasn't ready yet. One-shot per queue — if the context is
+  /// still null after the frame, the lifecycle / auth / Home-mount drains take
+  /// over, so this never busy-loops.
+  void _scheduleDrainRetry() {
+    if (_drainRetryScheduled) return;
+    _drainRetryScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _drainRetryScheduled = false;
+      processPendingNotification();
+    });
   }
 
   /// Main handler to execute redirection based on notification payload type.
@@ -655,6 +783,7 @@ class PushNotificationService {
         );
       }
       _pendingPayload = payload;
+      _scheduleDrainRetry();
       return;
     }
 
