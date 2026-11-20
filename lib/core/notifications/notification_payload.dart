@@ -351,14 +351,4 @@ class NotificationPayload {
         type.startsWith('profile_') ||
         type.startsWith('account_');
   }
-
-  /// Returns the first non-null, non-empty value as a String, else null.
-  static String? _firstNonEmpty(List<dynamic> values) {
-    for (final value in values) {
-      if (value == null) continue;
-      final str = value.toString();
-      if (str.isNotEmpty) return str;
-    }
-    return null;
-  }
 }
