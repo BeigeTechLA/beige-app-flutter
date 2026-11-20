@@ -1,4 +1,5 @@
 import '../core/providers/account_status_provider.dart';
+import '../core/notifications/push_notification_service.dart';
 import '../features/account_deletion/presentation/deletion_provider.dart';
 import '../features/account_deletion/presentation/account_recovery_screens.dart';
 import 'dart:io';
@@ -1079,18 +1080,35 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 /// Shell widget for bottom navigation with IndexedStack.
 /// Replaces the destructive switch(_selectedIndex) in old MainScreen.
-class _MainShell extends ConsumerWidget {
+class _MainShell extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const _MainShell({required this.navigationShell});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<_MainShell> {
+  @override
+  void initState() {
+    super.initState();
+    // ✅ CRITICAL CP APP PATTERN:
+    // Once the shell is mounted and auth check has settled, process any pending notification tap:
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        PushNotificationService.instance.processPendingNotification(context);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       drawer: const DrawerScreen(),
       extendBody: true,
 
-      body: navigationShell,
+      body: widget.navigationShell,
 
       /* Row(
         children: [
@@ -1117,7 +1135,7 @@ class _MainShell extends ConsumerWidget {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 85, sigmaY: 75),
                 child: BottomNavigationBar(
-                  currentIndex: navigationShell.currentIndex,
+                  currentIndex: widget.navigationShell.currentIndex,
                   elevation: 0,
                   type: BottomNavigationBarType.fixed,
                   backgroundColor: AppColors.background,
@@ -1138,9 +1156,9 @@ class _MainShell extends ConsumerWidget {
                       startNewBooking(context);
                       return;
                     }
-                    navigationShell.goBranch(
+                    widget.navigationShell.goBranch(
                       index,
-                      initialLocation: index == navigationShell.currentIndex,
+                      initialLocation: index == widget.navigationShell.currentIndex,
                     );
                   },
                   items: [

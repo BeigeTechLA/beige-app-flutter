@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 enum NotificationType {
@@ -15,6 +16,7 @@ class NotificationPayload {
   final String? title;
   final String? body;
   final String? chatId;
+  final String? contactName;
   final String? bookingId;
   final String? meetingId;
   final String? targetRoute;
@@ -25,6 +27,7 @@ class NotificationPayload {
     this.title,
     this.body,
     this.chatId,
+    this.contactName,
     this.bookingId,
     this.meetingId,
     this.targetRoute,
@@ -36,10 +39,37 @@ class NotificationPayload {
     String? title,
     String? body,
   }) {
-    // Check top-level data as well as optional nested payload/data map
-    final nested = (data['payload'] is Map)
-        ? data['payload'] as Map<dynamic, dynamic>
-        : (data['data'] is Map ? data['data'] as Map<dynamic, dynamic> : null);
+    // Check top-level data as well as optional nested payload/data map.
+    // FCM often encodes nested maps into JSON strings inside data.
+    Map<dynamic, dynamic>? nested;
+    if (data['payload'] is Map) {
+      nested = data['payload'] as Map<dynamic, dynamic>;
+    } else if (data['payload'] is String) {
+      final str = (data['payload'] as String).trim();
+      if (str.startsWith('{') && str.endsWith('}')) {
+        try {
+          final decoded = jsonDecode(str);
+          if (decoded is Map) {
+            nested = decoded as Map<dynamic, dynamic>;
+          }
+        } catch (_) {}
+      }
+    }
+    if (nested == null) {
+      if (data['data'] is Map) {
+        nested = data['data'] as Map<dynamic, dynamic>;
+      } else if (data['data'] is String) {
+        final str = (data['data'] as String).trim();
+        if (str.startsWith('{') && str.endsWith('}')) {
+          try {
+            final decoded = jsonDecode(str);
+            if (decoded is Map) {
+              nested = decoded as Map<dynamic, dynamic>;
+            }
+          } catch (_) {}
+        }
+      }
+    }
 
     String? find(List<String> keys) {
       for (final k in keys) {
@@ -72,7 +102,7 @@ class NotificationPayload {
     final topicString =
         (find(['topic', 'category']) ?? '').toLowerCase();
 
-    final bookingId = find([
+    String? bookingId = find([
       'booking_id',
       'bookingId',
       'shoot_id',
@@ -97,11 +127,54 @@ class NotificationPayload {
       'groupId',
       'room',
     ]);
-    final meetingId = find(['meeting_id', 'meetingId']);
+    String? meetingId = find(['meeting_id', 'meetingId']);
     final targetRoute = find(['targetRoute', 'route', 'filepath']);
+
+    // Check reference_id and reference_type
+    final refType = (find(['reference_type', 'referenceType']) ?? '').toLowerCase();
+    final refId = find(['reference_id', 'referenceId']);
+    if (chatId == null || chatId.isEmpty) {
+      if (refType == 'chat_room' ||
+          refType == 'chat' ||
+          refType == 'message' ||
+          typeString == 'direct_message' ||
+          typeString == 'chat' ||
+          topicString == 'messages') {
+        if (refId != null && refId.isNotEmpty) {
+          chatId = refId;
+        }
+      }
+    }
+    if (bookingId == null || bookingId.isEmpty) {
+      if (refType == 'booking' ||
+          refType == 'shoot' ||
+          refType == 'order' ||
+          typeString == 'booking' ||
+          topicString == 'shoots') {
+        if (refId != null && refId.isNotEmpty) {
+          bookingId = refId;
+        }
+      }
+    }
+    if (meetingId == null || meetingId.isEmpty) {
+      if (refType == 'meeting' || typeString == 'meeting' || topicString == 'meetings') {
+        if (refId != null && refId.isNotEmpty) {
+          meetingId = refId;
+        }
+      }
+    }
 
     final resolvedTitle = title ?? find(['title', 'sender_name', 'senderName']);
     final resolvedBody = body ?? find(['body', 'message']);
+    final contactName = find([
+      'chat_name',
+      'chatName',
+      'sender_name',
+      'senderName',
+      'contact_name',
+      'contactName',
+      'name',
+    ]) ?? resolvedTitle;
 
     // Title fallback heuristic for chat room (e.g. "New message in corporate_harsh_#4646")
     if (chatId == null || chatId.isEmpty) {
@@ -134,6 +207,7 @@ class NotificationPayload {
       title: resolvedTitle,
       body: resolvedBody,
       chatId: chatId,
+      contactName: contactName,
       bookingId: bookingId,
       meetingId: meetingId,
       targetRoute: targetRoute,

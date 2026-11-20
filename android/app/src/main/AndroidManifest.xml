@@ -30,13 +30,13 @@
         <!-- FCM Default Notification Channel & Icon -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="beige_general_channel_v2" />
+            android:value="beige_general_channel" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_stat_notification" />
+            android:resource="@mipmap/ic_launcher" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/notification_accent" />
+            android:resource="@android:color/transparent" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
