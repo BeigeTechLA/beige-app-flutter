@@ -1,4 +1,11 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- App does not use the Advertising ID; strip the permission pulled in transitively by firebase_analytics -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+
+    <!-- App is portrait-oriented but does not require portrait hardware; keep install availability for tablets/desktop/XR -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -9,8 +16,9 @@
     <!-- Camera Permission -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
-    <!-- For Android 13+ -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <!-- Pickers use Android Photo Picker (image_picker) + SAF (file_picker) — no broad media perms per Google Play policy -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove"/>
 
     <!-- For Android 12 and below -->
     <uses-permission
@@ -49,12 +57,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <!-- 🔥 REQUIRED FOR IMAGE CROPPER (THIS WAS MISSING) -->
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <meta-data
             android:name="flutterEmbedding"
