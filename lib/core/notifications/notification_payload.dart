@@ -50,7 +50,7 @@ class NotificationPayload {
         try {
           final decoded = jsonDecode(str);
           if (decoded is Map) {
-            nested = decoded as Map<dynamic, dynamic>;
+            nested = decoded;
           }
         } catch (_) {}
       }
@@ -64,7 +64,7 @@ class NotificationPayload {
           try {
             final decoded = jsonDecode(str);
             if (decoded is Map) {
-              nested = decoded as Map<dynamic, dynamic>;
+              nested = decoded;
             }
           } catch (_) {}
         }

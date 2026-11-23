@@ -795,16 +795,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           final args = state.extra is ChatArgs
               ? state.extra as ChatArgs
               : ChatArgs.fromExtra(extraMap);
-          final queryId = state.uri.queryParameters['conversationId'] ??
+          final queryId =
+              state.uri.queryParameters['conversationId'] ??
               state.uri.queryParameters['roomId'] ??
               state.uri.queryParameters['chatId'] ??
               state.uri.queryParameters['id'];
-          final queryName = state.uri.queryParameters['contactName'] ??
+          final queryName =
+              state.uri.queryParameters['contactName'] ??
               state.uri.queryParameters['name'];
           final resolvedId = args.conversationId.isNotEmpty
               ? args.conversationId
               : (queryId ?? '');
-          final resolvedName = (args.contactName != null && args.contactName!.isNotEmpty)
+          final resolvedName =
+              (args.contactName != null && args.contactName!.isNotEmpty)
               ? args.contactName
               : queryName;
           return ChatThreadScreen(
@@ -1047,9 +1050,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       MaterialGoRoute(
         path: '/meetings',
         name: RouteNames.meetings,
-        builder: (context, state) => MeetingsScreen(
-          meetingId: state.uri.queryParameters['meetingId'],
-        ),
+        builder: (context, state) =>
+            MeetingsScreen(meetingId: state.uri.queryParameters['meetingId']),
       ),
 
       MaterialGoRoute(
@@ -1073,6 +1075,24 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 
+  final notificationRouter = PushNotificationService.instance.tapRouter;
+  notificationRouter.attach(
+    router,
+    canNavigate: () =>
+        authNotifier.value &&
+        accountNotifier.value == AccountStatus.active &&
+        connNotifier.value != ConnectivityStatus.offline &&
+        !_publicRoutes.contains(router.state.uri.path),
+    blockedReason: () => accountNotifier.value != AccountStatus.active
+        ? 'waiting_for_active_account'
+        : null,
+  );
+  refreshListenable.addListener(notificationRouter.retry);
+  ref.onDispose(() {
+    refreshListenable.removeListener(notificationRouter.retry);
+    notificationRouter.detach();
+  });
+
   router.routerDelegate.addListener(persistOnChange);
 
   return router;
@@ -1090,18 +1110,6 @@ class _MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<_MainShell> {
-  @override
-  void initState() {
-    super.initState();
-    // ✅ CRITICAL CP APP PATTERN:
-    // Once the shell is mounted and auth check has settled, process any pending notification tap:
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        PushNotificationService.instance.processPendingNotification(context);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1158,7 +1166,8 @@ class _MainShellState extends ConsumerState<_MainShell> {
                     }
                     widget.navigationShell.goBranch(
                       index,
-                      initialLocation: index == widget.navigationShell.currentIndex,
+                      initialLocation:
+                          index == widget.navigationShell.currentIndex,
                     );
                   },
                   items: [
