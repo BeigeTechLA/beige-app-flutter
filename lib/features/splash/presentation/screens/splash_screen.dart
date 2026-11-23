@@ -64,8 +64,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       ref.read(draftStoreProvider).clearAll();
       FirebaseCrashlytics.instance.log('notification.launch.fast_track');
 
-      // Fast-track to Home; the mounted router shell drains the pending payload
-      // after its first frame so notification navigation follows auth redirects.
+      // The notification router dispatches once this landing route is ready.
       context.goNamed(RouteNames.home);
     });
   }
@@ -109,7 +108,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           final hasNotification =
               PushNotificationService.instance.hasPendingNotification;
 
-          final shouldRestore = !hasNotification &&
+          final shouldRestore =
+              !hasNotification &&
               restorer.shouldRestore(
                 isEnabled: kRestorationEnabled,
                 isLoggedIn: isLoggedIn,

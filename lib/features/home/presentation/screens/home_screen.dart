@@ -507,7 +507,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-
   }
 
   @override

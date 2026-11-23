@@ -32,7 +32,6 @@ class _AppState extends ConsumerState<App> {
   // Cached in initState: Riverpod 3 forbids `ref` access inside dispose().
   late final AppLifecycleObserver _lifecycleObserver;
 
-
   @override
   void initState() {
     super.initState();

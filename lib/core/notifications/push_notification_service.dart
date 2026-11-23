@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/colors.dart';
 import '../../app/navigator_key.dart';
-import '../../app/route_names.dart';
 import '../../firebase_options.dart';
 import '../firebase/crashlytics_service.dart';
 import 'notification_payload.dart';
+import 'notification_tap_router.dart';
 
 /// Masks an FCM token for privacy-safe diagnostic logging.
 String _maskToken(String? token) {
@@ -93,10 +93,7 @@ Future<void> _onDidReceiveBackgroundNotificationResponse(
   if (payload == null || payload.isEmpty) return;
   try {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      PushNotificationService.pendingTapPrefsKey,
-      payload,
-    );
+    await prefs.setString(PushNotificationService.pendingTapPrefsKey, payload);
   } catch (_) {
     // Best-effort — the foreground launch-details path is the primary capture.
   }
@@ -169,13 +166,22 @@ class PushNotificationService {
   void rememberSession(String sessionId) => _lastSessionId = sessionId;
   void clearSession() => _lastSessionId = null;
 
-  NotificationPayload? _pendingPayload;
+  final tapRouter = NotificationTapRouter(
+    onEvent: (event) {
+      if (event == 'waiting_for_active_account') {
+        unawaited(FirebaseCrashlytics.instance.log('notification.$event'));
+      }
+    },
+    onError: (error, stack) {
+      unawaited(CrashlyticsService.recordError(error, stack));
+    },
+  );
 
   /// Whether there is a pending notification payload waiting to be dispatched.
-  bool get hasPendingNotification => _pendingPayload != null;
+  bool get hasPendingNotification => pendingPayload != null;
 
   /// Current pending notification payload, if any.
-  NotificationPayload? get pendingPayload => _pendingPayload;
+  NotificationPayload? get pendingPayload => tapRouter.pending;
   bool _isInitialized = false;
   Future<String?>? _pendingTokenFetch;
 
@@ -237,7 +243,9 @@ class PushNotificationService {
       final initialMessage = await _fcm.getInitialMessage();
       if (initialMessage != null) {
         _logRemoteMessage('terminated_notification_opened', initialMessage);
-        _pendingPayload = NotificationPayload.fromRemoteMessage(initialMessage);
+        tapRouter.enqueue(
+          NotificationPayload.fromRemoteMessage(initialMessage),
+        );
       } else {
         // Also check if the app was launched by tapping a local notification
         // shown by `_firebaseMessagingBackgroundHandler` for a data-only push.
@@ -249,10 +257,10 @@ class PushNotificationService {
             responsePayload.isNotEmpty) {
           try {
             final Map<String, dynamic> data = jsonDecode(responsePayload);
-            _pendingPayload = NotificationPayload.fromMap(data);
+            tapRouter.enqueue(NotificationPayload.fromMap(data));
             if (kDebugMode) {
               debugPrint(
-                '[PushNotificationService] Captured terminated local notification launch: $_pendingPayload',
+                '[PushNotificationService] Captured terminated local notification launch: $pendingPayload',
               );
             }
           } catch (e) {
@@ -310,15 +318,16 @@ class PushNotificationService {
   Future<void> _drainPersistedTap() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
       final stored = prefs.getString(pendingTapPrefsKey);
       if (stored == null || stored.isEmpty) return;
       await prefs.remove(pendingTapPrefsKey);
-      if (_pendingPayload != null) return;
+      if (pendingPayload != null) return;
       final Map<String, dynamic> data = jsonDecode(stored);
-      _pendingPayload = NotificationPayload.fromMap(data);
+      tapRouter.enqueue(NotificationPayload.fromMap(data));
       if (kDebugMode) {
         debugPrint(
-          '[PushNotificationService] Captured persisted background tap: $_pendingPayload',
+          '[PushNotificationService] Captured persisted background tap: $pendingPayload',
         );
       }
     } catch (e) {
@@ -375,7 +384,7 @@ class PushNotificationService {
   /// Setup flutter_local_notifications plugin and create dedicated Android channels.
   Future<void> _setupLocalNotifications() async {
     const androidInitSettings = AndroidInitializationSettings(
-      'ic_beige_notification',
+      '@mipmap/ic_launcher',
     );
     const darwinInitSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -606,7 +615,8 @@ class PushNotificationService {
         importance: channel.importance,
         priority: _getPriorityForImportance(channel.importance),
         color: AppColors.notificationAccent,
-        icon: 'ic_beige_notification',
+        icon: '@mipmap/ic_launcher',
+        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
       );
 
       const darwinDetails = DarwinNotificationDetails(
@@ -672,7 +682,7 @@ class PushNotificationService {
 
       final plugin = FlutterLocalNotificationsPlugin();
       const androidInitSettings = AndroidInitializationSettings(
-        'ic_beige_notification',
+        'ic_stat_notification',
       );
       const darwinInitSettings = DarwinInitializationSettings(
         requestAlertPermission: false,
@@ -715,7 +725,10 @@ class PushNotificationService {
             importance: channel.importance,
             priority: _getPriorityForImportance(channel.importance),
             color: AppColors.notificationAccent,
-            icon: 'ic_beige_notification',
+            icon: '@mipmap/ic_launcher',
+            largeIcon: const DrawableResourceAndroidBitmap(
+              '@mipmap/ic_launcher',
+            ),
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
@@ -739,190 +752,10 @@ class PushNotificationService {
     }
   }
 
-  /// Processes any pending notification payload captured during app startup or
-  /// re-queued because the navigator wasn't ready.
-  ///
-  /// Called by the router shell after its first frame.
-  /// the payload is cleared before dispatch so repeated calls cannot route it
-  /// null and no-ops — no double navigation.
-  void processPendingNotification([BuildContext? context]) {
-    final payload = _pendingPayload;
-    if (payload == null) return;
-    final effectiveContext = context ?? rootNavigatorKey.currentContext;
-    if (effectiveContext == null || !effectiveContext.mounted) return;
-    _pendingPayload = null; // Clear immediately to prevent double routing
-    handleNotificationClick(payload, effectiveContext);
-  }
+  /// All tap sources share the same router readiness and acknowledgement path.
+  void processPendingNotification() => tapRouter.retry();
 
-  /// Main handler to execute redirection based on notification payload type.
-  void handleNotificationClick(
-    NotificationPayload payload, [
-    BuildContext? context,
-  ]) {
-    final effectiveContext = context ?? rootNavigatorKey.currentContext;
-
-    if (effectiveContext == null || !effectiveContext.mounted) {
-      if (kDebugMode) {
-        debugPrint(
-          '[PushNotificationService] Context not ready yet, queuing notification tap: $payload',
-        );
-      }
-      _pendingPayload = payload;
-      return;
-    }
-
-    // Navigation is driven by server-controlled payloads (arbitrary types,
-    // route strings). Guard the whole dispatch so a bad payload or router state
-    // can never crash the app — on failure, log and fall back to Home.
-    try {
-      final router = GoRouter.of(effectiveContext);
-
-      // Splash guard: while the app is still on splash the auth redirect has not
-      // settled yet. Re-queue and let the post-auth landing drain it, otherwise
-      // the redirect overwrites this navigation.
-      final currentLocation =
-          router.routerDelegate.currentConfiguration.uri.path;
-      if (currentLocation == '/splash' || currentLocation.isEmpty) {
-        if (kDebugMode) {
-          debugPrint(
-            '[PushNotificationService] On splash, deferring notification tap: $payload',
-          );
-        }
-        _pendingPayload = payload;
-        return;
-      }
-
-      if (kDebugMode) {
-        debugPrint(
-          '[PushNotificationService] Navigating for notification tap: $payload',
-        );
-      }
-
-      _executeRouting(effectiveContext, payload);
-    } catch (e, st) {
-      // ignore: discarded_futures
-      CrashlyticsService.recordError(e, st);
-      if (kDebugMode) {
-        debugPrint(
-          '[PushNotificationService] Navigation failed for ${payload.type}: $e',
-        );
-      }
-      _safeGoHome(effectiveContext);
-    }
-  }
-
-  /// Routing execution engine that matches CP App architecture.
-  void _executeRouting(BuildContext context, NotificationPayload payload) {
-    final router = GoRouter.of(context);
-
-    switch (payload.type) {
-      case NotificationType.chat:
-        if (payload.chatId != null && payload.chatId!.isNotEmpty) {
-          final contactName = payload.contactName ?? payload.title ?? 'Chat';
-          router.pushNamed(
-            RouteNames.chat,
-            extra: {
-              'conversationId': payload.chatId,
-              'contactName': contactName,
-            },
-            queryParameters: {
-              'conversationId': payload.chatId!,
-              'contactName': contactName,
-            },
-          );
-        } else {
-          router.goNamed(RouteNames.messages);
-        }
-        break;
-
-      case NotificationType.booking:
-        if (payload.bookingId != null && payload.bookingId!.isNotEmpty) {
-          final bookingId = int.tryParse(payload.bookingId!);
-          if (bookingId != null) {
-            final extraData = <String, dynamic>{
-              if (payload.title != null) 'projectName': payload.title,
-              if (payload.rawMap['project_name'] != null)
-                'projectName': payload.rawMap['project_name'],
-              if (payload.rawMap['image_url'] != null)
-                'imageUrl': payload.rawMap['image_url'],
-              if (payload.rawMap['location'] != null)
-                'location': payload.rawMap['location'],
-              if (payload.rawMap['event_date'] != null)
-                'eventDate': payload.rawMap['event_date'],
-              if (payload.rawMap['start_time'] != null)
-                'startTime': payload.rawMap['start_time'],
-              if (payload.rawMap['end_time'] != null)
-                'endTime': payload.rawMap['end_time'],
-              if (payload.rawMap['content_type'] != null)
-                'contentType': payload.rawMap['content_type'],
-              ...payload.rawMap,
-            };
-            router.pushNamed(
-              RouteNames.manageBooking,
-              pathParameters: {'bookingId': bookingId.toString()},
-              extra: extraData.isNotEmpty ? extraData : null,
-            );
-          } else {
-            router.goNamed(RouteNames.myShoots);
-          }
-        } else {
-          router.goNamed(RouteNames.myShoots);
-        }
-        break;
-
-      case NotificationType.meeting:
-        if (payload.meetingId != null && payload.meetingId!.isNotEmpty) {
-          router.goNamed(
-            RouteNames.meetings,
-            queryParameters: {'meetingId': payload.meetingId!},
-          );
-        } else if (payload.bookingId != null &&
-            int.tryParse(payload.bookingId!) != null) {
-          router.pushNamed(
-            RouteNames.manageBooking,
-            pathParameters: {'bookingId': payload.bookingId!},
-          );
-        } else {
-          router.goNamed(RouteNames.meetings);
-        }
-        break;
-
-      case NotificationType.files:
-        if (payload.targetRoute != null &&
-            payload.targetRoute!.startsWith('/file-manager')) {
-          router.push(payload.targetRoute!);
-        } else {
-          router.pushNamed(RouteNames.fileManager);
-        }
-        break;
-
-      case NotificationType.profile:
-        router.goNamed(RouteNames.profile);
-        break;
-
-      case NotificationType.deeplink:
-      case NotificationType.unknown:
-        _pushTargetRouteOrHome(router, payload.targetRoute);
-        break;
-    }
-  }
-
-  /// Pushes a server-provided deep-link route only if it looks like a valid
-  /// in-app path (starts with `/`); otherwise falls back to Home.
-  void _pushTargetRouteOrHome(GoRouter router, String? targetRoute) {
-    if (targetRoute != null && targetRoute.startsWith('/')) {
-      router.push(targetRoute);
-    } else {
-      router.goNamed(RouteNames.home);
-    }
-  }
-
-  /// Best-effort fallback navigation to Home; never throws.
-  void _safeGoHome(BuildContext context) {
-    try {
-      GoRouter.of(context).goNamed(RouteNames.home);
-    } catch (_) {
-      // Nothing more we can safely do.
-    }
+  void handleNotificationClick(NotificationPayload payload) {
+    tapRouter.enqueue(payload);
   }
 }
