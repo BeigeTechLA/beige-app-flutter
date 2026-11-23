@@ -24,9 +24,13 @@ Future<void> startApp(Environment environment) async {
       Env.init(environment);
       Stripe.publishableKey = Env.stripePublishableKey;
 
-      await FirebaseService.initialize();
-      await CrashlyticsService.initialize();
-      await CrashlyticsService.setBuildMode();
+      try {
+        await FirebaseService.initialize();
+        await CrashlyticsService.initialize();
+        await CrashlyticsService.setBuildMode();
+      } catch (e, st) {
+        debugPrint('[startApp] Firebase initialization error (non-fatal): $e\n$st');
+      }
 
       // Wipe SharedPreferences if this is a fresh install whose prefs were
       // restored from OS backup. Must run before SharedPreferences is read

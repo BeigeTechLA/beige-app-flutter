@@ -177,7 +177,6 @@ class PushNotificationService {
   /// Current pending notification payload, if any.
   NotificationPayload? get pendingPayload => _pendingPayload;
   bool _isInitialized = false;
-  bool _drainRetryScheduled = false;
   Future<String?>? _pendingTokenFetch;
 
   /// Initializes FCM listeners, multi-channel setup, permission prompts,
@@ -376,7 +375,7 @@ class PushNotificationService {
   /// Setup flutter_local_notifications plugin and create dedicated Android channels.
   Future<void> _setupLocalNotifications() async {
     const androidInitSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
+      'ic_beige_notification',
     );
     const darwinInitSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -607,8 +606,7 @@ class PushNotificationService {
         importance: channel.importance,
         priority: _getPriorityForImportance(channel.importance),
         color: AppColors.notificationAccent,
-        icon: '@mipmap/ic_launcher',
-        largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+        icon: 'ic_beige_notification',
       );
 
       const darwinDetails = DarwinNotificationDetails(
@@ -674,7 +672,7 @@ class PushNotificationService {
 
       final plugin = FlutterLocalNotificationsPlugin();
       const androidInitSettings = AndroidInitializationSettings(
-        'ic_stat_notification',
+        'ic_beige_notification',
       );
       const darwinInitSettings = DarwinInitializationSettings(
         requestAlertPermission: false,
@@ -717,10 +715,7 @@ class PushNotificationService {
             importance: channel.importance,
             priority: _getPriorityForImportance(channel.importance),
             color: AppColors.notificationAccent,
-            icon: '@mipmap/ic_launcher',
-            largeIcon: const DrawableResourceAndroidBitmap(
-              '@mipmap/ic_launcher',
-            ),
+            icon: 'ic_beige_notification',
           ),
           iOS: const DarwinNotificationDetails(
             presentAlert: true,
@@ -747,8 +742,8 @@ class PushNotificationService {
   /// Processes any pending notification payload captured during app startup or
   /// re-queued because the navigator wasn't ready.
   ///
-  /// Safe to call from multiple drain triggers (_MainShell mount, Home mount, app resume):
-  /// the payload is cleared BEFORE dispatch, so a concurrent second call sees
+  /// Called by the router shell after its first frame.
+  /// the payload is cleared before dispatch so repeated calls cannot route it
   /// null and no-ops — no double navigation.
   void processPendingNotification([BuildContext? context]) {
     final payload = _pendingPayload;
@@ -756,18 +751,7 @@ class PushNotificationService {
     final effectiveContext = context ?? rootNavigatorKey.currentContext;
     if (effectiveContext == null || !effectiveContext.mounted) return;
     _pendingPayload = null; // Clear immediately to prevent double routing
-    _executeRouting(effectiveContext, payload);
-  }
-
-  /// Schedules a single next-frame drain attempt for a payload queued because
-  /// the navigator wasn't ready yet. One-shot per queue.
-  void _scheduleDrainRetry() {
-    if (_drainRetryScheduled) return;
-    _drainRetryScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _drainRetryScheduled = false;
-      processPendingNotification();
-    });
+    handleNotificationClick(payload, effectiveContext);
   }
 
   /// Main handler to execute redirection based on notification payload type.
@@ -784,7 +768,6 @@ class PushNotificationService {
         );
       }
       _pendingPayload = payload;
-      _scheduleDrainRetry();
       return;
     }
 

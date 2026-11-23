@@ -64,8 +64,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       ref.read(draftStoreProvider).clearAll();
       FirebaseCrashlytics.instance.log('notification.launch.fast_track');
 
-      // Fast-track directly to Home; HomeScreen.initState drains _pendingPayload
-      // via processPendingNotification() so the target screen is displayed directly.
+      // Fast-track to Home; the mounted router shell drains the pending payload
+      // after its first frame so notification navigation follows auth redirects.
       context.goNamed(RouteNames.home);
     });
   }

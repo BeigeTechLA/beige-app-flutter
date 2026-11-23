@@ -9,7 +9,6 @@ import 'package:beige/app/colors.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/app/route_names.dart';
-import 'package:beige/core/notifications/push_notification_service.dart';
 import 'package:beige/core/providers/guest_mode_provider.dart';
 import 'package:beige/features/home/presentation/providers/home_notifier.dart';
 import 'package:beige/features/booking/domain/entities/booking_flow_enums.dart';
@@ -509,11 +508,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       duration: const Duration(milliseconds: 400),
     );
 
-    // Drain any push notification tap captured during cold start. Home is the
-    // post-auth landing, so navigation is now safe (auth redirect settled).
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      PushNotificationService.instance.processPendingNotification();
-    });
   }
 
   @override
