@@ -9,6 +9,7 @@ import 'package:beige/app/radii.dart';
 import 'package:beige/app/spacing.dart';
 import 'package:beige/app/text_styles.dart';
 import 'package:beige/core/notifications/domain/notification_preferences.dart';
+import 'package:beige/core/notifications/push_device_id.dart';
 import 'package:beige/core/notifications/push_preferences_provider.dart';
 import 'package:beige/core/notifications/push_session_id.dart';
 import 'package:beige/features/profile/presentation/widgets/notification_categories_bottom_sheet.dart';
@@ -85,9 +86,10 @@ class _NotificationSettingsScreenState
   /// hardcoded defaults (all-on) are kept.
   Future<void> _loadPreferences() async {
     final sessionId = await PushSessionId.getOrCreate();
+    final deviceId = await PushDeviceId.getOrCreate();
     final result = await ref
         .read(pushPreferencesRepositoryProvider)
-        .getPreferences(sessionId: sessionId);
+        .getPreferences(sessionId: sessionId, deviceId: deviceId);
 
     if (!mounted) return;
     result.fold((_) {}, (prefs) {
@@ -121,9 +123,14 @@ class _NotificationSettingsScreenState
       topics: {for (final c in _categories) c.id: c.isEnabled},
     );
     final sessionId = await PushSessionId.getOrCreate();
+    final deviceId = await PushDeviceId.getOrCreate();
     final result = await ref
         .read(pushPreferencesRepositoryProvider)
-        .updatePreferences(sessionId: sessionId, preferences: preferences);
+        .updatePreferences(
+          sessionId: sessionId,
+          preferences: preferences,
+          deviceId: deviceId,
+        );
 
     if (!mounted) return;
     setState(() => _saving = false);

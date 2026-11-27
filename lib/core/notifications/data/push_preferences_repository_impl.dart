@@ -14,10 +14,12 @@ class PushPreferencesRepositoryImpl implements PushPreferencesRepository {
   @override
   Future<Either<AppException, NotificationPreferences>> getPreferences({
     required String sessionId,
+    String? deviceId,
   }) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.getPreferences(
         sessionId: sessionId,
+        deviceId: deviceId,
       );
       _assertNoError(response);
       return NotificationPreferences.fromMap(response);
@@ -28,11 +30,13 @@ class PushPreferencesRepositoryImpl implements PushPreferencesRepository {
   Future<Either<AppException, Unit>> updatePreferences({
     required String sessionId,
     required NotificationPreferences preferences,
+    String? deviceId,
   }) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.updatePreferences(
         sessionId: sessionId,
         preferences: preferences,
+        deviceId: deviceId,
       );
       _assertNoError(response);
       return unit;

@@ -14,11 +14,13 @@ class PushTokenRepositoryImpl implements PushTokenRepository {
   Future<Either<AppException, Unit>> saveToken({
     required String fcmToken,
     required String sessionId,
+    String? deviceId,
   }) {
     return ExceptionHandler.guardAsync(() async {
       final response = await _remoteDataSource.saveToken(
         fcmToken: fcmToken,
         sessionId: sessionId,
+        deviceId: deviceId,
       );
       _assertNoError(response);
       return unit;
@@ -26,9 +28,15 @@ class PushTokenRepositoryImpl implements PushTokenRepository {
   }
 
   @override
-  Future<Either<AppException, Unit>> removeToken({required String sessionId}) {
+  Future<Either<AppException, Unit>> removeToken({
+    required String sessionId,
+    String? deviceId,
+  }) {
     return ExceptionHandler.guardAsync(() async {
-      final response = await _remoteDataSource.removeToken(sessionId: sessionId);
+      final response = await _remoteDataSource.removeToken(
+        sessionId: sessionId,
+        deviceId: deviceId,
+      );
       _assertNoError(response);
       return unit;
     });

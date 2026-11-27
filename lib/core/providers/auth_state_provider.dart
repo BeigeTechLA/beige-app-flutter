@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../firebase/analytics_events.dart';
 import '../firebase/analytics_service.dart';
 import '../firebase/crashlytics_service.dart';
+import '../notifications/push_device_id.dart';
 import '../notifications/push_notification_service.dart';
 import '../notifications/push_session_id.dart';
 import '../notifications/push_token_sync_provider.dart';
@@ -58,9 +59,10 @@ class AuthStateNotifier extends Notifier<bool> {
     pushService.clearSession();
     if (emitLogoutEvent && sessionId != null && sessionId.isNotEmpty) {
       await _cleanUp('push token', () async {
+        final deviceId = await PushDeviceId.peek();
         final result = await ref
             .read(pushTokenRepositoryProvider)
-            .removeToken(sessionId: sessionId);
+            .removeToken(sessionId: sessionId, deviceId: deviceId);
         if (kDebugMode) {
           result.fold(
             (err) => debugPrint(

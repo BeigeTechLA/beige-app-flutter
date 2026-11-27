@@ -47,10 +47,7 @@ class NotificationSectionScreenArgs {
 }
 
 class NotificationSectionScreen extends ConsumerStatefulWidget {
-  const NotificationSectionScreen({
-    super.key,
-    required this.args,
-  });
+  const NotificationSectionScreen({super.key, required this.args});
 
   final NotificationSectionScreenArgs args;
 
@@ -139,7 +136,9 @@ class _NotificationSectionScreenState
                 children: [
                   // Fixed Header (Section Title + Filter)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.base,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -162,7 +161,8 @@ class _NotificationSectionScreenState
                                   counts: counts,
                                   selectedCategory: state.selectedCategory,
                                   onApply: notifier.applyCategoryFilter,
-                                  onClearAll: () => notifier.applyCategoryFilter('All'),
+                                  onClearAll: () =>
+                                      notifier.applyCategoryFilter('All'),
                                 );
                               },
                               icon: SvgPicture.asset(
@@ -189,7 +189,9 @@ class _NotificationSectionScreenState
                               color: AppColors.white.withValues(alpha: 0.08),
                             ),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.mld),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.mld,
+                          ),
                           child: Row(
                             children: [
                               SvgPicture.asset(
@@ -214,9 +216,8 @@ class _NotificationSectionScreenState
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Search Notifications...',
-                                    hintStyle: AppTextStyles.bodyMedium.copyWith(
-                                      color: AppColors.white38,
-                                    ),
+                                    hintStyle: AppTextStyles.bodyMedium
+                                        .copyWith(color: AppColors.white38),
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
@@ -260,19 +261,25 @@ class _NotificationSectionScreenState
                         physics: const AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics(),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.base),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.base,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Notification List or Empty State
                             if (state.isLoading && items.isEmpty)
                               const Padding(
-                                padding: EdgeInsets.symmetric(vertical: AppSpacing.massive),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: AppSpacing.massive,
+                                ),
                                 child: AppScreenLoader(),
                               )
                             else if (items.isEmpty)
                               const Padding(
-                                padding: EdgeInsets.symmetric(vertical: AppSpacing.massive),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: AppSpacing.massive,
+                                ),
                                 child: EmptyNotificationWidget(),
                               )
                             else
@@ -280,7 +287,8 @@ class _NotificationSectionScreenState
                                 (item) => NotificationItemCard(
                                   item: item,
                                   onTap: null,
-                                  onActionTap: () => _openNotificationItem(item),
+                                  onActionTap: () =>
+                                      _openNotificationItem(item),
                                 ),
                               ),
 
@@ -300,54 +308,60 @@ class _NotificationSectionScreenState
 
       // Bottom CTA Button: Mark all as read
       bottomNavigationBar: state.selectedTab == NotificationTab.read
-        ? const SizedBox.shrink()
-        : SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.base),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: (items.isEmpty || state.isMarkingAllAsRead) ? null : () => notifier.markAllAsRead(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                disabledBackgroundColor: AppColors.surfaceVariant,
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadii.lgAll,
-                ),
-                elevation: 0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (state.isMarkingAllAsRead)
-                    const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: AppColors.onPrimary,
-                        strokeWidth: 2,
+          ? const SizedBox.shrink()
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.base),
+                child: SizedBox(
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: (items.isEmpty || state.isMarkingAllAsRead)
+                        ? null
+                        : () => notifier.markAllAsRead(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      disabledBackgroundColor: AppColors.surfaceVariant,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: AppRadii.lgAll,
                       ),
-                    )
-                  else
-                    Icon(
-                      Icons.done_all,
-                      size: AppSpacing.xl,
-                      color: items.isEmpty ? AppColors.white38 : AppColors.onPrimary,
+                      elevation: 0,
                     ),
-                  AppSpacing.gapHSm,
-                  Text(
-                    'Mark all as read',
-                    style: AppTextStyles.bodyMediumStrong.copyWith(
-                      color: items.isEmpty ? AppColors.white38 : AppColors.onPrimary,
-                      fontWeight: FontWeight.w600,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (state.isMarkingAllAsRead)
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: AppColors.onPrimary,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.done_all,
+                            size: AppSpacing.xl,
+                            color: items.isEmpty
+                                ? AppColors.white38
+                                : AppColors.onPrimary,
+                          ),
+                        AppSpacing.gapHSm,
+                        Text(
+                          'Mark all as read',
+                          style: AppTextStyles.bodyMediumStrong.copyWith(
+                            color: items.isEmpty
+                                ? AppColors.white38
+                                : AppColors.onPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

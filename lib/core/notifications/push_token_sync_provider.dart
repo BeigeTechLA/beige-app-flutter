@@ -8,6 +8,7 @@ import '../providers/core_providers.dart';
 import 'data/push_token_remote_datasource.dart';
 import 'data/push_token_repository_impl.dart';
 import 'domain/push_token_repository.dart';
+import 'push_device_id.dart';
 import 'push_notification_service.dart';
 import 'push_session_id.dart';
 
@@ -37,11 +38,13 @@ final pushTokenSyncProvider = Provider<void>((ref) {
     Future<void> syncToken(String token) async {
       if (token.isEmpty) return;
       final sessionId = await PushSessionId.getOrCreate();
+      final deviceId = await PushDeviceId.getOrCreate();
       service.rememberSession(sessionId);
 
       final result = await repo.saveToken(
         fcmToken: token,
         sessionId: sessionId,
+        deviceId: deviceId,
       );
       await result.fold(
         (failure) async {
@@ -55,6 +58,7 @@ final pushTokenSyncProvider = Provider<void>((ref) {
           final retryResult = await repo.saveToken(
             fcmToken: token,
             sessionId: sessionId,
+            deviceId: deviceId,
           );
           retryResult.fold(
             (retryErr) {
@@ -99,7 +103,9 @@ final pushTokenSyncProvider = Provider<void>((ref) {
     if (sessionId != null && sessionId.isNotEmpty) {
       service.clearSession();
       unawaited(
-        repo.removeToken(sessionId: sessionId).then((result) {
+        PushDeviceId.peek().then((deviceId) {
+          return repo.removeToken(sessionId: sessionId, deviceId: deviceId);
+        }).then((result) {
           if (kDebugMode) {
             result.fold(
               (err) => debugPrint(

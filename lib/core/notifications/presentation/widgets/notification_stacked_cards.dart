@@ -69,7 +69,8 @@ class _NotificationStackedCardsState extends State<NotificationStackedCards>
   void _onSwipePrevious() {
     if (!_controller.isAnimating && widget.items.isNotEmpty) {
       setState(() {
-        _currentIndex = (_currentIndex - 1 + widget.items.length) % widget.items.length;
+        _currentIndex =
+            (_currentIndex - 1 + widget.items.length) % widget.items.length;
       });
     }
   }
@@ -88,7 +89,9 @@ class _NotificationStackedCardsState extends State<NotificationStackedCards>
       return NotificationItemCard(
         item: first,
         onTap: widget.onTap,
-        onActionTap: widget.onActionTap != null ? () => widget.onActionTap!(first) : null,
+        onActionTap: widget.onActionTap != null
+            ? () => widget.onActionTap!(first)
+            : null,
       );
     }
 
@@ -115,7 +118,9 @@ class _NotificationStackedCardsState extends State<NotificationStackedCards>
 
             final currentDatum = widget.items[_currentIndex % n];
             final nextDatum = widget.items[(_currentIndex + 1) % n];
-            final next2Datum = n > 2 ? widget.items[(_currentIndex + 2) % n] : null;
+            final next2Datum = n > 2
+                ? widget.items[(_currentIndex + 2) % n]
+                : null;
 
             return Stack(
               clipBehavior: Clip.none,

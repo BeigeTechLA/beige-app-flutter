@@ -9,11 +9,13 @@ abstract class PushPreferencesRepository {
   /// Fetch saved preferences for [sessionId] to hydrate the settings UI.
   Future<Either<AppException, NotificationPreferences>> getPreferences({
     required String sessionId,
+    String? deviceId,
   });
 
   /// Update preferences for [sessionId]. Call whenever the user changes toggles.
   Future<Either<AppException, Unit>> updatePreferences({
     required String sessionId,
     required NotificationPreferences preferences,
+    String? deviceId,
   });
 }

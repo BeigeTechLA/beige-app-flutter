@@ -10,8 +10,12 @@ abstract class PushTokenRepository {
   Future<Either<AppException, Unit>> saveToken({
     required String fcmToken,
     required String sessionId,
+    String? deviceId,
   });
 
   /// Deregister the token for [sessionId]. Call on logout.
-  Future<Either<AppException, Unit>> removeToken({required String sessionId});
+  Future<Either<AppException, Unit>> removeToken({
+    required String sessionId,
+    String? deviceId,
+  });
 }
